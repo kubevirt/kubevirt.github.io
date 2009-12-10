@@ -83,7 +83,7 @@ Wait for the Virtual Machine to boot and to be available for login. You may moni
 
 Disconnect from the virtual machine console by typing: `ctrl+]`
 
-Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are **in the Kubernetes software defined network (SDN)**. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the [Easy install using AWS](https://kubevirt.io/pages/ec2.html) or [Easy install using GCP](https://kubevirt.io/pages/gcp.html) your cloud instance is already part of the cluster. 
+Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are **in the Kubernetes software defined network (SDN)**. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the [Easy install using AWS](https://kubevirt.io/pages/ec2.html) or [Easy install using GCP](https://kubevirt.io/pages/gcp.html) your cloud instance is already part of the cluster.
 
 ```
 {% include scriptlets/lab2/13_ssh_to_vm1.sh -%}
@@ -119,4 +119,4 @@ You can watch how the laboratory is done in the following video:
 
 <iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/ZHqcHbCxzYM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab1)
+[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab1) | [Next Lab]({{ site.baseurl }}/labs/kubernetes/lab3)
