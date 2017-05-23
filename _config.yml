@@ -1,0 +1,4 @@
+name: Virtual Machine Management on Kubernetes
+markdown: kramdown
+exclude:
+  - README.md

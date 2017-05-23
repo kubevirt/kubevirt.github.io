@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>KubeVirt: {{ page.title }}</title>
+    <link rel="stylesheet" type="text/css" href="/css/main.css">
+  </head>
+  <body>
+    <div id="header">
+      <h1><a href="/">KubeVirt</a></h1>
+    </div>
+    <div id="body">
+      <div id="nav">
+	<ul>
+	  <li><a href="/run">Run</a></li>
+	  <li><a href="/learn">Learn</a></li>
+	  <li><a href="/contrib">Contribute</a></li>
+	</ul>
+      </div>
+      <div id="content">
+	<h2>{{ page.title }}</h2>
+      {{ content }}
+      </div>
+    </div>
+    <div id="footer">
+      All persons involved in the project agree to abide by <a href="/conduct">the code of conduct</a>
+      <br/>
+      Web content &amp; assets <a href="copyright">&copy; {{ site.time | date: '%Y' }}</a> the KubeVirt authors
+
+    </div>
+  </body>
+</html>

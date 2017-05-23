@@ -1,0 +1,106 @@
+---
+# Dummy preamble to trigger generator
+---
+
+@import "fonts";
+
+body {
+  margin: 0em;
+  padding: 0px;
+  font-family: HostedOverpass;
+  background: #333;
+  color: #fff;
+}
+
+pre, code {
+  font-family: HostedOverpassMono;
+}
+
+#header {
+    height: 117px;
+
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    background-color: #1e2b3c;
+    background-image: url(/images/header-logo.jpeg);
+    background-repeat: no-repeat;
+    background-position: top right;
+    border-bottom: 2px solid #7d6621;
+    color: white;
+}
+
+#header h1 {
+    margin: 0px;
+    margin-left: 1em;
+    font-weight: 900;
+    font-size: 40pt;
+    line-height: 117px;
+}
+
+#header h1 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#body {
+    margin-top: 119px;
+    color: #000;
+    background: #eee;
+}
+
+#content h2 {
+    text-align: center;
+    font-size: 30pt;
+    font-weight: 700;
+}
+
+#nav {
+    margin: 0px;
+    background: #333;
+    color: #fff;
+    padding-top: 3px;
+    border-bottom: 2px solid #7d6621;
+}
+
+#nav ul {
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+}
+
+#nav ul li {
+    display: inline;
+    padding-right: 1em;
+    padding-left: 1em;
+    font-size: 30pt;
+    font-weight: 800;
+}
+
+#nav a {
+    text-decoration: none;
+    color: inherit;
+}
+
+#content {
+    width: 60em;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 1em;
+}
+
+#footer {
+    border-top: 2px solid #7d6621;
+    font-size: smaller;
+    text-align: right;
+    padding-right: 3em;
+    padding-top: 1em;
+    line-height: 1.5em;
+}
+
+#footer a {
+    color: inherit;
+}
