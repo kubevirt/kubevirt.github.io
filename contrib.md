@@ -1,5 +1,5 @@
 ---
-title: Contribute to the KubeVirt project
+title: Contribute to KubeVirt
 layout: default
 ---
 

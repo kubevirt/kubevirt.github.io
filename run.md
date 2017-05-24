@@ -1,5 +1,5 @@
 ---
-title: Getting started with KubeVirt
+title: Get started with KubeVirt
 layout: default
 ---
 

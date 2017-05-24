@@ -1,6 +1,6 @@
 ---
 layout: default
-title: Virtual Machine Management for Kubernetes
+title: Run KVM on Kubernetes
 ---
 
 The KubeVirt project aims to provide infrastructure and integration on top of
