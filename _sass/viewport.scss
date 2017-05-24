@@ -1,0 +1,110 @@
+
+#header {
+    height: 50px;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+#header h1 {
+    line-height: 50px;
+    font-size: 24pt;
+    font-weight: 900;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+#body {
+    margin-top: 50px;
+    -webkit-transition: all 0.5s;
+    -moz-transition: all 0.5s;
+    -ms-transition: all 0.5s;
+    -o-transition: all 0.5s;
+    transition: all 0.5s;
+}
+
+#nav.hamberger {
+    -webkit-transition: width 0.5s, height 0.5s;
+    -moz-transition: width 0.5s, height 0.5s;
+    -ms-transition: width 0.5s, height 0.5s;
+    -o-transition: width 0.5s, height 0.5s;
+    transition: width 0.5s, height 0.5s;
+}
+
+#nav ul li {
+    font-size: 14pt;
+    font-weight: 700;
+}
+
+#nav.hamberdger ul li {
+    font-size: 14pt ! IMPORTANT;
+    font-weight: 700;
+}
+
+
+#content h2 {
+    font-size: 20pt;
+    font-weight: 700;
+}
+
+#content h3 {
+    font-size: 16pt;
+    font-weight: 700;
+}
+
+#content h4 {
+    font-size: 14pt;
+    font-weight: 600;
+}
+
+#footer {
+    font-size: 8pt;
+}
+
+
+@media (min-width: 700px) {
+    #header {
+	height: 80px;
+    }
+    
+    #header h1 {
+	line-height: 80px;
+	font-size: 30pt;
+	font-weight: 900;
+    }
+
+    #body {
+	margin-top: 80px;
+    }
+
+
+    #nav ul li {
+	font-size: 20pt;
+	font-weight: 700;
+    }
+
+    #nav.hamberger {
+	width: 80px ! IMPORTANT;
+	height: 80px ! IMPORTANT;
+    }
+
+    #nav.hamberger ul {
+        top: 80px ! IMPORTANT;
+    }
+
+    #content {
+	margin-left: auto;
+	margin-right: auto;
+	max-width: 700px;
+    }
+
+    #footer {
+	font-size: 10pt;
+    }
+    
+}

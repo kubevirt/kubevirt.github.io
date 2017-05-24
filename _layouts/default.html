@@ -3,6 +3,29 @@
   <head>
     <title>KubeVirt: {{ page.title }}</title>
     <link rel="stylesheet" type="text/css" href="/css/main.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script type="text/javascript">
+      function init() {
+          window.addEventListener('scroll', function(e){
+              var distanceY = window.pageYOffset || document.documentElement.scrollTop,
+              shrinkOn = 50
+              nav = document.getElementById("nav");
+              content = document.getElementById("content");
+              if (distanceY > shrinkOn) {
+                  if (nav.className != "hamberger") {
+                      nav.className = "hamberger"
+                      content.className = "hamberger"
+                  }
+              } else {
+                  if (nav.className == "hamberger") {
+                      nav.className = ""
+                      content.className = ""
+                  }
+              }
+      });
+      }
+      window.onload = init();
+    </script>
   </head>
   <body>
     <div id="header">
@@ -22,7 +45,7 @@
       </div>
     </div>
     <div id="footer">
-      All persons involved in the project agree to abide by <a href="/conduct">the code of conduct</a>
+      Participants in the project agree to abide by <a href="/conduct">the code of conduct</a>
       <br/>
       Web content &amp; assets <a href="copyright">&copy; {{ site.time | date: '%Y' }}</a> the KubeVirt authors
 

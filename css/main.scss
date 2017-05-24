@@ -3,6 +3,7 @@
 ---
 
 @import "fonts";
+@import "viewport";
 
 body {
   margin: 0em;
@@ -17,8 +18,6 @@ pre, code {
 }
 
 #header {
-    height: 117px;
-
     position: fixed;
     top: 0px;
     width: 100%;
@@ -35,9 +34,6 @@ pre, code {
 #header h1 {
     margin: 0px;
     margin-left: 1em;
-    font-weight: 900;
-    font-size: 40pt;
-    line-height: 117px;
 }
 
 #header h1 a {
@@ -46,15 +42,12 @@ pre, code {
 }
 
 #body {
-    margin-top: 119px;
     color: #000;
     background: #eee;
 }
 
 #content h2 {
     text-align: center;
-    font-size: 30pt;
-    font-weight: 700;
 }
 
 #nav {
@@ -74,10 +67,8 @@ pre, code {
 
 #nav ul li {
     display: inline;
-    padding-right: 1em;
-    padding-left: 1em;
-    font-size: 30pt;
-    font-weight: 800;
+    padding-right: 0.5em;
+    padding-left: 0.5em;
 }
 
 #nav a {
@@ -86,15 +77,15 @@ pre, code {
 }
 
 #content {
-    width: 60em;
-    margin-left: auto;
-    margin-right: auto;
     padding: 1em;
+}
+
+#content.hamberger {
+    padding-top: 45px;
 }
 
 #footer {
     border-top: 2px solid #7d6621;
-    font-size: smaller;
     text-align: right;
     padding-right: 3em;
     padding-top: 1em;
@@ -103,4 +94,49 @@ pre, code {
 
 #footer a {
     color: inherit;
+}
+
+#nav.hamberger {
+    position: fixed;
+    margin: 0px;
+    right: 0px;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    top: 0px;
+    background-image: url(/images/menu.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+#nav.hamberger ul {
+    display: none;
+    margin: 0px;
+    padding: 0em;
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    background-color: #1e2b3c;
+    color: #fff;
+    border-left: 2px solid #7d6621;
+    border-bottom: 2px solid #7d6621;
+}
+
+#nav.hamberger:hover {
+    background-color: #1e2b3c;
+}
+
+#nav.hamberger:hover ul {
+    display: block;
+}
+
+#nav.hamberger li {
+    display: block;
+}
+
+#nav.hamberger a {
+    display: block;
+    color: inherit;
+    padding: 0.5em;
+    text-decoration: none;
 }
