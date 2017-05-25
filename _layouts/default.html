@@ -28,11 +28,11 @@
     </script>
   </head>
   <body>
-    <div id="header">
+    <div id="header" onclick="void(0)">
       <h1><a href="/">KubeVirt</a></h1>
     </div>
-    <div id="body">
-      <div id="nav">
+    <div id="body" onclick="void(0)">
+      <div id="nav" onclick="void(0)">
 	<ul>
 	  <li><a href="/run">Run</a></li>
 	  <li><a href="/docs">Documentation</a></li>
@@ -44,7 +44,7 @@
       {{ content }}
       </div>
     </div>
-    <div id="footer">
+    <div id="footer" onclick="void(0)">
       Participants in the project agree to abide by <a href="/conduct">the code of conduct</a>
       <br/>
       Web content &amp; assets <a href="copyright">&copy; {{ site.time | date: '%Y' }}</a> the KubeVirt authors
