@@ -59,13 +59,7 @@ repositories are:
 
 * [kubevirt](https://github.com/kubevirt/kubevirt) - The core infrastructure for integrating with and extending Kubernetes, to host KVM virtual machines.
 * [kubevirt.github.io](https://github.com/kubevirt/kubevirt.github.io) - The source for this entire website
-
-### Task tracking
-
-The project uses the Trello service as a way to track general future development
-tasks / feature requests
-
-* [kubevirt](https://trello.com/b/50CuosoD/kubevirt) - the Trello board for tracking development tasks
+* [project-infra](https://github.com/kubevirt/project-infra) - Miscellaneous project infrastructure tools
 
 ### Social media
 
