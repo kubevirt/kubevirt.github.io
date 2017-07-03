@@ -1,0 +1,142 @@
+---
+# Dummy preamble to trigger generator
+---
+
+@import "fonts";
+@import "viewport";
+
+body {
+  margin: 0em;
+  padding: 0px;
+  font-family: HostedOverpass;
+  background: #333;
+  color: #fff;
+}
+
+pre, code {
+  font-family: HostedOverpassMono;
+}
+
+#header {
+    position: fixed;
+    top: 0px;
+    width: 100%;
+    margin: 0px;
+    padding: 0px;
+    background-color: #1e2b3c;
+    background-image: url(/images/header-logo.jpeg);
+    background-repeat: no-repeat;
+    background-position: top right;
+    border-bottom: 2px solid #7d6621;
+    color: white;
+}
+
+#header h1 {
+    margin: 0px;
+    margin-left: 1em;
+}
+
+#header h1 a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#body {
+    color: #000;
+    background: #eee;
+}
+
+#content h2 {
+    text-align: center;
+}
+
+#nav {
+    margin: 0px;
+    background: #333;
+    color: #fff;
+    padding-top: 3px;
+    border-bottom: 2px solid #7d6621;
+}
+
+#nav ul {
+    display: block;
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+}
+
+#nav ul li {
+    display: inline;
+    padding-right: 0.5em;
+    padding-left: 0.5em;
+}
+
+#nav a {
+    text-decoration: none;
+    color: inherit;
+}
+
+#content {
+    padding: 1em;
+}
+
+#content.hamberger {
+    padding-top: 45px;
+}
+
+#footer {
+    border-top: 2px solid #7d6621;
+    text-align: right;
+    padding-right: 3em;
+    padding-top: 1em;
+    line-height: 1.5em;
+}
+
+#footer a {
+    color: inherit;
+}
+
+#nav.hamberger {
+    position: fixed;
+    margin: 0px;
+    right: 0px;
+    width: 50px;
+    height: 50px;
+    padding: 0px;
+    top: 0px;
+    background-image: url(/images/menu.png);
+    background-repeat: no-repeat;
+    background-position: center center;
+}
+
+#nav.hamberger ul {
+    display: none;
+    margin: 0px;
+    padding: 0em;
+    position: absolute;
+    top: 50px;
+    right: 0px;
+    background-color: #1e2b3c;
+    color: #fff;
+    border-left: 2px solid #7d6621;
+    border-bottom: 2px solid #7d6621;
+}
+
+#nav.hamberger:hover {
+    background-color: #1e2b3c;
+}
+
+#nav.hamberger:hover ul {
+    display: block;
+}
+
+#nav.hamberger li {
+    display: block;
+}
+
+#nav.hamberger a {
+    display: block;
+    color: inherit;
+    padding: 0.5em;
+    text-decoration: none;
+}
