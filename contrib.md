@@ -26,7 +26,7 @@ need for people to spread knowledge & passion about the project to potential
 new users & contributors.
 
 
-### Instant messaging / chat
+## Instant messaging / chat
 
 The project uses the ``#kubevirt`` IRC channel on the [Freenode
 network](https://irc.freenode.net). IRC is accessible from a wide variety of
@@ -39,7 +39,7 @@ that many members will inevitably miss conversations that take place online.
 For these reasons, detailed technical design discussions are often better held
 over email, leaving IRC for matters which require realtime engagement.
 
-### E-Mail / Forums
+## E-Mail / Forums
 
 The project uses the ``kubevirt-dev`` Google Group as a forum for developer
 discussions. To join the group, visit [the online web
@@ -47,11 +47,11 @@ interface](https://groups.google.com/forum/#!forum/kubevirt-dev). After joining
 messages can be sent either via the web interface, or directly via e-mail to
 the address [``kubevirt-dev@googlegroups.com``](mailto:kubevirt-dev@googlegroups.com)
 
-### Development resources
+## Development resources
 
 The development of KubeVirt relies on a number of online services
 
-### Source repository
+## Source repository
 
 All the source code assocaited with the project is managed in the GIT version
 control system, [hosted on github](https://github.com/kubevirt/). The primary
@@ -61,7 +61,7 @@ repositories are:
 * [kubevirt.github.io](https://github.com/kubevirt/kubevirt.github.io) - The source for this entire website
 * [project-infra](https://github.com/kubevirt/project-infra) - Miscellaneous project infrastructure tools
 
-### Social media
+## Social media
 
 The project maintains a presence in various social media systems to spread news
 and other interesting information related to the project

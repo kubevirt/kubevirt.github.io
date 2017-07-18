@@ -3,6 +3,6 @@ title: Learn about KubeVirt
 layout: default
 ---
 
-### Project overview
+## Project overview
 
 * [Kubevirt use cases](/use-cases)
