@@ -27,7 +27,7 @@
       window.onload = init();
     </script>
   </head>
-  <body>
+  <body{% if page.class %} class="{{ page.class }}"{% endif %}>
     <div id="header" onclick="void(0)">
       <h1><a href="/">KubeVirt</a></h1>
     </div>
