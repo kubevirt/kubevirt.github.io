@@ -1,0 +1,50 @@
+---
+layout: default
+title: Run KVM on Kubernetes
+class: sectioned
+---
+
+<div class="section" id="intro">
+<p>
+The high level goal of the project is to build a Kubernetes add-on to enable
+management of <a href="https://www.linux-kvm.org">KVM]</a>, via
+<a href="https://libvirt.org">libvirt</a>. The intent is that over the long
+term this would enable application container workloads, and virtual machines,
+to be managed from a single place via the
+<a href="https://kubernetes.io">Kubernetes</a> native API and objects. This
+will:
+</p>
+
+<ul>
+<li>Provide a migration path to Kubernetes for existing applications deployed in
+  virtual machines, allowing them to more seemlessly integrate with application
+  container and take advantage of Kubernetes concepts</li>
+<li>Provide a converged API and object model for tenant users needing to manage
+  both application containers and full OS image virtual machines</li>
+<li>Provide converged infrastructure for administrators wishing to support both
+  application containers and full machine virtualization concurrently</li>
+<li>Facilitate the creation of virtual compute nodes to use KVM to strongly
+isolate application container PODs belonging to tenant users with differing
+trust levels</li>
+</ul>
+
+<p>
+Read more about the <a href="/about">motivation for KubeVirt</a>.
+</p>
+</div>
+
+<div class="section" id="screencast">
+<h2>Demonstration screencast</h2>
+
+<p>
+Watch the screencast of an demostration session using Kubernetes and KubeVirt
+to launch virtual machines
+
+<script type="text/javascript" src="https://asciinema.org/a/98980.js" id="asciicast-98980" async>
+</script>
+<noscript>
+<a href="https://asciinema.org/a/98980"><img src="https://asciinema.org/a/98980.png" width="836"/></a>
+</noscript>
+</p>
+
+</div>
