@@ -6,7 +6,7 @@ layout: default
 ## Motivation
 
 There is a wide range of management applications dealing with different
-aspects of operating system and workload virtualization, i.e., oVirt (data
+aspects of operating system and workload virtualization, e.g. oVirt (data
 center, full OS virt), OpenStack (cloud, full OS virt) and OpenShift (cloud,
 application containers). In terms of infrastructure they all have broadly
 similar requirements for features such as API resource management, distributed
@@ -31,7 +31,7 @@ of such deployments may wish to be able to use hardware virtualization to
 strongly separate untrusted workloads.
 
 Users with existing applications may not be in a position to adopt the
-application container model straightaway. Currently, they have to continue using
+application container model straightaway. Currently they have to continue using
 traditional data center virt or cloud virt applications for running these
 existing applications in virtual machines. This results in having to manage two
 distinct hosting platforms, making it difficult for these applications to
