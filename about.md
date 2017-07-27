@@ -6,7 +6,7 @@ layout: default
 ## Motivation
 
 There is a wide range of management applications dealing with different
-aspects of operating system and workload virtualization, i.e. oVirt (data
+aspects of operating system and workload virtualization, e.g. oVirt (data
 center, full OS virt), OpenStack (cloud, full OS virt) and OpenShift (cloud,
 application containers). In terms of infrastructure they all have broadly
 similar requirements for features such as API resource management, distributed
@@ -23,7 +23,7 @@ between [oVirt](https://ovirt.org) and [OpenStack](https://openstack.org).
   and then manage three completely separate pieces of infrastructure.
 * This is a poor experience for tenant users because they have to learn three
   completely different application APIs and frontends depending on which
-  particular type of workload they wish to run
+  particular type of workload they wish to run.
 
 The Kubernetes container runtime(s) reliance on a shared kernel, provides
 insufficient security isolation for certain deployment scenarios. Administrators
