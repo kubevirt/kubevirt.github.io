@@ -33,7 +33,7 @@ that gives Kubernetes the ability to manage VMs.
 
 OpenStack is an open source IaaS platform built of various components to provide
 a wide range of features such as compute (VM scheduling), networking, block
-storage, object storage, ect.
+storage, object storage, etc.
 
 KubeVirt is a single component focused entirely on VM scheduling and lifecycle
 management. Network and block storage are something that KubeVirt consumes from
