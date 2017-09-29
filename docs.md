@@ -6,6 +6,7 @@ layout: default
 ### Project overview
 
 * [Kubevirt use cases](/use-cases)
+* [Kubevirt user guide](https://kubevirt.gitbooks.io/user-guide/)
 
 ### Contributing
 
