@@ -19,9 +19,9 @@ projects exist in the VM scheduling space. By comparing KubeVirt to these other
 projects, it should be clear what KubeVirt’s scope is and where it fits in the
 ecosystem.
 
-### KubeVirt vs. Other Projects
+## KubeVirt vs. Other Projects
 
-#### Kubernetes
+### Kubernetes
 
 Kubernetes is an open source project built to automate deployment and lifecycle
 management of containerized applications.
@@ -29,7 +29,7 @@ management of containerized applications.
 KubeVirt is a drop in addon that can be applied to any to Kubernetes cluster
 that gives Kubernetes the ability to manage VMs.
 
-#### OpenStack
+### OpenStack
 
 OpenStack is an open source IaaS platform built of various components to provide
 a wide range of features such as compute (VM scheduling), networking, block
@@ -43,7 +43,7 @@ projects, we hope to see KubeVirt become the widely adopted standard for
 scheduling VMs. It is theoretically possible OpenStack could adopt KubeVirt for
 VM scheduling.
 
-#### Nova
+### Nova
 
 Nova is the open source component of OpenStack responsible for VM scheduling.
 Nova provides an abstraction layer that allows multiple virtualization
@@ -57,7 +57,7 @@ focusing on this technology stack we aren’t limited by creating a one size fit
 all virtualization technology abstraction. We can fully support a feature set
 that leverages all that Libvirt and KVM have to offer.
 
-#### oVirt
+### oVirt
 
 oVirt is an open source virtualization management platform that provides VM
 scheduling, network and storage. One of the fundamental differences between
@@ -76,7 +76,7 @@ functionality desired for cloud IaaS VMs. Compared to oVirt, KubeVirt could
 replace the scheduling component of oVirt and consume network and storage from
 Kubernetes.
 
-#### Libvirt
+### Libvirt
 
 Libvirt is an open source project that provides a feature set for handling
 VM lifecycle actions (start, stop, pause, save, restore, and live migration)
@@ -90,7 +90,7 @@ functionality that libvirt already provides.  It's worth noting here that
 KubeVirt is primarily using libvirt for it's virtualization capabilities.
 Storage and network will be consumed from Kubernetes.
 
-#### AWS EC2 and Google GCE
+### AWS EC2 and Google GCE
 
 EC2 and GCE are closed source public cloud IaaS offerings provided by AWS and
 Google. This means users are locked into using datacenters and pricing models
@@ -109,7 +109,7 @@ We aim to provide the kind of feature set and flexibility that would
 allow IaaS providers to replace their underlying VM scheduling component with
 KubeVirt.
 
-### Use Cases
+## Use Cases
 
 Hopefully by understanding KubeVirt’s relationship to other projects the scope
 of KubeVirt is more obvious. KubeVirt is not trying to compete with any of
