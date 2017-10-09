@@ -1,7 +1,4 @@
----
-title: Contribution workflow
-layout: default
----
+# Contribution workflow
 
 What follows is an outline of the end-to-end contribution workflow for getting
 changes made in the KubeVirt project. In general terms, it applies to all the

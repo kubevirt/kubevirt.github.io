@@ -1,7 +1,4 @@
----
-title: About KubeVirt
-layout: default
----
+# About KubeVirt
 
 ## Motivation
 
