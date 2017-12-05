@@ -1,7 +1,4 @@
----
-title: Contribute to KubeVirt
-layout: default
----
+# Contribute to KubeVirt
 
 The KubeVirt project is looking for new contributors with a variety of skills
 and interests. The only prerequisite is an interest & passion for managing KVM
@@ -26,7 +23,7 @@ need for people to spread knowledge & passion about the project to potential
 new users & contributors.
 
 For contributions which involve changes to the project's GIT repositories,
-consult the [contribution workflow](/contrib-workflow) document.
+consult the [contribution workflow](contrib-workflow) document.
 
 ### Instant messaging / chat
 
