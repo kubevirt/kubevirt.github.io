@@ -40,7 +40,7 @@ curl run.kubevirt.io/demo.sh | bash
 ```
 
 Once it is deployed, take a look at the user documentation
-<https://kubevirt.gitbooks.io/user-guide/> to learn how to use KubeVirt.
+<http://docs.kubevirt.io> to learn how to use KubeVirt.
 
 Otherwise you can read about how to setup `minikube` and deploy KubeVirt at
 <https://github.com/kubevirt/demo>.
