@@ -1,0 +1,16 @@
+---
+layout: default
+---
+<div class="post">
+
+  <header class="post-header">
+    <h2 class="blogTitle">{{ page.title }}</h2>
+    <span class="blogAuthor">by {{ page.author }} - </span><span class="post-meta">{{ page.date | date: "%b %-d, %Y" }}  {% if page.meta %} | {{ page.meta }}{% endif %}</span>
+  </header>
+  <article class="post-content">
+    {{ content }}
+  </article>
+
+  {% include share_twitter.html text = page.title %}
+
+</div>

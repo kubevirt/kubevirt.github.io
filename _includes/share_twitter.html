@@ -1,0 +1,8 @@
+{% if include.url == null %}
+      {% assign url = page.url | prepend: site.baseurl %}
+{% else %}
+      {% assign url = include.url %}
+{% endif %}
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ include.text }}&url={{ url }}"><span>Tweet</span></a>
+<hr/>
