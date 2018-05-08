@@ -9,6 +9,7 @@ Kubernetes is traditionally used to deploy and manage containerized applications
 ## Contents
 
 * Prerequisites
+* Known Issues
 * Installing Kubernetes
 * Installing GlusterFS and Heketi using gk-deploy
 * Installing KubeVirt
@@ -27,6 +28,12 @@ For reference, I used the following components and versions:
 * Weave Net as the Container Network Interface (CNI), v2.3.0
 * [gluster-kubernetes](https://github.com/gluster/gluster-kubernetes) master commit 2a2a68ce5739524802a38f3871c545e4f57fa20a
 * KubeVirt v0.4.1.
+
+## Known Issues
+
+* You may need to set SELinux to permissive mode prior to running "kubeadm init" if you see failures attributed to etcd in /var/log/audit.log.
+* Prior to installing GlusterFS, you may need to disable firewalld until this issue is resolved: https://github.com/gluster/gluster-kubernetes/issues/471
+* kubevirt-ansible install may fail in storage-glusterfs role: https://github.com/kubevirt/kubevirt-ansible/issues/219
 
 ## Installing Kubernetes
 
