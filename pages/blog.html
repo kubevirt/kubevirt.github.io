@@ -13,7 +13,8 @@ order: 4
           {% for post in site.posts %}
             <li>
               <div class="blogTitle"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
-              <span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+              <div><span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span></div>
+              <br/>
               <article class="post-content">
                  {{ post.content | truncatewords:75}}
 
