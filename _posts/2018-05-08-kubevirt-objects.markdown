@@ -31,8 +31,7 @@ Below is a list of the top level API objects and descriptions that KubeVirt prov
 
 [DomainSpec](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_domainspec) is listed as a top-level object but is only used within all of the objects above. Currently the `DomainSpec` is a subset of what is configurable via [libvirt domain XML](https://libvirt.org/formatdomain.html).
 
-== VirtualMachine
---------------
+## VirtualMachine
 
 VirtualMachine is mortal object just like a
 [Pod](https://kubernetes.io/docs/concepts/workloads/pods/pod/) within Kubernetes.
