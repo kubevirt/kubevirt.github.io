@@ -6,9 +6,9 @@
    margin-bottom: 20px;
  }
 .site-header {
-    background-color: $kubevirt-fourth-color;
-    border-bottom: 1px solid $grey-color-light;
 
+    border-bottom: 1px solid $grey-color-light;
+    background-color: #e8e8e8;
     // Positioning context for the mobile navigation icon
     position: relative;
 }
@@ -92,7 +92,8 @@
 }
 
 .blogTitle {
-  font-size: 48px;
+  font-size: 30px;
+  font-weight: bolder;
 }
 
 .site-nav {
@@ -134,6 +135,7 @@
         background-color: $kubevirt-fourth-color;
 
         border-radius: 5px;
+        margin-bottom:5px;
         text-align: right;
         z-index: 1;
         .page-link {
@@ -151,15 +153,19 @@
   }
 }
 
-#demo {
-  background-color: $kubevirt-secondary-color;
-}
-.demo_banner {
-  background-color: $kubevirt-primary-color;
+.demoBG1 {
+  background-color: $kubevirt-third-color;
   color: white;
   padding: 5px;
+  padding-top: 9px;
   line-height: 40px;
+  text-align: center;
+  margin-bottom:5px;
 }
+.demoBG2 {
+  background-color: $kubevirt-primary-color;
+}
+
 
 .readmore {
   font-size: 10px;
