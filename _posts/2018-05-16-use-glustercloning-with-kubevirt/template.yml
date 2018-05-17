@@ -1,0 +1,128 @@
+apiVersion: template.openshift.io/v1
+kind: Template
+labels:
+  app: kubevirt-linux
+  demo: linux
+  template: kubevirt-linux-template
+message: linux VM has been created in your project
+metadata:
+  annotations:
+    description: linux  VM
+    openshift.io/display-name: linux VM
+    openshift.io/documentation-url: https://docs.openshift.org/latest
+    openshift.io/long-description: linux VM
+    openshift.io/provider-display-name: Red Hat, Inc.
+    openshift.io/support-url: https://access.redhat.com
+    tags: virtualmachine
+  labels:
+    kubevirt.io/os: linux
+    miq.github.io/kubevirt-is-vm-template: "true"
+  name: kubevirt-linux
+  namespace: openshift
+objects:
+- apiVersion: v1
+  kind: PersistentVolumeClaim
+  metadata:
+    annotations:
+      k8s.io/CloneRequest: ${Pvc_origin}
+    name: ${Name}
+  spec:
+    accessModes:
+    - ReadWriteOnce
+    resources:
+      requests:
+        storage: 1Gi
+    storageClassName: glustercloning
+- apiVersion: kubevirt.io/v1alpha1
+  kind: OfflineVirtualMachine
+  metadata:
+    labels:
+      demo: linux
+      kubevirt-ovm: ovm-${Name}
+      kubevirt.io/domain: ${Name}
+      kubevirt.io/os: linux
+    name: ${Name}
+  spec:
+    running: true
+    selector:
+      matchLabels:
+        kubevirt-ovm: ovm-${Name}
+    template:
+      metadata:
+        labels:
+          kubevirt-ovm: ovm-${Name}
+      spec:
+        domain:
+          cpu:
+            cores: ${{Cores}}
+          devices:
+            disks:
+            - disk:
+                bus: virtio
+              name: disk0
+              volumeName: disk0-pvc
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
+              volumeName: cloudinitvolume
+          machine:
+            type: q35
+          resources:
+            requests:
+              memory: ${{Memory}}
+        volumes:
+        - name: disk0-pvc
+          persistentVolumeClaim:
+            claimName: ${Name}
+        - cloudInitNoCloud:
+            userData: |
+              ssh-authorized-keys:
+              - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQCtZn9WfHu6xTGGs/FBKkp2BzyVkJxwTaCsyfEHG8Rgyncok80M+RX5HZ5vQz5RgHsCSQloMOeAcn/S8YvgmPe1JqxLcZvndlDJE62aU2iCyzHrmFLVFp1SUno66Go6thqgeOBf8/4kNHA+uuG+Jg9XLSUldsnNQU3ofr4kHZIuQsifLJ2RdbVJ+7GwZ2c+H0f2NpxOXRR1X95QlIVRrr7AaqQv6z/ol+gmuNlKZKEeUgrzbKKJ5TZw6y/p5R7wc0vsapb1csk2zlfG9D4oJP/E90C4yHCyx53aVkvMxhyZ4SJ5NqpX+ryD+7eAmgcIFi4kBzI4/qqrL6ZGaU+zskpz root@cnv1.cloud.lab.eng.bos.redhat.com
+          name: cloudinitvolume
+- apiVersion: v1
+  kind: Service
+  metadata:
+    labels:
+      kubevirt.io/domain: ${Name}
+    name: ssh-${Name}
+  spec:
+    ports:
+    - name: ssh
+      port: 22
+    selector:
+      kubevirt.io/domain: ${Name}
+    type: NodePort
+- apiVersion: v1
+  kind: Service
+  metadata:
+    name: http-${Name}
+  spec:
+    ports:
+    - name: http
+      port: 80
+    selector:
+      kubevirt.io/domain: ${Name}
+- apiVersion: route.openshift.io/v1
+  kind: Route
+  metadata:
+    name: http-${Name}
+  spec:
+    port:
+      targetPort: http
+    to:
+      kind: Service
+      name: http-${Name}
+      weight: 100
+    wildcardPolicy: None
+parameters:
+- description: Name for the new VM
+  name: Name
+- description: Amount of memory
+  name: Memory
+  value: 8192Mi
+- description: Number of cores
+  name: Cores
+  value: "4"
+- description: Pvc to use
+  name: Pvc_origin
+  value: cirros
