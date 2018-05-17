@@ -4,7 +4,7 @@ title: Community
 permalink: /community/
 order: 10
 ---
-# Introduction
+## Introduction
 
 Let's start with the relationship between the two important components:
 
