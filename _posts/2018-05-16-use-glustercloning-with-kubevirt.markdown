@@ -29,7 +29,7 @@ For reference, I used the following components and versions:
 
 ### initial deployment
 
-We will deploy the custom provisioner using [this template](2018-05-16-use-glustercloning-with-kubevirt/glusterfile-provisioner-template.yml), along with cluster rules located in [this file](2018-05-16-use-glustercloning-with-kubevirt/openshift-clusterrole.yaml)
+We will deploy the custom provisioner using [this template](../assets/2018-05-16-use-glustercloning-with-kubevirt/glusterfile-provisioner-template.yml), along with cluster rules located in [this file](../assets/2018-05-16-use-glustercloning-with-kubevirt/openshift-clusterrole.yaml)
 
 
 Note that we also patch the image to use an existing one from gluster org located at docker.io instead of quay.io, as the corresponding repository is private by the time of this writing, and the heketi one, to make sure it has the code required to handle cloning
@@ -165,7 +165,7 @@ metadata:
 
 ### Leveraging the feature in openshift templates
 
-We can make direct use of the feature in [this openshift template](2018-05-16-use-glustercloning-with-kubevirt/template.yml) which would create the following objects:
+We can make direct use of the feature in [this openshift template](../assets/2018-05-16-use-glustercloning-with-kubevirt/template.yml) which would create the following objects:
 
 - a persistent volume claim as a clone of an existing pvc (cirros by default)
 - an offline virtual machine object
