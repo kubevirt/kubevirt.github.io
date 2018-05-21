@@ -217,3 +217,11 @@ match your environment:
 
 ```
 ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-glusterfs -e namespace=kube-system -e glusterfs_namespace=kube-system -e glusterfs_name= -e heketi_url=http://10.32.0.4:8080 playbooks/kubevirt.yml```
+
+## How it looks like in the UI
+
+Provided you deployed kubernetes dashboard, you will see this kind of pods for your vms
+
+<img src="../assets/images/ui_vm_pod_1.png" alt="vm_pod_1"/>
+
+<img src="../assets/images/ui_vm_pod_2.png" alt="vm_pod_2"/>
