@@ -125,14 +125,14 @@ cd kubevirt-ansible
 To install KubeVirt without adding additional storage capabilities:
 
 ```bash
-ansible-playbook -i localhost -e cluster=k8s -e storage_role=storage-none playbooks/kubevirt.yml 
+ansible-playbook -i localhost -e cluster=k8s -e storage_role=storage-none playbooks/kubevirt.yml
 ```
 
 ## KubeVirt with storage environment for development and testing
 
-KubeVirt can also be installed with a self-contained storage environment, 
-using Ceph and Cinder, that is geared for non-production use. To install 
-KubeVirt with the demo storage environment, first edit the inventory file 
+KubeVirt can also be installed with a self-contained storage environment,
+using Ceph and Cinder, that is geared for non-production use. To install
+KubeVirt with the demo storage environment, first edit the inventory file
 and populate the section named "masters", "etcd", and "nodes".
 
 ```
@@ -166,19 +166,19 @@ and populate the section named "masters", "etcd", and "nodes".
 Once you have your inventory file filled in:
 
 ```bash
-ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-demo playbooks/kubevirt.yml 
+ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-demo playbooks/kubevirt.yml
 ```
 
-## KubeVirt with GlusterFS and Heketi storage environment 
+## KubeVirt with GlusterFS and Heketi storage environment
 
 To install GlusterFS and Heketi on Kubernetes, follow the setup guide in
  [gluster-kubernetes repo](https://github.com/gluster/gluster-kubernetes).
-You will need to configure the admin key with gk-deploy and at end of the 
+You will need to configure the admin key with gk-deploy and at end of the
 install note the Heketi URL.
 
-Once you have GlusterFS and Heketi installed on your Kubernetes cluster, 
-you can deploy KubeVirt with the storage-glusterfs role to setup a Secret 
-and a StorageClass to allow you to provision Persistent Volume Claims to 
+Once you have GlusterFS and Heketi installed on your Kubernetes cluster,
+you can deploy KubeVirt with the storage-glusterfs role to setup a Secret
+and a StorageClass to allow you to provision Persistent Volume Claims to
 store your VM images.
 
 First edit the inventory file and populate the sections "master", "etcd",

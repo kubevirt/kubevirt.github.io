@@ -141,7 +141,6 @@
         position: absolute;
         right: 5px;
         background-color: $kubevirt-fourth-color;
-
         border-radius: 5px;
         margin-bottom:5px;
         text-align: right;
@@ -179,12 +178,9 @@
 
 
 .readmore {
-  font-size: 10px;
+  font-size: 12px;
   font-weight: bold;
-  float: right !important;
-  ::after {
-    float: left;
-  }
+
 }
 /**
  * Site footer
@@ -293,19 +289,23 @@
  * Posts
  */
 .post-header {
-    margin-bottom: $spacing-unit;
+    margin-bottom: $spacing-unit ;
+    margin-bottom: 20px ;
 }
 
 .post-title {
     @include media-query($on-laptop) {
         font-size: 36px;
     }
-    font-weight: 400;
+
+}
+header h1 {
+  font-size: 2.4rem;
 }
 
 h1 {
   color: $kubevirt-primary-color;
-  font-size: 30px;
+  font-size: 2.1rem;
   font-weight: lighter;
 }
 
@@ -326,7 +326,23 @@ h2, h3, h4, h5 {
     font-size: 15px;
   }
 }
-
+.blogContentPreview {
+  h1 {
+    font-size: 20px;
+  }
+  h2 {
+    font-size: 18px;
+  }
+  h3 {
+    font-size: 17px;
+  }
+  h4 {
+    font-size: 16px;
+  }
+  h5 {
+    font-size: 15px;
+  }
+}
 
 .post-content {
     margin-bottom: $spacing-unit;
