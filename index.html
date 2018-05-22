@@ -74,40 +74,22 @@ With virtualized workloads placed directly in development workflows, teams can d
 
 
 
-<div class="page-content">
+<div id="usecases" class="page-content">
   <div class="wrapper">
     <div class="container">
-      <div class="row">
-        <div id="usecases">
-
-
-<h1> Use Cases </h1>
-
-
- <!-- UseCase Begins-->
-<p>Leverage KubeVirt and Kubernetes to manage virtual machines for applications that are impractical to containerize due to technical limitations or lack of resources.</p>
-<hr/>
-
-
-<!-- UseCase Ends-->
-
-
- <!-- UseCase Begins-->
-<p>Combining existing virtualized workloads with new container workloads on the same platform, thereby making it easier to decompose monolithic virtualized workloads into containers over time.</p>
-<hr/>
-
-<!-- UseCase Ends-->
-
-
- <!-- UseCase Begins-->
-<p>Supporting development of new microservice applications in containers that interact with existing virtualized applications.</p>
-<hr/>
-
-<!-- UseCase Ends-->
-
-
-        </div>
-      </div>
+      <h1> Use Cases </h1>
+       <!-- UseCase Begins-->
+      <p>Leverage KubeVirt and Kubernetes to manage virtual machines for applications that are impractical to containerize due to technical limitations or lack of resources.</p>
+      <hr/>
+      <!-- UseCase Ends-->
+       <!-- UseCase Begins-->
+      <p>Combining existing virtualized workloads with new container workloads on the same platform, thereby making it easier to decompose monolithic virtualized workloads into containers over time.</p>
+      <hr/>
+      <!-- UseCase Ends-->
+       <!-- UseCase Begins-->
+      <p>Supporting development of new microservice applications in containers that interact with existing virtualized applications.</p>
+      <hr/>
+      <!-- UseCase Ends-->
     </div>
   </div>
 </div>
@@ -116,24 +98,24 @@ With virtualized workloads placed directly in development workflows, teams can d
 <div id="blog" class="page-content">
   <div class="wrapper">
     <div class="container">
-      <div>
-        <h1>Blog</h1>
-        <ul class="post-list">
-          {% for post in site.posts limit:3 %}
-            <li>
-              <div class="blogTitle"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
-              <span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
-              <div> {{ post.description }} </div>
-                {% capture readmorelink %}
-                  {{ post.url | prepend: site.baseurl }}
-                {% endcapture %}
-                {% include readmore.html href_link= readmorelink %}
-            </li>
-          {% endfor %}
-        </ul>
-        <h5><a href="/kv-blog">Read all BLOGS</a></h5><hr/>
-        <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
-      </div>
+      <h1>Blog</h1>
+      <ul class="post-list">
+        {% for post in site.posts limit:3 %}
+          <li>
+            <div class="blogTitle"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
+            <span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+            <article class="post-content blogContentPreview">
+            {{ post.content | remove: '<ul>' | remove: '<li>'  | remove: '</ul>' | remove: '</li>'  | truncatewords:30 }}
+              {% capture readmorelink %}
+                {{ post.url | prepend: site.baseurl }}
+              {% endcapture %}
+              {% include readmore.html href_link= readmorelink %}
+            </article>
+          </li>
+        {% endfor %}
+      </ul>
+      <h5><a href="/kv-blog">Read all BLOGS</a></h5><hr/>
+      <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
     </div>
   </div>
 </div>
@@ -141,17 +123,15 @@ With virtualized workloads placed directly in development workflows, teams can d
 <div class="page-content">
   <div class="wrapper">
     <div class="container">
-      <div>
-        <div class="row">
-          <div class="col-md-6" style="padding-bottom: 30px;">
-            <h1>Red Hat Summit</h1>
-            <h5>Come and visit us at Red Hat Summit. We will be at the community central booth.</h5>
-            <img src="./../assets/images/redhat_summit.jpg">
-          </div>
-          <div class="col-md-6">
-            <h1>Twitter Feeds</h1>
-            <a class="twitter-timeline" data-width="560" data-height="500" href="https://twitter.com/kubevirt?ref_src=twsrc%5Etfw">Tweets by kubevirt</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-          </div>
+      <div class="row">
+        <div class="col-md-6" style="padding-bottom: 30px;">
+          <h1>Red Hat Summit</h1>
+          <h5>Come and visit us at Red Hat Summit. We will be at the community central booth.</h5>
+          <img src="./../assets/images/redhat_summit.jpg">
+        </div>
+        <div class="col-md-6">
+          <h1>Twitter Feeds</h1>
+          <a class="twitter-timeline" data-width="560" data-height="500" href="https://twitter.com/kubevirt?ref_src=twsrc%5Etfw">Tweets by kubevirt</a> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
         </div>
       </div>
     </div>

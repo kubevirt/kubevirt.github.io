@@ -5,30 +5,22 @@ permalink: /kv-blog/
 order: 4
 ---
 
-<div id="blog" class="blogContent">
-  <div class="wrapper">
-    <div class="container">
-      <div>
-        <ul class="post-list">
-          {% for post in site.posts %}
-            <li>
-              <div class="blogTitle"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
-              <div><span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span></div>
-              <br/>
-              <article class="post-content">
-                 {{ post.content | truncatewords:75}}
-
-                {% capture readmorelink %}
-                  {{ post.url | prepend: site.baseurl }}
-                {% endcapture %}
-                {% include readmore.html href_link= readmorelink %}
-              </article>
-
-            </li>
-          {% endfor %}
-        </ul>
-        <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
-      </div>
-    </div>
-  </div>
+<div id="blog" class="blogContentPreview">
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <div class="blogTitle"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></div>
+        <div><span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span></div>
+        <br/>
+        <article class="post-content blogContentPreview">
+          {{ post.content | remove: '<ul>' | remove: '<li>'  | remove: '</ul>' | remove: '</li>'  | truncatewords:50 }}
+          {% capture readmorelink %}
+            {{ post.url | prepend: site.baseurl }}
+          {% endcapture %}
+          {% include readmore.html href_link= readmorelink %}
+        </article>
+      </li>
+    {% endfor %}
+  </ul>
+  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 </div>

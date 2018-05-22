@@ -96,8 +96,7 @@ week: <https://github.com/kubevirt/kubevirt/pulse>
 Finally you can view our open issues at
 <https://github.com/kubevirt/kubevirt/issues>
 
-And keep track of events at our calendar
-[18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com](https://calendar.google.com/embed?src=<link xl:href=)"&gt;https://calendar.google.com/embed?src=<18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com>&lt;/link&gt;
+
 
 If you need some help or want to chat you can find us on
 <irc://irc.freenode.net/#kubevirt>
