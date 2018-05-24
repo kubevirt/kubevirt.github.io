@@ -12,14 +12,15 @@
           </button>
           <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
-            {% assign sorted_pages = site.pages | sort:"order" %}
-            {% for page in sorted_pages %}
-              {% if page.title %}
+              {% assign doclist = site.data.site_nav_pages.pages  %}
+
+              {% for item in doclist %}
                 <li class="nav-item">
-                  <a class="nav-link" href="{{ page.url | prepend: site.baseurl }}">{{ page.title }}</a>
+                  <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
                 </li>
-              {% endif %}
-            {% endfor %}
+
+              {% endfor %}
+
             </ul>
           </div>
         </nav>
