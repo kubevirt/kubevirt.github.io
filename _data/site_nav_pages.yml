@@ -1,0 +1,13 @@
+pages:
+
+- title: Get KubeVirt
+  url: /get_kubevirt
+
+- title: Blog
+  url: /kv-blog
+
+- title: Resources
+  url: /resources
+
+- title: Community
+  url: /community
