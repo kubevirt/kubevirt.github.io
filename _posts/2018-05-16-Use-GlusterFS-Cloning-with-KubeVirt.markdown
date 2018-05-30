@@ -4,17 +4,18 @@ author: karmab
 description: A first look at using gluster cloning with kubevirt
 ---
 
-Gluster seems like a good fit for storage in kubernetes and in particular in kubevirt. Still, as for other storage backends, we will likely need to use a golden set of images and deploy vms from them. 
+Gluster seems like a good fit for storage in kubernetes and in particular in kubevirt. Still, as for other storage backends, we will likely need to use a golden set of images and deploy vms from them.
 
 That's where cloning feature of gluster comes at rescue!
 
+<!-- more -->
 ## Contents
 
 * Prerequisites
 * Installing Gluster provisioner
 * Using The cloning feature
 * Conclusion
- 
+
 ## Prerequisites
 
 I assume you already have a running instance of openshift and kubevirt along with gluster and an already existing pvc where you copied a base operating system ( you can get those from [here](https://docs.openstack.org/image-guide/obtain-images.html))
@@ -77,7 +78,7 @@ then, create the following objects:
 - glustercloning-heketi-secret secret in your storage namespace
 - glustercloning storage class
 
-for reference, here are samples of those files. 
+for reference, here are samples of those files.
 
 Note how we change the type for the secret and add extra options for our storage class (in particular, enabling smartclone).
 
@@ -118,7 +119,7 @@ Once deployed, you can now provision pvcs from a base origin
 
 ### Cloning single pvcs
 
-For instance, provided you have an existing pvc named *cirros* containing this base operating system, and that this PVC contains an annotion of the following 
+For instance, provided you have an existing pvc named *cirros* containing this base operating system, and that this PVC contains an annotion of the following
 
 ```
 (...)
@@ -180,8 +181,3 @@ oc process -f template.yml -p Name=myvm | oc process -f - -n default
 ## Conclusion
 
 cloning features in the storage backend allow us to simply use a given set of pvcs as base os for the deployment of our vms. this feature is growing in gluster, worth giving it a try!
-
-
-
-
-

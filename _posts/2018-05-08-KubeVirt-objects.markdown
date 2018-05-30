@@ -14,6 +14,7 @@ compile information for this post:
 - [user-guide](http://www.kubevirt.io/user-guide/)
 - [api-reference](http://www.kubevirt.io/api-reference/)
 
+<!-- more -->
 With that let’s take a look at the objects that are available.
 
 KubeVirt top-level objects

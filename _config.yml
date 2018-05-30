@@ -17,5 +17,5 @@ markdown: kramdown
 permalink: /:year/:title:output_ext
 
 plugins: [jekyll-paginate]
-paginate: 8
+paginate: 10
 paginate_path: "/blog/page:num"
