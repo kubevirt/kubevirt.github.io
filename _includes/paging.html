@@ -1,0 +1,24 @@
+<div class="row">
+  {% if paginator.next_page %}
+    <div class="col-4">
+      <a href="{{ paginator.next_page_path }}" class="btn btn-light"> &lt; Older Posts</a>
+    </div>
+  {% else %}
+    <div class="col-4">
+      <span class="btn btn-light disabled"> &lt; Older Posts</span>
+    </div>
+  {% endif %}
+  <div class="col-4" style="text-align: center;">
+    <span class="page_number" style="display: inline-table; margin-top: 6px;">Page: {{ paginator.total_pages | minus: paginator.page | plus: 1 }} of {{ paginator.total_pages }}</span>
+  </div>
+  {% if paginator.previous_page %}
+  <div class="col-4">
+    <a href="{{ paginator.previous_page_path }}" class="btn btn-light" style="float: right;" >Newer Posts &gt; </a>
+  </div>
+  {% else %}
+  <div class="col-4">
+    <span class="btn btn-light disabled" style="float: right;">Newer Posts &gt; </span>
+  </div>
+  {% endif %}
+</div>
+<hr/>

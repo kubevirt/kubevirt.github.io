@@ -11,6 +11,7 @@ We are currently driven by
 
 -   Enabling people to contribute
 
+<!-- more -->
 This week we achieved to:
 
 -   Keep cloud-init data in Secrets (@vossel)

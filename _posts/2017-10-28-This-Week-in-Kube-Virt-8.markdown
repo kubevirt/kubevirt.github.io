@@ -13,6 +13,7 @@ We are currently driven by
 
 -   Node Isolator use-case (more informations soon)
 
+<!-- more -->
 This week we achieved to:
 
 -   Present at KVM Forum, Prague (@rmohr, @fabiand)

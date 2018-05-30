@@ -12,6 +12,7 @@ This week you could watch us at:
 
 -   Or follow us at our new blog: <https://kubevirt.github.io/blog/>
 
+<!-- more -->
 We are currently driven by
 
 -   Being easier to be used on Kubernetes and OpenShift

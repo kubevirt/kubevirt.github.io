@@ -20,6 +20,7 @@ We are currently driven by
 
 -   Being easier to be used on Kubernetes and OpenShift
 
+<!-- more -->
 Within the last weeks we achieved to:
 
 -   Drop of HAProxy and redeisng of console access (@davidvossel)

@@ -15,3 +15,7 @@ kubevirt_version: v0.4.1
 # Build settings
 markdown: kramdown
 permalink: /:year/:title:output_ext
+
+plugins: [jekyll-paginate]
+paginate: 10
+paginate_path: "/blog/page:num"

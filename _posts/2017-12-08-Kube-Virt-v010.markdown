@@ -7,6 +7,7 @@ This release follows v0.0.4 and consists of 115 changes, contributed by
 11 people, leading to 121 files changed, 5278 insertions(+), 1916
 deletions(-).
 
+<!-- more -->
 The source code and selected binaries are available for download at:
 <https://github.com/kubevirt/kubevirt/releases/tag/v0.1.0>.
 

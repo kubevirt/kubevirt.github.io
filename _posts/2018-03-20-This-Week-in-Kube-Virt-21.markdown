@@ -8,6 +8,7 @@ This is a weekly update from the KubeVirt team.
 In general there is now more work happening outside of the core kubevirt
 repository.
 
+<!-- more -->
 We are currently driven by
 
 -   Building a solid user-story around KubeVirt

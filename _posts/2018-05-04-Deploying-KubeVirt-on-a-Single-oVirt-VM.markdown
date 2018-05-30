@@ -11,6 +11,7 @@ platform that can nested virtualization this will also work.
 For this example I chose to use a single VM for everything, but I could have done different VMs for my master/nodes/storage/etc, for simplicity I used a single
 VM.
 
+<!-- more -->
 ## Preparing the VM
 
 First we will need to enable epel and install some needed tools, like git to get at the source, and ansible to do the deploy:

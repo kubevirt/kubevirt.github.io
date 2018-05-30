@@ -9,6 +9,7 @@ Based Access Control (RBAC) system. This system allows KubeVirt to tie directly
 into the existing authentication and authorization mechanisms Kubernetes
 already provides to its core api objects.
 
+<!-- more -->
 ## KubeVirt RBAC Role Basics
 
 Typically when people think of Kubernetes RBAC system, they're thinking about
@@ -76,7 +77,7 @@ rules:
 This same logic can be applied when creating RBAC roles for other KubeVirt
 objects as well. If we wanted to extend this RBAC role to grant similar
 permissions for VirtualMachinePreset objects, we'd just have to add a second
-resource kubevirt.io resource list. The result would look like this. 
+resource kubevirt.io resource list. The result would look like this.
 
 ```
 apiVersion: rbac.authorization.k8s.io/v1beta1
@@ -173,5 +174,3 @@ KubeVirt RBAC roles.
 
 More information about these default roles can be found in the KubeVirt
 user guide [here](https://www.kubevirt.io/user-guide/#/authorization)
-
-

@@ -16,6 +16,7 @@ tag is signed and can be verified using \[git-evtag\]\[git-evtag\].
 Pre-built containers are published on Docker Hub and can be viewed at:
 <https://hub.docker.com/u/kubevirt/>.
 
+<!-- more -->
 Notable changes
 ===============
 

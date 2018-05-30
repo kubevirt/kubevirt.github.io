@@ -19,6 +19,8 @@ We are currently driven by
 
 -   Being easier to be used on Kubernetes and OpenShift
 
+<!-- more -->
+
 Over the weekend you could have seen our talks at devconf.cz:
 
 -   ["Kubernetes Cloud Autoscaler for Isolated

@@ -9,6 +9,7 @@ We are currently driven by
 
 -   Being easier to consume on Kubernetes and OpenShift
 
+<!-- more -->
 This week we achieved to
 
 -   merge a design for cloud-init support

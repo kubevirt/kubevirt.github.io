@@ -11,6 +11,7 @@ We are currently driven by
 
 -   Enabling people to contribute
 
+<!-- more -->
 This week you could have met us at:
 
 -   KubeCon NA: Virtualizing Workloads Saloon

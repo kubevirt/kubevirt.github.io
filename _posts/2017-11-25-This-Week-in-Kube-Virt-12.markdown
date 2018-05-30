@@ -11,6 +11,7 @@ We are currently driven by
 
 -   Enabling people to contribute
 
+<!-- more -->
 This week we was really slow, but we still achieved to:
 
 -   Improve vagrant setup (@cynepco3hahue)

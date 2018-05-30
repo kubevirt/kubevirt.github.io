@@ -13,6 +13,7 @@ We are currently driven by
 
 -   Node Isolator use-case (more informations soon)
 
+<!-- more -->
 This week we achieved to:
 
 -   Release KubeVirt v0.0.4

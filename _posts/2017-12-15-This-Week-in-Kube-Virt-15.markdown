@@ -13,6 +13,7 @@ We are currently driven by
 
 -   Streamlining and improving the Kubernetes experience
 
+<!-- more -->
 This week we achieved to:
 
 -   VM Grace period and shutdown improvements (@davidvossel)

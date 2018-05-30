@@ -7,6 +7,7 @@ This is a weekly update from the KubeVirt team.
 
 We are currently driven by
 
+<!-- more -->
 -   Building a solid user-story around KubeVirt
 
 -   Caring about end-to-end (backend, core, ui)

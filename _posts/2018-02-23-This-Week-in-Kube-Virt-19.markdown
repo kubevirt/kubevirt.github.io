@@ -17,6 +17,8 @@ We are currently driven by
 
 -   Being easier to be used on Kubernetes and OpenShift
 
+<!-- more -->
+
 Within the last two weeks we achieved to:
 
 -   Support for native file-system PVs as disk storage (@alukiano,
