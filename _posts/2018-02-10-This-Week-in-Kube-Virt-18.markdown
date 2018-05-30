@@ -5,6 +5,7 @@ description: This is a weekly update from the KubeVirt team.
 ---
 This is a weekly update from the KubeVirt team.
 
+<!-- more -->
 We are currently driven by
 
 -   Building a solid user-story around KubeVirt

@@ -13,6 +13,7 @@ We are currently driven by
 
 -   Node Isolator use-case (more informations soon)
 
+<!-- more -->
 Non-code wise this week
 
 -   The KVM Forum recording was published: "Running Virtual Machines on

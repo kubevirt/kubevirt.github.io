@@ -11,6 +11,7 @@ We are currently driven by
 
 -   Enabling people to contribute
 
+<!-- more -->
 This week we achieved to:
 
 -   Generation of API documentation (@lukas-bednar)

@@ -7,6 +7,7 @@ The very first KubeVirt release of KubeVirt in the new year
 (<https://github.com/kubevirt/kubevirt/releases/v0.2.0>) had a few
 notable highlights which were brewing over the last few weeks.
 
+<!-- more -->
 VirtualMachine API redesign
 ===========================
 

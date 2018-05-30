@@ -16,6 +16,7 @@ We are currently driven by
 
 -   Improve the user-experience for users (UI, deployment)
 
+<!-- more -->
 Within the last weeks we achieved to:
 
 -   Drop of HAProxy and redeisng of console access (@davidvossel)

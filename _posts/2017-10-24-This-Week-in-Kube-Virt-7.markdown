@@ -13,6 +13,7 @@ This week you can read more or speak to us at:
 -   "KubeWHAT?" by S Gordon - On KubeVirt and OpenStack (past event)
     <https://www.slideshare.net/sgordon2/kubewhat>
 
+<!-- more -->
 We are currently driven by
 
 -   Being easier to be used on Kubernetes and OpenShift

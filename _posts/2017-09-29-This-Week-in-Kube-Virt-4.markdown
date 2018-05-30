@@ -13,6 +13,7 @@ We are currently driven by
 
 -   Node Isolator use-case (more informations soon)
 
+<!-- more -->
 This week you can find us at:
 
 -   Ohio Linux Fest (@stu-gott) "KubeVirt, Virtual Machine Management

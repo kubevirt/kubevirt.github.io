@@ -13,6 +13,7 @@ We are currently driven by
 
 -   Node Isolator use-case (more informations soon)
 
+<!-- more -->
 This week we achieved to:
 
 -   Improved sagger documentation (for SDK generation) (@lukas-bednar)

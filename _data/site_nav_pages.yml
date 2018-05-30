@@ -4,7 +4,7 @@ pages:
   url: /get_kubevirt
 
 - title: Blog
-  url: /kv-blog
+  url: /blog
 
 - title: Resources
   url: /resources

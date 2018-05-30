@@ -1,11 +1,9 @@
 ---
 layout: page
 title: Blog
-permalink: /kv-blog/
 order: 4
-pagination:
-  enabled: true
 ---
+
 
 {% include paging.html %}
 <div id="blog" class="blogContentPreview">
@@ -16,7 +14,12 @@ pagination:
         <div><span class="blogAuthor">by {{ post.author }} - </span><span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span></div>
         <br/>
         <article class="post-content blogContentPreview">
-          {{ post.content | remove: '<ul>' | remove: '</ul>'  | remove: '<li>' | remove: '</li>' | remove: '<a href>' | remove: '<a href=' | remove: '</a>' | truncatewords:50 }}
+          {% if post.content contains "<!-- more -->" %}
+            {{ post.content | split:"<!-- more -->" | first }}
+          {% else %}
+            {{ post.content | strip_html | truncatewords:50 }}
+          {% endif %}
+
           {% capture readmorelink %}
             {{ post.url | prepend: site.baseurl }}
           {% endcapture %}
