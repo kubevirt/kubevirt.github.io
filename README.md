@@ -1,6 +1,8 @@
 example
 =======
 
+[![Build Status](https://travis-ci.org/kubevirt/kubevirt.github.io.svg?branch=master)](https://travis-ci.org/kubevirt/kubevirt.github.io)
+
 All Pages Are stored in Directory: pages
 All Blog post are stored in Directory:  _posts
 
