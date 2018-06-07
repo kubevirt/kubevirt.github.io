@@ -6,14 +6,14 @@ description: This post tries to unveil some of the internals of our build system
 
 # Introduction
 
-In this post we will set up an alternative to the existing containerized build system used in Kubevirt.
+In this post we will set up an alternative to the existing containerized build system used in KubeVirt.
 
 A [new makefile](../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer) will be presented here, which you can for experimenting (if you are brave enough...)
 
 <!-- more -->
 # Why?
 
-Current build system for Kubevirt is done inside docker. This ensures a robust and consistent build environment:
+Current build system for KubeVirt is done inside docker. This ensures a robust and consistent build environment:
 - No need to install system dependencies
 - Controlled versions of these dependencies
 - Agnostic of local golang environment
@@ -24,7 +24,7 @@ Still, there are some drawback there:
 - Tool integration:
   - Since your tools are not running in the dockerized environment, they may give different outcome than the ones running in the dockerized environment
   - Invoking any of the dockerized scripts (under `hack` directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)
-- Build time: the dockerized build has some small overheads, and some improvements are still needed to make sure that chaching work properly and build is optimized
+- Build time: the dockerized build has some small overheads, and some improvements are still needed to make sure that caching work properly and build is optimized
 - And last, but not least, *sometimes it is just hard to resist the tinkering...*
 
 ## How?
@@ -33,7 +33,7 @@ Currently, the Makefile includes targets that address different things: building
 
 > Note that cross compilation is not covered here (e.g. building virtctl for mac and windows)
 
-### Prerequisitets
+### Prerequisites
 
 Best place to look for that is in the docker file definition for the build environment: [hack/docker-builder/Dockerfile](https://github.com/kubevirt/kubevirt/blob/master/hack/docker-builder/Dockerfile)
 
@@ -122,7 +122,7 @@ File has the following targets:
  - **bootsrap**: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
    - Note that the k8s code generators use specific version
    - Note that these are not code dependencies, as they are handled by using a `vendor` directory, as well as the distclean,  deps-install and deps-update targets in the [standard makefile](ttps://github.com/kubevirt/kubevirt/blob/master/Makefile)
-- **generate**: Calling [hack/generate.sh](https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh) script similarly to the [standard makefile](https://github.com/kubevirt/kubevirt/blob/master/Makefile). It builds all generators (under the `tools` directory) and use them to generate: test mocks, kubevirt resources and test yamls
+- **generate**: Calling [hack/generate.sh](https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh) script similarly to the [standard makefile](https://github.com/kubevirt/kubevirt/blob/master/Makefile). It builds all generators (under the `tools` directory) and use them to generate: test mocks, KubeVirt resources and test yamls
  - **apidocs**: this is similar to apidocs target in the [standard makefile](ttps://github.com/kubevirt/kubevirt/blob/master/Makefile)
 - **build**: this is building all product binaries, and then using a script ([copy-cmd.sh](../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh), should be placed under: `hack`) to copy the binaries from their standard location into the `_out` directory, where the cluster management scripts expect them
 - **test**: building and running unit tests
