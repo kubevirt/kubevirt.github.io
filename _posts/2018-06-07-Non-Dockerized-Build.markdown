@@ -20,7 +20,7 @@ Current build system for KubeVirt is done inside docker. This ensures a robust a
 
 So, in general, **you should just use the dockerized build system**.
 
-Still, there are some drawback there:
+Still, there are some drawbacks there:
 - Tool integration:
   - Since your tools are not running in the dockerized environment, they may give different outcome than the ones running in the dockerized environment
   - Invoking any of the dockerized scripts (under `hack` directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)
@@ -109,7 +109,7 @@ cluster-sync: build
     ./cluster/clean.sh
     ./cluster/deploy.sh
 
-.PHONY: bootstarp generate apidocs build test check functest cluster-sync
+.PHONY: bootstrap generate apidocs build test check functest cluster-sync
 ```
 ### Targets
 
@@ -119,7 +119,7 @@ make -f Makefile.nocontainer <target>
 ```
 File has the following targets:
 
- - **bootsrap**: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
+ - **bootstrap**: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
    - Note that the k8s code generators use specific version
    - Note that these are not code dependencies, as they are handled by using a `vendor` directory, as well as the distclean,  deps-install and deps-update targets in the [standard makefile](ttps://github.com/kubevirt/kubevirt/blob/master/Makefile)
 - **generate**: Calling [hack/generate.sh](https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh) script similarly to the [standard makefile](https://github.com/kubevirt/kubevirt/blob/master/Makefile). It builds all generators (under the `tools` directory) and use them to generate: test mocks, KubeVirt resources and test yamls

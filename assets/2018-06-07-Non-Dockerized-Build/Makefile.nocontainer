@@ -43,5 +43,5 @@ cluster-sync: build
 	./cluster/clean.sh
 	./cluster/deploy.sh
 
-.PHONY: bootstarp generate apidocs build test check functest cluster-sync
+.PHONY: bootstrap generate apidocs build test check functest cluster-sync
 
