@@ -54,7 +54,7 @@ sudo systemctl start docker
 ```
 Now, getting the actual code could be done either via `go get` (don't forget to set the `GOPATH` environment variable):
 ```
-go get -d -insecure kubevirt.io/kubevirt/...
+go get -d kubevirt.io/kubevirt/...
 ```
 Or `git clone`:
 ```
