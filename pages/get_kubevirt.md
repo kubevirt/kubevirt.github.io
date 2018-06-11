@@ -15,7 +15,7 @@ later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a
 KubeVirt deploys as an add-on to a Kubernetes (1.9 or later) cluster, using the `kubectl` tool and the following manifest file:
 
 ```bash
-$ export VERSION=v0.4.1
+$ export VERSION={{ site.kubevirt_version }}
 $ kubectl create \
     -f https://github.com/kubevirt/kubevirt/releases/download/$VERSION/kubevirt.yaml
 ```
@@ -33,7 +33,7 @@ $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kub
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-controller
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-infra
 
-$ export VERSION=v0.4.1
+$ export VERSION={{ site.kubevirt_version }}
 $ oc apply -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt.yaml
 ```
 
