@@ -5,139 +5,15 @@ description: In this post we will deploy a vm on top of kubernetes with istio se
 ---
 
 # Introduction
-In this blog post we are going to talk about istio and virtual machines on top of kubernetes.
-
-Little explanation about Istio from there page
-
-## Istio Overview
-This document introduces Istio: an open platform to connect, manage, and secure microservices. Istio provides an easy way to create a network of deployed services with load balancing, service-to-service authentication, monitoring, and more, without requiring any changes in service code. You add Istio support to services by deploying a special sidecar proxy throughout your environment that intercepts all network communication between microservices, configured and managed using Istio’s control plane functionality.
-
-### Why use Istio?
-Istio addresses many of the challenges faced by developers and operators as monolithic applications transition towards a distributed microservice architecture. The term service mesh is often used to describe the network of microservices that make up such applications and the interactions between them. As a service mesh grows in size and complexity, it can become harder to understand and manage. Its requirements can include discovery, load balancing, failure recovery, metrics, and monitoring, and often more complex operational requirements such as A/B testing, canary releases, rate limiting, access control, and end-to-end authentication.
-
-* Istio provides a complete solution to satisfy the diverse requirements of microservice applications by providing behavioral insights and operational control over the service mesh as a whole. It provides a number of key capabilities uniformly across a network of services:
-
-* Traffic Management. Control the flow of traffic and API calls between services, make calls more reliable, and make the network more robust in the face of adverse conditions.
-
-* Service Identity and Security. Provide services in the mesh with a verifiable identity and provide the ability to protect service traffic as it flows over networks of varying degrees of trustability.
-
-* Policy Enforcement. Apply organizational policy to the interaction between services, ensure access policies are enforced and resources are fairly distributed among consumers. Policy changes are made by configuring the mesh, not by changing application code.
-
-* Telemetry. Gain understanding of the dependencies between services and the nature and flow of traffic between them, providing the ability to quickly identify issues.
-
-In addition to these behaviors, Istio is designed for extensibility to meet diverse deployment needs:
-
-Platform Support. Istio is designed to run in a variety of environments including ones that span Cloud, on-premise, Kubernetes, Mesos etc. We’re initially focused on Kubernetes but are working to support other environments soon.
-
-Integration and Customization. The policy enforcement component can be extended and customized to integrate with existing solutions for ACLs, logging, monitoring, quotas, auditing and more.
-
-These capabilities greatly decrease the coupling between application code, the underlying platform, and policy. This decreased coupling not only makes services easier to implement, but also makes it simpler for operators to move application deployments between environments or to new policy schemes. Applications become inherently more portable as a result.
-
-### Istio Architecture
-An Istio service mesh is logically split into a data plane and a control plane.
-
-The data plane is composed of a set of intelligent proxies (Envoy) deployed as sidecars that mediate and control all network communication between microservices, along with a general-purpose policy and telemetry hub (Mixer).
-
-The control plane is responsible for managing and configuring proxies to route traffic, and configuring Mixers to enforce policies and collect telemetry.
-
-The following diagram shows the different components that make up each plane:
-
-<img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/arch.svg" alt="Istio-Architecture" style="width: 800px;"/>
-
-### Envoy
-Istio uses an extended version of the Envoy proxy, a high-performance proxy developed in C++, to mediate all inbound and outbound traffic for all services in the service mesh. Istio leverages Envoy’s many built-in features such as dynamic service discovery, load balancing, TLS termination, HTTP/2 & gRPC proxying, circuit breakers, health checks, staged rollouts with %-based traffic split, fault injection, and rich metrics.
-
-Envoy is deployed as a sidecar to the relevant service in the same Kubernetes pod. This allows Istio to extract a wealth of signals about traffic behavior as attributes, which in turn it can use in Mixer to enforce policy decisions, and be sent to monitoring systems to provide information about the behavior of the entire mesh. The sidecar proxy model also allows you to add Istio capabilities to an existing deployment with no need to rearchitect or rewrite code. You can read more about why we chose this approach in our Design Goals.
-
-### Mixer
-Mixer is a platform-independent component responsible for enforcing access control and usage policies across the service mesh and collecting telemetry data from the Envoy proxy and other services. The proxy extracts request level attributes, which are sent to Mixer for evaluation. More information on this attribute extraction and policy evaluation can be found in Mixer Configuration. Mixer includes a flexible plugin model enabling it to interface with a variety of host environments and infrastructure backends, abstracting the Envoy proxy and Istio-managed services from these details.
-
-### Pilot
-Pilot provides service discovery for the Envoy sidecars, traffic management capabilities for intelligent routing (e.g., A/B tests, canary deployments, etc.), and resiliency (timeouts, retries, circuit breakers, etc.). It converts high level routing rules that control traffic behavior into Envoy-specific configurations, and propagates them to the sidecars at runtime. Pilot abstracts platform-specific service discovery mechanisms and synthesizes them into a standard format consumable by any sidecar that conforms to the Envoy data plane APIs. This loose coupling allows Istio to run on multiple environments (e.g., Kubernetes, Consul/Nomad) while maintaining the same operator interface for traffic management.
-
-### Citadel
-Citadel provides strong service-to-service and end-user authentication, with built-in identity and credential management. It can be used to upgrade unencrypted traffic in the service mesh, and provides operators the ability to enforce policy based on service identity rather than network controls. Starting from release 0.5, Istio supports role-based access control to control who can access your services.
-
-
-# Libvirt
-<img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/libvirt-logo-banner.png" alt="libvirt-logo" style="width: 300px;"/>
-
-Libvirt is collection of software that provides a convenient way to manage virtual machines and other virtualization functionality, such as storage and network interface management. These software pieces include a long term stable C API, a daemon (libvirtd), and a command line utility (virsh). A primary goal of libvirt is to provide a single way to manage multiple different virtualization providers/hypervisors, such as the KVM/QEMU, Xen, LXC, OpenVZ or VirtualBox hypervisors (among others).
-
-Some of the major libvirt features are:
-
-VM management: Various domain lifecycle operations such as start, stop, pause, save, restore, and migrate. Hotplug operations for many device types including disk and network interfaces, memory, and CPUs.
-Remote machine support: All libvirt functionality is accessible on any machine running the libvirt daemon, including remote machines. A variety of network transports are supported for connecting remotely, with the simplest being SSH, which requires no extra explicit configuration.
-Storage management: Any host running the libvirt daemon can be used to manage various types of storage: create file images of various formats (qcow2, vmdk, raw, ...), mount NFS shares, enumerate existing LVM volume groups, create new LVM volume groups and logical volumes, partition raw disk devices, mount iSCSI shares, and much more.
-Network interface management: Any host running the libvirt daemon can be used to manage physical and logical network interfaces. Enumerate existing interfaces, as well as configure (and create) interfaces, bridges, vlans, and bond devices.
-Virtual NAT and Route based networking: Any host running the libvirt daemon can manage and create virtual networks. Libvirt virtual networks use firewall rules to act as a router, providing VMs transparent access to the host machines network.
-
-# About KVM
-<img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/kvmbanner-logo3.png" alt="kvm-logo" style="width: 300px;"/>
-
-KVM (for Kernel-based Virtual Machine) is a full virtualization solution for Linux on x86 hardware containing virtualization extensions (Intel VT or AMD-V). It consists of a loadable kernel module, kvm.ko, that provides the core virtualization infrastructure and a processor specific module, kvm-intel.ko or kvm-amd.ko.
-
-Using KVM, one can run multiple virtual machines running unmodified Linux or Windows images. Each virtual machine has private virtualized hardware: a network card, disk, graphics adapter, etc.
-
-KVM is open source software. The kernel component of KVM is included in mainline Linux, as of 2.6.20. The userspace component of KVM is included in mainline QEMU, as of 1.3.
-
-# About iptables
-iptables is a user-space utility program that allows a system administrator to configure the tables provided by the Linux kernel firewall (implemented as different Netfilter modules) and the chains and rules it stores. Different kernel modules and programs are currently used for different protocols; iptables applies to IPv4, ip6tables to IPv6
-
-Xtables allows the system administrator to define tables containing chains of rules for the treatment of packets. Each table is associated with a different kind of packet processing. Packets are processed by sequentially traversing the rules in chains. A rule in a chain can cause a goto or jump to another chain, and this can be repeated to whatever level of nesting is desired. (A jump is like a “call”, i.e. the point that was jumped from is remembered.) Every network packet arriving at or leaving from the computer traverses at least one chain.
-
-
-Packet flow paths. Packets start at a given box and will flow along a certain path, depending on the circumstances.
-The origin of the packet determines which chain it traverses initially. There are five predefined chains (mapping to the five available Netfilter hooks), though a table may not have all chains. Predefined chains have a policy, for example DROP, which is applied to the packet if it reaches the end of the chain. The system administrator can create as many other chains as desired. These chains have no policy; if a packet reaches the end of the chain it is returned to the chain which called it. A chain may be empty.
-
-PREROUTING: Packets will enter this chain before a routing decision is made.
-
-INPUT: Packet is going to be locally delivered. It does not have anything to do with processes having an opened socket; local delivery is controlled by the "local-delivery" routing table: ip route show table local.
-
-FORWARD: All packets that have been routed and were not for local delivery will traverse this chain.
-
-OUTPUT: Packets sent from the machine itself will be visiting this chain.
-
-POSTROUTING: Routing decision has been made. Packets enter this chain just before handing them off to the hardware.
-
-Each rule in a chain contains the specification of which packets it matches. It may also contain a target (used for extensions) or verdict (one of the built-in decisions). As a packet traverses a chain, each rule in turn is examined. If a rule does not match the packet, the packet is passed to the next rule. If a rule does match the packet, the rule takes the action indicated by the target/verdict, which may result in the packet being allowed to continue along the chain or it may not. Matches make up the large part of rulesets, as they contain the conditions packets are tested for. These can happen for about any layer in the OSI model, as with e.g. the --mac-source and -p tcp --dport parameters, and there are also protocol-independent matches, such as -m time.
-
-The packet continues to traverse the chain until either
-
-a rule matches the packet and decides the ultimate fate of the packet, for example by calling one of the ACCEPT or DROP, or a module returning such an ultimate fate; or
-a rule calls the RETURN verdict, in which case processing returns to the calling chain; or
-the end of the chain is reached; traversal either continues in the parent chain (as if RETURN was used), or the base chain policy, which is an ultimate fate, is used.
-Targets also return a verdict like ACCEPT (NAT modules will do this) or DROP (e.g. the REJECT module), but may also imply CONTINUE (e.g. the LOG module; CONTINUE is an internal name) to continue with the next rule as if no target/verdict was specified at all.
-
-![Iptables](../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/iptables.png)
-
-# About ebtables
-The ebtables program is a filtering tool for a Linux-based bridging firewall. It enables transparent filtering of network traffic passing through a Linux bridge. The filtering possibilities are limited to link layer filtering and some basic filtering on higher network layers. Advanced logging, MAC DNAT/SNAT and brouter facilities are also included.
-
-The ebtables tool can be combined with the other Linux filtering tools (iptables, ip6tables and arptables) to make a bridging firewall that is also capable of filtering these higher network layers. This is enabled through the bridge-netfilter architecture which is a part of the standard Linux kernel.
-
-To use ebtables the relevant module kernels need to be loaded, the follow command will load them into the kernel
-```
- modprobe bridge
-```
-
-# About Tproxy
-Work on linux machines only!
-
-Transparent Proxy (TProxy for short) provides the ability to transparently proxy traffic through a userland program without the need for conntrack overhead caused by using NAT to force the traffic into the proxy.
-
-Another feature of TProxy is the ability to connect to remote hosts using the same client information as the original client making the connection. For example, if the connection 10.0.0.1:50073 -> 8.8.8.8:80 was intercepted, the service could make a connection to 8.8.8.8:80 pretending to come from 10.0.0.1:50073.
-
-The linux kernel and IPTables handle diverting the packets back into the proxy for those remote connections by matching incoming packets to any locally bound sockets with the same details.
-
+In this blog post we are going to talk about istio and virtual machines on top of Kubernetes. Some of the components we are going to use are [istio](https://istio.io/docs/concepts/what-is-istio/overview/), [libvirt](https://libvirt.org/index.html), [ebtables](http://ebtables.netfilter.org/), [iptables](https://en.wikipedia.org/wiki/Iptables), and [tproxy](https://github.com/LiamHaworth/go-tproxy). Please review the links provided for an overview and deeper dive into each technology
 
 # Research explanation
-Our research goal was to gave virtual machines running inside pods (kubevirt project) all the benefits kubernetes have to offer, one of them is a service mesh like istio.
+Our research goal was to give virtual machines running inside pods (kubevirt project) all the benefits kubernetes have to offer, one of them is a service mesh like istio.
 
 ## Iptables only with dnat and source nat configuration
 <span style="color:red;">This configuration is istio only!</span>
 
-For this solution a created the following architecture
+For this solution we created the following architecture
 
 ![Iptables-Diagram](../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/Iptables-diagram.png)
 
@@ -339,7 +215,7 @@ spec:
           servicePort: 9080
 ```
 
-When the my-libvirt container start it run an entry point script for iptables configuration.
+When the my-libvirt container starts it runs an entry point script for iptables configuration.
 
 ```
 1. iptables -t nat -D PREROUTING 1
@@ -598,7 +474,7 @@ spec:
           servicePort: 9080
 ```
 
-When the mynatproxy container start it run an entry point script for iptables configuration.
+When the mynatproxy container starts it runs an entry point script for iptables configuration.
 
 ```
 1. iptables -t nat -I PREROUTING 1 -p tcp -s 10.0.1.2 -m comment --comment "nat-proxy redirect" -j REDIRECT --to-ports 8080
@@ -612,7 +488,7 @@ Now lets explain every one of this lines:
 2. Accept all the traffic that go from the pod to the virtual machine
 3. Nat all the udp praffic that came from the virtual machine
 
-This solution use a container I created that have two process inside, one for the egress traffic of the virtual machine and one for the ingress traffic.
+This solution uses a container I created that has two processes inside, one for the egress traffic of the virtual machine and one for the ingress traffic.
 For the egress traffic i used a program writed in golang, and for the ingress traffic I used haproxy.
 
 The nat-proxy used a system call to get the original destination address and port that its been redirected to us from the iptable rules I created.
@@ -953,7 +829,7 @@ spec:
           servicePort: 9080
 ```
 
-When the tproxy container start it run an entry point script for iptables configuration but this time the proxy redirect came in the mangle table and not in the nat table that because TPROXY module avilable only in the mangle table.
+When the tproxy container starts it runs an entry point script for iptables configuration but this time the proxy redirect came in the mangle table and not in the nat table that because TPROXY module avilable only in the mangle table.
 
 ```
 TPROXY
@@ -1050,10 +926,10 @@ TProxy redirection with the iptables TPROXY target also
 requires that this option be set on the redirected socket.
 ```
 
-Then he setting the IP_TRANSPARENT socket option on outbound connections
+Then we set the IP_TRANSPARENT socket option on outbound connections
 Same goes for making connections to a remote host pretending to be the client, the IP_TRANSPARENT socket option is set and the Linux kernel will allow the bind so along as a connection was intercepted with those details being used for the bind.
 
-When the process get a new connection he start a connection to the read destination address and copy the traffic between both sockets
+When the process get a new connection we start a connection to the real destination address and copy the traffic between both sockets
 ```
 var streamWait sync.WaitGroup
 streamWait.Add(2)
@@ -1069,7 +945,7 @@ go streamConn(VMconn, remoteConn)
 streamWait.Wait()
 ```
 
-The Haproxy help us with the ingress traffic with the follow configuration
+The Haproxy helps us with the ingress traffic with the follow configuration
 ```
 defaults
   mode tcp
