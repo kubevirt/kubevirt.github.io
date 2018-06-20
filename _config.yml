@@ -11,6 +11,7 @@ irc: kubevirt@irc.freenode.net
 Mailinglist: https://groups.google.com/forum/#!forum/kubevirt-dev
 events: 18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com
 kubevirt_version: v0.7.0-alpha.2
+kubernetes_version: v1.10.0
 
 # Build settings
 markdown: kramdown
