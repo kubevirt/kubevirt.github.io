@@ -71,7 +71,7 @@ $ kubectl get vmis -o yaml testvm
 $ ./virtctl stop testvm
 
 # To delete
-$ kubectl delete vmis testvm
+$ kubectl delete vms testvm
 # To create your own
 $ kubectl create -f $YOUR_VM_SPEC
 ```
@@ -96,15 +96,22 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
 1. If not installed, install minikube as described [here](https://github.com/kubernetes/minikube/)
 
    1. Install the [kvm2 driver](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver)
-   2. Download the [`minikube` binary](https://github.com/kubernetes/minikube/releases)
+   2. Verify nested virtualization is enabled on the machine minikube is being installed on:
+       ```bash
+       $ cat /sys/module/kvm_intel/parameters/nested
+       Y
+       ```
+       If not, then enable it as described [here](https://docs.fedoraproject.org/quick-docs/en-US/using-nested-virtualization-in-kvm.html)
+
+   3. Download the [`minikube` binary](https://github.com/kubernetes/minikube/releases)
 
 2. Launch minikube with CNI:
 
-```bash
-$ minikube start \
-  --vm-driver kvm2 \
-  --network-plugin cni
-```
+    ```bash
+    $ minikube start \
+    --vm-driver kvm2 \
+    --network-plugin cni
+    ```
 
 3. Install `kubectl` via a package manager or [download](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl) it
 ---
