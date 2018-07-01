@@ -1,0 +1,24 @@
+toc:
+  - title: Introduction
+    page: Introduction
+    url: /docs/introduction
+
+  - title: Installation
+    page: Installation
+    url: /docs/installation
+
+  - title: Usage
+    page: Usage
+    url: /docs/usage
+
+  - title: Authorization
+    page: Authorization
+    url: /docs/authorization
+
+  - title: Workloads
+    page: Workloads
+    url: /docs/workloads
+
+  - title: Additional Resources
+    page: Additional Resources
+    url: /docs/additional-resources

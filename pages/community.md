@@ -1,7 +1,8 @@
 ---
 layout: page
-title: Community
-permalink: /community/
+title: COMMUNITY
+navbar_active: community
+permalink: /community/index.html
 order: 10
 ---
 ## Introduction

@@ -1,53 +1,96 @@
 ---
 layout: homepage
 ---
-<div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
-  <div class="carousel-inner">
-    <div class="carousel-item active">
-      <img class="d-block w-80" src="./../assets/images/carrousel_banner_1.png" alt="Banner KubeVirt">
-    </div>
-  </div>
-  <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev">
-    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next">
-    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    <span class="sr-only">Next</span>
-  </a>
-</div>
 
-
-<div class="page-content">
+<section style="background-color: #f5f5f5;">
   <div class="wrapper">
-    <div class="container">
-      <div>
-        <h1>Why KubeVirt ?</h1>
-        <div id="why" class="row">
-          <div class="col-md-6">
-            <div style="width: 100%; height: 290px;">
-              <iframe style="width: 100%; height: 100%;" src="https://www.youtube.com/embed/0dob7KsJizg" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-            </div>
-          </div>
-          <div class="col-md-6">
-            <p>
-KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized.
-More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.
+    <div class="container-fluid">
+      <div id="why" class="row">
+        <div class="col align-self-start">
+          <h2 style="margin-top: 60px; margin-left: 80px;">Why KubeVirt?</h2>
+          <p style="margin-left: 80px;">
+            KubeVirt technology addresses the needs of development teams that have adopted or want to adopt <a href="#">Kubernetes</a> but
+            possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the
+            technology provides a unified development platform where developers can build, modify, and deploy applications
+            residing in both Application Containers as well as Virtual Machines in a common, shared environment.
           </p>
-          <p>
-Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications.
-With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.
+          <p style="margin-bottom: 60px; margin-left: 80px;">
+            Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are
+            empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows,
+            teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.
           </p>
-          </div>
+        </div>
+        <div class="col align-self-end">
+          <img src="./../assets/images/home-image1.svg" style="float: right;">
         </div>
       </div>
     </div>
   </div>
-</div>
+</section>
 
+<section class="kubevirt-can-do">
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col align-self-start">
+        <h2 style="margin-top: 60px; margin-bottom: 40px; margin-left: 80px;">What can I do with KubeVirt?</h2>
+      </div>
+    </div>
+    <div class="row justify-content-center">
+      <div class="card-group" style="justify-content: center;">
+        <div class="col-3 align-self-center">
+          <div class="card text-center">
+            <div class="card-body" style="display: flex; margin: auto; height: 8rem;">
+              <img src="./../assets/images/home-image-col1.svg">
+            </div>
+            <div class="card-footer">
+              <p>
+                Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="card text-center">
+            <div class="card-body" style="display: flex; margin: auto; height: 8rem;">
+              <img src="./../assets/images/home-image-col2.svg">
+            </div>
+            <div class="card-footer">
+              <p>
+                Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.
+              </p>
+            </div>
+          </div>
+        </div>
+        <div class="col-3">
+          <div class="card text-center">
+            <div class="card-body" style="display: flex; margin: auto; height: 8rem;">
+              <img src="./../assets/images/home-image-col3.svg">
+            </div>
+            <div class="card-footer">
+              <p>
+                Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- <div class="col-3 text-center">
+        <img src="./../assets/images/home-image-col2.svg">
+        <p>
+          Combine existing virtualized workloads with new container workloads on the one platform.
+        </p>
+      </div>
+      <div class="col-3 text-center">
+        <img src="./../assets/images/home-image-col3.svg">
+        <p>
+          Support development of new microservice applications in containers that interact with existing virtualized applications.
+        </p>
+      </div> -->
+    </div>
+  </div>
+</section>
 
-
-<div class="demoBG1">
+<!-- <div class="demoBG1">
   <span style="text-align: center; font-size: 28px;">KubeVirt Demo </span>
   <span style="text-align: center;">Get Started with KubeVirt {{ site.kubevirt_version }}</span>
 </div>
@@ -72,30 +115,21 @@ With virtualized workloads placed directly in development workflows, teams can d
   </div>
 </div>
 
-
-
 <div id="usecases" class="page-content">
   <div class="wrapper">
     <div class="container">
       <h1> Use Cases </h1>
-       <!-- UseCase Begins-->
       <p>Leverage KubeVirt and Kubernetes to manage virtual machines for applications that are impractical to containerize due to technical limitations or lack of resources.</p>
       <hr/>
-      <!-- UseCase Ends-->
-       <!-- UseCase Begins-->
       <p>Combining existing virtualized workloads with new container workloads on the same platform, thereby making it easier to decompose monolithic virtualized workloads into containers over time.</p>
       <hr/>
-      <!-- UseCase Ends-->
-       <!-- UseCase Begins-->
       <p>Supporting development of new microservice applications in containers that interact with existing virtualized applications.</p>
       <hr/>
-      <!-- UseCase Ends-->
     </div>
   </div>
-</div>
+</div> -->
 
-
-<div id="blog" class="page-content">
+<!-- <div id="blog" class="page-content">
   <div class="wrapper">
     <div class="container">
       <h1>Blog</h1>
@@ -118,9 +152,9 @@ With virtualized workloads placed directly in development workflows, teams can d
       <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
     </div>
   </div>
-</div>
+</div> -->
 
-<div class="page-content">
+<!-- <div class="page-content">
   <div class="wrapper">
     <div class="container">
       <div class="row">
@@ -136,4 +170,4 @@ With virtualized workloads placed directly in development workflows, teams can d
       </div>
     </div>
   </div>
-</div>
+</div> -->

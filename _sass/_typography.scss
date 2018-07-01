@@ -1,0 +1,72 @@
+html {
+  font-family: sans-serif;
+  line-height: 1.43;
+}
+body {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.43;
+  letter-spacing: normal;
+  color: $kv-color--white;
+}
+
+h1 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 42px;
+  font-weight: 300;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: $kv-color--green-700;
+}
+
+h2 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  line-height: 1.4;
+  letter-spacing: normal;
+  color: $kv-color--green-500;
+}
+
+h3 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 18px;
+  font-weight: bold;
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+
+h4 {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+}
+
+p {
+  font-family: 'Open Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  font-style: normal;
+  font-stretch: normal;
+  color: $kv-color--black-500;
+  line-height: 1.5;
+}
+
+a {
+  color: $kv-color--green-500;
+  &:hover {
+    color: $kv-color--green-300;
+    text-decoration: none;
+  }
+}

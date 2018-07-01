@@ -1,0 +1,31 @@
+{
+  "name": "kubevirt.io",
+  "version": "2.0.0",
+  "description": "Virtual Machine Management on Kubernetes",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "publish-travis": "master _site",
+    "refresh": "gulp cleanVendors && gulp",
+    "bundle": "bundle update",
+    "reinstall": "rimraf node_modules && npm install && gulp cleanVendors && gulp",
+    "site": "gulp && npm run bundle && jekyll serve"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kubevirt/kubevirt.github.io.git"
+  },
+  "author": "KubeVirt",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kubevirt/kubevirt.github.ioissues"
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome": "^1.1.8",
+    "bootstrap": "4.1.1",
+    "jquery": "^3.3.1",
+    "popper.js": "^1.14.3"
+  }
+}
