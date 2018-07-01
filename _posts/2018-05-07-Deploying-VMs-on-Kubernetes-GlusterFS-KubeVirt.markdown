@@ -2,6 +2,11 @@
 layout: post
 author: rwsu
 description: Deploying Virtual Machines on Kubernetes with GlusterFS+Heketi and KubeVirt
+navbar_active: Blogs
+pub-date: May 07
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 Kubernetes is traditionally used to deploy and manage containerized applications. Did you know Kubernetes can also be used to deploy and manage virtual machines? This guide will walk you through installing a Kubernetes environment backed by GlusterFS for storage and the KubeVirt add-on to enable deployment and management of VMs.
@@ -15,7 +20,6 @@ Kubernetes is traditionally used to deploy and manage containerized applications
 * Installing KubeVirt
 * Deploying Virtual Machines
 
-<!-- more -->
 ## Prerequisites
 
 You should have access to at least three baremetal servers. One server will be the master Kubernetes node and other two servers will be the worker nodes. Each server should have a block device attached for GlusterFS, this is in addition to the ones used by the OS.

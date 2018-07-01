@@ -1,0 +1,25 @@
+toc:
+  - title: Categories
+    subfolderitems:
+      - page: Community
+        url: /blogs/community.html
+      - page: News
+        url: /blogs/news.html
+      - page: Weekly Updates
+        url: /blogs/updates.html
+      - page: Releases
+        url: /blogs/releases.html
+      - page: Uncategorized
+        url: /blogs/uncategorized.html
+
+  - title: Additional Resources
+    subfolderitems:
+      - page: Grouped by Date
+        url: /blogs/date.html
+      - page: 2018 Posts
+        url: /blogs/2018/posts.html
+      - page: 2017 Posts
+        url: /blogs/2017/posts.html
+        # subsubfolderitems:
+        #   - page: 2017 Posts
+        #     url: /blogs/2017/2017-posts

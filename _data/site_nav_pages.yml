@@ -1,16 +1,15 @@
-pages:
+nav:
+  - title: Blogs
+    page: Blogs
+    url: /blogs/
 
-- title: Get KubeVirt
-  url: /get_kubevirt
+  - title: Videos
+    page: Videos
+    url: /videos/
 
-- title: Blog
-  url: /blog
+  - title: Docs
+    url: https://kubevirt.io/user-guide/#/
 
-- title: Resources
-  url: /resources
-
-- title: Community
-  url: /community
-
-- title: Privacy
-  url: /privacy
+  - title: Community
+    page: Community
+    url: /community/

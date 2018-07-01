@@ -1,6 +1,16 @@
 language: ruby
+cache:
+  bundler: true
 rvm:
 - 2.3.3
+
+# Assume bundler is being used, therefore
+# the `install` step will run `bundle install` by default.
+before_install:
+  - gem install jekyll
+  - bundle install
+
+install: true
 
 script: ./scripts/cibuild.sh
 

@@ -2,9 +2,12 @@
 layout: post
 author: SchSeba
 description: In this post we will install and configure vscode for KubeVirt development
+navbar_active: Blogs
+pub-date: May 22
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
-
-# Introduction
 
 In this post we will install and configure Visual studio code (vscode) for KubeVirt development and debug.
 
@@ -12,7 +15,6 @@ Visual Studio Code is a source code editor developed by Microsoft for Windows, L
 
 It includes support for debugging, embedded Git control, syntax highlighting, intelligent code completion, snippets, and code refactoring.
 
-<!-- more -->
 # Golang Installation
 
 GO installation is required, We can find the binaries in [golang page](https://golang.org/dl/).

@@ -2,6 +2,11 @@
 layout: post
 author: jcpowermac
 description: In this post we will go over the objects provided by KubeVirt
+navbar_active: Blogs
+pub-date: May 08
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 The [KubeVirt](https://github.com/kubevirt/kubevirt/) project provides extensions to Kubernetes via [custom resources](https://kubernetes.io/docs/concepts/api-extension/custom-resources/).
@@ -14,7 +19,6 @@ compile information for this post:
 - [user-guide](http://www.kubevirt.io/user-guide/)
 - [api-reference](http://www.kubevirt.io/api-reference/)
 
-<!-- more -->
 With that let’s take a look at the objects that are available.
 
 KubeVirt top-level objects

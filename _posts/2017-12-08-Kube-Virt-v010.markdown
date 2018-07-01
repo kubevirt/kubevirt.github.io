@@ -2,7 +2,13 @@
 layout: post
 author: fabiand
 description: This release follows v0.0.4 and consists of 115 changes, contributed by 11 people, leading to 121 files changed, 5278 insertions(+), 1916 deletions(-).
+navbar_active: Blogs
+pub-date: December 08
+pub-year: 2017
+category: releases
+comments: true
 ---
+
 This release follows v0.0.4 and consists of 115 changes, contributed by
 11 people, leading to 121 files changed, 5278 insertions(+), 1916
 deletions(-).

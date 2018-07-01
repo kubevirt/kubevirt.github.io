@@ -2,7 +2,13 @@
 layout: post
 author: fabiand
 description: This is a weekly update from the KubeVirt team - including the holiday backlog update.
+navbar_active: Blogs
+pub-date: January 19
+pub-year: 2018
+category: updates
+comments: true
 ---
+
 This is a weekly update from the KubeVirt team - including the holiday
 backlog update.
 

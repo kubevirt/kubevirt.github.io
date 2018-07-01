@@ -2,13 +2,18 @@
 layout: post
 author: fabiand
 description: This is a close-to weekly update from the KubeVirt team.
+navbar_active: Blogs
+pub-date: April 27
+pub-year: 2018
+category: updates
+comments: true
 ---
+
 This is a close-to weekly update from the KubeVirt team.
 
 In general there is now more work happening outside of the core kubevirt
 repository.
 
-<!-- more -->
 We are currently driven by
 
 -   Closing a lot of loose ends

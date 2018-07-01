@@ -1,0 +1,12 @@
+{% for item in site.data.blogs_toc.toc %}
+  <ul class="blogs-navigation">
+    <h3>{{ item.title }}</h3>
+    {% for entry in item.subfolderitems %}
+      <li class="blogs-navigation--item">
+        <a href="{{ entry.url | prepend: site.baseurl }}" {% if page.title == entry.page %} class="blogs-navigation--item_link active" {% else %} class="blogs-navigation--item_link" {% endif %}>
+          {{ entry.page }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endfor %}

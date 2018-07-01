@@ -2,9 +2,12 @@
 layout: post
 author: SchSeba
 description: In this post we will deploy a vm on top of kubernetes with istio service mesh
+navbar_active: Blogs
+pub-date: June 03
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
-
-# Introduction
 
 In this blog post we are going to talk about istio and virtual machines on top of Kubernetes. Some of the components we are going to use are [istio](https://istio.io/docs/concepts/what-is-istio/overview/), [libvirt](https://libvirt.org/index.html), [ebtables](http://ebtables.netfilter.org/), [iptables](https://en.wikipedia.org/wiki/Iptables), and [tproxy](https://github.com/LiamHaworth/go-tproxy). Please review the links provided for an overview and deeper dive into each technology
 
@@ -220,7 +223,7 @@ When the my-libvirt container starts it runs an entry point script for iptables 
 
 ```
 1. iptables -t nat -D PREROUTING 1
-2. iptables -t nat -A PREROUTING -p tcp -m comment --comment "Kubevirt Spice"  --dport 5900 -j ACCEPT 
+2. iptables -t nat -A PREROUTING -p tcp -m comment --comment "Kubevirt Spice"  --dport 5900 -j ACCEPT
 3. iptables -t nat -A PREROUTING -p tcp -m comment --comment "Kubevirt virt-manager"  --dport 16509 -j ACCEPT
 4. iptables -t nat  -A PREROUTING -d 10.96.0.0/12 -m comment --comment "istio/redirect-ip-range-10.96.0.0/12-service cidr" -j ISTIO_REDIRECT
 5. iptables -t nat  -A PREROUTING -d 192.168.0.0/16 -m comment --comment "istio/redirect-ip-range-192.168.0.0/16-Pod cidr" -j ISTIO_REDIRECT
@@ -612,7 +615,7 @@ Cons:
 * Not other process can change the iptables rules
 * External process needed
 * The traffic is passed to user space
-* Only support ingress TCP connection 
+* Only support ingress TCP connection
 
 ## Iptables with a trasperent-proxy process
 This is the last solution I used in my research, it use a kernel module named TPROXY The [official documentation](https://www.kernel.org/doc/Documentation/networking/tproxy.txt) from the linux kernel documentation.
@@ -834,12 +837,12 @@ When the tproxy container starts it runs an entry point script for iptables conf
 
 ```
 TPROXY
-This target is only valid in the mangle table, in the 
-PREROUTING chain and user-defined chains which are only 
-called from this chain.  It redirects the packet to a local 
+This target is only valid in the mangle table, in the
+PREROUTING chain and user-defined chains which are only
+called from this chain.  It redirects the packet to a local
 socket without changing the packet header in any way. It can
-also change the mark value which can then be used in 
-advanced routing rules. 
+also change the mark value which can then be used in
+advanced routing rules.
 ```
 
 iptables rules:
@@ -878,7 +881,7 @@ iptables -t ${table} -I OUTPUT 1 -d 10.0.1.2 -j ACCEPT
 iptables -t ${table} -I POSTROUTING 1 -s 10.0.1.2 -p udp -j MASQUERADE
 ```
 
-For this solution we also need to load the bridge kernel module 
+For this solution we also need to load the bridge kernel module
 ```
 modprobe bridge
 ```
@@ -917,8 +920,8 @@ this socket.  This socket option allows the calling applica‐
 tion to bind to a nonlocal IP address and operate both as a
 client and a server with the foreign address as the local
 end‐point.  NOTE: this requires that routing be set up in
-a way that packets going to the foreign address are routed 
-through the TProxy box (i.e., the system hosting the 
+a way that packets going to the foreign address are routed
+through the TProxy box (i.e., the system hosting the
 application that employs the IP_TRANSPARENT socket option).
 Enabling this socket option requires superuser privileges
 (the CAP_NET_ADMIN capability).
@@ -981,7 +984,7 @@ Cons:
 * Need NET_ADMIN capability for the docker
 * External process needed
 * The traffic is passed to user space
-* Only support ingress TCP connection 
+* Only support ingress TCP connection
 
 
 # Research Conclustion

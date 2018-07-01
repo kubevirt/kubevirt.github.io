@@ -2,6 +2,11 @@
 layout: post
 author: phoracek
 description: OVN Multi-Network Plugin for Kubernetes, Kubetron
+navbar_active: Blogs
+pub-date: May 16
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 Kubernetes networking model is suited for containerized applications, based mostly around L4 and L7 services, where all pods are connected to one big network. This is perfectly ok for most use cases. However, sometimes there is a need for fine-grained network configuration with better control. Use-cases such as L2 networks, static IP addresses, interfaces dedicated for storage traffic etc. For such needs there is ongoing effort in Kubernetes sig-network to support multiple networks (see [Kubernetes Network CRD De-Facto Standard](https://docs.google.com/document/d/1Ny03h6IDVy_e_vmElOqR7UdTPAG_RNydhVE1Kx54kFQ). There exist many prototypes of plugins providing such functionality. You are reading about one of them.

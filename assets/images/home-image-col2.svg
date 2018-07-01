@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="106px" height="79px" viewBox="0 0 106 79" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 50.2 (55047) - http://www.bohemiancoding.com/sketch -->
+    <title>Group 21</title>
+    <desc>Created with Sketch.</desc>
+    <defs></defs>
+    <g id="Welcome" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Home" transform="translate(-462.000000, -1058.000000)">
+            <g id="Group-21" transform="translate(462.000000, 1058.000000)">
+                <circle id="Oval-2" fill="#F5F5F5" cx="53" cy="40" r="38"></circle>
+                <g id="Group-9">
+                    <g id="Group-8" fill="#00AAB2">
+                        <rect id="Rectangle-4" x="0" y="0" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="0" y="46" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="13" y="46" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="26" y="46" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="39" y="46" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="52" y="46" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="13" y="0" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="26" y="0" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" transform="translate(59.500000, 37.500000) rotate(90.000000) translate(-59.500000, -37.500000) " x="55" y="36" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" transform="translate(1.500000, 37.500000) rotate(90.000000) translate(-1.500000, -37.500000) " x="-3" y="36" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" transform="translate(1.500000, 24.500000) rotate(90.000000) translate(-1.500000, -24.500000) " x="-3" y="23" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" transform="translate(1.500000, 11.500000) rotate(90.000000) translate(-1.500000, -11.500000) " x="-3" y="10" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" transform="translate(59.500000, 24.500000) rotate(90.000000) translate(-59.500000, -24.500000) " x="55" y="23" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" transform="translate(59.500000, 11.500000) rotate(90.000000) translate(-59.500000, -11.500000) " x="55" y="10" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="39" y="0" width="9" height="3"></rect>
+                        <rect id="Rectangle-4" x="52" y="0" width="9" height="3"></rect>
+                    </g>
+                    <rect id="Rectangle-8" fill="#3ACCC5" x="9" y="8" width="20" height="15" rx="2"></rect>
+                    <rect id="Rectangle-8" fill="#3ACCC5" x="33" y="8" width="20" height="15" rx="2"></rect>
+                    <rect id="Rectangle-8" fill="#3ACCC5" x="8" y="27" width="45" height="15" rx="2"></rect>
+                </g>
+                <g id="Group-9" transform="translate(40.000000, 27.000000)" stroke="#00797F" stroke-dasharray="9,4" stroke-linejoin="round" stroke-width="3">
+                    <path d="M2,0 L26,0 C27.1045695,-2.02906125e-16 28,0.8954305 28,2 L28,19 C28,20.1045695 27.1045695,21 26,21 L2,21 C0.8954305,21 1.3527075e-16,20.1045695 0,19 L0,2 C-1.3527075e-16,0.8954305 0.8954305,2.02906125e-16 2,0 Z" id="Rectangle-8"></path>
+                    <path d="M38,0 L62,0 C63.1045695,-2.02906125e-16 64,0.8954305 64,2 L64,19 C64,20.1045695 63.1045695,21 62,21 L38,21 C36.8954305,21 36,20.1045695 36,19 L36,2 C36,0.8954305 36.8954305,2.02906125e-16 38,0 Z" id="Rectangle-8"></path>
+                    <path d="M2,29 L62,29 C63.1045695,29 64,29.8954305 64,31 L64,48 C64,49.1045695 63.1045695,50 62,50 L2,50 C0.8954305,50 1.3527075e-16,49.1045695 0,48 L0,31 C-1.3527075e-16,29.8954305 0.8954305,29 2,29 Z" id="Rectangle-8"></path>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>

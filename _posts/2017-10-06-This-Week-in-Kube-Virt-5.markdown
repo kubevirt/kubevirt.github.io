@@ -2,7 +2,13 @@
 layout: post
 author: fabiand
 description: This is the fith weekly update from the KubeVirt team.
+navbar_active: Blogs
+pub-date: October 06
+pub-year: 2017
+category: updates
+comments: true
 ---
+
 This is the fith weekly update from the KubeVirt team.
 
 We are currently driven by

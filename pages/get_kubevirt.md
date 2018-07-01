@@ -28,7 +28,7 @@ $ kubectl create \
 
 On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-platform/3.9/admin_guide/manage_scc.html) need to be added prior kubevirt.yaml deployment:
 
-```
+```bash
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-privileged
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-controller
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-infra
@@ -78,7 +78,7 @@ $ kubectl create -f $YOUR_VM_SPEC
 
 ### Accessing VMs (serial console & spice)
 
-```
+```bash
 # Connect to the serial console
 $ ./virtctl console testvm
 
@@ -94,7 +94,6 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
 ## Appendix: Deploying minikube
 
 1. If not installed, install minikube as described [here](https://github.com/kubernetes/minikube/)
-
    1. Install the [kvm2 driver](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver)
    2. Verify nested virtualization is enabled on the machine minikube is being installed on:
        ```bash
@@ -104,7 +103,6 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
        If not, then enable it as described [here](https://docs.fedoraproject.org/quick-docs/en-US/using-nested-virtualization-in-kvm.html)
 
    3. Download the [`minikube` binary](https://github.com/kubernetes/minikube/releases)
-
 2. Launch minikube with CNI:
 
     ```bash
@@ -112,8 +110,8 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
     --vm-driver kvm2 \
     --network-plugin cni
     ```
-
 3. Install `kubectl` via a package manager or [download](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl) it
+
 ---
 
 # KubeVirt on an existing Kubernetes cluster {#install_3}
@@ -142,7 +140,7 @@ using Ceph and Cinder, that is geared for non-production use. To install
 KubeVirt with the demo storage environment, first edit the inventory file
 and populate the section named "masters", "etcd", and "nodes".
 
-```
+```bash
 # inventory
 # BEGIN CUSTOM SETTINGS
 [masters]
@@ -222,13 +220,14 @@ First edit the inventory file and populate the sections "master", "etcd",
 Then run this playbook, substituting the namespaces and heketi_url to
 match your environment:
 
+```bash
+ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-glusterfs -e namespace=kube-system -e glusterfs_namespace=kube-system -e glusterfs_name= -e heketi_url=http://10.32.0.4:8080 playbooks/kubevirt.yml
 ```
-ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-glusterfs -e namespace=kube-system -e glusterfs_namespace=kube-system -e glusterfs_name= -e heketi_url=http://10.32.0.4:8080 playbooks/kubevirt.yml```
 
-## How it looks like in the UI
+## How it looks in the UI
 
 Provided you deployed kubernetes dashboard, you will see this kind of pods for your vms
 
-<img src="../assets/images/ui_vm_pod_1.png" alt="vm_pod_1"/>
+<img src="./../assets/images/ui_vm_pod_1.png" class="text-hide img-fluid" alt="Screenshot of VM Pod 1"/>
 
-<img src="../assets/images/ui_vm_pod_2.png" alt="vm_pod_2"/>
+<img src="./../assets/images/ui_vm_pod_2.png" class="text-hide img-fluid" alt="Screenshot of VM Pod 2"/>

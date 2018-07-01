@@ -1,0 +1,57 @@
+.footer {
+  margin-top: 5rem;
+  margin-bottom: 2rem;
+  a {
+    color: $kv-color--green-600;
+    &.link-social {
+      &-twitter,
+      &-github,
+      &-mail,
+      &-calendar {
+        color: $kv-color--black-400;
+        @media (max-width: 576px) {
+          font-size: 2rem;
+        }
+      }
+      &-twitter {
+        margin-right: 1rem;
+        &:hover {
+          color: $kv-color--blue-500;
+        }
+      }
+      &-github {
+        margin-right: 1rem;
+        &:hover {
+          color: $kv-color--black-700;
+        }
+      }
+      &-mail {
+        margin-right: 1rem;
+        &:hover {
+          color: $kv-color--gold-600;
+        }
+      }
+      &-calendar {
+        &:hover {
+          color: $kv-color--green-400;
+        }
+      }
+    }
+    &.privacy-statement {
+      &-link {
+        &:hover {
+          color: $kv-color--green-300;
+        }
+      }
+    }
+    &:hover {
+      text-decoration: none;
+    }
+  }
+  &-licensing {
+    font-size: .8rem;
+    a {
+        font-size: .8rem;
+    }
+  }
+}

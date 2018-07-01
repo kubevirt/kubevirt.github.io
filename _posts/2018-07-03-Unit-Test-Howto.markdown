@@ -2,18 +2,22 @@
 layout: post
 author: yuvalif
 description: This post tries to demystify some of our unit test mechanism, hopefully will make it easier to write more tests and increase our code coverage!
+navbar_active: Blogs
+pub-date: July 3
+pub-year: 2018
+category: news
+comments: true
 ---
 
-# Introduction
 There are [way too many reasons](https://blog.codinghorror.com/i-pity-the-fool-who-doesnt-write-unit-tests/) to write unit tests, but my favorite one is: the freedom to hack, modify and improve the code without fear, and get quick feedback that you are on the right track.
-<!-- more -->
+
 Of course, writing good integration tests (the stuff under the [tests](https://github.com/kubevirt/kubevirt/tree/master/tests) directory) is the best way to validate that everything works, but unit tests has great value as:
-- They are much faster to run (~30 seconds in our case) 
+- They are much faster to run (~30 seconds in our case)
 - You get nice coverage reports with [coveralls](https://coveralls.io/github/kubevirt/kubevirt)
 - No need to: `make cluster up/sync`
 - Cover corner cases and easier to debug
 
-> Some Notes: 
+> Some Notes:
 > - We use same frameworks (ginkgo, gomega) for unit testing and integration testing, which means that with the same learning curve, you can develop much more!
 > - "Bang for the Buck" - it usually takes 20% of the time to get to 80% coverage, and 80% of the time to get to 100%. Which mean that you have to use common sense when improving coverage - some code is just fine with 80% coverage (e.g. large files calling some other APIs with little logic), and other would benefit from getting close to 100% (e.g. complex core functionality handling lots of error cases)
 > - Follow the ["boy (or girl) scout rule"](http://programmer.97things.oreilly.com/wiki/index.php/The_Boy_Scout_Rule) - every time you enhance/fix some code, add more testing around the existing code as well
@@ -51,5 +55,5 @@ But a better way would be:
 Expect(arr).To(HaveLen(N))
 ```
 ## Function Override
-Sometimes the code under test is invoking a function which is not mocked. In most cases, this is an indication that the code needs to be refactored, so this function, or its return values, will be passed as part of the API of the code being tested. 
+Sometimes the code under test is invoking a function which is not mocked. In most cases, this is an indication that the code needs to be refactored, so this function, or its return values, will be passed as part of the API of the code being tested.
 However, if this refactoring is not possible (or too costly), you can inject your own implementation of this function. The original function should be defined as a closure, and assigned to a global variable. Since functions are 1st class citizens in go, you can assign your implementation to that function variable. More detailed example is [here](https://gist.github.com/yuvalif/006c48c563f264041f4ada5f90ddfd0c)

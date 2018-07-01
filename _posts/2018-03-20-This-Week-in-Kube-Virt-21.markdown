@@ -2,7 +2,13 @@
 layout: post
 author: fabiand
 description: This is a weekly update from the KubeVirt team.
+navbar_active: Blogs
+pub-date: March 20
+pub-year: 2018
+category: updates
+comments: true
 ---
+
 This is a weekly update from the KubeVirt team.
 
 In general there is now more work happening outside of the core kubevirt

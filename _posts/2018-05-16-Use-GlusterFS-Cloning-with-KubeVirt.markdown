@@ -2,13 +2,17 @@
 layout: post
 author: karmab
 description: A first look at using gluster cloning with kubevirt
+navbar_active: Blogs
+pub-date: May 16
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 Gluster seems like a good fit for storage in kubernetes and in particular in kubevirt. Still, as for other storage backends, we will likely need to use a golden set of images and deploy vms from them.
 
 That's where cloning feature of gluster comes at rescue!
 
-<!-- more -->
 ## Contents
 
 * Prerequisites
