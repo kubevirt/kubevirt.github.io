@@ -8,7 +8,6 @@ Gluster seems like a good fit for storage in kubernetes and in particular in kub
 
 That's where cloning feature of gluster comes at rescue!
 
-<!-- more -->
 ## Contents
 
 * Prerequisites

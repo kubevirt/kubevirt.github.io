@@ -12,7 +12,6 @@ Visual Studio Code is a source code editor developed by Microsoft for Windows, L
 
 It includes support for debugging, embedded Git control, syntax highlighting, intelligent code completion, snippets, and code refactoring.
 
-<!-- more -->
 # Golang Installation
 
 GO installation is required, We can find the binaries in [golang page](https://golang.org/dl/).

@@ -8,7 +8,6 @@ This is a close-to weekly update from the KubeVirt team.
 In general there is now more work happening outside of the core kubevirt
 repository.
 
-<!-- more -->
 We are currently driven by
 
 -   Closing a lot of loose ends

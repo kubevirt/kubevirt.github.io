@@ -7,31 +7,45 @@
 .navbar-expand-lg .navbar-collapse {
   align-self: flex-end;
 }
+.posts {
+  list-style: none;
+  &-title {
+
+  }
+  &-date {
+    margin-top: .5rem;
+    margin-bottom: 1.5rem;
+    color: $kv-color--black-400;
+    font-size: 12px;
+  }
+}
+.readmore {
+  margin-top: .5rem;
+  margin-bottom: 5rem;
+  i.fas.fa-angle-right {
+    font-weight: 300;
+  }
+}
 .doc-intro-text {
   max-width: 85%;
   height: 7.8rem;
   overflow: hidden;
   text-overflow: ellipsis;
-  &::after {
-    content: '...';
-    position: absolute;
-    right: 0;
-    bottom: 0;
-  }
-
 }
 .video-navigation,
 .docs-navigation {
   list-style: none;
   &--item {
-    padding-top: 15px;
-    padding-bottom: 15px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-top: 10px;
+    padding-bottom: 10px;
     &:hover {
       background-color: $kv-color--black-150;
     }
     &_link {
-      padding-top: 5px;
-      padding-bottom: 5px;
+      padding-top: 10px;
+      padding-bottom: 10px;
       padding-left: 5px;
       border-left: 3px solid transparent;
       font-size: 18px;
@@ -101,6 +115,9 @@
 .footer {
   margin-top: 5rem;
   margin-bottom: 2rem;
+  .col-sm-12.social-link {
+    text-align: center;
+  }
   a {
     color: $kv-color--black-200;
     &:hover {

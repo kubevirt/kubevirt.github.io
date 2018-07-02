@@ -15,7 +15,6 @@ Kubernetes is traditionally used to deploy and manage containerized applications
 * Installing KubeVirt
 * Deploying Virtual Machines
 
-<!-- more -->
 ## Prerequisites
 
 You should have access to at least three baremetal servers. One server will be the master Kubernetes node and other two servers will be the worker nodes. Each server should have a block device attached for GlusterFS, this is in addition to the ones used by the OS.
