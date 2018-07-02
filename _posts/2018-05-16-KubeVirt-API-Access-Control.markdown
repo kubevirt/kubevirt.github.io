@@ -9,7 +9,6 @@ Based Access Control (RBAC) system. This system allows KubeVirt to tie directly
 into the existing authentication and authorization mechanisms Kubernetes
 already provides to its core api objects.
 
-<!-- more -->
 ## KubeVirt RBAC Role Basics
 
 Typically when people think of Kubernetes RBAC system, they're thinking about

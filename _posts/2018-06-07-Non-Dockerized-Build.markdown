@@ -10,7 +10,6 @@ In this post we will set up an alternative to the existing containerized build s
 
 A [new makefile](../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer) will be presented here, which you can for experimenting (if you are brave enough...)
 
-<!-- more -->
 # Why?
 
 Current build system for KubeVirt is done inside docker. This ensures a robust and consistent build environment:

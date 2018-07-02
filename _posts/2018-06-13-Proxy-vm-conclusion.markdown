@@ -8,7 +8,6 @@ description: This is a roadmap blog post for the network implementation in the k
 
 This blog post follow my previous reseach on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.
 
-
 # Research conclusions and network roadmap
 
 After the deep research about different options/ways to connect VM to pods, we find that all the solution have different pros and cons.
@@ -54,7 +53,7 @@ Cons:
 * Not other process can change the iptables rules
 * External process needed
 * The traffic is passed to user space
-* Only support ingress TCP connection 
+* Only support ingress TCP connection
 
 ### Iptables with a trasperent-proxy
 
@@ -67,4 +66,4 @@ Cons:
 * Need NET_ADMIN capability for the docker
 * External process needed
 * The traffic is passed to user space
-* Only support ingress TCP connection 
+* Only support ingress TCP connection

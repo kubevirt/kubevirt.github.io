@@ -1,0 +1,16 @@
+toc:
+  - title: KubeVirt Videos
+    page: KubeVirt Videos
+    url: /videos/kubevirt-videos
+
+  - title: Talks
+    page: Talks
+    url: /videos/talks
+
+  - title: Deep Dives
+    page: deep_dives
+    url: /videos/deep_dives
+
+  - title: Community Demos
+    page: community-demos
+    url: /videos/community-demos

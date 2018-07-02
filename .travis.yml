@@ -1,6 +1,24 @@
 language: ruby
+cache:
+  bundler: true
+  directories:
+    - node_modules #NPM packages
 rvm:
 - 2.3.3
+
+addons:
+  apt:
+  packages:
+    - node
+
+# Assume bundler is being used, therefore
+# the `install` step will run `bundle install` by default.
+before_install:
+  - npm install
+  - npm run refresh
+  - gem install jekyll
+
+install: true
 
 script: ./scripts/cibuild.sh
 

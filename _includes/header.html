@@ -1,33 +1,18 @@
-<header class="site-header">
+  <a class="navbar-brand" href="/">
+    <img src="{{ site.baseurl}}/assets/images/KubeVirt_logo_color.svg" height="30" class="d-inline-block align-top" alt="">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav">
+      {% assign doclist = site.data.site_nav_pages.nav  %}
 
-  <div class="wrapper fix-header">
+      {% for item in doclist %}
+        <li {% if page.title == item.title %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+          <a class="nav-link text-uppercase" href="{{ item.url }}">{{ item.title }}</a>
+        </li>
+      {% endfor %}
 
-    <a class="site-title " href="{{ site.baseurl }}/"></a>
-
-    <nav class="site-nav">
-      <div class="">
-        <nav class="navbar navbar-expand-lg navbar-light">
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-              {% assign doclist = site.data.site_nav_pages.pages  %}
-
-              {% for item in doclist %}
-                <li class="nav-item">
-                  <a class="nav-link" href="{{ item.url }}">{{ item.title }}</a>
-                </li>
-
-              {% endfor %}
-
-            </ul>
-          </div>
-        </nav>
-
-      </div>
-    </nav>
-
+    </ul>
   </div>
-
-</header>
