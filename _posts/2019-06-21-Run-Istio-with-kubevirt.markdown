@@ -123,7 +123,7 @@ kubectl taint nodes --all node-role.kubernetes.io/master-
 
 echo Deploy kubevirt.
 
-kubectl apply -f kubevirt.yaml
+kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v0.7.0/kubevirt.yaml
 
 echo Deploy istio.
 
