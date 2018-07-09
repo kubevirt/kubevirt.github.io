@@ -371,13 +371,13 @@ NAME                         READY     STATUS      RESTARTS   AGE
 image-importer-cirros        0/1       Completed   0          28s
 ```
 
-Create a Offline Virtual Machine definition for your VM and source it into Kubernetes.
+Create a Virtual Machine definition for your VM and source it into Kubernetes.
 Note the PVC containing the cirros image must be listed as the first disk under spec.domain.devices.disks.
 
 ```yaml
 cat <<EOF | kubectl create -f -
-apiVersion: kubevirt.io/v1alpha1
-kind: OfflineVirtualMachine
+apiVersion: kubevirt.io/v1alpha2
+kind: VirtualMachine
 metadata:
   creationTimestamp: null
   labels:
@@ -427,7 +427,7 @@ chmod +x virtctl
 ./virtctl start cirros
 ```
 
-Wait for the VM to be in "Running" status.
+Wait for the VM pod to be in "Running" status.
 
 ```
 [root@master ~]# kubectl get pods
