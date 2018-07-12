@@ -5,7 +5,6 @@ description: Use Istio with KubeVirt
 ---
 
 # Introduction
-
 On this blog post, we are going to deploy virtual machines with the KubeVirt project and insert them into the Istio service mesh.
 
 Some information about the technologies we are going to use in this blog post.

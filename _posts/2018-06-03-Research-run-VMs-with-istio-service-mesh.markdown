@@ -5,7 +5,6 @@ description: In this post we will deploy a vm on top of kubernetes with istio se
 ---
 
 # Introduction
-
 In this blog post we are going to talk about istio and virtual machines on top of Kubernetes. Some of the components we are going to use are [istio](https://istio.io/docs/concepts/what-is-istio/overview/), [libvirt](https://libvirt.org/index.html), [ebtables](http://ebtables.netfilter.org/), [iptables](https://en.wikipedia.org/wiki/Iptables), and [tproxy](https://github.com/LiamHaworth/go-tproxy). Please review the links provided for an overview and deeper dive into each technology
 
 # Research explanation
