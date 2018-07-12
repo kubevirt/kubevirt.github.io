@@ -5,7 +5,6 @@ description: This is a roadmap blog post for the network implementation in the k
 ---
 
 # Introduction
-
 This blog post follow my previous reseach on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.
 
 
