@@ -1,13 +1,15 @@
 ---
 layout: post
 author: SchSeba
+title: Proxy VM Conclusion
 description: This is a roadmap blog post for the network implementation in the kubevirt project
+pub-date: June 13
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
-# Introduction
-
 This blog post follow my previous reseach on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.
-
 
 # Research conclusions and network roadmap
 
@@ -54,7 +56,7 @@ Cons:
 * Not other process can change the iptables rules
 * External process needed
 * The traffic is passed to user space
-* Only support ingress TCP connection 
+* Only support ingress TCP connection
 
 ### Iptables with a trasperent-proxy
 
@@ -67,4 +69,4 @@ Cons:
 * Need NET_ADMIN capability for the docker
 * External process needed
 * The traffic is passed to user space
-* Only support ingress TCP connection 
+* Only support ingress TCP connection

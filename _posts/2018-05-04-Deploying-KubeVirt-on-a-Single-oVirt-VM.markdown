@@ -2,6 +2,11 @@
 layout: post
 author: awels
 description: Deploying KubeVirt on a single oVirt VM
+navbar_active: Blogs
+pub-date: May 04
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 In this blog post we are exploring the possibilities of deploying Kube Virt on top of Open Shift which is running inside an oVirt VM. First we must prepare the environment. In my testing I created a VM with 4 cpus, 14G memory and a 100G disk. I then installed Centos 7.4 minimal on it. I also have nested virtualization
@@ -11,7 +16,6 @@ platform that can nested virtualization this will also work.
 For this example I chose to use a single VM for everything, but I could have done different VMs for my master/nodes/storage/etc, for simplicity I used a single
 VM.
 
-<!-- more -->
 ## Preparing the VM
 
 First we will need to enable epel and install some needed tools, like git to get at the source, and ansible to do the deploy:

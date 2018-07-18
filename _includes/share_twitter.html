@@ -1,8 +1,10 @@
 {% if include.url == null %}
-      {% assign url = page.url | prepend: site.baseurl %}
+  {% assign url = page.url | prepend: site.baseurl %}
 {% else %}
-      {% assign url = include.url %}
+  {% assign url = include.url %}
 {% endif %}
 
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ include.text }}&url={{ url }}"><span>Tweet</span></a>
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text={{ include.text }}&url=https://www.kubevirt.io{{ url }}&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
 <hr/>

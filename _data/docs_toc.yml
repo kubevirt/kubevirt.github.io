@@ -1,0 +1,21 @@
+toc:
+  - title:
+    subfolderitems:
+      - page: Introduction
+        url: /docs
+  - title:
+    subfolderitems:
+      - page: Installation
+        url: /docs/installation.html
+      - page: Usage
+        url: /docs/usage.html
+      - page: Authorization
+        url: /docs/authorization.html
+      - page: Workloads
+        url: /docs/workloads.html
+      - page: Additional Resources
+        url: /docs/additional-resources.html
+  - title:
+    subfolderitems:
+      - page: User Guide <i class="fas fa-external-link-alt"></i>
+        url: https://kubevirt.io/user-guide/#/

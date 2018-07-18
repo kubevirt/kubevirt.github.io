@@ -2,6 +2,11 @@
 layout: post
 author: davidvossel
 description: How User Access Control works in KubeVirt
+navbar_active: Blogs
+pub-date: May 16
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 Access to KubeVirt resources are controlled entirely by Kubernete's Resource
@@ -9,7 +14,6 @@ Based Access Control (RBAC) system. This system allows KubeVirt to tie directly
 into the existing authentication and authorization mechanisms Kubernetes
 already provides to its core api objects.
 
-<!-- more -->
 ## KubeVirt RBAC Role Basics
 
 Typically when people think of Kubernetes RBAC system, they're thinking about

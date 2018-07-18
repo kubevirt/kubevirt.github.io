@@ -1,0 +1,16 @@
+{
+  "author": "KubeVirt.io",
+  "description": "",
+  "name": "KubeVirt.io",
+  "short_name": "KubeVirt",
+  "lang": "en-US",
+  "homepage_url": "https://www.kubevirt.io",
+  "developer": {
+    "name": "Adam J. Jolicoeur",
+    "url": "https://github.com/mindreeper2420"
+  },
+  "icons": {
+    "48": "android-icon-48x48.png",
+    "96": "android-icon-96x96.png"
+  }
+}

@@ -2,6 +2,11 @@
 layout: post
 author: stu-gott
 description: KubeVirt Using Device Plugins For KVM
+navbar_active: Blogs
+pub-date: June 20
+pub-year: 2018
+category: news
+comments: true
 ---
 
 As of Kubernetes 1.10, the Device Plugins API is now in beta! KubeVirt is now
@@ -11,7 +16,6 @@ longer responsible for creating their own device nodes. Or stated another way:
 virt-launcher pods no longer require excess privileges just for the purpose of
 creating device nodes.
 
-<!-- more -->
 ## Kubernetes Device Plugin Basics
 
 Device Plugins consist of two main parts: a server that provides devices and
@@ -48,7 +52,6 @@ status:
     devices.kubevirt.io/tun: "110"
     pods: "110"
     ...
-
 ```
 
 In this case advertising 110 KVM or TUN devices is simply an arbitrary default

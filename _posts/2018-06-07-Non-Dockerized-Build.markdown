@@ -2,15 +2,17 @@
 layout: post
 author: yuvalif
 description: This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host
+navbar_active: Blogs
+pub-date: June 07
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
-
-# Introduction
 
 In this post we will set up an alternative to the existing containerized build system used in KubeVirt.
 
 A [new makefile](../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer) will be presented here, which you can for experimenting (if you are brave enough...)
 
-<!-- more -->
 # Why?
 
 Current build system for KubeVirt is done inside docker. This ensures a robust and consistent build environment:

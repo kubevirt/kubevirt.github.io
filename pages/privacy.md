@@ -1,11 +1,11 @@
 ---
 layout: page
-title: Privacy
+title: Privacy Statement
 permalink: /privacy/
 order: 20
 ---
 
-# Privacy Statement for the KubeVirt Project
+## Privacy Statement for the KubeVirt Project
 
 ## Scope of This Notice
 
@@ -20,6 +20,7 @@ At KubeVirt, your privacy is important to us. To better protect your privacy, we
 This Privacy Statement applies to all information collected by or submitted to KubeVirt, including personal data. "Personal data" is data that can be used to identify an individual.
 
 KubeVirt collects personal data when:
+
 * you browse our web sites;
 * you contribute to the project;
 * you participate in surveys and evaluations;
@@ -29,6 +30,7 @@ KubeVirt collects personal data when:
 KubeVirt may also collect personal data from individuals (with their consent) at conventions, trade shows and expositions.
 
 The types of personal data collected may include (but are not limited to):
+
 * your first and last name;
 * your title and your company's name;
 * your home, billing, or other physical address (including street name, name of a city or town, state/province);
@@ -55,6 +57,7 @@ You may contact [our privacy team](mailto:privacy@kubevirt.io) at any time to ha
 ## Using (Processing) Your Personal Data
 
 KubeVirt uses the personal data you provide to:
+
 * identify and authenticate you;
 * attribute data and content you produce directly and indirectly in our public-facing services;
 * answer your questions;
@@ -69,6 +72,7 @@ We also use this personal data to provide you with information related to your a
 Unless you consent, KubeVirt will never process or share the personal data you provide to us except as described below.
 
 KubeVirt may share your personal data with third parties under any of the following circumstances:
+
 * Your publicly available personal data in, as described above, is accessible by anyone unless you opt out as already described in this Privacy Statement.
 * As required to provide service, and for e-mail housing (as a consequence of uses already described in this Privacy Statement). It is in KubeVirt’s legitimate business interest to provide all users an accurate record of data and content provided by KubeVirt’s services, and to maintain the integrity of that data and content for historical, scientific, and research purposes. This data and content may include but is not limited to email, code changes, comments, and artifacts.
 * As required by law (such as responding to a valid subpoena, warrant, audit, or agency action, or to prevent fraud).
@@ -113,6 +117,7 @@ This site contains links to other sites. KubeVirt does not control the informati
 ## Your Rights and Choices in the EEA
 
 Where the EU General Data Protection Regulation 2016/679 (“GDPR”) applies to the processing of your personal data, especially when you access the website from a country in the European Economic Area (“EEA”), you have the following rights, subject to some limitations, against KubeVirt:
+
 * The right to access your personal data;
 * The right to rectify the personal data we hold about you;
 * The right to erase your personal data;

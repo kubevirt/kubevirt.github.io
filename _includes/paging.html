@@ -1,24 +1,70 @@
-<div class="row">
-  {% if paginator.next_page %}
-    <div class="col-4">
-      <a href="{{ paginator.next_page_path }}" class="btn btn-light"> &lt; Older Posts</a>
-    </div>
-  {% else %}
-    <div class="col-4">
-      <span class="btn btn-light disabled"> &lt; Older Posts</span>
-    </div>
-  {% endif %}
-  <div class="col-4" style="text-align: center;">
-    <span class="page_number" style="display: inline-table; margin-top: 6px;">Page: {{ paginator.total_pages | minus: paginator.page | plus: 1 }} of {{ paginator.total_pages }}</span>
-  </div>
+<!--
+{% if paginator.total_pages > 1 %}
+<div class="pagination align-items-center">
   {% if paginator.previous_page %}
-  <div class="col-4">
-    <a href="{{ paginator.previous_page_path }}" class="btn btn-light" style="float: right;" >Newer Posts &gt; </a>
-  </div>
+    <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="btn btn-light mr-2">
+      <i class="fas fa-angle-left"></i> Newer Posts
+    </a>
   {% else %}
-  <div class="col-4">
-    <span class="btn btn-light disabled" style="float: right;">Newer Posts &gt; </span>
-  </div>
+    <span class="btn btn-disabled mr-2">
+      <i class="fas fa-angle-left"></i> Newer Posts
+    </span>
+  {% endif %}
+
+  {% for page in (1..paginator.total_pages) %}
+    {% if page == paginator.page %}
+      <span class="font-weight-bold mr-2">{{ page }}</span>
+    {% elsif page == 1 %}
+      <a href="{{ site.baseurl }}/blogs" class="mr-2">
+        {{ page }}
+      </a>
+    {% else %}
+      <a href="{{ site.paginate_path | prepend: site.baseurl | replace: '//', '/' | replace: ':num', page }}" class="mr-2">
+        {{ page }}
+      </a>
+    {% endif %}
+  {% endfor %}
+
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="btn btn-light">
+      Older Posts  <i class="fas fa-angle-right"></i>
+    </a>
+  {% else %}
+    <span class="btn btn-disabled">
+      Older Posts  <i class="fas fa-angle-right"></i>
+    </span>
   {% endif %}
 </div>
-<hr/>
+{% endif %}
+-->
+
+{% if paginator.total_pages > 1 %}
+<div class="pagination align-items-center">
+  {% if paginator.previous_page %}
+    <a href="{{ paginator.previous_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="btn btn-outline-secondary btn-light mr-2">
+      <i class="fas fa-angle-left"></i> New
+    </a>
+  {% else %}
+    <span class="btn btn-outline-light mr-2">
+      <i class="fas fa-angle-left"></i> New
+    </span>
+  {% endif %}
+
+  {% for page in (1..paginator.total_pages) %}
+      {% if page == paginator.page %}
+        <strong class="font-weight-bold">{{ page }}</strong>
+      {% endif %}
+  {% endfor %}
+  <strong>of {{ paginator.total_pages }}</strong>
+
+  {% if paginator.next_page %}
+    <a href="{{ paginator.next_page_path | prepend: site.baseurl | replace: '//', '/' }}" class="btn btn-outline-secondary btn-light ml-2">
+      Old <i class="fas fa-angle-right"></i>
+    </a>
+  {% else %}
+    <span class="btn btn-outline-light ml-2">
+      Old <i class="fas fa-angle-right"></i>
+    </span>
+  {% endif %}
+{% endif %}
+</div>

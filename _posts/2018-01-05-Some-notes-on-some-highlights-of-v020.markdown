@@ -2,7 +2,13 @@
 layout: post
 author: fabiand
 description: The very first KubeVirt release of KubeVirt in the new year (<https://github.com/kubevirt/kubevirt/releases/v0.2.0>) had a few notable highlights which were brewing over the last few weeks.
+navbar_active: Blogs
+pub-date: January 05
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
+
 The very first KubeVirt release of KubeVirt in the new year
 (<https://github.com/kubevirt/kubevirt/releases/v0.2.0>) had a few
 notable highlights which were brewing over the last few weeks.
