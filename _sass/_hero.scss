@@ -10,6 +10,9 @@
     background-position: top center;
     min-height: 60vh;
     padding-top: 50px;
+    @media (max-width: 992px) {
+      padding-top: 75px;
+    }
     .row {
       min-height: 12rem;
     }
