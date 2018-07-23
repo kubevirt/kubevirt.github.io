@@ -22,6 +22,10 @@
 .page-title {
   padding-top: 60px;
   margin-bottom: 40px;
+  @media (max-width: 992px) {
+    padding-top: 20px;
+    padding-left: 15px;
+  }
 }
 .page-subtitle--spacer_top {
   margin-top: 60px;
@@ -46,6 +50,10 @@
 .community-page {
   .page-title {
     margin-bottom: 0;
+    @media (max-width: 992px) {
+      padding-left: 0;
+      margin-bottom: 10px;
+    }
   }
 }
 .doc-intro-text {

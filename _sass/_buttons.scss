@@ -41,5 +41,8 @@
     width: 220px;
     padding: .5rem 1rem;
     box-shadow: none;
+    @media (max-width: 992px) {
+      margin-bottom: 20px;
+    }
   }
 }
