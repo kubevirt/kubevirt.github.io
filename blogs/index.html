@@ -46,7 +46,6 @@ order: 4
             <h2 href="{{ post.url | prepend: site.baseurl }}" class="posts-title">{{ post.title }}</h2>
             <div class="posts-date">{{ post.pub-date }}, {{ post.pub-year }}</div>
             {{ post.description | strip_html | truncatewords:50 }}
-            <!-- {{ post.excerpt | strip_html | truncatewords:50 }} -->
             {% capture readmorelink %}
               {{ post.url | prepend: site.baseurl }}
             {% endcapture %}
