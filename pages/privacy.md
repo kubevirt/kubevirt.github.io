@@ -96,10 +96,6 @@ Generally, we use cookies to:
 
 If you do not want your personal information to be stored by cookies, you can configure your browser so that it always rejects these cookies or asks you each time if you accept them or not. However, you must understand that the use of cookies may be necessary to provide certain services, and choosing to reject cookies will reduce the performance and functionality of the site. Your browser documentation includes instructions explaining how to enable, disable or delete cookies at the browser level (usually located in the “Help”, “Tools” or “Edit” facility).
 
-## Google Analytics
-
-In addition to other cookies, our project uses Google Analytics to track your website activity, including times, IP addresses, and pages visited.  We do this in order to track, and report on, our success in promoting our project and website.  While we are happy to remove any personal data which is under our control in Google Analytics at your request, you may also need to [contact Google](https://privacy.google.com/businesses/compliance/#?modal_active=none) about removing data from their servers.
-
 ## Public Forums Reminder
 
 KubeVirt often makes chat rooms, forums, mailing lists, message boards, and/or news groups available to its users. Please remember that any information that is disclosed in these areas becomes public information. Exercise caution when deciding to disclose your personal data. Although we value individual ideas and encourage free expression, KubeVirt reserves the right to take necessary action to preserve the integrity of these areas, such as removing any posting that is vulgar or inappropriate. It is in KubeVirt’s legitimate business interests to provide all users an accurate record of data and content provided in the public forums it maintains and uses; to maintain the integrity of that data and content for historical, scientific, and research purposes; and to provide an environment for the free exchange of ideas relevant and constructive to the development and propagation of open source software.
