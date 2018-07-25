@@ -66,10 +66,10 @@
   .card {
     border: none;
     &-footer {
+      min-height: 8rem;
       background-color: transparent;
       border: none;
       border-radius: 0;
     }
   }
 }
-
