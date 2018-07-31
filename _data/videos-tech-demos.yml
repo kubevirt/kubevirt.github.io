@@ -1,0 +1,25 @@
+list:
+  - title: KubeVirt as an OpenShift Virtualization provider
+    intro: The video introduces 'kubevirt' as a secondary virtualization provider of the container managers (openshift/kubernetes) and demonstrates how the 'kubevirt' infrastructure provider tracks virtual machines on openshift/kubernetes.
+    url: https://www.youtube-nocookie.com/embed/6Z_kGj9_s6Q
+  - title: Cockpit-KubeVirt recent progress
+    intro: State of recent work-in-progress on adding KubeVirt support to Cockpit.
+    url: https://www.youtube-nocookie.com/embed/ljfpkIpt8Ro
+  - title: cockpit kubevirt - create new VM
+    intro: Creating virtual machine on kubernetes or openshift cluster in cockpit
+    url: https://www.youtube-nocookie.com/embed/J07dW5VZJtg
+  - title: Clone Template in ManageIQ by KubeVirt provider
+    intro: The video demonstrates cloning of a template to VM in ManageIQ by KubeVirt provider.
+    url: https://www.youtube-nocookie.com/embed/9Gf2Nv7h558
+  - title: Provision and Deprovision kubevirt-apb
+    intro: Kubevirt is a system APB. Meaning it's a cluster level resource that should only be provisioned once that manages many different resources in different namespaces.
+    url: https://www.youtube-nocookie.com/embed/27MG-ybRqzc
+  - title: K8s Data Import and PVC Cloning
+    intro: An end to end demonstration using cinder/ceph. This demo imports data into a persistent volume claim and then clones that data into a second claim.
+    url: https://www.youtube-nocookie.com/embed/q9u7SoB6cso
+  - title: virtualmachine APB
+    intro: Early work-in-progress preview of provisioning virtual machines in OpenShift via ansible service broker.
+    url: https://www.youtube-nocookie.com/embed/8g32y7LHOVU
+  - title: Libvirt to KubeVirt - Run your VMs in Kubernetes
+    intro: Migrate VMs running locally to a Kubernetes cluster with KubeVirt
+    url: https://www.youtube-nocookie.com/embed/3VwUV03k8hw
