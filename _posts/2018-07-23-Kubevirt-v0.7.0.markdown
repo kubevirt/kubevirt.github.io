@@ -19,7 +19,7 @@ the full list is visible [here](https://github.com/kubevirt/kubevirt/releases/ta
 
 ## hugepages support
 
-To use hugepages as backing memory, we need to provide desired amount of memory (`resources.requests.memory`) and size of hugepages to use (`memory.hugepages.pageSize`)
+To use hugepages as backing memory, we need to indicate a desired amount of memory (`resources.requests.memory`) and size of hugepages to use (`memory.hugepages.pageSize`)
 
 ```
 apiVersion: kubevirt.io/v1alpha1
@@ -44,6 +44,8 @@ spec:
         claimname: myclaim
 ```
 
+Note that 
+
 - a node must have pre-allocated hugepages
 - hugepages size cannot be bigger than requested memory
 - requested memory must be divisible by hugepages size
@@ -51,7 +53,7 @@ spec:
 
 ## setting network interface model and MAC address
 
-the following syntax within interfaces section allows use to set both a mac address and network  model
+the following syntax within interfaces section allows us to set both a mac address and network  model
 
 ```
 kind: VM
@@ -63,6 +65,9 @@ spec:
           macAddress: de:ad:00:00:be:af
           model: e1000
           bridge: {}
+  networks:
+  - name: red
+    pod: {}
 ```
 
 alternative network models can be 
@@ -114,12 +119,12 @@ spec:
 ...
 ```
 
-The available models are listed [here]()
-we can also use
+The available models are listed [here](https://github.com/libvirt/libvirt/blob/master/src/cpu/cpu_map.xml)
+
+Additionally, we can also use
 
 - host-model
 - host-passthrough
-
 
 ## virtctl expose
 
@@ -159,8 +164,6 @@ spec:
   - name: red
     pod: {}
 ```
-
-slirp mode currently doesn't support additional configuration fields.
 
 ## Role aggregation for our roles
 
