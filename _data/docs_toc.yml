@@ -1,21 +1,61 @@
 toc:
-  - title:
+  - title: Introduction
+    url: /docs
+  - title: Installation
+    url: /docs/installation.html
     subfolderitems:
-      - page: Introduction
-        url: /docs
-  - title:
+      - page: Admission Controllers
+        url: /docs/installation/admission-controllers.html
+      - page: Feature Matrix
+        url: /docs/installation/feature-matrix.html
+  - title: Usage
+    url: /docs/usage.html
+  - title: Authorization
+    url: /docs/authorization.html
+  - title: Workloads
+    url: /docs/workloads.html
     subfolderitems:
-      - page: Installation
-        url: /docs/installation.html
-      - page: Usage
-        url: /docs/usage.html
-      - page: Authorization
-        url: /docs/authorization.html
-      - page: Workloads
-        url: /docs/workloads.html
-      - page: Additional Resources
-        url: /docs/additional-resources.html
-  - title:
-    subfolderitems:
-      - page: User Guide <i class="fas fa-external-link-alt"></i>
-        url: https://kubevirt.io/user-guide/#/
+      - page: Virtual Machines
+        url: /docs/workloads/virtual-machines.html
+        subsubfolderitems:
+          - page: Creation
+            url: /docs/workloads/vms/creation.html
+          - page: Node Eviction
+            url: /docs/workloads/vms/node-eviction.html
+          - page: Presets
+            url: /docs/workloads/vms/presets.html
+          - page: Life-cycle
+            url: /docs/workloads/vms/life-cycle.html
+          - page: DNS for Services and VirtualMachineInstances
+            url: /docs/workloads/vms/dns-for-services.html
+          - page: Expose VirtualMachineInstances as Services
+            url: /docs/workloads/vms/expose-vm-services.html
+          - page: Create Networkpolicy
+            url: /docs/workloads/vms/create-networkpolicy.html
+          - page: Graphical and Console Access
+            url: /docs/workloads/vms/graphical-and-console-access.html
+          - page: Disks and Volumes
+            url: /docs/workloads/vms/disks-and-volumes.html
+          - page: Interfaces and Networks
+            url: /docs/workloads/vms/interfaces-networks.html
+          - page: Startup Scripts
+            url: /docs/workloads/vms/startup-scripts.html
+          - page: Guest Operating System Information
+            url: /docs/workloads/vms/guest-os-info.html
+          - page: Virtualized Hardware Configuration
+            url: /docs/workloads/vms/virtual-hardware-config.html
+          - page: Assigning VMs to Nodes
+            url: /docs/workloads/vms/vms-to-nodes.html
+      - page: Controllers
+        url: /docs/workloads/controllers.html
+        subsubfolderitems:
+          - page: VirtualMachine
+            url: /docs/workloads/controllers/virtualmachine.html
+          - page: VirtualMachineInstanceReplicaSet
+            url: /docs/workloads/controllers/virtual-machine-replica-set.html
+      - page: Templates
+        url: /docs/workloads/templates.html
+      - page: Annotations and Labels
+        url: /docs/workloads/annotations-labels.html
+  - title: Additional Resources
+    url: /docs/additional-resources.html

@@ -9,15 +9,19 @@
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container">
+      <div class="container-fluid">
         <div class="row">
-          <h1 class="page-title">{{ page.navbar_active }}</h1>
+          <h1 class="page-title offset-lg-1">{{ page.navbar_active }}</h1>
         </div>
         <div class="row">
-          <div class="col-sm-12 col-md-3">
+          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+            <div class="search-bar">
+              <i class="fas fa-search"></i>
+              <input type="search" placeholder="Type to search"></input>
+            </div>
             {% include sidebar-docs.html %}
           </div>
-          <div class="col-sm-12 col-md-9 docs">
+          <div class="col-sm-12 col-md-8 col-lg-8 docs">
             {{ content }}
           </div>
         </div>

@@ -6,6 +6,8 @@ navbar_active: Docs
 order: 10
 ---
 
+# Authorization
+
 KubeVirt authorization is performed using Kubernete's Resource Based
 Authorization Control system (RBAC). RBAC allows cluster admins to grant
 access to cluster resources by binding RBAC roles to users.
@@ -142,7 +144,3 @@ rules:
       - get
       - patch
 ```
-
-----
-
-View on [docs.kubevirt.io](https://kubevirt.io/user-guide/#/authorization)
