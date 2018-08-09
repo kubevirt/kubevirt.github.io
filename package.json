@@ -17,5 +17,8 @@
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/kubevirt/kubevirt.github.ioissues"
+  },
+  "dependencies": {
+    "simple-jekyll-search": "^1.7.0"
   }
 }

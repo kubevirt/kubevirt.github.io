@@ -6,6 +6,8 @@ navbar_active: Docs
 order: 10
 ---
 
+# Usage
+
 Using KubeVirt should be fairly natural if you are used to working with Kubernetes.
 
 The primary way of using KubeVirt is by working with the KubeVirt kinds in the Kubernetes API:
@@ -21,7 +23,3 @@ The following pages describe how to use and discover the API, manage, and access
 ## User Interface
 
 KubeVirt does not come with a UI, it is only extending the Kuebrnetes API with virtualization functionality.
-
-----
-
-View on [docs.kubevirt.io](https://kubevirt.io/user-guide/#/usage)

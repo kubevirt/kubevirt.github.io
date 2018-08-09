@@ -6,6 +6,8 @@ navbar_active: Docs
 order: 10
 ---
 
+# Installation
+
 KubeVirt is a virtualization add-on to Kubernetes and this guide assumes that a Kubernetes cluster is already installed.
 
 ## Requirements
@@ -148,12 +150,3 @@ Usually it is sufficient to re-apply the manifests for performing a rolling upda
 $ RELEASE=v0.4.0
 $ kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt.yaml
 ```
-
-## Additional Installation Steps
-
-* [Admission Controllers](https://kubevirt.io/user-guide/#/installation/api-validation)
-* [Feature Matrix](https://kubevirt.io/user-guide/#/installation/feature-matrix)
-
-----
-
-View on [docs.kubevirt.io](https://kubevirt.io/user-guide/#/installation/README)

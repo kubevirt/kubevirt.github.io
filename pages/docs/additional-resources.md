@@ -6,6 +6,8 @@ navbar_active: Docs
 order: 10
 ---
 
+# Additional Resources
+
 ## Incubator
 
 The KubeVirt incubator is a place to give projects associated with KubeVirt a room to grow. These projects are monitored by KubeVirt maintainers, but might not be ripe enough yet to be a part of core KubeVirt.
@@ -26,7 +28,3 @@ The KubeVirt incubator is a place to give projects associated with KubeVirt a ro
 
 * [Start Contributing](https://github.com/kubevirt/kubevirt/blob/master/CONTRIBUTING.md)
 * [API Reference](http://www.kubevirt.io/api-reference/)
-
-----
-
-View on [docs.kubevirt.io](https://kubevirt.io/user-guide/#/additional-resources)
