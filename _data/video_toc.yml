@@ -1,13 +1,13 @@
 toc:
   - title: General
     subfolderitems:
-      - page: KubeVirt Videos
-        url: /videos/kubevirt-videos.html
+      - page: Demos
+        url: /videos/demos.html
       - page: Talks
         url: /videos/talks.html
-      - page: Deep Dives
-        url: /videos/deep_dives.html
-  - title: Community Demos
+      - page: Tech Demos
+        url: /videos/tech-demos.html
+  - title: Community
     subfolderitems:
-      - page: Sprint 11
-        url: /videos/sprints/sprint-11.html
+      - page: Weekly Meetings
+        url: /videos/community/meetings.html
