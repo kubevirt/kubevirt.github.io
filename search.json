@@ -1,0 +1,13 @@
+---
+layout: null
+---
+[
+  {% for page in site.pages %}
+   {
+     {% if page.title != nil and page.url contains "/docs" %}
+        "title"    : "{{ page.title | escape }}",
+        "url"      : "{{ site.baseurl }}{{ page.url }}"
+     {% endif %}
+   } {% unless forloop.last %},{% endunless %}
+  {% endfor %}
+]

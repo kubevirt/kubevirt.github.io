@@ -15,13 +15,11 @@
         </div>
         <div class="row">
           <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
-            <!-- <div class="search-bar">
-              <form action="{{ site.baseurl }}/search.html" method="get">
-                <label for="search-box">Search</label>
-                <input type="text" id="search-box" name="query">
-                <input type="submit" value="search">
-              </form>
-            </div> -->
+            <div class="search-bar">
+              <i class="fas fa-search docs-search"></i>
+              <input type="text" id="search-input" class="docs-search--input" placeholder="Type to search">
+              <ul id="results-container" class="docs-search--container"></ul>
+            </div>
             {% include sidebar-docs.html %}
           </div>
           <div class="col-sm-12 col-md-8 col-lg-8 docs">
@@ -35,6 +33,14 @@
       {% include footer.html %}
     </footer>
 
+    <script src="{{ site.baseurl }}/js/simple-jekyll-search.min.js"></script>
+    <script>
+    var sjs = SimpleJekyllSearch({
+      searchInput: document.getElementById('search-input'),
+      resultsContainer: document.getElementById('results-container'),
+      json: '{{ site.baseurl }}/search.json'
+    });
+    </script>
     <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
