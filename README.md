@@ -56,6 +56,49 @@ navbar_active: Docs
 
 If you add a new page and want it to appear in the sidebar of that section (such as the sidebar under **Docs**), then you also need to update the `yaml` file associated with that group. These are located under `_data/`. For **Docs**, you would update `docs_toc.yml`, following the structure that currently exists within that file.
 
+## Creating a Lab
+
+All Labs are located in the `/labs` directory, and then broken down into their individual labs. Each Lab should contain a landing page, allowing users to enter (or allow the site to link to) the starting page of a specific lab - i.e. `/labs/kubernetes/kubernetes.html`.
+
+### Lab Landing Pages
+
+Each Lab landing page should have the following Font Matter configuration:
+
+```jekyll
+---
+layout: kubernetes
+title: Kubernetes Lab
+order: 1
+permalink: labs/kubernetes.html
+---
+```
+
+As can be seen, each page requires a particular layout - this ensures that the Table of Contents reads through the correct collections and builds properly.
+
+### Lab Files
+
+Once the landing page and layout has been created, the individual lab steps can now be added. These need to be place in the same directory as the landing page - i.e. `/labs/kubernetes/`. Labs should be named `lab1.md`, replacing the number as necessary. This ensures that the pages are ordered properly in the Table of Contents.
+
+Lab Front Matter should be configured as follows:
+
+```jekyll
+---
+layout: kubernetes
+title: Use KubeVirt
+permalink: /labs/kubernetes/lab6
+lab: kubernetes
+order: 1
+---
+```
+
+**Here is a breakdown of the Front Matter:**
+- `layout:` This is the layout that is used for the page. This should match the layout of the landing page.
+- `title:` The title of the Lab.
+- `permalink:` This is the shorthand link for the individual lab step - this keep this lab at a permanent place in the site.
+- `lab:` Define this to match the Lab. This is necessary for the Table of Contents to pick up on the particular Lab and add it to the proper navigation.
+- `order: 1` This is set to say this page is a top level item (all Labs have this to ensure their proper place in the site).
+
+
 ## Linking
 
 When creating a link within KubeVirt.io, they all should include `{{ site.baseurl }}` before the location.

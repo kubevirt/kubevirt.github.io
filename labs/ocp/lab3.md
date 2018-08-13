@@ -1,13 +1,21 @@
-## Explore the Environment
+---
+layout: ocp
+title: Explore the Environment
+permalink: /labs/ocp/lab3
+lab: ocp
+order: 1
+---
+
+# Explore the Environment
 
 A PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator
 
 ```
-oc get pv 
+oc get pv
 ```
 
 By examining hostPath section of one of the existing PVS, we can see how we are using local paths to provide such storage
-The *-o yaml* flag allows us to gather full information for the corrresponding object
+The *-o yaml* flag allows us to gather full information for the corresponding object
 
 ```
 oc get pv pv0001 -o yaml
@@ -69,6 +77,8 @@ oc whoami
 
 This concludes this section of the lab.
 
-[Next Lab](../lab4/lab4.md)\
-[Previous Lab](../lab2/lab2.md)\
-[Home](../../README.md)
+---
+
+[Next Lab](../lab4/lab4)\
+[Previous Lab](../lab2/lab2)\
+[Home](../../../labs)

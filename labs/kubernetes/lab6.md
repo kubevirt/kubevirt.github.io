@@ -1,17 +1,25 @@
-## Use KubeVirt
+---
+layout: kubernetes
+title: Use KubeVirt
+permalink: /labs/kubernetes/lab6
+lab: kubernetes
+order: 1
+---
+
+# Use KubeVirt
 
 ### Create a Virtual Machine
 
 Download the VM manifest and explore it. Note it uses a [registry disk](https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk) and as such doesn't persist data. Such registry disks currently exist for alpine, cirros and fedora.
 
-```
+```bash
 wget https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
 less vm.yaml
 ```
 
 Apply the manifest to Kubernetes.
 
-```
+```bash
 kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
   virtualmachine.kubevirt.io "testvm" created
   virtualmachineinstancepreset.kubevirt.io "small" created
@@ -41,7 +49,7 @@ kubectl get vms -o yaml testvm
 
 ### Accessing VMs (serial console & spice)
 
-Connect to the serial console of the Cirros VM. Hit return / enter a few times and login with the displayed username and password. 
+Connect to the serial console of the Cirros VM. Hit return / enter a few times and login with the displayed username and password.
 
 ```
 ./virtctl console testvm
@@ -51,7 +59,7 @@ Disconnect from the virtual machine console by typing: `ctrl+]`.
 
 Connect to the graphical display.
 
-Note: Requires `remote-viewer` from the `virt-viewer` package. This is out of scope for this lab. 
+Note: Requires `remote-viewer` from the `virt-viewer` package. This is out of scope for this lab.
 
 ```
 ./virtctl vnc testvm
@@ -74,4 +82,4 @@ kubectl delete vms testvm
 This concludes this section of the lab.
 
 [Next Lab](../lab7/lab7.md)\
-[Home](../../README.md)
+[Home](../../../labs)

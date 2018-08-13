@@ -1,18 +1,26 @@
-## Set up your Environment
+---
+layout: ocp
+title: Set up your Environment
+permalink: /labs/ocp/lab2
+lab: ocp
+order: 1
+---
+
+# Set up your Environment
 
 For the sake of time, some of the required setup has already been taken care of on your GCP VM. For future reference though, the easiest way to get started is to head over to the OpenShift Origin repo on github and follow the "[Getting Started](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md)" instructions. The instructions cover getting started on Windows, MacOS, and Linux.
 
-### Requirements 
+### Requirements
 
 First, let's escalate privileges. The remaining commands will be run as _root_ on the GCP instance.
 
-```
+```bash
 sudo -i
 ```
 
 Create an SSH key that you will be using later.
 
-```
+```bash
 ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa
 ```
 
@@ -24,7 +32,7 @@ Review the [`requirements.sh`](../../administrator/requirements.sh) file. This s
 
 As GCP instances might randomly experience network issues at boot, double check requirements by relaunching the script. It will run missing steps if needed.
 
-```
+```bash
 ~/requirements.sh
 ```
 
@@ -34,19 +42,19 @@ All that's left to do is run OpenShift by executing the `openshift.sh` script in
 
 The remaining commands will be run as _root_ on the GCP instance. Review the `openshift.sh` file. Notice how additional flags are passed to `oc cluster up` to enable additional features like ansible service broker and to allow public access.
 
-```
+```bash
 cat ~/openshift.sh
 ```
 
 Now, let's start our local, containerized OpenShift environment. Running this script could take between 3-5 minutes.
 
-```
+```bash
 ~/openshift.sh
 ```
 
 The resulting output should be something of this nature:
 
-```
+```bash
 OpenShift server started.
 
 The server is accessible via web console at:
@@ -88,12 +96,12 @@ The expected results here are that you recieved quite a bit of output. If you re
 
 OK, so now that OpenShift is available, let's ask for a cluster status & take a look at our running containers:
 
-```
+```bash
 oc version
   oc v3.10.0-rc.0+c20e215
   kubernetes v1.10.0+b81c8f8
   features: Basic-Auth GSSAPI Kerberos SPNEGO
- 
+
   Server https://127.0.0.1:8443
   openshift v3.10.0-rc.0+ad6a1da-30
   kubernetes v1.10.0+b81c8f8
@@ -101,18 +109,20 @@ oc version
 
 The important item from the `oc cluster status` command output is the `Web console URL`.
 
-```
+```bash
 oc cluster status
   Web console URL: https://student002.cnvlab.gce.sysdeseng.com:8443/console/
-  
-  Config is at host directory 
-  Volumes are at host directory 
+
+  Config is at host directory
+  Volumes are at host directory
   Persistent volumes are at host directory /root/openshift.local.clusterup/openshift.local.pv
   Data will be discarded when cluster is destroyed
 ```
 
 This concludes this section of the lab.
 
-[Next Lab](../lab3/lab3.md)\
-[Previous Lab](../lab1/lab1.md)\
-[Home](../../README.md)
+---
+
+[Next Lab](../lab3/lab3)\
+[Previous Lab](../lab1/lab1)\
+[Home](../../../labs)

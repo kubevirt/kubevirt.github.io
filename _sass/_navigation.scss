@@ -82,7 +82,11 @@
   }
 }
 
-.docs-title {
+.labs-title {
+  margin-left: 25px;
+}
+.docs-title,
+.labs-title {
   &--item {
     display: flex;
     flex: 1;
@@ -106,7 +110,8 @@
 
 .blogs-navigation,
 .video-navigation,
-.docs-navigation {
+.docs-navigation,
+.labs-navigation {
   list-style: none;
   margin-bottom: 0;
   &--item {
