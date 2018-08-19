@@ -2,6 +2,11 @@
 layout: post
 author: mhenriks
 description: Hello KubeVirt on MiniKube
+navbar_active: Blogs
+pub-date: June 20
+pub-year: 2018
+category: uncategorized
+comments: true
 ---
 
 In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt.  We will also go through the process of installing [Minikube](https://kubernetes.io/docs/setup/minikube/) and KubeVirt on a Fedora 28 workstation.
@@ -174,6 +179,6 @@ $ kubectl get vms
 No resources found.
 ```
 
-## Nest Steps
+## Next Steps
 
 Take a look at the [user guide](https://kubevirt.io/user-guide/#/) and get involved with the [community](http://kubevirt.io/community/).
