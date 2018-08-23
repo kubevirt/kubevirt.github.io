@@ -1,6 +1,14 @@
-## Experiment with CDI
+---
+layout: ocp
+title: Experiment with CDI
+permalink: /labs/ocp/lab7
+lab: ocp
+order: 1
+---
 
-[CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt. 
+# Experiment with CDI
+
+[CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt.
 
 At a high level, a persistent volume claim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named *disk.img* with the desired content into the associated PVC
 
@@ -74,6 +82,8 @@ ssh fedora@VM_IP
 
 This concludes this section of the lab.
 
+---
+
 [Next Lab](../lab8/lab8.md)\
 [Previous Lab](../lab6/lab6.md)\
-[Home](../../README.md)
+[Home](../../../labs)

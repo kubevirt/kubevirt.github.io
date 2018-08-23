@@ -1,4 +1,12 @@
-## Install KubeVirt
+---
+layout: ocp
+title: Install KubeVirt
+permalink: /labs/ocp/lab5
+lab: ocp
+order: 1
+---
+
+# Install KubeVirt
 
 In this section, download the `kubevirt.yaml` file and explore it.  Then, apply it from the upstream github repo.
 
@@ -8,14 +16,14 @@ export VERSION=v0.7.0-alpha.2
 
 Grab the kubevirt.yaml file to explore. Review the ClusterRole's, CRDs, ServiceAccounts, DaemonSets, Deployments, and Services.
 
-```
+```bash
 wget https://github.com/kubevirt/kubevirt/releases/download/$VERSION/kubevirt.yaml
 less kubevirt.yaml
 ```
 
 Install KubeVirt. You should see several objects were created.
- 
-```
+
+```bash
 oc apply -f https://github.com/kubevirt/kubevirt/releases/download/$VERSION/kubevirt.yaml
 ```
 
@@ -27,7 +35,7 @@ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-controller
 oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-apiserver
 ```
 
-Give permissions to the qemu user for persistent volume claims 
+Give permissions to the qemu user for persistent volume claims
 
 ```
 setfacl -m user:107:rwx /root/openshift.local.pv/pv*
@@ -53,21 +61,21 @@ To review the objects through the OpenShift web console, access the console and 
 
 Open that URL in a browser, log in as the `developer` user with a password of `developer`.
 
-![openshift](images/openshift-console-login.png)
+<img src="/assets/images/labs/ocp/openshift-console-login.png" class="img-fluid" alt="Provisioned KubeVirt">
 
 Explore the kube-system project by clicking on the `View All` link in the right hand navigation pane.
 
-![openshift](images/openshift-console-view-all.png)
+<img src="/assets/images/labs/ocp/openshift-console-view-all.png" class="img-fluid" alt="OpenShift">
 
 Browse to the `kube-system` project and explore the objects. Click on the different objects, explore the environment.
 
-![openshift](images/openshift-console-kube-system.png)
+<img src="/assets/images/labs/ocp/openshift-console-kube-system.png" class="img-fluid" alt="OpenShift">
 
 #### Install virtctl
 
 Return to the CLI and install virtctl. This tool provides quick access to the serial and graphical ports of a VM, and handle start/stop operations. Also run `virtctl` to get an idea of it's options.
 
-```
+```bash
 curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/$VERSION/virtctl-$VERSION-linux-amd64
 chmod -v +x virtctl
 ./virtctl --help
@@ -75,6 +83,8 @@ chmod -v +x virtctl
 
 This concludes this section of the lab.
 
-[Next Lab](../lab6/lab6.md)\
-[Previous Lab](../lab4/lab4.md)\
-[Home](../../README.md)
+---
+
+[Next Lab](../lab6/lab6)\
+[Previous Lab](../lab4/lab4)\
+[Home](../../../labs)

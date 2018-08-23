@@ -45,4 +45,32 @@
       margin-bottom: 20px;
     }
   }
+  &-link--sidebar {
+    color: $kv-color--green-500;
+    &:hover,
+    &:active,
+    &:focus {
+      color: $kv-color--green-300;
+      text-decoration: none;
+    }
+    &::after {
+      position: absolute;
+      right: 2rem;
+      display: inline-block;
+      font-style: normal;
+      font-variant: normal;
+      text-rendering: auto;
+      -webkit-font-smoothing: antialiased;
+      font-family: "Font Awesome 5 Free";
+      font-weight: 900;
+      content: "\f107"; // angle-down
+    }
+    &.collapsed {
+      &::after {
+        font-family: "Font Awesome 5 Free";
+        font-weight: 900;
+        content: "\f105"; // angle-right
+      }
+    }
+  }
 }

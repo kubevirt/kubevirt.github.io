@@ -1,14 +1,22 @@
-## Experiment with CDI
+---
+layout: kubernetes
+title: Experiment with CDI
+permalink: /labs/kubernetes/lab7
+lab: kubernetes
+order: 1
+---
 
-[CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt. 
+# Experiment with CDI
+
+[CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt.
 
 At a high level, a persistent volume claim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named *disk.img* with the desired content into the associated PVC
 
 #### Install CDI
 
-We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class. 
+We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class.
 
-```
+```bash
 wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/pages/labs/manifests/storage-setup.yml
 cat storage-setup.yml
 wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/v0.5.0/manifests/controller/cdi-controller-deployment.yaml
@@ -27,7 +35,7 @@ kubectl get pods
 
 As an example, we will import a Fedora28 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
-```
+```bash
 kubectl create -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/pages/labs/manifests/pvc_fedora.yml
 ```
 
@@ -44,7 +52,7 @@ Notice that the importer downloaded the publically available Fedora Cloud qcow i
 
 Let's create a Virtual Machine making use of it. Review the file *vm1_pvc.yml*.
 
-```
+```bash
 wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/pages/labs/manifests/vm1_pvc.yml
 cat ~/vm1_pvc.yml
 ```

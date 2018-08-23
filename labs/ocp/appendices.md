@@ -1,12 +1,19 @@
-== Appendix A - Manual Configuration of Ansible Tower
+---
+layout: default
+title: Appendicies
+permalink: /labs/ocp/appendices
+order: 10
+---
+
+# Appendix A - Manual Configuration of Ansible Tower
 
 Steps necessary to manually configure a fresh Ansible Tower instances instead.
 
-NOTE: This section assumes a link:http://docs.ansible.com/ansible-tower/latest/html/userguide/credentials.html#machine[Machine Credential] to connect to the instances via SSH and a link:http://docs.ansible.com/ansible-tower/latest/html/userguide/credentials.html#amazon-web-services[Cloud Credential] to communicate with AWS has been previously configured.
+NOTE: This section assumes a link: [Machine Credential](http://docs.ansible.com/ansible-tower/latest/html/userguide/credentials.html#machine) to connect to the instances via SSH and a link:[Cloud Credential](http://docs.ansible.com/ansible-tower/latest/html/userguide/credentials.html#amazon-web-services) to communicate with AWS has been previously configured.
 
 ##  Create Tower Inventory
 
-An link:http://docs.ansible.com/ansible-tower/latest/html/userguide/inventories.html[inventory] in Ansible Tower is similar to an inventory in standalone Ansible as it contains the hosts that playbooks can be run against.  
+An link: [inventory](http://docs.ansible.com/ansible-tower/latest/html/userguide/inventories.html) in Ansible Tower is similar to an inventory in standalone Ansible as it contains the hosts that playbooks can be run against.  
 
 
 * Click **INVENTORIES** on the top navigation pane.
@@ -14,11 +21,10 @@ An link:http://docs.ansible.com/ansible-tower/latest/html/userguide/inventories.
 ** Provide a name of: **OpenShift**
 ** In the _VARIABLES_ pane underneath the `---`, add the following content. Ensure there is a **space** between the `:` and the `<student_id>`.
 
-[source, text]
-----
+```text
 student_id: <student_id>
 lab_user: student
-----
+```
 
 ** Click **SAVE**
 
@@ -30,22 +36,20 @@ Within the newly created _OpenShift_ group, add a new group called _AWS_
 ** Under _CLOUD CREDENTIAL_ click the search icon and select the preconfigured **AWS** credential radio button. Click **SELECT** to choose the value.
 ** In the _REGIONS_ dropdown, select **Asia Pacific (Singapore)**
 ** Provide the following in the _INSTANCE FILTER_
-+
-[source, text]
-----
+
+```text
 tag:student_id=<student_id>
-----
-+
+```
+
 ** Select the **Update on Launch** checkbox
 ** Add the following variables to the _SOURCE VARIABLES_ pane:
-+
-[source, text]
-----
+
+```text
 regions: 'eu-central-1'
 destination_format_tags: 'Name'
 destination_format: '{0}'
-----
-+
+```
+
 ** Click **SAVE**
 
 Add a new group called _OSEv3_ which will be used as the top level group referenced by the OpenShift installer.
@@ -57,8 +61,7 @@ Add a new group called _OSEv3_ which will be used as the top level group referen
 
 IMPORTANT: REPLACE <student_id> with your student ID! student_id takes form similar to `student-1` as used previously. **There are 4 instances of <student_id>** in the variables below - be sure to change each of them.
 
-[source, bash]
-----
+```bash
 deployment_type: openshift-enterprise
 osm_use_cockpit: no
 openshift_master_default_subdomain: apps-<student_id>.rhte.sysdeseng.com
@@ -93,11 +96,12 @@ openshift_node_labels: "{{ ec2_tag_node_labels }}"
 
 # Default Node Selector Cannot be Used Due to Issue With Service Catalog Deployment. Is set during Postinstall playbook
 #osm_default_node_selector: 'type=app'
-----
-+
+```
+
+
 ** Click **SAVE**
 
-In this section, we are going to configure link:http://docs.ansible.com/ansible-tower/latest/html/userguide/inventories.html#groups-and-hosts[groups].  This is important because this is the way that Ansible Tower constructs an inventory to pass to the openshift-ansible byo playbook.
+In this section, we are going to configure link: [groups](http://docs.ansible.com/ansible-tower/latest/html/userguide/inventories.html#groups-and-hosts).  This is important because this is the way that Ansible Tower constructs an inventory to pass to the openshift-ansible byo playbook.
 
 ** Click on the **OSEv3** group
 *** Click on **ADD GROUP**
@@ -118,15 +122,14 @@ In this section, we are going to configure link:http://docs.ansible.com/ansible-
 
 At this point, this is what your inventory group paths should look like:
 
-[source, bash]
-----
+```bash
 INVENTORIES -> OpenShift -> OSEv3 -> nodes -> tag_lab_role_node
 INVENTORIES -> OpenShift -> OSEv3 -> nodes -> masters -> tag_lab_role_master
-----
+```
 
 ## Create Projects for Provision and Post-install Playbooks
 
-A link:http://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html[project] in Ansible tower is a logical collection of Ansible playbooks. A new project will be created to reference the custom content provided by this lab.
+A link: [project](http://docs.ansible.com/ansible-tower/latest/html/userguide/projects.html) in Ansible tower is a logical collection of Ansible playbooks. A new project will be created to reference the custom content provided by this lab.
 
 * Click **PROJECTS** in the top navigation pane.
 ** Click **ADD**.
@@ -148,7 +151,7 @@ Now you should have two projects: _openshift-ansible_ and _Managing OCP from Ins
 
 ## Create Job Template for Deployment Provision
 
-A link:http://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html[job template] is the definition and a set of parameters for running an Ansible job. They are used to execute playbooks provided within a project with a set of resources that are needed to execute the playbook, such as credentials and parameters.
+A link: [job template](http://docs.ansible.com/ansible-tower/latest/html/userguide/job_templates.html) is the definition and a set of parameters for running an Ansible job. They are used to execute playbooks provided within a project with a set of resources that are needed to execute the playbook, such as credentials and parameters.
 
 First a new job template will need to be created in order to provision new instances for OpenShift in AWS.
 
@@ -162,9 +165,7 @@ First a new job template will need to be created in order to provision new insta
 ** Click the _SEARCH_ icon for the _SELECT CLOUD CREDENTIAL_ input box and select **AWS** and then click **SELECT**.
 ** Add the following to the _EXTRA VARIABLES_ pane. Be sure to replace the `<student_id>` with the student ID assigned to you.
 
-+
-[source, bash]
-----
+```bash
 lab_user: student
 student_id: <student_id>
 openshift_cluster_public_url: "https{{':'}}//master-{{ student_id }}.{{ domain_name }}{{':'}}8443"
@@ -182,7 +183,7 @@ domain_name: rhte.sysdeseng.com
 ocp_ami_id: ami-4267d02d
 ocp_master_inst_type: t2.large
 ocp_node_inst_type: t2.xlarge
-----
+```
 
 ** Click **SAVE**.
 
@@ -246,9 +247,7 @@ Perform these steps from the Ansible Tower host
 ** Click the "SEARCH" icon for the "SELECT CLOUD CREDENTIAL" input box and select "AWS" and then click "SELECT".
 ** Add the following to the "EXTRA VARIABLES" pane.
 
-+
-[source, bash]
-----
+```bash
 lab_user: student
 student_id: <student_id>
 openshift_cluster_public_url: "https{{':'}}//master-{{ student_id }}.{{ domain_name }}{{':'}}8443"
@@ -266,7 +265,7 @@ domain_name: rhte.sysdeseng.com
 ocp_ami_id: ami-4267d02d
 ocp_master_inst_type: t2.large
 ocp_node_inst_type: t2.xlarge
-----
+```
 
 ** Click "SAVE".
 
@@ -297,13 +296,13 @@ ocp_node_inst_type: t2.xlarge
 ** Select “Deployment Post-install” and “Select
 ** Select “SAVE” at the bottom right.
 
-== Appendix B - Script For Deploying CloudForms
+# Appendix B - Script For Deploying CloudForms
 
-These are pulled directly from <<Lab 4 - Installing Red Hat CloudForms>>
+These are pulled directly from [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/pages/labs/ocp/lab4/lab4.md)
 
 .master$
-[source, bash]
-----
+
+```
 #!/bin/bash
 
 oc new-project cloudforms
@@ -318,63 +317,63 @@ oc describe -n openshift template cloudforms
 oc new-app -p APPLICATION_MEM_REQ=3072Mi --template=cloudforms
 oc -n cloudforms get pods -w
 oc status -n cloudforms
-----
+```
 
 Proceed to <<Accessing the CloudForms User Interface>>
 
-== Appendix C - Recovering From Failed CloudForms  Deployment
+# Appendix C - Recovering From Failed CloudForms  Deployment
 
 The following output represents a failed deployment:
 
 .master$
-[source, bash]
-----
+
+```bash
 NAME                  READY     STATUS              RESTARTS   AGE
 cloudforms-1-deploy   1/1       Running             0          10s
 cloudforms-1-dgvv6    0/1       ContainerCreating   0          4s
 memcached-1-deploy    1/1       Running             0          10s
 memcached-1-s78jr     0/1       ContainerCreating   0          2s
 postgresql-1-deploy   0/1       ContainerCreating   0          10s
-NAME                 READY     STATUS    RESTARTS   AGE
-postgresql-1-oqoyw   0/1       Pending   0          0s
-postgresql-1-oqoyw   0/1       Pending   0         0s
-postgresql-1-oqoyw   0/1       ContainerCreating   0         0s
-postgresql-1-deploy   1/1       Running   0         11s
-memcached-1-s78jr   0/1       Running   0         18s
-memcached-1-s78jr   1/1       Running   0         30s
-memcached-1-deploy   0/1       Completed   0         41s
-memcached-1-deploy   0/1       Terminating   0         41s
-memcached-1-deploy   0/1       Terminating   0         41s
-cloudforms-1-dgvv6   0/1       Running   0         1m
-postgresql-1-deploy   0/1       Error     0         10m
-postgresql-1-oqoyw   0/1       Terminating   0         10m
-cloudforms-1-dgvv6   0/1       Running   1         10m
-postgresql-1-oqoyw   0/1       Terminating   0         10m
-postgresql-1-oqoyw   0/1       Terminating   0         10m
-cloudforms-1-dgvv6   0/1       Running   2         19m
-cloudforms-1-deploy   0/1       Error     0         20m
-cloudforms-1-dgvv6   0/1       Terminating   2         20m
-cloudforms-1-dgvv6   0/1       Terminating   2         20m
-cloudforms-1-dgvv6   0/1       Terminating   2         20m
-cloudforms-1-dgvv6   0/1       Terminating   2         20m
-----
+NAME                  READY     STATUS              RESTARTS   AGE
+postgresql-1-oqoyw    0/1       Pending             0          0s
+postgresql-1-oqoyw    0/1       Pending             0          0s
+postgresql-1-oqoyw    0/1       ContainerCreating   0          0s
+postgresql-1-deploy   1/1       Running             0          11s
+memcached-1-s78jr     0/1       Running             0          18s
+memcached-1-s78jr     1/1       Running             0          30s
+memcached-1-deploy    0/1       Completed           0          41s
+memcached-1-deploy    0/1       Terminating         0          41s
+memcached-1-deploy    0/1       Terminating         0          41s
+cloudforms-1-dgvv6    0/1       Running             0          1m
+postgresql-1-deploy   0/1       Error               0          10m
+postgresql-1-oqoyw    0/1       Terminating         0          10m
+cloudforms-1-dgvv6    0/1       Running             1          10m
+postgresql-1-oqoyw    0/1       Terminating         0          10m
+postgresql-1-oqoyw    0/1       Terminating         0          10m
+cloudforms-1-dgvv6    0/1       Running             2          19m
+cloudforms-1-deploy   0/1       Error               0          20m
+cloudforms-1-dgvv6    0/1       Terminating         2          20m
+cloudforms-1-dgvv6    0/1       Terminating         2          20m
+cloudforms-1-dgvv6    0/1       Terminating         2          20m
+cloudforms-1-dgvv6    0/1       Terminating         2          20m
+```
 
 The quickest way to remedy this is to delete the project and start over
 
 .master$
-[source, bash]
-----
+
+```bash
 oc delete project cloudforms
-----
+```
 
-Now return the the lab and try again <<Lab 4 - Installing Red Hat CloudForms>>
+Now return the the lab and try again [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/pages/labs/ocp/lab4/lab4.md)
 
-== Appendix D - Average Tower Job Times
+# Appendix D - Average Tower Job Times
 
-[options="header]
+
 |======================
 | Tower Workflow Job | Tower Job | Elapsed Time | Purpose
-|1-Deploy_OpenShift_on_AWS | | 00:24:44 | Orchestrated workflow to deploy OpenShift
+| 1-Deploy_OpenShift_on_AWS | | 00:24:44 | Orchestrated workflow to deploy OpenShift
 | | Deploy-1-Provision | 00:03:19 |Crease instances on Cloud Provider
 | | Deploy-2-Install | 00:18:06 | Install OpenShift via openshift-ansible
 | | Deploy-3-Post-Install | 00:01:29 | Setup templates and image streams for labs
@@ -384,65 +383,64 @@ Now return the the lab and try again <<Lab 4 - Installing Red Hat CloudForms>>
 | | Scaleup-3-Post-Install | 00:00:19 | Run post-install tasks
 |======================
 
-Return to <<Lab 4 - Installing Red Hat CloudForms>>
+Return to [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/pages/labs/ocp/lab4/lab4.md)
 
-== Appendix E - Troubleshooting CloudForms
+# Appendix E - Troubleshooting CloudForms
 
 Try to curl the CloudForms application, this may fail.
 
 .master$
-[source, bash]
-----
+
+```bash
 curl -Ik https://cloudforms-cloudforms.apps.example.com
-----
+```
 
 If this matches the web browser’s output of **Application Not Available** or status code of **503**. then something failed in the deployment.
 
 List the pods in the _default_ project
 
 .master$
-[source, bash]
-----
+
+```bash
 oc get pods -n default
-----
+```
 
 List services in the default project
 
 .master$
-[source, bash]
-----
+
+```bash
 oc get services
-----
+```
 
 Try curl against the cloudforms service IP
 
 .master$
-[source, bash]
-----
+
+```bash
 curl -Ik http://72.30.126.6
-----
+```
 
 If the router is in error state, delete it
 
 .master$
-[source, bash]
-----
+
+```bash
 oc delete pod router -n default
-----
+```
 
 Watch the router get deployed
 
 .master$
-[source, bash]
-----
+
+```bash
 oc get pods -n default -w
-----
+```
 
 The cloudforms application should work now if the router came up cleanly
 
 .master$
-[source, bash]
-----
-curl -Ik https://cloudforms-cloudforms.apps.example.com
-----
 
+```bash
+curl -Ik https://cloudforms-cloudforms.apps.example.com
+```

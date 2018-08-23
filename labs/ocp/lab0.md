@@ -1,18 +1,24 @@
-toc::[]
-= Lab 0 - Overview
+---
+layout: default
+title: Lab 0
+permalink: /labs/ocp/lab0
+order: 10
+---
+
+# Lab 0 - Overview
 
 image::../lab0/images/managing-ocp-overview/1.png[]
 
 image::images/managing-ocp-beyond.png[]
 
-== Abstract
+## Abstract
 _Today’s complex application environments require a design that addresses several common themes: they must be automated, scalable and manageable. This starts from the ground up: from the infrastructure layer all the way up to the lifecycle of applications. Fortunately, working in unison, the collection of Red Hat’s cloud and automation technologies can be used to orchestrate the infrastructure and application deployment process along with providing insight into the operational environment. In this hands-on session, attendees will experience firsthand how Ansible and Ansible Tower can be a central fixture within the enterprise by coordinating an installation of the Red Hat OpenShift Container Platform on top of Amazon Web Services. Since containers can not only run mission critical applications, but also the components to manage the infrastructure, multiple tools will be utilized including Prometheus to gather metrics along with a containerized version of Red Hat CloudForms. Both tools will be deployed to provide insight into the runtime environment. The result is solution that demonstrates how the combination or the proper tools can solve the most complex challenges._
 
-=== Lab Overview and Introduction
+### Lab Overview and Introduction
 
 Managing an ecosystem of infrastructure and applications can be challenging. Fortunately, there are automation tools and technologies available to handle the most intense workloads. Today, we will leverage tools such as Ansible Tower to automate the provisioning of the OpenShift Container Platform on top of Amazon Web Services to provide the foundation for running containerized applications. Afterward, multiple methods for monitoring the platform will be utilized. First, Prometheus can be installed by default in OpenShift as a method for collecting metrics. While Prometheus has a method for visualizing the collected data, Grafana is a tool specifically suited for this purpose. Alternatively to Prometheus and Grafana, Red Hat CloudForms will also be deployed to manage and monitor the underlying infrastructure and applications that run in the environment. Finally, we will walk through expanding the environment by adding new OpenShift compute resources to the environment dynamically based on cluster capacity. By the conclusion of the lab, you will learn how each of these technologies complement one another to offer solutions to effectively manage the most complex environment.
 
-=== Environment Overview
+### Environment Overview
 
 The lab environment that we will utilize today consists of the workstation that you brought with you along with multiple virtual machines running in Amazon Web Services (AWS).  The details of each virtual machine are listed below:
 
@@ -20,7 +26,7 @@ The lab environment that we will utilize today consists of the workstation that 
 * AWS is hosting instances that will be used for hosting the following infrastructure instances:
     * Red Hat OpenShift Container Platform 3.9
         ** 1 Master node
-        ** 2 Application Nodes (1 Application node intitially, then scaled up to several)
+        ** 2 Application Nodes (1 Application node initially, then scaled up to several)
            *** Red Hat CloudForms (containerized)
     * Ansible Tower 3.2.3 using Ansible Engine 2.5
 
@@ -30,53 +36,31 @@ The following diagram depicts a high level overview of the environment:
 
 image::images/environment-overview.png[]
 
-=== Target Environment
+### Target Environment
 
 As you progress through the series of labs, you will build increased capabilities for effectively managing containerized workloads. The diagram below represents the environment that we will be building today.
 
 image::images/target-environment.png[]
 
-=== Connectivity Details
+### Connectivity Details
 
 There are several components that will be utilized throughout the course of this lab. During the lab, you will be asked navigate to components running in the environment from a web browser as well as connect directly to the VMs running in AWS via _SSH_.
 
 A specific `student_id` should have been assigned to you. This must be used consistently throughout the rest of this lab. A private key will also be provided in order to facilitate direct connectivity to the instances.
 
-*IMPORTANT: If you have not been asigned a `student_id` immediately halt and raise your hand to speak with an instructor!*
+*IMPORTANT: If you have not been assigned a `student_id` immediately halt and raise your hand to speak with an instructor!*
 
 The following table outlines how to connect to each resource:
 
-[options="header"]
-|======================
-| *Item* | *URL* | *Access*
-| Ansible Tower|
-link:https://tower-<student_id>.labs.sysdeseng.com[https://tower-<student_id>.labs.sysdeseng.com] |
-Username: <student_id> +
-Password: INSTRUCTOR WILL PROVIDE
-| OpenShift Container Platform |
-link:https://:master-<student_id>.labs.sysdeseng.com:8443[https://master-<student_id>.labs.sysdeseng.com:8443] |
-Username: <student_id> +
-Password: INSTRUCTOR WILL PROVIDE
-| Prometheus |
-link:https://prometheus-openshift-metrics.apps-<student_id>.labs.sysdeseng.com[https://prometheus-openshift-metrics.apps-<student_id>.labs.sysdeseng.com] |
-Username: <student_id>-admin +
-Password: INSTRUCTOR WILL PROVIDE
-| AlertManager |
-link:https://alertmanager-openshift-metrics.apps-<student_id>.labs.sysdeseng.com[https://alertmanager-openshift-metrics.apps-<student_id>.labs.sysdeseng.com] |
-Username: <student_id>-admin +
-Password: INSTRUCTOR WILL PROVIDE
-| Grafana
-| link:https://grafana-grafana.apps-<student_id>.labs.sysdeseng.com[https://grafana-grafana.apps-<student_id>.labs.sysdeseng.com]
-| Username: <student_id>-admin +
-| Red Hat CloudForms |
-link:https://cloudforms-cloudforms.apps-<student_id>.labs.sysdeseng.com[https://cloudforms-cloudforms.apps-<student_id>.labs.sysdeseng.com] |
-Username: admin +
-Password: INSTRUCTOR WILL PROVIDE
-| Linux SSH private key
-| link:https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem[https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem]
-| Username: student +
-Password: INSTRUCTOR WILL PROVIDE
-|======================
+| *Item* | *URL* | *Access* |
+| --- | --- | --- |
+| Ansible Tower | [https://tower-<student_id>.labs.sysdeseng.com](https://tower-<student_id>.labs.sysdeseng.com) | Username: <student_id> + Password: INSTRUCTOR WILL PROVIDE |
+| OpenShift Container Platform | [https://:master-<student_id>.labs.sysdeseng.com:8443](https://master-<student_id>.labs.sysdeseng.com:8443) | Username: <student_id> + Password: INSTRUCTOR WILL PROVIDE |
+| Prometheus | [https://prometheus-openshift-metrics.apps-<student_id>.labs.sysdeseng.com](https://prometheus-openshift-metrics.apps-<student_id>.labs.sysdeseng.com) | Username: <student_id>-admin + Password: INSTRUCTOR WILL PROVIDE |
+| AlertManager | [https://alertmanager-openshift-metrics.apps-<student_id>.labs.sysdeseng.com](https://alertmanager-openshift-metrics.apps-<student_id>.labs.sysdeseng.com) | Username: <student_id>-admin + Password: INSTRUCTOR WILL PROVIDE |
+| Grafana | [https://grafana-grafana.apps-<student_id>.labs.sysdeseng.com](https://grafana-grafana.apps-<student_id>.labs.sysdeseng.com) | Username: <student_id>-admin + |
+| Red Hat CloudForms | [https://cloudforms-cloudforms.apps-<student_id>.labs.sysdeseng.com](https://cloudforms-cloudforms.apps-<student_id>.labs.sysdeseng.com) | Username: admin + Password: INSTRUCTOR WILL PROVIDE |
+| Linux SSH private key | [https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem](https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem[https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem) | Username: student + Password: INSTRUCTOR WILL PROVIDE |
 
 You will need to use a private key file to _SSH_ to the instances that are deployed on AWS. Choose the section below to follow based on your operating system type (more instructions will follow in Lab 1):
 
@@ -85,16 +69,15 @@ You will need to use a private key file to _SSH_ to the instances that are deplo
 Retrieve the `managing-ocp-install-beyond.pem` key from the instructor server (See Linux SSH private key resource in the table above for the URL) so that you can _SSH_ into the instances by accessing the password protected directory from the table above. Download the _managing-ocp-install-beyond.pem_ file to your local machine and change the permissions of the file to 600.
 
 .workstation$
-[source, bash]
-----
+```bash
 chmod 600 managing-ocp-install-beyond.pem
-----
+```
 
-In order to connect to an AWS instance, instructions are here: link:https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html[https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html].
+In order to connect to an AWS instance, instructions are here: [https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AccessingInstancesLinux.html).
 
 Each component plays a critical role into the overall management of the environment. Now let’s get started!
 
-'''
+---
 
-[Next Lab](../lab1/lab1.md)\
-[Home](../../README.md)
+[Next Lab](../lab1/lab1)\
+[Home](../../../labs)

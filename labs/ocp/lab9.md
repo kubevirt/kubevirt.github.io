@@ -1,4 +1,12 @@
-## Conclusion
+---
+layout: ocp
+title: Conclusion
+permalink: /labs/ocp/lab9
+lab: ocp
+order: 1
+---
+
+# Conclusion
 
 Now that you have completed the lab, let's review what was covered here -
 
@@ -14,5 +22,7 @@ Now that you have completed the lab, let's review what was covered here -
 
 Thanks for participating and don't forget to submit that PR if you find issues. :+1:
 
-[Previous Lab](../lab8/lab8.md)\
-[Home](../../README.md)
+---
+
+[Previous Lab](../lab8/lab8)\
+[Home](../../../labs)
