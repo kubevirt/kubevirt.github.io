@@ -34,6 +34,6 @@ This concludes this section of the lab.
 
 ---
 
-[Next Lab](../lab9/lab9)\
-[Previous Lab](../lab7/lab7)\
+[Next Lab](../ocp/lab9)\
+[Previous Lab](../ocp/lab7)\
 [Home](../../../labs)

@@ -24,5 +24,5 @@ Thanks for participating and don't forget to submit that PR if you find issues. 
 
 ---
 
-[Previous Lab](../lab8/lab8)\
+[Previous Lab](../ocp/lab8)\
 [Home](../../../labs)
