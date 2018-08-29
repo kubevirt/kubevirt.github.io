@@ -81,5 +81,5 @@ kubectl delete vms testvm
 
 This concludes this section of the lab.
 
-[Next Lab](../lab7/lab7.md)\
+[Next Lab](../kubernetes/lab7)\
 [Home](../../../labs)

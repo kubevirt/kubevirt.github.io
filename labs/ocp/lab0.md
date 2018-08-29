@@ -79,5 +79,5 @@ Each component plays a critical role into the overall management of the environm
 
 ---
 
-[Next Lab](../lab1/lab1)\
+[Next Lab](../ocp/lab1)\
 [Home](../../../labs)

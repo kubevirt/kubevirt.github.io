@@ -123,6 +123,6 @@ This concludes this section of the lab.
 
 ---
 
-[Next Lab](../lab3/lab3)\
-[Previous Lab](../lab1/lab1)\
+[Next Lab](../ocp/lab3)\
+[Previous Lab](../ocp/lab1)\
 [Home](../../../labs)

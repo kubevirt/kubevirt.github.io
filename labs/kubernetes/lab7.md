@@ -17,7 +17,7 @@ At a high level, a persistent volume claim (PVC) is created. A custom controller
 We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class.
 
 ```bash
-wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/pages/labs/manifests/storage-setup.yml
+wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/storage-setup.yml
 cat storage-setup.yml
 wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/v0.5.0/manifests/controller/cdi-controller-deployment.yaml
 cat cdi-controller-deployment.yaml
@@ -36,7 +36,7 @@ kubectl get pods
 As an example, we will import a Fedora28 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
 ```bash
-kubectl create -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/pages/labs/manifests/pvc_fedora.yml
+kubectl create -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
 ```
 
 This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the *kubevirt.io/storage.import.endpoint* annotation.
@@ -53,7 +53,7 @@ Notice that the importer downloaded the publically available Fedora Cloud qcow i
 Let's create a Virtual Machine making use of it. Review the file *vm1_pvc.yml*.
 
 ```bash
-wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/pages/labs/manifests/vm1_pvc.yml
+wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm1_pvc.yml
 cat ~/vm1_pvc.yml
 ```
 
@@ -87,5 +87,5 @@ ssh fedora@VM_IP
 
 This concludes this section of the lab.
 
-[Previous Lab](../lab6/lab6.md)\
-[Home](../../README.md)
+[Previous Lab](../kubernetes/lab6)\
+[Home](../../../labs)
