@@ -402,3 +402,35 @@ In the above example the VM will have `64Mi` of memory, but instead of regular m
 - a node must have pre-allocated hugepages
 - hugepages size cannot be bigger than requested memory
 - requested memory must be divisible by hugepages size
+
+## Virtio RNG
+
+The Virtio RNG is a way of transferring the host source of entropy to the guest.
+It is always good idea to enable the host source of entropy in your VM for two reasons.
+First the random number generator  in VM will be much faster. Second when running
+multiple VMs on single host, you will guarantee they will not have the same seed.
+
+To enable the Virtio RNG, simple add the `rng` to the `spec.domain.devices`
+section as illustrated in following example.
+
+```yaml
+apiVersion: kubevirt.io/v1alpha2
+kind: VirtualMachineInstance
+metadata:
+  name: myvmi
+spec:
+  domain:
+    devices:
+      rng: {}
+```
+
+That is it, nothing more is needed from the host side.
+
+On the guest side on linux guest, the host RNG is mapped as `/dev/hwrng`, as it
+would be a hardware random generator. If you are not running RHEL 7.1+ and you
+want to take a good use of the mapped entropy you have to install and setup
+`rngd` package for your distribution.
+More info on `rngd` is on the [QEMU wiki page](https://wiki.qemu.org/Features/VirtIORNG).
+
+In case you are running windows guest, you have to install the
+[Virtio drivers](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/index.html).
