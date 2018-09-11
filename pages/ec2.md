@@ -12,7 +12,7 @@ To use the images, you should already have an AWS account. The images
 are free to use but AWS will bill you for instance hours, storage,
  and associated services unless you are in an AWS trial period.
 
-### Step 1: Launch KubeVirt in Amazon EC2
+## Step 1: Launch KubeVirt in Amazon EC2
 
 Click on an AMI link below to start up an instance in your preferred
 EC2 region.
@@ -50,7 +50,7 @@ to SSH and select a key pair to SSH into your instance.
 It takes about 5 mins after the EC2 instance is started for the 
 instance to be ready for SSH login.
 
-### Step 2: Walkthrough the KubeVirt labs
+## Step 2: Walkthrough the KubeVirt labs
 
 After you have connected to your instance, you can walkthrough
 a couple of labs to help you get acquainted with KubeVirt and
