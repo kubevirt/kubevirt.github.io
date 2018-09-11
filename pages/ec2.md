@@ -8,11 +8,11 @@ and KubeVirt inside an EC2 instance to help you quickly deploy
 a trial environment. 
 
 In Step 1, we guide you through selecting an AMI and some factors to
-consider when launching the EC2 instance through the AWS console
+consider when launching the EC2 instance through the AWS console.
 
 After you have launched your EC2 instance, navigate back to this 
-page then dive into the two labs in Step 2 to help you get acquainted 
-with KubeVirt. 
+page and then dive into the two labs in Step 2 to help you get 
+acquainted with KubeVirt. 
 
 ## Step 1: Launch KubeVirt in Amazon EC2
 
@@ -64,10 +64,10 @@ ssh -i <aws-private-key> centos@<ec2_public_ip_or_hostname>
 
 ```
 
-## Step 2: Walkthrough the KubeVirt labs
+## Step 2: KubeVirt labs
 
 After you have connected to your instance through SSH, you can 
-walkthrough a couple of labs to help you get acquainted with KubeVirt 
+work through a couple of labs to help you get acquainted with KubeVirt 
 and how to use it to create and deploy VMs with Kubernetes.
 
 The first lab is ["Use KubeVirt"](../labs/kubernetes/lab6). This lab walks you 
