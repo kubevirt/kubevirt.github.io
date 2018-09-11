@@ -25,7 +25,7 @@ When configuring your instance, you will also need to allow ingress
 to SSH and select a key pair to SSH into your instance.
 
 | EC2 Region | Location      | AMI Type | AMI ID |
-| ---        | ---           | ---      | ---    |
+| ---        | ---           | -------- | ---:    |
 |            |               |          |        |
 | us-east-1  | N. Virginia   | HVM      | [ami-0bbcf719fec0d74e9](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0bbcf719fec0d74e9) |
 | us-east-2  | Ohio          | HVM      | [ami-044aa283a41e6ef37](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-044aa283a41e6ef37) |
