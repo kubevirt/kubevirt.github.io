@@ -122,7 +122,7 @@ Under the Community page, depending on your content settings, you will be able t
 ### Run a jekyll container
 
 ```
-sudo docker run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll serve --watch
+sudo docker run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch
 ```
 
 ### View the site
