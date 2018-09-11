@@ -53,7 +53,7 @@ If hardware virtualization is not available, then a [software emulation fallback
 
 ```bash
 $ kubectl configmap -n kube-system kubevirt-config \
-    --from-literal debug.allowEmulation=true
+    --from-literal debug.useEmulation=true
 ```
 
 This ConfigMap needs to be created before deployment or the virt-controller deployment has to be restarted.
