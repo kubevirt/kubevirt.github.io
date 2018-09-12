@@ -22,7 +22,7 @@ This week we achieved to:
 
 -   Generation of API documentation (@lukas-bednar)
     (<https://github.com/kubevirt/kubevirt/pull/571>)
-    (<https://kubevirt-incubator.github.io/api-reference/content/index.html>)
+    (<https://kubevirt.io/api-reference/master/definitions.html>)
 
 -   Move components to kube-system namespace (@cynepco3hahue)
     (<https://github.com/kubevirt/kubevirt/pull/558>)
@@ -42,7 +42,7 @@ Finally you can view our open issues at
 <https://github.com/kubevirt/kubevirt/issues>
 
 And keep track of events at our calendar
-[18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com](https://calendar.google.com/embed?src=<link xl:href=)"&gt;https://calendar.google.com/embed?src=<18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com>&lt;/link&gt;
+[18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com](https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com)
 
 If you need some help or want to chat you can find us on
 <irc://irc.freenode.net/#kubevirt>

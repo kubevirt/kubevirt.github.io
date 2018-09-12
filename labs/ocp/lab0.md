@@ -60,7 +60,7 @@ The following table outlines how to connect to each resource:
 | AlertManager | [https://alertmanager-openshift-metrics.apps-<student_id>.labs.sysdeseng.com](https://alertmanager-openshift-metrics.apps-<student_id>.labs.sysdeseng.com) | Username: <student_id>-admin + Password: INSTRUCTOR WILL PROVIDE |
 | Grafana | [https://grafana-grafana.apps-<student_id>.labs.sysdeseng.com](https://grafana-grafana.apps-<student_id>.labs.sysdeseng.com) | Username: <student_id>-admin + |
 | Red Hat CloudForms | [https://cloudforms-cloudforms.apps-<student_id>.labs.sysdeseng.com](https://cloudforms-cloudforms.apps-<student_id>.labs.sysdeseng.com) | Username: admin + Password: INSTRUCTOR WILL PROVIDE |
-| Linux SSH private key | [https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem](https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem[https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem) | Username: student + Password: INSTRUCTOR WILL PROVIDE |
+| Linux SSH private key | [https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem](https://instructor.labs.sysdeseng.com/summit/managing-ocp-install-beyond.pem) | Username: student + Password: INSTRUCTOR WILL PROVIDE |
 
 You will need to use a private key file to _SSH_ to the instances that are deployed on AWS. Choose the section below to follow based on your operating system type (more instructions will follow in Lab 1):
 
