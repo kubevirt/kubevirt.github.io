@@ -38,23 +38,23 @@ EC2 region.
 | ---        | ---           | ---      | ---:   |
 |            |               |          |        |
 | us-east-1  | N. Virginia   | HVM      | [ami-0bbcf719fec0d74e9](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0bbcf719fec0d74e9) |
-| us-east-2  | Ohio          | HVM      | [ami-044aa283a41e6ef37](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-044aa283a41e6ef37) |
-| us-west-1  | N. California | HVM      | [ami-0c14ec087d17f9012](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0c14ec087d17f9012) |
-| us-west-2  | Oregon        | HVM      | [ami-08190196d0f8271ca](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-08190196d0f8271ca) |
+| us-east-2  | Ohio          | HVM      | [ami-044aa283a41e6ef37](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-044aa283a41e6ef37) |
+| us-west-1  | N. California | HVM      | [ami-0c14ec087d17f9012](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-0c14ec087d17f9012) |
+| us-west-2  | Oregon        | HVM      | [ami-08190196d0f8271ca](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-08190196d0f8271ca) |
 |            |               |          |        |
-| ca-central-1 | Canada   | HVM      | [ami-00bb805a6b82e11ab](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-00bb805a6b82e11ab) |
+| ca-central-1 | Canada   | HVM      | [ami-00bb805a6b82e11ab](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-00bb805a6b82e11ab) |
 |            |               |          |        |
-| eu-west-1      | Ireland   | HVM      | [ami-01e0fa09440c6610f](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-01e0fa09440c6610f) |
-| eu-west-2      | London    | HVM      | [ami-05cb85ccf49452dd3](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-05cb85ccf49452dd3) |
-| eu-west-3      | Paris    | HVM      | [ami-06f30cf3c97215d50](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-06f30cf3c97215d50) |
-| eu-central-1   | Frankfurt | HVM      | [ami-0439bc95ea180e33d](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0439bc95ea180e33d) |
+| eu-west-1      | Ireland   | HVM      | [ami-01e0fa09440c6610f](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-01e0fa09440c6610f) |
+| eu-west-2      | London    | HVM      | [ami-05cb85ccf49452dd3](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-05cb85ccf49452dd3) |
+| eu-west-3      | Paris    | HVM      | [ami-06f30cf3c97215d50](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-06f30cf3c97215d50) |
+| eu-central-1   | Frankfurt | HVM      | [ami-0439bc95ea180e33d](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-0439bc95ea180e33d) |
 |                |               |          |        |
-| ap-northeast-1 | Tokyo   | HVM      | [ami-03339e0ccdafb2bc9](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-03339e0ccdafb2bc9) |
-| ap-southeast-1 | Singapore | HVM      | [ami-006e3a928020bebb9](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-006e3a928020bebb9) |
-| ap-southeast-2 | Sydney   | HVM      | [ami-047df916b259b17cf](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-047df916b259b17cf) |
-| ap-south-1     | Mumbai   | HVM      | [ami-0bbcf719fec0d74e9](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0bbcf719fec0d74e9) |
+| ap-northeast-1 | Tokyo   | HVM      | [ami-03339e0ccdafb2bc9](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-03339e0ccdafb2bc9) |
+| ap-southeast-1 | Singapore | HVM      | [ami-006e3a928020bebb9](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-006e3a928020bebb9) |
+| ap-southeast-2 | Sydney   | HVM      | [ami-047df916b259b17cf](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-047df916b259b17cf) |
+| ap-south-1     | Mumbai   | HVM      | [ami-0bbcf719fec0d74e9](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-0bbcf719fec0d74e9) |
 |            |               |          |        |
-| sa-east-1  | Sao Paulo   | HVM      | [ami-0447be57cacc2bff4](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0447be57cacc2bff4) |
+| sa-east-1  | Sao Paulo   | HVM      | [ami-0447be57cacc2bff4](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-0447be57cacc2bff4) |
 |            |               |          |        |
 
 Then SSH to your EC2 instance:
