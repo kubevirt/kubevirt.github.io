@@ -1,19 +1,16 @@
 ---
 layout: page
-title: Easy Install Using A Public Cloud Provider
+title: Easy Install Using Gcp
 ---
 
-You can try KubeVirt in one of the public clouds that are supported. The
-benefits of this option are that you don't need any hardware yourself, and that
-you can also use the same public cloud as the platform to be managed.
-Note this setup is not meant for production, only to give you a quick taste of kubevirt's functionality
+You can try KubeVirt in Google Cloud Platform
 
-In the instructions below we will use the Google Cloud Platform. The KubeVirt
-project publishes ready-to-use images on [Google
-Storage](https://console.cloud.google.com/storage/browser/kubevirt-button). We will
-assume that you have a Google account with an active payment method or a free
+Note this setup is not meant for production, only to give you a quick taste of KubeVirt's functionality
+
+The KubeVirt project publishes ready-to-use images on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button). 
+
+We will assume that you have a Google account with an active payment method or a free
 trial. You also need to make sure that you have a default keypair installed.
-
 
 ### Step 1: Create a new image
 
@@ -24,15 +21,13 @@ on "Create Image" or click the following [link](https://console.cloud.google.com
 
 Fill in the following data:
 
-{% assign release = site.data.releases["stable"] %}
-
-**Name:** kubevirt-{{release.tag}}
+**Name:** kubevirt-button
 
 **Family:** centos-7 (optional)
 
 **Source:** cloud storage file
 
-**Cloud storage file:** kubevirt-button/{{release.tag}}.tar.gz
+**Cloud storage file:** kubevirt-button/{{ site.kubevirt_version}}.tar.gz
 
 ### Step 2: Create a new instance using the image you created
 
@@ -56,13 +51,16 @@ KubeVirt along with Kubernetes will get provisioned during boot!
 You can now access the instance through ssh and launch vms
 
 ## Step 2: KubeVirt labs
- After you have connected to your instance through SSH, you can
+
+After you have connected to your instance through SSH, you can
 work through a couple of labs to help you get acquainted with KubeVirt
 and how to use it to create and deploy VMs with Kubernetes.
- The first lab is ["Use KubeVirt"](../labs/kubernetes/lab6). This lab walks you
+
+The first lab is ["Use KubeVirt"](../labs/kubernetes/lab6). This lab walks you
 through the creation of a Virtual Machine instance on Kubernetes and then
 shows you how to use virtctl to interact with its console.
- The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
+
+The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
 lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
 (PVC) and then how to define a VM to make use of the PVC.
