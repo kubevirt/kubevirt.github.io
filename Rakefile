@@ -35,6 +35,4 @@ namespace :links do
 end
 
 desc 'The default task will execute all tests in a row'
-# TODO: Waiting for merging the link fixing PR to activate the external and internal checker
-#task :default => ['links:test_external', 'links:test_internal']
-task :default => :build
+task :default => ['links:test_external', 'links:test_internal']
