@@ -79,6 +79,6 @@ This concludes this section of the lab.
 
 ---
 
-[Next Lab](../ocp/lab4)\
-[Previous Lab](../ocp/lab2)\
-[Home](../../../labs)
+[Next Lab]({{ site.baseurl }}/labs/ocp/lab4)\
+[Previous Lab]({{ site.baseurl }}/labs/ocp/lab2)\
+[Home]({{ site.baseurl }}/labs.html)

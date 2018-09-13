@@ -119,7 +119,7 @@ spec:
 ...
 ```
 
-The available models are listed [here](https://github.com/libvirt/libvirt/blob/master/src/cpu/cpu_map.xml)
+The available models are listed [here](https://github.com/libvirt/libvirt/blob/master/src/cpu_map)
 
 Additionally, we can also use
 

@@ -67,6 +67,6 @@ your cluster.
 
 # What's next
 
- * More information about persistent and ephemeral volumes: [Disks and Volumes](workloads/vms/disks-and-volumes.md)
- * How to access a VirtualMachineInstance via `console` or `vnc`: [Graphical and Serial Console Access](workloads/vms/graphical-and-console-access.md)
- * How to customize VirtualMachineInstances with `cloud-init`: [Startup Scripts](workloads/vms/startup-scripts.md)
+ * More information about persistent and ephemeral volumes: [Disks and Volumes]({{ site.baseurl }}/docs/workloads/vms/disks-and-volumes)
+ * How to access a VirtualMachineInstance via `console` or `vnc`: [Graphical and Serial Console Access]({{ site.baseurl }}/docs/workloads/vms/graphical-and-console-access)
+ * How to customize VirtualMachineInstances with `cloud-init`: [Startup Scripts]({{ site.baseurl }}/docs/workloads/vms/startup-scripts)

@@ -24,5 +24,5 @@ Thanks for participating and don't forget to submit that PR if you find issues. 
 
 ---
 
-[Previous Lab](../ocp/lab8)\
-[Home](../../../labs)
+[Previous Lab]({{ site.baseurl }}/labs/ocp/lab8.html)\
+[Home]({{ site.baseurl }}/labs.html)

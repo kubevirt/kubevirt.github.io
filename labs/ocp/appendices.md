@@ -296,9 +296,9 @@ ocp_node_inst_type: t2.xlarge
 ** Select “Deployment Post-install” and “Select
 ** Select “SAVE” at the bottom right.
 
-# Appendix B - Script For Deploying CloudForms
+# Appendix B - Script For Installing Red Hat CloudForms
 
-These are pulled directly from [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/pages/labs/ocp/lab4/lab4.md)
+These are pulled directly from [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/labs/ocp/lab4)
 
 .master$
 
@@ -366,7 +366,7 @@ The quickest way to remedy this is to delete the project and start over
 oc delete project cloudforms
 ```
 
-Now return the the lab and try again [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/pages/labs/ocp/lab4/lab4.md)
+Now return the the lab and try again [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/labs/ocp/lab4)
 
 # Appendix D - Average Tower Job Times
 
@@ -383,7 +383,7 @@ Now return the the lab and try again [Lab 4 - Installing Red Hat CloudForms]({{ 
 | | Scaleup-3-Post-Install | 00:00:19 | Run post-install tasks
 |======================
 
-Return to [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/pages/labs/ocp/lab4/lab4.md)
+Return to [Lab 4 - Installing Red Hat CloudForms]({{ site.baseurl }}/labs/ocp/lab4)
 
 # Appendix E - Troubleshooting CloudForms
 

@@ -1,7 +1,7 @@
 ---
 layout: ocp
 title: APBs and the Service Catalog
-permalink: /labs/ocp/lab8/lab8
+permalink: /labs/ocp/lab8
 lab: ocp
 order: 1
 ---
@@ -34,6 +34,6 @@ This concludes this section of the lab.
 
 ---
 
-[Next Lab](../ocp/lab9)\
-[Previous Lab](../ocp/lab7)\
-[Home](../../../labs)
+[Next Lab]({{ site.baseurl }}/labs/ocp/lab9)\
+[Previous Lab]({{ site.baseurl }}/labs/ocp/lab7)\
+[Home]({{ site.baseurl }}/labs.html)

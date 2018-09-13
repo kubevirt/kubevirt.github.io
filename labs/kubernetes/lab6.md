@@ -81,5 +81,5 @@ kubectl delete vms testvm
 
 This concludes this section of the lab.
 
-[Next Lab](../kubernetes/lab7)\
-[Home](../../../labs)
+[Next Lab]({{ site.baseurl }}/labs/kubernetes/lab7)\
+[Home]({{ site.baseurl }}/labs.html)
