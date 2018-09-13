@@ -12,9 +12,8 @@ namespace :links do
         options = { 
             :assume_extension 	=> true,
             :only_4xx 			=> true,
-            :url_ignore 		=> ["https://calendar.google.com/*"],
-			:log_level 			=> :debug,
-            :internal_domains 	=> ["https://instructor.labs.sysdeseng.com", "https://calendar.google.com"],
+			:log_level 			=> :info,
+            :internal_domains 	=> ["https://instructor.labs.sysdeseng.com"],
             :external_only 		=> true
         }
         puts "Checking External links..."
@@ -24,8 +23,11 @@ namespace :links do
     desc 'Checks html files looking for internal dead links'
     task :test_internal => :build do
         options = { 
-            :assume_extension => true,
-            :disable_external => true
+            :assume_extension   => true,
+            :only_4xx 		    => true,
+            :allow_hash_href    => true,
+			:log_level 			=> :info,
+            :disable_external   => true
         }
         puts "Checking Internal links..."
         HTMLProofer.check_directory("./_site", options).run

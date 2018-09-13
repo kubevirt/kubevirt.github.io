@@ -14,7 +14,7 @@ exposes. Usually there are two types of consoles:
 * Serial Console
 * Graphical Console \(VNC\)
 
-> Note: You need to have `virtctl` [installed](/docs/installation/?id=client-side-virtctl-deployment) to gain access to the VirtualMachineInstance.
+> Note: You need to have `virtctl` [installed]({{ site.baseurl }}/docs/installation.html#client-side-virtctl-deployment) to gain access to the VirtualMachineInstance.
 
 ## Accessing the serial console
 

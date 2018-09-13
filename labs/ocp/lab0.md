@@ -79,5 +79,5 @@ Each component plays a critical role into the overall management of the environm
 
 ---
 
-[Next Lab](../ocp/lab1)\
-[Home](../../../labs)
+[Next Lab]({{ site.baseurl }}/labs/ocp/lab1)\
+[Home]({{ site.baseurl }}/labs.html)
