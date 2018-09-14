@@ -1,18 +1,18 @@
 ---
 layout: page
-title: Easy Install Using Gcp
+title: Easy Install Using GCP
 ---
 
 You can try KubeVirt in Google Cloud Platform
 
 Note this setup is not meant for production, only to give you a quick taste of KubeVirt's functionality
 
-The KubeVirt project publishes ready-to-use images on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button). 
+The KubeVirt project publishes ready-to-use images on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button).
 
 We will assume that you have a Google account with an active payment method or a free
 trial. You also need to make sure that you have a default keypair installed.
 
-### Step 1: Create a new image
+## Step 1: Create a new image
 
 From console.cloud.google.com, go to "Compute Engine", "Images" and then click
 on "Create Image" or click the following [link](https://console.cloud.google.com/compute/imagesAdd?)
@@ -29,7 +29,7 @@ Fill in the following data:
 
 **Cloud storage file:** kubevirt-button/{{ site.kubevirt_version}}.tar.gz
 
-### Step 2: Create a new instance using the image you created
+## Step 2: Create a new instance using the image you created
 
 Once the image is created, you can create a new instance based on this image.
 Go to "Compute Engine", "VM instances and then click on "Create instance".
@@ -50,7 +50,7 @@ KubeVirt along with Kubernetes will get provisioned during boot!
 
 You can now access the instance through ssh and launch vms
 
-## Step 2: KubeVirt labs
+## Step 3: KubeVirt labs
 
 After you have connected to your instance through SSH, you can
 work through a couple of labs to help you get acquainted with KubeVirt
