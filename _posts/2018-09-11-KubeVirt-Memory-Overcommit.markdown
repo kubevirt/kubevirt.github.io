@@ -15,10 +15,8 @@ One of the latest additions to KubeVirt has been the memory overcommitment featu
 
 ## What it does
                                 
-As you might know already, when a pod is created in Kubernetes, it can define requests for resources like CPU or memory, those requests are taken into account for deciding to what node the pod will be scheduled. Usually, on a node, there are already some resources reserve
-d or requested, Kubernetes itself [reserved some resources for its processes](https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/) and there might be monitoring pods or storage pods already requesting resources as well, all those are also accoun
-ted for what is left to run pods.
-Having the memory overcommitment feture included in KubeVirt allows the users to assign the VMI more or less memory than set into the requests, offering more flexibility, giving the user the option to overcommit (or undercommit) the node's memory if needed.
+As you might know already, when a pod is created in Kubernetes, it can define requests for resources like CPU or memory, those requests are taken into account for deciding to what node the pod will be scheduled. Usually, on a node, there are already some resources reserved or requested, Kubernetes itself [reserved some resources for its processes](https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/) and there might be monitoring pods or storage pods already requesting resources as well, all those are also accounted for what is left to run pods.
+Having the memory overcommitment feature included in KubeVirt allows the users to assign the VMI more or less memory than set into the requests, offering more flexibility, giving the user the option to overcommit (or undercommit) the node's memory if needed.
      
          
 ## How does it work?
@@ -72,8 +70,7 @@ spec:
     name: cloudinitvolume
 ```
 
-As explained already, the QEMU process spawn by libvirt, will get *25761732Ki* of RAM, minus some amount for the graphics and firmwares, the guest OS will see its total memory close to that amount, while Kubernetes would think the pod requests *24534983Ki*, making more ro
-om to schedule more pods if needed.
+As explained already, the QEMU process spawn by libvirt, will get *25761732Ki* of RAM, minus some amount for the graphics and firmwares, the guest OS will see its total memory close to that amount, while Kubernetes would think the pod requests *24534983Ki*, making more room to schedule more pods if needed.
 
 Now let's imagine we want to undercommit, here's the same YAML definition but setting less memory than requested:
 
