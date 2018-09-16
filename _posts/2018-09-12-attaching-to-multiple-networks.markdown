@@ -10,14 +10,14 @@ comments: true
 ---
 
 # Introduction
-Virtual Machines often need multiple interfaces connected to different networks. This could be because the application running on it expect to be connected to different interfaces (e.g. a virtual router running on the VM); because the VM need L2 connectivity to a network not managed by k8s (e.g. allow for PXE booting); or any other reason - which I'll be happy to hear about in the comment section!
+Virtual Machines often need multiple interfaces connected to different networks. This could be because the application running on it expect to be connected to different interfaces (e.g. a virtual router running on the VM); because the VM need L2 connectivity to a network not managed by Kubernetes (e.g. allow for PXE booting); because an **existing** VM, ported into KubeVirt, runs applications that expect multiple interfaces to exists; or any other reason - which we'll be happy to hear about in the comment section!
 
-In KubeVirt, as nicely explained in this [blog post](http://kubevirt.io/2018/KubeVirt-Network-Deep-Dive.html), there is already a mechanism to take an interface from the pod and move it into the Virtual Machine. However, k8s allows for a single network plugin to be used in a cluster (across all pods), and provide one interface for each pod. 
+In KubeVirt, as nicely explained in this [blog post](http://kubevirt.io/2018/KubeVirt-Network-Deep-Dive.html), there is already a mechanism to take an interface from the pod and move it into the Virtual Machine. However, Kubernetes allows for a single network plugin to be used in a cluster (across all pods), and provide one interface for each pod. This forces us to choose between having pod network connectivity and any other network connectivity for the pod and, in the context of KubeVirt, the Virtual Machine within.
 
 To overcome this limitation, we use [Multus](https://github.com/intel/multus-cni), which is a "meta" CNI (Container Network Interface), allowing multiple CNIs to coexist, and allow for a pod to use the right ones for its networking needs.
 
 # How Does it Work for Pods?
-The magic is done via a new CRD (Custom Resource Definition) called ```NetworkAttachmentDefinition``` introduced by the Multus project, and adopted by the k8s community as the [de-facto standard](https://docs.google.com/document/d/1Ny03h6IDVy_e_vmElOqR7UdTPAG_RNydhVE1Kx54kFQ/edit#heading=h.hylsbqoj5fxd) for attaching pods to one or more networks. These network definition contains a field called ```type``` which indicates the name of the actual CNI that provide the network, and different configuration payloads which the Multus CNI is passing to the actual CNI. For example, the following network definition:
+The magic is done via a new CRD (Custom Resource Definition) called ```NetworkAttachmentDefinition``` introduced by the Multus project, and adopted by the Kubernetes community as the [de-facto standard](https://docs.google.com/document/d/1Ny03h6IDVy_e_vmElOqR7UdTPAG_RNydhVE1Kx54kFQ/edit#heading=h.hylsbqoj5fxd) for attaching pods to one or more networks. These network definition contains a field called ```type``` which indicates the name of the actual CNI that provide the network, and different configuration payloads which the Multus CNI is passing to the actual CNI. For example, the following network definition:
 ```yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
@@ -52,7 +52,7 @@ spec:
 ```
 The Multus CNI will find out whether a CNI of type ```bridge``` exists, and invoke it with the rest of the configuration in the CRD.
 
-Note that, even without Multus, this exact configuration could have been put under ```/etc/cni/net.d```, and provide the same network to the pod, using the bride CNI. But, in such a case, this would have been the **only** network interface to the pod, since k8s just takes the first configuration file from that directory (sorted by alphabetical order) and use it to provide a single interface for all pods.
+Note that, even without Multus, this exact configuration could have been put under ```/etc/cni/net.d```, and provide the same network to the pod, using the bride CNI. But, in such a case, this would have been the **only** network interface to the pod, since Kubernetes just takes the first configuration file from that directory (sorted by alphabetical order) and use it to provide a single interface for all pods.
 If we have Multus around, and some other CNI (e.g. flannel), in addition to the bridge one, we could have have defined another ```NetworkAttachmentDefinition``` object, of type ```flannel```, with its configuration, for example:
 ```yaml
 apiVersion: "k8s.cni.cncf.io/v1"
@@ -94,7 +94,7 @@ This would allow VMI interfaces to be connected to two networks:
 
 # Deployment Example
 In the following example we use flannel as the CNI that provides the primary pod network, and an [OVS bridge CNI](https://github.com/kubevirt/ovs-cni) provides a secondary network.
-## Install k8s
+## Install Kubernetes
 - This was tested with latest version, on a single node cluster. Best would be to just follow [these instructions](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
 - Since we use a single node cluster, Don't forget to allow scheduling pods on the master: 
 ```bash
