@@ -3,19 +3,21 @@ layout: page
 title: Try KubeVirt on GCP
 ---
 
-You can try KubeVirt in Google Cloud Platform
+You can try KubeVirt in Google Cloud Platform.
 
-Note this setup is not meant for production, only to give you a quick taste of KubeVirt's functionality
+Note this setup is not meant for production, it is meant to give you a 
+quick taste of KubeVirt's functionality.
 
 The KubeVirt project publishes ready-to-use images on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button).
 
-We will assume that you have a Google account with an active payment method or a free
-trial. You also need to make sure that you have a default keypair installed.
+We will assume that you have a Google account with an active payment method 
+or a free trial. You also need to make sure that you have a default keypair 
+installed.
 
 ## Step 1: Create a new image
 
 From console.cloud.google.com, go to "Compute Engine", "Images" and then click
-on "Create Image" or click the following [link](https://console.cloud.google.com/compute/imagesAdd?)
+on "Create Image" or click this [link](https://console.cloud.google.com/compute/imagesAdd?).
 
 ![screenshot0040](/assets/images/kubevirt-button/create_image.png)
 
@@ -32,7 +34,7 @@ Fill in the following data:
 ## Step 2: Create a new instance using the image you created
 
 Once the image is created, you can create a new instance based on this image.
-Go to "Compute Engine", "VM instances and then click on "Create instance".
+Go to "Compute Engine", then to "VM instances", and then click on "Create instance".
 
 ![screenshot0042](/assets/images/kubevirt-button/create_instance_1.png)
 
@@ -41,14 +43,13 @@ It's recommended to select:
 - the 2 CPU / 7.5GB instance
 - a zone that supports the Haswell CPU Platform or newer (for nested virtualization to work), `us-central1-b` for instance
 
-Under "boot disk",
-select the image that you created above
+Under "boot disk", select the image that you created above.
 
 Now hit "Create" to start the instance.
 
 KubeVirt along with Kubernetes will get provisioned during boot!
 
-You can now access the instance through ssh and launch vms
+You can now access the instance through ssh and launch VMs.
 
 ## Step 3: KubeVirt labs
 
