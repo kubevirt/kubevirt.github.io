@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Easy Install Using GCP
+title: Try KubeVirt on GCP
 ---
 
 You can try KubeVirt in Google Cloud Platform

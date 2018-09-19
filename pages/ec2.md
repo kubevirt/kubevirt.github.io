@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Easy install using AWS 
+title: Try KubeVirt on AWS 
 ---
 
 We have created AWS images that automatically install Kubernetes
