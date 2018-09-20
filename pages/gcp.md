@@ -5,19 +5,19 @@ title: Try KubeVirt on GCP
 
 You can try KubeVirt in Google Cloud Platform.
 
-Note this setup is not meant for production, it is meant to give you a 
+Note this setup is not meant for production, it is meant to give you a
 quick taste of KubeVirt's functionality.
 
-The KubeVirt project publishes ready-to-use images on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button).
+The KubeVirt project publishes ready-to-use images on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button){:target="_blank"}.
 
-We will assume that you have a Google account with an active payment method 
-or a free trial. You also need to make sure that you have a default keypair 
+We will assume that you have a Google account with an active payment method
+or a free trial. You also need to make sure that you have a default keypair
 installed.
 
 ## Step 1: Create a new image
 
 From console.cloud.google.com, go to "Compute Engine", "Images" and then click
-on "Create Image" or click this [link](https://console.cloud.google.com/compute/imagesAdd?).
+on "Create Image" or click this [link](https://console.cloud.google.com/compute/imagesAdd?){:target="_blank"}.
 
 ![screenshot0040](/assets/images/kubevirt-button/create_image.png)
 
@@ -62,6 +62,6 @@ through the creation of a Virtual Machine instance on Kubernetes and then
 shows you how to use virtctl to interact with its console.
 
 The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
-lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
-(CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/)
+lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
+(CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
 (PVC) and then how to define a VM to make use of the PVC.
