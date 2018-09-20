@@ -11,7 +11,7 @@ In Step 1, we guide you through selecting an AMI and some factors to
 consider when launching the EC2 instance through the AWS console.
 
 After you have launched your EC2 instance, navigate back to this 
-page and then dive into the two labs in Step 2 to help you get 
+page and then dive into the two labs below to help you get 
 acquainted with KubeVirt. 
 
 ## Step 1: Launch KubeVirt in Amazon EC2
@@ -21,18 +21,8 @@ account. The images are free to use but AWS will bill you for instance
 hours, storage, and associated services unless you are in an AWS trial 
 period. These images are not meant to be used in production.
 
-At least 4GB of memory is required to complete the labs in Step 2.
-Select more instance memory or storage if you are planning to deploy 
-VMs with larger memory or storage requirements than what is used in the
-labs.
-
-When configuring your instance, you will need to enable public IP, allow
- ingress to SSH, and select a key pair to SSH into your instance. It takes about 
-5 mins after the EC2 instance is started for the instance to be ready 
-for SSH login.
-
-Click on an AMI link below to start up an instance in your preferred
-EC2 region. 
+ * First, open one of the AMI links below in a new tab or window to start up an instance in your preferred
+   EC2 region. 
 
 | EC2 Region | Location      | AMI Type | AMI ID |
 | ---        | ---           | ---      | ---    |
@@ -57,7 +47,40 @@ EC2 region.
 | sa-east-1  | Sao Paulo   | HVM      | [ami-06baa167dc17800eb](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-06baa167dc17800eb) |
 |            |               |          |        |
 
-Then SSH to your EC2 instance:
+
+ * At the instance type selection screen, select a type that has at least 
+   4GB of memory. This is the minimum amount of memory required to complete 
+   the labs in Step 2. Select more memory or storage if you are planning 
+   to deploy VMs with larger memory or storage requirements than what is 
+   used in the labs.
+   
+![instance-type-memory-selection](/assets/images/kubevirt-button/ec2-instance-memory-selection.png)
+
+ * You will need to be able to log into your instance through SSH. Depending
+   on your network configuration, you may need to enable public IP. To enable
+   a public IP, in the "Instance Details" screen select "Enable" for 
+   "Auto-assign Public IP" or select "Use subnet setting" if public IPs
+   are enabled for your subnet.
+   
+![instance-enable-public-ip](/assets/images/kubevirt-button/ec2-public-ip.png)
+
+ * At the security group configuration screen, allow ingress to SSH by
+   enabling access to port 22 from your IP address.
+ 
+ ![instance-enable-public-ip](/assets/images/kubevirt-button/ec2-ssh-ingress.png)
+
+ * Finally, you will need to associate a key pair with your instance. If 
+   you have created one before, select it. If haven't created one before,
+   select "Create a new key pair", enter a name, download the private key,
+   and note where you place it because you will use it in a few minutes.
+   Once you made your selection, hit "Launch Instance". It takes about 
+   5 mins after the EC2 instance is started for the instance to be ready 
+   for SSH login.
+ 
+  ![instance-enable-public-ip](/assets/images/kubevirt-button/ec2-select-create-keypair.png)
+
+ * Once your instance is ready, SSH to your EC2 instance using your private
+   key. Note "centos" is the default username.
 
 ```bash
 ssh -i <aws-private-key> centos@<ec2_public_ip_or_hostname>
