@@ -8,7 +8,7 @@ order: 2
 # KubeVirt Quickstart
 
 This demo will deploy [KubeVirt](https://www.kubevirt.io) on an existing Kubernetes (1.9 or
-later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a Kubernetes or OpenShift Origin cluster, see [Minikube](https://github.com/kubernetes/minikube/) and [Minishift](https://www.openshift.org/minishift/).
+later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a Kubernetes or OpenShift Origin cluster, see [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"} and [Minishift](https://www.openshift.org/minishift/){:target="_blank"}.
 
 ### Deploy KubeVirt
 
@@ -93,16 +93,16 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
 
 ## Appendix: Deploying minikube
 
-1. If not installed, install minikube as described [here](https://github.com/kubernetes/minikube/)
-   1. Install the [kvm2 driver](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver)
+1. If not installed, install minikube as described [here](https://github.com/kubernetes/minikube/){:target="_blank"}
+   1. Install the [kvm2 driver](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver){:target="_blank"}
    2. Verify nested virtualization is enabled on the machine minikube is being installed on:
        ```bash
        $ cat /sys/module/kvm_intel/parameters/nested
        Y
        ```
-       If not, then enable it as described [here](https://docs.fedoraproject.org/quick-docs/en-US/using-nested-virtualization-in-kvm.html)
+       If not, then enable it as described [here](https://docs.fedoraproject.org/quick-docs/en-US/using-nested-virtualization-in-kvm.html){:target="_blank"}
 
-   3. Download the [`minikube` binary](https://github.com/kubernetes/minikube/releases)
+   3. Download the [`minikube` binary](https://github.com/kubernetes/minikube/releases){:target="_blank"}
 2. Launch minikube with CNI:
 
     ```bash
@@ -110,13 +110,13 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
     --vm-driver kvm2 \
     --network-plugin cni
     ```
-3. Install `kubectl` via a package manager or [download](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl) it
+3. Install `kubectl` via a package manager or [download](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl){:target="_blank"} it
 
 ---
 
 # KubeVirt on an existing Kubernetes cluster {#install_3}
 
-If you already have a Kubernetes cluster, you can use [kubevirt-ansible](https://github.com/kubevirt/kubevirt-ansible) to deploy KubeVirt.
+If you already have a Kubernetes cluster, you can use [kubevirt-ansible](https://github.com/kubevirt/kubevirt-ansible){:target="_blank"} to deploy KubeVirt.
 
 First clone the kubevirt-ansible repo on your master Kubernetes node.
 
@@ -177,7 +177,7 @@ ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-demo playbo
 ## KubeVirt with GlusterFS and Heketi storage environment
 
 To install GlusterFS and Heketi on Kubernetes, follow the setup guide in
- [gluster-kubernetes repo](https://github.com/gluster/gluster-kubernetes).
+ [gluster-kubernetes repo](https://github.com/gluster/gluster-kubernetes){:target="_blank"}.
 You will need to configure the admin key with gk-deploy and at end of the
 install note the Heketi URL.
 
