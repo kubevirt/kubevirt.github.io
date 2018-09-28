@@ -31,7 +31,7 @@ On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-p
 ```bash
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-privileged
 $ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-controller
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-infra
+$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-apiserver
 
 $ export VERSION={{ site.kubevirt_version }}
 $ oc apply -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt.yaml
