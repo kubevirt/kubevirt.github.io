@@ -8,7 +8,7 @@ nav:
     url: /videos/
 
   - title: Docs
-    url: /docs/
+    url: http://kubevirt.io/user-guide
 
   - title: Community
     page: Community
