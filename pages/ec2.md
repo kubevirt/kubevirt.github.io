@@ -56,6 +56,12 @@ period. These images are not meant to be used in production.
 
 ![instance-type-memory-selection](/assets/images/kubevirt-button/ec2-instance-memory-selection.png)
 
+ * We install Weave Net as the CNI to enable pods to communicate with each
+   other in the Kubernetes cluster. We reserve the 172.30.0.0/16 IP allocation
+   range for Weave Net. Verify that the VPC you selected for "Network" in the
+   "Instance Details" screen has a CIDR that does not overlap with Weave's
+   IP allocation range. 
+
  * You will need to be able to log into your instance through SSH. Depending
    on your network configuration, you may need to enable public IP. To enable
    a public IP, in the "Instance Details" screen select "Enable" for
