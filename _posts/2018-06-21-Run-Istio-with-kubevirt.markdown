@@ -67,7 +67,7 @@ ratings. The ratings microservice contains book ranking information that accompa
 * docker
 * kubeadm
 
-Follow this [document](https://kubernetes.io/docs/tasks/tools/install-kubeadm/) to install everything we need for the POC
+Follow this [document](https://kubernetes.io/docs/setup/independent/install-kubeadm/) to install everything we need for the POC
 
 
 # Deployment

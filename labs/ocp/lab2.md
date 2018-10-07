@@ -24,7 +24,7 @@ Create an SSH key that you will be using later.
 ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa
 ```
 
-Review the [`requirements.sh`](../../administrator/requirements.sh) file. This script does the following:
+Review the [`requirements.sh`](https://github.com/scollier/kubevirt-tutorial/blob/master/administrator/requirements.sh) file. This script does the following:
 
 - install *docker*, enable and start it as a service
 - install *oc* and *kubectl* client
@@ -123,6 +123,6 @@ This concludes this section of the lab.
 
 ---
 
-[Next Lab](../ocp/lab3)\
-[Previous Lab](../ocp/lab1)\
-[Home](../../../labs)
+[Next Lab]({{ site.baseurl }}/labs/ocp/lab3)\
+[Previous Lab]({{ site.baseurl }}/labs/ocp/lab1)\
+[Home]({{ site.baseurl }}/labs.html)

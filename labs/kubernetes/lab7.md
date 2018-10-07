@@ -87,5 +87,5 @@ ssh fedora@VM_IP
 
 This concludes this section of the lab.
 
-[Previous Lab](../kubernetes/lab6)\
-[Home](../../../labs)
+[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab6)\
+[Home]({{ site.baseurl }}/labs.html)

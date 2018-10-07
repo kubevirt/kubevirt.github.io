@@ -117,7 +117,7 @@ ssh to verify your identify when you ssh into a machine. Since we are doing all 
 id_rsa.pub to authorized_keys in /root/.ssh. If that file doesn't exist you can simply copy id_rsa.pub to authorized_keys. If you are deploying to multiple hosts
 you need to append the contents of id_rsa.pub on each host.
 
-Next we need to configure docker storage, one can write a whole book about how to do that, so I will post a [link](https://docs.openshift.org/latest/install_config/install/host_preparation.html#configuring-docker-storage) to the installation document and for now go with the defaults which are not recommended for production, but since this is an introduction its fine.
+Next we need to configure docker storage, one can write a whole book about how to do that, so I will post a [link](https://docs.okd.io/1.5/install_config/install/host_preparation.html#configuring-docker-storage) to the installation document and for now go with the defaults which are not recommended for production, but since this is an introduction its fine.
 
 As _root_:
 ```bash

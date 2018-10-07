@@ -20,7 +20,7 @@ order: 10
         <h3>{{ yearMonth.name }}</h3>
           <ul>
             {% for post in yearMonth.items %}
-              <li><a href="{{ post.url }}">{{ post.title }}</a></li>
+              <li><a href="{{ post.baseurl }}">{{ post.title }}</a></li>
             {% endfor %}
           </ul>
       {% endfor %}

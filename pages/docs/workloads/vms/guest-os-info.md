@@ -21,7 +21,7 @@ The `kubevirt.io/os` label is based on the short OS identifier from [libosinfo](
 
 | Short ID | Name | Version | Family | ID |
 | --- | --- | --- | --- | --- |
-| **win2k12r2** | Microsoft Windows Server 2012 R2 | 6.3 | winnt | [http://microsoft.com/win/2k12r2](http://microsoft.com/win/2k12r2) |
+| **win2k12r2** | Microsoft Windows Server 2012 R2 | 6.3 | winnt | [https://www.microsoft.com/es-es/evalcenter/evaluate-windows-server-2012-r2](https://www.microsoft.com/es-es/evalcenter/evaluate-windows-server-2012-r2) |
 
 ## Use with presets
 
