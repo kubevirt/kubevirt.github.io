@@ -14,7 +14,10 @@ namespace :links do
             :only_4xx           => true,
             :log_level          => :info,
             :internal_domains   => ["https://instructor.labs.sysdeseng.com"],
-            :external_only      => true
+            :external_only      => true,
+            :url_swap           => {
+                                    'https://www.kubevirt.io/' => '', 
+                                    }
         }
         puts "Checking External links..."
         HTMLProofer.check_directory("./_site", options).run
