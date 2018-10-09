@@ -46,7 +46,7 @@ It's recommended to select:
 Under "boot disk", select the image that you created above.
 
 If you are using custom networking settings, verify that the CIDR used
-by the network interfaces do not overlap with Weave Net's 172.30.0.0/16
+by the network interfaces does not overlap with Weave Net's 172.30.0.0/16
 IP allocation range. We use Weave Net as the CNI to enable pods to communicate
 with each other in the Kubernetes cluster.
 
