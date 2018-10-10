@@ -1,0 +1,1 @@
+./virtctl console testvm

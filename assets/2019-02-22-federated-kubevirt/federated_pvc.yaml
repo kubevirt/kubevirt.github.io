@@ -1,0 +1,26 @@
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedPersistentVolumeClaim
+metadata:
+  name: fed001
+  namespace: myproject
+  labels:
+    name: fed001
+spec:
+  template:
+    spec:
+      accessModes:
+        - ReadWriteOnce
+      resources:
+        requests:
+          storage: 1Gi
+      volumeName: fed001
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedPersistentVolumeClaimPlacement
+metadata:
+  name: fed001
+  namespace: myproject
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2

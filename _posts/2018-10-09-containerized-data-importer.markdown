@@ -136,7 +136,7 @@ Edit the PVC above -
 - cdi.kubevirt.io/storage.import.endpoint: The full URL to the VM image in the format of: http://www.myUrl.com/path/of/data or s3://bucketName/fileName.
 - storageClassName: The default StorageClass will be used if not set. Otherwise, set to a desired StorageClass.
 
-Note: It is possible to use authentication when importing the image from the endpoint url. Please see [using secret during import](https://github.com/kubevirt/containerized-data-importer/blob/master/manifests/example/golden-pvc.yaml).
+Note: It is possible to use authentication when importing the image from the endpoint url. Please see [using secret during import](https://github.com/kubevirt/containerized-data-importer/blob/master/manifests/example/endpoint-secret.yaml)
 
 ## Deploy the manifest yaml files
 

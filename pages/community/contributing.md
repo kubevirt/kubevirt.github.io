@@ -39,7 +39,7 @@ wanted](https://github.com/kubevirt/kubevirt/issues?q=is%3Aissue+is%3Aopen+label
 
 ### Testing
 
-**Untested features do not exist**. To ensure that what we code really works, relevant flows should be covered via unit tests and functional tests. So when thinking about a contribution, also think about testability. All tests can be run local without the need of CI. Have a look at the Testing section in the [Developer Guide]({{ site.baseurl }}/get_kubevirt).
+**Untested features do not exist**. To ensure that what we code really works, relevant flows should be covered via unit tests and functional tests. So when thinking about a contribution, also think about testability. All tests can be run local without the need of CI. Have a look at the Testing section in the [Developer Guide]({{ site.baseurl }}/quickstart_minikube).
 
 ### Getting your code reviewed/merged
 
@@ -60,7 +60,7 @@ Maintainers are:
 ### [KubeVirt](https://github.com/kubevirt/){:target="_blank"}
 
 * Getting started
-  * [Developer Guide]({{ site.baseurl }}/get_kubevirt)
+  * [Developer Guide]({{ site.baseurl }}/quickstart_minikube)
   * [Demo](https://github.com/kubevirt/demo){:target="_blank"}
   * [Documentation]({{ site.baseurl }}/docs)
 

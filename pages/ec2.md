@@ -1,7 +1,12 @@
 ---
-layout: page
-title: Try KubeVirt on AWS
+layout: labs
+title: Easy install using AWS
+permalink: pages/ec2
+lab: kubernetes
+order: 1
 ---
+
+# Easy install using AWS
 
 We have created AWS images that automatically install Kubernetes
 and KubeVirt inside an EC2 instance to help you quickly deploy
@@ -27,24 +32,24 @@ period. These images are not meant to be used in production.
 | EC2 Region | Location      | AMI Type | AMI ID |
 | ---        | ---           | ---      | ---    |
 |            |               |          |        |
-| us-east-1  | N. Virginia   | HVM      | [ami-0050c59eb4514da3e](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0050c59eb4514da3e){:target="_blank"} |
-| us-east-2  | Ohio          | HVM      | [ami-0e40bbe9e87f726cd](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-0e40bbe9e87f726cd){:target="_blank"} |
-| us-west-1  | N. California | HVM      | [ami-02ab6c92f0c112fd7](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-02ab6c92f0c112fd7){:target="_blank"} |
-| us-west-2  | Oregon        | HVM      | [ami-0d279ebc148a4f36c](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-0d279ebc148a4f36c){:target="_blank"} |
+| us-east-1  | N. Virginia   | HVM      | [ami-0cd2d0b662f913e62](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0cd2d0b662f913e62){:target="_blank"} |
+| us-east-2  | Ohio          | HVM      | [ami-0c8ea85510e3f61b2](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-0c8ea85510e3f61b2){:target="_blank"} |
+| us-west-1  | N. California | HVM      | [ami-012686b82e24e1a80](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-012686b82e24e1a80){:target="_blank"} |
+| us-west-2  | Oregon        | HVM      | [ami-023ea902f30ea07a1](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-023ea902f30ea07a1){:target="_blank"} |
 |            |               |          |        |
-| ca-central-1 | Canada   | HVM      | [ami-0e377c951874e2bf7](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-0e377c951874e2bf7){:target="_blank"} |
+| ca-central-1 | Canada   | HVM      | [ami-091070107987fdba2](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-091070107987fdba2){:target="_blank"} |
 |            |               |          |        |
-| eu-west-1      | Ireland   | HVM      | [ami-0bb04bf9edc84cade](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-0bb04bf9edc84cade){:target="_blank"} |
-| eu-west-2      | London    | HVM      | [ami-0a94f7993db846173](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-0a94f7993db846173){:target="_blank"} |
-| eu-west-3      | Paris    | HVM      | [ami-03eded124bfcbf774](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-03eded124bfcbf774){:target="_blank"} |
-| eu-central-1   | Frankfurt | HVM      | [ami-023bfd05de1c68da3](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-023bfd05de1c68da3){:target="_blank"} |
+| eu-west-1      | Ireland   | HVM      | [ami-02320ba039cc35021](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-02320ba039cc35021){:target="_blank"} |
+| eu-west-2      | London    | HVM      | [ami-09579f7eed5f67516](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-09579f7eed5f67516){:target="_blank"} |
+| eu-west-3      | Paris    | HVM      | [ami-02b98d0a3c810e3ae](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-02b98d0a3c810e3ae){:target="_blank"} |
+| eu-central-1   | Frankfurt | HVM      | [ami-0a203e75e9638e701](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-0a203e75e9638e701){:target="_blank"} |
 |                |               |          |        |
-| ap-northeast-1 | Tokyo   | HVM      | [ami-031a9f9bb5116ed8e](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-031a9f9bb5116ed8e){:target="_blank"} |
-| ap-southeast-1 | Singapore | HVM      | [ami-04422eec3514f1e87](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-04422eec3514f1e87){:target="_blank"} |
-| ap-southeast-2 | Sydney   | HVM      | [ami-0c8d2e1ad2031cecc](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-0c8d2e1ad2031cecc){:target="_blank"} |
-| ap-south-1     | Mumbai   | HVM      | [ami-08e83860b87a12816](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-08e83860b87a12816){:target="_blank"} |
+| ap-northeast-1 | Tokyo   | HVM      | [ami-05443e7bb4531958f](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-05443e7bb4531958f){:target="_blank"} |
+| ap-southeast-1 | Singapore | HVM      | [ami-0ab8614782d7ff8f7](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-0ab8614782d7ff8f7){:target="_blank"} |
+| ap-southeast-2 | Sydney   | HVM      | [ami-0df79e9b59ea8462e](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-0df79e9b59ea8462e){:target="_blank"} |
+| ap-south-1     | Mumbai   | HVM      | [ami-04ee718d8bbf9617e](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-04ee718d8bbf9617e){:target="_blank"} |
 |            |               |          |        |
-| sa-east-1  | Sao Paulo   | HVM      | [ami-06baa167dc17800eb](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-06baa167dc17800eb){:target="_blank"} |
+| sa-east-1  | Sao Paulo   | HVM      | [ami-08f7c79baaa9b7208](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-08f7c79baaa9b7208){:target="_blank"} |
 |            |               |          |        |
 
 
@@ -55,12 +60,6 @@ period. These images are not meant to be used in production.
    used in the labs.
 
 ![instance-type-memory-selection](/assets/images/kubevirt-button/ec2-instance-memory-selection.png)
-
- * We install Weave Net as the CNI to enable pods to communicate with each
-   other in the Kubernetes cluster. We reserve the 172.30.0.0/16 IP allocation
-   range for Weave Net. Verify that the VPC you selected for "Network" in the
-   "Instance Details" screen has a CIDR that does not overlap with Weave's
-   IP allocation range.
 
  * You will need to be able to log into your instance through SSH. Depending
    on your network configuration, you may need to enable public IP. To enable
@@ -99,14 +98,14 @@ After you have connected to your instance through SSH, you can
 work through a couple of labs to help you get acquainted with KubeVirt
 and how to use it to create and deploy VMs with Kubernetes.
 
-The first lab is ["Use KubeVirt"](../labs/kubernetes/lab6). This lab walks you
+The first lab is ["Use KubeVirt"](../labs/kubernetes/lab1). This lab walks you
 through the creation of a Virtual Machine instance on Kubernetes and then
 shows you how to use virtctl to interact with its console.
 
-The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
+The second lab is ["Experiment with CDI"](../labs/kubernetes/lab2). This
 lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
-(PVC) and then how to define a VM to make use of the PVC.  
+(PVC) and then how to define a VM to make use of the PVC.
 
 ## Found a bug?
 

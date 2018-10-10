@@ -1,0 +1,92 @@
+test:
+  name: Lab Two
+  url: https://kubevirt.io/labs/kubernetes/lab2
+  source: ../../../labs/kubernetes/lab2.md
+  requirements:
+    files:
+      - path: "./virtctl"
+        present: true
+        executable: true
+    commands:
+      - name: kubectl
+        test: kubectl get pods --namespace kube-system
+
+  steps:
+    - step: 1
+      name: Get Storage Setup Manifest
+      filename: "01_get_storage_manifest.sh"
+      test: "test -f storage-setup.yml"
+      stdout: "‘storage-setup.yml’ saved"
+      revert: "rm ./storage-setup.yml"
+
+    - step: 2
+      name: Get CDI Controller Manifest
+      filename: "02_get_cdi_controller_manifest.sh"
+      test: "test -f cdi-controller.yaml"
+      stdout: "‘cdi-controller.yaml’ saved"
+      revert: "rm ./cdi-controller.yaml"
+
+    - step: 3
+      name: Create Storage
+      filename: "03_create_storage.sh"
+      test: "kubectl get deployments --namespace kube-system hostpath-provisioner"
+      # revert:
+      stdout: |
+        deployment.extensions/hostpath-provisioner created
+        clusterrole.rbac.authorization.k8s.io/hostpath-provisioner created
+        clusterrolebinding.rbac.authorization.k8s.io/hostpath-provisioner created
+        storageclass.storage.k8s.io/hostpath created
+      # poll for running hostpath provisioner pod
+      wait_for:
+        poll: "kubectl get pods -n kube-system -o json | jq --raw-output '.items[] | select(.metadata.name|test(\"hostpath-provisioner-.*\")) | .status.phase'"
+        match: 'Running'
+        rate: 15
+        tries: 20
+
+    - step: 4
+      name: Create CDI Controller
+      filename: "04_create_cdi-controller.sh"
+      test: "kubectl get deployments --namespace kube-system cdi-apiserver cdi-deployment cdi-uploadproxy -o json"
+      # Poll for three cdi- pods running
+      wait_for:
+        poll: "kubectl get pods -n kube-system -o json | jq --raw-output ' [.items[] | select((.metadata.name|test(\"cdi-.*\")) and  .status.phase == \"Running\" )] | length'"
+        match: "3"
+        rate: 15
+        tries: 20
+      stdout: |        
+        customresourcedefinition.apiextensions.k8s.io/datavolumes.cdi.kubevirt.io created
+        clusterrolebinding.rbac.authorization.k8s.io/cdi-sa created
+        clusterrole.rbac.authorization.k8s.io/cdi created
+        clusterrolebinding.rbac.authorization.k8s.io/cdi-apiserver created
+        clusterrole.rbac.authorization.k8s.io/cdi-apiserver created
+        clusterrolebinding.rbac.authorization.k8s.io/cdi-apiserver-auth-delegator created
+        serviceaccount/cdi-apiserver created
+        rolebinding.rbac.authorization.k8s.io/cdi-apiserver created
+        role.rbac.authorization.k8s.io/cdi-apiserver created
+        rolebinding.rbac.authorization.k8s.io/cdi-extension-apiserver-authentication created
+        role.rbac.authorization.k8s.io/cdi-extension-apiserver-authentication created
+        service/cdi-api created
+        deployment.apps/cdi-apiserver created
+        serviceaccount/cdi-sa created
+        deployment.apps/cdi-deployment created
+        service/cdi-uploadproxy created
+        deployment.apps/cdi-uploadproxy created
+
+    - step: 5
+      name: "View CDI Pod Status"
+      filename: "05_view_cdi_pod_status.sh"
+      test: false
+
+#    - step: 6
+#      name: "Create Fedora Cloud Instance"
+#      filename: "06_create_fedora_cloud_instance.sh"
+#      test: false
+#      stdout: |
+#        persistentvolumeclaim/fedora created
+      
+  cleanup:
+    - kubectl delete -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
+    - kubectl delete -f cdi-controller.yaml
+    - kubectl delete -f storage-setup.yml
+    - rm cdi-controller.yaml
+    - rm storage-setup.yml

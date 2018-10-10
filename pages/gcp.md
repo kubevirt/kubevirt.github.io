@@ -1,7 +1,12 @@
 ---
-layout: page
-title: Try KubeVirt on GCP
+layout: labs
+title: Easy install using GCP
+permalink: pages/gcp
+lab: kubernetes
+order: 1
 ---
+
+# Easy install using GCP
 
 You can try KubeVirt in Google Cloud Platform.
 
@@ -29,7 +34,7 @@ Fill in the following data:
 
 **Source:** cloud storage file
 
-**Cloud storage file:** kubevirt-button/{{ site.kubevirt_version}}.tar.gz
+**Cloud storage file:** kubevirt-button/vX.X.X.tar.gz (make sure to use latest one)
 
 ## Step 2: Create a new instance using the image you created
 
@@ -45,16 +50,18 @@ It's recommended to select:
 
 Under "boot disk", select the image that you created above.
 
-If you are using custom networking settings, verify that the CIDR used
-by the network interfaces does not overlap with Weave Net's 172.30.0.0/16
-IP allocation range. We use Weave Net as the CNI to enable pods to communicate
-with each other in the Kubernetes cluster.
-
 Now hit "Create" to start the instance.
 
-KubeVirt along with Kubernetes will get provisioned during boot!
+KubeVirt along with Kubernetes will get provisioned during boot! You may have to
+wait at least 5 minutes in order for SSH to become available. Once your instance is
+ready, SSH to your EC2 instance using your private key.
 
-You can now access the instance through ssh and launch VMs.
+Then become the "centos" user, which has kubectl enabled, and verify the Kubernetes pods are up and running.
+
+```bash
+sudo -i -u centos
+kubectl get pods -n kube-system
+```
 
 ## Step 3: KubeVirt labs
 
@@ -62,11 +69,11 @@ After you have connected to your instance through SSH, you can
 work through a couple of labs to help you get acquainted with KubeVirt
 and how to use it to create and deploy VMs with Kubernetes.
 
-The first lab is ["Use KubeVirt"](../labs/kubernetes/lab6). This lab walks you
+The first lab is ["Use KubeVirt"](../labs/kubernetes/lab1). This lab walks you
 through the creation of a Virtual Machine instance on Kubernetes and then
 shows you how to use virtctl to interact with its console.
 
-The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
+The second lab is ["Experiment with CDI"](../labs/kubernetes/lab2). This
 lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
 (PVC) and then how to define a VM to make use of the PVC.
