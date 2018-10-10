@@ -17,19 +17,23 @@
                 <div class="card-header card-header--sidebar" id="headingTOC">
                   <h5 class="mb-0">
                     <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
-                      Kubernetes Labs
+                      KubeVirt Labs
                     </button>
                   </h5>
                 </div>
                 <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
                   <div class="card-body card-body--sidebar">
-                    {% for page in site.pages %}
-                      {% if page.lab == "kubernetes" %}
-                        <h3 class="labs-title">
-                          <a href="{{ page.url }}" {% if page.title == page.url %} class="labs-title--item active" {% else %} class="labs-title--item" {% endif %}>{{ page.title }}</a>
-                        </h3>
-                      {% endif %}
-                    {% endfor %}
+                    {% if site.data.labs_toc.toc[0] %}
+                      {% for item in site.data.labs_toc.toc %}
+                        {% if item.subfolderitems[0] %}
+                          {% for entry in item.subfolderitems %}
+                            <h3 class="labs-title">
+                              <a href="{{ entry.url }}" {% if page.title == entry.page %} class="labs-title--item active" {% else %} class="labs-title--item" {% endif %}>{{ entry.page }}</a>
+                            </h3>
+                          {% endfor %}
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
                   </div>
                 </div>
               </div>
