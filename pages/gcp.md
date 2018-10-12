@@ -70,3 +70,13 @@ The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
 lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
 (PVC) and then how to define a VM to make use of the PVC.
+
+## Found a bug?
+
+We are interested in hearing about your experience.
+
+If you encounter an issue with deploying your cloud instance or if
+Kubernetes or KubeVirt did not install correctly, please report it to
+the [cloud-image-builder issue tracker](https://github.com/kubevirt/cloud-image-builder/issues){:target="_blank"}.
+
+If experience a problem with the labs, please report it to the [kubevirt.io issue tracker](https://github.com/kubevirt/kubevirt.github.io/issues){:target="_blank"}.

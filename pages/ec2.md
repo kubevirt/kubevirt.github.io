@@ -60,7 +60,7 @@ period. These images are not meant to be used in production.
    other in the Kubernetes cluster. We reserve the 172.30.0.0/16 IP allocation
    range for Weave Net. Verify that the VPC you selected for "Network" in the
    "Instance Details" screen has a CIDR that does not overlap with Weave's
-   IP allocation range. 
+   IP allocation range.
 
  * You will need to be able to log into your instance through SSH. Depending
    on your network configuration, you may need to enable public IP. To enable
@@ -107,3 +107,13 @@ The second lab is ["Experiment with CDI"](../labs/kubernetes/lab7). This
 lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
 (PVC) and then how to define a VM to make use of the PVC.  
+
+## Found a bug?
+
+We are interested in hearing about your experience.
+
+If you encounter an issue with deploying your cloud instance or if
+Kubernetes or KubeVirt did not install correctly, please report it to
+the [cloud-image-builder issue tracker](https://github.com/kubevirt/cloud-image-builder/issues){:target="_blank"}.
+
+If experience a problem with the labs, please report it to the [kubevirt.io issue tracker](https://github.com/kubevirt/kubevirt.github.io/issues){:target="_blank"}.
