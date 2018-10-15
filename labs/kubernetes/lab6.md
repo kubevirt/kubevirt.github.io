@@ -57,10 +57,6 @@ Connect to the serial console of the Cirros VM. Hit return / enter a few times a
 
 Disconnect from the virtual machine console by typing: `ctrl+]`.
 
-Connect to the graphical display.
-
-Note: Requires `remote-viewer` from the `virt-viewer` package. This is out of scope for this lab.
-
 ```
 ./virtctl vnc testvm
 ```
