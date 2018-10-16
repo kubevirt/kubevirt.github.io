@@ -27,24 +27,24 @@ period. These images are not meant to be used in production.
 | EC2 Region | Location      | AMI Type | AMI ID |
 | ---        | ---           | ---      | ---    |
 |            |               |          |        |
-| us-east-1  | N. Virginia   | HVM      | [ami-0050c59eb4514da3e](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0050c59eb4514da3e){:target="_blank"} |
-| us-east-2  | Ohio          | HVM      | [ami-0e40bbe9e87f726cd](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-0e40bbe9e87f726cd){:target="_blank"} |
-| us-west-1  | N. California | HVM      | [ami-02ab6c92f0c112fd7](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-02ab6c92f0c112fd7){:target="_blank"} |
-| us-west-2  | Oregon        | HVM      | [ami-0d279ebc148a4f36c](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-0d279ebc148a4f36c){:target="_blank"} |
+| us-east-1  | N. Virginia   | HVM      | [ami-07b3e1e892af238c4](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-07b3e1e892af238c4){:target="_blank"} |
+| us-east-2  | Ohio          | HVM      | [ami-010e038d73be0cba6](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-010e038d73be0cba6){:target="_blank"} |
+| us-west-1  | N. California | HVM      | [ami-038eb97410b954edb](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-038eb97410b954edb){:target="_blank"} |
+| us-west-2  | Oregon        | HVM      | [ami-01135ee21096a85a1](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-01135ee21096a85a1){:target="_blank"} |
 |            |               |          |        |
-| ca-central-1 | Canada   | HVM      | [ami-0e377c951874e2bf7](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-0e377c951874e2bf7){:target="_blank"} |
+| ca-central-1 | Canada   | HVM      | [ami-006d6b832e338f0b2](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-006d6b832e338f0b2){:target="_blank"} |
 |            |               |          |        |
-| eu-west-1      | Ireland   | HVM      | [ami-0bb04bf9edc84cade](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-0bb04bf9edc84cade){:target="_blank"} |
-| eu-west-2      | London    | HVM      | [ami-0a94f7993db846173](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-0a94f7993db846173){:target="_blank"} |
-| eu-west-3      | Paris    | HVM      | [ami-03eded124bfcbf774](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-03eded124bfcbf774){:target="_blank"} |
-| eu-central-1   | Frankfurt | HVM      | [ami-023bfd05de1c68da3](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-023bfd05de1c68da3){:target="_blank"} |
+| eu-west-1      | Ireland   | HVM      | [ami-0e0e603111b8b433e](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-0e0e603111b8b433e){:target="_blank"} |
+| eu-west-2      | London    | HVM      | [ami-0a126cb6c44f0a8e7](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-0a126cb6c44f0a8e7){:target="_blank"} |
+| eu-west-3      | Paris    | HVM      | [ami-0dc82bfebacc32546](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-0dc82bfebacc32546){:target="_blank"} |
+| eu-central-1   | Frankfurt | HVM      | [ami-0da6e0f978a3f25ac](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-0da6e0f978a3f25ac){:target="_blank"} |
 |                |               |          |        |
-| ap-northeast-1 | Tokyo   | HVM      | [ami-031a9f9bb5116ed8e](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-031a9f9bb5116ed8e){:target="_blank"} |
-| ap-southeast-1 | Singapore | HVM      | [ami-04422eec3514f1e87](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-04422eec3514f1e87){:target="_blank"} |
-| ap-southeast-2 | Sydney   | HVM      | [ami-0c8d2e1ad2031cecc](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-0c8d2e1ad2031cecc){:target="_blank"} |
-| ap-south-1     | Mumbai   | HVM      | [ami-08e83860b87a12816](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-08e83860b87a12816){:target="_blank"} |
+| ap-northeast-1 | Tokyo   | HVM      | [ami-08cb5f59e957eb1f4](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-08cb5f59e957eb1f4){:target="_blank"} |
+| ap-southeast-1 | Singapore | HVM      | [ami-0b9548760846bd25c](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-0b9548760846bd25c){:target="_blank"} |
+| ap-southeast-2 | Sydney   | HVM      | [ami-056189f29cd73a89d](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-056189f29cd73a89d{:target="_blank"} |
+| ap-south-1     | Mumbai   | HVM      | [ami-0ae3d55c7af062941](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-0ae3d55c7af062941){:target="_blank"} |
 |            |               |          |        |
-| sa-east-1  | Sao Paulo   | HVM      | [ami-06baa167dc17800eb](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-06baa167dc17800eb){:target="_blank"} |
+| sa-east-1  | Sao Paulo   | HVM      | [ami-0f5913438d2da987d](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-0f5913438d2da987d){:target="_blank"} |
 |            |               |          |        |
 
 
@@ -55,12 +55,6 @@ period. These images are not meant to be used in production.
    used in the labs.
 
 ![instance-type-memory-selection](/assets/images/kubevirt-button/ec2-instance-memory-selection.png)
-
- * We install Weave Net as the CNI to enable pods to communicate with each
-   other in the Kubernetes cluster. We reserve the 172.30.0.0/16 IP allocation
-   range for Weave Net. Verify that the VPC you selected for "Network" in the
-   "Instance Details" screen has a CIDR that does not overlap with Weave's
-   IP allocation range.
 
  * You will need to be able to log into your instance through SSH. Depending
    on your network configuration, you may need to enable public IP. To enable
