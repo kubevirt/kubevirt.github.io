@@ -41,7 +41,7 @@ period. These images are not meant to be used in production.
 |                |               |          |        |
 | ap-northeast-1 | Tokyo   | HVM      | [ami-08cb5f59e957eb1f4](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-08cb5f59e957eb1f4){:target="_blank"} |
 | ap-southeast-1 | Singapore | HVM      | [ami-0b9548760846bd25c](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-0b9548760846bd25c){:target="_blank"} |
-| ap-southeast-2 | Sydney   | HVM      | [ami-056189f29cd73a89d](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-056189f29cd73a89d{:target="_blank"} |
+| ap-southeast-2 | Sydney   | HVM      | [ami-056189f29cd73a89d](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-056189f29cd73a89d){:target="_blank"} |
 | ap-south-1     | Mumbai   | HVM      | [ami-0ae3d55c7af062941](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-0ae3d55c7af062941){:target="_blank"} |
 |            |               |          |        |
 | sa-east-1  | Sao Paulo   | HVM      | [ami-0f5913438d2da987d](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-0f5913438d2da987d){:target="_blank"} |
