@@ -5,7 +5,7 @@ metadata:
   labels:
     app: containerized-data-importer
   annotations:
-    kubevirt.io/storage.import.endpoint: "https://download.fedoraproject.org/pub/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-28-1.1.x86_64.qcow2"
+    cdi.kubevirt.io/storage.import.endpoint: "https://fedora.mirror.constant.com/fedora/linux/releases/28/Cloud/x86_64/images/Fedora-Cloud-Base-28-1.1.x86_64.qcow2"
 spec:
   accessModes:
   - ReadWriteOnce
