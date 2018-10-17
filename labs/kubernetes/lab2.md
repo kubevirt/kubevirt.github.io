@@ -1,7 +1,7 @@
 ---
 layout: kubernetes
 title: Experiment with CDI
-permalink: /labs/kubernetes/lab7
+permalink: /labs/kubernetes/lab2
 lab: kubernetes
 order: 1
 ---
@@ -97,5 +97,5 @@ ssh fedora@VM_IP
 
 This concludes this section of the lab.
 
-[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab6)\
+[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab1)\
 [Home]({{ site.baseurl }}/labs.html)

@@ -1,7 +1,7 @@
 ---
 layout: kubernetes
 title: Use KubeVirt
-permalink: /labs/kubernetes/lab6
+permalink: /labs/kubernetes/lab1
 lab: kubernetes
 order: 1
 ---
@@ -77,5 +77,5 @@ kubectl delete vms testvm
 
 This concludes this section of the lab.
 
-[Next Lab]({{ site.baseurl }}/labs/kubernetes/lab7)\
+[Next Lab]({{ site.baseurl }}/labs/kubernetes/lab2)\
 [Home]({{ site.baseurl }}/labs.html)
