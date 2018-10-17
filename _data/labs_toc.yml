@@ -2,6 +2,6 @@ toc:
   - title: KubeVirt Labs
     subfolderitems:
       - page: Use KubeVirt
-        url: /labs/kubernetes/lab6
+        url: /labs/kubernetes/lab1
       - page: Experiment with CDI
-        url: /labs/kubernetes/lab7
+        url: /labs/kubernetes/lab2
