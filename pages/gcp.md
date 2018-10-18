@@ -54,7 +54,7 @@ ready, SSH to your EC2 instance using your private key.
 Then become the "centos" user, which has kubectl enabled, and verify the Kubernetes pods are up and running.
 
 ```bash
-sudo su - centos
+sudo -i -u centos
 kubectl get pods -n kube-system
 ```
 
