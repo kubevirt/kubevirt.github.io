@@ -47,7 +47,7 @@ kubectl get vms
 kubectl get vms -o yaml testvm
 ```
 
-### Accessing VMs (serial console & spice)
+### Accessing VMs (serial console)
 
 Connect to the serial console of the Cirros VM. Hit return / enter a few times and login with the displayed username and password.
 
@@ -56,10 +56,6 @@ Connect to the serial console of the Cirros VM. Hit return / enter a few times a
 ```
 
 Disconnect from the virtual machine console by typing: `ctrl+]`.
-
-```
-./virtctl vnc testvm
-```
 
 ### Controlling the State of the VM
 
