@@ -1,7 +1,15 @@
 toc:
-  - title: KubeVirt Labs
+  - title: AWS
+    subfolderitems:
+      - page: Easy install using AWS
+        url: pages/ec2
+  - title: GCP
+    subfolderitems:
+      - page: Easy install using GCP
+        url: pages/gcp
+  - title: Labs
     subfolderitems:
       - page: Use KubeVirt
-        url: /labs/kubernetes/lab1
+        url: labs/kubernetes/lab1
       - page: Experiment with CDI
-        url: /labs/kubernetes/lab2
+        url: labs/kubernetes/lab2
