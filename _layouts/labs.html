@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+      {% include header.html %}
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+            <div class="accordion" id="accordionTOC">
+              <div class="card card--sidebar">
+                <div class="card-header card-header--sidebar" id="headingTOC">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
+                      Labs
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
+                  <div class="card-body card-body--sidebar">
+                    {% if site.data.labs_toc.toc[0] %}
+                      {% for item in site.data.labs_toc.toc %}
+                        <h3>{{ item.title }}</h3>
+                        {% if item.subfolderitems[0] %}
+                          {% for entry in item.subfolderitems %}
+                            <h3 class="labs-title">
+                              <a href="{{ site.baseurl }}/{{ entry.url }}" {% if page.title == entry.page %} class="labs-title--item active" {% else %} class="labs-title--item" {% endif %}>{{ entry.page }}</a>
+                            </h3>
+                          {% endfor %}
+                        {% endif %}
+                      {% endfor %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-8 col-lg-8 docs">
+            {{ content }}
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer" role="footer">
+      {% include footer.html %}
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="{{ site.baseurl }}/js/kubevirt-io.js"></script>
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

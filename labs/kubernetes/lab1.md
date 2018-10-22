@@ -1,5 +1,5 @@
 ---
-layout: kubernetes
+layout: labs
 title: Use KubeVirt
 permalink: /labs/kubernetes/lab1
 lab: kubernetes

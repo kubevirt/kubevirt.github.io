@@ -1,7 +1,12 @@
 ---
-layout: page
-title: Try KubeVirt on GCP
+layout: labs
+title: Easy install using GCP
+permalink: pages/gcp
+lab: kubernetes
+order: 1
 ---
+
+# Easy install using GCP
 
 You can try KubeVirt in Google Cloud Platform.
 

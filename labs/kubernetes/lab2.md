@@ -1,5 +1,5 @@
 ---
-layout: kubernetes
+layout: labs
 title: Experiment with CDI
 permalink: /labs/kubernetes/lab2
 lab: kubernetes

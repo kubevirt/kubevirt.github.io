@@ -1,7 +1,12 @@
 ---
-layout: page
-title: Try KubeVirt on AWS
+layout: labs
+title: Easy install using AWS
+permalink: pages/ec2
+lab: kubernetes
+order: 1
 ---
+
+# Easy install using AWS
 
 We have created AWS images that automatically install Kubernetes
 and KubeVirt inside an EC2 instance to help you quickly deploy
@@ -100,7 +105,7 @@ shows you how to use virtctl to interact with its console.
 The second lab is ["Experiment with CDI"](../labs/kubernetes/lab2). This
 lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
-(PVC) and then how to define a VM to make use of the PVC.  
+(PVC) and then how to define a VM to make use of the PVC.
 
 ## Found a bug?
 
