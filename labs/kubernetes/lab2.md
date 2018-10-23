@@ -19,7 +19,7 @@ We will first explore each component and install them. In this exercise we creat
 ```bash
 wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/storage-setup.yml
 cat storage-setup.yml
-wget https://github.com/kubevirt/containerized-data-importer/releases/download/v1.2.0/cdi-controller.yaml
+wget https://github.com/kubevirt/containerized-data-importer/releases/download/v1.3.0/cdi-controller.yaml
 cat cdi-controller.yaml
 kubectl create -f storage-setup.yml
 kubectl create -f cdi-controller.yaml
