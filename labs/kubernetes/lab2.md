@@ -17,9 +17,9 @@ At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller w
 We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class.
 
 ```bash
-wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/storage-setup.yml
+wget {{ site.data.labs_kubernetes_variables.cdi_lab.storage_setup_manifest }}
 cat storage-setup.yml
-wget https://github.com/kubevirt/containerized-data-importer/releases/download/v1.2.0/cdi-controller.yaml
+wget {{ site.data.labs_kubernetes_variables.cdi_lab.cdi_controller_manifest }}
 cat cdi-controller.yaml
 kubectl create -f storage-setup.yml
 kubectl create -f cdi-controller.yaml
@@ -28,7 +28,7 @@ kubectl create -f cdi-controller.yaml
 Review the "cdi" pods that were added.
 
 ```
-kubectl get pods -n kube-system
+{{ site.data.labs_kubernetes_variables.cdi_lab.cdi_pod_listing_command }}
 ```
 
 #### Use the CDI
@@ -36,13 +36,13 @@ kubectl get pods -n kube-system
 As an example, we will import a Fedora28 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
 ```bash
-kubectl create -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
+kubectl create -f {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_manifest }}
 ```
 
 This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the *cdi.kubevirt.io/storage.import.endpoint* annotation.
 
 ```
-kubectl get pvc fedora -o yaml
+kubectl get pvc {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} -o yaml
 kubectl get pod
 # replace with your importer pod name
 kubectl logs importer-fedora-pnbqh   # Substitute your importer-fedora pod name here.
@@ -50,12 +50,12 @@ kubectl logs importer-fedora-pnbqh   # Substitute your importer-fedora pod name 
 
 Notice that the importer downloaded the publicly available Fedora Cloud qcow image. Once the importer pod completes, this PVC is ready for use in kubevirt.
 
-If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the fedora PVC, and then recreate the fedora PVC.
+If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} PVC, and then recreate the {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} PVC.
 
 Let's create a Virtual Machine making use of it. Review the file *vm1_pvc.yml*.
 
 ```bash
-wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm1_pvc.yml
+wget {{ site.data.labs_kubernetes_variables.cdi_lab.vm_manifest }}
 cat ~/vm1_pvc.yml
 ```
 
@@ -78,13 +78,13 @@ kubectl get pod -o wide
 Since we are running an all in one setup, the corresponding Virtual Machine is actually running on the same node, we can check its qemu process.
 
 ```
-ps -ef | grep qemu | grep vm1
+ps -ef | grep qemu | grep {{ site.data.labs_kubernetes_variables.cdi_lab.vm_name }}
 ```
 
 Wait for the Virtual Machine to boot and to be available for login. You may monitor its progress through the console. The speed at which the VM boots depends on whether baremetal hardware is used. It is much slower when nested virtualization is used, which is likely the case if you are completing this lab on an instance on a cloud provider.
 
 ```
-./virtctl console vm1
+./virtctl console {{ site.data.labs_kubernetes_variables.cdi_lab.vm_name }}
 ```
 
 Disconnect from the virtual machine console by typing: `ctrl+]`
