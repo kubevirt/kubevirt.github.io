@@ -29,9 +29,9 @@ $ kubectl create \
 On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-platform/3.9/admin_guide/manage_scc.html) need to be added prior kubevirt.yaml deployment:
 
 ```bash
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-privileged
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-controller
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-apiserver
+$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-privileged
+$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-controller
+$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-apiserver
 
 $ export VERSION={{ site.kubevirt_version }}
 $ oc apply -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt.yaml
