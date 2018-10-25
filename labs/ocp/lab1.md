@@ -37,5 +37,4 @@ This concludes this section of the lab.
 
 ---
 
-[Next Lab]({{ site.baseurl }}/labs/ocp/lab2)\
-[Home]({{ site.baseurl }}/labs.html)
+[Next Lab]({{ site.baseurl }}/labs/ocp/lab2)
