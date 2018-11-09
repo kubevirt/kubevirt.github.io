@@ -2,14 +2,14 @@ toc:
   - title: AWS
     subfolderitems:
       - page: Easy install using AWS
-        url: pages/ec2
+        url: pages/ec2.html
   - title: GCP
     subfolderitems:
       - page: Easy install using GCP
-        url: pages/gcp
+        url: pages/gcp.html
   - title: Labs
     subfolderitems:
       - page: Use KubeVirt
-        url: labs/kubernetes/lab1
+        url: labs/kubernetes/lab1.html
       - page: Experiment with CDI
-        url: labs/kubernetes/lab2
+        url: labs/kubernetes/lab2.html
