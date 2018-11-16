@@ -8,7 +8,7 @@ order: 1
 
 # Set up your Environment
 
-For the sake of time, some of the required setup has already been taken care of on your GCP VM. For future reference though, the easiest way to get started is to head over to the OpenShift Origin repo on github and follow the "[Getting Started](https://github.com/openshift/origin/blob/master/docs/cluster_up_down.md)" instructions. The instructions cover getting started on Windows, MacOS, and Linux.
+For the sake of time, some of the required setup has already been taken care of on your GCP VM. For future reference though, the easiest way to get started is to head over to the documentation and follow the "[Getting Started](https://docs.okd.io/latest/getting_started/administrators.html)" instructions. The instructions cover getting started on Windows, MacOS, and Linux.
 
 ### Requirements
 
