@@ -53,36 +53,23 @@ how to do this might vary depending on the VM's operating system.
 apiVersion: kubevirt.io/v1alpha2
 kind: VirtualMachineInstance
 metadata:
-  creationTimestamp: null
-  labels:
-    special: vmi-fedora
   name: vmi-fedora
 spec:
   domain:
     devices:
       disks:
       - name: registrydisk
-        disk:
-          bus: virtio
         volumeName: registryvolume
       - name: cloudinitdisk
-        disk:
-          bus: virtio
         volumeName: cloudinitvolume
       - name: configmap-disk
-        disk:
-          bus: virtio
-        serial: BD65E8D512AABD54
+        serial: configmap
         volumeName: configmap-volume
       - name: secret-disk
-        disk:
-          bus: virtio
-        serial: D23YZ9W6WA5DJ487
+        serial: secret
         volumeName: secret-volume
       - name: serviceaccount-disk
-        disk:
-          bus: virtio
-        serial: 54DE5BCCE6E12AAC
+        serial: serviceaccount
         volumeName: serviceaccount-volume
     resources:
       requests:
@@ -100,9 +87,9 @@ spec:
         bootcmd:
           # mount the disks
           - "mkdir /mnt/{myconfigmap,mysecret,myserviceaccount}"
-          - "mount /dev/disk/by-id/virtio-BD65E8D512AABD54 /mnt/myconfigmap"
-          - "mount /dev/disk/by-id/virtio-D23YZ9W6WA5DJ487 /mnt/mysecret"
-          - "mount /dev/disk/by-id/virtio-54DE5BCCE6E12AAC /mnt/myserviceaccount"
+          - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_configmap /mnt/myconfigmap"
+          - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_secret /mnt/mysecret"
+          - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_serviceaccount /mnt/myserviceaccount"
   - name: configmap-volume
     configMap:
       name: myconfigmap
