@@ -10,6 +10,16 @@ order: 2
 This demo will deploy [KubeVirt](https://www.kubevirt.io) on an existing Kubernetes (1.9 or
 later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a Kubernetes or OpenShift Origin cluster, see [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"} and [Minishift](https://www.openshift.org/minishift/){:target="_blank"}.
 
+### Check Virtualization Extensions 
+
+If your nodes lack virtual machine extensions, create the following configuration map so that kubevirt uses emulation mode
+
+```
+$ kubectl create configmap -n kube-system kubevirt-config --from-literal debug.useEmulation=true
+```
+
+Such a procedure is mandatory for minishift
+
 ### Deploy KubeVirt
 
 KubeVirt deploys as an add-on to a Kubernetes (1.9 or later) cluster, using the `kubectl` tool and the following manifest file:
@@ -29,9 +39,11 @@ $ kubectl create \
 On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-platform/3.9/admin_guide/manage_scc.html) need to be added prior kubevirt.yaml deployment:
 
 ```bash
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-privileged
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-controller
-$ oc adm policy add-scc-to-user privileged system:serviceaccount:kube-system:kubevirt-apiserver
+$ oc login -u system:admin
+$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-privileged
+$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-controller
+$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-apiserver
+
 
 $ export VERSION={{ site.kubevirt_version }}
 $ oc apply -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt.yaml
@@ -100,7 +112,7 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
        $ cat /sys/module/kvm_intel/parameters/nested
        Y
        ```
-       If not, then enable it as described [here](https://docs.fedoraproject.org/quick-docs/en-US/using-nested-virtualization-in-kvm.html){:target="_blank"}
+       If not, then enable it as described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="_blank"}
 
    3. Download the [`minikube` binary](https://github.com/kubernetes/minikube/releases){:target="_blank"}
 2. Launch minikube with CNI:
