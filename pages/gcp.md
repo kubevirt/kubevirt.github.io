@@ -34,7 +34,7 @@ Fill in the following data:
 
 **Source:** cloud storage file
 
-**Cloud storage file:** kubevirt-button/{{ site.kubevirt_version}}.tar.gz
+**Cloud storage file:** kubevirt-button/vX.X.X.tar.gz
 
 ## Step 2: Create a new instance using the image you created
 
