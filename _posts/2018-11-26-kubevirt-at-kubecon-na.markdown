@@ -34,7 +34,7 @@ virtual machines, but also to meet other members of the community:
   - Tuesday, December 11 @ 2:35 PM PST
 
 * [Running VM Workloads Side by Side with Container Workloads][7] presented by
-  Sebastian Scheele, Co-founder and CEO, [Loodse][https://www.loodse.com/]
+  Sebastian Scheele, Co-founder and CEO, [Loodse][12]
   - Thursday, December 13 @ 10:50 AM PST
 
 As [previously announced][13] on the [kubevirt-dev][14] mailing list we will
