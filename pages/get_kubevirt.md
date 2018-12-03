@@ -14,8 +14,8 @@ later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a
 
 If your nodes lack virtual machine extensions, create the following configuration map so that kubevirt uses emulation mode
 
-```
-$ kubectl create configmap -n kube-system kubevirt-config --from-literal debug.useEmulation=true
+```bash
+{% include scriptlets/get_kubevirt/emulate_vm_extensions.sh -%}
 ```
 
 Such a procedure is mandatory for minishift
@@ -24,10 +24,9 @@ Such a procedure is mandatory for minishift
 
 KubeVirt deploys as an add-on to a Kubernetes (1.9 or later) cluster, using the `kubectl` tool and the following manifest file:
 
+
 ```bash
-$ export VERSION={{ site.kubevirt_version }}
-$ kubectl create \
-    -f https://github.com/kubevirt/kubevirt/releases/download/$VERSION/kubevirt.yaml
+{% include scriptlets/get_kubevirt/deploy_with_kubectl.sh -%}
 ```
 
 > **Note:** The initial deployment to a new cluster can take
@@ -39,14 +38,7 @@ $ kubectl create \
 On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-platform/3.9/admin_guide/manage_scc.html) need to be added prior kubevirt.yaml deployment:
 
 ```bash
-$ oc login -u system:admin
-$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-privileged
-$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-controller
-$ oc adm policy add-scc-to-user privileged -n kube-system -z kubevirt-apiserver
-
-
-$ export VERSION={{ site.kubevirt_version }}
-$ oc apply -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt.yaml
+{% include scriptlets/get_kubevirt/deploy_with_oc.sh -%}
 ```
 
 ### Install virtctl
@@ -57,9 +49,7 @@ An additional binary is provided to get quick access to the serial and graphical
 The tool is called `virtctl` and can be retrieved from the release page of KubeVirt:
 
 ```bash
-$ curl -L -o virtctl \
-    https://github.com/kubevirt/kubevirt/releases/download/$VERSION/virtctl-$VERSION-linux-amd64
-$ chmod +x virtctl
+{% include scriptlets/get_kubevirt/get_virtctl.sh -%}
 ```
 
 ### Deploy a VirtualMachine
@@ -67,36 +57,13 @@ $ chmod +x virtctl
 Once you deployed KubeVirt you are ready to launch a VM:
 
 ```bash
-# Creating a virtual machine
-$ kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
-
-# After deployment you can manage VMs using the usual verbs:
-$ kubectl get vms
-$ kubectl get vms -o yaml testvm
-
-# To start an offline VM you can use
-$ ./virtctl start testvm
-$ kubectl get vmis
-$ kubectl get vmis -o yaml testvm
-
-# To shut it down again
-$ ./virtctl stop testvm
-
-# To delete
-$ kubectl delete vms testvm
-# To create your own
-$ kubectl create -f $YOUR_VM_SPEC
+{% include scriptlets/get_kubevirt/create_vm.sh -%}
 ```
 
 ### Accessing VMs (serial console & spice)
 
 ```bash
-# Connect to the serial console
-$ ./virtctl console testvm
-
-# Connect to the graphical display
-# Note: Requires `remote-viewer` from the `virt-viewer` package.
-$ ./virtctl vnc testvm
+{% include scriptlets/get_kubevirt/vm_consoles.sh -%}
 ```
 
 ### User Guide
@@ -109,8 +76,7 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
    1. Install the [kvm2 driver](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver){:target="_blank"}
    2. Verify nested virtualization is enabled on the machine minikube is being installed on:
        ```bash
-       $ cat /sys/module/kvm_intel/parameters/nested
-       Y
+{% include scriptlets/get_kubevirt/verify_nested_virt.sh -%}
        ```
        If not, then enable it as described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="_blank"}
 
@@ -118,9 +84,7 @@ Now that KubeVirt is up an running, you can take a look at the [user guide](http
 2. Launch minikube with CNI:
 
     ```bash
-    $ minikube start \
-    --vm-driver kvm2 \
-    --network-plugin cni
+{% include scriptlets/get_kubevirt/start_minikube.sh -%}
     ```
 3. Install `kubectl` via a package manager or [download](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl){:target="_blank"} it
 
@@ -133,8 +97,7 @@ If you already have a Kubernetes cluster, you can use [kubevirt-ansible](https:/
 First clone the kubevirt-ansible repo on your master Kubernetes node.
 
 ```bash
-git clone https://github.com/kubevirt/kubevirt-ansible
-cd kubevirt-ansible
+{% include scriptlets/kubevirt-ansible/clone_ansible.sh -%}
 ```
 
 ## KubeVirt with no additional storage
@@ -142,7 +105,7 @@ cd kubevirt-ansible
 To install KubeVirt without adding additional storage capabilities:
 
 ```bash
-ansible-playbook -i localhost -e cluster=k8s -e storage_role=storage-none playbooks/kubevirt.yml
+{% include scriptlets/kubevirt-ansible/playbook_no_storage.sh -%}
 ```
 
 ## KubeVirt with storage environment for development and testing
@@ -152,38 +115,14 @@ using Ceph and Cinder, that is geared for non-production use. To install
 KubeVirt with the demo storage environment, first edit the inventory file
 and populate the section named "masters", "etcd", and "nodes".
 
-```bash
-# inventory
-# BEGIN CUSTOM SETTINGS
-[masters]
-# Your master FQDN
-
-[etcd]
-# Your etcd FQDN
-
-[nodes]
-# Your nodes FQDN's
-
-[nfs]
-# Your nfs server FQDN
-
-[glusterfs]
-# Your glusterfs nodes FQDN
-# Each node should have the "glusterfs_devices" variable, which
-# points to the block device that will be used by gluster.
-
-#
-# If you run openshift deployment
-# You can add your master as schedulable node with option openshift_schedulable=true
-# Add at least one node with lable to run on it router and docker containers
-# openshift_node_labels="{'region': 'infra','zone': 'default'}"
-# END CUSTOM SETTINGS
+```ini
+{% include scriptlets/kubevirt-ansible/storage-inventory-template.yml -%}
 ```
 
 Once you have your inventory file filled in:
 
 ```bash
-ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-demo playbooks/kubevirt.yml
+{% include scriptlets/kubevirt-ansible/playbook_with_storage.sh -%}
 ```
 
 ## KubeVirt with GlusterFS and Heketi storage environment
@@ -202,38 +141,14 @@ First edit the inventory file and populate the sections "master", "etcd",
 "nodes", and "glusterfs".
 
 ```bash
-# inventory
-# BEGIN CUSTOM SETTINGS
-[masters]
-# Your master FQDN
-
-[etcd]
-# Your etcd FQDN
-
-[nodes]
-# Your nodes FQDN's
-
-[nfs]
-# Your nfs server FQDN
-
-[glusterfs]
-# Your glusterfs nodes FQDN
-# Each node should have the "glusterfs_devices" variable, which
-# points to the block device that will be used by gluster.
-
-#
-# If you run openshift deployment
-# You can add your master as schedulable node with option openshift_schedulable=true
-# Add at least one node with lable to run on it router and docker containers
-# openshift_node_labels="{'region': 'infra','zone': 'default'}"
-# END CUSTOM SETTINGS
+{% include scriptlets/kubevirt-ansible/gluster-heketi-inventory-template.yml -%}
 ```
 
 Then run this playbook, substituting the namespaces and heketi_url to
 match your environment:
 
 ```bash
-ansible-playbook -i inventory -e cluster=k8s -e storage_role=storage-glusterfs -e namespace=kube-system -e glusterfs_namespace=kube-system -e glusterfs_name= -e heketi_url=http://10.32.0.4:8080 playbooks/kubevirt.yml
+{% include scriptlets/kubevirt-ansible/playbook-gluster-heketi.sh -%}
 ```
 
 ## How it looks in the UI
