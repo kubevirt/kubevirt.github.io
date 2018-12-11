@@ -42,6 +42,7 @@ also be holding a users and contributors meetup on the Tuesday evening of the
 event:
 
 * Location: [Sheraton Grand, Seattle][15]
+* Room: Aspen Room, 2nd Floor (Union Street Tower)
 * Date: Tuesday, December 11th
 * Time: 6:45 - 8:45 PM PST
 
