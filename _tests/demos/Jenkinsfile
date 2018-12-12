@@ -1,0 +1,145 @@
+// setup up and run the simple demo on four environments
+//
+// centos/minikube/KVM2
+// centos/minikube/VirtualBox
+// centos/minishift/KVM
+// centos/minishift/VirtualBox
+
+
+// Stage 1: Install Virtualization
+
+// Stage 2: Install VM
+
+// Stage 3: Install Kubevirt
+
+// Stage 4: Execute Demos
+
+
+properties(
+    [
+        buildDiscarder(
+            logRotator(
+                artifactDaysToKeepStr: '',
+                artifactNumToKeepStr: '',
+                daysToKeepStr: '5',
+                numToKeepStr: '10'
+            )
+        ),
+        disableConcurrentBuilds(),
+        [
+            $class: 'ParametersDefinitionProperty',
+            parameterDefinitions: [
+                [
+                    name: 'TARGET_NODE',
+                    description: 'Jenkins agent node',
+                    $class: 'hudson.model.StringParameterDefinition',
+                    defaultValue: 'kubevirt'
+                ],
+                [
+                    name: 'GITHUB_OWNER',
+                    description: 'Github ownerfor repos',
+                    $class: 'hudson.model.ChoiceParameterDefinition',
+                    choices: [
+                        "markllama"
+                    ].join("\n"),
+                    defaultValue: 'markllama'
+                ],
+                [
+                    name: 'SSH_KEY_ID',
+                    description: 'SSH credential id to use',
+                    $class: 'hudson.model.ChoiceParameterDefinition',
+                    choices: [
+                        "markllama"
+                    ].join("\n"),
+                    defaultValue: 'markllama'
+                ],
+                [
+                    name: 'VIRT_DRIVER',
+                    description: 'Which virtualization driver to use',
+                    $class: 'hudson.model.ChoiceParameterDefinition',
+                    choices: [
+                        "kvm2",
+                        "kvm",
+                        "virtualbox"
+                    ].join("\n"),
+                    defaultValue: 'kvm2'
+                ],                
+                [
+                    name: 'MINIKUBE_VERSION',
+                    description: 'What version of minikube to use (no v prefix!)',
+                    $class: 'hudson.model.StringParameterDefinition',
+                    defaultValue: '0.32.0'
+                ],
+                [
+                    name: 'DEBUG',
+                    description: 'ask commands to print details',
+                    $class: 'hudson.model.BooleanParameterDefinition',
+                    defaultValue: false
+                ]
+            ]
+        ],
+        disableConcurrentBuilds()
+    ]
+)
+
+// persist = PERSIST.toBoolean()
+debug = DEBUG.toBoolean()
+
+def clean_minikube() {
+    echo "cleaning minikube"
+    sh "${WORKSPACE}/bin/minikube delete"
+}
+
+def clean_kube_env() {
+    echo "echo cleaning kube environment"
+    clean_minikube()
+}
+
+node(TARGET_NODE) {
+
+    //sh("echo I ran")
+    //echo "I ran"
+
+    // This might not be needed here
+    // checkout scm
+
+    //stage("verify virtualization") {
+    //    check_virt_kvm()
+    //}
+
+    try {
+        stage("prepare kubernetes environment") {
+            echo "running main body"
+            prep = build(
+                job: 'prepare-minikube',
+                parameters: [
+                    [
+                        name: 'TARGET_NODE',
+                        value: TARGET_NODE,
+                        $class: 'hudson.model.StringParameterValue',
+                    ],
+                    [
+                        name: 'PERSIST',
+                        value: true,
+                        $class: 'hudson.model.BooleanParameterValue',
+                    ]                  
+                ]
+            )
+
+            currentBuild.displayName = "demo: ${prep.displayName}"
+            currentBuild.result = prep.result
+        }
+    } catch (err) {
+        echo "encountered an error: ${err}"
+        error err
+    } finally {
+        try {
+            clean_kube_env()
+        } catch (err) {
+            echo "error cleaning kube environment"
+        }
+        cleanWs()
+        deleteDir()
+    }
+}
+
