@@ -15,7 +15,7 @@ later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a
 If your nodes lack virtual machine extensions, create the following configuration map so that kubevirt uses emulation mode
 
 ```bash
-{% include scriptlets/get_kubevirt/emulate_vm_extensions.sh -%}
+{% include scriptlets/get_kubevirt/01_emulate_vm_extensions.sh -%}
 ```
 
 Such a procedure is mandatory for minishift
@@ -26,7 +26,7 @@ KubeVirt deploys as an add-on to a Kubernetes (1.9 or later) cluster, using the 
 
 
 ```bash
-{% include scriptlets/get_kubevirt/deploy_with_kubectl.sh -%}
+{% include scriptlets/get_kubevirt/02-a_deploy_with_kubectl.sh -%}
 ```
 
 > **Note:** The initial deployment to a new cluster can take
@@ -38,7 +38,7 @@ KubeVirt deploys as an add-on to a Kubernetes (1.9 or later) cluster, using the 
 On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-platform/3.9/admin_guide/manage_scc.html) need to be added prior kubevirt.yaml deployment:
 
 ```bash
-{% include scriptlets/get_kubevirt/deploy_with_oc.sh -%}
+{% include scriptlets/get_kubevirt/02-b_deploy_with_oc.sh -%}
 ```
 
 ### Install virtctl
@@ -49,7 +49,7 @@ An additional binary is provided to get quick access to the serial and graphical
 The tool is called `virtctl` and can be retrieved from the release page of KubeVirt:
 
 ```bash
-{% include scriptlets/get_kubevirt/get_virtctl.sh -%}
+{% include scriptlets/get_kubevirt/03_get_virtctl.sh -%}
 ```
 
 ### Deploy a VirtualMachine
@@ -57,13 +57,13 @@ The tool is called `virtctl` and can be retrieved from the release page of KubeV
 Once you deployed KubeVirt you are ready to launch a VM:
 
 ```bash
-{% include scriptlets/get_kubevirt/create_vm.sh -%}
+{% include scriptlets/get_kubevirt/04_create_vm.sh -%}
 ```
 
 ### Accessing VMs (serial console & spice)
 
 ```bash
-{% include scriptlets/get_kubevirt/vm_consoles.sh -%}
+{% include scriptlets/get_kubevirt/05_vm_consoles.sh -%}
 ```
 
 ### User Guide
