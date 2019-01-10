@@ -14,6 +14,7 @@ Download the VM manifest and explore it. Note it uses a [registry disk](https://
 
 ```bash
 {% include scriptlets/lab1/01_get_vm_manifest.sh -%}
+less vm.yaml
 ```
 
 Apply the manifest to Kubernetes.
