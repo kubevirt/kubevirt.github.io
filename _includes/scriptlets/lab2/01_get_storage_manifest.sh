@@ -1,1 +1,1 @@
-wget {{ site.data.labs_kubernetes_variables.cdi_lab.storage_setup_manifest }}
+wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/storage-setup.yml

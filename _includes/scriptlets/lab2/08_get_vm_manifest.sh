@@ -1,1 +1,1 @@
-wget {{ site.data.labs_kubernetes_variables.cdi_lab.vm_manifest }}
+wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm1_pvc.ym

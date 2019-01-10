@@ -1,1 +1,1 @@
-kubectl create -f {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_manifest }}
+kubectl create -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
