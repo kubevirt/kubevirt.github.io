@@ -20,6 +20,8 @@ Apply the manifest to Kubernetes.
 
 ```bash
 {% include scriptlets/lab1/02_create_testvm.sh -%}
+  virtualmachine.kubevirt.io "testvm" created
+  virtualmachineinstancepreset.kubevirt.io "small" created
 ```
 
 ### Manage Virtual Machines (optional):
