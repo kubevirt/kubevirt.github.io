@@ -1,6 +1,3 @@
-use_kubevirt_lab:
-  vm_manifest: https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
-  vm_name: testvm
 cdi_lab:
   storage_setup_manifest: https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/storage-setup.yml
   cdi_controller_manifest: https://github.com/kubevirt/containerized-data-importer/releases/download/v1.3.0/cdi-controller.yaml
