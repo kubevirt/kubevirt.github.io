@@ -17,18 +17,18 @@ At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller w
 We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class.
 
 ```bash
-wget {{ site.data.labs_kubernetes_variables.cdi_lab.storage_setup_manifest }}
+{% include scriptlets/lab2/01_get_storage_manifest.sh -%}
 cat storage-setup.yml
-wget {{ site.data.labs_kubernetes_variables.cdi_lab.cdi_controller_manifest }}
+{% include scriptlets/lab2/02_get_cdi_controller_manifest.sh -%}
 cat cdi-controller.yaml
-kubectl create -f storage-setup.yml
-kubectl create -f cdi-controller.yaml
+{% include scriptlets/lab2/03_create_storage.sh -%}
+{% include scriptlets/lab2/04_create_cdi-controller.sh -%}
 ```
 
 Review the "cdi" pods that were added.
 
 ```
-{{ site.data.labs_kubernetes_variables.cdi_lab.cdi_pod_listing_command }}
+{% include scriptlets/lab2/05_view_cdi_pod_status.sh -%}
 ```
 
 #### Use the CDI
@@ -36,16 +36,13 @@ Review the "cdi" pods that were added.
 As an example, we will import a Fedora28 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
 ```bash
-kubectl create -f {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_manifest }}
+{% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
 ```
 
 This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the *cdi.kubevirt.io/storage.import.endpoint* annotation.
 
 ```
-kubectl get pvc {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} -o yaml
-kubectl get pod
-# replace with your importer pod name
-kubectl logs importer-fedora-pnbqh   # Substitute your importer-fedora pod name here.
+{% include scriptlets/lab2/07_view_pod_logs.sh -%}
 ```
 
 Notice that the importer downloaded the publicly available Fedora Cloud qcow image. Once the importer pod completes, this PVC is ready for use in kubevirt.
@@ -55,36 +52,32 @@ If the importer pod completes in error, you may need to retry it or specify a di
 Let's create a Virtual Machine making use of it. Review the file *vm1_pvc.yml*.
 
 ```bash
-wget {{ site.data.labs_kubernetes_variables.cdi_lab.vm_manifest }}
+{% include scriptlets/lab2/08_get_vm_manifest.sh -%}
 cat ~/vm1_pvc.yml
 ```
 
 We change the yaml definition of this Virtual Machine to inject the default public key of user in the cloud instance.
 
 ```
-# Generate a password-less SSH key using the default location.
-ssh-keygen
-PUBKEY=`cat ~/.ssh/id_rsa.pub`
-sed -i "s%ssh-rsa.*%$PUBKEY%" vm1_pvc.yml
-kubectl create -f vm1_pvc.yml
+{% include scriptlets/lab2/09_create_vm1.sh -%}
 ```
 
 This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to gather its IP. You are looking for the IP address beside the `virt-launcher` pod.
 
 ```
-kubectl get pod -o wide
+{% include scriptlets/lab2/10_view_pods.sh -%}
 ```
 
 Since we are running an all in one setup, the corresponding Virtual Machine is actually running on the same node, we can check its qemu process.
 
 ```
-ps -ef | grep qemu | grep {{ site.data.labs_kubernetes_variables.cdi_lab.vm_name }}
+{% include scriptlets/lab2/11_view_vm_in_qemu.sh -%}
 ```
 
 Wait for the Virtual Machine to boot and to be available for login. You may monitor its progress through the console. The speed at which the VM boots depends on whether baremetal hardware is used. It is much slower when nested virtualization is used, which is likely the case if you are completing this lab on an instance on a cloud provider.
 
 ```
-./virtctl console {{ site.data.labs_kubernetes_variables.cdi_lab.vm_name }}
+{% include scriptlets/lab2/12_connect_to_vm1_console.sh -%}
 ```
 
 Disconnect from the virtual machine console by typing: `ctrl+]`
@@ -92,7 +85,7 @@ Disconnect from the virtual machine console by typing: `ctrl+]`
 Finally, use the gathered ip to connect to the Virtual Machine, create some files, stop and restart the Virtual Machine with virtctl and check how data persists.
 
 ```
-ssh fedora@VM_IP
+{% include scriptlets/lab2/13_ssh_to_vm1.sh -%}
 ```
 
 This concludes this section of the lab.
