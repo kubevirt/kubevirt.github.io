@@ -1,1 +1,1 @@
-./virtctl start {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_name }}
+./virtctl start testvm
