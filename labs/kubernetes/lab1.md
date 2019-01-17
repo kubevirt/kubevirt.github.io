@@ -13,14 +13,14 @@ order: 1
 Download the VM manifest and explore it. Note it uses a [registry disk](https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk) and as such doesn't persist data. Such registry disks currently exist for alpine, cirros and fedora.
 
 ```bash
-wget {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_manifest }}
+{% include scriptlets/lab1/01_get_vm_manifest.sh -%}
 less vm.yaml
 ```
 
 Apply the manifest to Kubernetes.
 
 ```bash
-kubectl apply -f {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_manifest }}
+{% include scriptlets/lab1/02_create_testvm.sh -%}
   virtualmachine.kubevirt.io "testvm" created
   virtualmachineinstancepreset.kubevirt.io "small" created
 ```
@@ -30,21 +30,19 @@ kubectl apply -f {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_mani
 To get a list of existing Virtual Machines. Note the `running` status.
 
 ```
-kubectl get vms
-kubectl get vms -o yaml testvm
+{% include scriptlets/lab1/03_verify_testvm.sh -%}
 ```
 
 To start a Virtual Machine you can use:
 
 ```
-./virtctl start {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_name }}
+{% include scriptlets/lab1/04_start_testvm.sh -%}
 ```
 
 Now that the Virtual Machine has been started, check the status. Note the `running` status.
 
 ```
-kubectl get vms
-kubectl get vms -o yaml {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_name }}
+{% include scriptlets/lab1/05_verify_testvm_instance.sh -%}
 ```
 
 ### Accessing VMs (serial console)
@@ -52,7 +50,7 @@ kubectl get vms -o yaml {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.
 Connect to the serial console of the Cirros VM. Hit return / enter a few times and login with the displayed username and password.
 
 ```
-./virtctl console {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_name }}
+{% include scriptlets/lab1/06_connect_to_testvm_console.sh -%}
 ```
 
 Disconnect from the virtual machine console by typing: `ctrl+]`.
@@ -62,13 +60,13 @@ Disconnect from the virtual machine console by typing: `ctrl+]`.
 To shut it down:
 
 ```
-./virtctl stop {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_name }}
+{% include scriptlets/lab1/07_stop_testvm.sh -%}
 ```
 
 To delete a Virtual Machine:
 
 ```
-kubectl delete vms {{ site.data.labs_kubernetes_variables.use_kubevirt_lab.vm_name }}
+{% include scriptlets/lab1/08_delete_testvm.sh -%}
 ```
 
 This concludes this section of the lab.
