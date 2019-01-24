@@ -1,1 +1,1 @@
-wget https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yml
