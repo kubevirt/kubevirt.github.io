@@ -37,7 +37,7 @@ Currently, the Makefile includes targets that address different things: building
 
 ### Prerequisites
 
-Best place to look for that is in the docker file definition for the build environment: [hack/docker-builder/Dockerfile](https://github.com/kubevirt/kubevirt/blob/master/hack/docker-builder/Dockerfile)
+Best place to look for that is in the docker file definition for the build environment: [hack/docker-builder/Dockerfile](https://github.com/kubevirt/kubevirt/blob/master/hack/builder/Dockerfile)
 
 Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:
 ```
