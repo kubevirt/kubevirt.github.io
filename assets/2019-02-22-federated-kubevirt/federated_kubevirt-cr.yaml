@@ -1,0 +1,19 @@
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedKubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  template:
+    spec: null
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedKubeVirtPlacement
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
+---

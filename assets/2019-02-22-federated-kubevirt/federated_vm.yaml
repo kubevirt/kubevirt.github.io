@@ -1,0 +1,54 @@
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedVirtualMachine
+metadata:
+  name: testvm2
+spec:
+  template:
+    spec:
+      running: true
+      template:
+        metadata:
+          labels:
+            kubevirt.io/domain: testvm
+            kubevirt.io/size: small
+        spec:
+          domain:
+            devices:
+              disks:
+              - disk:
+                  bus: virtio
+                name: containerdisk
+              - disk:
+                  bus: virtio
+                name: pvcdisk
+              - disk:
+                  bus: virtio
+                name: cloudinitdisk
+              interfaces:
+              - bridge: {}
+                name: default
+            resources:
+              requests:
+                memory: 64M
+          networks:
+          - name: default
+            pod: {}
+          volumes:
+          - containerDisk:
+              image: kubevirt/cirros-registry-disk-demo:latest
+            name: containerdisk
+          - name: pvcdisk
+            persistentVolumeClaim:
+              claimName: fed001
+          - cloudInitNoCloud:
+              userDataBase64: SGkuXG4=
+            name: cloudinitdisk
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedVirtualMachinePlacement
+metadata:
+  name: testvm2
+spec:
+  clusterNames:
+  - cluster1
+---

@@ -1,0 +1,172 @@
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedCustomResourceDefinition
+metadata:
+  name: kubevirts.kubevirt.io
+spec:
+  template:
+    spec:
+      additionalPrinterColumns:
+      - JSONPath: .metadata.creationTimestamp
+        name: Age
+        type: date
+      - JSONPath: .status.phase
+        name: Phase
+        type: string
+      group: kubevirt.io
+      names:
+        kind: KubeVirt
+        plural: kubevirts
+        shortNames:
+        - kv
+        - kvs
+        singular: kubevirt
+      scope: Namespaced
+      version: v1alpha3
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedCustomResourceDefinitionPlacement
+metadata:
+  name: kubevirts.kubevirt.io
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedClusterRole
+metadata:
+  name: kubevirt.io.operator
+spec:
+  template:
+    rules:
+    - apiGroups:
+      - kubevirt.io
+      resources:
+      - kubevirts
+      verbs:
+      - get
+      - delete
+      - create
+      - update
+      - patch
+      - list
+      - watch
+      - deletecollection
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedClusterRolePlacement
+metadata:
+  name: kubevirt.io.operator
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedServiceAccount
+metadata:
+  name: kubevirt-operator
+  namespace: kubevirt
+spec:
+  template: {}
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedServiceAccountPlacement
+metadata:
+  name: kubevirt-operator
+  namespace: kubevirt
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedClusterRoleBinding
+metadata:
+  name: kubevirt-operator
+  namespace: kubevirt
+spec:
+  template:
+    roleRef:
+      apiGroup: rbac.authorization.k8s.io
+      kind: ClusterRole
+      name: cluster-admin
+    subjects:
+    - kind: ServiceAccount
+      name: kubevirt-operator
+      namespace: kubevirt
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedClusterRoleBindingPlacement
+metadata:
+  name: kubevirt-operator
+  namespace: kubevirt
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedDeployment
+metadata:
+  labels:
+    operator.kubevirt.io: virt-operator
+    prometheus.kubevirt.io: ''
+  name: virt-operator
+  namespace: kubevirt
+spec:
+  template:
+    spec:
+      replicas: 1
+      selector:
+        matchLabels:
+          operator.kubevirt.io: virt-operator
+          prometheus.kubevirt.io: ''
+      template:
+        metadata:
+          annotations:
+            scheduler.alpha.kubernetes.io/critical-pod: ''
+            scheduler.alpha.kubernetes.io/tolerations: "[\n  {\n    \"key\": \"CriticalAddonsOnly\"\
+              ,\n    \"operator\": \"Exists\"\n  }\n]\n"
+          labels:
+            operator.kubevirt.io: virt-operator
+            prometheus.kubevirt.io: ''
+        spec:
+          containers:
+          - command:
+            - virt-operator
+            - --port
+            - '8443'
+            - -v
+            - '2'
+            env:
+            - name: OPERATOR_IMAGE
+              value: docker.io/kubevirt/virt-operator:v0.14.0
+            image: docker.io/kubevirt/virt-operator:v0.14.0
+            imagePullPolicy: IfNotPresent
+            name: virt-operator
+            ports:
+            - containerPort: 8443
+              name: metrics
+              protocol: TCP
+            readinessProbe:
+              httpGet:
+                path: /metrics
+                port: metrics
+                scheme: HTTPS
+              initialDelaySeconds: 5
+              periodSeconds: 10
+          securityContext:
+            runAsNonRoot: true
+          serviceAccountName: kubevirt-operator
+---
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedDeploymentPlacement
+metadata:
+  name: virt-operator
+  namespace: kubevirt
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
+---
