@@ -1,0 +1,9 @@
+apiVersion: primitives.federation.k8s.io/v1alpha1
+kind: FederatedNamespacePlacement
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  clusterNames:
+  - cluster1
+  - cluster2
