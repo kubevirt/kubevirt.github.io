@@ -1,1 +1,1 @@
-kubectl create configmap -n kube-system kubevirt-config --from-literal debug.useEmulation=true
+kubectl create configmap -n kubevirt kubevirt-config --from-literal debug.useEmulation=true
