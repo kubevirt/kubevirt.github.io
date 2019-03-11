@@ -18,7 +18,7 @@ KubeVirt is deployed by means of an operator, using the `kubectl` tool and the f
 {% include scriptlets/get_kubevirt/00_deploy_operator.sh -%}
 ```
 
-## Check Virtualization Extensions
+### Check Virtualization Extensions
 
 To check if your CPU supports virtualization extensions perform:
 
@@ -44,8 +44,6 @@ KubeVirt is then deployed by creating a dedicated custom resource:
 ```
 
 ### Install virtctl
-
-> **Note:** This requires `kubectl` from Kubernetes 1.9 or later on the client
 
 An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
 The tool is called `virtctl` and can be retrieved from the release page of KubeVirt:
