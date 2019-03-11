@@ -10,9 +10,23 @@ order: 2
 This demo will deploy [KubeVirt](https://www.kubevirt.io) on an existing Kubernetes (1.9 or
 later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a Kubernetes or OpenShift Origin cluster, see [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"} and [Minishift](https://www.openshift.org/minishift/){:target="_blank"}.
 
-### Check Virtualization Extensions 
+### Check Virtualization Extensions
 
-If your nodes lack virtual machine extensions, create the following configuration map so that kubevirt uses emulation mode
+To check if your CPU supports virtualization extensions perform:
+
+```bash
+{% include scriptlets/get_kubevirt/00_verify_virtualization.sh -%}
+```
+
+If your nodes lack virtual machine extensions, create the kubevirt namespace:
+
+```bash
+{% include scriptlets/get_kubevirt/00_create_kubevirt_namespace.sh -%}
+```
+
+
+Then create the following configuration map so that kubevirt uses emulation
+mode:
 
 ```bash
 {% include scriptlets/get_kubevirt/01_emulate_vm_extensions.sh -%}
