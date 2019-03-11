@@ -1,1 +1,0 @@
-kubectl create namespace kubevirt
