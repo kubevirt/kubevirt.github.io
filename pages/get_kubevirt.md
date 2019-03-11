@@ -7,52 +7,40 @@ order: 2
 
 # KubeVirt Quickstart
 
-This demo will deploy [KubeVirt](https://www.kubevirt.io) on an existing Kubernetes (1.9 or
-later) or OpenShift Origin (3.9 or later) cluster. For a quick way to bring up a Kubernetes or OpenShift Origin cluster, see [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"} and [Minishift](https://www.openshift.org/minishift/){:target="_blank"}.
+This will deploy [KubeVirt](https://www.kubevirt.io) on an existing Kubernetes (1.11 or
+later) or OpenShift Origin (3.11 or later) cluster. For a quick way to bring up a Kubernetes or OpenShift Origin cluster, see [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"} and [Minishift](https://www.openshift.org/minishift/){:target="_blank"}.
 
-### Check Virtualization Extensions
+### Deploy KubeVirt Operator
+
+KubeVirt is deployed by means of an operator, using the `kubectl` tool and the following commands:
+
+```bash
+{% include scriptlets/get_kubevirt/00_deploy_operator.sh -%}
+```
+
+## Check Virtualization Extensions
 
 To check if your CPU supports virtualization extensions perform:
 
 ```bash
-{% include scriptlets/get_kubevirt/00_verify_virtualization.sh -%}
+{% include scriptlets/get_kubevirt/01_a_verify_virtualization.sh -%}
 ```
 
-If your nodes lack virtual machine extensions, create the kubevirt namespace:
-
-```bash
-{% include scriptlets/get_kubevirt/00_create_kubevirt_namespace.sh -%}
-```
-
-
-Then create the following configuration map so that kubevirt uses emulation
+If it doesn't Then create the following configuration map so that kubevirt uses emulation
 mode:
 
 ```bash
-{% include scriptlets/get_kubevirt/01_emulate_vm_extensions.sh -%}
+{% include scriptlets/get_kubevirt/01_b_emulate_vm_extensions.sh -%}
 ```
 
 Such a procedure is mandatory for minishift
 
 ### Deploy KubeVirt
 
-KubeVirt deploys as an add-on to a Kubernetes (1.9 or later) cluster, using the `kubectl` tool and the following manifest file:
-
-
-```bash
-{% include scriptlets/get_kubevirt/02-a_deploy_with_kubectl.sh -%}
-```
-
-> **Note:** The initial deployment to a new cluster can take
-> a long time, because a number of containers have to be pulled from the
-> internet. Use `watch kubectl get --all-namespaces pods` to monitor the progress.
-
-#### Deploying KubeVirt on OpenShift Origin
-
-On OpenShift Origin, the following [SCCs](https://docs.openshift.com/container-platform/3.9/admin_guide/manage_scc.html) need to be added prior kubevirt.yaml deployment:
+KubeVirt is then deployed by creating a dedicated custom resource:
 
 ```bash
-{% include scriptlets/get_kubevirt/02-b_deploy_with_oc.sh -%}
+{% include scriptlets/get_kubevirt/02_deploy_kubevirt.sh -%}
 ```
 
 ### Install virtctl
