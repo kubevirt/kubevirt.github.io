@@ -1,6 +1,7 @@
 test:
   name: Lab Two
   url: https://kubevirt.io/labs/kubernetes/lab2
+  source: ../../../labs/kubernetes/lab2.md
   requirements:
     - file:
         path: "./virtctl"
