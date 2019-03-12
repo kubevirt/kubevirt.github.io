@@ -103,7 +103,7 @@ order: 1
 
 When creating a link within KubeVirt.io, they all should include `{{ site.baseurl }}` before the location.
 
-Example are `href="{{ site.baseurl }}/assets/images/image1.jpg"` to properly locate the file `image1.jpg`. For page linking, you would use `href="{{ site.baseurl }}/get_kubevirt"` to link to the Get KubeVirt information.
+Example are `href="{{ site.baseurl }}/assets/images/image1.jpg"` to properly locate the file `image1.jpg`. For page linking, you would use `href="{{ site.baseurl }}/quickstart_minikube"` to link to the Get KubeVirt information.
 
 ## Features
 
