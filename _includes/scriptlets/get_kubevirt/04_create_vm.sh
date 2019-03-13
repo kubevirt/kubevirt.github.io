@@ -1,5 +1,5 @@
 # Creating a virtual machine
-kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
 
 # After deployment you can manage VMs using the usual verbs:
 kubectl get vms
