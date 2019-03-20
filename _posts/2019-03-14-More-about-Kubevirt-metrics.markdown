@@ -37,9 +37,9 @@ kubevirt_vm_vcpu_seconds{domain="$VM_NAME",id="0",state="1"}
 ```
 
 The metrics expose [versioning information according to the recommendations](https://www.robustperception.io/exposing-the-software-version-to-prometheus) using the `kubevirt_info` metric; the other metrics should be self-explanatory.
-As we can expect, labels like `domain`, `drive` and `interface` depends on the specifics of the VM. `type`, however, is not and represent the subtype of the metric.
+As we can expect, labels like `domain`, `drive` and `interface` depend on the specifics of the VM. `type`, however, is not and represents the subtype of the metric.
 
-Let's now see a live example, from this idle, diskless VM:
+Let's now see a real life example, from this idle, diskless VM:
 
 ```yaml
 apiVersion: kubevirt.io/v1alpha3
@@ -92,7 +92,7 @@ Example of how the `kubevirt_vm_memory_resident_bytes` metric looks like in the 
 ## Accessing the metrics programmatically
 
 We can access the VM metrics using the [standard Prometheus API](https://prometheus.io/docs/prometheus/latest/querying/api/).
-For example, let's get the same data about the memory consumption we seen above in the Prometheus UI.
+For example, let's get the same data about the memory consumption we have seen above in the Prometheus UI.
 The following query yields all the data for the year 2019, aggregated every two hours.
 Not much data in this case, but beware of potentially large result sets.
 
@@ -154,17 +154,17 @@ Which yields something like
 ## Troubleshooting tips
 
 We strive to make the monitoring experience seamless, streamlined and working out of the box, but the stack is still evolving fast,
-and there are many option to actually set up the monitoring stack. Here we present some troubleshooting tips for the most common issues.
+and there are many options to actually set up the monitoring stack. Here we present some troubleshooting tips for the most common issues.
 
 ### prometheus targets
 
-A underused feature of the prometheus server is the _target configuration_. The Prometehus server exposes data about the targets it is
-lookign for, so we can easily asses if the prometheus server knows that it must scrape the `kubevirt` endpoints for metrics.
+An underused feature of the Prometheus server is the _target configuration_. The Prometehus server exposes data about the targets it is
+looking for, so we can easily asses if the Prometheus server knows that it must scrape the `kubevirt` endpoints for metrics.
 We can see this both in the  Prometheus UI:
 
   ![promui_targets_1](../assets/2019-03-14-More-about-KubeVirt-metrics/promui_targets_1.png)
 
-Or programmatically, with the prometheus REST API:
+Or programmatically, with the Prometheus REST API:
 
 ```bash
 curl -g 'http://192.168.48.7:9090/api/v1/targets' | json_pp
@@ -269,8 +269,8 @@ curl -g 'http://192.168.48.7:9090/api/v1/targets' | json_pp
 }
 ```
 
-The prometheus target state gives us a very useful information that shapes the next steps during the troubleshooting:
-- does the Prometheus server know it should scrape our target? If no, we should check the prometheus configuration, which is, in our case, driven by the prometheus operator. Otherwise:
+The Prometheus target state gives us a very useful information that shapes the next steps during the troubleshooting:
+- does the Prometheus server know it should scrape our target? If no, we should check the Prometheus configuration, which is, in our case, driven by the Prometheus operator. Otherwise:
 - can the Prometheus server access the endpoint? If no, we need to check the network connectivity/DNS configuration, or the endpoint itself
 
 ### servicemonitors
@@ -309,7 +309,7 @@ virt-api                      ClusterIP   10.109.162.102   <none>        443/TCP
 
 See [the KubeVirt documentation](https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#custom-service-discovery) for all the details.
 
-#### configure the prometheus instance to look in the right namespace
+#### configure the Prometheus instance to look in the right namespace
 
 The `prometheus` server instance(s) run by default in their own namespace; this is the recommended configuration, and running them in the same `kubevirt` namespace
 is not recommended anyway.
@@ -362,7 +362,7 @@ But please make sure that any other namespace you may want to monitor has the co
 
 ### endpoint state
 
-As in KubeVirt 0.15.0, `virt-handler` is the component which exposes the VM metrics through its prometheus endpoint. Let's check it reports the data correctly.
+As in KubeVirt 0.15.0, `virt-handler` is the component which exposes the VM metrics through its Prometheus endpoint. Let's check it reports the data correctly.
 
 First, let's get the virt-handler IP address. We look out the instance we want to check with
 ```bash
@@ -386,7 +386,7 @@ Putting all together:
 curl -s -k -L https://$(kubectl get pod -o json -n KubeVirt virt-handler-6ng6j | jq -r '.status.podIP'):8443/metrics | grep -E '^kubevirt_'
 ```
 
-Let's see how healthy output looks like:
+Let's see how a healthy output looks like:
 ```bash
 kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0"} 1
 kubevirt_vm_memory_resident_bytes{domain="default_vm-test-01"} 4.1168896e+07
@@ -396,10 +396,8 @@ kubevirt_vm_vcpu_seconds{domain="default_vm-test-01",id="0",state="1"} 5173
 ```
 
 Please remember that some metrics can be correctly omitted for some VMs.
-In general, we should always see metrics about version (pseudo metric), memory, network, CPU. But there are known cases on which not having
-storage metrics is expected and correct: for example this case, since we are using a diskless VM.
-
-In this case, the endpoint is healthy and correctly reports the VM metrics we expect
+In general, we should always see metrics about version (pseudo metric), memory, network, and CPU.
+But there are known cases on which not having storage metrics is expected and correct: for example this case, since we are using a diskless VM.
 
 ## Coming next
 
