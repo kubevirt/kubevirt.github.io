@@ -10,12 +10,14 @@ This guide will help you deploying [KubeVirt](https://kubevirt.io) on
 Kubernetes, we'll be using
 [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"}.
 
-Our recommendation is to always run the latest version of
+Our recommendation is to always run the latest (*) version of
 [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"}
 available for your platform of choice, following their
 [installation intructions](https://kubernetes.io/docs/tasks/tools/install-minikube/){:target="_blank"}. For instance, to write this guide, the **Linux** version has been used, together
 with the [**KVM2**](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver){:target="_blank"}
 driver.
+
+_(*): KubeVirt >=v0.9.2 won't run on Minikube <v0.35.0 by default because of lack of vhost-net device. (see more details at [Issue#2056](https://github.com/kubevirt/kubevirt/issues/2056))_
 
 Finally, you'll need *kubectl* installed, it can be downloaded from [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl){:target="_blank"} or installed using the means available for your platform.
 
