@@ -1,1 +1,1 @@
-export KUBEVIRT_VERSION="{{ site.kubevirt_version }}"
+export KUBEVIRT_VERSION="v0.15.0"
