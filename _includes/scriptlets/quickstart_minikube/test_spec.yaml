@@ -142,7 +142,7 @@ test:
         match: "Running"
         rate: 10
         tries: 18
-      skip: true
+      skip: false
 
     - step: 16
       name: Get VMIs - Human Readable
@@ -162,7 +162,7 @@ test:
           expect: "testvm login:"
           timeout: 15
           tries: 20
-      skip: true
+      skip: false
 
     - step: 19
       name: Check VNC Console
