@@ -19,7 +19,9 @@ driver.
 
 _(*): KubeVirt >=v0.9.2 won't run on Minikube <v0.35.0 by default because of lack of vhost-net device. (see more details at [Issue#2056](https://github.com/kubevirt/kubevirt/issues/2056))_
 
-Finally, you'll need *kubectl* installed, it can be downloaded from [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl){:target="_blank"} or installed using the means available for your platform.
+Finally, you'll need *kubectl* installed (*), it can be downloaded from [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl){:target="_blank"} or installed using the means available for your platform.
+
+_(*): Ensure that *kubectl* version complies with the [supported release skew](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew) (The version of kubectl should be close to Kubernetes server version)._
 
 ## Start Minikube
 
@@ -32,9 +34,7 @@ host where Minikube is being installed on:
 
 If you get an **N**, follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="_blank"} for enabling it.
 
-
 **Note** that nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can't be enabled, don't forget to enable emulation as shown in the *Check for the Virtualization Extensions* section.
-
 
 Let's begin, normally, Minikube can be started with default values and those will be enough
 to run this quickstart guide, that being said, if you can spare few more GiBs
