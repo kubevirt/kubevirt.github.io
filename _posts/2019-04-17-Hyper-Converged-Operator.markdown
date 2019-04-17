@@ -1,5 +1,15 @@
 ---
+layout: post
+author: DirectedSoul
+description: Hyper Converged Operator (HCO) 
+navbar_active: Blogs
+pub-date: TDB
+pub-year: 2019
+category: news
+comments: true
+=======
 
+>>>>>>> 71594c5313bebd7e7ade2a8f7d854a2b33cb327f
 ---
 
 ## Operators-Definition
