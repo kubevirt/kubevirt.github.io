@@ -77,7 +77,7 @@ kubectl create -f deploy/converged/crds/cna.crd.yaml
 Lets see the yaml file for the hco.crd.yaml
 
 
-```
+```yaml
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -108,6 +108,7 @@ spec:
     served: true
     storage: true
 ```
+
 Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments for the operator
 
 ```shell
@@ -121,7 +122,7 @@ $ kubectl create -f deploy/converged/crds/hco.cr.yaml
 ```
 We can take a look at the YAML definition of the CustomResource of HCO:
 
-```
+```yaml
 ---
 apiVersion: hco.kubevirt.io/v1alpha1
 kind: HyperConverged
