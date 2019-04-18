@@ -73,7 +73,7 @@ kubectl create -f deploy/converged/crds/hco.crd.yaml
 kubectl create -f deploy/converged/crds/kubevirt.crd.yaml
 kubectl create -f deploy/converged/crds/cdi.crd.yaml
 kubectl create -f deploy/converged/crds/cna.crd.yaml
-
+```
 Lets see the yaml file for the hco.crd.yaml
 
 
