@@ -162,7 +162,7 @@ virt-handler-hqz9d                                 1/1     Running   0          
 virt-operator-667b6c845d-jfnsr                     1/1     Running   0          11m
 ```
 
-We can see the CRD's in the `kubevirt-hyperconverged` NameSpace
+We can see the CRD's in the which has a cluster-wide scope: 
 
 ```
 ~/minikube/hyperconverged-cluster-operator  root@DirectedSoul1🎩kubectl get crds 
@@ -197,7 +197,7 @@ virt-operator                     1/1     1            1           16m
 ```
 #> **NOTE**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator)  . Again we’ll need to execute the command until everything is up&running (or use -w).
 
-## Deploying HCO using [OperatorLifecycleManager](https://github.com/operator-framework/operator-lifecycle-manager) on Openshift4.
+## Deploying HCO Openshift4 Cluster.
 
 [Openshift](https://www.openshift.com/learn/what-is-openshift/)
 
