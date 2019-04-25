@@ -321,28 +321,28 @@ kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/m
 We can check the YAML definition:
 ```
 kubectl get vms
-kubectl get vms -o yaml HCO-vm
+kubectl get vms -o yaml testvm
 ```
 
 #**Note**: The field **`running:`** is set to **`false`**, that means we only have defined the object but we now should instantiate it.
 
 ```
-./virtctl start HCO-vm
+./virtctl start testvm
 ```
 
 Use **`virtctl`** to query the VM instance
 
 ```
 kubectl get vmis
-kubectl get vmis -o yaml HCO-vm
+kubectl get vmis -o yaml testvm
 ```
 #**Note**: The 'i' in **vmi** , as it stands for VirtualMachineInstance. Now, pay attention to the phase field, its value will be transitioning from one state to the next, indicating VMI progress to finish being set to Running.
 
 
 Now use **virtctl** command to connect to the VMI consoles interfaces:
 ```
-./virtctl console HCO-vm
-./virtctl vnc HCO-vm
+./virtctl console testvm
+./virtctl vnc testvm
 ```
 Remember that for exiting from the console to hit Ctrl+] (Control plus closing square bracket).
 
@@ -352,12 +352,12 @@ Now its time for a Clean Up:
 
 Let’s stop the VM instance:
 ```
-./virtctl stop HCO-vm
+./virtctl stop testvm
 ```
 
 Delete the VM:
 ```
-kubectl delete vm HCO-vm
+kubectl delete vm testvm
 ```
 
 Delete the minikube instance:
