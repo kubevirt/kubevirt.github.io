@@ -16,7 +16,7 @@ Operators are a design pattern made public in a 2016 [CoreOS](https://coreos.com
 
 Operators implement and automate common Day-1 (installation, configuration, etc) and Day-2 (re-configuration, update, backup, failover, restore, etc.) activities in a piece of software running inside your Kubernetes cluster, by integrating natively with Kubernetes concepts and APIs. We call this a Kubernetes-native application. With Operators you can stop treating an application as a collection of primitives like Pods, Deployments, Services or ConfigMaps, but instead as a single object that only exposes the knobs that make sense for the application.
 
-# HCO known as Hyper Converged Operator 
+# [HCO known as Hyper Converged Operator](https://github.com/kubevirt/hyperconverged-cluster-operator)  
 
 ## What it does?
 
@@ -27,6 +27,7 @@ The goal of the hyperconverged-cluster-operator (HCO) is to provide a single ent
 In this blog post, I'd like to focus on the first method(i.e by deploying a HCO using a CustomResourceDefinition method which might seem like the most immediate benefit of this feature. Let's get started!
 
 ### Environment description
+We can use HCO both on minikube and also on Openshift4. 
 
 * **Minikube**
 
@@ -54,7 +55,14 @@ If the command doesn’t generate any output, create the following ConfigMap so 
 ```
 kubectl create configmap kubevirt-config -n kubevirt-hco --from-literal debug.useEmulation=true
 ```
-### Using the HCO
+### Using the HCO on minikube
+
+Clone the HCO repo [here](https://github.com/kubevirt/hyperconverged-cluster-operator)
+
+```
+git clone https://github.com/kubevirt/hyperconverged-cluster-operator.git
+```
+This gives all the necessary `go` packages and `yaml` manifests for the next steps.
  
 Lets create a NameSpace for the HCO deployment
 
@@ -189,6 +197,39 @@ virt-operator                     1/1     1            1           16m
 ```
 #> **NOTE**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator)  . Again we’ll need to execute the command until everything is up&running (or use -w).
 
+## Deploying HCO using [OperatorLifecycleManager](https://github.com/operator-framework/operator-lifecycle-manager) on Openshift4.
+
+[Openshift](https://www.openshift.com/learn/what-is-openshift/)
+
+Installation steps for OCP4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/) 
+
+After, we have the running cluster which has 3 master and 3 workers, we can start our HCO integration.
+```
+[root@localhost hyperconverged-cluster-operator]# oc version
+Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
+Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e", GitCommit:"0ba401e", GitTreeState:"clean", BuildDate:"2019-03-31T22:28:12Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
+```
+Check the nodes 
+```
+[root@localhost hyperconverged-cluster-operator]# oc get nodes
+NAME                                         STATUS   ROLES    AGE   VERSION
+ip-10-0-135-62.us-east-2.compute.internal    Ready    master   23h   v1.12.4+509916ce1
+ip-10-0-142-184.us-east-2.compute.internal   Ready    worker   22h   v1.12.4+509916ce1
+ip-10-0-146-223.us-east-2.compute.internal   Ready    master   23h   v1.12.4+509916ce1
+ip-10-0-150-253.us-east-2.compute.internal   Ready    worker   22h   v1.12.4+509916ce1
+ip-10-0-167-105.us-east-2.compute.internal   Ready    worker   22h   v1.12.4+509916ce1
+ip-10-0-174-7.us-east-2.compute.internal     Ready    master   23h   v1.12.4+509916ce1
+```
+After the HCO is up and running on the cluster, we should be able to see the info of CRD's
+
+```
+[root@localhost hyperconverged-cluster-operator]# oc get crds | grep kubevirt
+cdis.cdi.kubevirt.io                                             2019-04-23T17:36:02Z
+hyperconvergeds.hco.kubevirt.io                                  2019-04-23T17:35:37Z
+kubevirts.kubevirt.io                                            2019-04-23T17:35:51Z
+networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io   2019-04-23T17:36:12Z
+```
+##Note: Just replace `kubectl` with `oc` to get HCO up and running on Openshift.
 
 ## Here is the yaml file for CDI, CNI and KubeVirt:
 
@@ -258,7 +299,7 @@ spec:
 So, after HCO is up and running we need to test it by deploying a small instance of a VM.For doing so, we need to follow the steps:
 
 ```
-export KUBEVIRT_VERSION="v0.15.0"
+export KUBEVIRT_VERSION="v0.16.1"
 ```
 
 Download the binary `virtcl` which helps in getting a quick access to the serial and graphical ports of a VM, and can handle start/stop operations. 
