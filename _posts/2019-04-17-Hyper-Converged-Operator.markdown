@@ -82,7 +82,7 @@ kubectl create -f deploy/converged/crds/kubevirt.crd.yaml
 kubectl create -f deploy/converged/crds/cdi.crd.yaml
 kubectl create -f deploy/converged/crds/cna.crd.yaml
 ```
-Lets see the yaml file for the hco.crd.yaml
+Lets see the yaml file for HCO Custom Resource Definition
 
 
 ```yaml
@@ -146,7 +146,7 @@ After succesfully executing the above commands,we should be now be having a `vir
 Lets see the deployed pods
 
 ```
-~/minikube/hyperconverged-cluster-operator root@DirectedSoul1🎩kubectl get pods
+$kubectl get pods
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-rv8zt                     1/1     Running   0          5m2s
 cdi-deployment-8b64c5585-g7zfk                     1/1     Running   0          5m2s
@@ -165,7 +165,7 @@ virt-operator-667b6c845d-jfnsr                     1/1     Running   0          
 We can see the CRD's in the which has a cluster-wide scope: 
 
 ```
-~/minikube/hyperconverged-cluster-operator  root@DirectedSoul1🎩kubectl get crds 
+$kubectl get crds 
 NAME                                                             CREATED AT
 cdiconfigs.cdi.kubevirt.io                                       2019-04-17T18:23:37Z
 cdis.cdi.kubevirt.io                                             2019-04-17T18:16:18Z
@@ -183,7 +183,7 @@ virtualmachines.kubevirt.io                                      2019-04-17T18:2
 Also the below deployments 
 
 ```
-~/minikube/hyperconverged-cluster-operator  root@DirectedSoul1🎩kubectl get deployments
+$kubectl get deployments
 NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
 cdi-apiserver                     1/1     1            1           10m
 cdi-deployment                    1/1     1            1           10m
@@ -205,13 +205,13 @@ Installation steps for OCP4 including video tutorial can be found [here](https:/
 
 After, we have the running cluster which has 3 master and 3 workers, we can start our HCO integration.
 ```
-[root@localhost hyperconverged-cluster-operator]# oc version
+$oc version
 Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
 Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e", GitCommit:"0ba401e", GitTreeState:"clean", BuildDate:"2019-03-31T22:28:12Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
 ```
 Check the nodes 
 ```
-[root@localhost hyperconverged-cluster-operator]# oc get nodes
+$oc get nodes
 NAME                                         STATUS   ROLES    AGE   VERSION
 ip-10-0-135-62.us-east-2.compute.internal    Ready    master   23h   v1.12.4+509916ce1
 ip-10-0-142-184.us-east-2.compute.internal   Ready    worker   22h   v1.12.4+509916ce1
@@ -223,7 +223,7 @@ ip-10-0-174-7.us-east-2.compute.internal     Ready    master   23h   v1.12.4+509
 After the HCO is up and running on the cluster, we should be able to see the info of CRD's
 
 ```
-[root@localhost hyperconverged-cluster-operator]# oc get crds | grep kubevirt
+$oc get crds | grep kubevirt
 cdis.cdi.kubevirt.io                                             2019-04-23T17:36:02Z
 hyperconvergeds.hco.kubevirt.io                                  2019-04-23T17:35:37Z
 kubevirts.kubevirt.io                                            2019-04-23T17:35:51Z
@@ -233,7 +233,7 @@ networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io   2019-04-23T17:3
 
 ## Here is the yaml file for CDI, CNI and KubeVirt:
 
-[CDI-container data Importer](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown): In short Containerized Data Importer (or CDI for short), is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.
+[CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown): Container Data Importer(or CDI for short), is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.
 
 ```yaml
 ---
@@ -299,50 +299,50 @@ spec:
 So, after HCO is up and running we need to test it by deploying a small instance of a VM.For doing so, we need to follow the steps:
 
 ```
-export KUBEVIRT_VERSION="v0.16.1"
+$export KUBEVIRT_VERSION="v0.16.1"
 ```
 
 Download the binary `virtcl` which helps in getting a quick access to the serial and graphical ports of a VM, and can handle start/stop operations. 
 
 ```
-curl -L -o virtctl \
+$curl -L -o virtctl \
     https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/virtctl-${KUBEVIRT_VERSION}-linux-amd64
 ```
 Also, give the executable permission to the virtctl 
 ```
-chmod +x virtctl
+$chmod +x virtctl
 ```
 # Deploy a VirtualMachine 
 
 ```
-kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+$kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
 ```
 
 We can check the YAML definition:
 ```
-kubectl get vms
-kubectl get vms -o yaml testvm
+$kubectl get vms
+$kubectl get vms -o yaml testvm
 ```
 
 #**Note**: The field **`running:`** is set to **`false`**, that means we only have defined the object but we now should instantiate it.
 
 ```
-./virtctl start testvm
+$./virtctl start testvm
 ```
 
 Use **`virtctl`** to query the VM instance
 
 ```
-kubectl get vmis
-kubectl get vmis -o yaml testvm
+$kubectl get vmis
+$kubectl get vmis -o yaml testvm
 ```
 #**Note**: The 'i' in **vmi** , as it stands for VirtualMachineInstance. Now, pay attention to the phase field, its value will be transitioning from one state to the next, indicating VMI progress to finish being set to Running.
 
 
 Now use **virtctl** command to connect to the VMI consoles interfaces:
 ```
-./virtctl console testvm
-./virtctl vnc testvm
+$./virtctl console testvm
+$./virtctl vnc testvm
 ```
 Remember that for exiting from the console to hit Ctrl+] (Control plus closing square bracket).
 
@@ -352,17 +352,17 @@ Now its time for a Clean Up:
 
 Let’s stop the VM instance:
 ```
-./virtctl stop testvm
+$./virtctl stop testvm
 ```
 
 Delete the VM:
 ```
-kubectl delete vm testvm
+$kubectl delete vm testvm
 ```
 
 Delete the minikube instance:
 ```
-minikube delete -p kubevirt-hco
+$minikube delete -p kubevirt-hco
 ```
 
 #**Conclusion**-What to expect next ?
