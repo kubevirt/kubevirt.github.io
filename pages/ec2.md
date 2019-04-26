@@ -32,24 +32,24 @@ period. These images are not meant to be used in production.
 | EC2 Region | Location      | AMI Type | AMI ID |
 | ---        | ---           | ---      | ---    |
 |            |               |          |        |
-| us-east-1  | N. Virginia   | HVM      | [ami-0cd2d0b662f913e62](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0cd2d0b662f913e62){:target="_blank"} |
-| us-east-2  | Ohio          | HVM      | [ami-0c8ea85510e3f61b2](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-0c8ea85510e3f61b2){:target="_blank"} |
-| us-west-1  | N. California | HVM      | [ami-012686b82e24e1a80](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-012686b82e24e1a80){:target="_blank"} |
-| us-west-2  | Oregon        | HVM      | [ami-023ea902f30ea07a1](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-023ea902f30ea07a1){:target="_blank"} |
+| us-east-1  | N. Virginia   | HVM      | [ami-0a931f01389894a65](https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0a931f01389894a65){:target="_blank"} |
+| us-east-2  | Ohio          | HVM      | [ami-007e7962f0221bf3f](https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-007e7962f0221bf3f){:target="_blank"} |
+| us-west-1  | N. California | HVM      | [ami-0213abf4e045cafdc](https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-0213abf4e045cafdc){:target="_blank"} |
+| us-west-2  | Oregon        | HVM      | [ami-0fc9402e92a34c972](https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-0fc9402e92a34c972){:target="_blank"} |
 |            |               |          |        |
-| ca-central-1 | Canada   | HVM      | [ami-091070107987fdba2](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-091070107987fdba2){:target="_blank"} |
+| ca-central-1 | Canada   | HVM      | [ami-0bbfb75f9c7f9cc6b](https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-0bbfb75f9c7f9cc6b){:target="_blank"} |
 |            |               |          |        |
-| eu-west-1      | Ireland   | HVM      | [ami-02320ba039cc35021](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-02320ba039cc35021){:target="_blank"} |
-| eu-west-2      | London    | HVM      | [ami-09579f7eed5f67516](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-09579f7eed5f67516){:target="_blank"} |
-| eu-west-3      | Paris    | HVM      | [ami-02b98d0a3c810e3ae](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-02b98d0a3c810e3ae){:target="_blank"} |
-| eu-central-1   | Frankfurt | HVM      | [ami-0a203e75e9638e701](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-0a203e75e9638e701){:target="_blank"} |
+| eu-west-1      | Ireland   | HVM      | [ami-0f0f1099dbf06d9ff](https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-0f0f1099dbf06d9ff){:target="_blank"} |
+| eu-west-2      | London    | HVM      | [ami-044fcec85282e0b84](https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-044fcec85282e0b84){:target="_blank"} |
+| eu-west-3      | Paris    | HVM      | [ami-081dee4cf5fd48a0c](https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-081dee4cf5fd48a0c){:target="_blank"} |
+| eu-central-1   | Frankfurt | HVM      | [ami-0749b25ef0f69d33d](https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-0749b25ef0f69d33d){:target="_blank"} |
 |                |               |          |        |
-| ap-northeast-1 | Tokyo   | HVM      | [ami-05443e7bb4531958f](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-05443e7bb4531958f){:target="_blank"} |
-| ap-southeast-1 | Singapore | HVM      | [ami-0ab8614782d7ff8f7](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-0ab8614782d7ff8f7){:target="_blank"} |
-| ap-southeast-2 | Sydney   | HVM      | [ami-0df79e9b59ea8462e](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-0df79e9b59ea8462e){:target="_blank"} |
-| ap-south-1     | Mumbai   | HVM      | [ami-04ee718d8bbf9617e](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-04ee718d8bbf9617e){:target="_blank"} |
+| ap-northeast-1 | Tokyo   | HVM      | [ami-0ffa71b8fe2bbea6e](https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-0ffa71b8fe2bbea6e){:target="_blank"} |
+| ap-southeast-1 | Singapore | HVM      | [ami-07838d9608605f303](https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-07838d9608605f303){:target="_blank"} |
+| ap-southeast-2 | Sydney   | HVM      | [ami-0b07b77fd6396deab](https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-0b07b77fd6396deab){:target="_blank"} |
+| ap-south-1     | Mumbai   | HVM      | [ami-0d64d9f3c68588fb1](https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-0d64d9f3c68588fb1){:target="_blank"} |
 |            |               |          |        |
-| sa-east-1  | Sao Paulo   | HVM      | [ami-08f7c79baaa9b7208](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-08f7c79baaa9b7208){:target="_blank"} |
+| sa-east-1  | Sao Paulo   | HVM      | [ami-0230216ffe2936a55](https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-0230216ffe2936a55){:target="_blank"} |
 |            |               |          |        |
 
 

@@ -91,7 +91,7 @@ cd kubevirt-istio-poc
 
 # Demo application
 
-We are going to use the [bookinfo sample application](https://istio.io/docs/guides/bookinfo/#overview) from the istio webpage.
+We are going to use the [bookinfo sample application](https://istio.io/docs/examples/bookinfo/) from the istio webpage.
 
 The follow yaml will deploy the bookinfo application with a 'small' change the details service will run on a virtual machine inside our kubernetes cluster!
 
