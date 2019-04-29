@@ -3,7 +3,7 @@ layout: post
 author: DirectedSoul
 description: Hyper Converged Operator on OCP4 and K8s(HCO) 
 navbar_active: Blogs
-pub-date: TDB
+pub-date: May 08
 pub-year: 2019
 category: news
 ---
