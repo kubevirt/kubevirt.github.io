@@ -296,69 +296,9 @@ spec:
 
 [KubeVirt](http://kubevirt.io/quickstart_minikube/) : In short , KubeVirt technology addresses the needs of development teams that have adopted or want to adopt [Kubernetes](https://kubernetes.io/) but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment. 
 
-So, after HCO is up and running we need to test it by deploying a small instance of a VM.For doing so, we need to follow the steps:
+So, after HCO is up and running we need to test it by deploying a small instance of a VM.For doing so, please follow the instructions given in the [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
 
-```
-$export KUBEVIRT_VERSION="v0.16.1"
-```
-
-Download the binary `virtcl` which helps in getting a quick access to the serial and graphical ports of a VM, and can handle start/stop operations. 
-
-```
-$curl -L -o virtctl \
-    https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/virtctl-${KUBEVIRT_VERSION}-linux-amd64
-```
-Also, give the executable permission to the virtctl 
-```
-$chmod +x virtctl
-```
-# Deploy a VirtualMachine 
-
-```
-$kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
-```
-
-We can check the YAML definition:
-```
-$kubectl get vms
-$kubectl get vms -o yaml testvm
-```
-
-#**Note**: The field **`running:`** is set to **`false`**, that means we only have defined the object but we now should instantiate it.
-
-```
-$./virtctl start testvm
-```
-
-Use **`virtctl`** to query the VM instance
-
-```
-$kubectl get vmis
-$kubectl get vmis -o yaml testvm
-```
-#**Note**: The 'i' in **vmi** , as it stands for VirtualMachineInstance. Now, pay attention to the phase field, its value will be transitioning from one state to the next, indicating VMI progress to finish being set to Running.
-
-
-Now use **virtctl** command to connect to the VMI consoles interfaces:
-```
-$./virtctl console testvm
-$./virtctl vnc testvm
-```
-Remember that for exiting from the console to hit Ctrl+] (Control plus closing square bracket).
-
-#**Note**: VNC requires remote-viewer from the virt-viewer package installed on the host.
-
-Now its time for a Clean Up:
-
-Let’s stop the VM instance:
-```
-$./virtctl stop testvm
-```
-
-Delete the VM:
-```
-$kubectl delete vm testvm
-```
+#**Note**: You can delete the minikube instance after you are done testing the VM.
 
 Delete the minikube instance:
 ```
