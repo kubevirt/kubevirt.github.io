@@ -136,9 +136,6 @@ apiVersion: hco.kubevirt.io/v1alpha1
 kind: HyperConverged
 metadata:
   name: hyperconverged-cluster
-spec:
-  CDIImagePullPolicy: IfNotPresent
-  KubeVirtImagePullPolicy: IfNotPresent
 ```
 
 After succesfully executing the above commands,we should be now be having a `virt-controller` pod, HCO pod,and a `network-addon` pod functional and can be viewed as below
@@ -297,7 +294,7 @@ spec:
 [KubeVirt](http://kubevirt.io/quickstart_minikube/) : In short , KubeVirt technology addresses the needs of development teams that have adopted or want to adopt [Kubernetes](https://kubernetes.io/) but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment. 
 
 
-[Deploying HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md): Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided. 
+#**[Deploying HCO using the OLM method]**(https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md): Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided. 
 
 Next, build and publish the converged HCO operator-registry image.
 
@@ -386,6 +383,7 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 
 ```
 🎩oc get pods
+
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-97q8r                     1/1     Running   0          83m
 cdi-deployment-8b64c5585-5txmd                     1/1     Running   0          83m
