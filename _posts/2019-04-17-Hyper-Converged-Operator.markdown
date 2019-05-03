@@ -195,7 +195,7 @@ virt-api                          2/2     2            2           9m58s
 virt-controller                   2/2     2            2           8m49s
 virt-operator                     1/1     1            1           16m
 ```
-# **NOTE**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
+#**NOTE**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
 
 ## Deploying HCO Openshift4 Cluster.
 
@@ -441,7 +441,7 @@ HCO achieved its goal which was to provide a single entrypoint for multiple oper
 
 Now, we can also launch the HCO through OLM, 
 
-#**Note**: 
+**Note**: 
 Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
 
 Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
