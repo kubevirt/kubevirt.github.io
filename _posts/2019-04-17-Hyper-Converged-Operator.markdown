@@ -12,7 +12,7 @@ category: news
 
 ## What is an Operator after all?
 
-Operators are a design pattern made public in a 2016 [CoreOS](https://coreos.com/blog/introducing-operators.html) blog post. The goal of an Operator is to put operational knowledge into software. Previously this knowledge only resided in the minds of administrators, various combinations of shell scripts or automation software like Ansible. It was outside of your Kubernetes cluster and hard to integrate. With Operators, CoreOS changed that.
+Operators are a design pattern made public in a 2016 [CoreOS BlogPost](https://coreos.com/blog/introducing-operators.html) blog post. The goal of an Operator is to put operational knowledge into software. Previously this knowledge only resided in the minds of administrators, various combinations of shell scripts or automation software like Ansible. It was outside of your Kubernetes cluster and hard to integrate. With Operators, CoreOS changed that.
 
 Operators implement and automate common Day-1 (installation, configuration, etc) and Day-2 (re-configuration, update, backup, failover, restore, etc.) activities in a piece of software running inside your Kubernetes cluster, by integrating natively with Kubernetes concepts and APIs. We call this a Kubernetes-native application. With Operators you can stop treating an application as a collection of primitives like Pods, Deployments, Services or ConfigMaps, but instead as a single object that only exposes the knobs that make sense for the application.
 
@@ -24,17 +24,16 @@ The goal of the hyperconverged-cluster-operator (HCO) is to provide a single ent
 
 ## How does it work?
 
-In this blog post, I'd like to focus on the first method(i.e by deploying a HCO using a CustomResourceDefinition method which might seem like the most immediate benefit of this feature. Let's get started!
+In this blog post, I'd like to focus on the first method(i.e by deploying a HCO using a CustomResourceDefinition method)which might seem like the most immediate benefit of this feature. Let's get started!
 
 ### Environment description
 We can use HCO both on minikube and also on Openshift4. 
 
-* **Minikube**
-
 Minikube is a tool that makes it easy to run Kubernetes locally. Minikube runs a single-node Kubernetes cluster inside a VM on your laptop for users looking to try out Kubernetes or develop with it day-to-day.
 For testing Hyper Converged Operator I have deployed a single-node K8's cluster with the name kubevirt-hco. This can be deployed using [minikube](https://kubernetes.io/docs/setup/minikube/#installation):
 
-We’ll create a profile for KubeVirt so it gets its own settings without interfering what any configuration you might had already, let’s start by increasing the default memory to 4GiB:
+We'll create a profile for KubeVirt allowing us to define specific settings and to ensure the settings don't interfering what any configuration you might had already, let’s start by increasing the default memory to 4GiB:
+
 ```
 minikube config -p kubevirt-hco set memory 4096
 ```
@@ -123,6 +122,10 @@ Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments fo
 $ kubectl create -f deploy/converged
 ```
 
+```
+$kubectl get crds 
+```
+
 And after verifying all the above resources we can now finally deploy our HCO custom resource 
 
 ```shell
@@ -192,15 +195,16 @@ virt-api                          2/2     2            2           9m58s
 virt-controller                   2/2     2            2           8m49s
 virt-operator                     1/1     1            1           16m
 ```
-#> **NOTE**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator)  . Again we’ll need to execute the command until everything is up&running (or use -w).
+# **NOTE**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
 
 ## Deploying HCO Openshift4 Cluster.
 
 [Openshift](https://www.openshift.com/learn/what-is-openshift/)
 
-Installation steps for OCP4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/) 
+Installation steps for Openshift4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/) 
 
-After, we have the running cluster which has 3 master and 3 workers, we can start our HCO integration.
+Upon successful installation of OpenShift, we will have a cluster consistening of 3 mastersand 3 workers which can be used for HCO integration
+
 ```
 $oc version
 Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
@@ -226,11 +230,11 @@ hyperconvergeds.hco.kubevirt.io                                  2019-04-23T17:3
 kubevirts.kubevirt.io                                            2019-04-23T17:35:51Z
 networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io   2019-04-23T17:36:12Z
 ```
-##Note: Just replace `kubectl` with `oc` to get HCO up and running on Openshift.
+#Note: In Openshift we can use both `kubectl` and  `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
 ## Here is the yaml file for CDI, CNI and KubeVirt:
 
-[CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown): Container Data Importer(or CDI for short), is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.
+[CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown): Container Data Importer, is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.
 
 ```yaml
 ---
@@ -266,7 +270,7 @@ spec:
 
 ```
 
-[CNI](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md): In short CNI-multus enables the pods with an additional network interface through which it can communicate with the pods. We can summarize this as for ex: if pod has three interface: eth0, net0 and net1. eth0 connects kubernetes cluster network to connect with kubernetes server/services (e.g. kubernetes api-server, kubelets and so on). net0 and net1 are network attachment and connect to other networks with other CNI networks (e.g. vlan/vxlan/ptp).
+[CNI](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md): Enables the pods with an additional network interface through which it can communicate with the pods. We can summarize this as for ex: if pod has three interface: eth0, net0 and net1. eth0 connects kubernetes cluster network to connect with kubernetes server/services (e.g. kubernetes api-server, kubelets and so on). net0 and net1 are network attachment and connect to other networks with other CNI networks (e.g. vlan/vxlan/ptp).
 
 ```yaml
 ---
@@ -291,7 +295,7 @@ spec:
     storage: true
 ```
 
-[KubeVirt](http://kubevirt.io/quickstart_minikube/) : In short , KubeVirt technology addresses the needs of development teams that have adopted or want to adopt [Kubernetes](https://kubernetes.io/) but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment. 
+[KubeVirt](http://kubevirt.io/quickstart_minikube/) : KubeVirt technology addresses the needs of development teams that have adopted or want to adopt [Kubernetes](https://kubernetes.io/) but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment. 
 
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
@@ -419,18 +423,21 @@ packageserver-85f4964547-t6j5q      1/1     Running   0          101m
 ```
 The above method demonstrates the integration of HCO operator in Openshift4.
 
-So, after HCO is up and running we need to test it by deploying a small instance of a VM.For doing so, please follow the instructions given in the [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
+So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
 
 #**Note**: You can delete the minikube instance after you are done testing the VM.
 
-Delete the minikube instance:
+#Cleaning up the minikube instance:
+
 ```
 $minikube delete -p kubevirt-hco
 ```
 
-#**Conclusion**-What to expect next ?
+## Conclusion
 
-HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object as seen above.
+What to expect next ?
+
+HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object asseen above.
 
 Now, we can also launch the HCO through OLM, 
 
