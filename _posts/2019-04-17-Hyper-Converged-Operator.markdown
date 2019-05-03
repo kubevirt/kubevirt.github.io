@@ -293,8 +293,9 @@ spec:
 
 [KubeVirt](http://kubevirt.io/quickstart_minikube/) : In short , KubeVirt technology addresses the needs of development teams that have adopted or want to adopt [Kubernetes](https://kubernetes.io/) but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment. 
 
+#[HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md): 
 
-#**[Deploying HCO using the OLM method]**(https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md): Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided. 
+Replace <docker_org> with your Docker organization as official operator-registry images forHCO will not be provided. 
 
 Next, build and publish the converged HCO operator-registry image.
 
