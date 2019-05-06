@@ -299,6 +299,8 @@ spec:
 
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
+The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
+
 Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided. 
 
 Next, build and publish the converged HCO operator-registry image.
