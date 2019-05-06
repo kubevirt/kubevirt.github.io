@@ -32,7 +32,7 @@ We can use HCO both on minikube and also on Openshift4.
 Minikube is a tool that makes it easy to run Kubernetes locally. Minikube runs a single-node Kubernetes cluster inside a VM on your laptop for users looking to try out Kubernetes or develop with it day-to-day.
 For testing Hyper Converged Operator I have deployed a single-node K8's cluster with the name kubevirt-hco. This can be deployed using [minikube](https://kubernetes.io/docs/setup/minikube/#installation):
 
-We'll create a profile for KubeVirt allowing us to define specific settings and to ensure the settings don't interfering what any configuration you might had already, let’s start by increasing the default memory to 4GiB:
+We'll create a profile for KubeVirt allowing us to define specific settings and to ensure the settings don't interfere with any configuration you might had already, let’s start by increasing the default memory to 4GiB:
 
 ```
 minikube config -p kubevirt-hco set memory 4096
@@ -299,7 +299,7 @@ spec:
 
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
-Replace <docker_org> with your Docker organization as official operator-registry images forHCO will not be provided. 
+Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided. 
 
 Next, build and publish the converged HCO operator-registry image.
 
@@ -437,7 +437,7 @@ $minikube delete -p kubevirt-hco
 
 What to expect next ?
 
-HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object asseen above.
+HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object as seen above.
 
 Now, we can also launch the HCO through OLM, 
 
