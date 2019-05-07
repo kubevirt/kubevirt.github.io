@@ -18,6 +18,10 @@ Operators implement and automate common Day-1 (installation, configuration, etc)
 
 # [HCO known as Hyper Converged Operator](https://github.com/kubevirt/hyperconverged-cluster-operator)  
 
+####New Change 1->**Prerequisites:** 
+ 
+This Blog assumes that the reader is aware of the concept of Operators and how it works in K8's environment. Before proceeding further, feel free to take a look at this concept using [CoreOS BlogPost](https://coreos.com/blog/introducing-operators.html)
+
 ## What it does?
 
 The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md), etc... - where users can deploy and configure them in a single object. This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM. It only creates operator CRs, which is the user's prerogative.
@@ -203,7 +207,7 @@ virt-operator                     1/1     1            1           16m
 
 Installation steps for Openshift4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/) 
 
-Upon successful installation of OpenShift, we will have a cluster consistening of 3 mastersand 3 workers which can be used for HCO integration
+Upon successful installation of OpenShift, we will have a cluster consistening of 3 masters and 3 workers which can be used for HCO integration
 
 ```
 $oc version
@@ -232,70 +236,13 @@ networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io   2019-04-23T17:3
 ```
 #Note: In Openshift we can use both `kubectl` and  `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
-## Here is the yaml file for CDI, CNI and KubeVirt:
+## You can read more about CDI, CNI and KubeVirt:
 
-[CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown): Container Data Importer, is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.
+- [CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown) 
 
-```yaml
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: cdis.cdi.kubevirt.io
-spec:
-  additionalPrinterColumns:
-  - JSONPath: .metadata.creationTimestamp
-    name: Age
-    type: date
-  - JSONPath: .status.phase
-    name: Phase
-    type: string
-  group: cdi.kubevirt.io
-  names:
-    kind: CDI
-    listKind: CDIList
-    plural: cdis
-    shortNames:
-    - cdi
-    - cdis
-    singular: cdi
-  scope: Cluster
-  subresources:
-    status: {}
-  version: v1alpha1
-  versions:
-  - name: v1alpha1
-    served: true
-    storage: true
+- [CNI](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md)
 
-```
-
-[CNI](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md): Enables the pods with an additional network interface through which it can communicate with the pods. We can summarize this as for ex: if pod has three interface: eth0, net0 and net1. eth0 connects kubernetes cluster network to connect with kubernetes server/services (e.g. kubernetes api-server, kubelets and so on). net0 and net1 are network attachment and connect to other networks with other CNI networks (e.g. vlan/vxlan/ptp).
-
-```yaml
----
-apiVersion: apiextensions.k8s.io/v1beta1
-kind: CustomResourceDefinition
-metadata:
-  name: networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io
-spec:
-  group: networkaddonsoperator.network.kubevirt.io
-  names:
-    kind: NetworkAddonsConfig
-    listKind: NetworkAddonsConfigList
-    plural: networkaddonsconfigs
-    singular: networkaddonsconfig
-  scope: Cluster
-  subresources:
-    status: {}
-  version: v1alpha1
-  versions:
-  - name: v1alpha1
-    served: true
-    storage: true
-```
-
-[KubeVirt](http://kubevirt.io/quickstart_minikube/) : KubeVirt technology addresses the needs of development teams that have adopted or want to adopt [Kubernetes](https://kubernetes.io/) but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment. 
+- [KubeVirt](http://kubevirt.io/quickstart_minikube/) 
 
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
