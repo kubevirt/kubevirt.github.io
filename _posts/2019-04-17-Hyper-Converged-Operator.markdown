@@ -265,37 +265,18 @@ Once subscribed, we can create a kubevirt Hyperconverged Operator from UI:
 
 ![Creating-Subscription](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-02-31.png)
 
-```
-cat <<EOF | oc create -f -
-apiVersion: operators.coreos.com/v1alpha1
-kind: Subscription
-metadata:
-  name: hco-subscription
-  namespace: kubevirt-hyperconverged
-spec:
-  channel: alpha
-  name: kubevirt-hyperconverged
-  source: hco-catalogsource
-  sourceNamespace: openshift-operator-lifecycle-manager
-EOF
-
-sleep 60
-```
 Wait until the `virt-operator`, `cdi-operator` and `cluster-network-addons-operator` comes up. 
 
 After they are up, its now time to launch the HCO-Custom Resource itself:
 
-```
-cat <<EOF | oc create -f -
-apiVersion: hco.kubevirt.io/v1alpha1
-kind: HyperConverged
-metadata:
-  name: hyperconverged-cluster
-  namespace: kubevirt-hyperconverged
-EOF
-```
+![HCO-CR](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-04-48.png)
+
 
 Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can see all the pods are up and running:
+
+![HCO-Managed-Operators](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-12-54.png)
+
+We can verify the same from the CLI:
 
 ```
 🎩oc get pods
@@ -322,16 +303,8 @@ virt-operator-87d7c98b-rngqq                       1/1     Running   0          
 ```
 We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
 
-```
-oc get pods -n openshift-operator-lifecycle-manager
-NAME                                READY   STATUS    RESTARTS   AGE
-catalog-operator-56cbfb5965-8fm7r   1/1     Running   0          104m
-hco-catalogsource-tmltb             1/1     Running   0          85m
-olm-operator-77d8f864d-8hsf5        1/1     Running   0          104m
-olm-operators-8qqgn                 1/1     Running   0          102m
-packageserver-85f4964547-sjswg      1/1     Running   0          101m
-packageserver-85f4964547-t6j5q      1/1     Running   0          101m
-```
+![HCO-Managed-Operators](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/HCO-Managed-Operators.png)
+
 The above method demonstrates the integration of HCO operator in Openshift4.
 
 So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
