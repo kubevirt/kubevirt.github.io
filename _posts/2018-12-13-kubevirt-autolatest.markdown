@@ -3,7 +3,7 @@ layout: post
 author: karmab
 description: Kubevirt Autodeployer
 navbar_active: Blogs
-pub-date: Dic 13
+pub-date: Dec 13
 pub-year: 2018
 category: news
 comments: true
