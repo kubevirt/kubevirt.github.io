@@ -1,9 +1,6 @@
-example
-=======
+# KubeVirt.io Website
 
 [![Build Status](https://travis-ci.org/kubevirt/kubevirt.github.io.svg?branch=master)](https://travis-ci.org/kubevirt/kubevirt.github.io)
-
-# KubeVirt.io Website
 
 ## Creating a Blog Post
 
