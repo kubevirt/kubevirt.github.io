@@ -16,7 +16,7 @@ This Blog assumes that the reader is aware of the concept of Operators and how i
 
 ## What it does?
 
-The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md), etc... - where users can deploy and configure them in a single object. This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM. It only creates operator CRs, which is the user's prerogative.
+The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md), etc... - where users can deploy and configure them in a single object. This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM. It only creates operator CRs, which is the user's prerogative.
 
 ## How does it work?
 
@@ -41,7 +41,7 @@ Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e
 ```
 Check the nodes 
 ```
-🎩oc get nodes
+$oc get nodes
 NAME                                         STATUS   ROLES    AGE   VERSION
 ip-10-0-133-213.us-east-2.compute.internal   Ready    worker   12m   v1.13.4+da48e8391
 ip-10-0-138-120.us-east-2.compute.internal   Ready    master   18m   v1.13.4+da48e8391
@@ -60,21 +60,23 @@ This gives all the necessary go packages and yaml manifests for the next steps.
 Lets create a NameSpace for the HCO deployment
 
 ```
-kubectl create namespace kubevirt-hyperconverged
+oc create new-project kubevirt-hyperconverged
 ```
 Now switch to the kubevirt-hyperconverged NameSpace
 
 ```
-kubectl config set-context $(kubectl config current-context) --namespace=kubevirt-hyperconverged
+oc project kubevirt-hyperconverged
 ```
+
 Now launch all the CRD’s
 ```
-kubectl create -f deploy/converged/crds/hco.crd.yaml
-kubectl create -f deploy/converged/crds/kubevirt.crd.yaml
-kubectl create -f deploy/converged/crds/cdi.crd.yaml
-kubectl create -f deploy/converged/crds/cna.crd.yaml
+oc create -f deploy/converged/crds/hco.crd.yaml
+oc create -f deploy/converged/crds/kubevirt.crd.yaml
+oc create -f deploy/converged/crds/cdi.crd.yaml
+oc create -f deploy/converged/crds/cna.crd.yaml
 ```
 Lets see the yaml file for HCO Custom Resource Definition
+
 ```yaml
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
@@ -107,13 +109,15 @@ spec:
     storage: true
 ```
 Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments for the operator
+
 ```
-$ kubectl create -f deploy/converged
+$ oc create -f deploy/converged
 ```
 And after verifying all the above resources we can now finally deploy our HCO custom resource
 
 ```
-$ kubectl create -f deploy/converged/crds/hco.cr.yaml 
+$ oc create -f deploy/converged/crds/hco.cr.yaml 
+
 ```
 We can take a look at the YAML definition of the CustomResource of HCO:
 
@@ -129,7 +133,7 @@ After succesfully executing the above commands,we should be now be having a virt
 
 Lets see the deployed pods
 ```
-$kubectl get pods
+$oc get pods
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-rv8zt                     1/1     Running   0          5m2s
 cdi-deployment-8b64c5585-g7zfk                     1/1     Running   0          5m2s
@@ -147,7 +151,7 @@ virt-operator-667b6c845d-jfnsr                     1/1     Running   0          
 Also the below deployments
 
 ```
-$kubectl get deployments
+$oc get deployments
 NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
 cdi-apiserver                     1/1     1            1           10m
 cdi-deployment                    1/1     1            1           10m
@@ -185,11 +189,11 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 ```
 #Note: In Openshift we can use both `kubectl` and  `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
-## You can read more about CDI, CNI, ssp-operator, web-ui and KubeVirt:
+## You can read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
 
 - [CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown) 
 
-- [CNI](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md)
+- [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
 
 - [KubeVirt](http://kubevirt.io/quickstart_minikube/) 
 
@@ -200,6 +204,12 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 - [NodeMaintenance](https://github.com/kubevirt/node-maintenance-operator)
 
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
+
+
+**Note**:
+Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
+
+Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
 
 The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
@@ -279,7 +289,7 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 We can verify the same from the CLI:
 
 ```
-🎩oc get pods
+$oc get pods
 
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-97q8r                     1/1     Running   0          83m
@@ -315,7 +325,7 @@ What to expect next ?
 
 HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object as seen above.
 
-Now, we can also launch the HCO through OLM, 
+Now, we can also launch the HCO through OLM. 
 
 **Note**: 
 Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
