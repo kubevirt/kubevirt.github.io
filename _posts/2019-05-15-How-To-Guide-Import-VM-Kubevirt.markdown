@@ -22,10 +22,10 @@ In this BlogPost we will discuss about the VM as a yaml template and steps on ho
 
 - User is familiar with the concept of [kubevirt-architecture](https://github.com/kubevirt/kubevirt/blob/master/docs/architecture.md) and [CDI-architecture](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design)
 
-**Virtual machines:**
+- User has already installed kubevirt in his K8s environment, if not please follow the link [Installing Kubevirt](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#installation)
 
-VirtualMachine
-An VirtualMachine provides additional management capabilities to a VirtualMachineInstance inside the cluster. That includes:
+**Virtual machines:**
+A VirtualMachine provides additional management capabilities to a VirtualMachineInstance inside the cluster. That includes:
 
 - ABI stability
 
