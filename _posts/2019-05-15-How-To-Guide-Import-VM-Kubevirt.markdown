@@ -39,10 +39,6 @@ It focuses on a 1:1 relationship between the controller instance and a virtual m
 
 **How to use a VirtualMachine:**
 
-A VirtualMachine will make sure that a VirtualMachineInstance object with an identical name will be present in the cluster, if spec.running is set to true. Further it will make sure that a VirtualMachineInstance will be removed from the cluster if spec.running is set to false.
-
-There exists a field spec.runStrategy which can also be used to control the state of the associated VirtualMachineInstance object. To avoid confusing and contradictory states, these fields are mutually exclusive. An extended explanation of spec.runStrategy vs spec.running can be found in Run Strategies.
-
 **Starting and stopping**
 
 After creating a VirtualMachine it can be switched on or off like this:
@@ -106,7 +102,7 @@ spec:
         name: cloudinitdisk
 
 ```
-From the above manifest, `kind: VirtualMachine` states that its a VM object, `spec` section has pvc request as a local storage, `source` refering to the http url where the `iso` of a VM is stored. In the later section of this Blog you will see how this is all gets connected in the context of CDI. 
+From the above manifest, `kind: VirtualMachine` states that its a VM object, `spec.domain.device.name` section and `spec.volumes.name` should match. In the later section of this Blog you will see how this is all gets connected in the context of CDI. 
 
 # **Note**: 
 
@@ -210,7 +206,7 @@ The [Containerized Data Importer (CDI)](https://github.com/kubevirt/containerize
 
 - Upload a local disk image to a PVC
 
-This document deals with the third use case. So you should have CDI installed in your cluster, a VM disk that you’d like to upload, and virtctl in your path.
+This document for now deals with the third use case and covers the HTTP based import use case at the end of the BlogPost. So you should have CDI installed in your cluster, a VM disk that you’d like to upload, and virtctl in your path.
 
 Lets begin by installing the latest CDI release [here](https://github.com/kubevirt/containerized-data-importer/releases) (currently v1.9.0)
 
@@ -348,5 +344,86 @@ Use virtctl to connect to the newly create VirtualMachinInstance.
 virtctl console cirros-vm
 ```
 
+The above method explains the import of the VM by importing the locally available image, now lets see the concept of DataVolumes:
 
+**DataVolume**:
+
+DataVolumes are a way to automate importing virtual machine disks onto pvcs during the virtual machine’s launch flow. Without using a DataVolume, users have to prepare a pvc with a disk image before assigning it to a VM or VMI manifest. With a DataVolume, both the pvc creation and import is automated on behalf of the user.
+
+DataVolume VM Behavior
+DataVolumes can be defined in the VM spec directly by adding the DataVolumes to the dataVolumeTemplates list. Below is an example.
+
+```yaml
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  labels:
+    kubevirt.io/vm: vm-alpine-datavolume
+  name: vm-alpine-datavolume
+spec:
+  running: false
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: vm-alpine-datavolume
+    spec:
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: datavolumedisk1
+        resources:
+          requests:
+            memory: 64M
+      volumes:
+      - dataVolume:                #Note the type is dataVolume
+          name: alpine-dv
+        name: datavolumedisk1
+  dataVolumeTemplates:             # Automatically a PVC of size 2Gi is created
+  - metadata:
+      name: alpine-dv
+    spec:
+      pvc:
+        accessModes:
+        - ReadWriteOnce
+        resources:
+          requests:
+            storage: 2Gi
+      source:                      #This is the source where the iso file resides
+        http:
+          url: http://cdi-http-import-server.kubevirt/images/alpine.iso
+```
+From the above manifest the two main sections that needs an attention are **`source`** and **`pvc`**.
+
+The `source` part declares that there is a disk image living on an http server that we want to use as a volume for this VM. The `pvc` part declares the spec that should be used to create the pvc that hosts the source data.
+
+When this VM manifest is posted to the cluster, as part of the launch flow a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.
+
+**A few caveats to be considered before using DataVolumes:** 
+
+A DataVolume is a custom resource provided by the Containerized Data Importer (CDI) project. KubeVirt integrates with CDI in order to provide users a workflow for dynamically creating pvcs and importing data into those pvcs.
+
+In order to take advantage of the `DataVolume` volume source on a VM or VMI, the DataVolumes feature gate must be enabled in the `kubevirt-config` config map before KubeVirt is installed. CDI must also be installed(follow the steps as mentioned above).
+
+Enabling the DataVolumes feature gate
+
+Below is an example of how to enable DataVolume support using the kubevirt-config config map.
+
+```shell
+cat <<EOF | kubectl create -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubevirt-config
+  namespace: kubevirt
+  labels:
+    kubevirt.io: ""
+data:
+  feature-gates: "DataVolumes"
+EOF
+```
+This config map assumes KubeVirt will be installed in the kubevirt namespace. Change the namespace to suite your installation.
+
+First post the configmap above, then install KubeVirt. At that point DataVolume integration will be enabled.
 
