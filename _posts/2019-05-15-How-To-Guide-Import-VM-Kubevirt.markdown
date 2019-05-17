@@ -427,3 +427,6 @@ This config map assumes KubeVirt will be installed in the kubevirt namespace. Ch
 
 First post the configmap above, then install KubeVirt. At that point DataVolume integration will be enabled.
 
+**Conclusion:**
+
+VM can be imported as a k8s object using a CDI project along with kubevirt. For more detailed insights, please feel free to follow the [kubevirt project](https://kubevirt.io/)
