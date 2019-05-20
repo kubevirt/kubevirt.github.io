@@ -289,27 +289,26 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 We can verify the same from the CLI:
 
 ```
-$oc get pods
-
+oc get pods -n kubevirt-hyperconverged
 NAME                                               READY   STATUS    RESTARTS   AGE
-cdi-apiserver-769fcc7bdf-97q8r                     1/1     Running   0          83m
-cdi-deployment-8b64c5585-5txmd                     1/1     Running   0          83m
-cdi-operator-77b8847b96-2zxtz                      1/1     Running   0          84m
-cdi-uploadproxy-8dcdcbff-v7stq                     1/1     Running   0          83m
-cluster-network-addons-operator-584dff99b8-cqd7g   1/1     Running   0          84m
-hco-operator-59b559bd44-5dg6j                      1/1     Running   0          84m
-kubevirt-ssp-operator-67b78446f7-9phxj             1/1     Running   0          84m
-kubevirt-web-ui-operator-9df6b67d9-djjcs           1/1     Running   0          84m
-node-maintenance-operator-6b464dc85-6ml2z          1/1     Running   0          84m
-virt-api-85b47b44db-28x96                          1/1     Running   0          83m
-virt-api-85b47b44db-n4v4r                          1/1     Running   0          83m
-virt-controller-59fbcc9f9b-44sgx                   1/1     Running   0          82m
-virt-controller-59fbcc9f9b-p9jpf                   1/1     Running   0          82m
-virt-handler-bl657                                 1/1     Running   1          82m
-virt-handler-lszwp                                 1/1     Running   0          82m
-virt-handler-sfgtj                                 1/1     Running   0          82m
-virt-operator-87d7c98b-5pmlw                       1/1     Running   0          84m
-virt-operator-87d7c98b-rngqq                       1/1     Running   0          84m
+cdi-apiserver-769fcc7bdf-b5v8n                     1/1     Running   0          4m5s
+cdi-deployment-8b64c5585-qs527                     1/1     Running   0          4m4s
+cdi-operator-77b8847b96-5kmb2                      1/1     Running   0          4m55s
+cdi-uploadproxy-8dcdcbff-xgnxf                     1/1     Running   0          4m5s
+cluster-network-addons-operator-584dff99b8-c5kz5   1/1     Running   0          4m55s
+hco-operator-59b559bd44-lgdnm                      1/1     Running   0          4m55s
+kubevirt-ssp-operator-67b78446f7-l7rfv             1/1     Running   0          4m55s
+kubevirt-web-ui-operator-9df6b67d9-mzf6s           1/1     Running   0          4m55s
+node-maintenance-operator-6b464dc85-v6vmw          1/1     Running   0          4m55s
+virt-api-7b56d7dd89-8s78r                          1/1     Running   0          2m59s
+virt-api-7b56d7dd89-h75t8                          1/1     Running   1          2m59s
+virt-controller-77c6d6d779-9qpp4                   1/1     Running   0          2m32s
+virt-controller-77c6d6d779-vbbxg                   1/1     Running   0          2m32s
+virt-handler-4bfb9                                 1/1     Running   0          2m32s
+virt-handler-ns97x                                 1/1     Running   0          2m32s
+virt-handler-q7wbh                                 1/1     Running   0          2m32s
+virt-operator-87d7c98b-mh8pg                       1/1     Running   0          4m55s
+virt-operator-87d7c98b-p6mbd                       1/1     Running   0          4m55s
 ```
 We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
 
