@@ -65,7 +65,7 @@ kubectl patch virtualmachine myvm --type merge -p \
 ```
 **VM defined in a `yaml` format:**
 
-In genaral, VM's can be defined as a `yaml` manifests and can be deployed as k8s objects, a simple example of a VM  in a yaml format is below:
+In general, VM's can be defined as a `yaml` manifests and can be deployed as k8s objects, a simple example of a VM  in a yaml format is below:
 
 ```yaml
 apiVersion: kubevirt.io/v1alpha3
@@ -409,7 +409,7 @@ A DataVolume is a custom resource provided by the Containerized Data Importer (C
 
 In order to take advantage of the `DataVolume` volume source on a VM or VMI, the DataVolumes feature gate must be enabled in the `kubevirt-config` config map before KubeVirt is installed. CDI must also be installed(follow the steps as mentioned above).
 
-Enabling the DataVolumes feature gate
+**Enabling the DataVolumes feature gate:**
 
 Below is an example of how to enable DataVolume support using the kubevirt-config config map.
 
