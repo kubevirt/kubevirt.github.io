@@ -10,7 +10,7 @@ category: news
 
 # Import a VM into the Kubernetes Native Environment:
 
-Motivation: Kubernetes have become the new way to orchestrate the containers and to handle the microservice architecture, but what if I already have legacy apps running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well if that is the usecase for you then we have a solution now with kubevirt. 
+Motivation: Kubernetes have become the new way to orchestrate the containers and to handle the microservice architecture, but what if I already have legacy apps running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well if that is the usecase for you then we have a solution now with kubevirt.
 
 In this BlogPost we will discuss about how to deploy VM as a yaml template and steps on how to import it as a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) onto your kubernetes environment using the CDI and kubevirt add-ons.
 
@@ -105,9 +105,9 @@ spec:
         name: cloudinitdisk
 
 ```
-From the above manifest, `kind: VirtualMachine` states that its a VM object, `spec.domain.device.name` section and `spec.volumes.name` should match. In the later section of this Blog you will see how this is all gets connected in the context of CDI. 
+From the above manifest, `kind: VirtualMachine` states that its a VM object, `spec.domain.device.name` section and `spec.volumes.name` should match. In the later section of this Blog you will see how this is all gets connected in the context of CDI.
 
-# **Note**: 
+# **Note**:
 
 - More examples of a VM declared as a `yaml` manifest can be seen [here](https://github.com/kubevirt/kubevirt/tree/master/cluster/examples)
 
@@ -119,7 +119,7 @@ Now, we have seen how a VM can be declared as a yaml object inside kubernetes, w
 
 A VirtualMachine will make sure that a VirtualMachineInstance object with an identical name will be present in the cluster, if `spec.running` is set to `true`. Further it will make sure that a VirtualMachineInstance will be removed from the cluster if `spec.running` is set to `false`.
 
-There exists a field `spec.runStrategy` which can also be used to control the state of the associated VirtualMachineInstance object. To avoid confusing and contradictory states, these fields are mutually exclusive. An extended explanation of `spec.runStrategy` vs `spec.running` can be found in [Run Strategies](https://kubevirt.io/user-guide/docs/latest/architecture/creating-virtual-machines/run-strategies.html).
+There exists a field `spec.runStrategy` which can also be used to control the state of the associated VirtualMachineInstance object. To avoid confusing and contradictory states, these fields are mutually exclusive. An extended explanation of `spec.runStrategy` vs `spec.running` can be found in [Run Strategies](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/run-strategies.html).
 
 Saving this manifest into vm.yaml and submitting it to Kubernetes will create the controller instance:
 
@@ -195,7 +195,7 @@ Events:
   ----    ------            ----  ----                              -------
   Normal  SuccessfulCreate  15s   virtualmachine-controller  Created virtual machine: vm-cirros
 ```
-**Note**: For more detailed explanation check the link [here](https://kubevirt.io/user-guide/docs/latest/architecture/virtual-machine.html). 
+**Note**: For more detailed explanation check the link [here](https://kubevirt.io/user-guide/docs/latest/architecture/virtual-machine.html).
 
 Since we were able to start and stop the VM instance, now lets shift our focus on importing the VM.
 
@@ -309,7 +309,7 @@ EOF
 
 A PersistentVolume can be in filesystem'' or block'' mode:
 
-Filesystem: For KubeVirt to be able to consume the disk present on a PersistentVolume’s filesystem, the disk must be named disk.img and be placed in the root path of the filesystem. Currently the disk is also required to be in raw format. 
+Filesystem: For KubeVirt to be able to consume the disk present on a PersistentVolume’s filesystem, the disk must be named disk.img and be placed in the root path of the filesystem. Currently the disk is also required to be in raw format.
 
 **Important:** The disk.img image file needs to be owned by the user-id 107 in order to avoid permission issues.
 
@@ -403,7 +403,7 @@ The `source` part declares that there is a disk image living on an http server t
 
 When this VM manifest is posted to the cluster, as part of the launch flow a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.
 
-**A few caveats to be considered before using DataVolumes:** 
+**A few caveats to be considered before using DataVolumes:**
 
 A DataVolume is a custom resource provided by the Containerized Data Importer (CDI) project. KubeVirt integrates with CDI in order to provide users a workflow for dynamically creating pvcs and importing data into those pvcs.
 
