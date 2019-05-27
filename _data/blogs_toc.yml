@@ -16,6 +16,8 @@ toc:
     subfolderitems:
       - page: Grouped by Date
         url: /blogs/date.html
+      - page: 2019 Posts
+        url: /blogs/2019/posts.html
       - page: 2018 Posts
         url: /blogs/2018/posts.html
       - page: 2017 Posts
