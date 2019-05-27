@@ -272,13 +272,13 @@ spec:
 EOF
 ~~~
 
-Please wait until the `hco-catalogsource` pod comes up
+Please, wait until the `hco-catalogsource` pod comes up
 
-Next is to create a subscription, we can create a subscription from the OpenShift 4 web interface as shown below:
+Next step, is to create a subscription, we can create a subscription from the OpenShift 4 web interface as shown below:
 
 ![Subscription](../assets/HCO/subscription.png)
 
-Once subscribed, we can create a kubevirt Hyperconverged Operator from UI:
+Once subscribed, we can create a kubevirt HyperConverged Operator from UI:
 
 ![Creating-Subscription](../assets/HCO/Screenshot%20from%202019-05-08%2014-02-31.png)
 
