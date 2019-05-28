@@ -39,25 +39,7 @@ $oc version
 Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
 Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e", GitCommit:"0ba401e", GitTreeState:"clean", BuildDate:"2019-03-31T22:28:12Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
 ```
-Check the nodes 
-```
-We can use HCO both on [minikube](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/HCO-minikube.markdown) and also on OpenShift 4. I will be using Openshift 4 for HCO in this Blog.
-
-## Deploying HCO on Openshift 4 Cluster
-
-[Openshift](https://www.openshift.com/learn/what-is-openshift/)
-
-Installation steps for Openshift 4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/)
-
-Upon successful installation of OpenShift, we will have a cluster consisting of 3 masters and 3 workers which can be used for HCO integration
-
-~~~
-$oc version
-Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
-Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e", GitCommit:"0ba401e", GitTreeState:"clean", BuildDate:"2019-03-31T22:28:12Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
-~~~
-
-Check the nodes
+Check the nodes:
 
 ~~~
 $oc get nodes
@@ -88,31 +70,6 @@ oc project kubevirt-hyperconverged
 ```
 
 Now launch all the CRD’s
-```
-~~~
-
-Clone the HCO repo here
-
-~~~
-git clone https://github.com/kubevirt/hyperconverged-cluster-operator.git
-~~~
-
-This gives all the necessary go packages and yaml manifests for the next steps.
-
-Let's create a NameSpace for the HCO deployment
-
-~~~
-oc create new-project kubevirt-hyperconverged
-~~~
-
-Now switch to the kubevirt-hyperconverged NameSpace
-
-~~~
-oc project kubevirt-hyperconverged
-~~~
-
-Now launch all the CRD’s
-
 ~~~
 oc create -f deploy/converged/crds/hco.crd.yaml
 oc create -f deploy/converged/crds/kubevirt.crd.yaml
