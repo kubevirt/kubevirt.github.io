@@ -26,7 +26,8 @@ In this BlogPost we will discuss about how to deploy VM as a yaml template and s
 
 - User has already installed kubevirt in his K8s environment, if not please follow the link [Installing Kubevirt](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#installation)
 
-**Virtual machines:**
+# Virtual machines:
+
 A VirtualMachine provides additional management capabilities to a VirtualMachineInstance inside the cluster. That includes:
 
 - ABI stability
@@ -39,7 +40,7 @@ A VirtualMachine provides additional management capabilities to a VirtualMachine
 
 It focuses on a 1:1 relationship between the controller instance and a virtual machine instance. In many ways it is very similar to a StatefulSet with spec.replica set to 1.
 
-**How to use a VirtualMachine:**
+# How to use a VirtualMachine:
 
 **Starting and stopping**
 
@@ -349,7 +350,7 @@ virtctl console cirros-vm
 
 The above method explains the import of the VM by importing the locally available image, now lets see the concept of DataVolumes:
 
-**DataVolume**:
+# DataVolume:
 
 DataVolumes are a way to automate importing virtual machine disks onto pvcs during the virtual machine’s launch flow. Without using a DataVolume, users have to prepare a pvc with a disk image before assigning it to a VM or VMI manifest. With a DataVolume, both the pvc creation and import is automated on behalf of the user.
 
@@ -409,7 +410,7 @@ A DataVolume is a custom resource provided by the Containerized Data Importer (C
 
 In order to take advantage of the `DataVolume` volume source on a VM or VMI, the DataVolumes feature gate must be enabled in the `kubevirt-config` config map before KubeVirt is installed. CDI must also be installed(follow the steps as mentioned above).
 
-**Enabling the DataVolumes feature gate:**
+# Enabling the DataVolumes feature gate:
 
 Below is an example of how to enable DataVolume support using the kubevirt-config config map.
 
@@ -430,6 +431,6 @@ This config map assumes KubeVirt will be installed in the kubevirt namespace. Ch
 
 First post the configmap above, then install KubeVirt. At that point DataVolume integration will be enabled.
 
-**Conclusion:**
+# Conclusion:
 
 VM can be imported as a k8s object using a CDI project along with kubevirt. For more detailed insights, please feel free to follow the [kubevirt project](https://kubevirt.io/)
