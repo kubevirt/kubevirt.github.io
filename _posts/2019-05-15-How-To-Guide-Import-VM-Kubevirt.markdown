@@ -3,7 +3,7 @@ layout: post
 author: DirectedSoul
 description: Import a VM into the Kubernetes Platform using CDI
 navbar_active: Blogs
-pub-date: May 20
+pub-date: May 30
 pub-year: 2019
 category: news
 ---
@@ -280,6 +280,7 @@ Here, `virtctl image-upload` works by creating a PVC of the requested size, send
 ```shell
 virtctl image-upload --pvc-name=cirros-vm-disk --pvc-size=500Mi --image-path=/home/shegde/images/cirros-0.4.0-x86_64-disk.img --uploadproxy-url=<url to upload proxy service>
 ```
+
 **To create a VirtualMachineInstance from a PVC:**
 
 ```shell
