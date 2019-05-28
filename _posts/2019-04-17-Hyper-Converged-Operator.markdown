@@ -50,7 +50,8 @@ ip-10-0-146-51.us-east-2.compute.internal    Ready    master   18m   v1.13.4+da4
 ip-10-0-150-215.us-east-2.compute.internal   Ready    worker   12m   v1.13.4+da48e8391
 ip-10-0-160-201.us-east-2.compute.internal   Ready    master   17m   v1.13.4+da48e8391
 ip-10-0-168-28.us-east-2.compute.internal    Ready    worker   12m   v1.13.4+da48e8391
-```
+~~~
+
 Clone the HCO repo here
 
 ```
@@ -109,7 +110,8 @@ spec:
   - name: v1alpha1
     served: true
     storage: true
-```
+~~~
+
 Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments for the operator
 
 ```
@@ -143,7 +145,7 @@ apiVersion: hco.kubevirt.io/v1alpha1
 kind: HyperConverged
 metadata:
   name: hyperconverged-cluster
-```
+~~~
 
 After successfully executing the above commands,we should be now be having a virt-controller pod, HCO pod, and a network-addon pod functional and can be viewed as below.
 
@@ -164,7 +166,6 @@ virt-controller-6ccbfb7d5b-m7ljf                   1/1     Running   0          
 virt-controller-6ccbfb7d5b-mbvlv                   1/1     Running   0          3m49s
 virt-handler-hqz9d                                 1/1     Running   0          3m49s
 virt-operator-667b6c845d-jfnsr                     1/1     Running   0          11m
-```
 ~~~
 
 Also the below deployments:
@@ -181,7 +182,7 @@ hyperconverged-cluster-operator   1/1     1            1           16m
 virt-api                          2/2     2            2           9m58s
 virt-controller                   2/2     2            2           8m49s
 virt-operator                     1/1     1            1           16m
-```
+~~~
 
 
 **Note**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
@@ -206,7 +207,7 @@ virtualmachineinstancepresets.kubevirt.io                        2019-05-07T20:2
 virtualmachineinstancereplicasets.kubevirt.io                    2019-05-07T20:23:02Z
 virtualmachineinstances.kubevirt.io                              2019-05-07T20:23:01Z
 virtualmachines.kubevirt.io                                      2019-05-07T20:23:02Z
-```
+~~~
 
 **Note**: In Openshift we can use both `kubectl` and `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
@@ -232,13 +233,12 @@ Replace <docker_org> with your Docker organization as official operator-registry
 
 Next, build and publish the converged HCO operator-registry image.
 
-```
 ~~~sh
 cd deploy/converged
 export HCO_DOCKER_ORG=<docker_org>
 docker build --no-cache -t docker.io/$HCO_DOCKER_ORG/hco-registry:example -f Dockerfile .
 docker push docker.io/$HCO_DOCKER_ORG/hco-registry:example
-```
+~~~
 As an example deployment, Let's take the value of operator-registry image as 
 
 ```
@@ -253,7 +253,6 @@ oc create ns kubevirt-hyperconverged
 
 Create the OperatorGroup
 
-```
 ~~~yaml
 cat <<EOF | oc create -f -
 apiVersion: operators.coreos.com/v1alpha2
@@ -262,7 +261,6 @@ metadata:
   name: hco-operatorgroup
   namespace: kubevirt-hyperconverged
 EOF
-```
 ~~~
 
 Create a Catalog Source backed by a grpc registry
@@ -281,9 +279,9 @@ spec:
   displayName: KubeVirt HyperConverged
   publisher: Red Hat
 EOF
-```
-Please wait until the `hco-catalogsource` pod comes up
+~~~
 
+Please wait until the `hco-catalogsource` pod comes up
 
 Next is to create a subscription, we can create a subscription from the Openshift4 web interface as shown below:
 
@@ -306,8 +304,6 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 
 We can verify the same from the CLI:
 
-```
-=======
 ~~~
 
 Please, wait until the `hco-catalogsource` pod comes up
@@ -353,19 +349,13 @@ virt-handler-ns97x                                 1/1     Running   0          
 virt-handler-q7wbh                                 1/1     Running   0          2m32s
 virt-operator-87d7c98b-mh8pg                       1/1     Running   0          4m55s
 virt-operator-87d7c98b-p6mbd                       1/1     Running   0          4m55s
-```
+~~~
+
 We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
 
 ![HCO-Managed-Operators](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/HCO-Managed-Operators.png)
 
 The above method demonstrates the integration of HCO operator in Openshift4.
-~~~
-
-We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
-
-![HCO-Managed-Operators](../assets/HCO/HCO-Managed-Operators.png)
-
-The above method demonstrates the integration of HCO operator in OpenShift 4.
 
 So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
 
