@@ -8,20 +8,6 @@ pub-year: 2019
 category: news
 ---
 
-# Import a VM into the Kubernetes Native Environment:
-
-Motivation: Kubernetes have become the new way to orchestrate the containers and to handle the microservice architecture, but what if I already have legacy apps running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well if that is the usecase for you then we have a solution now with kubevirt. 
-
-In this BlogPost we will discuss about how to deploy VM as a yaml template and steps on how to import it as a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) onto your kubernetes environment using the CDI and kubevirt add-ons.
-
-**Assumptions:**
-
-- A basic understanding of the k8s architecture: In its simplest terms Kubernetes is a portable, extensible open-source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available.For complete details check [Kubernetes-architecture](https://www.aquasec.com/wiki/display/containers/Kubernetes+Architecture+101)
-
-- User is familiar with the concept of a [virsh based VM](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-guest_virtual_machine_installation_overview-creating_guests_with_virt_install)
-
-- PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a lifecycle independent of any individual pod that uses the PV. This API object captures the details of the implementation of the storage, be that NFS, iSCSI, or a cloud-provider-specific storage system. [Persistent Volume(PV)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) and Persistent Volume Claim PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., can be mounted once read/write or many times read-only).[Persistent Volume Claim(PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
-
 # Importing a VM into the Kubernetes Native Environment
 
 Motivation: Kubernetes have become the new way to orchestrate the containers and to handle the microservice architecture, but what if I already have legacy apps running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well if that is the usecase for you then we have a solution now with kubevirt.
