@@ -122,7 +122,7 @@ Now, we have seen how a VM can be declared as a yaml object inside kubernetes, w
 
 A VirtualMachine will make sure that a VirtualMachineInstance object with an identical name will be present in the cluster, if `spec.running` is set to `true`. Further it will make sure that a VirtualMachineInstance will be removed from the cluster if `spec.running` is set to `false`.
 
-There exists a field `spec.runStrategy` which can also be used to control the state of the associated VirtualMachineInstance object. To avoid confusing and contradictory states, these fields are mutually exclusive. An extended explanation of `spec.runStrategy` vs `spec.running` can be found in [Run Strategies](https://kubevirt.io/user-guide/docs/latest/architecture/creating-virtual-machines/run-strategies.html).
+There exists a field `spec.runStrategy` which can also be used to control the state of the associated VirtualMachineInstance object. To avoid confusing and contradictory states, these fields are mutually exclusive. An extended explanation of `spec.runStrategy` vs `spec.running` can be found in [Run Strategies](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
 
 Saving this manifest into vm.yaml and submitting it to Kubernetes will create the controller instance:
 
