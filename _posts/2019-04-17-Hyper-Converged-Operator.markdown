@@ -305,30 +305,6 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 We can verify the same from the CLI:
 
 ~~~
-
-Please, wait until the `hco-catalogsource` pod comes up
-
-Next step, is to create a subscription, we can create a subscription from the OpenShift 4 web interface as shown below:
-
-![Subscription](../assets/HCO/subscription.png)
-
-Once subscribed, we can create a kubevirt HyperConverged Operator from UI:
-
-![Creating-Subscription](../assets/HCO/Screenshot%20from%202019-05-08%2014-02-31.png)
-
-Wait until the `virt-operator`, `cdi-operator` and `cluster-network-addons-operator` comes up.
-
-After they are up, its now time to launch the HCO-Custom Resource itself:
-
-![HCO-CR](../assets/HCO/Screenshot%20from%202019-05-08%2014-04-48.png)
-
-Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can see all the pods are up and running:
-
-![HCO-Managed-Operators](../assets/HCO/Screenshot%20from%202019-05-08%2014-12-54.png)
-
-We can verify the same from the CLI:
-
-~~~
 oc get pods -n kubevirt-hyperconverged
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-b5v8n                     1/1     Running   0          4m5s
