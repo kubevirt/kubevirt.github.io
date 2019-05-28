@@ -1,17 +1,28 @@
 ---
 layout: post
 author: DirectedSoul
+<<<<<<< HEAD
 description: Hyper Converged Operator on OCP4 and K8s(HCO) 
+=======
+description: Hyper Converged Operator on OCP4 and K8s(HCO)
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 navbar_active: Blogs
 pub-date: May 08
 pub-year: 2019
 category: news
 ---
 
+<<<<<<< HEAD
 # [HCO known as Hyper Converged Operator](https://github.com/kubevirt/hyperconverged-cluster-operator)  
 
 **Prerequisites:** 
  
+=======
+# [HCO known as Hyper Converged Operator](https://github.com/kubevirt/hyperconverged-cluster-operator)
+
+**Prerequisites:**
+
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 This Blog assumes that the reader is aware of the concept of Operators and how it works in K8's environment. Before proceeding further, feel free to take a look at this concept using [CoreOS BlogPost](https://coreos.com/blog/introducing-operators.html)
 
 ## What it does?
@@ -24,6 +35,7 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 ### Environment description
 
+<<<<<<< HEAD
 We can use HCO both on [minikube](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/HCO-minikube.markdown) and also on Openshift4. I will be using Openshift4 for HCO in this Blog.   
 
 ## Deploying HCO on Openshift4 Cluster.
@@ -41,6 +53,27 @@ Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e
 ```
 Check the nodes 
 ```
+=======
+We can use HCO both on [minikube](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/HCO-minikube.markdown) and also on OpenShift 4. I will be using Openshift 4 for HCO in this Blog.
+
+## Deploying HCO on Openshift 4 Cluster
+
+[Openshift](https://www.openshift.com/learn/what-is-openshift/)
+
+Installation steps for Openshift 4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/)
+
+Upon successful installation of OpenShift, we will have a cluster consisting of 3 masters and 3 workers which can be used for HCO integration
+
+~~~
+$oc version
+Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
+Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e", GitCommit:"0ba401e", GitTreeState:"clean", BuildDate:"2019-03-31T22:28:12Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
+~~~
+
+Check the nodes
+
+~~~
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 $oc get nodes
 NAME                                         STATUS   ROLES    AGE   VERSION
 ip-10-0-133-213.us-east-2.compute.internal   Ready    worker   12m   v1.13.4+da48e8391
@@ -49,6 +82,7 @@ ip-10-0-146-51.us-east-2.compute.internal    Ready    master   18m   v1.13.4+da4
 ip-10-0-150-215.us-east-2.compute.internal   Ready    worker   12m   v1.13.4+da48e8391
 ip-10-0-160-201.us-east-2.compute.internal   Ready    master   17m   v1.13.4+da48e8391
 ip-10-0-168-28.us-east-2.compute.internal    Ready    worker   12m   v1.13.4+da48e8391
+<<<<<<< HEAD
 ```
 Clone the HCO repo here
 
@@ -70,14 +104,49 @@ oc project kubevirt-hyperconverged
 
 Now launch all the CRD’s
 ```
+=======
+~~~
+
+Clone the HCO repo here
+
+~~~
+git clone https://github.com/kubevirt/hyperconverged-cluster-operator.git
+~~~
+
+This gives all the necessary go packages and yaml manifests for the next steps.
+
+Let's create a NameSpace for the HCO deployment
+
+~~~
+oc create new-project kubevirt-hyperconverged
+~~~
+
+Now switch to the kubevirt-hyperconverged NameSpace
+
+~~~
+oc project kubevirt-hyperconverged
+~~~
+
+Now launch all the CRD’s
+
+~~~
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 oc create -f deploy/converged/crds/hco.crd.yaml
 oc create -f deploy/converged/crds/kubevirt.crd.yaml
 oc create -f deploy/converged/crds/cdi.crd.yaml
 oc create -f deploy/converged/crds/cna.crd.yaml
+<<<<<<< HEAD
 ```
 Lets see the yaml file for HCO Custom Resource Definition
 
 ```yaml
+=======
+~~~
+
+Lets see the yaml file for HCO Custom Resource Definition
+
+~~~yaml
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 ---
 apiVersion: apiextensions.k8s.io/v1beta1
 kind: CustomResourceDefinition
@@ -107,6 +176,7 @@ spec:
   - name: v1alpha1
     served: true
     storage: true
+<<<<<<< HEAD
 ```
 Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments for the operator
 
@@ -122,17 +192,46 @@ $ oc create -f deploy/converged/crds/hco.cr.yaml
 We can take a look at the YAML definition of the CustomResource of HCO:
 
 ```yaml
+=======
+~~~
+
+Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments for the operator
+
+~~~
+$ oc create -f deploy/converged
+~~~
+
+And after verifying all the above resources we can now finally deploy our HCO custom resource
+
+~~~
+$ oc create -f deploy/converged/crds/hco.cr.yaml
+~~~
+
+We can take a look at the YAML definition of the CustomResource of HCO:
+
+~~~yaml
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 ---
 apiVersion: hco.kubevirt.io/v1alpha1
 kind: HyperConverged
 metadata:
   name: hyperconverged-cluster
+<<<<<<< HEAD
 ```
 
 After succesfully executing the above commands,we should be now be having a virt-controller pod, HCO pod,and a network-addon pod functional and can be viewed as below
 
 Lets see the deployed pods
 ```
+=======
+~~~
+
+After successfully executing the above commands,we should be now be having a virt-controller pod, HCO pod, and a network-addon pod functional and can be viewed as below.
+
+Let's see the deployed pods:
+
+~~~
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 $oc get pods
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-rv8zt                     1/1     Running   0          5m2s
@@ -147,10 +246,18 @@ virt-controller-6ccbfb7d5b-m7ljf                   1/1     Running   0          
 virt-controller-6ccbfb7d5b-mbvlv                   1/1     Running   0          3m49s
 virt-handler-hqz9d                                 1/1     Running   0          3m49s
 virt-operator-667b6c845d-jfnsr                     1/1     Running   0          11m
+<<<<<<< HEAD
 ```
 Also the below deployments
 
 ```
+=======
+~~~
+
+Also the below deployments:
+
+~~~
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 $oc get deployments
 NAME                              READY   UP-TO-DATE   AVAILABLE   AGE
 cdi-apiserver                     1/1     1            1           10m
@@ -162,6 +269,7 @@ hyperconverged-cluster-operator   1/1     1            1           16m
 virt-api                          2/2     2            2           9m58s
 virt-controller                   2/2     2            2           8m49s
 virt-operator                     1/1     1            1           16m
+<<<<<<< HEAD
 ```
 
 #NOTE: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
@@ -169,6 +277,15 @@ virt-operator                     1/1     1            1           16m
 After the HCO is up and running on the cluster, we should be able to see the info of CRD's
 
 ```
+=======
+~~~
+
+**Note**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
+
+After the HCO is up and running on the cluster, we should be able to see the info of CRD's
+
+~~~
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 $oc get crds | grep kubevirt
 cdiconfigs.cdi.kubevirt.io                                       2019-05-07T20:22:17Z
 cdis.cdi.kubevirt.io                                             2019-05-07T20:20:58Z
@@ -186,6 +303,7 @@ virtualmachineinstancepresets.kubevirt.io                        2019-05-07T20:2
 virtualmachineinstancereplicasets.kubevirt.io                    2019-05-07T20:23:02Z
 virtualmachineinstances.kubevirt.io                              2019-05-07T20:23:01Z
 virtualmachines.kubevirt.io                                      2019-05-07T20:23:02Z
+<<<<<<< HEAD
 ```
 #Note: In Openshift we can use both `kubectl` and  `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
@@ -205,12 +323,29 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
+=======
+~~~
+
+**Note**: In Openshift we can use both `kubectl` and `oc` interchangeably to interact with the cluster objects once HCO is up and running.
+
+## You can read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
+
+- [CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown)
+- [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
+- [KubeVirt](http://kubevirt.io/quickstart_minikube/)
+- [ssp-operator](https://github.com/MarSik/kubevirt-ssp-operator)
+- [kubevirt-web-ui](https://github.com/kubevirt/web-ui)
+- [NodeMaintenance](https://github.com/kubevirt/node-maintenance-operator)
+
+# [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 
 **Note**:
 Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
 
 Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
 
+<<<<<<< HEAD
 The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md) 
 
 Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided. 
@@ -218,10 +353,20 @@ Replace <docker_org> with your Docker organization as official operator-registry
 Next, build and publish the converged HCO operator-registry image.
 
 ```
+=======
+The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
+
+Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided.
+
+Next, build and publish the converged HCO operator-registry image.
+
+~~~sh
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 cd deploy/converged
 export HCO_DOCKER_ORG=<docker_org>
 docker build --no-cache -t docker.io/$HCO_DOCKER_ORG/hco-registry:example -f Dockerfile .
 docker push docker.io/$HCO_DOCKER_ORG/hco-registry:example
+<<<<<<< HEAD
 ```
 As an example deployment, Let's take the value of operator-registry image as 
 
@@ -238,6 +383,25 @@ oc create ns kubevirt-hyperconverged
 Create the OperatorGroup
 
 ```
+=======
+~~~
+
+As an example deployment, Let's take the value of operator-registry image as:
+
+~~~
+docker.io/rthallisey/hyperconverged-cluster-operator:latest
+~~~
+
+Now, Let's create the `kubevirt-hyperconverged` NS as below
+
+~~~
+oc create ns kubevirt-hyperconverged
+~~~
+
+Create the OperatorGroup
+
+~~~yaml
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 cat <<EOF | oc create -f -
 apiVersion: operators.coreos.com/v1alpha2
 kind: OperatorGroup
@@ -245,11 +409,19 @@ metadata:
   name: hco-operatorgroup
   namespace: kubevirt-hyperconverged
 EOF
+<<<<<<< HEAD
 ```
 
 Create a Catalog Source backed by a grpc registry
 
 ```
+=======
+~~~
+
+Create a Catalog Source backed by a grpc registry
+
+~~~yaml
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 cat <<EOF | oc create -f -
 apiVersion: operators.coreos.com/v1alpha1
 kind: CatalogSource
@@ -263,6 +435,7 @@ spec:
   displayName: KubeVirt HyperConverged
   publisher: Red Hat
 EOF
+<<<<<<< HEAD
 ```
 Please wait until the `hco-catalogsource` pod comes up
 
@@ -289,6 +462,33 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 We can verify the same from the CLI:
 
 ```
+=======
+~~~
+
+Please, wait until the `hco-catalogsource` pod comes up
+
+Next step, is to create a subscription, we can create a subscription from the OpenShift 4 web interface as shown below:
+
+![Subscription](../assets/HCO/subscription.png)
+
+Once subscribed, we can create a kubevirt HyperConverged Operator from UI:
+
+![Creating-Subscription](../assets/HCO/Screenshot%20from%202019-05-08%2014-02-31.png)
+
+Wait until the `virt-operator`, `cdi-operator` and `cluster-network-addons-operator` comes up.
+
+After they are up, its now time to launch the HCO-Custom Resource itself:
+
+![HCO-CR](../assets/HCO/Screenshot%20from%202019-05-08%2014-04-48.png)
+
+Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can see all the pods are up and running:
+
+![HCO-Managed-Operators](../assets/HCO/Screenshot%20from%202019-05-08%2014-12-54.png)
+
+We can verify the same from the CLI:
+
+~~~
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 oc get pods -n kubevirt-hyperconverged
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-b5v8n                     1/1     Running   0          4m5s
@@ -309,12 +509,22 @@ virt-handler-ns97x                                 1/1     Running   0          
 virt-handler-q7wbh                                 1/1     Running   0          2m32s
 virt-operator-87d7c98b-mh8pg                       1/1     Running   0          4m55s
 virt-operator-87d7c98b-p6mbd                       1/1     Running   0          4m55s
+<<<<<<< HEAD
 ```
 We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
 
 ![HCO-Managed-Operators](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/HCO-Managed-Operators.png)
 
 The above method demonstrates the integration of HCO operator in Openshift4.
+=======
+~~~
+
+We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
+
+![HCO-Managed-Operators](../assets/HCO/HCO-Managed-Operators.png)
+
+The above method demonstrates the integration of HCO operator in OpenShift 4.
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
 
 So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
 
@@ -322,6 +532,7 @@ So, after HCO is up and running we need to test it by deploying a small instance
 
 What to expect next ?
 
+<<<<<<< HEAD
 HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object as seen above.
 
 Now, we can also launch the HCO through OLM. 
@@ -333,3 +544,13 @@ Once we publish operators through Marketplace|operatorhub.io, it will be availab
 
 
 
+=======
+HCO achieved its goal which was to provide a single entry point for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object as seen above.
+
+Now, we can also launch the HCO through OLM.
+
+**Note**:
+Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
+
+Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
+>>>>>>> c38b92460ce99bf7e2f20e36335aa7eb48c101f0
