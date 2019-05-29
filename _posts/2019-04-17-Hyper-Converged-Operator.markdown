@@ -291,12 +291,15 @@ Once subscribed, we can create a kubevirt Hyperconverged Operator from UI:
 
 ![Creating-Subscription](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-02-31.png)
 
-Wait until the `virt-operator`, `cdi-operator` and `cluster-network-addons-operator` comes up. 
+Install the HCO Operator: 
+
+![Installed-HCO](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-03-57.png) 
+
+Please wait until the `virt-operator`, `cdi-operator` and `cluster-network-addons-operator` comes up. 
 
 After they are up, its now time to launch the HCO-Custom Resource itself:
 
 ![HCO-CR](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-04-48.png)
-
 
 Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can see all the pods are up and running:
 
