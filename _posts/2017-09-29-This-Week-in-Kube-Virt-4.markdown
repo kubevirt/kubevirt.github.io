@@ -23,7 +23,7 @@ We are currently driven by
 This week you can find us at:
 
 -   Ohio Linux Fest (@stu-gott) "KubeVirt, Virtual Machine Management
-    Using Kubernetes" <https://ohiolinux.org/schedule/>
+    Using Kubernetes" <https://ohiolinux.org>
 
 This week we achieved to:
 
