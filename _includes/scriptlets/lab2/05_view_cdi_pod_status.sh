@@ -1,1 +1,1 @@
-kubectl get pods -n kube-system
+kubectl get pods -n cdi
