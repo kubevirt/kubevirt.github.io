@@ -35,58 +35,8 @@ ip-10-0-156-213.us-east-2.compute.internal   Ready    master   15m   v1.13.4+278
 ip-10-0-163-116.us-east-2.compute.internal   Ready    master   15m   v1.13.4+27816e1b1
 ip-10-0-164-160.us-east-2.compute.internal   Ready    worker   15m   v1.13.4+27816e1b1
 ~~~
+To test the node eviction, there are mainly two methods. 
 
-We need to deploy the HyperConvergedClusterOperator, the gist for the same can be found [here](https://gist.github.com/rthallisey/ed3417bc7f14f264030d26fee4032092)
-
-~~~
-$ curl https://gist.github.com/rthallisey/ed3417bc7f14f264030d26fee4032092 
-.
-.
-.
-+ echo 'Launching CNV...'
-Launching CNV...
-+ cat
-+ oc create -f -
-hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
-~~~
-
-Observe the resources that get created after the HCO is installed
-
-~~~
-$oc get pods -n kubevirt-hyperconverged
-NAME                                               READY   STATUS    RESTARTS   AGE
-cdi-apiserver-769fcc7bdf-xgpt8                     1/1     Running   0          12m
-cdi-deployment-8b64c5585-gq46b                     1/1     Running   0          12m
-cdi-operator-77b8847b96-kx8rx                      1/1     Running   0          13m
-cdi-uploadproxy-8dcdcbff-47lng                     1/1     Running   0          12m
-cluster-network-addons-operator-584dff99b8-2c96w   1/1     Running   0          13m
-hco-operator-59b559bd44-vpznq                      1/1     Running   0          13m
-kubevirt-ssp-operator-67b78446f7-b9klr             1/1     Running   0          13m
-kubevirt-web-ui-operator-9df6b67d9-f5l4l           1/1     Running   0          13m
-**node-maintenance-operator-6b464dc85-zd6nt**    **1/1** **Running** **0**    **13m**
-virt-api-7655b9696f-g48p8                          1/1     Running   1          12m
-virt-api-7655b9696f-zfsw9                          1/1     Running   0          12m
-virt-controller-7c4584f4bc-6lmxq                   1/1     Running   0          11m
-virt-controller-7c4584f4bc-6m62t                   1/1     Running   0          11m
-virt-handler-cfm5d                                 1/1     Running   0          11m
-virt-handler-ff6c8                                 1/1     Running   0          11m
-virt-handler-mcl7r                                 1/1     Running   1          11m
-virt-operator-87d7c98b-fvvzt                       1/1     Running   0          13m
-virt-operator-87d7c98b-xzc42                       1/1     Running   0          13m
-virt-template-validator-76cbbd6f68-5fbzx           1/1     Running   0          12m
-~~~
-
-As seen from above HCO deploys the `node-maintenance-operator`. 
-
-Next,Let's install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps [here](https://kubevirt.io//quickstart_minikube/#deploy-kubevirt) and deploy a VMI as explained.
-
-~~~
-$oc get vms
-NAME     AGE     RUNNING   VOLUME
-testvm   2m13s   true      
-~~~
-
-Now to evict the pods(every VMI is backed by a pod) we can either use:
 
 - Method1: Use kubectl node drain command: 
 
@@ -130,14 +80,63 @@ or in the case of OpenShift
 oc adm uncordon <node name>
 ```
 
-- **Method2:** Deploy a node-maintenance-operator CR: As seen from above NMO is deployed from HCO, The purpose of this operator is to watch the node maintenance CustomResource(CR) called `NodeMaintenance` which mainly contains the node that needs a maintenance and the reason for the same. The below actions are performed 
+- **Method2:** 
+We need to deploy the HyperConvergedClusterOperator, the gist for the same can be found [here](https://gist.github.com/rthallisey/ed3417bc7f14f264030d26fee4032092)
+
+~~~
+$ curl https://gist.github.com/rthallisey/ed3417bc7f14f264030d26fee4032092
+.
+.
+.
++ echo 'Launching CNV...'
+Launching CNV...
++ cat
++ oc create -f -
+hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
+~~~
+
+Observe the resources that get created after the HCO is installed
+~~~
+$oc get pods -n kubevirt-hyperconverged
+NAME                                               READY   STATUS    RESTARTS   AGE
+cdi-apiserver-769fcc7bdf-xgpt8                     1/1     Running   0          12m
+cdi-deployment-8b64c5585-gq46b                     1/1     Running   0          12m
+cdi-operator-77b8847b96-kx8rx                      1/1     Running   0          13m
+cdi-uploadproxy-8dcdcbff-47lng                     1/1     Running   0          12m
+cluster-network-addons-operator-584dff99b8-2c96w   1/1     Running   0          13m
+hco-operator-59b559bd44-vpznq                      1/1     Running   0          13m
+kubevirt-ssp-operator-67b78446f7-b9klr             1/1     Running   0          13m
+kubevirt-web-ui-operator-9df6b67d9-f5l4l           1/1     Running   0          13m
+**node-maintenance-operator-6b464dc85-zd6nt**    **1/1** **Running** **0**    **13m**
+virt-api-7655b9696f-g48p8                          1/1     Running   1          12m
+virt-api-7655b9696f-zfsw9                          1/1     Running   0          12m
+virt-controller-7c4584f4bc-6lmxq                   1/1     Running   0          11m
+virt-controller-7c4584f4bc-6m62t                   1/1     Running   0          11m
+virt-handler-cfm5d                                 1/1     Running   0          11m
+virt-handler-ff6c8                                 1/1     Running   0          11m
+virt-handler-mcl7r                                 1/1     Running   1          11m
+virt-operator-87d7c98b-fvvzt                       1/1     Running   0          13m
+virt-operator-87d7c98b-xzc42                       1/1     Running   0          13m
+virt-template-validator-76cbbd6f68-5fbzx           1/1     Running   0          12m
+~~~
+
+As seen from above HCO deploys the `node-maintenance-operator`.
+
+Next,Let's install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps [here](https://kubevirt.io//quickstart_minikube/#deploy-kubevirt) and deploy a VMI as explained.Please feel free to check the video that explains the [same](https://www.youtube.com/watch?v=LLNjyeB-3fI)
+~~~
+$oc get vms
+NAME     AGE     RUNNING   VOLUME
+testvm   2m13s   true
+~~~
+
+Deploy a node-maintenance-operator CR: As seen from above NMO is deployed from HCO, The purpose of this operator is to watch the node maintenance CustomResource(CR) called `NodeMaintenance` which mainly contains the node that needs a maintenance and the reason for the same. The below actions are performed 
 
 1. If a `NodeMaintenance` CR is created: Marks the node as unschedulable, cordons it and evicts all the pods from that node
 
 2. If a `NodeMaintenance` CR is deleted: Marks the node as schedulable, uncordons it, removes pod from maintenance.
 
 To install the NMO please follow the instructions from [NMO](https://github.com/kubevirt/node-maintenance-operator)
-
+Either use HCO to create NMO Operator or deploy NMO operator as shown below 
 After you follow the instructions:
 1. Create a CRD
 ~~~
@@ -203,9 +202,6 @@ NAME      READY   STATUS    RESTARTS   AGE   IP            NODE                 
 lab-pod   1/1     Running   0          16s   10.128.2.11   ip-10-0-165-139.us-east-2.compute.internal   <none>           <none>
 ~~~
 Note down the node name and edit the `nodemaintenance_cr.yaml` file and then issue the CR manifest which sends the node into maintenance.
-
-
-
 
 
 **Conclusion:**
