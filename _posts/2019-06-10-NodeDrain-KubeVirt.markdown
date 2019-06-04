@@ -191,25 +191,16 @@ spec:
   nodeName: <Node-Name>
   reason: "Test node maintenance"
 ~~~
-For testing purpose, we can deploy a nginx pod and a sample VM instance as shown:
-~~~
-kubectl run lab-pod --image=nginx --port=80 --labels="app=web,env=dev" --generator=run-pod/v1
-pod/lab-pod created
-~~~
-
-~~~
-oc get pods -o wide
-NAME      READY   STATUS    RESTARTS   AGE   IP            NODE                                         NOMINATED NODE   READINESS GATES
-lab-pod   1/1     Running   0          16s   10.128.2.11   ip-10-0-165-139.us-east-2.compute.internal   <none>           <none>
-~~~
+For testing purpose, we can deploy a sample VM instance as shown:
 
 ~~~
 kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
 ~~~
-
+Now start the VM `testvm`
 ~~~
 ./virtctl start testvm
 ~~~
+We can see that its up and running
 ~~~
 kubectl get vmis
 NAME     AGE   PHASE     IP            NODENAME
@@ -226,14 +217,15 @@ kubectl get vmis -o yaml testvm
     mac: 0a:58:0a:83:00:11
     name: default
   migrationMethod: BlockMigration
-  **nodeName: ip-10-0-173-203.us-east-2.compute.internal**
+  nodeName: ip-10-0-173-203.us-east-2.compute.internal    #NoteDown the nodeName
   phase: Running
 ~~~
 
 Note down the node name and edit the `nodemaintenance_cr.yaml` file and then issue the CR manifest which sends the node into maintenance.
 
 Now to evict the pods from the node `ip-10-0-173-203.us-east-2.compute.internal` , edit the `node-maintenance_cr.yaml` as shown 
----
+
+~~~
 cat deploy/crds/nodemaintenance_cr.yaml
 
 apiVersion: kubevirt.io/v1alpha1
@@ -244,27 +236,31 @@ spec:
   nodeName: ip-10-0-173-203.us-east-2.compute.internal
   reason: "Test node maintenance"
 
----
+~~~
 As soon as you apply the above CR , the current VM gets deployed in the other node,
 
 ~~~
 oc apply -f deploy/crds/nodemaintenance_cr.yaml
 nodemaintenance.kubevirt.io/nodemaintenance-xyz created
 ~~~
+
+Immediately evicts the VMI 
+
 ~~~
 kubectl get vmis
 NAME     AGE   PHASE        IP    NODENAME
 testvm   33s   Scheduling         
-~~~
+
 kubectl get vmis
 NAME     AGE    PHASE     IP            NODENAME
 testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.internal
 ~~~
+
 ~~~
 ip-10-0-173-203.us-east-2.compute.internal   Ready,SchedulingDisabled   worker 
 ~~~
 
-Clearly we can see that the previous node went into scheduling state and the VMI was evicted and placed into other node in the cluster. This demonstrates the node eviction using NMO.
+Clearly we can see that the previous node went into `SchedulingDisabled` state and the VMI was evicted and placed into other node in the cluster. This demonstrates the node eviction using NMO.
 
 **A few closing thoughts**
 
