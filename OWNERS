@@ -1,0 +1,13 @@
+filters:
+  "^_posts/.*":
+    labels:
+      - kind/blog
+  "^_(data|layouts|sass|css|js)/.*":
+    labels:
+      - kind/website
+reviewers:
+  - tripledes
+  - jparrill
+approvers:
+  - jparrill
+  - tripledes
