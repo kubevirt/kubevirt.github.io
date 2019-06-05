@@ -19,6 +19,8 @@
     "url": "https://github.com/kubevirt/kubevirt.github.ioissues"
   },
   "dependencies": {
-    "simple-jekyll-search": "^1.7.0"
+    "simple-jekyll-search": "^1.7.0",
+    "jekyll-sitemap": "^1.3.0"
+
   }
 }
