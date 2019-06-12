@@ -1,3 +1,4 @@
+#encoding: utf-8
 desc 'Generate HTML of Kubevirt.io'
 task :build do
     puts "Building"
