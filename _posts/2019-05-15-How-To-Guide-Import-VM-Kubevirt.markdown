@@ -54,6 +54,7 @@ virtctl start myvm
 # Stop the virtual machine:
 virtctl stop myvm
 ```
+
 Kubectl can be used for the same:
 
 ```shell
@@ -65,7 +66,8 @@ kubectl patch virtualmachine myvm --type merge -p \
 kubectl patch virtualmachine myvm --type merge -p \
     '{"spec":{"running":false}}'
 ```
-**VM defined in a `yaml` format:**
+
+# VM defined in a `yaml` format:
 
 In general, VM's can be defined as a `yaml` manifests and can be deployed as k8s objects, a simple example of a VM  in a yaml format is below:
 
@@ -107,13 +109,11 @@ spec:
         name: cloudinitdisk
 
 ```
+
 **Note**: 
 From the above manifest, `kind: VirtualMachine` states that its a VM object, `spec.domain.device.name` section and `spec.volumes.name` should match. In the later section of this Blog you will see how this is all gets connected in the context of CDI.
 
-**Note**:
-
 - More examples of a VM declared as a `yaml` manifest can be seen [here](https://github.com/kubevirt/kubevirt/tree/master/cluster/examples)
-
 - Please feel free to take a look at how to deploy VM as a K8s object by using kubevirt add-on using minikube [here](https://kubevirt.io//quickstart_minikube/)
 
 For detailed usage of Volumes, you can take a look at [here](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/disks-and-volumes.html)
@@ -130,12 +130,14 @@ Saving this manifest into vm.yaml and submitting it to Kubernetes will create th
 $ kubectl create -f vm.yaml
 virtualmachine "vm-cirros" created
 ```
+
 Since spec.running is set to false, no vmi will be created:
 
 ```shell
 $ kubectl get vmis
 No resources found.
 ```
+
 Let’s start the VirtualMachine:
 
 ```shell
@@ -199,11 +201,12 @@ Events:
   ----    ------            ----  ----                              -------
   Normal  SuccessfulCreate  15s   virtualmachine-controller  Created virtual machine: vm-cirros
 ```
+
 **Note**: For more detailed explanation check the link [here](https://kubevirt.io/user-guide/docs/latest/architecture/virtual-machine.html). 
 
 Since we were able to start and stop the VM instance, now lets shift our focus on importing the VM.
 
-**Creating Virtual Machines from local images with CDI and virtctl:**
+# Creating Virtual Machines from local images with CDI and virtctl:
 
 The [Containerized Data Importer (CDI)](https://github.com/kubevirt/containerized-data-importer) project provides facilities for enabling Persistent Volume Claims (PVCs) to be used as disks for KubeVirt VMs. The three main CDI use cases are:
 
@@ -226,24 +229,23 @@ kubectl create -f https://github.com/kubevirt/containerized-data-importer/releas
 **Expose cdi-uploadproxy service:**
 
 The cdi-uploadproxy service must be accessible from outside the cluster. Here are some ways to do that:
-
 - [NodePort Service](https://kubernetes.io/docs/concepts/services-networking/service/#nodeport)
-
 - [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
-
 - [Route](https://docs.openshift.com/container-platform/3.9/architecture/networking/routes.html)
 
 We can take a look at example manifests [here](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md)
 
 The supported image formats are:
 
+```shell
 - .img
 
 - .iso
 
 - .qcow2
 
-- Also compressed .tar, .gz and .xz of the above are supported.
+- Compressed .tar, .gz and .xz of the above formats are supported.
+```
 
 This Blog uses [this](http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img) [CirrOS](https://launchpad.net/cirros) Image(in a .img format)
 
@@ -280,7 +282,8 @@ Here, `virtctl image-upload` works by creating a PVC of the requested size, send
 ```shell
 virtctl image-upload --pvc-name=cirros-vm-disk --pvc-size=500Mi --image-path=/home/shegde/images/cirros-0.4.0-x86_64-disk.img --uploadproxy-url=<url to upload proxy service>
 ```
-**To create a VirtualMachineInstance from a PVC:**
+
+# To create a VirtualMachineInstance from a PVC:
 
 ```shell
 cat <<EOF | kubectl apply -f -
@@ -308,6 +311,7 @@ spec:
 status: {}
 EOF
 ```
+
 **Note**: As we are aware, the data inside are ephemeral meaning its lost when the VM restarts, in order to prevent that and provide a persistent data storage we use PVC.
 `persistentVolumeClaim` Allows connecting a PersistentVolumeClaim to a VM disk.
 
@@ -344,9 +348,9 @@ spec:
         claimName: mypvc
 ```
 
-**Connect to VirtualMachineInstance console**
+# Connect to VirtualMachineInstance console
 
-Use virtctl to connect to the newly create VirtualMachinInstance.
+Use virtctl to connect to the newly created VirtualMachineInstance.
 
 ```shell
 virtctl console cirros-vm
@@ -402,21 +406,20 @@ spec:
         http:
           url: http://cdi-http-import-server.kubevirt/images/alpine.iso
 ```
+
 From the above manifest the two main sections that needs an attention are **`source`** and **`pvc`**.
 
 The `source` part declares that there is a disk image living on an http server that we want to use as a volume for this VM. The `pvc` part declares the spec that should be used to create the pvc that hosts the source data.
 
 When this VM manifest is posted to the cluster, as part of the launch flow a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.
 
-**A few caveats to be considered before using DataVolumes:** 
+# A few caveats to be considered before using DataVolumes: 
 
 From the above manifest the two main sections that needs an attention are `source` and `pvc`.
 
 The `source` part declares that there is a disk image living on an http server that we want to use as a volume for this VM. The `pvc` part declares the spec that should be used to create the pvc that hosts the source data.
 
 When this VM manifest is posted to the cluster as part of the launch flow, a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.
-
-**A few caveats to be considered before using DataVolumes:**
 
 A DataVolume is a custom resource provided by the Containerized Data Importer (CDI) project. KubeVirt integrates with CDI in order to provide users a workflow for dynamically creating pvcs and importing data into those pvcs.
 
@@ -439,6 +442,7 @@ data:
   feature-gates: "DataVolumes"
 EOF
 ```
+
 This config map assumes KubeVirt will be installed in the kubevirt namespace. Change the namespace to suite your installation.
 
 First post the configmap above, then install KubeVirt. At that point DataVolume integration will be enabled.
