@@ -110,17 +110,23 @@ Under the Community page, depending on your content settings, you will be able t
 
 ## Test your changes in a local container
 
-### selinux labelling
-
-```
-# sudo chcon -Rt svirt_sandbox_file_t .
-```
-
 ### Run a jekyll container
 
-```
-sudo docker run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch
-```
+* On a SELinux enabled OS:
+
+    ```console
+    cd kubevirt.github.io
+    sudo docker run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch
+    ```
+    
+    **NOTE**: Be sure to cd into the *kubevirt.github.io* directory before running the above command as the Z at the end of the volume (-v) will relabel its contents so it can be written from within the container, like running `chcon -Rt svirt_sandbox_file_t -l s0:c1,c2` yourself.
+
+* On an OS without SELinux:
+
+    ```console
+    cd kubevirt.github.io
+    sudo docker run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch
+    ```
 
 ### View the site
 
