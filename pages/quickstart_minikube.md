@@ -6,6 +6,15 @@ redirect_from: "/get_kubevirt/"
 order: 2
 ---
 
+# Easy install using minikube
+
+In Step 1, we guide you through setting up your environment to launch Kubernetes via minikube
+
+After it's ready, dive into the two labs below to help you get
+acquainted with KubeVirt.
+
+## Step 1: Prepare minikube environment
+
 This guide will help you deploying [KubeVirt](https://kubevirt.io) on
 Kubernetes, we'll be using
 [Minikube](https://github.com/kubernetes/minikube/){:target="_blank"}.
@@ -23,7 +32,7 @@ Finally, you'll need *kubectl* installed (*), it can be downloaded from [here](h
 
 _(*): Ensure that *kubectl* version complies with the [supported release skew](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew) (The version of kubectl should be close to Kubernetes server version)._
 
-## Start Minikube
+### Start Minikube
 
 Before starting with Minikube, let's verify whether nested virtualization is enabled on the
 host where Minikube is being installed on:
@@ -60,7 +69,7 @@ We're ready to start the Minikube VM:
 {% include scriptlets/quickstart_minikube/03_start_minikube.sh -%}
 ```
 
-## Deploy KubeVirt Operator
+### Deploy KubeVirt Operator
 
 Having the Minikube VM is up and running, let's set the *version* environment
 variable that will be used on few commands:
@@ -90,7 +99,7 @@ We'll need to execute the command above few times (or add *-w* for *watching*
 the pods), until the operator is *Running* and *Ready* (1/1), then it's time
 to head to the next section.
 
-## Check for the Virtualization Extensions
+### Check for the Virtualization Extensions
 
 To check if your VM's CPU supports virtualization extensions execute the
 following command:
@@ -106,7 +115,7 @@ so that KubeVirt uses emulation mode, otherwise skip to the next section:
 {% include scriptlets/quickstart_minikube/08_emulate_vm_extensions.sh -%}
 ```
 
-## Deploy KubeVirt
+### Deploy KubeVirt
 
 KubeVirt is then deployed by creating a dedicated custom resource:
 
@@ -133,7 +142,7 @@ actual KubeVirt pods (*virt-api*, *virt-controller* and *virt-handler*). Again
 we'll need to execute the command until everything is *up&running*
 (or use *-w*).
 
-## Install virtctl
+### Install virtctl
 
 An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
 The tool is called *virtctl* and can be retrieved from the release page of KubeVirt:
@@ -142,68 +151,35 @@ The tool is called *virtctl* and can be retrieved from the release page of KubeV
 {% include scriptlets/quickstart_minikube/11_get_virtctl.sh -%}
 ```
 
-## Deploy a VirtualMachine
+### Clean Up (after lab cleanups):
 
-Now that KubeVirt is ready, let's deploy our first VM:
-
-```bash
-{% include scriptlets/quickstart_minikube/12_create_vm.sh -%}
-```
-
-Using *kubectl* we can get the object and its YAML definition:
-
-```bash
-{% include scriptlets/quickstart_minikube/13_get_vms.sh -%}
-{% include scriptlets/quickstart_minikube/14_get_vms_yaml.sh -%}
-```
-
-**Note** the field *running* is set to *false*, that means we've only defined
-the object but it now needs to be instantiated. So let's start the VM:
-
-```bash
-{% include scriptlets/quickstart_minikube/15_virtctl_start_vm.sh -%}
-```
-
-Then again, using *kubectl*, let's query for the VM instance:
-
-```bash
-{% include scriptlets/quickstart_minikube/16_get_vmis.sh -%}
-{% include scriptlets/quickstart_minikube/17_get_vmis_yaml.sh -%}
-```
-
-**Note** the added *i*, as it stands for *VirtualMachineInstance*. Now, pay
-attention to the *phase* field, its value will be transitioning from one state
-to the next, indicating VMI progress to finish being set to *Running*.
-
-Using again *virtctl*, let's connect to the VMI consoles interfaces:
-
-```bash
-{% include scriptlets/quickstart_minikube/18_virtctl_serial_console.sh -%}
-{% include scriptlets/quickstart_minikube/19_virtctl_vnc_console.sh -%}
-```
-
-Remember that for exiting from the *console* to hit *Ctrl+]* (Control plus
-closing square bracket).
-
-**Note**: VNC requires *remote-viewer* from the *virt-viewer* package
-installed on the host.
-
-## Clean Up:
-
-Let's stop the VM instance:
-
-```bash
-{% include scriptlets/quickstart_minikube/20_virtctl_stop_vm.sh -%}
-```
-
-Delete the VM:
-
-```bash
-{% include scriptlets/quickstart_minikube/21_kubectl_delete_vm.sh -%}
-```
-
-Delete the VM:
+Delete the Kubevirt from minikube:
 
 ```bash
 {% include scriptlets/quickstart_minikube/22_minikube_delete.sh -%}
 ```
+
+## Step 2: KubeVirt labs
+
+After you have connected to your instance through SSH, you can
+work through a couple of labs to help you get acquainted with KubeVirt
+and how to use it to create and deploy VMs with Kubernetes.
+
+The first lab is ["Use KubeVirt"](../labs/kubernetes/lab1). This lab walks you
+through the creation of a Virtual Machine instance on Kubernetes and then
+shows you how to use virtctl to interact with its console.
+
+The second lab is ["Experiment with CDI"](../labs/kubernetes/lab2). This
+lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
+(CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
+(PVC) and then how to define a VM to make use of the PVC.
+
+## Found a bug?
+
+We are interested in hearing about your experience.
+
+If you encounter an issue with deploying your cloud instance or if
+Kubernetes or KubeVirt did not install correctly, please report it to
+the [cloud-image-builder issue tracker](https://github.com/kubevirt/cloud-image-builder/issues){:target="_blank"}.
+
+If experience a problem with the labs, please report it to the [kubevirt.io issue tracker](https://github.com/kubevirt/kubevirt.github.io/issues){:target="_blank"}.

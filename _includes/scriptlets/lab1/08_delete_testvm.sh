@@ -1,1 +1,1 @@
-kubectl delete vms testvm
+kubectl delete vm testvm
