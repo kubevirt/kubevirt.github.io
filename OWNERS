@@ -1,21 +1,22 @@
 filters:
+  ".*":
+    reviewers:
+      - jparrill
+      - codificat
+      - iranzo
+      - karmab
+      - tripledes
+      - joeldavis84
+      - DirectedSoul1
+    approvers:
+      - jparrill
+      - tripledes
+      - codificat
+      - iranzo
+      - karmab
   "^_posts/.*":
     labels:
       - kind/blog
   "^_(data|layouts|sass|css|js)/.*":
     labels:
       - kind/website
-reviewers:
-  - jparrill
-  - codificat
-  - iranzo
-  - karmab
-  - tripledes
-  - joeldavis84
-  - DirectedSoul1
-approvers:
-  - jparrill
-  - tripledes
-  - codificat
-  - iranzo
-  - karmab
