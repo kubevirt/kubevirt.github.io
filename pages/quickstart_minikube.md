@@ -151,6 +151,30 @@ The tool is called *virtctl* and can be retrieved from the release page of KubeV
 {% include scriptlets/quickstart_minikube/11_get_virtctl.sh -%}
 ```
 
+If [`krew` plugin manager](https://krew.dev/) is [installed](https://github.com/kubernetes-sigs/krew/#installation), `virtctl` can be installed via `krew`:
+
+```bash
+$ kubectl krew install virt
+```
+
+Then `virtctl` can be used as a kubectl plugin. For a list of available commands run:
+
+```bash
+$ kubectl virt help
+```
+
+Every occurrence throughout this guide of
+
+```bash
+$ ./virtctl <command>...
+```
+
+should then be read as
+
+```bash
+$ kubectl virt <command>...
+```
+
 ### Clean Up (after lab cleanups):
 
 Delete the Kubevirt from minikube:
