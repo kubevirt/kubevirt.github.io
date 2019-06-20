@@ -10,17 +10,19 @@ category: news
 
 # Importing a VM into the Kubernetes Native Environment
 
-Motivation: Kubernetes have become the new way to orchestrate the containers and to handle the microservice architecture, but what if I already have legacy apps running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well if that is the usecase for you then we have a solution now with kubevirt.
+Motivation: Kubernetes has become the new way to orchestrate the containers and to handle the microservices, but what if I already have applications running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well, if that is the usecase for you then we have a solution now with kubevirt.
 
-In this blog post we will discuss about how to deploy VM as a yaml template and steps on how to import it as a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) onto your kubernetes environment using the CDI and kubevirt add-ons.
+In this blog post we will show you how to deploy a VM as a yaml template and steps on how to import it as a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) onto your kubernetes environment using the CDI and kubevirt add-ons.
 
 **Assumptions:**
 
 - A basic understanding of the k8s architecture: In its simplest terms Kubernetes is a portable, extensible open-source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available. For complete details check [Kubernetes-architecture](https://www.aquasec.com/wiki/display/containers/Kubernetes+Architecture+101)
 
-- User is familiar with the concept of a [virsh based VM](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-guest_virtual_machine_installation_overview-creating_guests_with_virt_install)
+- User is familiar with the concept of a [Libvirt based VM](https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-guest_virtual_machine_installation_overview-creating_guests_with_virt_install)
 
-- PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator. It is a resource in the cluster just like a node is a cluster resource. PVs are volume plugins like Volumes, but have a lifecycle independent of any individual pod that uses the PV. This API object captures the details of the implementation of the storage, be that NFS, iSCSI, or a cloud-provider-specific storage system. [Persistent Volume(PV)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) and Persistent Volume Claim PersistentVolumeClaim (PVC) is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources. Pods can request specific levels of resources (CPU and Memory). Claims can request specific size and access modes (e.g., can be mounted once read/write or many times read-only). [Persistent Volume Claim(PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
+- PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator. Feel free to check more on [Persistent Volume(PV)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/).  
+
+- Persistent Volume Claim (PVC) is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources. Feel free to check more on [Persistent Volume Claim(PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
 
 - User is familiar with the concept of [kubevirt-architecture](https://github.com/kubevirt/kubevirt/blob/master/docs/architecture.md) and [CDI-architecture](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design)
 
@@ -29,17 +31,8 @@ In this blog post we will discuss about how to deploy VM as a yaml template and 
 # Virtual machines:
 
 **Virtual machines:**
-A VirtualMachine provides additional management capabilities to a VirtualMachineInstance inside the cluster. That includes:
 
-- ABI stability
-
-- Start/stop/restart capabilities on the controller level
-
-- Offline configuration change with propagation on VirtualMachineInstance recreation
-
-- Ensure that the VirtualMachineInstance is running if it should be running
-
-It focuses on a 1:1 relationship between the controller instance and a virtual machine instance. In many ways it is very similar to a StatefulSet with spec.replica set to 1.
+A VirtualMachine provides additional management capabilities to a VirtualMachineInstance inside the cluster. Read more about VM [here](https://kubevirt.io/user-guide/docs/latest/architecture/virtual-machine.html)
 
 # How to use a VirtualMachine:
 
@@ -113,7 +106,6 @@ spec:
 **Note**: 
 From the above manifest, `kind: VirtualMachine` states that its a VM object, `spec.domain.device.name` section and `spec.volumes.name` should match. In the later section of this Blog you will see how this is all gets connected in the context of CDI.
 
-- More examples of a VM declared as a `yaml` manifest can be seen [here](https://github.com/kubevirt/kubevirt/tree/master/cluster/examples)
 - Please feel free to take a look at how to deploy VM as a K8s object by using kubevirt add-on using minikube [here](https://kubevirt.io//quickstart_minikube/)
 
 For detailed usage of Volumes, you can take a look at [here](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/disks-and-volumes.html)
@@ -122,7 +114,6 @@ Now, we have seen how a VM can be declared as a yaml object inside kubernetes, w
 
 A VirtualMachine will make sure that a VirtualMachineInstance object with an identical name will be present in the cluster, if `spec.running` is set to `true`. Further it will make sure that a VirtualMachineInstance will be removed from the cluster if `spec.running` is set to `false`.
 
-There exists a field `spec.runStrategy` which can also be used to control the state of the associated VirtualMachineInstance object. To avoid confusing and contradictory states, these fields are mutually exclusive. An extended explanation of `spec.runStrategy` vs `spec.running` can be found in [Run Strategies](https://kubernetes.io/docs/tasks/run-application/run-single-instance-stateful-application/)
 
 Saving this manifest into vm.yaml and submitting it to Kubernetes will create the controller instance:
 
@@ -218,13 +209,7 @@ The [Containerized Data Importer (CDI)](https://github.com/kubevirt/containerize
 
 This document for now deals with the third use case and covers the HTTP based import use case at the end of the BlogPost. So you should have CDI installed in your cluster, a VM disk that you’d like to upload, and virtctl in your path.
 
-Lets begin by installing the latest CDI release [here](https://github.com/kubevirt/containerized-data-importer/releases) (currently v1.9.0)
-
-```shell
-VERSION=v1.9.0
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator.yaml
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$VERSION/cdi-operator-cr.yaml
-```
+Please follow the instructions for the installation of CDI [here](https://github.com/kubevirt/containerized-data-importer) (currently v1.9.0)
 
 **Expose cdi-uploadproxy service:**
 
