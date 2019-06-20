@@ -28,7 +28,7 @@ Of course, writing good integration tests (the stuff under the [tests](https://g
 There are several frameworks we use to write unit tests:
 - The tests themselves are written using [ginkgo](https://github.com/onsi/ginkgo), which is a [Behavior-Driven Development (BDD)](https://en.wikipedia.org/wiki/Behavior-driven_development) framework
 - The library used for assertions in the tests is [gomega](https://github.com/onsi/gomega). It has a very rich set of matchers, so, before you write you own code around the "equal" matcher, check [here](http://onsi.github.io/gomega/#provided-matchers) to see if there is a more expressive assertion you can use
-- We use [GoMock](https://github.com/golang/mock) to generate mocks for the different kubevirt interfaces and objects. The command `make generate` will (among other things) create a [file](https://github.com/kubevirt/kubevirt/blob/master/pkg/kubecli/generated_mock_kubevirt.go) holding the mocked version of our objects and interfaces
+- We use [GoMock](https://github.com/golang/mock) to generate mocks for the different kubevirt interfaces and objects. The command `make generate` will (among other things) create a [file](https://github.com/kubevirt/kubevirt/blob/master/staging/src/kubevirt.io/client-go/kubecli/generated_mock_kubevirt.go) holding the mocked version of our objects and interfaces
   - Many examples exist in our code on how to use this framework
   - Also see [here](https://github.com/golang/mock/tree/master/sample) for sample code from GoMock
 - If you need mocks for k8s objects and interfaces, use their framework. They have a tool called [client-gen](https://github.com/kubernetes/code-generator), which generates both the code and the mocks based on the defined APIs
