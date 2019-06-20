@@ -214,7 +214,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 
 **Note**: In Openshift we can use both `kubectl` and `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
-## You can read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
+## You can also read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
 
 - [CDI](../_posts/2018-10-10-CDI-DataVolumes.markdown)
 - [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
