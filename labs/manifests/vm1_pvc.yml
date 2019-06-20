@@ -12,10 +12,18 @@ spec:
     metadata:
       creationTimestamp: null
     spec:
+      networks:
+      - name: default
+        pod: {}
       domain:
         cpu:
           cores: 2
         devices:
+          interfaces:
+          - bridge: {}
+            name: default
+            ports:
+            - port: 22
           disks:
           - disk:
               bus: virtio
