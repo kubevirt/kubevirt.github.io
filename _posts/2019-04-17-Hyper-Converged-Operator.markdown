@@ -11,6 +11,7 @@ category: news
 # [HCO known as Hyper Converged Operator](https://github.com/kubevirt/hyperconverged-cluster-operator)  
 
 **Prerequisites:** 
+
  
 This Blog assumes that the reader is aware of the concept of Operators and how it works in K8's environment. Before proceeding further, feel free to take a look at this concept using [CoreOS BlogPost](https://coreos.com/blog/introducing-operators.html)
 
@@ -24,7 +25,9 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 ### Environment description
 
-We can use HCO both on [minikube](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/HCO-minikube.markdown) and also on Openshift4. I will be using Openshift4 for HCO in this Blog.   
+
+
+We can use HCO both on [minikube](https://github.com/DirectedSoul1/kubevirt.github.io/blob/newfeature-hco-ocp/_posts/2019-04-17-HCO-minikube.markdown) and also on Openshift4. I will be using Openshift4 for HCO in this Blog.   
 
 ## Deploying HCO on Openshift4 Cluster.
 
@@ -213,7 +216,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 
 ## You can read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
 
-- [CDI](https://github.com/kubevirt/kubevirt.github.io/blob/master/_posts/2018-10-10-CDI-DataVolumes.markdown)
+- [CDI](../_posts/2018-10-10-CDI-DataVolumes.markdown)
 - [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
 - [KubeVirt](http://kubevirt.io/quickstart_minikube/)
 - [ssp-operator](https://github.com/MarSik/kubevirt-ssp-operator)
