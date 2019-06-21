@@ -34,7 +34,7 @@ Fill in the following data:
 
 **Source:** cloud storage file
 
-**Cloud storage file:** kubevirt-button/vX.X.X.tar.gz (make sure to use latest one)
+**Cloud storage file:** kubevirt-button/vX.X.X.tar.gz (Browse to [https://console.cloud.google.com/storage/browser/kubevirt-button](https://console.cloud.google.com/storage/browser/kubevirt-button) to pick a version)
 
 ## Step 2: Create a new instance using the image you created
 
