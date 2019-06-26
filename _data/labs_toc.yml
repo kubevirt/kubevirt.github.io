@@ -1,14 +1,10 @@
 toc:
-  - title: AWS
+  - title: Installation
     subfolderitems:
       - page: Easy install using AWS
         url: pages/ec2.html
-  - title: GCP
-    subfolderitems:
       - page: Easy install using GCP
         url: pages/gcp.html
-  - title: Minikube
-    subfolderitems:
       - page: Easy install using Minikube
         url: quickstart_minikube/
   - title: Labs
