@@ -24,7 +24,7 @@ Create an SSH key that you will be using later.
 ssh-keygen -t rsa -N '' -f /root/.ssh/id_rsa
 ```
 
-Review the [`requirements.sh`](https://github.com/kubevirt/kubevirt-tutorial/blob/instructor-readme-update/administrator/requirements.sh) file. This script does the following:
+Review the [`requirements.sh`](https://github.com/kubevirt/kubevirt-tutorial/commits/211ec7ce8c7b4c5f33974d3d1ac9b9e8cd06d3ee/administrator/requirements.sh) file. This script does the following:
 
 - install *docker*, enable and start it as a service
 - install *oc* and *kubectl* client
