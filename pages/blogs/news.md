@@ -19,7 +19,7 @@ order: 10
       {% for post in site.posts %}
         {% if post.categories contains "news" %}
           <li>
-            <h2 href="{{ post.url | prepend: site.baseurl }}" class="posts-title">{{ post.title }}</h2>
+            <h2 class="posts-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
             <div class="posts-date">{{ post.pub-date }}, {{ post.pub-year }}</div>
               {{ post.description | strip_html | truncatewords:50 }}
               {% capture readmorelink %}
