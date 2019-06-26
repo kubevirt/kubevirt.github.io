@@ -7,6 +7,10 @@ toc:
     subfolderitems:
       - page: Easy install using GCP
         url: pages/gcp.html
+  - title: Minikube
+    subfolderitems:
+      - page: Easy install using Minikube
+        url: quickstart_minikube/
   - title: Labs
     subfolderitems:
       - page: Use KubeVirt

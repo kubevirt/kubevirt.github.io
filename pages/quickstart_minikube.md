@@ -1,9 +1,10 @@
 ---
-layout: page
+layout: labs
 title: KubeVirt Quickstart with Minikube
 permalink: /quickstart_minikube/
 redirect_from: "/get_kubevirt/"
 order: 2
+lab: kubernetes
 ---
 
 # Easy install using minikube
