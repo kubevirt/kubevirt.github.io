@@ -8,12 +8,14 @@ filters:
       - tripledes
       - joeldavis84
       - DirectedSoul1
+      - e-minguez
     approvers:
       - jparrill
       - tripledes
       - codificat
       - iranzo
       - karmab
+      - e-minguez
   "^_posts/.*":
     labels:
       - kind/blog
