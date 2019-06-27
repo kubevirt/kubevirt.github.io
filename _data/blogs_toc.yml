@@ -1,8 +1,8 @@
 toc:
   - title: Categories
     subfolderitems:
-      - page: Community
-        url: /blogs/community.html
+      # - page: Community
+      #   url: /blogs/community.html
       - page: News
         url: /blogs/news.html
       - page: Weekly Updates
