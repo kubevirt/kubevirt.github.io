@@ -1,5 +1,14 @@
-**HCO on minikube**
+---
+layout: post
+author: DirectedSoul
+description: Hyper Converged Operator on minikube
+navbar_active: Blogs
+pub-date: Apr 17
+pub-year: 2019
+category: news
+---
 
+**HCO on minikube**
 
 Minikube is a tool that makes it easy to run Kubernetes locally. Minikube runs a single-node Kubernetes cluster inside a VM on your laptop for users looking to try out Kubernetes or develop with it day-to-day. For testing Hyper Converged Operator I have deployed a single-node K8’s cluster with the name kubevirt-hco. This can be deployed using minikube:
 
