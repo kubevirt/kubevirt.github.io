@@ -1,7 +1,7 @@
 ---
 layout: post
 author: DirectedSoul
-description: Hyper Converged Operator on minikube
+description: Hyper Converged Operator(HCO) on minikube
 navbar_active: Blogs
 pub-date: Apr 17
 pub-year: 2019
