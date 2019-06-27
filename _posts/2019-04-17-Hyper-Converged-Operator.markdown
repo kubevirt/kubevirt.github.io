@@ -25,9 +25,7 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 ### Environment description
 
-
-
-We can use HCO both on [minikube](https://github.com/DirectedSoul1/kubevirt.github.io/blob/newfeature-hco-ocp/_posts/2019-04-17-HCO-minikube.markdown) and also on Openshift4. I will be using Openshift4 for HCO in this Blog.   
+We can use HCO both on [minikube]({% post_url 2019-04-17-HCO-minikube %}) and also on Openshift4. I will be using Openshift4 for HCO in this Blog.   
 
 ## Deploying HCO on Openshift4 Cluster.
 
@@ -216,7 +214,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 
 ## You can also read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
 
-- [CDI](../_posts/2018-10-10-CDI-DataVolumes.markdown)
+- [CDI]({% post_url 2018-10-10-CDI-DataVolumes %})
 - [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
 - [KubeVirt](http://kubevirt.io/quickstart_minikube/)
 - [ssp-operator](https://github.com/MarSik/kubevirt-ssp-operator)
@@ -288,25 +286,25 @@ Please wait until the `hco-catalogsource` pod comes up
 
 Next is to create a subscription, we can create a subscription from the Openshift4 web interface as shown below:
 
-![Subscription](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/subscription.png)
+![Subscription](../assets/subscription.png)
 
 Once subscribed, we can create a kubevirt Hyperconverged Operator from UI:
 
-![Creating-Subscription](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-02-31.png)
+![Creating-Subscription](../assets/2019-04-17-HyperConvergedOperator/kubevirt-hyperconverged-31.png)
 
 Install the HCO Operator: 
 
-![Installed-HCO](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-03-57.png) 
+![Installed-HCO](../assets/2019-04-17-HyperConvergedOperator/kubevirt-operator-57.png)
 
 Please wait until the `virt-operator`, `cdi-operator` and `cluster-network-addons-operator` comes up. 
 
 After they are up, its now time to launch the HCO-Custom Resource itself:
 
-![HCO-CR](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-04-48.png)
+![HCO-CR](../assets/2019-04-17-HyperConvergedOperator/Installed-operator-HCO-48.png)
 
 Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can see all the pods are up and running:
 
-![HCO-Managed-Operators](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/Screenshot%20from%202019-05-08%2014-12-54.png)
+![HCO-Managed-Operators](../assets/2019-04-17-HyperConvergedOperator/status-pods-54.png)
 
 We can verify the same from the CLI:
 
@@ -335,7 +333,7 @@ virt-operator-87d7c98b-p6mbd                       1/1     Running   0          
 
 We can see how OLM operator manages the HCO pods from the `openshift-operator-lifecycle-manager` NS:
 
-![HCO-Managed-Operators](https://github.com/DirectedSoul1/kubevirt.github.io/blob/master/_layouts/HCO-Managed-Operators.png)
+![HCO-Managed-Operators](../assets/2019-04-17-HyperConvergedOperator/HCO-Managed-Operators.png)
 
 The above method demonstrates the integration of HCO operator in Openshift4.
 
