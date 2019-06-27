@@ -286,7 +286,7 @@ Please wait until the `hco-catalogsource` pod comes up
 
 Next is to create a subscription, we can create a subscription from the Openshift4 web interface as shown below:
 
-![Subscription](../assets/subscription.png)
+![Subscription](../assets/2019-04-17-HyperConvergedOperator/subscription.png)
 
 Once subscribed, we can create a kubevirt Hyperconverged Operator from UI:
 
