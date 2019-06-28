@@ -2,9 +2,11 @@
 # Description: This script generates markdown files for each release of kubevirt in repository
 # Generated markdown files should be stored under _posts/ for website rendering
 
-[[ -e kubevirt ]] || git clone git@github.com:kubevirt/kubevirt.git
-git -C kubevirt checkout master
-git -C kubevirt pull --tags
+TARGET='build'
+mkdir -p build/artifacts
+[[ -e build/kubevirt ]] || git clone git@github.com:kubevirt/kubevirt.git build/
+git -C build/kubevirt checkout master
+git -C build/kubevirt pull --tags
 
 releases() {
 git -C kubevirt tag | sort -rV | while read TAG ;
@@ -56,7 +58,7 @@ EOF
     month=$(date --date="$newdate" '+%m')
     monthname=$(LANG=C date --date="$newdate" '+%B')
     day=$(date --date="$newdate" '+%d')
-    NEWFILENAME="$year-$month-$day-$FILENAME"
+    NEWFILENAME="build/artifacts/$year-$month-$day-$FILENAME"
     mv $FILENAME $NEWFILENAME
     sed -i "s#^pub-date:.*#pub-date: $monthname#g" "$NEWFILENAME"
     sed -i "s#^pub-year:.*#pub-year: $year#g" "$NEWFILENAME"
@@ -65,3 +67,11 @@ EOF
 }
 
 gen_changelog
+
+for file in build/artifacts/*.md; do
+[ -f $(filename _posts/$file) ] || mv $file _posts/
+done
+
+git add _posts/
+git commit -m "Release autobot 🤖"
+git push
