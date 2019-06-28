@@ -3,13 +3,13 @@
 # Generated markdown files should be stored under _posts/ for website rendering
 
 TARGET='build'
-mkdir -p build/artifacts
-[[ -e build/kubevirt ]] || git clone git@github.com:kubevirt/kubevirt.git build/
+mkdir -p build/artifacts || continue
+[[ -e build/kubevirt ]] || git clone https://github.com/kubevirt/kubevirt.git build/kubevirt/
 git -C build/kubevirt checkout master
 git -C build/kubevirt pull --tags
 
 releases() {
-git -C kubevirt tag | sort -rV | while read TAG ;
+git -C build/kubevirt tag | sort -rV | while read TAG ;
 do
   [[ "$TAG" =~ [0-9].0$ ]] || continue ;
   # Skip following releases as there's a manual article for them
@@ -21,9 +21,9 @@ done
 
 features_for() {
   echo -e  ""
-  git -C kubevirt show $1 | grep Date: | head -n1 | sed "s/Date:\s\+/Released on: /"
+  git -C build/kubevirt show $1 | grep Date: | head -n1 | sed "s/Date:\s\+/Released on: /"
   echo -e  ""
-  git -C kubevirt show $1 | sed -n "/changes$/,/Contributors/ p" | egrep "^- " ;
+  git -C build/kubevirt show $1 | sed -n "/changes$/,/Contributors/ p" | egrep "^- " ;
 }
 
 gen_changelog() {
@@ -68,10 +68,10 @@ EOF
 
 gen_changelog
 
-for file in build/artifacts/*.md; do
-[ -f $(filename _posts/$file) ] || mv $file _posts/
+for file in build/artifacts/*.markdown; do
+[ -f _posts/$(basename $file) ] || mv $file _posts/
 done
 
 git add _posts/
-git commit -m "Release autobot 🤖"
+git commit -m "Release autobot 🚗---->🤖"
 git push
