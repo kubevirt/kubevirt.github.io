@@ -7,7 +7,6 @@ filters:
       - karmab
       - tripledes
       - joeldavis84
-      - DirectedSoul1
       - e-minguez
     approvers:
       - jparrill
