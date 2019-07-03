@@ -10,6 +10,10 @@ nav:
   - title: Docs
     url: //kubevirt.io/user-guide
 
+  - title: Labs
+    page: Labs
+    url: /labs/
+
   - title: Community
     page: Community
     url: /community/
