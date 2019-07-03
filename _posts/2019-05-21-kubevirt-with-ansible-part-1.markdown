@@ -13,7 +13,7 @@ comments: true
 KubeVirt is a great solution for migrating existing workloads towards Kubernetes without having to containerize
 everything all at once (or at all).
 If some parts of your system can run as pods, while others are perfectly fine as virtual machines, KubeVirt is the
-technology that will let you seamlessly run both in a single cluster.
+technology that lets you seamlessly run both in a single cluster.
 
 And with the recent release of Ansible 2.8 containing a new set of dedicated modules, it's now possible to treat KubeVirt
 just like any other ansible–supported VM hosting system. Already an Ansible user? Or maybe still researching your options?
@@ -24,12 +24,16 @@ This series of posts should give you a good primer on how combining both technol
 While it's possible to specify the connection and authentication details of your k8s cluster directly in the
 playbook, for the purpose of this introduction, we'll assume you have a working kubeconfig file in your system. If
 running `kubectl get nodes` correctly returns a list of nodes and you've already deployed KubeVirt, then you're
-good to go. If not, here's a [KubeVirt quickstart (with Minikube)](/quickstart_minikube/).
+good to go. If not, here's a [KubeVirt quickstart (with Minikube)][quickstart minikube].
+
+[quickstart minikube]: https://kubevirt.io/quickstart_minikube/
 
 ## Basic VM management
 
-Before we get down to the yaml, please keep in mind that this post contains only the most interesting bits of the playbooks.
-To get actually runnable versions of each example, take a look at [this code repository](https://github.com/mmazur/ansible-kubevirt-examples/tree/master/blog1).
+Before we get down to the YAML, please keep in mind that this post contains only the most interesting bits of the playbooks.
+To get actually runnable versions of each example, take a look at [this code repository][examples repo].
+
+[examples repo]: https://github.com/kubevirt/ansible-kubevirt-modules/tree/master/examples/blog/part1
 
 Let's start with creating the most basic VM by utilizing the *kubevirt_vm* module, like so:
 
@@ -125,7 +129,7 @@ currently is in (the VM is already running) then nothing will change, no matter 
 __NOTE:__ Kubernetes versions prior to 1.12 contain a bug that might report operations that didn't really do anything as having
 changed things. If your second (and third, etc.) run of `01_vm1_running.yaml` keep reporting `changed=1`, this might be the reason why.
 
-Let's finish with cleaning up after ourselves by removing _vm1_. First the relevant yaml:
+Let's finish with cleaning up after ourselves by removing _vm1_. First the relevant YAML:
 
 ```yaml
 kubevirt_vm:
@@ -152,5 +156,6 @@ Just like before, if you run the playbook a few more times, the _play recap_ wil
 
 ## Next
 
-This concludes the introduction. Next time we'll investigate some more advanced topics.
+Please read [part two][part 2] for a wider overview of available features.
 
+[part 2]: https://kubevirt.io/2019/kubevirt-with-ansible-part-2.html
