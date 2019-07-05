@@ -13,13 +13,13 @@ comments: true
 [Part 1][blog part 1] contained a short introduction to basic VM management with Ansible's `kubevirt_vm` module.
 This time we'll paint a more complete picture of all the features on offer.
 
-As before, examples found herein are also available as full working playbooks in our 
-[playbooks example repository][blog examples]. 
+As before, examples found herein are also available as full working playbooks in our
+[playbooks example repository][blog examples].
 Additionally, each section of this post links to the corresponding module's Ansible documentation page.
-Those pages always contain an _Examples_ section, which the reader is encouraged to look through, as they have 
+Those pages always contain an _Examples_ section, which the reader is encouraged to look through, as they have
 many more ways of using the modules than can reasonably fit here.
 
-[blog part 1]: https://kubevirt.io/2019/kubevirt-with-ansible-part-1.html
+[blog part 1]: {% post_url 2019-05-21-kubevirt-with-ansible-part-1 %}
 [blog examples]: https://github.com/kubevirt/ansible-kubevirt-modules/tree/master/examples/blog
 
 
@@ -34,17 +34,17 @@ Virtual machines managed by KubeVirt are highly customizable. Among the features
 * direct DataVolumes support (`datavolumes`),
 * and OpenShift Templates support (`template`).
 
-[datavols]: https://kubevirt.io/2018/CDI-DataVolumes.html
+[datavols]: {% post_url 2018-10-10-CDI-DataVolumes %}
 
 ### Further resources
 
 * [Ansible module documentation](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html)
   * [Examples, lots of examples](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html#examples)
 * DataVolumes
-  * [Introductory blog post](https://kubevirt.io/2018/attaching-to-multiple-networks.html)
+  * [Introductory blog post]({% post_url 2018-10-10-CDI-DataVolumes %})
   * [Upstream documentation](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md)
 * Multus
-  * [Introductory blog post](https://kubevirt.io/2018/attaching-to-multiple-networks.html)
+  * [Introductory blog post]({% post_url 2018-09-12-attaching-to-multiple-networks %})
   * [GitHub repo](https://github.com/intel/multus-cni)
 
 
@@ -206,4 +206,3 @@ VM presets to be used by deployed VMs,
 templating mechanism, when running on top of OpenShift or OKD,
 * and [kubevirt_rs](https://docs.ansible.com/ansible/latest/modules/kubevirt_rs_module.html) lets one configure KubeVirt's
 own ReplicaSets for running multiple instances of a specified virtual machine.
-
