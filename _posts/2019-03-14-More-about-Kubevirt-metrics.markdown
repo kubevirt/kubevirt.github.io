@@ -11,11 +11,11 @@ comments: true
 
 # More about KubeVirt and Prometheus metrics
 
-In this blog post, we update about the KubeVirt metrics, continuing [the series started earlier this year](https://kubevirt.io/2019/An-overview-to-KubeVirt-metrics.html).
+In this blog post, we update about the KubeVirt metrics, continuing [the series started earlier this year]({% post_url 2019-01-22-An-overview-to-KubeVirt-metrics %}).
 Since the previous post, the [initial groundwork and first set of metrics](https://github.com/kubevirt/kubevirt/pull/1840) was merged, and it is expected
 to be available with KubeVirt v0.15.0 and onwards.
 
-Make sure you followed [the steps described in the previous post](https://kubevirt.io/2019/An-overview-to-KubeVirt-metrics.html) to set up properly the monitoring stack
+Make sure you followed [the steps described in the previous post]({% post_url 2019-01-22-An-overview-to-KubeVirt-metrics %}) to set up properly the monitoring stack
 in your KubeVirt-powered cluster.
 
 ## New metrics
