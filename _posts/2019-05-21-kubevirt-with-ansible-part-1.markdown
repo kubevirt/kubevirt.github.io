@@ -147,7 +147,7 @@ TASK [Delete the vm] ***********************************************************
 changed: [localhost]
 
 PLAY RECAP ********************************************************************************************************
-localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0 
+localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
 Now the VM is gone, which running `kubectl get vms -n default` will confirm.
@@ -158,4 +158,4 @@ Just like before, if you run the playbook a few more times, the _play recap_ wil
 
 Please read [part two][part 2] for a wider overview of available features.
 
-[part 2]: https://kubevirt.io/2019/kubevirt-with-ansible-part-2.html
+[part 2]: {% post_url 2019-07-08-kubevirt-with-ansible-part-2 %}
