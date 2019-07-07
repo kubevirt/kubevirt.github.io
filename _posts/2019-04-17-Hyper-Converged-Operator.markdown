@@ -347,7 +347,7 @@ HCO achieved its goal which was to provide a single entrypoint for multiple oper
 Now, we can also launch the HCO through OLM. 
 
 **Note**: 
-Until we publish (and consume) the HCO and component operators through Marketplace[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
+Until we publish (and consume) the HCO and component operators through [operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
 
 Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
 
