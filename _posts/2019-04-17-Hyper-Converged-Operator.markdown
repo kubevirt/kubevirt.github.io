@@ -1,7 +1,7 @@
 ---
 layout: post
 author: DirectedSoul
-description: Hyper Converged Operator on OCP4 and K8s(HCO) 
+description: Hyper Converged Operator on OCP 4 and K8s(HCO) 
 navbar_active: Blogs
 pub-date: May 08
 pub-year: 2019
@@ -11,7 +11,6 @@ category: news
 # [HCO known as Hyper Converged Operator](https://github.com/kubevirt/hyperconverged-cluster-operator)  
 
 **Prerequisites:** 
-
  
 This Blog assumes that the reader is aware of the concept of Operators and how it works in K8's environment. Before proceeding further, feel free to take a look at this concept using [CoreOS BlogPost](https://coreos.com/blog/introducing-operators.html)
 
@@ -25,21 +24,22 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 ### Environment description
 
-We can use HCO both on [minikube]({% post_url 2019-04-17-HCO-minikube %}) and also on Openshift4. I will be using Openshift4 for HCO in this Blog.   
+We can use HCO both on [minikube]({% post_url 2019-04-17-HCO-minikube %}) and also on Openshift 4. We will be using Openshift 4 for HCO in this Blog.   
 
-## Deploying HCO on Openshift4 Cluster.
+## Deploying HCO on Openshift 4 Cluster.
 
 [Openshift](https://www.openshift.com/learn/what-is-openshift/)
 
-Installation steps for Openshift4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/) 
+Installation steps for Openshift 4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/) 
 
-Upon successful installation of OpenShift, we will have a cluster consistening of 3 masters and 3 workers which can be used for HCO integration
+Upon successful installation of OpenShift, we will have a cluster consisting of 3 masters and 3 workers which can be used for HCO integration
 
-```
+```sh
 $oc version
 Client Version: version.Info{Major:"4", Minor:"1+", GitVersion:"v4.1.0", GitCommit:"2793c3316", GitTreeState:"", BuildDate:"2019-04-23T07:46:06Z", GoVersion:"", Compiler:"", Platform:""}
 Server Version: version.Info{Major:"1", Minor:"12+", GitVersion:"v1.12.4+0ba401e", GitCommit:"0ba401e", GitTreeState:"clean", BuildDate:"2019-03-31T22:28:12Z", GoVersion:"go1.10.8", Compiler:"gc", Platform:"linux/amd64"}
 ```
+
 Check the nodes:
 
 ~~~
@@ -55,19 +55,19 @@ ip-10-0-168-28.us-east-2.compute.internal    Ready    worker   12m   v1.13.4+da4
 
 Clone the HCO repo here
 
-```
+```sh
 git clone https://github.com/kubevirt/hyperconverged-cluster-operator.git
 ```
 This gives all the necessary go packages and yaml manifests for the next steps.
 
 Lets create a NameSpace for the HCO deployment
 
-```
+```sh
 oc create new-project kubevirt-hyperconverged
 ```
 Now switch to the kubevirt-hyperconverged NameSpace
 
-```
+```sh
 oc project kubevirt-hyperconverged
 ```
 
@@ -122,8 +122,8 @@ And after verifying all the above resources we can now finally deploy our HCO cu
 
 ```
 $ oc create -f deploy/converged/crds/hco.cr.yaml 
-
 ```
+
 We can take a look at the YAML definition of the CustomResource of HCO:
 
 Lets create ClusterRoleBindings, ClusterRole , ServerAccounts and Deployments for the operator
@@ -185,8 +185,7 @@ virt-controller                   2/2     2            2           8m49s
 virt-operator                     1/1     1            1           16m
 ~~~
 
-
-**Note**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the -w flag.
+**Note**: Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the `-w`flag.
 
 After the HCO is up and running on the cluster, we should be able to see the info of CRD's
 
@@ -224,7 +223,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
 
 **Note**:
-Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
+Until we publish (and consume) the HCO and component operators through Marketplace or [operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
 
 Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
 
@@ -308,7 +307,7 @@ Once the HCO Operator is deployed in the `kubevirt-hyperconverged` NS, we can se
 
 We can verify the same from the CLI:
 
-~~~
+~~~sh
 oc get pods -n kubevirt-hyperconverged
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-b5v8n                     1/1     Running   0          4m5s
@@ -348,7 +347,7 @@ HCO achieved its goal which was to provide a single entrypoint for multiple oper
 Now, we can also launch the HCO through OLM. 
 
 **Note**: 
-Until we publish (and consume) the HCO and component operators through Marketplace|[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
+Until we publish (and consume) the HCO and component operators through Marketplace[operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
 
 Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
 
