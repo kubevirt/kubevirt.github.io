@@ -33,14 +33,10 @@ Please use the following as general guidelines on any kind of contents generated
     * Linking externally can be problematic, some time after the publication of your contents, try linking to the repositories or directories, website's front page rather than to a page, etc.
     * For linking internally use [Jekyll's tags](https://jekyllrb.com/docs/liquid/tags/#links)
       * For blog posts
-        ```markdown
-        [Name of Link]({{ site.baseurl }}{% post_url 2010-07-21-name-of-post %})
-        ```
+        * Use macro `{% post_url FILENAME.WITHOUT.EXTENSION %}` instead of regular URI
       * For pages, collections, assets, etc
-        ```markdown
-        [Link to a document]({% link _collection/name-of-document.md %})
-        [Link to a file]({% link /assets/files/doc.pdf %})
-        ```
+        * For document linking: `{% link _collection/name-of-document.md %}` instead of regular URI
+        * For file linking: `{% link /assets/files/doc.pdf %}` instead of regular URI
 
 ## Contents types
 
@@ -75,7 +71,7 @@ All Blog posts are located in the [_posts](/_posts/) directory, each entry is a 
   * **category**: Array of categories for your blog post, some common ones are community, news and releases, as last resort, use uncategorized. If you'd like to add multiple categories, used *categories* instead of *category* and a [YAML list](https://en.wikipedia.org/wiki/YAML#Basic_components)
   * **comments**: This enables comments your blog post. Please consider setting this to *true* and allow discussion around the topic you're writing, otherwise skip the field or set it to false
 
-* Blog post contents recommendation: 
+* Blog post contents recommendation:
 
   * Title is a very important piece of your blog post, a catchy title will likely have more readers, write a bad title and no matter how good the contents is, you'll likely get less readers
   * After the title, write a brief introduction of what you're going to be writing about, which will help the reader to get a grasp on the topic
@@ -100,7 +96,7 @@ All Blog posts are located in the [_posts](/_posts/) directory, each entry is a 
 * The fields have the same function as for blog posts, but some values are different, as we're producing different contents.
   * **permalink** tells *Jekyll* what the output path for your page will be, it's useful for linking and web indexers
   * **navbar_active** will add your page to the navigation bar you specify as value, commonly used values are *Docs* or *Videos*
-  * **layout**, just use *default* as value, it'll include all the necessary parts when your page is generated 
+  * **layout**, just use *default* as value, it'll include all the necessary parts when your page is generated
 
 * As for the contents, follow the general guidelines above
 
@@ -137,7 +133,7 @@ These are the pages containing actual lab, exercises, documentations, etc... and
 
 ```yaml
 ---
-layout: labs 
+layout: labs
 title: Installing KubeVirt
 permalink: /labs/kubevirt101/lab01
 lab: KubeVirt 101 Lab
