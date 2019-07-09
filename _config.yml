@@ -40,3 +40,7 @@ feed:
     - community
     - releases
     - uncategorized
+
+exclude:
+  - GUIDELINES.md
+  - README.md
