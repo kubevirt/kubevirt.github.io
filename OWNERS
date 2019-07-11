@@ -8,6 +8,7 @@ filters:
       - tripledes
       - joeldavis84
       - e-minguez
+      - ptrnull
     approvers:
       - jparrill
       - tripledes
@@ -15,6 +16,7 @@ filters:
       - iranzo
       - karmab
       - e-minguez
+      - ptrnull
   "^_posts/.*":
     labels:
       - kind/blog
