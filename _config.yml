@@ -44,3 +44,4 @@ feed:
 exclude:
   - GUIDELINES.md
   - README.md
+  - TODO.md
