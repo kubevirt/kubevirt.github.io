@@ -24,7 +24,9 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 ### Environment description
 
-We can use HCO both on [minikube]({% post_url 2019-04-17-HCO-minikube %}) and also on Openshift 4. We will be using Openshift 4 for HCO in this Blog.   
+We can use HCO both on minikube and also on Openshift 4. We will be using Openshift 4 for HCO in this Blog.   
+
+**Note**: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link [Install_HCO_minikube](https://kubevirt.io//quickstart_minikube/) install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended). 
 
 ## Deploying HCO on Openshift 4 Cluster.
 
