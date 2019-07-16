@@ -54,7 +54,7 @@ Now hit "Create" to start the instance.
 
 KubeVirt along with Kubernetes will get provisioned during boot! You may have to
 wait at least 5 minutes in order for SSH to become available. Once your instance is
-ready, SSH to your EC2 instance using your private key.
+ready, SSH to your instance using your private key.
 
 Then become the "centos" user, which has kubectl enabled, and verify the Kubernetes pods are up and running.
 
