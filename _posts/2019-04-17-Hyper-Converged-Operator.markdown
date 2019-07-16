@@ -229,10 +229,6 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
 
 **Note**:
-Until we publish (and consume) the HCO and component operators through Marketplace or [operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
-
-Once we publish operators through Marketplace|operatorhub.io, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
-
 The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
 
 Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided.
@@ -347,7 +343,7 @@ So, after HCO is up and running we need to test it by deploying a small instance
 
 ## Conclusion
 
-What to expect next ?
+What to expect next?
 
 HCO achieved its goal which was to provide a single entrypoint for multiple operators - kubevirt, cdi, networking, etc.where users can deploy and configure them in a single object as seen above.
 
