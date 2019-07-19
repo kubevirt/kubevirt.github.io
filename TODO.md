@@ -10,6 +10,7 @@
 - Tags and Categories for articles
 - RSS generation headers not just for main site, but for tags, etc so users can follow tags of interest (releases, specific author, etc)
 - Add a TOC for articles automatically (to ease navigation) (example at: https://iranzo.github.io/blog/2019/03/04/telegram-redken_bot-documentation/)
+- Add a FAQ based on short articles to be shown similar to what is in project for metal3 explaining concepts like operators, acronyms, etc
 
 ## Admin / behind the scenes
 
