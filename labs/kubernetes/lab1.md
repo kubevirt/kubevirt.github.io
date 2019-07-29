@@ -39,6 +39,18 @@ To start a Virtual Machine you can use:
 {% include scriptlets/lab1/04_start_testvm.sh -%}
 ```
 
+Alternatively you can use kubectl for it:
+
+```shell
+# Start the virtual machine:
+kubectl patch virtualmachine myvm --type merge -p \
+    '{"spec":{"running":true}}'
+
+# Stop the virtual machine:
+kubectl patch virtualmachine myvm --type merge -p \
+    '{"spec":{"running":false}}'
+```
+
 Now that the Virtual Machine has been started, check the status. Note the `running` status.
 
 ```
