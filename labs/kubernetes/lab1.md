@@ -39,7 +39,17 @@ To start a Virtual Machine you can use:
 {% include scriptlets/lab1/04_start_testvm.sh -%}
 ```
 
-Alternatively you can use kubectl for it:
+If you installed virtctl via krew, you can use `kubectl virt`:
+
+```shell
+# Start the virtual machine:
+kubectl virt start testvm
+
+# Stop the virtual machine:
+kubectl virt stop testvm
+```
+
+Alternatively you could use `kubectl patch`:
 
 ```shell
 # Start the virtual machine:
