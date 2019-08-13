@@ -1,0 +1,20 @@
+#!/bin/expect -f
+
+spawn ./virtctl console testvm
+sleep 1
+
+send "\n"
+
+expect "testvm login: "
+send "cirros\n"
+
+expect "Password:"
+send "gocubsgo\n"
+
+expect "$ "
+send "who && exit \n"
+
+  ## TODO: There has to be a better way to send ^] than this
+set timeout 1
+
+expect eof
