@@ -73,7 +73,7 @@ which is as simple as running the following commands:
 ```bash
 export CDI_VER=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")
 kubectl apply -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VER/cdi-operator.yaml
-kubectl apply -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VER/cdi-operator-cr.yaml
+kubectl apply -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VER/cdi-cr.yaml
 ```
 
 Once `kubectl get pods -n cdi` confirms all pods are ready, CDI is good to go.
@@ -81,7 +81,6 @@ Once `kubectl get pods -n cdi` confirms all pods are ready, CDI is good to go.
 The module can instruct CDI to fill the PVC with data from:
 * a remote HTTP(S) server (`http:`),
 * a container registry (`registry:`),
-* another PVC, where CDI will clone an existing volume (`pvc:`),
 * a local file (`upload: yes`), though this requires using `kubevirt_cdi_upload` for the actual upload step,
 * or nowhere (the `blank: yes` option).
 
