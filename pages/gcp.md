@@ -41,7 +41,8 @@ Fill in the following data:
 Once the image is created, you can create a new instance based on this image.
 Go to "Compute Engine", then to "VM instances", and then click on "Create instance".
 
-![screenshot0042](/assets/images/kubevirt-button/create_instance_1.png)
+![screenshot0041](/assets/images/kubevirt-button/create_instance_1.png)
+![screenshot0042](/assets/images/kubevirt-button/create_instance_2.png)
 
 It's recommended to select:
 
