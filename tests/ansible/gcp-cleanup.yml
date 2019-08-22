@@ -1,0 +1,23 @@
+---
+- hosts: localhost
+  gather_facts: False
+  vars:
+    credentials_file: "{{ lookup('env', 'GOOGLE_APPLICATION_CREDENTIALS') }}"
+    build_id: "{{ lookup('env', 'buildID') }}"
+  tasks:
+  - name: Shut down GCE Test VM
+    gce:
+      instance_names: "kubevirt-labci-build{{build_id}}"
+      zone: "us-central1-b"
+      state: "stopped"
+      service_account_email: "push-button-ci@cnvlab-209908.iam.gserviceaccount.com"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "cnvlab-209908"
+  - name: Delete GCE test VM
+    gce:
+      instance_names: "kubevirt-labci-build{{build_id}}"
+      zone: "us-central1-b"
+      state: "absent"
+      service_account_email: "push-button-ci@cnvlab-209908.iam.gserviceaccount.com"
+      credentials_file: "{{ credentials_file }}"
+      project_id: "cnvlab-209908"
