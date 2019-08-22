@@ -14,15 +14,14 @@ At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller w
 
 #### Install the CDI
 
-We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class.
+We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class. Also we will deploy the CDI component using the Operator.
 
 ```bash
 {% include scriptlets/lab2/01_get_storage_manifest.sh -%}
 cat storage-setup.yml
-{% include scriptlets/lab2/02_get_cdi_controller_manifest.sh -%}
-cat cdi-controller.yaml
-{% include scriptlets/lab2/03_create_storage.sh -%}
-{% include scriptlets/lab2/04_create_cdi-controller.sh -%}
+{% include scriptlets/lab2/02_create_storage.sh -%}
+{% include scriptlets/lab2/03_deploy_cdi_operator.sh -%}
+{% include scriptlets/lab2/04_create_cdi-cr.sh -%}
 ```
 
 Review the "cdi" pods that were added.
