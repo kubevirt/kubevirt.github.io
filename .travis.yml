@@ -7,7 +7,6 @@ rvm:
 # Assume bundler is being used, therefore
 # the `install` step will run `bundle install` by default.
 before_install:
-  - gem install jekyll html-proofer
   - bundle install
 
 install: true
