@@ -12,7 +12,7 @@ order: 1
 
 At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named *disk.img* with the desired content into the associated PVC.
 
-**NOTE**: This 'lab' targes deployment on *one node* as it uses `hostpath` storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.
+**NOTE**: This 'lab' targets deployment on *one node* as it uses `hostpath` storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.
 
 #### Install the CDI
 
