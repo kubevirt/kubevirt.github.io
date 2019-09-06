@@ -229,7 +229,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 # [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
 
 **Note**:
-The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
+The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/954a669200e57c6ce3105ddca17793186b3a3a43/Documentation/design/architecture.md)
 
 Replace <docker_org> with your Docker organization as official operator-registry images for HCO will not be provided.
 
@@ -352,4 +352,4 @@ Now, we can also launch the HCO through OLM.
 **Note**:
 Until we publish (and consume) the HCO and component operators through [operatorhub.io](https://operatorhub.io/), this is a means to demonstrate the HCO workflow without OLM
 
-Once we publish operators through Marketplace at <operatorhub.io></operatorhub.io>, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/install/install.md#installing-olm)
+Once we publish operators through Marketplace at <operatorhub.io>, it will be available [here](https://github.com/operator-framework/operator-lifecycle-manager/blob/954a669200e57c6ce3105ddca17793186b3a3a43/Documentation/install/install.md#installing-olm)
