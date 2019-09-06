@@ -226,7 +226,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 - [kubevirt-web-ui](https://github.com/kubevirt/web-ui)
 - [NodeMaintenance](https://github.com/kubevirt/node-maintenance-operator)
 
-# [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/master/Documentation/design/architecture.md)
+# [HCO using the OLM method](https://github.com/operator-framework/operator-lifecycle-manager/blob/954a669200e57c6ce3105ddca17793186b3a3a43/Documentation/design/architecture.md)
 
 **Note**:
 The complete architecture of OLM and its components that connect together can be understood using the link [OLM_architecture](https://github.com/operator-framework/operator-lifecycle-manager/blob/954a669200e57c6ce3105ddca17793186b3a3a43/Documentation/design/architecture.md)
