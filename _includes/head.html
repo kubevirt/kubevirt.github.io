@@ -7,11 +7,8 @@
     <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
     <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
     <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
-    <meta name="go-import" content="kubevirt.io/machine-remediation-operator git https://github.com/kubevirt/machine-remediation-operator"> 
+    <meta name="go-import" content="kubevirt.io/machine-remediation-operator git https://github.com/kubevirt/machine-remediation-operator">
     <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
-    <meta name="description" content="{{ site.description }}">
-    <title>{% if page.title %}{{ page.title }}{% else %}{{ site.title }}{% endif %}</title>
-
     <link rel="apple-touch-icon" sizes="72x72" href="{{ site.baseurl }}/assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/assets/favicon/favicon-16x16.png">
@@ -24,6 +21,7 @@
     <link rel="stylesheet" href="{{ site.baseurl }}/css/main.css">
     <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    {% include metas-ogp.html %}
     {% feed_meta %}
     <!-- Global site tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id={{ site.google_UA }}"></script>

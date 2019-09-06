@@ -1,0 +1,19 @@
+
+    <!-- Precrete array of authors for all posts -->
+    {% assign autharray = "" | split: ',' %}
+    {% for post in site.posts %}{% assign autharray = autharray | push: post.author %}{% endfor %}
+    <title>{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="{% if page.author %}{{ page.author | join: ', ' }}{% else %}The {{site.title}} website team, {{ autharray |uniq | join: ", " }}{% endif %}" />
+    <meta property="og:type" content="article" />
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
+    <meta name="keywords" content="{% if page.categories %}{{ page.categories | join: ', ' }}{% else %}{% for category in site.categories %}{{ category | first | slugify }}, {% endfor %}{% endif %}" />
+    <meta property="og:title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}"/>
+    <meta property="og:url" content="{{site.url}}{{ page.url }}" />
+    <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}" />
+    <meta property="og:site_name" content="{{ site.title }}" />
+    <meta property="og:article:author" content="{% if page.author %}{{ page.author | join: ', ' }}{% else %}The {{site.title}} website team, {{ autharray |uniq | join: ", " }}{% endif %}" />
+    <meta property="og:article:published_time" content="{% if page.date %}{{ page.date }}{% else %}{{ site.time }}{% endif %}" />
+    <meta name="twitter:title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
+    <meta name="twitter:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
