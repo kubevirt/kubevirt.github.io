@@ -4,7 +4,7 @@ email: non@none.com
 description: >- # this means to ignore newlines until "baseurl:"
   Virtual Machine Management on Kubernetes
 baseurl: "" # the subpath of your site, e.g. /blog/
-url: "https://www.kubevirt.io/" # the base hostname & protocol for your site
+url: "https://kubevirt.io/" # the base hostname & protocol for your site
 type: website
 image: /assets/images/KubeVirt_logo_color.svg
 twitter_username: kubevirt
