@@ -1,9 +1,9 @@
 ---
 layout: post
 author: jcpowermac
-description: Quick rehash of the network deep-dive 
+description: Quick rehash of the network deep-dive
 navbar_active: Blogs
-pub-date: Oct 11 
+pub-date: Oct 11
 pub-year: 2018
 category: news
 comments: true
@@ -12,9 +12,9 @@ comments: true
 # Introduction
 
 This post is a quick rehash of the previous [post]({{ site.baseurl }}/2018/KubeVirt-Network-Deep-Dive.html) regarding KubeVirt networking.
-It has been updated to reflect the updates that are included with v0.8.0 which includes 
+It has been updated to reflect the updates that are included with v0.8.0 which includes
 optional layer 2 support via Multus and the ovs-cni. I won't be covering the installation
-of [OKD](https://docs.okd.io/), Kubernetes, KubeVirt, [Multus or ovs-cni]({{site.baseurl}}/2018/attaching-to-multiple-networks.html) all can be found in other documentation or 
+of [OKD](https://docs.okd.io/), Kubernetes, KubeVirt, [Multus or ovs-cni]({{site.baseurl}}/2018/attaching-to-multiple-networks.html) all can be found in other documentation or
 posts.
 
 # KubeVirt Virtual Machines
@@ -25,7 +25,7 @@ These instances are where we will install our simple NodeJS and MongoDB applicat
 ## Create Objects and Start the Virtual Machines
 
 
-One of the first objects to create is the `NetworkAttachmentDefinition`.  
+One of the first objects to create is the `NetworkAttachmentDefinition`.
 We are using a fairly simple definition for this post with an ovs bridge `br1` and no vlan configured.
 ```
 apiVersion: "k8s.cni.cncf.io/v1"
@@ -80,8 +80,8 @@ virt-launcher-nodejs-dlgv6    2/2       Running   0          3h
 ## Service and Endpoints
 
 We may still want to use services and routes with a KubeVirt virtual machine instance utilizing
-multiple interfaces. 
-The service object below is considered 
+multiple interfaces.
+The service object below is considered
 [headless](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
 because the `clusterIP` is set to `None`. We don't want load-balancing or single service IP as
 this would force traffic over the cluster network which in this example we are trying to avoid.
@@ -113,8 +113,8 @@ subsets:
       - port: 27017
         name: mongo
 ```
-The above ip address is provided by DHCP via dnsmasq to the virtual machine instance's `eth1` interface. 
-All the nodes are virtual instances configured by libvirt. 
+The above ip address is provided by DHCP via dnsmasq to the virtual machine instance's `eth1` interface.
+All the nodes are virtual instances configured by libvirt.
 
 
 After creating the service and endpoints objects lets confirm that DNS is resolving correctly.
@@ -127,7 +127,7 @@ $ ssh fedora@$(oc get pod -l kubevirt-vm=nodejs --template '{{ range .items }}{{
 
 ### Node
 
-We can also add a `service`, `endpoints` and `route` for the nodejs virtual machine so the application 
+We can also add a `service`, `endpoints` and `route` for the nodejs virtual machine so the application
 is accessible from the defined subdomain.
 
 ```yaml
@@ -170,7 +170,7 @@ spec:
 
 ## Testing our application
 
-I am using the same application and method of installation as the previous post so I won't 
+I am using the same application and method of installation as the previous post so I won't
 duplicate it here.  Just in case though let's make sure that the application is available
 via the `route`.
 
@@ -220,7 +220,7 @@ mongo     192.168.123.139:27017   8h
 node      192.168.123.140:8080    7h
 ```
 
-### route 
+### route
 
 This will allow us access the NodeJS example application using the route url.
 
@@ -274,7 +274,7 @@ is one of the veth pair created to connect the virtual machine to the Open vSwit
         Port "eth1"
             Interface "eth1"
 ...output...
-```	 
+```
 
 ## Pod-level
 
@@ -328,9 +328,9 @@ Showing the bridge `k6t-eth0` and `k6t-net` member ports.
 
 ### DHCP
 
-The virtual machine network is configured by DHCP. You can see `virt-launcher` has UDP port 67 open 
-on the `k6t-eth0` interface to serve DHCP to the virtual machine. As described in the previous 
-[post]({{ site.baseurl }}/2018/KubeVirt-Network-Deep-Dive.html) the `virt-launcher` process contains 
+The virtual machine network is configured by DHCP. You can see `virt-launcher` has UDP port 67 open
+on the `k6t-eth0` interface to serve DHCP to the virtual machine. As described in the previous
+[post]({{ site.baseurl }}/2018/KubeVirt-Network-Deep-Dive.html) the `virt-launcher` process contains
 a simple DHCP server that provides an offer and typical options to the virtual machine instance.
 
 `~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- ss -tuanp`
@@ -356,9 +356,9 @@ vnet1      bridge     k6t-net1   virtio      20:37:cf:e0:ad:f2
 
 ### interfaces
 
-Fortunately the vm interfaces are fairly typical. Two interfaces: one that has been assigned the original 
+Fortunately the vm interfaces are fairly typical. Two interfaces: one that has been assigned the original
 pod ip address and the other the `ovs-cni` layer 2 interface. The `eth1` interface receives a IP address
-from DHCP provided by dnsmasq that was configured by libvirt network on the physical host. 
+from DHCP provided by dnsmasq that was configured by libvirt network on the physical host.
 
 
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ip a`
@@ -382,7 +382,7 @@ from DHCP provided by dnsmasq that was configured by libvirt network on the phys
 #### Configuration and DNS
 
 In this example we want to use Kubernetes services so special care must be used when
-configuring the network interfaces.  The default route and dns configuration must be 
+configuring the network interfaces.  The default route and dns configuration must be
 maintained by `eth0`.  `eth1` has both route and dns configuration disabled.
 
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0`
@@ -421,22 +421,22 @@ nameserver 192.168.122.112
 
 ## VM to VM communication
 
-The virtual machines are on different hosts. This was done purposely to show that connectivity 
-between virtual machine and hosts. Here we finally get to use [Skydive](https://github.com/skydive-project/skydive). 
+The virtual machines are on different hosts. This was done purposely to show that connectivity
+between virtual machine and hosts. Here we finally get to use [Skydive](https://github.com/skydive-project/skydive).
 The real-time topology below along with
 arrows annotate the flow of packets between the host and virtual machine network devices.
 
-![vm-to-vm]({{ "assets/images/skydive_vm_to_vm.png" | absolute_url }}) 
+![vm-to-vm](/assets/images/skydive_vm_to_vm.png)
 
 ### Connectivity Tests
 
-To confirm connectivity we are going to do a few things. First look for an established 
+To confirm connectivity we are going to do a few things. First look for an established
 connection to MongoDB and finally check the NodeJS logs looking for confirmation of database connection.
 
 
 #### TCP connection
 
-After connecting to the nodejs virtual machine via ssh we can use `ss` to determine the current TCP connections. 
+After connecting to the nodejs virtual machine via ssh we can use `ss` to determine the current TCP connections.
 We are specifically looking for the established connections to the MongoDB service that is running on the mongodb virtual machine.
 
 `ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ss -tanp`
@@ -470,11 +470,11 @@ Finally let's confirm that when using the OKD route that traffic is successfully
 
 ### HAProxy Traffic Status
 
-OKD HAProxy provides optional traffic status - which we already enabled. The screenshot below shows 
+OKD HAProxy provides optional traffic status - which we already enabled. The screenshot below shows
 the requests that Nginx is receiving for `nodejs.ingress.virtomation.com`.
 
 
-![haproxy-stats]({{ "assets/images/haproxy_stats.png" | absolute_url }})
+![haproxy-stats](/assets/images/haproxy_stats.png)
 
 
 ### HAProxy to NodeJS VM
@@ -488,5 +488,4 @@ NAME             READY     STATUS    RESTARTS   AGE       IP                NODE
 router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.168.122.101.nip.io   <none>
 ```
 
-![haproxy-vm]({{ "assets/images/skydive_haproxy_to_vm.png" | absolute_url }})
-
+![haproxy-vm](/assets/images/skydive_haproxy_to_vm.png)
