@@ -45,7 +45,6 @@ k8s-test.local# yum update -y
 
 k8s-test.local# yum install vim jq -y
 ```
-
 The following kernel parameters have to be configured:
 ```
 k8s-test.local# cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
