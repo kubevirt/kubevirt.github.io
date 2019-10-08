@@ -16,5 +16,4 @@
 
 - Define set of users interested in reviewing PR's to website, community, kubevirt-tutorial, etc to add them to OWNERS/reviewers so that prow requests their feedback
 - Investigate alternatives to Disquss (other projects doing this research: https://github.com/Pelican-Elegant/elegant/issues/288)
-- Consider implementing 'netlify' for PR rendering of website for easier review of new content, etc via your browser.
 - Custom 404 page creation on Github (https://help.github.com/en/articles/creating-a-custom-404-page-for-your-github-pages-site)
