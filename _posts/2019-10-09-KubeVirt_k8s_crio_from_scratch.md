@@ -33,7 +33,7 @@ The following versions are going to be used:
 ## Requirements
 It is a requirement to have a VM with enough resources, the OS running this VM as indicated in the table above has to be CentOS 7.7.1908 and you should take care of its deployment. In this guide the system will be named k8s-test.local and the IP address is 192.168.0.10. A second system called laptop would be used to run the playbooks (if you choose to go the easy and automated way).
 
-It is also needed to have access to the root account in the VM for installing the required software and configure some kernel parameters.
+It is also needed to have access to the root account in the VM for installing the required software and configure some kernel parameters. In this example only a Kubernetes master would be used.
 
 # Instructions
 ## Preparing the VM
