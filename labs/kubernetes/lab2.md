@@ -14,8 +14,6 @@ At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller w
 
 **NOTE**: This 'lab' targets deployment on *one node* as it uses `hostpath` storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.
 
-**NOTE**: In you are running this lab on minikube, be aware that at least you need 5Gi of memory assigned to minikube VM in order to import correctly the Fedora cloud image. In case you do not have this amount of memory available, I suggest to import a [CirrOS](http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img) image instead of Fedora and decrease the size of the PVC requested file to 1Gi. Both changes can be made in pvc_fedora.yml file itself.
-
 #### Install the CDI
 
 We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class. Also we will deploy the CDI component using the Operator.
@@ -35,8 +33,6 @@ Review the "cdi" pods that were added.
 ```
 
 #### Use the CDI
-
-**NOTE** As commented previously, if you are runing minikube on a local VM you probably need to download the pvc_fedora.yml file first, then modify the configuration accordingly to your resources.
 
 As an example, we will import a Fedora30 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
