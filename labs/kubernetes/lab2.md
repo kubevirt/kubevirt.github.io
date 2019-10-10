@@ -34,7 +34,7 @@ Review the "cdi" pods that were added.
 
 #### Use the CDI
 
-As an example, we will import a Fedora28 Cloud Image as a PVC and launch a Virtual Machine making use of it.
+As an example, we will import a Fedora30 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
 ```bash
 {% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
@@ -88,6 +88,29 @@ Finally, use the gathered ip to connect to the Virtual Machine, create some file
 ```
 {% include scriptlets/lab2/13_ssh_to_vm1.sh -%}
 ```
+
+In case of running a local minikube this is slightly different due to how Kubernetes networking works. Note that the gathered ip is an ip from the SDN network and the only server which is inside the SDN is the minikube vm itself. So, in order to ssh to the Virtual Machine vm1 you first need to ssh minikube vm and then ssh to the ip gathered. However, as you notice this is not very straightforward. Also, take into account that you will need to copy to the minikube instance the ssh private key associated with the public ssh key added to vm1_pvc.yml file previously.
+
+```
+{% include scriptlets/lab2/14_minikube_ssh_vm1.sh -%}
+```
+
+A much more straightforward method is to expose the ssh port of the vm1 as a NodePort by means of the virtctl tool already installed in [Easy install using minikube](https://kubevirt.io/quickstart_minikube/). First, expose the vm1 as and verify that the K8S object service was created successfully as NodePort on a random port of the Minikube VM.
+
+```
+{% include scriptlets/lab2/15_minikube_virtctl_expose_ssh_nodeport.sh -%}
+```
+
+Once exposed successfully, check the IP of your Minikube VM and verify you can reach the VM using your public SSH key previously configured.
+
+```
+{% include scriptlets/lab2/16_minikube_vm_ip.sh -%}
+```
+
+```
+{% include scriptlets/lab2/17_ssh_from_outer_minikube.sh -%}
+```
+
 
 This concludes this section of the lab.
 
