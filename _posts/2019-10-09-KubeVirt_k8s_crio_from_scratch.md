@@ -10,15 +10,14 @@ pub-date: October
 pub-year: 2019
 ---
 
-# KubeVirt on Kubernetes with CRI-O from scratch
 Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions up to today of Kubernetes, CRI-O and KubeVirt.
 In this series of blogposts the following topics are going to be covered en each post:
 * Requirements: dependencies and containers runtime
 * Kubernetes: Cluster and Network
 * KubeVirt: requirements and first Virtual Machine
 
-# Pre-requisites
-## Versions
+## Pre-requisites
+### Versions
 The following versions are going to be used:
 
 | Software      | Purpose  |  Version       |
@@ -30,13 +29,13 @@ The following versions are going to be used:
 | Ansible (optional)     | Automation tool | 2.8.4         |
 
 
-## Requirements
+### Requirements
 It is a requirement to have a VM with enough resources, the OS running this VM as indicated in the table above has to be CentOS 7.7.1908 and you should take care of its deployment. In this guide the system will be named k8s-test.local and the IP address is 192.168.0.10. A second system called laptop would be used to run the playbooks (if you choose to go the easy and automated way).
 
 It is also needed to have access to the root account in the VM for installing the required software and configure some kernel parameters. In this example only a Kubernetes master would be used.
 
-# Instructions
-## Preparing the VM
+## Instructions
+### Preparing the VM
 Ensure the VM system is updated to the latest versions of the software and also ensure that the epel repository is installed:
 ```
 k8s-test.local# yum install epel-release -y
@@ -76,17 +75,17 @@ k8s-test.local# sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/
 ```
 And the installation of Kubernetes and CRI-O can proceed.
 
-## Installing Kubernetes and CRI-O
+### Installing Kubernetes and CRI-O
 To install Kubernetes and CRI-O several ways can be used, in this guide there is the step-by-step guide where the user can do everything by himself or the alternative option, taking the easy road and running the ansible-playbook that will take care of almost everything.
 
-### The ansible way
+#### The ansible way
 Note: we are waiting for the [PR](https://github.com/cri-o/cri-o-ansible/pull/25) to be merged in the official cri-o-ansible repository, meantime a fork in an alternative repository would be used. Also, note that the following commands are executed from a different place, in this case from a computer called `laptop`:
 ```
 laptop$ sudo yum install ansible -y
 
 laptop# git clone https://github.com/ptrnull/cri-o-ansible
 
-laptop# cd cri-o-ansible 
+laptop# cd cri-o-ansible
 
 laptop# git checkout fixes_k8s_1_16
 
@@ -95,7 +94,7 @@ laptop# ansible-playbook cri-o.yml -i 192.168.0.10,
 
 Once the playbook ends the system would be ready for getting CRI-O configured.
 
-### The step-by-step way
+#### The step-by-step way
 If the ansible way was chosen, you may want to skip this section. Otherwise, let's configure each piece.
 
 The required packages may be installed in the system running the following command:
@@ -212,7 +211,7 @@ k8s-test.local# vim /etc/crio/crio.conf
 storage_option = [ "overlay2.override_kernel_check=1" ]
 ```
 
-## Preparing CRI-O
+### Preparing CRI-O
 CRI-O is the lightweight container runtime for Kubernetes. As it is pointed in the [CRI-O Website](https://cri-o.io):
 
 >CRI-O is an implementation of the Kubernetes CRI (Container Runtime Interface) to enable using OCI (Open Container Initiative) compatible runtimes. It is a lightweight alternative to using Docker as the runtime for Kubernetes. It allows Kubernetes to use any OCI-compliant runtime as the container runtime for running pods. Today it supports runc and Kata Containers as the container runtimes but any OCI-conformant runtime can be plugged in principle.
