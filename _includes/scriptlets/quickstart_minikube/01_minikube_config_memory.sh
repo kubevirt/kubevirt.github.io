@@ -1,1 +1,1 @@
-minikube config -p kubevirt set memory 4096
+minikube config -p kubevirt set memory 5120

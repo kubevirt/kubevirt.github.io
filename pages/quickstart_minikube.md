@@ -52,7 +52,7 @@ of RAM (by default it uses 2GiB), it'll allow you to experiment further this gui
 
 We'll create a profile for KubeVirt so it gets its own settings without
 interfering what any configuration you might had already, let's start by
-increasing the default memory to 4GiB:
+increasing the default memory:
 
 ```bash
 {% include scriptlets/quickstart_minikube/01_minikube_config_memory.sh -%}
