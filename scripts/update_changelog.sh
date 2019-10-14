@@ -35,12 +35,12 @@ gen_changelog() {
 ---
 layout: post
 author: kubebot
-description: This article provides information about Kube Virt release $REL changes
+description: This article provides information about KubeVirt release $REL changes
 navbar_active: Blogs
 datefixme:
 category: releases
 comments: true
-title: Kube Virt $REL
+title: KubeVirt $REL
 pub-date: July 23
 pub-year: 2018
 ---
