@@ -7,6 +7,7 @@ end
 
 namespace :links do
     require 'html-proofer'
+    require 'optparse'
 
     desc 'Checks html files looking for external dead links'
     task :test_external => :build do
@@ -16,10 +17,19 @@ namespace :links do
             :log_level          => :info,
             :internal_domains   => ["https://instructor.labs.sysdeseng.com"],
             :external_only      => true,
-            :url_swap           => {
-                                    'https://kubevirt.io/' => '',
-                                    }
+            :url_swap           => {'https://kubevirt.io/' => '',},
         }
+
+        parser = OptionParser.new
+        parser.banner = "Usage: rake -- [arguments]"
+        # Added option -u which will remove the url_swap option to from the map
+        parser.on("-u", "--us", "Remove url_swap from htmlProofer") do |url_swap|
+            options.delete(:url_swap)
+        end
+
+        args = parser.order!(ARGV) {}
+        parser.parse!(args)
+
         puts "Checking External links..."
         HTMLProofer.check_directory("./_site", options).run
     end
