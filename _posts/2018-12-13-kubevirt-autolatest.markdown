@@ -1,7 +1,7 @@
 ---
 layout: post
 author: karmab
-description: Kubevirt Autodeployer
+description: KubeVirt Autodeployer
 navbar_active: Blogs
 pub-date: Dec 13
 pub-year: 2018

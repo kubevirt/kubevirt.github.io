@@ -223,12 +223,12 @@ When the my-libvirt container starts it runs an entry point script for iptables 
 
 ```
 1. iptables -t nat -D PREROUTING 1
-2. iptables -t nat -A PREROUTING -p tcp -m comment --comment "Kubevirt Spice"  --dport 5900 -j ACCEPT
-3. iptables -t nat -A PREROUTING -p tcp -m comment --comment "Kubevirt virt-manager"  --dport 16509 -j ACCEPT
+2. iptables -t nat -A PREROUTING -p tcp -m comment --comment "KubeVirt Spice"  --dport 5900 -j ACCEPT
+3. iptables -t nat -A PREROUTING -p tcp -m comment --comment "KubeVirt virt-manager"  --dport 16509 -j ACCEPT
 4. iptables -t nat  -A PREROUTING -d 10.96.0.0/12 -m comment --comment "istio/redirect-ip-range-10.96.0.0/12-service cidr" -j ISTIO_REDIRECT
 5. iptables -t nat  -A PREROUTING -d 192.168.0.0/16 -m comment --comment "istio/redirect-ip-range-192.168.0.0/16-Pod cidr" -j ISTIO_REDIRECT
-6. iptables -t nat  -A OUTPUT -d 127.0.0.1/32 -p tcp -m comment --comment "Kubevirt mesh application port" --dport 9080 -j DNAT --to-destination 10.0.0.2
-7. iptables -t nat  -A POSTROUTING -s 127.0.0.1/32 -d 10.0.0.2/32 -m comment --comment "Kubevirt VM Forward" -j SNAT --to-source `ifconfig eth0 | grep inet | awk '{print $2}'
+6. iptables -t nat  -A OUTPUT -d 127.0.0.1/32 -p tcp -m comment --comment "KubeVirt mesh application port" --dport 9080 -j DNAT --to-destination 10.0.0.2
+7. iptables -t nat  -A POSTROUTING -s 127.0.0.1/32 -d 10.0.0.2/32 -m comment --comment "KubeVirt VM Forward" -j SNAT --to-source `ifconfig eth0 | grep inet | awk '{print $2}'
 ```
 
 Now lets explain every one of this lines:
@@ -854,8 +854,8 @@ iptables -t mangle -A KUBEVIRT_DIVERT -j ACCEPT
 
 table=mangle
 iptables -t ${table} -N KUBEVIRT_INBOUND
-iptables -t ${table} -A PREROUTING -p tcp -m comment --comment "Kubevirt Spice"  --dport 5900 -j RETURN
-iptables -t ${table} -A PREROUTING -p tcp -m comment --comment "Kubevirt virt-manager"  --dport 16509 -j RETURN
+iptables -t ${table} -A PREROUTING -p tcp -m comment --comment "KubeVirt Spice"  --dport 5900 -j RETURN
+iptables -t ${table} -A PREROUTING -p tcp -m comment --comment "KubeVirt virt-manager"  --dport 16509 -j RETURN
 iptables -t ${table} -A PREROUTING -p tcp -i vnet0 -j KUBEVIRT_INBOUND
 
 iptables -t ${table} -N KUBEVIRT_TPROXY
@@ -988,4 +988,4 @@ Cons:
 
 
 # Research Conclustion
-Kubevirt shows it is possible to run virtual machines inside a kubernetes cluster, and this post shows that the virtual machine can also get the benefit of it.
+KubeVirt shows it is possible to run virtual machines inside a kubernetes cluster, and this post shows that the virtual machine can also get the benefit of it.
