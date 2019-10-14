@@ -80,7 +80,7 @@ Get KubeVirt components running on the Kubernetes cluster.
 ```bash
 $ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/{{ site.kubevirt_version }}/kubevirt.yaml
 
-# watch for Kubevirt components to start (bebin with 'virt-')
+# watch for KubeVirt components to start (bebin with 'virt-')
 # may take awhile as containers are downloaded and started
 $ watch kubectl get --all-namespaces pods
 

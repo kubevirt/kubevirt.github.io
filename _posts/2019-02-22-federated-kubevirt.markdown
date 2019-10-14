@@ -1,7 +1,7 @@
 ---
 layout: post
 author: karmab
-description: Federated Kubevirt
+description: Federated KubeVirt
 navbar_active: Blogs
 pub-date: Feb 22
 pub-year: 2019
@@ -9,20 +9,20 @@ category: news
 comments: true
 ---
 
-# Federated Kubevirt
+# Federated KubeVirt
 
-Federated Kubevirt is a reference implementation of deploying and managing [Kubevirt](https://kubevirt.io/) across multiple
+Federated KubeVirt is a reference implementation of deploying and managing [KubeVirt](https://kubevirt.io/) across multiple
 [Kubernetes](https://kubernetes.io/) clusters using [Federation-v2](https://github.com/kubernetes-sigs/federation-v2).
 
 Federation-v2 is an API and control-plane for actively managing multiple Kubernetes clusters and applications in those
-clusters. This makes Federation-v2 a viable solution for managing Kubevirt deployments that span multiple Kubernetes
+clusters. This makes Federation-v2 a viable solution for managing KubeVirt deployments that span multiple Kubernetes
 clusters.
 
 ## Federation-v2 Deployment
 
 We assume federation is already deployed (using latest stable version) and you have configured your two clusters with context `cluster1` and `cluster2`
 
-## Federated Kubevirt Deployment
+## Federated KubeVirt Deployment
 
 We create kubevirt namespace on first cluster:
 
@@ -50,7 +50,7 @@ And [federated kubevirt](/assets/2019-02-22-federated-kubevirt/federated_kubevir
 kubectl create -f federated_kubevirt-operator.yaml
 ```
 
-This gets kubevirt operator deployed at both sites, which creates the Custom Resource definition *Kubevirt*. We then deploy kubevirt by federating this CRD and creates [an instance of it](/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml).
+This gets kubevirt operator deployed at both sites, which creates the Custom Resource definition *KubeVirt*. We then deploy kubevirt by federating this CRD and creates [an instance of it](/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml).
 
 ```
 kubefed2 enable kubevirts
@@ -66,9 +66,9 @@ mv virtctl-$VERSION-linux-amd64 /usr/bin/virtctl
 chmod +x /usr/bin/virtctl
 ```
 
-## Kubevirt Deployment Verification
+## KubeVirt Deployment Verification
 
-Verify that all Kubevirt pods are running in the clusters:
+Verify that all KubeVirt pods are running in the clusters:
 
 ```bash
 $ for c in cluster1 cluster2; do kubectl get pods -n kubevirt --context ${c} ; done
@@ -139,7 +139,7 @@ We can then connect there and see how the data is still available!!!
 
 # Final Thoughts
 
-Federating Kubevirt allows interesting use cases around kubevirt like disaster recovery scenarios.
+Federating KubeVirt allows interesting use cases around kubevirt like disaster recovery scenarios.
 
 More over, the pattern used to federate this product can be seen as a generic way to federate modern applications:
 

@@ -10,24 +10,24 @@ comments: true
 ---
 
 # Introduction
-Containerized Data Importer (CDI) is a utility to import, upload and clone Virtual Machine images for use with [Kubevirt](https://github.com/kubevirt/kubevirt). At a high level, a persistent volume claim (PVC), which defines VM-suitable storage via a storage class, is created. 
+Containerized Data Importer (CDI) is a utility to import, upload and clone Virtual Machine images for use with [KubeVirt](https://github.com/kubevirt/kubevirt). At a high level, a persistent volume claim (PVC), which defines VM-suitable storage via a storage class, is created. 
 
-A custom controller watches for specific annotation on the persistent volume claim, and when discovered, starts an import, upload or clone process. The status of the each process is reflected in an additional annotation on the associated claim, and when the process completes Kubevirt can create the VM based on the new image. 
+A custom controller watches for specific annotation on the persistent volume claim, and when discovered, starts an import, upload or clone process. The status of the each process is reflected in an additional annotation on the associated claim, and when the process completes KubeVirt can create the VM based on the new image. 
 
 The Containerized Data Cloner gives the option to clone the imported/uploaded VM image from one PVC to another one either within the same namespace or across two different namespaces.
 
-This Containerized Data Importer project is designed with Kubevirt in mind and provides a declarative method for importing amd uploading VM images into a Kuberenetes cluster. Kubevirt detects when the VM disk image import/upload is complete and uses the same PVC that triggered the import/upload process, to create the VM.
+This Containerized Data Importer project is designed with KubeVirt in mind and provides a declarative method for importing amd uploading VM images into a Kuberenetes cluster. KubeVirt detects when the VM disk image import/upload is complete and uses the same PVC that triggered the import/upload process, to create the VM.
 
 This approach supports two main use-cases:
 
-- A cluster administrator can build an abstract registry of immutable images (referred to as "Golden Images") which can be cloned and later consumed by Kubevirt
-- An ad-hoc user (granted access) can import a VM image into their own namespace and feed this image directly to Kubevirt, bypassing the cloning step
+- A cluster administrator can build an abstract registry of immutable images (referred to as "Golden Images") which can be cloned and later consumed by KubeVirt
+- An ad-hoc user (granted access) can import a VM image into their own namespace and feed this image directly to KubeVirt, bypassing the cloning step
 
 For an in depth look at the system and workflow, see the [Design](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design) documentation.
 
 
 # Data Format
-The Containerized Data Importer is capable of performing certain functions that streamline its use with Kubevirt. It automatically decompresses gzip and xz files, and un-tar's tar archives. Also, qcow2 images are converted into the raw format which is required by Kubevirt, resulting in the final file being a simple .img file.
+The Containerized Data Importer is capable of performing certain functions that streamline its use with KubeVirt. It automatically decompresses gzip and xz files, and un-tar's tar archives. Also, qcow2 images are converted into the raw format which is required by KubeVirt, resulting in the final file being a simple .img file.
 
 Supported file formats are:
 
@@ -309,7 +309,7 @@ CDI runs under a custom ServiceAccount (cdi-sa) and uses the [Kubernetes RBAC mo
 
 ## Protecting VM Image Namespaces
 
-Currently there is no support for automatically implementing [Kubernetes ResourceQuotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/) and Limits on desired namespaces and resources, therefore administrators need to manually lock down all new namespaces from being able to use the StorageClass associated with CDI/Kubevirt and cloning capabilities. This capability of automatically restricting resources is planned for future releases. Below are some examples of how one might achieve this level of resource protection:
+Currently there is no support for automatically implementing [Kubernetes ResourceQuotas](https://kubernetes.io/docs/concepts/policy/resource-quotas/) and Limits on desired namespaces and resources, therefore administrators need to manually lock down all new namespaces from being able to use the StorageClass associated with CDI/KubeVirt and cloning capabilities. This capability of automatically restricting resources is planned for future releases. Below are some examples of how one might achieve this level of resource protection:
 
 - Lock Down StorageClass Usage for Namespace:
 

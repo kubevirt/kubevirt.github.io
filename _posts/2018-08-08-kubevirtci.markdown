@@ -11,7 +11,7 @@ comments: true
 
 # Building Clusters with kubevirtci
 
-One of the projects in the Kubevirt github organization is a project called kubevirtci.  While this may sound like it’s the repo containing the Kubevirt CI system and scripts, that’s not completely accurate.  We leverage kubevirtci for our CI process, but there’s more to the CI system than just this repo.  Today, we’re not going to talk about the CI system in general, but instead we’re going to talk about the kubevirtci project, what it does, how it does it and why it’s pretty cool.
+One of the projects in the KubeVirt github organization is a project called kubevirtci.  While this may sound like it’s the repo containing the KubeVirt CI system and scripts, that’s not completely accurate.  We leverage kubevirtci for our CI process, but there’s more to the CI system than just this repo.  Today, we’re not going to talk about the CI system in general, but instead we’re going to talk about the kubevirtci project, what it does, how it does it and why it’s pretty cool.
 
 ## What it does
 In short: Deploys a Kubernetes (or OpenShift) cluster using QEMU Virtual Machines, that run inside Docker containers. First a base image is [provisioned](https://github.com/kubevirt/kubevirtci/blob/master/cluster-provision/k8s/provision.sh), this image contains a stock a Kubernetes node. Then one or more of these images are deployed in the target environment to make up the cluster.
@@ -46,7 +46,7 @@ So how is this better than simply creating some Virtual Machines and cloning the
 
 But the biggest advantage is that this can all be easily automated and repeated. Each time you spin up a cluster, it will be identical from a previous run. You have a mechanism to allow you to populate the cluster with an application you are developing/testing and then running automated processes against that application.
 
-Kubevirt itself works on a similar principal, embed a QEMU process in a container to start a Virtual Machine with configuration obtained from the encapsulating container. And the Kubevirt development team uses kubevirtci images in their development workflow as well.
+KubeVirt itself works on a similar principal, embed a QEMU process in a container to start a Virtual Machine with configuration obtained from the encapsulating container. And the KubeVirt development team uses kubevirtci images in their development workflow as well.
 
 And a final interesting thought: Everything mentioned in this article is a container, from the Virtual Machine images, to the gocli utility. It might be an interesting exercise to see if we can leverage kubernetes to manage the life cycle in a CI/CD system. We would then be creating Kubernetes clusters inside a kubernetes cluster to run CI/CD.
 

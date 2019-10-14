@@ -11,7 +11,7 @@ comments: true
 ---
 
 # Introduction
-Vagrant is a command line utility for managing the lifecycle of virtual machines. There are number of providers available which allow to control and provision virtual machines in different environment. In this blog post we update how to use the [provider](https://github.com/pkliczewski/vagrant-kubevirt) to manage [Kubevirt](https://kubevirt.io/).
+Vagrant is a command line utility for managing the lifecycle of virtual machines. There are number of providers available which allow to control and provision virtual machines in different environment. In this blog post we update how to use the [provider](https://github.com/pkliczewski/vagrant-kubevirt) to manage [KubeVirt](https://kubevirt.io/).
 
 The KubeVirt Vagrant provider implements the following features:
 - Manages virtual machines lifecycle - start, halt, status and destroy.
@@ -37,7 +37,7 @@ $ vagrant up --provider=kubevirt
 Instead of building a virtual machine from scratch, which would be a slow and tedious process, Vagrant uses a base image as template for virtual machines. These base images are known as "boxes" and every provider must introduce its own box format. The provider introduces *kubevirt* boxes.
 You can view an example box [here](https://github.com/pkliczewski/vagrant-kubevirt/blob/master/example_box/).
 
-There are two ways to tell Vagrant, how to connect to Kubevirt cluster in Vagrantfile:
+There are two ways to tell Vagrant, how to connect to KubeVirt cluster in Vagrantfile:
 - use Kubernetes configuration file. When no other connection details provided, the provider will look for kubeconfig using value of KUBECONFIG environment variable or $HOME/.kube/config location.
 - define connection details as part of box definition
 

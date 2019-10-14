@@ -11,7 +11,7 @@ comments: true
 
 # Introduction
 
-Kubevirt v0.7.0 was released a few weeks ago and brings a bunch of new features that this blog post will detail.
+KubeVirt v0.7.0 was released a few weeks ago and brings a bunch of new features that this blog post will detail.
 
 the full list is visible [here](https://github.com/kubevirt/kubevirt/releases/tag/v0.7.0) but we will pick the ones oriented to the end user
 

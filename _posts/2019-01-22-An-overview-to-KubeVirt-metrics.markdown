@@ -137,13 +137,13 @@ In this blog post, we will explore the current state of integration between Kube
 
 * Now, following again [KubeVirt's docs](https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html), we need to deploy two resources:
 
-  1. A [Prometheus resource](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#prometheus). Just copy the YAML snippet from *Kubevirt's docs* and apply it as follows:
+  1. A [Prometheus resource](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#prometheus). Just copy the YAML snippet from *KubeVirt's docs* and apply it as follows:
 
      ```
      $ kubectl apply -f kubevirt-prometheus.yml -n kube-system
      ```
 
-  2. A [ServiceMonitor resource](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#servicemonitor), again, take the YAML snippet from *Kubevirt's docs* and apply it to the cluster:
+  2. A [ServiceMonitor resource](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#servicemonitor), again, take the YAML snippet from *KubeVirt's docs* and apply it to the cluster:
 
      ```
      $ kubectl apply -f kubevirt-servicemonitor.yml -n kube-system

@@ -1,12 +1,12 @@
 ---
 layout: post
 author: kubebot
-description: This article provides information about Kube Virt release v0.22.0 changes
+description: This article provides information about KubeVirt release v0.22.0 changes
 navbar_active: Blogs
 datefixme:
 category: releases
 comments: true
-title: Kube Virt v0.22.0
+title: KubeVirt v0.22.0
 pub-date: October
 pub-year: 2019
 ---
@@ -16,7 +16,7 @@ pub-year: 2019
 
 Released on: Thu Oct 10 18:55:08 2019 +0200
 
-- Support for Nvidia GPUs and vGPUs exposed by Nvidia Kubevirt Device Plugin.
+- Support for Nvidia GPUs and vGPUs exposed by Nvidia KubeVirt Device Plugin.
 - VMIs now successfully start if they get a 0xfe prefixed MAC address assigned from the pod network
 - Removed dependency on host semanage in SELinux Permissive mode
 - Some changes as result of entering the CNCF sandbox (DCO check, FOSSA check, best practice badge)

@@ -18,7 +18,7 @@ Ignition is a new provisioning utility designed specifically for CoreOS/RhCOS. A
 - Writing files (regular files, systemd units, networkd units).
 - Configuring users and their associated ssh public keys.
 
-Recently, we added support for it in Kubevirt so ignition data can now be embedded in a vm specification, through a dedicated annotation.
+Recently, we added support for it in KubeVirt so ignition data can now be embedded in a vm specification, through a dedicated annotation.
 Ignition support is still needed in the guest operating system.
 
 
@@ -126,4 +126,4 @@ We currently leverage [Pass-through of arbitrary qemu commands](https://libvirt.
 
 ## Summary
 
-Ignition Support brings the ability to run coreos/rhcos distros on Kubevirt and to customize them at boot time.
+Ignition Support brings the ability to run coreos/rhcos distros on KubeVirt and to customize them at boot time.

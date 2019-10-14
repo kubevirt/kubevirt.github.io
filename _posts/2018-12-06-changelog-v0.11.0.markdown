@@ -1,12 +1,12 @@
 ---
 layout: post
 author: kubebot
-description: This article provides information about Kube Virt release v0.11.0 changes
+description: This article provides information about KubeVirt release v0.11.0 changes
 navbar_active: Blogs
 datefixme:
 category: releases
 comments: true
-title: Kube Virt v0.11.0
+title: KubeVirt v0.11.0
 pub-date: December
 pub-year: 2018
 ---

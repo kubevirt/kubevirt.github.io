@@ -169,7 +169,7 @@ rules:
       - get
 ```
 
-## Default Kubevirt RBAC Roles
+## Default KubeVirt RBAC Roles
 
 The next release of KubeVirt is coming with three default ClusterRoles that
 admins can use to grant users access to KubeVirt resources. In most cases,
