@@ -34,7 +34,7 @@ gen_changelog() {
     cat <<EOF >  $FILENAME
 ---
 layout: post
-author: kubebot
+author: kube🤖
 description: This article provides information about KubeVirt release $REL changes
 navbar_active: Blogs
 datefixme:

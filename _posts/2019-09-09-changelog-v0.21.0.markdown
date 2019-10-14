@@ -1,6 +1,6 @@
 ---
 layout: post
-author: kubebot
+author: kube🤖
 description: This article provides information about KubeVirt release v0.21.0 changes
 navbar_active: Blogs
 datefixme:
