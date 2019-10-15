@@ -13,7 +13,7 @@ pub-year: 2019
 Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions up to today of Kubernetes, CRI-O and KubeVirt.
 In this series of blogposts the following topics are going to be covered en each post:
 * Requirements: dependencies and containers runtime
-* Kubernetes: Cluster and Network
+* [Kubernetes: Cluster and Network](https://kubevirt.io/2019/KubeVirt_k8s_crio_from_scratch_installing_kubernetes.html)
 * KubeVirt: requirements and first Virtual Machine
 
 ## Pre-requisites
@@ -266,4 +266,4 @@ oct 02 16:17:06 k8s-test systemd[1]: Starting Container Runtime Interface for OC
 oct 02 16:17:06 k8s-test systemd[1]: Started Container Runtime Interface for OCI (CRI-O).
 ```
 
-In the next posts, the Kubernetes cluster will be set up, together with the pod Network and also the KubeVirt with the virtual Machines deployments.
+In the next posts, the [Kubernetes cluster will be set up](https://kubevirt.io/2019/KubeVirt_k8s_crio_from_scratch_installing_kubernetes.html), together with the pod Network and also the KubeVirt with the virtual Machines deployments.
