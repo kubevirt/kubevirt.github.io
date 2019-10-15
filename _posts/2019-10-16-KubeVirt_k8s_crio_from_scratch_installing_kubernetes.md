@@ -10,20 +10,20 @@ pub-date: October
 pub-year: 2019
 ---
 
-Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions up to today of Kubernetes, CRI-O and KubeVirt.
+Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
 In this series of blogposts the following topics are going to be covered en each post:
-* [Requirements: dependencies and containers runtime](https://kubevirt.io/2019/KubeVirt_k8s_crio_from_scratch.html)
+* [Requirements: dependencies and containers runtime]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %})
 * Kubernetes: Cluster and Network
 * KubeVirt: requirements and first Virtual Machine
 
-In the first blogpost of the series ([KubeVirt on Kubernetes with CRI-O from scratch)](https://kubevirt.io/2019/KubeVirt_k8s_crio_from_scratch.html) the initial set up for a CRI-O runtime environment has been covered. In this post is shown the installation and configuration of Kubernetes based in the previous CRI-O environment.
+In the first blogpost of the series ([KubeVirt on Kubernetes with CRI-O from scratch)]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %}) the initial set up for a CRI-O runtime environment has been covered. In this post is shown the installation and configuration of Kubernetes based in the previous CRI-O environment.
 
 ## Installing Kubernetes
 
 If the ansible way was chosen, you may want to skip this section since the repository and needed packages were already installed during execution.
 
 To install the K8s packages a new repo has to be added:
-```
+```ini
 k8s-test.local# vim /etc/yum.repos.d/kubernetes.repo
 [Kubernetes]
 name=Kubernetes
@@ -34,7 +34,7 @@ repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
 https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 ```
-Now the gpg keys of the packages can be imported into the system and the installation can proceed:
+Now, the gpg keys of the packages can be imported into the system and the installation can proceed:
 ```
 k8s-test.local# rpm --import https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 
@@ -75,7 +75,7 @@ Then you can join any number of worker nodes by running the following on each as
 kubeadm join 192.168.0.10:6443 --token 6fsrbi.iqsw1girupbwue5o \
     --discovery-token-ca-cert-hash sha256:c7cf9d9681876856f9b7819067841436831f19004caadab0b5838a9bf7f4126a
 ```
-As it says, now it's time to deploy the pod network, if the reader is curious and want to already check the status of the cluster, the following commands can be executed for getting all the pods running and their status:
+Now, it's time to deploy the pod network. If the reader is curious and want to already check the status of the cluster, the following commands can be executed for getting all the pods running and their status:
 ```
 k8s-test.local# export KUBECONFIG=/etc/kubernetes/kubelet.conf
 
@@ -105,7 +105,7 @@ k8s-test.local# cd /root
 k8s-test.local# wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 ```
 
-The version of CNI has to be checked and ensured that is the `0.3.1` version, otherwise,G it has to be changed, in this example the version `0.2.0` is replaced by the `0.3.1`:
+The version of CNI has to be checked and ensured that is the `0.3.1` version, otherwise, it has to be changed, in this example the version `0.2.0` is replaced by the `0.3.1`:
 ```
 k8s-test.local# grep cniVersion kube-flannel.yml
       "cniVersion": "0.2.0",
@@ -138,7 +138,7 @@ kube-system   kube-proxy-lqjpv                   1/1     Running   0          20
 kube-system   kube-scheduler-k8s-test            1/1     Running   0          20h
 ```
 
-To load the multus configuration the `multus-cni` repository has to be cloned, and also the `kube-1.16-change` branch has to be used:
+To load the multus configuration, the `multus-cni` repository has to be cloned, and also the `kube-1.16-change` branch has to be used:
 ```
 k8s-test.local# git clone https://github.com/intel/multus-cni /root/src/github.com/multus-cni
 
