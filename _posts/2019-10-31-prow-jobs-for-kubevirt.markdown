@@ -15,7 +15,7 @@ category: news
 
 General PR's, etc are tested by Prow to be validated to be reviewed by doing some sanity checks defined by developers.
 
-In general, the internals on how it works can be checked at [Life of a Prow Job](https://github.com/kubernetes/test-infra/blob/master/prow/life_of_a_prow_job.md).
+In general, the internals on how it works can be checked at [Life of a Prow Job](https://github.com/kubernetes/test-infra/blob/master/prow/life_of_a_prow_job.md), and of course in the presentation made by [Juanma](https://github.com/jparrill) on <https://talks.godoc.org/github.com/jparrill/hands-on-prow/hands-on-prow.slide#1>.
 
 ## Community repositories
 
