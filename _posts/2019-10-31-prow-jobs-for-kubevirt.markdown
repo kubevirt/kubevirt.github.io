@@ -44,8 +44,9 @@ Jobs are defined in the [project-infra](https://github.com/kubevirt/project-infr
 - <https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt-tutorial/kubevirt-tutorial-periodics.yaml>
 - <https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt-tutorial/kubevirt-tutorial-presubmits.yaml>
 
-Those jobs define the image to use (image and tag), and the commands to execute. In above examples we're using 'Docker-in-Docker' (dind) images and we're targetting the kubevirt-tutorial repository.
+Those jobs define the image to use (image and tag), and the commands to execute. In above examples we're using 'Docker-in-Docker' (dind) images and we're targetting the KubeVirt-tutorial repository.
 
+### KubeVirt-tutorial
 The jobs, when executed as part of the Prow workflow, run the commands defined in the repo itself, for example for `kubevirt-tutorial` check the following folder:
 
 - <https://github.com/kubevirt/kubevirt-tutorial/tree/master/hack>
@@ -54,6 +55,9 @@ That folder contains three scripts: `build`, `test_lab` and `tests`, which do se
 
 - install required software on top of the used images.
 - prepare the scripts to be executed via [mdsh](https://github.com/bashup/mdsh) which extracts markdown from lab files to be executed against the cluster setup by Prow (using `dind`).
+- Run each script and report status
+
+Once the execution has finished, if the final status is `ok`, the status is reported back to GitHub PR so that it can be reviewed by mantainers of the repo.
 
 ## Job status
 
