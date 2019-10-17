@@ -63,7 +63,7 @@ We change the yaml definition of this Virtual Machine to inject the default publ
 {% include scriptlets/lab2/09_create_vm1.sh -%}
 ```
 
-This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to gather its IP. You are looking for the IP address beside the `virt-launcher` pod.
+This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to `gather its IP`. You are looking for the IP address beside the `virt-launcher` pod.
 
 ```
 {% include scriptlets/lab2/10_view_pods.sh -%}
@@ -83,25 +83,27 @@ Wait for the Virtual Machine to boot and to be available for login. You may moni
 
 Disconnect from the virtual machine console by typing: `ctrl+]`
 
-Finally, use the gathered ip to connect to the Virtual Machine, create some files, stop and restart the Virtual Machine with virtctl and check how data persists.
+Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are **in the Kubernetes software defined network (SDN)**. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the [Easy install using AWS](https://kubevirt.io/pages/ec2.html) or [Easy install using GCP](https://kubevirt.io/pages/gcp.html) your cloud instance is already part of the cluster. 
 
 ```
 {% include scriptlets/lab2/13_ssh_to_vm1.sh -%}
 ```
 
-In case of running a local minikube this is slightly different due to how Kubernetes networking works. Note that the gathered ip is an ip from the SDN network and the only server which is inside the SDN is the minikube vm itself. So, in order to ssh to the Virtual Machine vm1 you first need to ssh minikube vm and then ssh to the ip gathered. However, as you notice this is not very straightforward. Also, take into account that you will need to copy to the minikube instance the ssh private key associated with the public ssh key added to vm1_pvc.yml file previously.
+On the other side, if you followed [Easy install using minikube](https://kubevirt.io/quickstart_minikube/) take into account that you will need to ssh into Minikube first, as shown below.
 
 ```
 {% include scriptlets/lab2/14_minikube_ssh_vm1.sh -%}
 ```
 
-A much more straightforward method is to expose the ssh port of the vm1 as a NodePort by means of the virtctl tool already installed in [Easy install using minikube](https://kubevirt.io/quickstart_minikube/). First, expose the vm1 as and verify that the K8S object service was created successfully as NodePort on a random port of the Minikube VM.
+Finally, on a usual situation you will probably want to give access to your vm1 VM to someone else from outside the Kubernetes cluster nodes. Someone who is actually connecting from his or her laptop. This can be achieved with the virtctl tool already installed in [Easy install using minikube](https://kubevirt.io/quickstart_minikube/). **Note that this is the same case as connecting from our laptop to vm1 VM running on our local Minikube instance**
+
+First, we are going expose the ssh port of the vm1 as NodePort type. Then verify that the Kubernetes object service was created successfully on a random port of the Minikube or cloud instance.
 
 ```
 {% include scriptlets/lab2/15_minikube_virtctl_expose_ssh_nodeport.sh -%}
 ```
 
-Once exposed successfully, check the IP of your Minikube VM and verify you can reach the VM using your public SSH key previously configured.
+Once exposed successfully, check the IP of your Minikube VM or cloud instance and verify you can reach the VM using your public SSH key previously configured. In case of cloud instances verify that security group applied allows traffic to the random port created.
 
 ```
 {% include scriptlets/lab2/16_minikube_vm_ip.sh -%}
@@ -110,7 +112,6 @@ Once exposed successfully, check the IP of your Minikube VM and verify you can r
 ```
 {% include scriptlets/lab2/17_ssh_from_outer_minikube.sh -%}
 ```
-
 
 This concludes this section of the lab.
 
