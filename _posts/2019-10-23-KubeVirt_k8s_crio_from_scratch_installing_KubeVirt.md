@@ -10,7 +10,7 @@ pub-date: Oct 23
 pub-year: 2019
 ---
 
-Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
+Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide, you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
 
 In this series of blogposts the following topics are going to be covered en each post:
 
@@ -19,15 +19,17 @@ In this series of blogposts the following topics are going to be covered en each
 * [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %})
 
 In the first blogpost of the series ([KubeVirt on Kubernetes with CRI-O from scratch)]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %}) the initial set up for a CRI-O runtime environment has been covered. 
-In the second blogpost of the series ([Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})) the Kubernetes cluster and network were set up based in the CRI-O installation already prepared in the first post.
+
+In the second blogpost of the series ([Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})) the Kubernetes cluster and network were set up based on the CRI-O installation already prepared in the first post.
+
 This is the last blogpost of the series of 3, in this case KubeVirt is going to be installed and also would be used to deploy an example Virtual Machine.
 
 ## Installing KubeVirt
 What is KubeVirt? if you navigate to the [KubeVirt webpage](https://kubevirt.io) you can read:
 
->KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.
+> KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.
 
->Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired. 
+> Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired. 
 
 In this example there is a Kubernetes cluster compose of one master, for it to be schedulable to host the KubeVirt pods, a little modification has to be done:
 ```sh
@@ -118,17 +120,17 @@ CAVEATS:
 \
  |  virt plugin is a wrapper for virtctl originating from the KubeVirt project. In order to use virtctl you will
  |  need to have KubeVirt installed on your Kubernetes cluster to use it. See https://kubevirt.io/ for details
- |  
+ |
  |  Run
- |  
+ |
  |    kubectl virt help
- |  
+ |
  |  to get an overview of the available commands
- |  
+ |
  |  See
- |  
+ |
  |    https://kubevirt.io/user-guide/docs/latest/using-virtual-machines/graphical-and-console-access.html
- |  
+ |
  |  for a usage example
 /
 Installed plugin: virt
@@ -139,13 +141,13 @@ WARNING: You installed a plugin from the krew-index plugin repository.
 
 
 ## Installing the first Virtual Machine in KubeVirt
-For this example, a cirros Virtual Machine is going to be created, in this example the kind of disk used is a registry disk (not persistent):
+For this example, a cirros Virtual Machine is going to be created, in this example, the kind of disk used is a registry disk (not persistent):
 ```sh
 k8s-test.local# kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
 
 k8s-test.local# kubectl get vms
 NAME        AGE   RUNNING   VOLUME
-testvm   13s   false     
+testvm   13s   false
 ```
 After the Virtual Machine has been created, it has to be started, to do so, the virtcl or the kubectl can be used (dependeing on what method has been choosen in previous steps).
 ```sh
@@ -154,7 +156,7 @@ VM vm-cirros was scheduled to start
 
 k8s-test.local# kubectl get vms
 NAME        AGE     RUNNING   VOLUME
-testvm   7m11s   true   
+testvm   7m11s   true
 ```
 Next thing to do is to use the `kubectl` command for getting the IP address and the actual status of the virtual machines:
 ```sh
@@ -187,10 +189,10 @@ VM testvm was scheduled to stop
 ```
 
 # Troubleshooting
-Each step of this guide has a place where to look for possible issues, in general the [troubleshooting guide of kubernetes](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can be checked. The following list try to ease the possible troubleshooting in the case of problems during each step of this guide:
+Each step of this guide has a place where to look for possible issues, in general, the [troubleshooting guide of kubernetes](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can be checked. The following list tries to ease the possible troubleshooting in the case of problems during each step of this guide:
 * CRI-O: check the status of the CRI-O service `systemctl status crio` and also the messages in the journal `journalctl -u crio -lf`
 * Kubernetes: check the status of the Kubelet service `systemctl status kubelet` and also the messages in the journal `journalctl -u kubelet -fl`
-* Pods: for checking the status of the pods the kubectl command can be used in different ways 
+* Pods: for checking the status of the pods the kubectl command can be used in different ways
     * `kubectl get pods -A`
     * `kubectl describe pod $pod`
 * Nodes: a `Ready` status would mean everything is ok with the node, otherwise the details of that node can be checked.
