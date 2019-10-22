@@ -15,8 +15,8 @@ Building your environment for testing or automation purposes can be difficult wh
 In this series of blogposts the following topics are going to be covered en each post:
 
 * [Requirements: dependencies and containers runtime]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %})
-* Kubernetes: Cluster and Network
-* KubeVirt: requirements and first Virtual Machine
+* [Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})
+* [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %})
 
 In the first blogpost of the series ([KubeVirt on Kubernetes with CRI-O from scratch)]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %}) the initial set up for a CRI-O runtime environment has been covered. In this post is shown the installation and configuration of Kubernetes based in the previous CRI-O environment.
 
