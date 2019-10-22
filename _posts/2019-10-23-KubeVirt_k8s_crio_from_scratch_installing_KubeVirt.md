@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: KubeVirt on Kubernetes with CRI-O from scratch - Installing Kubernetes
-pub-date: Oct 16
+pub-date: Oct 23
 pub-year: 2019
 ---
 Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
