@@ -1,11 +1,11 @@
 ---
 layout: post
 author: Pedro Ibáñez Requena
-description: How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide - Installing Kubernetes
+description: How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide - Installing KubeVirt
 navbar_active: Blogs
 category: news
 comments: true
-title: KubeVirt on Kubernetes with CRI-O from scratch - Installing Kubernetes
+title: KubeVirt on Kubernetes with CRI-O from scratch - Installing KubeVirt
 pub-date: Oct 23
 pub-year: 2019
 ---
@@ -198,6 +198,7 @@ Each step of this guide has a place where to look for possible issues, in genera
 * KubeVirt: to check the status of the KubeVirt pods use `kubectl get pods -n kubevirt`
 
 ## References
+
 * [Kubernetes getting started](https://kubernetes.io/docs/setup/)
 * [Kubernetes installing kubeadm](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/)
 * [Running CRI-O with kubeadm](https://github.com/cri-o/cri-o/blob/master/tutorials/kubeadm.md#configuring-cni)
@@ -205,4 +206,4 @@ Each step of this guide has a place where to look for possible issues, in genera
 * [Kubectl cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 * [Multus](https://github.com/intel/multus-cni)
 * [KubeVirt Userguide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
-
+* [KubeVirt Katacoda scenarios](https://www.katacoda.com/kubevirt)
