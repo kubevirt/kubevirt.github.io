@@ -89,7 +89,7 @@ Use "virtctl <command> --help" for more information about a given command.
 Use "virtctl options" for a list of global command-line options (applies to all commands).
 ```
 
-This step is optional, right now anything related with the Virtual Machines can be done running the `virtctl` command. In the case there is a need to interact with the Virtual Machines without leaving the scope of the `kubectl` command, the virt pluging for krew can be installed following the instructions below:
+This step is optional, right now anything related with the Virtual Machines can be done running the `virtctl` command. In case ther's a need to interact with the Virtual Machines without leaving the scope of the `kubectl` command, the virt pluging for krew can be installed following the instructions below:
 ```sh
 k8s-test.local# (
   set -x; cd "$(mktemp -d)" &&
@@ -111,7 +111,7 @@ k8s-test.local# vim ~/.bashrc
 export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 k8s-test.local# source ~/.bashrc
 ```
-Now the virt plugin is going to be installed using the krew plugin manager:
+Now, the virt plugin is going to be installed using the krew plugin manager:
 ```sh
 k8s-test.local# kubectl krew install virt
 Updated the local copy of plugin index.
@@ -189,7 +189,7 @@ VM testvm was scheduled to stop
 ```
 
 # Troubleshooting
-Each step of this guide has a place where to look for possible issues, in general, the [troubleshooting guide of kubernetes](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can be checked. The following list tries to ease the possible troubleshooting in the case of problems during each step of this guide:
+Each step of this guide has a place where to look for possible issues, in general, the [troubleshooting guide of kubernetes](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can be checked. The following list tries to ease the possible troubleshooting in case of problems during each step of this guide:
 * CRI-O: check the status of the CRI-O service `systemctl status crio` and also the messages in the journal `journalctl -u crio -lf`
 * Kubernetes: check the status of the Kubelet service `systemctl status kubelet` and also the messages in the journal `journalctl -u kubelet -fl`
 * Pods: for checking the status of the pods the kubectl command can be used in different ways
