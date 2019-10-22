@@ -9,13 +9,14 @@ title: KubeVirt on Kubernetes with CRI-O from scratch - Installing KubeVirt
 pub-date: Oct 23
 pub-year: 2019
 ---
+
 Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
 
 In this series of blogposts the following topics are going to be covered en each post:
 
 * [Requirements: dependencies and containers runtime]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %})
 * [Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})
-* KubeVirt: requirements and first Virtual Machine({% 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt.md %})
+* [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %})
 
 In the first blogpost of the series ([KubeVirt on Kubernetes with CRI-O from scratch)]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %}) the initial set up for a CRI-O runtime environment has been covered. 
 In the second blogpost of the series ([Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})) the Kubernetes cluster and network were set up based in the CRI-O installation already prepared in the first post.
