@@ -6,7 +6,7 @@
   tasks:
   - name: "Fetch AMI Feed"
     get_url:
-      url: "https://jenkins-kubevirt.apps.ci.centos.org/job/dev/job/jodavis/job/kvio-lab-images/lastSuccessfulBuild/artifact/new-images.json"
+      url: "https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json"
       dest: "./existing-ami.json"
       mode: "0400"
   - name: "Import JSON into variable"
