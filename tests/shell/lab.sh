@@ -4,10 +4,10 @@
 ### Global Vars and Utility Functions
 #########################################
 
-  ## This disables a warning about something that's intended behavior (not having inventory for provisioning and cleanup
+## This disables a warning about something that's intended behavior (not having inventory for provisioning and cleanup
 export ANSIBLE_LOCALHOST_WARNING="False"
 
-  ## Default to running lab1 tests
+## Default to running lab1 tests
 if [[ -z "$1" ]]; then
 
   labName="lab1"

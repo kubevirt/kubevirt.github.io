@@ -1,28 +1,28 @@
-# Kubevirt.io Laboratory testing
+# KubeVirt.io Laboratory testing
 
-This repository contains tests for Kubevirt.io laboratories regarding the **try it!** buttons. The environments tested are GCE, AWS and Minikube (you could replace ${PROVIDER} any of them).
+This repository contains tests for KubeVirt.io laboratories regarding the **try it!** buttons. The environments tested are GCE, AWS and Minikube (you could replace ${PROVIDER} any of them).
 
 ## Resources
 
 - Jenkins jobs:
-    - Image Generation: https://jenkins-kubevirt.apps.ci.centos.org/job/dev/job/jodavis/job/kvio-lab-testing/
+  - Image Generation: https://jenkins-kubevirt.apps.ci.centos.org/job/dev/job/jodavis/job/kvio-lab-testing/
 
 ## Workflow
 
 The entry point is the Jenkinsfile which executes this pipeline:
 
-- `shell/provision-and-destroy.sh`: This script will execute 2 ansible playbooks in a row, the first one will bootstrap an image prebuilded by [this repo](https://github.com/joeldavis84/kvio-lab-images.git) which raise up a Kubevirt environment on a ${PROVIDER} and then when the kubevirt environments was up and running stops it and delete it. This test will ensure that the Images are working fine and could bootstrap a well formed Kubevirt environment. The ansible playbooks executed are these:
+- `shell/provision-and-destroy.sh`: This script will execute 2 ansible playbooks in a row, the first one will bootstrap an image prebuilt by [this repo](https://github.com/kubevirt/cloud-image-builder) which raise up a KubeVirt environment on a ${PROVIDER} and then when the KubeVirt environments was up and running stops it and delete it. This test will ensure that the Images are working fine and could bootstrap a well formed KubeVirt environment. The ansible playbooks executed are these:
 
-    - `${PROVIDER}-provision.yml`
-    - `${PROVIDER}-cleanup.yml`
+  - `${PROVIDER}-provision.yml`
+  - `${PROVIDER}-cleanup.yml`
 
 - `sh shell/lab.sh labX`: `lab.sh` is a lab executor which accept a parameter with the `labX.yml` filename. This will wrap the lab results and the possible fails that could happen on the execution. This `labx.sh`:
 
-    - Raises up an kubevirt enironment with `${PROVIDER}-provision.yml`.
-    - Executes the `LabX.yml` ansible manifest.
-    - Deletes the previous kubevirt enironment with `${PROVIDER}-cleanup.yml`.
+  - Raises up an KubeVirt enironment with `${PROVIDER}-provision.yml`.
+  - Executes the `LabX.yml` ansible manifest.
+  - Deletes the previous KubeVirt enironment with `${PROVIDER}-cleanup.yml`.
 
-- `labX.yml`: Contains the test cases in a hardcoded way, that ansible executes in the Kubevirt environment.
+- `labX.yml`: Contains the test cases in a hardcoded way, that ansible executes in the KubeVirt environment.
 
 ## Results
 
