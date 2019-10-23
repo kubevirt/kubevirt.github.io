@@ -44,7 +44,7 @@
     shell: kubectl get pods -l app=containerized-data-importer -o json | jq .items
     until: import_status.stdout == "[]"
     delay: 10
-    retries: 50
+    retries: 100
   - name: (LAB 2) Generate SSH Key
     shell: ssh-keygen -f /home/centos/.ssh/id_rsa -t rsa -N ''
   - name: (LAB 2) Download vm1 VirtualMachine YAML
@@ -56,10 +56,11 @@
   - name: (LAB 2) Create vm1 VirtualMachine object
     shell: kubectl create -f /tmp/vm1_pvc.yml
   - name: (LAB 2) Wait for vm1 to be in a Running State
-    register: vm1_status 
+    register: vm1_status
     shell: kubectl get vmi vm1 -o json | jq -r .status.phase
     until: vm1_status.stdout == "Running"
-    retries: 20
+    delay: 10
+    retries: 100
   - name: (LAB 2) Get IP Address for vm1
     register: vm1_ip
     shell: kubectl get pods -o json | jq -r .items[0].status.podIP
