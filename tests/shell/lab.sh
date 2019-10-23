@@ -45,9 +45,7 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Ansible playbooks are in the prior folder, launch from there
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd ${DIR}
-cd ..
+cd $(dirname "${BASH_SOURCE[0]}")/..
 
 set -o pipefail
 ansible-playbook --private-key ${SSH_KEY_LOCATION} ansible/${targetEnvironment}-provision.yml | tee ansible-${targetEnvironment}-${labName}-provision.log

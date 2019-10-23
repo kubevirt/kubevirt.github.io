@@ -16,8 +16,6 @@ if [[ $? -ne 0 ]]; then
 fi
 
 # Ansible playbooks are in the prior folder, launch from there
-DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-cd ${DIR}
-cd ..
+cd $(dirname "${BASH_SOURCE[0]}")/..
 
 ansible-playbook ansible/${targetEnvironment}-provision.yml && ansible-playbook ansible/${targetEnvironment}-cleanup.yml
