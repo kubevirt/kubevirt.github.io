@@ -10,7 +10,7 @@ pub-date: October
 pub-year: 2019
 ---
 
-Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions up to today of Kubernetes, CRI-O and KubeVirt.
+Building your environment for testing or automation purposes can be difficult when using different technologies. In this guide you'll find how to set up your system step-by-step to work with the latest versions up to today of Kubernetes, CRI-O and KubeVirt.
 In this series of blogposts the following topics are going to be covered en each post:
 * [Requirements: dependencies and containers runtime]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %})
 * [Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})
