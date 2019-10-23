@@ -179,4 +179,5 @@ daemonset.apps/kube-multus-ds-amd64 created
 daemonset.apps/kube-multus-ds-ppc64le created
 ```
 
-In the next post, the KubeVirt requirements will be set up together with the binaries and YAML files and also the first virtual Machines will be deployed.
+In the next post [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %}), the KubeVirt requirements will be set up together with the binaries and YAML files and also the first virtual Machines will be deployed.
+
