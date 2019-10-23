@@ -10,7 +10,7 @@ pub-date: Oct 16
 pub-year: 2019
 ---
 
-Building your environment for testing or automation purposes can be difficult when using different edge technologies, in this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
+Building your environment for testing or automation purposes can be difficult when using different technologies. In this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
 
 In this series of blogposts the following topics are going to be covered en each post:
 
@@ -180,3 +180,4 @@ daemonset.apps/kube-multus-ds-ppc64le created
 ```
 
 In the next post [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %}), the KubeVirt requirements will be set up together with the binaries and YAML files and also the first virtual Machines will be deployed.
+
