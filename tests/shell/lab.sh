@@ -20,7 +20,7 @@ fi
 
 failImmediately(){
   if [[ $1 -ne 0 ]]; then
-    echo "Ansible Playbook Failed with: $1" >&1
+    echo "Ansible Playbook $2 Failed with: $1" >&1
     exit $1
   fi
 }
@@ -47,28 +47,16 @@ fi
 # Ansible playbooks are in the prior folder, launch from there
 cd $(dirname "${BASH_SOURCE[0]}")/..
 
+echo Lab ${labName} Provision
+echo ${SSH_KEY_LOCATION}
 set -o pipefail
 ansible-playbook --private-key ${SSH_KEY_LOCATION} ansible/${targetEnvironment}-provision.yml | tee ansible-${targetEnvironment}-${labName}-provision.log
-failImmediately $?
+failImmediately $? Provision
 
+echo Lab ${labName} Validation
 ansible-playbook --private-key ${SSH_KEY_LOCATION} -i /tmp/inventory ansible/${labName}.yml | tee ansible-${targetEnvironment}-${labName}.log
-failImmediately $?
+failImmediately $? Validation
 
-ansible-playbook ansible/${targetEnvironment}-cleanup.yml | tee ansible-${targetEnvironment}-${labName}-cleanup.log
-failImmediately $?
-
-if [[ "${targetEnvironment}" == "gcp" ]]; then
-
-  if [[ -e /workDir/.ansible/plugins/modules ]]; then
-    find /workDir/.ansible/plugins/modules -type f
-  fi
-
-  if [[ -e /usr/share/ansible/plugins/modules ]]; then
-    find /usr/share/ansible/plugins/modules -type f
-  fi
-
-  if [[ -e /usr/lib/python3.7/site-packages/ansible ]]; then
-    find /usr/lib/python3.7/site-packages/ansible -type f > ansible-modules.log
-  fi
-
-fi
+echo Lab ${labName} Cleanup
+ansible-playbook --private-key ${SSH_KEY_LOCATION} ansible/${targetEnvironment}-cleanup.yml | tee ansible-${targetEnvironment}-${labName}-cleanup.log
+failImmediately $? Cleanup

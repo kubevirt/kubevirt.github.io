@@ -92,9 +92,10 @@ cloudEnvironments.each { environName, environValues ->
 
           } // END stage(prepare env)
 
-          stage("${environName}-validate-provision") {
-            executeInContainer(containerName: 'ansible-executor', containerScript: "sh tests/shell/provision-and-destroy.sh", stageVars: params, credentials: credentials)
-          }
+          // comment: We already create/destroy in lab validation step, so removing this, reduces time to validate the labs
+          // stage("${environName}-validate-provision") {
+          //  executeInContainer(containerName: 'ansible-executor', containerScript: "sh tests/shell/provision-and-destroy.sh", stageVars: params, credentials: credentials)
+          //}
 
           stage("${environName}-lab1") {
             executeInContainer(containerName: 'ansible-executor', containerScript: "sh tests/shell/lab.sh lab1", stageVars: params, credentials: credentials)
@@ -117,7 +118,7 @@ cloudEnvironments.each { environName, environValues ->
 
   } // END builders definition
 
-} // END cloudEnvironments.each 
+} // END cloudEnvironments.each
 
   // Instruct the built pipeline steps to be executed in parallel
 parallel builders
