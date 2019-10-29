@@ -13,3 +13,4 @@
       service_account_email: "push-button-ci@cnvlab-209908.iam.gserviceaccount.com"
       credentials_file: "{{ credentials_file }}"
       project_id: "cnvlab-209908"
+    ignore_errors: yes
