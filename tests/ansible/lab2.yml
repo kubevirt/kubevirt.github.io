@@ -73,9 +73,3 @@
     register: result
     until: result.rc == 0
     when: target_env != "minikube"
-  - name: shutdown instance
-    become: "yes"
-    command: /sbin/shutdown -h now
-    sudo: yes
-  - name: wait go down
-    local_action: wait_for host={{ ansible_ssh_host }} port=22 state=stopped

@@ -35,9 +35,3 @@
     retries: 100
     delay: 10
     until: expect_script.stdout == "cirros"
-  - name: shutdown instance
-    become: "yes"
-    command: /sbin/shutdown -h now
-    sudo: yes
-  - name: wait go down
-    local_action: wait_for host={{ ansible_ssh_host }} port=22 state=stopped
