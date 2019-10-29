@@ -10,9 +10,8 @@ pub-date: October
 pub-year: 2019
 ---
 
-![KubeVirt](/images/kubevirt-stacked-color_250.png "KubeVirt")
-![Rook](/images/rook-stacked-color_250.png "Rook")
-![Ceph](/images/Ceph_Logo_Standard_RGB_120411_fa_250.png "Ceph")
+![Rook](/assets/2019-10-30-KubeVirt_storage_rook_ceph/rook-stacked-color_250.png "Rook")
+![Ceph](/assets/2019-10-30-KubeVirt_storage_rook_ceph/Ceph_Logo_Standard_RGB_120411_fa_250.png "Ceph")
 
 ## Introduction
 > In computer science, persistence refers to the characteristic of state that outlives the process
