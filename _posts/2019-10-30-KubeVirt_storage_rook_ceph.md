@@ -17,7 +17,7 @@ pub-year: 2019
 > In computer science, persistence refers to the characteristic of state that outlives the process
 that created it. This is achieved in practice by storing the state as data in computer data storage.
 Programs have to transfer data to and from storage devices and have to provide mappings from the
-native programming-language data structures to the storage device data structures. [Wikipedia](https://en.wikipedia.org/wiki/Persistence_(computer_science))
+native programming-language data structures to the storage device data structures. Source: [Wikipedia](https://en.wikipedia.org/wiki/Persistence_(computer_science))
 
 In this post, we are going to show how to set up a persistence system to store VM images with the help of [Ceph](https://ceph.io) and the automation of [Rook](https://rook.io).
 
