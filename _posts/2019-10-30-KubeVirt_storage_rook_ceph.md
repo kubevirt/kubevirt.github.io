@@ -10,11 +10,11 @@ pub-date: October
 pub-year: 2019
 ---
 
-![KubeVirt](/assets/2019-10-30-KubeVirt_storage_rook_ceph/kubevirt-stacked-color_250.png "KubeVirt")
-![Rook](/assets/2019-10-30-KubeVirt_storage_rook_ceph/rook-stacked-color_250.png "Rook")
-![Ceph](/assets/2019-10-30-KubeVirt_storage_rook_ceph/Ceph_Logo_Standard_RGB_120411_fa_250.png "Ceph")
+![KubeVirt](/images/kubevirt-stacked-color_250.png "KubeVirt")
+![Rook](/images/rook-stacked-color_250.png "Rook")
+![Ceph](/images/Ceph_Logo_Standard_RGB_120411_fa_250.png "Ceph")
 
-## Pre-requisites
+## Introduction
 > In computer science, persistence refers to the characteristic of state that outlives the process
 that created it. This is achieved in practice by storing the state as data in computer data storage.
 Programs have to transfer data to and from storage devices and have to provide mappings from the
@@ -22,6 +22,7 @@ native programming-language data structures to the storage device data structure
 
 In this post, we are going to show how to set up a persistence system to store VM images with the help of [Ceph](https://ceph.io) and the automation of [Rook](https://rook.io).
 
+## Pre-requisites
 Some prerequisites have to be met:
 - An existent Kubernetes cluster with 3 masters and 1 worker (min) is already set up, it's not mandatory to have that setup but for showing an example of a HA Ceph installation.
 - Each Kubernetes node has an extra empty disk connected (has to be blank with no filesystem).
