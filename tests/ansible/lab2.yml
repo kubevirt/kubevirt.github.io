@@ -14,6 +14,7 @@
       src: "../shell/disable-hostpath-minikube.sh"
       dest: "/tmp/disable-standard-hostpath-minikube.sh"
       mode: "0700"
+    when: target_env == "minikube"
   - name: "(LAB 2) Disable minikube-hostpath  Provisioner If It Exists"
     shell: "/tmp/disable-standard-hostpath-minikube.sh"
     when: target_env == "minikube"
@@ -23,6 +24,7 @@
     register: schedule_status
     shell: kubectl get pods -n cdi -l app=containerized-data-importer -o json | jq -r .items[0].status.phase
     until: schedule_status.stdout == "Running"
+    delay: 10
     retries: 20
   - name: (LAB 2) Give CDI deployment time to finish
     pause:

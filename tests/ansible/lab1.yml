@@ -3,7 +3,7 @@
   gather_facts: False
   remote_user: centos
   tasks:
-  - debug: 
+  - debug:
       msg: "Starting Run At: {{ lookup('pipe','date +%Y-%m-%d-%H-%M-%S') }}"
   - name: (LAB 1) Copy Expect Script
     become: "yes"
@@ -18,18 +18,20 @@
     yum:
       name: expect
       state: latest
-  - name: (LAB 1) Create Virtual Machine Object 
+  - name: (LAB 1) Create Virtual Machine Object
     shell: kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml && /home/centos/virtctl start testvm
   - name: (LAB 1) Wait for the VM to get scheduled and start running
     register: schedule_status
     shell: kubectl get vmi testvm -o json | jq -r .status.phase
     until: schedule_status.stdout == "Running"
-    retries: 20
+    retries: 100
+    delay: 10
   - name: (LAB 1) Give CirrOS VM time to boot
     pause:
       minutes: 2
   - name: (LAB 1) Run Expect Script Until A Successful Login Is Reached
     register: expect_script
     shell: /bin/expect /tmp/cirros-login.exp | grep ttyS0 | egrep -o '^cirros'
-    retries: 10
+    retries: 100
+    delay: 10
     until: expect_script.stdout == "cirros"
