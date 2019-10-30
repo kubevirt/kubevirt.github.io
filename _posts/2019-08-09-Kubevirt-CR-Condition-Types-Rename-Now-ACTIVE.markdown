@@ -1,6 +1,6 @@
 ---
 layout: post
-author: iranzo
+author: Pablo Iranzo Gómez
 description: Condition Types have been RENAMED
 title: KubeVirt Condition Types Renamed
 navbar_active: Blogs
