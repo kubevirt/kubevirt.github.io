@@ -14,36 +14,41 @@ pub-year: 2019
 ![Ceph](/assets/2019-10-30-KubeVirt_storage_rook_ceph/Ceph_Logo_Standard_RGB_120411_fa_250.png "Ceph")
 
 ## Introduction
+
+Quoting [Wikipedia](https://en.wikipedia.org/wiki/Persistence_(computer_science)):
+
 > In computer science, persistence refers to the characteristic of state that outlives the process
-that created it. This is achieved in practice by storing the state as data in computer data storage.
-Programs have to transfer data to and from storage devices and have to provide mappings from the
-native programming-language data structures to the storage device data structures. Source: [Wikipedia](https://en.wikipedia.org/wiki/Persistence_(computer_science))
+> that created it. This is achieved in practice by storing the state as data in computer data storage.
+> Programs have to transfer data to and from storage devices and have to provide mappings from the
+> native programming-language data structures to the storage device data structures.
 
 In this post, we are going to show how to set up a persistence system to store VM images with the help of [Ceph](https://ceph.io) and the automation of [Rook](https://rook.io).
 
 ## Pre-requisites
+
 Some prerequisites have to be met:
-- An existent Kubernetes cluster with 3 masters and 1 worker (min) is already set up, it's not mandatory to have that setup but for showing an example of a HA Ceph installation.
+
+- An existent Kubernetes cluster with 3 masters and 1 worker (min) is already set up, it's not mandatory, but allows to demonstrate an example of a HA Ceph installation.
 - Each Kubernetes node has an extra empty disk connected (has to be blank with no filesystem).
 - KubeVirt is already installed and running.
 
 In this example the following systems names and IP addresses are used:
 
-| System      | Purpose  |  IP | 
-| ------------- | ---------- | ------------- |
-| kv-master-00     | Kubernetes Master node 00 | 192.168.122.6     |
-| kv-master-01     | Kubernetes Master node 01 | 192.168.122.106     |
-| kv-master-02     | Kubernetes Master node 02 | 192.168.122.206     |
-| kv-worker-00     | Kubernetes Worker node 00 | 192.168.122.222     |
+|    System    |          Purpose          |       IP        |
+| :----------: | :-----------------------: | :-------------: |
+| kv-master-00 | Kubernetes Master node 00 |  192.168.122.6  |
+| kv-master-01 | Kubernetes Master node 01 | 192.168.122.106 |
+| kv-master-02 | Kubernetes Master node 02 | 192.168.122.206 |
+| kv-worker-00 | Kubernetes Worker node 00 | 192.168.122.222 |
 
+For being able to import Virtual Machines, the KubeVirt CDI has to be configured too.
 
-To have this system able to import Virtual Machines, the KubeVirt CDI has to be configured.
+> Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes. Its primary goal is to provide a declarative way to build Virtual Machine Disks on PVCs for KubeVirt VMs.
 
-> Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes. Its primary goal is to provide a declarative way to build Virtual Machine Disks on PVCs for Kubevirt VMs.
+> CDI works with standard core Kubernetes resources and is storage device-agnostic, while its primary focus is to build disk images for Kubevirt, it's also useful outside of a KubeVirt context to use for initializing your Kubernetes Volumes with data.
 
-> CDI works with standard core Kubernetes resources and is storage device-agnostic, while its primary focus is to build disk images for Kubevirt, it's also useful outside of a Kubevirt context to use for initializing your Kubernetes Volumes with data.
+In the case your cluster doesn't have CDI, the following commands will cover CDI operator and the CR setup:
 
-In the case your cluster doesn't have CDI, the following commands take care of the CDI operator and the cr set up:
 ```sh
 [root@kv-master-00 ~]# export VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\+\.[0-9]*\.[0-9]*")
 
@@ -62,9 +67,9 @@ cdi.cdi.kubevirt.io/cdi created
 
 ```
 
-The nodes of the cluster have to be time synchronised (note that this should have been done for you by chronyd but it can't harm to do it again):
+The nodes of the cluster have to be time synchronized (note that this should have been done for you by `chronyd` but it can't harm to do it again):
 
-```
+```sh
 [root@kv-master-00 ~]# for i in $(echo 6 106 206 222); do ssh -oStrictHostKeyChecking=no \
     root@192.168.122.$i sudo chronyc -a makestep; done
 
@@ -80,10 +85,11 @@ Warning: Permanently added '192.168.122.222' (ECDSA) to the list of known hosts.
 
 > NOTE: This step could also be done with ansible (one line or rhel-system-roles.noarch).
 
-
 ## Installing Rook in Kubernetes to handle the Ceph cluster
+
 Next, the latest upstream release of Rook has to be cloned:
-```
+
+```sh
 [root@kv-master-00 ~]# git clone https://github.com/rook/rook
 Cloning into 'rook'...
 remote: Enumerating objects: 1, done.
@@ -92,8 +98,10 @@ remote: Total 37745 (delta 0), reused 0 (delta 0), pack-reused 37744
 Receiving objects: 100% (37745/37745), 13.02 MiB | 1.54 MiB/s, done.
 Resolving deltas: 100% (25309/25309), done.
 ```
-Now change directory to the location of the Kubernetes examples where the respective resource definitions can be found:
-```
+
+Now, change the actual directory to the location of the Kubernetes examples where the respective resource definitions can be found:
+
+```sh
 [root@kv-master-00 ~]# cd rook/cluster/examples/kubernetes/ceph
 ```
 
@@ -105,12 +113,13 @@ The Rook common resources that make up Rook have to be created:
 ```
 
 Next, create the Kubernetes Rook operator:
+
 ```sh
 [root@kv-master-00 ~]# kubectl create -f operator.yaml
 deployment.apps/rook-ceph-operator created
 ```
 
-To check the progress of the operator pod, and the discovery pods starting up to the commands below can be executed. The discovery pods are responsible for investigating the available resources (e.g. disks that can make up OSD's) across all available Nodes:
+To check the progress of the operator pod and the discovery pods starting up, the commands below can be executed. The discovery pods are responsible for investigating the available resources (e.g. disks that can make up OSD's) across all available Nodes:
 
 ```sh
 [root@kv-master-00 ~]# watch kubectl get pods -n rook-ceph
@@ -129,7 +138,7 @@ pod/rook-discover-f8k4s                  1/1     Running   0          3m26s
 pod/rook-discover-x22hh                  1/1     Running   0          3m26s
 ```
 
-Next, to set the Ceph cluster configuration inside of the Rook operator:
+After, the Ceph cluster configuration inside of the Rook operator has to be prepared:
 
 ```sh
 [root@kv-master-00 ~]# kubectl create -f cluster.yaml
@@ -172,7 +181,8 @@ rook-discover-f8k4s                             1/1     Running             0   
 rook-discover-x22hh                             1/1     Running             0          8m35s
 
 ```
-Wait until the Ceph monitor pods are created. Next up, the toolbox pod has to be created; this is useful to verify the status/health of the cluster, getting/setting authentication, and querying the Ceph cluster using standard Ceph tools:
+
+Wait until the Ceph monitor pods are created. Next, the toolbox pod has to be created; this is useful to verify the status/health of the cluster, getting/setting authentication, and querying the Ceph cluster using standard Ceph tools:
 
 ```sh
 [root@kv-master-00 ~]# kubectl create -f toolbox.yaml
@@ -187,6 +197,7 @@ rook-ceph-tools-856c5bc6b4-s47qm                       1/1     Running   0      
 ```
 
 Before proceeding with the pool and the storage class the Ceph cluster status can be checked already:
+
 ```sh
 [root@kv-master-00 ~]# toolbox=$(kubectl -n rook-ceph get pods -o custom-columns=NAME:.metadata.name --no-headers | grep tools)
 
@@ -196,28 +207,31 @@ sh-4.2# ceph status
     id:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_WARN
             clock skew detected on mon.c
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 3m)
     mgr: a(active, since 2m)
     osd: 4 osds: 4 up (since 105s), 4 in (since 105s)
- 
+
   data:
     pools:   0 pools, 0 pgs
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:
 ```
-> NOTE: In this example, the health value is HEALTH_WARN because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a HEALTH_OK.
+
+> NOTE: In this example, the health value is `HEALTH_WARN` because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a `HEALTH_OK`.
 
 Next, some other resources need to be created. First, the block pool that defines the name (and specification) of the RBD pool that will be used for creating persistent volumes, in this case, is called `replicapool`:
 
 ## Configuring the CephBlockPool and the Kubernetes StorageClass for using Ceph hosting the Virtual Machines
+
 The `cephblockpool.yml` is based in the `pool.yml`, you can check that file in the same directory to learn about the details of each parameter:
 
 ```sh
 [root@kv-master-00 ~]# cat pool.yml
 ```
+
 ```yaml
 #################################################################################################################
 # Create a Ceph pool with settings for replication in production environments. A minimum of 3 OSDs on
@@ -241,10 +255,12 @@ spec:
   #  key: value
 ```
 
-The following file is the one that has to be created to define the CephBlockPool:
+The following file has to be created to define the CephBlockPool:
+
 ```sh
 [root@kv-master-00 ~]# vim cephblockpool.yml
 ```
+
 ```yaml
 apiVersion: ceph.rook.io/v1
 kind: CephBlockPool
@@ -256,6 +272,7 @@ spec:
   replicated:
     size: 2
 ```
+
 ```sh
 [root@kv-master-00 ~]# kubectl create -f cephblockpool.yml
 cephblockpool.ceph.rook.io/replicapool created
@@ -270,6 +287,7 @@ Now is time to create the Kubernetes storage class that would be used to create 
 ```sh
 [root@kv-master-00 ~]# vim storageclass.yml
 ```
+
 ```yaml
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
@@ -302,6 +320,7 @@ parameters:
 # Delete the rbd volume when a PVC is deleted
 reclaimPolicy: Delete
 ```
+
 ```sh
 [root@kv-master-00 ~]# kubectl create -f storageclass.yml
 storageclass.storage.k8s.io/rook-ceph-block created
@@ -310,9 +329,10 @@ storageclass.storage.k8s.io/rook-ceph-block created
 NAME              PROVISIONER                  AGE
 rook-ceph-block   rook-ceph.rbd.csi.ceph.com   61s
 ```
+
 > NOTE: Special attention to the pool name, it has to be the same as configured in the CephBlockPool.
 
-Now simply wait for the Ceph OSD's to finish provisioning and we'll be done with our Ceph deployment:
+Now, simply wait for the Ceph OSD's to finish provisioning and we'll be done with our Ceph deployment:
 
 ```sh
 [root@kv-master-00 ~]# watch  "kubectl -n rook-ceph get pods | grep rook-ceph-osd-prepare"
@@ -322,9 +342,10 @@ rook-ceph-osd-prepare-kv-master-02.kubevirt-io-zm7c2   0/1     Completed   0    
 rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0          20m
 
 ```
+
 >NOTE: This process may take a few minutes as it has to zap the disks, deploy a BlueStore configuration on them, and start the OSD service pods across our nodes.
 
-Now, the cluster deployment can be validated:
+The cluster deployment can be validated now:
 
 ```sh
 [root@kv-master-00 ~]# kubectl -n rook-ceph exec -it $toolbox sh
@@ -333,19 +354,20 @@ sh-4.2# ceph -s
     id:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_WARN
             too few PGs per OSD (4 < min 30)
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 12m)
     mgr: a(active, since 21m)
     osd: 4 osds: 4 up (since 20m), 4 in (since 20m)
- 
+
   data:
     pools:   1 pools, 8 pgs
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:     8 active+clean
 ```
-Oh Wait! the health value is again HEALTH_WARN, no problem, it is because there are too few PGs per OSD, in this case 4, for a minimum value of 30. Let's fix it changing that value to 256:
+
+Oh Wait! the health value is again `HEALTH_WARN`, no problem! it is because there are too few PGs per OSD, in this case 4, for a minimum value of 30. Let's fix it changing that value to 256:
 
 ```sh
 [root@kv-master-00 ~]# kubectl -n rook-ceph exec -it $toolbox sh
@@ -356,12 +378,12 @@ sh-4.2# ceph -s
   cluster:
     id:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_OK
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 18m)
     mgr: a(active, since 27m)
     osd: 4 osds: 4 up (since 26m), 4 in (since 26m)
- 
+
   data:
     pools:   1 pools, 256 pgs
     objects: 0 objects, 0 B
@@ -373,18 +395,20 @@ sh-4.2# ceph -s
              1   peering
 
 ```
-In a moment Ceph will end peering and the status of the pgs would be `active+clean`:
+
+In a moment, Ceph will end peering and the status of the pgs would be `active+clean`:
+
 ```sh
 sh-4.2# ceph -s
   cluster:
     id:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_OK
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 21m)
     mgr: a(active, since 29m)
     osd: 4 osds: 4 up (since 28m), 4 in (since 28m)
- 
+
   data:
     pools:   1 pools, 256 pgs
     objects: 0 objects, 0 B
@@ -392,18 +416,19 @@ sh-4.2# ceph -s
     pgs:     256 active+clean
 ```
 
-Some additional checks on the Ceph cluster can be made:
+Some additional checks on the Ceph cluster can be performed:
+
 ```sh
 sh-4.2# ceph osd tree
-ID CLASS WEIGHT  TYPE NAME                         STATUS REWEIGHT PRI-AFF 
--1       0.07434 root default                                              
--9       0.01859     host kv-master-00-kubevirt-io                         
- 3   hdd 0.01859         osd.3                         up  1.00000 1.00000 
--7       0.01859     host kv-master-01-kubevirt-io                         
- 2   hdd 0.01859         osd.2                         up  1.00000 1.00000 
--3       0.01859     host kv-master-02-kubevirt-io                         
- 0   hdd 0.01859         osd.0                         up  1.00000 1.00000 
--5       0.01859     host kv-worker-00-kubevirt-io                         
+ID CLASS WEIGHT  TYPE NAME                         STATUS REWEIGHT PRI-AFF
+-1       0.07434 root default
+-9       0.01859     host kv-master-00-kubevirt-io
+ 3   hdd 0.01859         osd.3                         up  1.00000 1.00000
+-7       0.01859     host kv-master-01-kubevirt-io
+ 2   hdd 0.01859         osd.2                         up  1.00000 1.00000
+-3       0.01859     host kv-master-02-kubevirt-io
+ 0   hdd 0.01859         osd.0                         up  1.00000 1.00000
+-5       0.01859     host kv-worker-00-kubevirt-io
  1   hdd 0.01859         osd.1                         up  1.00000 1.00000
 
 sh-4.2# ceph osd status
@@ -419,17 +444,18 @@ sh-4.2# ceph osd status
 ```
 
 That should match the available block devices in the nodes, let's check it in the `kv-master-00` node:
+
 ```sh
-[root@kv-master-00 ~]# lsblk 
+[root@kv-master-00 ~]# lsblk
 NAME                                                                                                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
-sr0                                                                                                   11:0    1  512K  0 rom  
-vda                                                                                                  253:0    0   50G  0 disk 
+sr0                                                                                                   11:0    1  512K  0 rom
+vda                                                                                                  253:0    0   50G  0 disk
 └─vda1                                                                                               253:1    0   50G  0 part /
-vdb                                                                                                  253:16   0   20G  0 disk 
+vdb                                                                                                  253:16   0   20G  0 disk
 └─ceph--09112f92--11cd--4284--b763--447065cc169c-osd--data--0102789c--852c--4696--96ce--54c2ad3a848b 252:0    0   19G  0 lvm
 ```
 
-It can also be shown that these pods are running across the correct nodes, see the 'NODE' column below:
+To validate that the pods are running on the correct nodes, check the `NODE` column below:
 
 ```sh
 [root@kv-master-00 ~]# kubectl get pods -n rook-ceph -o wide | egrep '(NAME|osd)'
@@ -447,6 +473,7 @@ rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0    
 All good!
 
 For validating the storage provisioning through the new Ceph cluster managed by the Rook operator, a persistent volume claim (PVC) can be created:
+
 ```sh
 [root@kv-master-00 ~]# vim pvc.yml
 ```
@@ -463,13 +490,16 @@ spec:
     requests:
       storage: 1Gi
 ```
+
 ```sh
-[root@kv-master-00 ceph]# kubectl create -f pvc.yml 
+[root@kv-master-00 ceph]# kubectl create -f pvc.yml
 persistentvolumeclaim/pv-claim created
 ```
+
 > NOTE: Ensure that the `storageClassName` contains the name of the storage class you have created, in this case, `rook-ceph-block`
 
-For checking that it has been bound, list the PVCs and look for the ones in the `rook-ceph-block` storageclass:
+For checking that it has been bound, list the PVC's and look for the ones in the `rook-ceph-block` storageclass:
+
 ```sh
 [root@kv-master-00 ~]# kubectl get pvc
 NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
@@ -479,13 +509,16 @@ pv-claim   Bound    pvc-62a9738a-e027-4a68-9ecf-16278711ff64   1Gi        RWO   
 >NOTE: If the volume is still in a 'Pending' state, likely, that one of the pods haven't come up correctly or one of the steps above has been missed. To check it, the command 'kubectl get pods -n rook-ceph' can be executed for viewing the running/failed pods.
 
 Before proceeding let's clean up the temporary PVC:
+
 ```sh
 [root@kv-master-00 ~]# kubectl delete pvc pv-claim
 persistentvolumeclaim "pv-claim" deleted
 ```
 
 ## Creating a Virtual Machine in KubeVirt backed by Ceph
+
 Once the Ceph cluster is up and running, the first Virtual Machine can be created, to do so, a YML example file is being downloaded and modified:
+
 ```sh
 [root@kv-master-00 ~]# wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/master/manifests/example/vm-dv.yaml
 [root@kv-master-00 ~]# sed -i 's/hdd/rook-ceph-block/' vm-dv.yaml
@@ -496,6 +529,7 @@ Once the Ceph cluster is up and running, the first Virtual Machine can be create
 ```
 
 The modified YAML could be run already like this but a user won't be able to log in as we don't know the password used in that image. `cloud-init` can be used to change the password of the default user of that image `centos` and grant us access, two parts have to be added:
+
 - Add a second disk after the `datavolumevolume` (already existing), in this example is called `cloudint`:
 ```sh
 [root@kv-master-00 ~]# vim vm-dv.yaml
@@ -517,7 +551,7 @@ The modified YAML could be run already like this but a user won't be able to log
               bus: virtio
             name: cloudinit
 ...
-``` 
+```
 - Afterwards, add the volume at the end of the file, after the volume already defined as `datavolumevolume`, in this example it's also called `cloudinit`:
 ```sh
 [root@kv-master-00 ~]# vim vm-dv.yaml
@@ -535,10 +569,12 @@ The modified YAML could be run already like this but a user won't be able to log
             chpasswd: { expire: False }
         name: cloudinit
 ```
-The password value is up to you (`changeme` in this example), you can set it as you like.
+
+The password value (`changeme` in this example), can be set to your preferred one.
 
 Once the YAML file is prepared the Virtual Machine can be created and started:
-```
+
+```sh
 [root@kv-master-00 ~]# kubectl create -f vm-dv.yaml
 virtualmachine.kubevirt.io/vm-centos-datavolume created
 
@@ -547,14 +583,16 @@ NAME                   AGE   RUNNING   VOLUME
 vm-centos-datavolume              62m   false
 ```
 
-Let's wait a little bit until the importer pod finishes, you can check it with:
+Let's wait a little bit until the importer pod finishes, meanwhile you can check it with:
+
 ```sh
-[root@kv-master-00 ~]# kubectl get pods 
+[root@kv-master-00 ~]# kubectl get pods
 NAME                       READY   STATUS              RESTARTS   AGE
 importer-centos-dv-8v6l5   0/1     ContainerCreating   0          12s
 ```
 
 Once that pods ends, the Virtual Machine can be started (in this case the virt parameter can be used because of the [krew plugin system](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#client-side-virtctl-deployment):
+
 ```sh
 [root@kv-master-00 tmp]# kubectl virt start vm-centos-datavolume
 VM vm-centos-datavolume was scheduled to start
@@ -569,7 +607,8 @@ centos-dv   Bound    pvc-5604eb4a-21dd-4dca-8bb7-fbacb0791402   9Gi        RWO  
 ```
 
 Awesome! the Virtual Machine is running in a pod through KubeVirt and it's backed up with Ceph under the management of Rook. Now it's the time for grabbing a coffee to allow cloud-init to do its job. A little while later let's connect to that VM console:
-```
+
+```sh
 [root@kv-master-00 ~]# kubectl virt console vm-centos-datavolume
 Successfully connected to vm-centos-datavolume console. The escape sequence is ^]
 
@@ -579,13 +618,15 @@ Kernel 3.10.0-957.27.2.el7.x86_64 on an x86_64
 
 vm-centos-datavolume login: centos
 Password:
-[centos@vm-centos-datavolume ~]$ 
+[centos@vm-centos-datavolume ~]$
 ```
 
-And there it is, our Kubernetes cluster provided with virtualization capabilities thanks to KubeVirt and backed up with a strong Ceph cluster under the management of Rook.
+And there it is! our Kubernetes cluster provided with virtualization capabilities thanks to KubeVirt and backed up with a strong Ceph cluster under the management of Rook.
 
 ## Troubleshooting
-It can happen that once the Ceph cluster is created, the hosts are not properly time-synchronized, in that case, the Ceph configuration can be modified to allow a bigger time difference between the nodes, in this case, the variable `mon clock drift allowed` is changed to 0.5 seconds, the steps to do so are the following:
+
+It might happen that once the Ceph cluster is created, the hosts are not properly time-synchronized, in that case, the Ceph configuration can be modified to allow a bigger time difference between the nodes, in this case, the variable `mon clock drift allowed` is changed to 0.5 seconds, the steps to do so are the following:
+
 - Connect to the toolbox pod to check the cluster status
 - Modify the configMap with the Ceph cluster configuration
 - Verify the changes
@@ -598,20 +639,20 @@ sh-4.2# ceph status
     id:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_WARN
             clock skew detected on mon.c
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 3m)
     mgr: a(active, since 2m)
     osd: 4 osds: 4 up (since 105s), 4 in (since 105s)
- 
+
   data:
     pools:   0 pools, 0 pgs
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:
-  
+
 [root@kv-master-00 ~]# kubectl -n rook-ceph edit ConfigMap rook-config-override -o yaml
-config: |                            
+config: |
     [global]
     mon clock drift allowed = 0.5
 
@@ -645,26 +686,24 @@ pod "rook-ceph-mon-c-5df78f7f96-dr2jn" deleted
 sh-4.2# ceph status                                                                         cluster:
     id:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_OK
- 
+
   services:
     mon: 3 daemons, quorum a,b,c (age 43s)
     mgr: a(active, since 9m)
     osd: 4 osds: 4 up (since 8m), 4 in (since 8m)
- 
+
   data:
     pools:   0 pools, 0 pgs
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
-    pgs:     
+    pgs:
 ```
 
-
-
 ## References
+
 * [Kubernetes getting started](https://kubernetes.io/docs/setup/)
 * [KubeVirt Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
 * [Ceph: free-software storage platform](https://ceph.io)
 * [Ceph hardware recommendations](https://docs.ceph.com/docs/jewel/start/hardware-recommendations/)
 * [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
 * [KubeVirt Userguide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
-
