@@ -1,6 +1,6 @@
 ---
 layout: post
-author: iranzo
+author: Pablo Iranzo Gómez
 title: Website roadmap
 description: List of identified things that might need an improvement
 navbar_active: Blogs

@@ -1,6 +1,6 @@
 ---
 layout: post
-author: iranzo
+author: Pablo Iranzo Gómez
 description: KubeVirt is renaming Condition Types in next release
 title: KubeVirt Condition Types Rename in Custom Resource
 navbar_active: Blogs
