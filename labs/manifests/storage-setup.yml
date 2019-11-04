@@ -22,14 +22,14 @@ spec:
                 fieldRef:
                   fieldPath: spec.nodeName
             - name: PV_DIR
-              value: /var/kubernetes
+              value: /var/lib/minikube
           volumeMounts:
             - name: pv-volume
-              mountPath: /var/kubernetes
+              mountPath: /var/lib/minikube
       volumes:
         - name: pv-volume
           hostPath:
-            path: /var/kubernetes
+            path: /var/lib/minikube
 ---
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1beta1
