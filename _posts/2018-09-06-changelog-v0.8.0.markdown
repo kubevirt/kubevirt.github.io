@@ -3,11 +3,10 @@ layout: post
 author: kube🤖
 description: This article provides information about KubeVirt release v0.8.0 changes
 navbar_active: Blogs
-datefixme:
 category: releases
 comments: true
 title: KubeVirt v0.8.0
-pub-date: September
+pub-date: Sep 06
 pub-year: 2018
 ---
 

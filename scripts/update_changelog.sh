@@ -37,7 +37,6 @@ layout: post
 author: kube🤖
 description: This article provides information about KubeVirt release $REL changes
 navbar_active: Blogs
-datefixme:
 category: releases
 comments: true
 title: KubeVirt $REL
@@ -52,15 +51,14 @@ EOF
     features_for $REL
     )>> "$FILENAME"
     daterelease=$(cat "$FILENAME"| grep "Released on" |cut -d ":" -f 2-)
-    sed -i "s#^datefixme: #date: $daterelease#g" "$FILENAME"
     newdate=$(echo $daterelease|tr " " "\n"|grep -v "+"|tr "\n" " ")
     year=$(date --date="$newdate" '+%Y')
     month=$(date --date="$newdate" '+%m')
-    monthname=$(LANG=C date --date="$newdate" '+%B')
+    monthname=$(LANG=C date --date="$newdate" '+%b')
     day=$(date --date="$newdate" '+%d')
     NEWFILENAME="build/artifacts/$year-$month-$day-$FILENAME"
     mv $FILENAME $NEWFILENAME
-    sed -i "s#^pub-date:.*#pub-date: $monthname#g" "$NEWFILENAME"
+    sed -i "s#^pub-date:.*#pub-date: $monthname $day#g" "$NEWFILENAME"
     sed -i "s#^pub-year:.*#pub-year: $year#g" "$NEWFILENAME"
   done
   }
