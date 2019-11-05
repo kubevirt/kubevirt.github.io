@@ -3,11 +3,10 @@ layout: post
 author: kube🤖
 description: This article provides information about KubeVirt release v0.22.0 changes
 navbar_active: Blogs
-datefixme:
 category: releases
 comments: true
 title: KubeVirt v0.22.0
-pub-date: October
+pub-date: Oct 10
 pub-year: 2019
 ---
 
