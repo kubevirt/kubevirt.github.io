@@ -125,10 +125,11 @@ cloudEnvironments.each { environName, environValues ->
           echo e.toString()
           throw e
 
-        } // END try/catch
-
-        /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
-        slackNotifier(currentBuild.currentResult)
+        } finally {
+          /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
+          slackNotifier(currentBuild.currentResult)
+        }
+         // END try/catch
 
       } // END ciPipeline
 
