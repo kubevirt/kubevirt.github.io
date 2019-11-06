@@ -134,7 +134,7 @@ cloudEnvironments.each { environName, environValues ->
         } catch (e) {
 
           echo e.toString()
-          throw e
+          throw e.toString()
 
         } finally {
           /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
