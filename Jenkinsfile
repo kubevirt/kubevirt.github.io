@@ -51,7 +51,7 @@ def notifyBuild(String environment = '', def buildStatus) {
     def colorMap = [ 'STARTED': '#FFA500', 'SUCCESS': '#008B00', 'FAILURE': '#FF0000' ]
 
     // Define messages contents
-    def subject = "Pipeline: ${environment} : #${env.BUILD_NUMBER} ${buildStatus}"
+    def subject = "Lab Validator(${environment}) : #${env.BUILD_NUMBER} ${buildStatus}"
     def summary = "${subject} (${env.BUILD_URL})"
     def colorName = colorMap[buildStatus]
 
