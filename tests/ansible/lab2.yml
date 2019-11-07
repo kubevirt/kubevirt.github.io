@@ -69,7 +69,7 @@
   - name: (LAB 2) Testing SSH Access To vm1
     shell: "ssh -o StrictHostKeyChecking=no fedora@{{ vm1_ip.stdout }} uptime"
     delay: 10
-    retries: 50
+    retries: 100
     register: result
     until: result.rc == 0
     when: target_env != "minikube"

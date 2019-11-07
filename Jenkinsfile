@@ -37,11 +37,26 @@ def cloudEnvironments = [
     'credentials': gcp_credentials
   ],
 
-  'minikube': [
-    'envFile': 'config/environment.gcp',
-    'credentials': gcp_credentials
-  ]
+//  'minikube': [
+//    'envFile': 'config/environment.gcp',
+//    'credentials': gcp_credentials
+//  ]
 ]
+
+// define the slack notify build function
+def notifyBuild(String environment = '', def buildStatus) {
+
+    // set default of build status
+    buildStatus =  buildStatus ?: 'SUCCESS'
+    def colorMap = [ 'STARTED': '#FFA500', 'SUCCESS': '#008B00', 'FAILURE': '#FF0000' ]
+
+    // Define messages contents
+    def subject = "Pipeline: ${environment} : #${env.BUILD_NUMBER} ${buildStatus}"
+    def summary = "${subject} (${env.BUILD_URL})"
+    def colorName = colorMap[buildStatus]
+
+    slackSend (color: colorName, message: summary)
+}
 
 builders = [:]
 
@@ -76,6 +91,7 @@ cloudEnvironments.each { environName, environValues ->
             handlePipelineStep {
 
               echo "STARTING TESTS FOR ${environName}"
+              notifyBuild("${environName}", 'STARTED')
 
                 // Clone this git repo into the container so that included scripts can be ran.
               checkout scm
@@ -106,11 +122,15 @@ cloudEnvironments.each { environName, environValues ->
           }
 
         } catch (e) {
-
+          currentBuild.result = "FAILED"
           echo e.toString()
-          throw e
+          throw e.toString()
 
-        } // END try/catch
+        } finally {
+          /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
+          notifyBuild("${environName}", currentBuild.result)
+        }
+         // END try/catch
 
       } // END ciPipeline
 
