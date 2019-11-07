@@ -124,7 +124,7 @@ cloudEnvironments.each { environName, environValues ->
         } catch (e) {
           currentBuild.result = "FAILED"
           echo e.toString()
-          throw e.toString()
+          throw e
 
         } finally {
           /* Use slackNotifier.groovy from shared library and provide current build result as parameter */
