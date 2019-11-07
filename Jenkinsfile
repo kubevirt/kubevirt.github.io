@@ -43,30 +43,19 @@ def cloudEnvironments = [
 //  ]
 ]
 
-def notifyBuild(String environment = '', String buildStatus = 'STARTED') {
-  // build status of null means successful
-  buildStatus =  buildStatus ?: 'SUCCESSFUL'
+// define the slack notify build function
+def notifyBuild(String environment = '', def buildStatus) {
 
-  // Default values
-  def colorName = 'RED'
-  def colorCode = '#FF0000'
-  def subject = "${environment} : ${buildStatus}: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]'"
-  def summary = "${subject} (${env.BUILD_URL})"
+    // set default of build status
+    buildStatus =  buildStatus ?: 'SUCCESS'
+    def colorMap = [ 'STARTED': '#FFA500', 'SUCCESS': '#008B00', 'FAILURE': '#FF0000' ]
 
-  // Override default values based on build status
-  if (buildStatus == 'STARTED') {
-    color = 'YELLOW'
-    colorCode = '#FFFF00'
-  } else if (buildStatus == 'SUCCESSFUL') {
-    color = 'GREEN'
-    colorCode = '#00FF00'
-  } else {
-    color = 'RED'
-    colorCode = '#FF0000'
-  }
+    // Define messages contents
+    def subject = "Pipeline: ${environment} : #${env.BUILD_NUMBER} ${buildStatus}"
+    def summary = "${subject} (${env.BUILD_URL})"
+    def colorName = colorMap[buildStatus]
 
-  // Send notifications
-  slackSend (color: colorCode, message: summary)
+    slackSend (color: colorName, message: summary)
 }
 
 builders = [:]
@@ -102,6 +91,7 @@ cloudEnvironments.each { environName, environValues ->
             handlePipelineStep {
 
               echo "STARTING TESTS FOR ${environName}"
+              notifyBuild("${environName}", 'STARTED')
 
                 // Clone this git repo into the container so that included scripts can be ran.
               checkout scm
@@ -132,7 +122,7 @@ cloudEnvironments.each { environName, environValues ->
           }
 
         } catch (e) {
-
+          currentBuild.result = "FAILED"
           echo e.toString()
           throw e.toString()
 
