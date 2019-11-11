@@ -54,7 +54,7 @@ Let's create a Virtual Machine making use of it. Review the file *vm1_pvc.yml*.
 
 ```bash
 {% include scriptlets/lab2/08_get_vm_manifest.sh -%}
-cat ~/vm1_pvc.yml
+cat vm1_pvc.yml
 ```
 
 We change the yaml definition of this Virtual Machine to inject the default public key of user in the cloud instance.
