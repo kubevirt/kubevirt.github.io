@@ -41,12 +41,12 @@ At this point, it was decided to go forward with the full upgrade: latest stable
 
 Updated to configure the instance of CentOS OpenShift with the system account for accessing it:
 
-![](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-44-56.png)
+![Jenkins OpenShift Client configuration](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-44-56.png)
 
 
 ### OpenShift Jenkins Sync
 Updated and configured to use the console as well with `kubevirt` namespace:
-![](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-46-47.png)
+![Jenkins OpenShift sync configuration](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-46-47.png)
 
 ### Global Pipeline Libraries
 
@@ -58,9 +58,9 @@ Here we added the libraries we used, but targetting latest version in `master` b
 
 For all of them, we ticked:
 
-- load implicitly
-- Allow default version to be overriden
-- Include @Library changes in job recent changes
+- `Load Implicitly`
+- `Allow default version to be overriden`
+- `Include @Library changes in job recent changes`
 
 Jenkins replied with the 'currently maps to revision: `hash`' for each one of them, after having loaded them properly.
 
@@ -72,17 +72,17 @@ In addition to regular plugins used for builds, we incorporated the slack plugin
 
 In addition Kubernets `Cloud` was configured pointing to the same console access and using the `kubevirt` namespace:
 
-![](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-51-19.png)
+![OpenShift Cloud definition and URL and tunnel settings](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-51-19.png)
 
 The libraries we added, automatically add some pod templates for `jenkins-contra-slave`:
 
-![](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-54-24.png)
+![Jenkins-contra-slave container configuration](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-54-24.png)
 
 ## Other changes
 
 Our environment also used other helper tools as regular OpenShift builds:
 
-![](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-55-41.png)
+![OpenShift Build repositories and status](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-55-41.png)
 
 We had to update the repos from using some of the older ones (no longer valid and outdated) to use latest versions, and for the ansible-executor we also created a fork to use the newest libraries for accessing Google Cloud environment and tuning some of the other variables (<https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59>).
 
@@ -100,3 +100,17 @@ Our Jenkins Jobs were defined (as documented in prior article) inside each repos
 - We've added code to do the actual 'Slack' notification we mentioned above
 - Extend the try/catch block to include a 'finally' to send the notifications
 - Change the syntax for 'artifacts' as it was previously `ArchiveArtifacts` and now it's a `postBuild`
+
+
+## The outcome
+
+After several attempts:
+
+![Sunny build status](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-11-02-34.png)
+
+Of course, one of the advantages is that builds happen automatically everyday or on code changes on the repos.
+
+There's still room for improvement identified that will happen in next iterations:
+- Find running instances on Cloud providers to shutdown for reducing the bills
+- Trigger builds when new releases of kubevirt happen (out of kubevirt/kubevirt repo)
+- Unify testing on [Prow instance]({% post_url 2019-10-31-prow-jobs-for-kubevirt %})
