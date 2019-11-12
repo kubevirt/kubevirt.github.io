@@ -26,7 +26,7 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 We can use HCO both on minikube and also on Openshift 4. We will be using Openshift 4 for HCO in this Blog.
 
-**Note**: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link [Install_HCO_minikube](https://kubevirt.io//quickstart_minikube/) install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).
+**Note**: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link [Install_HCO_minikube](https://kubevirt.io/quickstart_minikube/) install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).
 
 ## Deploying HCO on Openshift 4 Cluster.
 
@@ -339,7 +339,7 @@ We can see how OLM operator manages the HCO pods from the `openshift-operator-li
 
 The above method demonstrates the integration of HCO operator in Openshift4.
 
-So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io//quickstart_minikube/#install-virtctl):
+So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io/quickstart_minikube/#install-virtctl):
 
 ## Conclusion
 
