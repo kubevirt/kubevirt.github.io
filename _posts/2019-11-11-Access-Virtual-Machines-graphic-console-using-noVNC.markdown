@@ -243,6 +243,7 @@ If you want manager virtual machines in other namespace, you can specify namespa
 ```
 http://NODEIP:NODEPORT/?namespace=test
 ```
+![VirtVNC](/assets/2019-11-11-Access-Virtual-Machines-graphic-console-using-noVNC/virtvnc.gif "VirtVNC")
 ## References
 
 * [Embedding and Deploying noVNC Application
