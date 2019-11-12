@@ -6,37 +6,36 @@ navbar_active: Blogs
 category: news
 comments: true
 title: Access Virtual Machines' graphic console using noVNC
-pub-date: November
+pub-date: November 11
 pub-year: 2019
 ---
 
 ## Introduction
 
-NoVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas. Kubevirt provides api websocket VNC access under
+NoVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas. We provide websocket api for VNC access under
 ```url
 APISERVER:/apis/subresources.kubevirt.io/v1alpha3/namespaces/NAMESPACE/virtualmachineinstances/VM/vnc
 ```
 but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provides a component using ```kubectl proxy``` to provide a authorized vnc acess, we name this Component [```virtVNC```](https://github.com/wavezhang/virtVNC). 
-In this post, we are going to show how to we do this in details.
-## Prepare Docker Image
-### Prepare docker build dicrectory
+In this post, we are going to show how to do this in details.
+## The detailed method
+### Prepare Docker Image
+Firt prepare docker build dicrectory.
 ```bash
 mkdir -p virtvnc/static
 ```
-### Clone noVNC files
+Then clone noVNC files from github.
 ```bash
 git clone https://github.com/novnc/noVNC
 ```
-### Copy noVNC files to docker build directory
+And then copy noVNC files to docker build directory.
 ```bash
 cp noVNC/app virtvnc/static/
 cp noVNC/core virtvnc/static/
 cp noVNC/vender virtvnc/static/
 cp noVNC/*.html virtvnc/static/
 ```
-### Add VM list page
-
-Add file ```index.html``` to ```virtvnc/static/``` with the following content. 
+Create a file ```index.html``` to ```virtvnc/static/``` with the following content. The page will displays VMs and corresponding VNC links.
 ```html
 <html>
   <meta charset="utf-8">
@@ -105,19 +104,19 @@ Add file ```index.html``` to ```virtvnc/static/``` with the following content.
   </body>
 </html>
 ```
-### Add Dockerfile
+Create dockerfile with following content to add static html files and set up ```kubectl proxy``` command line args.
 ```Dockerfile
 FROM quay.io/bitnami/kubectl:1.15
 ADD static /static
 CMD ["proxy", "--www=/static", "--accept-hosts=^.*$", "--address=[::]", "--api-prefix=/k8s/", "--www-prefix="]
 ```
-### Build docker image
+Finally use ```docker build``` to build docker image.
 ```
 cd virtvnc
 docker build -t quay.io/samblade/virtvnc:v0.1 .
 ```
-## Setting Up RBAC
-### Create a service account for virtvnc
+### Setting Up RBAC
+Create a service account for virtvnc.
 ```yaml
 apiVersion: v1
 kind: ServiceAccount
@@ -125,7 +124,7 @@ metadata:
   name: virtvnc
   namespace: kubevirt
 ```
-### Define cluster role for kubevirt 
+Then define cluster role for kubevirt, setting up permissions needed.
 ```yaml
 kind: ClusterRole
 apiVersion: rbac.authorization.k8s.io/v1
@@ -152,9 +151,7 @@ rules:
   - list
   - watch
 ```
-> **Note that this will make all your virtual machines vnc & console accessible to node network.**
-
-### Binding service accout and cluster role
+And then binding cluster role to service accout.
 ```yaml
 kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
@@ -169,8 +166,8 @@ roleRef:
   name: virtvnc
   apiGroup: rbac.authorization.k8s.io
 ```
-## Deploy to kubernetes
-### Setup deployment
+### Deploy to kubernetes
+Create following yaml, and then apply to kubernetes to setup ```virtvnc` deployment.
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -209,7 +206,7 @@ spec:
           successThreshold: 1
           timeoutSeconds: 5
 ```
-### Expose service
+Expose a ```NodePort``` service, then we can access the web page from node network.
 ```yaml
 apiVersion: v1
 kind: Service
@@ -227,6 +224,7 @@ spec:
     app: virtvnc
   type: NodePort
 ```
+> **Note that this will make all your virtual machines vnc & console accessible to node network.**
 ## The Simple Way
 All the above procedures can be done by simply using one command:
 ```
@@ -250,7 +248,7 @@ http://NODEIP:NODEPORT/?namespace=test
 * [Embedding and Deploying noVNC Application
 ](https://github.com/novnc/noVNC/blob/master/docs/EMBEDDING.md)
 * [Kubevirt Api Access Control
-](https://kubevirt.io/2018/KubeVirt-API-Access-Control.html)
+]({%post_url 2018-05-16-KubeVirt-API-Access-Control %})
 * [Use an HTTP Proxy to Access the Kubernetes API
 ](https://kubernetes.io/docs/tasks/access-kubernetes-api/http-proxy-access-api/)
 
