@@ -10,9 +10,9 @@ comments: true
 ---
 
 # Introduction
-Containerized Data Importer (CDI) is a utility to import, upload and clone Virtual Machine images for use with [KubeVirt](https://github.com/kubevirt/kubevirt). At a high level, a persistent volume claim (PVC), which defines VM-suitable storage via a storage class, is created. 
+Containerized Data Importer (CDI) is a utility to import, upload and clone Virtual Machine images for use with [KubeVirt](https://github.com/kubevirt/kubevirt). At a high level, a persistent volume claim (PVC), which defines VM-suitable storage via a storage class, is created.
 
-A custom controller watches for specific annotation on the persistent volume claim, and when discovered, starts an import, upload or clone process. The status of the each process is reflected in an additional annotation on the associated claim, and when the process completes KubeVirt can create the VM based on the new image. 
+A custom controller watches for specific annotation on the persistent volume claim, and when discovered, starts an import, upload or clone process. The status of the each process is reflected in an additional annotation on the associated claim, and when the process completes KubeVirt can create the VM based on the new image.
 
 The Containerized Data Cloner gives the option to clone the imported/uploaded VM image from one PVC to another one either within the same namespace or across two different namespaces.
 
@@ -112,7 +112,7 @@ $ go get kubevirt.io/containerized-data-importer
 
 Import disk image is achieved by creating a new PVC with the 'cdi.kubevirt.io/storage.import.endpoint' annotation indicating the url of the source image that we want to download from. Once the controller detects the PVC, it starts a pod which is responsible for importing the image from the given url.
 
-## Create a PVC yaml file named golden-pvc.yaml 
+## Create a PVC yaml file named golden-pvc.yaml
 
 ```yaml
 apiVersion: v1
@@ -168,13 +168,13 @@ annotation to verify - cdi.kubevirt.io/storage.pod.phase: Succeeded
 
 # Start cloning disk image
 
-Cloning is achieved by creating a new PVC with the 'k8s.io/CloneRequest' annotation indicating the name of the PVC the image is copied from. Once the controller detects the PVC, it starts two pods (source and target pods) which are responsible for the cloning of the image from one PVC to another using a unix socket that is created on the host itself. 
+Cloning is achieved by creating a new PVC with the 'k8s.io/CloneRequest' annotation indicating the name of the PVC the image is copied from. Once the controller detects the PVC, it starts two pods (source and target pods) which are responsible for the cloning of the image from one PVC to another using a unix socket that is created on the host itself.
 
 When the cloning is completed, the PVC which the image was copied to, is assigned with the 'k8s.io/CloneOf' annotation to indicate cloning completion. The copied VM image can be used by a new pod only after the cloning process is completed.
 
 The two cloning pods must execute on the same node. Pod adffinity is used to enforce this requirement; however, the cluster also needs to be configured to delay volume binding until pod scheduling has completed.
 
-When using local storage and Kubernetes 1.9 and older, export KUBE_FEATURE_GATES before bringing up the cluster: 
+When using local storage and Kubernetes 1.9 and older, export KUBE_FEATURE_GATES before bringing up the cluster:
 
 ```bash
 $ export KUBE_FEATURE_GATES="PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"
@@ -212,7 +212,7 @@ spec:
       storage: 10Gi
 ```
 
-Edit the PVC above - 
+Edit the PVC above -
 - k8s.io/CloneRequest: The name of the PVC we copy the image from (including its namespace). For example: "source-ns/golden-pvc".
 - add the name of the storage class which defines volumeBindingMode per above. Note, this is not required in Kubernetes 1.10 and later.
 
@@ -305,7 +305,7 @@ $ curl -v --insecure -H "Authorization: Bearer $TOKEN" --data-binary @tests/imag
 
 ## RBAC Roles
 
-CDI runs under a custom ServiceAccount (cdi-sa) and uses the [Kubernetes RBAC model](https://kubernetes.io/docs/admin/authorization/rbac/) to apply an application specific custom ClusterRole with rules to properly access needed resources such as PersistentVolumeClaims and Pods.
+CDI runs under a custom ServiceAccount (cdi-sa) and uses the [Kubernetes RBAC model](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) to apply an application specific custom ClusterRole with rules to properly access needed resources such as PersistentVolumeClaims and Pods.
 
 ## Protecting VM Image Namespaces
 
@@ -338,4 +338,3 @@ spec:
 ```
 
 NOTE: .storageclass.storage.k8s.io/persistentvolumeclaims: "4" could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.
-
