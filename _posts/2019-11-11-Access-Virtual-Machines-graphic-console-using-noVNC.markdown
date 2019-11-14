@@ -12,15 +12,16 @@ pub-year: 2019
 
 ## Introduction
 
-NoVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas. We provide websocket api for VNC access under
+[NoVNC](https://novnc.com/) is a JavaScript VNC client using WebSockets and HTML5 Canvas. We provide websocket api for VNC access under
 ```url
 APISERVER:/apis/subresources.kubevirt.io/v1alpha3/namespaces/NAMESPACE/virtualmachineinstances/VM/vnc
 ```
-but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provides a component using ```kubectl proxy``` to provide a authorized vnc acess, we name this Component [```virtVNC```](https://github.com/wavezhang/virtVNC). 
-In this post, we are going to show how to do this in details.
+but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provide a component using ```kubectl proxy``` to provide a authorized vnc acess, we name this Component [```virtVNC```](https://github.com/wavezhang/virtVNC). 
+
+In this post we are going to show how to do this in detail.
 ## The detailed method
 ### Prepare Docker Image
-Firt prepare docker build dicrectory.
+First prepare docker build dicrectory.
 ```bash
 mkdir -p virtvnc/static
 ```
@@ -35,7 +36,7 @@ cp noVNC/core virtvnc/static/
 cp noVNC/vender virtvnc/static/
 cp noVNC/*.html virtvnc/static/
 ```
-Create a file ```index.html``` to ```virtvnc/static/``` with the following content. The page will displays VMs and corresponding VNC links.
+Create a file ```index.html``` to ```virtvnc/static/``` with the following content. The page will display VMs and corresponding VNC links.
 ```html
 <html>
   <meta charset="utf-8">
@@ -167,7 +168,7 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 ### Deploy to kubernetes
-Create following yaml, and then apply to kubernetes to setup ```virtvnc` deployment.
+Create following yaml, and then apply to kubernetes to setup `virtvnc` deployment.
 ```yaml
 apiVersion: extensions/v1beta1
 kind: Deployment
@@ -226,7 +227,7 @@ spec:
 ```
 > **Note that this will make all your virtual machines vnc & console accessible to node network.**
 ## The Simple Way
-All the above procedures can be done by simply using one command:
+In this [github repo](https://github.com/wavezhang/virtVNC) and [registry](https://quay.io/repository/samblade/virtvnc) you'll find a ready to use version of the above which you can deploy in a single command like this:
 ```
 kubectl apply -f https://github.com/wavezhang/virtVNC/raw/master/k8s/virtvnc.yaml
 ```
@@ -239,7 +240,7 @@ Then visit the following url in browser:
 ```
 http://NODEIP:NODEPORT/
 ```
-If you want manager virtual machines in other namespace, you can specify namespace using query param namespace like following:
+If you want manage virtual machines in other namespace, you can specify namespace using query param `namespace` like following:
 ```
 http://NODEIP:NODEPORT/?namespace=test
 ```
