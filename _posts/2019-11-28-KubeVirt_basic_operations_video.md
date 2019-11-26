@@ -10,12 +10,12 @@ pub-date: October 28
 pub-year: 2019
 ---
 
-In this video we are showing how KubeVirt can be used from a begginer point of view.
+In this video, we are showing how KubeVirt can be used from a beginner point of view.
 
 ## Pre-requisites
 
-In the video there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the [KubeVirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) or try it yourself in the [First steps with KubeVirt](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101) Katacoda scenario.
-Also the `virtctl` command is already placed in a directory pointed from the PATH variable.
+In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the [KubeVirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) or try it yourself in the [First steps with KubeVirt](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101) Katacoda scenario.
+Also, the `virtctl` command is already placed in a directory pointed from the PATH variable.
 
 ## Video
 
