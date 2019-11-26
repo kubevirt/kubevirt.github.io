@@ -1,11 +1,11 @@
 ---
 layout: post
 author: Pedro Ibáñez Requena
-description: KubeVirt: basic operations video
+description: KubeVirt basic operations video
 navbar_active: Blogs
 category: news
 comments: true
-title: KubeVirt: basic operations video
+title: KubeVirt basic operations video
 pub-date: October 28
 pub-year: 2019
 ---
