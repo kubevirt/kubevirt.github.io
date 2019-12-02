@@ -1,11 +1,11 @@
 ---
 layout: post
 author: Pedro Ibáñez Requena
-description: KubeVirt Laboratory 1: Use KubeVirt
+description: KubeVirt Laboratory 1, use KubeVirt
 navbar_active: Blogs
 category: news
 comments: true
-title: KubeVirt Laboratory 1: Use KubeVirt
+title: KubeVirt Laboratory 1, use KubeVirt
 pub-date: December 4
 pub-year: 2019
 ---
