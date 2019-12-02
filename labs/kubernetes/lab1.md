@@ -93,4 +93,8 @@ To delete a Virtual Machine:
 
 This concludes this section of the lab.
 
+You can watch how the laboratory is done in the following video:
+
+<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/eQZPCeOs9-c" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+
 [Next Lab]({{ site.baseurl }}/labs/kubernetes/lab2)
