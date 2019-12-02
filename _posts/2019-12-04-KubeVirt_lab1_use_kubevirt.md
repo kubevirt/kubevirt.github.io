@@ -1,7 +1,7 @@
 ---
 layout: post
 author: Pedro Ibáñez Requena
-description: KubeVirt Laboratory 1, use KubeVirt
+description: In this video, we are showing the step by step of the [KubeVirt Laboratory 1: Use KubeVirt](https://kubevirt.io/labs/kubernetes/lab1.html)
 navbar_active: Blogs
 category: news
 comments: true
