@@ -119,4 +119,4 @@ You can watch how the laboratory is done in the following video:
 
 <iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/ZHqcHbCxzYM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab1) | [Next Lab]({{ site.baseurl }}/labs/kubernetes/lab3)
+[Previous Lab]({{ site.baseurl }}/labs/kubernetes/lab1)
