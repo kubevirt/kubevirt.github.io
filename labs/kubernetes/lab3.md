@@ -57,7 +57,7 @@ kubectl get pods -n kubevirt
 Once it's ready, it will show something similar to the information below:
 
 ~~~sh
-master $ kubectl get pods -n kubevirt
+$ kubectl get pods -n kubevirt
 NAME                               READY     STATUS    RESTARTS   AGE
 virt-api-7fc57db6dd-g4s4w          1/1       Running   0          3m
 virt-api-7fc57db6dd-zd95q          1/1       Running   0          3m
@@ -116,7 +116,7 @@ Once the VM is running you can inspect its status:
 
 ~~~sh
 kubectl get vmis
-master $ kubectl get vmis
+$ kubectl get vmis
 NAME     AGE   PHASE        IP    NODENAME
 testvm   10s   Scheduling
 ~~~
@@ -124,7 +124,7 @@ testvm   10s   Scheduling
 Once it's ready, the command above will print something like:
 
 ~~~sh
-master $ kubectl get vmis
+$ kubectl get vmis
 NAME      AGE       PHASE     IP           NODENAME
 testvm    1m        Running   10.32.0.11   master
 ~~~
@@ -170,7 +170,7 @@ In any case, we can check that the VM is still running
 
 ~~~sh
 kubectl get vmis
-master $ kubectl get vmis
+$ kubectl get vmis
 NAME      AGE       PHASE     IP           NODENAME
 testvm    1m        Running   10.32.0.11   master
 ~~~
