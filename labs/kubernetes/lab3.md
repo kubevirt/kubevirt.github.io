@@ -24,23 +24,29 @@ Let's deploy the KubeVirt Operator by running the following command:
 
 ~~~sh
 kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+namespace/kubevirt created
+...
+deployment.apps/virt-operator created
 ~~~
 
 Let's wait for the operator to become ready:
 ~~~sh
 kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevirt --timeout=100s
+pod/virt-operaqtor-5ddb4674b9-6fbrv condition met
 ~~~
 
 If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
 
 ~~~sh
 kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
+configmap/kubevirt-config created
 ~~~
 
 Now let's deploy KubeVirt by creating a Custom Resource that will trigger the 'operator' and perform the deployment:
 
 ~~~sh
 kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
+kubevirt.kubevirt.io/kubevirt created
 ~~~
 
 Let's check the deployment:
@@ -78,12 +84,15 @@ And proceed with the VM creation:
 
 ~~~sh
 kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+virtualmachine.kubevirt.io/testvm created
 ~~~
 
 Using the command below for checking that the VM is defined:
 
 ~~~sh
 kubectl get vms
+NAME    AGE RUNNING VOLUME
+testvm  22s false
 ~~~
 
 Notice from the output that the VM is not running yet.
@@ -150,6 +159,9 @@ Let's upgrade to the newer version after the one installed (`0.20.1` -> `0.21.0`
 ~~~sh
 export KUBEVIRT_VERSION=v0.21.0
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
+...
+deployment.apps/virt-operator configured
 ~~~
 
 **NOTE:** Compared to the first step of the lab now we are using **apply** instead of **create** to deploy the newer version because the operator already exists.
@@ -185,6 +197,9 @@ Updating the operator to that release:
 
 ~~~sh
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
+...
+deployment.apps/virt-operator configured
 ~~~
 
 **NOTE:** Since version `0.20.1`, the operator version should be checked with the following command:
@@ -199,12 +214,14 @@ Shutting down a VM works by either using `virtctl` or editing the VM.
 
 ~~~sh
 ./virtctl stop testvm
+VM testvm was scheduled to stop
 ~~~
 
 Finally, the VM can be deleted using:
 
 ~~~sh
 kubectl delete vms testvm
+virtualmachine.kubevirt.io "testvm" deleted
 ~~~
 
 When updating using the operator, we can see that the 'AGE' of containers is similar between them, but when updating only the kubevirt version, the operator 'AGE' keeps increasing because it is not 'recreated'.
