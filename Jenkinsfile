@@ -121,6 +121,10 @@ cloudEnvironments.each { environName, environValues ->
             executeInContainer(containerName: 'ansible-executor', containerScript: "sh tests/shell/lab.sh lab2", stageVars: params, credentials: credentials)
           }
 
+          stage("${environName}-lab3") {
+            executeInContainer(containerName: 'ansible-executor', containerScript: "sh tests/shell/lab.sh lab3", stageVars: params, credentials: credentials)
+          }
+
         } catch (e) {
           currentBuild.result = "FAILED"
           echo e.toString()

@@ -32,7 +32,6 @@ The test results are stored on the Jenkins environment as:
 - `ansible-${targetEnvironment}-${labName}.log`
 - `ansible-${targetEnvironment}-${labName}-cleanup.log`
 
-
 - [Build/Test log Sample](https://jenkins-kubevirt.apps.ci.centos.org/job/dev/job/jodavis/job/kvio-lab-testing/30/consoleFull)
 - [Builded artifacts](https://jenkins-kubevirt.apps.ci.centos.org/job/dev/job/jodavis/job/kvio-lab-testing/lastSuccessfulBuild/artifact/), log separated by ${PROVIDER}.
 

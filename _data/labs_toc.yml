@@ -13,3 +13,5 @@ toc:
         url: labs/kubernetes/lab1.html
       - page: Experiment with CDI
         url: labs/kubernetes/lab2.html
+      - page: KubeVirt Upgrades
+        url: labs/kubernetes/lab3.html
