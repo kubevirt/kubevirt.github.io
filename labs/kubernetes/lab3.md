@@ -32,7 +32,7 @@ deployment.apps/virt-operator created
 Let's wait for the operator to become ready:
 ~~~sh
 $ kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevirt --timeout=100s
-pod/virt-operaqtor-5ddb4674b9-6fbrv condition met
+pod/virt-operator-5ddb4674b9-6fbrv condition met
 ~~~
 
 If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
@@ -76,8 +76,11 @@ First, let's wait for all the pods to be ready like previously provided example:
 
 ~~~sh
 $ kubectl wait --for condition=ready pod -l kubevirt.io=virt-api -n kubevirt --timeout=100s
+pod/virt-api-5ddb4674b9-6fbrv condition met
 $ kubectl wait --for condition=ready pod -l kubevirt.io=virt-controller -n kubevirt --timeout=100s
+pod/virt-controller-p3d4o-1fvfz condition met
 $ kubectl wait --for condition=ready pod -l kubevirt.io=virt-handler -n kubevirt --timeout=100s
+pod/virt-handler-1b4n3z4674b9-sf1rl condition met
 ~~~
 
 And proceed with the VM creation:
