@@ -23,7 +23,7 @@ export KUBEVIRT_VERSION=v0.20.1
 Let's deploy the KubeVirt Operator by running the following command:
 
 ~~~sh
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+$ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 namespace/kubevirt created
 ...
 deployment.apps/virt-operator created
@@ -31,27 +31,27 @@ deployment.apps/virt-operator created
 
 Let's wait for the operator to become ready:
 ~~~sh
-kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevirt --timeout=100s
+$ kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevirt --timeout=100s
 pod/virt-operaqtor-5ddb4674b9-6fbrv condition met
 ~~~
 
 If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
 
 ~~~sh
-kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
+$ kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
 configmap/kubevirt-config created
 ~~~
 
 Now let's deploy KubeVirt by creating a Custom Resource that will trigger the 'operator' and perform the deployment:
 
 ~~~sh
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
+$ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
 kubevirt.kubevirt.io/kubevirt created
 ~~~
 
 Let's check the deployment:
 ~~~sh
-kubectl get pods -n kubevirt
+$ kubectl get pods -n kubevirt
 ~~~
 
 Once it's ready, it will show something similar to the information below:
@@ -75,22 +75,22 @@ Once all the containers are with the status "Running" you can execute the comman
 First, let's wait for all the pods to be ready like previously provided example:
 
 ~~~sh
-kubectl wait --for condition=ready pod -l kubevirt.io=virt-api -n kubevirt --timeout=100s
-kubectl wait --for condition=ready pod -l kubevirt.io=virt-controller -n kubevirt --timeout=100s
-kubectl wait --for condition=ready pod -l kubevirt.io=virt-handler -n kubevirt --timeout=100s
+$ kubectl wait --for condition=ready pod -l kubevirt.io=virt-api -n kubevirt --timeout=100s
+$ kubectl wait --for condition=ready pod -l kubevirt.io=virt-controller -n kubevirt --timeout=100s
+$ kubectl wait --for condition=ready pod -l kubevirt.io=virt-handler -n kubevirt --timeout=100s
 ~~~
 
 And proceed with the VM creation:
 
 ~~~sh
-kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+$ kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
 virtualmachine.kubevirt.io/testvm created
 ~~~
 
 Using the command below for checking that the VM is defined:
 
 ~~~sh
-kubectl get vms
+$ kubectl get vms
 NAME    AGE RUNNING VOLUME
 testvm  22s false
 ~~~
@@ -100,14 +100,14 @@ Notice from the output that the VM is not running yet.
 To start a VM, `virtctl`~~~` should be used:
 
 ~~~sh
-./virtctl start testvm
+$ ./virtctl start testvm
 VM testvm was scheduled to start
 ~~~
 
 Now you can check again the VM status:
 
 ~~~sh
-kubectl get vms
+$ kubectl get vms
 NAME     AGE   RUNNING   VOLUME
 testvm   0s    false
 ~~~
@@ -132,7 +132,7 @@ testvm    1m        Running   10.32.0.11   master
 While the PHASE is still `Scheduling` you can run the same command for checking again:
 
 ~~~sh
-kubectl get vmis
+$ kubectl get vmis
 ~~~
 
 Once the PHASE will change to `Running`, we're ready for upgrading KubeVirt.
@@ -157,8 +157,8 @@ When no `imageTag` value is set in the KubeVirt CR, the system assumes that the 
 Let's upgrade to the newer version after the one installed (`0.20.1` -> `0.21.0`):
 
 ~~~sh
-export KUBEVIRT_VERSION=v0.21.0
-kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+$ export KUBEVIRT_VERSION=v0.21.0
+$ kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
 ...
 deployment.apps/virt-operator configured
@@ -169,7 +169,6 @@ deployment.apps/virt-operator configured
 In any case, we can check that the VM is still running
 
 ~~~sh
-kubectl get vmis
 $ kubectl get vmis
 NAME      AGE       PHASE     IP           NODENAME
 testvm    1m        Running   10.32.0.11   master
@@ -181,8 +180,8 @@ testvm    1m        Running   10.32.0.11   master
 You can keep testing in this lab updating 'one version at a time' until reaching the value of `KUBEVIRT_LATEST_VERSION`:
 
 ~~~sh
-export KUBEVIRT_LATEST_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)
-echo -e "CURRENT: $KUBEVIRT_VERSION  LATEST: $KUBEVIRT_LATEST_VERSION"
+$ export KUBEVIRT_LATEST_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq -r .tag_name)
+$ echo -e "CURRENT: $KUBEVIRT_VERSION  LATEST: $KUBEVIRT_LATEST_VERSION"
 ~~~
 
 Compare the values between and continue upgrading 'one release at a time' by:
@@ -190,13 +189,13 @@ Compare the values between and continue upgrading 'one release at a time' by:
 Choosing the target version:
 
 ~~~sh
-export KUBEVIRT_VERSION=vX.XX.X
+$ export KUBEVIRT_VERSION=vX.XX.X
 ~~~
 
 Updating the operator to that release:
 
 ~~~sh
-kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+$ kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
 ...
 deployment.apps/virt-operator configured
@@ -205,7 +204,7 @@ deployment.apps/virt-operator configured
 **NOTE:** Since version `0.20.1`, the operator version should be checked with the following command:
 
 ~~~sh
-echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}')
+$ echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}')
 ~~~
 
 #### Wrap-up
@@ -213,14 +212,14 @@ echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.spec
 Shutting down a VM works by either using `virtctl` or editing the VM.
 
 ~~~sh
-./virtctl stop testvm
+$ ./virtctl stop testvm
 VM testvm was scheduled to stop
 ~~~
 
 Finally, the VM can be deleted using:
 
 ~~~sh
-kubectl delete vms testvm
+$ kubectl delete vms testvm
 virtualmachine.kubevirt.io "testvm" deleted
 ~~~
 
