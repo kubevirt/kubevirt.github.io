@@ -46,7 +46,7 @@
     retries: 3
 
   - name: "(LAB 3) Deploy Kubevirt 0.21.0 Operator"
-    shell: kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v0.21.0/kubevirt-operator.yaml
+    shell: kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v0.21.0/kubevirt-operator.yaml
 
   - name: "(LAB 3) Wait for Kubevirt 0.21.0 Operator Ready"
     shell: kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevirt --timeout=100s
