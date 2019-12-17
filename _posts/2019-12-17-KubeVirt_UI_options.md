@@ -82,7 +82,7 @@ Note that OKD4 is in preview, which means that only a subset of platforms and fu
 
 <video autoplay loop muted playsinline src="/assets/2019-12-19-KubeVirt_UI_options/okd.mp4" type="video/mp4" width="1280" height="720"></video>
 
-One of the drawbacks is that the current [KubeVirt HCO operator](https://operatorhub.io/operator/kubevirt) contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest [Fedora cloud container disk image](kubevirt/fedora-cloud-container-disk-demo) we used the one tagged as v0.18.1 which matches the version of KubeVirt deployed.
+One of the drawbacks is that the current [KubeVirt HCO operator](https://operatorhub.io/operator/kubevirt) contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest [Fedora cloud container disk image](https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo) we used the one tagged as v0.18.1 which matches the version of KubeVirt deployed.
 
 If for any reason there is a need to deploy latest version, it can be done by running the following script which applies directly the HCO operator: [unreleased bundles using the hco without marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace). Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.
 
@@ -100,7 +100,7 @@ As we reviewed previously the [OpenShift web console](https://github.com/openshi
 - Serving all frontend static assets
 - User Authentication
 
-Then, as briefly explained in their [repository]((https://github.com/openshift/console#native-kubernetes)) our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar as the ones found in the OKD installation except:
+Then, as briefly explained in their [repository]((https://github.com/openshift/console#native-kubernetes) our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar as the ones found in the OKD installation except:
 
 - KubeVirt installation is done using the [Hyperconverged Cluster Operator (HCO) without OL or Marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace) instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically
 - Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.
