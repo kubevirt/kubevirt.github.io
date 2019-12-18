@@ -38,3 +38,8 @@ pre {
     padding-left: 0;
   }
 }
+
+&>blockquote {
+  padding-left: var(--mk--spacer--sm);
+  border-left: var(--mk--BorderWidth--lg) solid var(--mk--BackgroundColor--350);
+}
