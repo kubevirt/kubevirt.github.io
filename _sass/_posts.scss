@@ -19,6 +19,11 @@
   &-category-name {
     color: $kv-color--black-400;
   }
+  & > blockquote {
+      padding-left: 1px 5px;
+      border-left: 0px solid $kv-color--green-450;
+  }
+
 }
 .readmore {
   margin-top: .5rem;
