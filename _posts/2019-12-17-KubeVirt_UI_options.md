@@ -66,7 +66,7 @@ As defined in the [official webpage](https://www.okd.io/):
 
 A few weeks ago Kubernetes distribution [OKD4](https://github.com/openshift/okd) was released as preview. OKD is the official upstream version of Red Hat's Openshift. Since Openshift includes KubeVirt (Red Hat calls it [CNV](https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html)) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.
 
-Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it is reached beta. Said that, we have we found a similar behaviour as testing KubeVirt with Openshift. We have noticed that from the UI a user can:
+Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with Openshift. We have noticed that from the UI a user can:
 
 - Install the KubeVirt operator from the operator marketplace.
 - Create Virtual Machines by importing YAML files or following a wizard. The wizard prevents you from moving to the next screen until you provide values in the required fields.
@@ -82,7 +82,7 @@ Note that OKD4 is in preview, which means that only a subset of platforms and fu
 
 <video autoplay loop muted playsinline src="/assets/2019-12-19-KubeVirt_UI_options/okd.mp4" type="video/mp4" width="1280" height="720"></video>
 
-One of the drawbacks is that the current [KubeVirt HCO operator](https://operatorhub.io/operator/kubevirt) contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest [Fedora cloud container disk image](https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo) we used the one tagged as v0.18.1 which matches the version of KubeVirt deployed.
+One of the drawbacks is that the current [KubeVirt HCO operator](https://operatorhub.io/operator/kubevirt) contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest [Fedora cloud container disk image](https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo) and instead we were forced to use the one tagged as v0.18.1 which matches the version of KubeVirt deployed.
 
 If for any reason there is a need to deploy the latest version, it can be done by running the following script which applies directly the HCO operator: [unreleased bundles using the hco without marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace). Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.
 
