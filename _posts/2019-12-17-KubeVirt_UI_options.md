@@ -25,7 +25,7 @@ The different UI options available for KubeVirt that we have been checking, at t
 
 ## Octant
 
-<img src="/assets/2019-12-19-KubeVirt_UI_options/octant-logo.png" alt="Octant logo" height="110" width="520">
+<img src="/assets/2019-12-19-KubeVirt_UI_options/octant-logo.png" alt="Octant logo">
 
 As the [Octant webpage](https://octant.dev/) claims:
 
@@ -56,7 +56,7 @@ With further work and investigation, it could be an option to develop a specific
 
 ## OKD: The Origin Community Distribution of Kubernetes
 
-<img src="/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png" alt="Octant logo" height="120" width="600">
+<img src="/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png" alt="OKD logo">
 
 As defined in the [official webpage](https://www.okd.io/):
 > OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.
