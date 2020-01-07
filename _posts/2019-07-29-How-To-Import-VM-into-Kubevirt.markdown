@@ -73,7 +73,7 @@ Usage:
 
 Examples:
   # Upload a local disk image to a newly created PersistentVolumeClaim:
-    virtctl image-upload --upload-proxy-url=https://cdi-uploadproxy.mycluster.com --pvc-name=upload-pvc --pvc-size=10Gi --image-path=/images/fedora28.qcow2
+    virtctl image-upload --uploadproxy-url=https://cdi-uploadproxy.mycluster.com --pvc-name=upload-pvc --pvc-size=10Gi --image-path=/images/fedora28.qcow2
 
 Flags:
       --access-mode string       The access mode for the PVC. (default "ReadWriteOnce")
