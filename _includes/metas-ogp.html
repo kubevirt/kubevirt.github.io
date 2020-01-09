@@ -9,7 +9,7 @@
     <meta property="og:title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
     <meta property="og:type" content="{% if page.type %}{{ page.type }} | {{ site.type }}{% else %}{{ site.type }}{% endif %}">
     <meta property="og:url" content="{{site.url}}{{ page.url }}" >
-    <meta property="og:image" content="{% if page.image %}{{ page.image }} | {{ site.image }}{% else %}{{ site.image }}{% endif %}">
+    <meta property="og:image" content="{% if page.image %}{{site.url}}{{ page.image }} | {{site.url}}{{ site.image }}{% else %}{{site.url}}{{ site.image }}{% endif %}">
     <meta property="og:description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}" >
     <meta property="og:site_name" content="{{ site.title }}" >
     <meta property="og:article:author" content="{% if page.author %}{{ page.author | join: ', ' }}{% else %}The {{site.title}} website team{% endif %}" >
