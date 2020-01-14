@@ -18,7 +18,7 @@ In the video, there is a Kubernetes cluster already running.  Also, the `virtctl
 
 ## Video
 
-<iframe width="560" height="315" style="height: 315px" src="https://youtu.be/OAPzOvqp0is" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/OAPzOvqp0is" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
 ## Operations
 
