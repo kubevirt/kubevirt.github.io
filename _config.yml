@@ -48,10 +48,12 @@ feed:
     - uncategorized
 
 exclude:
-  - GUIDELINES.md
+  - CONTRIBUTING.md
   - README.md
   - TODO.md
   - .history
+  - LICENSE
+  - CODE_OF_CONDUCT.md
 
 tag_page_layout: tag
 tag_page_dir: /tag/
