@@ -24,7 +24,7 @@ In the video, there is a Kubernetes cluster already running.  Also, the `virtctl
 
 The following operations are shown in the video:
 - Install a specific version of the KubeVirt Operator and Custom Resource
-- Create a cirros Virtual Machine running in KubeVirt
+- Create a CirrOS Virtual Machine running in KubeVirt
 - Connect to the Virtual Machine using SSH
 - Upgrade to a specific version of KubeVirt while the Virtual Machine is running
 - Check the new KubeVirt version
