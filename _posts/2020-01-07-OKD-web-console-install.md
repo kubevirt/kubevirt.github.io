@@ -308,37 +308,21 @@ In order to configure the deployment of the OKD web console the proper Kubernete
 
 A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from [here](../assets/2020-01-07-OKD-web-console-install/2020-01-07-OKD-web-console-install/) and configured depending on the user's local installation.
 
-Finally, the `environment.sh` script can be executed paying attention to the variables and values exported:
+Then, create a specific service account (**console**) for running the OpenShift web console in case it is not created [previously](#compiling-okd-web-console) and grant cluster-admin permissions:
 
 ```sh
-$ bash -x contrib/environment.sh 
-+ export BRIDGE_USER_AUTH=disabled
-+ BRIDGE_USER_AUTH=disabled
-+ export BRIDGE_K8S_MODE=off-cluster
-+ BRIDGE_K8S_MODE=off-cluster
-++ kubectl config view -o json
-++ jq '{myctx: .["current-context"], ctxs: .contexts[], clusters: .clusters[]}'
-++ jq .clusters.cluster.server -r
-++ jq 'select(.ctxs.context.cluster ==  .clusters.name)'
-++ jq 'select(.myctx == .ctxs.name)'
-+ BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT=https://192.168.123.250:6443
-+ export BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
-+ export BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
-+ BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS=true
-+ export BRIDGE_K8S_AUTH=bearer-token
-+ BRIDGE_K8S_AUTH=bearer-token
-++ kubectl get serviceaccount console --namespace=kube-system -o 'jsonpath={.secrets[0].name}'
-+ secretname=console-token-ppfc2
-++ kubectl get secret console-token-ppfc2 --namespace=kube-system -o template '--template={{.data.token}}'
-++ base64 --decode
-+ BRIDGE_K8S_AUTH_BEARER_TOKEN=eyJhbGciOiJSUzI1NiIsImtpZCI6InJseElWc2dRVTZIbHlKTE5ablVzZWNpWkt6YjBjczdnZ0p4X1JRWEtLWEEifQ.eyJpc3MiOiJrdWJlcm5ldGVzL3NlcnZpY2VhY2NvdW50Iiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9uYW1lc3BhY2UiOiJrdWJlLXN5c3RlbSIsImt1YmVybmV0ZXMuaW8vc2VydmljZWFjY291bnQvc2VjcmV0Lm5hbWUiOiJjb25zb2xlLXRva2VuLXBwZmMyIiwia3ViZXJuZXRlcy5pby9zZXJ2aWNlYWNjb3VudC9zZXJ2aWNlLWFjY291bnQubmFtZSI6ImNvbnNvbGUiLCJrdWJlcm5ldGVzLmlvL3NlcnZpY2VhY2NvdW50L3NlcnZpY2UtYWNjb3VudC51aWQiOiI3MmIyYTU4ZS00Y2I1LTRjOGQtYjhjNy1mMDAwOWEzNWZhNWYiLCJzdWIiOiJzeXN0ZW06c2VydmljZWFjY291bnQ6a3ViZS1zeXN0ZW06Y29uc29sZSJ9.kHgsjYpGCVlsO9_yUN2_KVF8Fd9IDUV4gN5PM_v4SckEv9GPfF8UJ2M9f4KugKs2rVxKEWoxCLju6JE87rrzT_PAOv4ANNrbErl93hDFAqr56Wd39RImUjog096PqM0A-VO-eTlnPMk9hKr5Avrr2aSuBR_JR0J5qoKl4PCubQacoQh_bIW5SY5l-c6Nl9VEPNm_51iSi7GKdLRe0kQxMxp1xMlj2LUhsLPPqyuMTL2Se-9AU_FLzKC2qJbXdSV_8a-fRqKZKKDQwq_xhg-1QNSs5yd44cUnhZEzD61qXV5EbxerQvpVsC0Z4UVzjqP-tcVIjswLishxZ4ZaLsHTow
-+ export BRIDGE_K8S_AUTH_BEARER_TOKEN
-+ echo 'Using https://192.168.123.250:6443'
-Using https://192.168.123.250:6443
-
+$ kubectl create serviceaccount console -n kube-system
+$ kubectl create clusterrolebinding console --clusterrole=cluster-admin --serviceaccount=kube-system:console -n kube-system
 ```
 
-Below, the downloaded YAML file can be modified assigning the proper values to the **env** and **token** section:
+Next, extract the **token secret name** associated with the console service account:
+
+```sh
+$ kubectl get serviceaccount console --namespace=kube-system -o jsonpath='{.secrets[0].name}'
+console-token-ppfc2
+``` 
+
+Finally, the downloaded YAML file must be modified assigning the proper values to the **token** section. The following command may help to extract the token name from the user console, which is a user created by
 
 ```yaml
 apiVersion: apps/v1
@@ -367,7 +351,7 @@ spec:
         - name: BRIDGE_K8S_MODE
           value: off-cluster
         - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
-          value: https://192.168.123.250:6443  #master api
+          value: https://kubernetes.default  #master api
         - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
           value: "true"           # no tls enabled
         - name: BRIDGE_K8S_AUTH
