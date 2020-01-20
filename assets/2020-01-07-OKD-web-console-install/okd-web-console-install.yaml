@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
       - name: console-app
-        image: quay.io/openshift/origin-console:v4.2.0
+        image: quay.io/openshift/origin-console:4.2
         env:
         - name: BRIDGE_USER_AUTH
           value: disabled
@@ -34,6 +34,8 @@ spec:
             secretKeyRef:
               name: <token_name>  #include the console token name
               key: token
+
+---
 kind: Service
 apiVersion: v1
 metadata:
@@ -50,3 +52,4 @@ spec:
     nodePort: 30036
     protocol: TCP
 
+---

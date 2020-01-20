@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: Managing KubeVirt with Openshift Web Console
-pub-date: January 21
+pub-date: January 24
 pub-year: 2020
 ---
 
