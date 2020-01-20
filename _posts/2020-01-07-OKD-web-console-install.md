@@ -306,7 +306,7 @@ The OKD web console actually runs as a pod in OKD along with its deployment, ser
 
 In order to configure the deployment of the OKD web console the proper Kubernetes objects have to be created. As shown in the previously [Compiling OKD web console](#compiling-okd-web-console) there are quite a few environment variables that needs to be set. When dealing with Kubernetes objects these variables should be included in the deployment object.
 
-A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from [here](../assets/2020-01-07-OKD-web-console-install/2020-01-07-OKD-web-console-install/) and configured depending on the user's local installation.
+A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from [here](../assets/2020-01-07-OKD-web-console-install/okd-web-console-install.yaml) and configured depending on the user's local installation.
 
 Then, create a specific service account (**console**) for running the OpenShift web console in case it is not created [previously](#compiling-okd-web-console) and grant cluster-admin permissions:
 
@@ -451,7 +451,7 @@ spec:
         - name: BRIDGE_K8S_MODE
           value: off-cluster
         - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
-          value: https://192.168.123.250:6443
+          value: https://kubernetes.default
         - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
           value: "true"
         - name: BRIDGE_K8S_AUTH
