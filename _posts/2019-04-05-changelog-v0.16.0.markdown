@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: releases
 comments: true
 title: KubeVirt v0.16.0
-pub-date: Apr 05
+pub-date: April 05
 pub-year: 2019
 ---
 

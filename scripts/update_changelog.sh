@@ -54,7 +54,7 @@ EOF
     newdate=$(echo $daterelease|tr " " "\n"|grep -v "+"|tr "\n" " ")
     year=$(date --date="$newdate" '+%Y')
     month=$(date --date="$newdate" '+%m')
-    monthname=$(LANG=C date --date="$newdate" '+%b')
+    monthname=$(LANG=C date --date="$newdate" '+%B')
     day=$(date --date="$newdate" '+%d')
     NEWFILENAME="build/artifacts/$year-$month-$day-$FILENAME"
     mv $FILENAME $NEWFILENAME
