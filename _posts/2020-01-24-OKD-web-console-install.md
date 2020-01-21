@@ -43,7 +43,7 @@ Unlike what is explained in the [official repository](https://github.com/openshi
 
 In this section the OKD web console will be compiled from the source code and executed as a binary artifact in a **CentOS 8** server which does not belong to any Kubernetes cluster. The following diagram shows the relationship between all the components: user, OKD web console and Kubernetes cluster.
 
-<img src="/assets/2020-01-07-OKD-web-console-install/OKD-console-kubevirt.png" alt="Lab diagram">
+<img src="/assets/2020-01-24-OKD-web-console-install/OKD-console-kubevirt.png" alt="Lab diagram">
 
 Note that it is possible to run the OKD web console in a Kubernetes master, in a regular node or, as shown, in a server outside the cluster. In the latter case, the external server must have access to the master API. *Notice also that it can be configured with different security and network settings or even different hardware resources*.
 
@@ -148,7 +148,7 @@ Probably, the following issue will be faced when connecting to the web user inte
 
 <br>
 
-<img src="/assets/2020-01-07-OKD-web-console-install/okd-serviceaccount-error.png" alt="OKD sa error" width="1110" height="720">
+<img src="/assets/2020-01-24-OKD-web-console-install/okd-serviceaccount-error.png" alt="OKD sa error" width="1110" height="720">
 
 <br>
 
@@ -306,7 +306,7 @@ The OKD web console actually runs as a pod in OKD along with its deployment, ser
 
 In order to configure the deployment of the OKD web console the proper Kubernetes objects have to be created. As shown in the previously [Compiling OKD web console](#compiling-okd-web-console) there are quite a few environment variables that needs to be set. When dealing with Kubernetes objects these variables should be included in the deployment object.
 
-A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from [here](../assets/2020-01-07-OKD-web-console-install/okd-web-console-install.yaml) and configured depending on the user's local installation.
+A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from [here](../assets/2020-01-24-OKD-web-console-install/okd-web-console-install.yaml) and configured depending on the user's local installation.
 
 Then, create a specific service account (**console**) for running the OpenShift web console in case it is not created [previously](#compiling-okd-web-console) and grant cluster-admin permissions:
 
@@ -404,13 +404,13 @@ Once running, a connection to the `nodeport` defined in the service object can b
 <br>
 
 
-<img src="/assets/2020-01-07-OKD-web-console-install/okd-pod-4.2.resized.png" alt="OKD 4.2">
+<img src="/assets/2020-01-24-OKD-web-console-install/okd-pod-4.2.resized.png" alt="OKD 4.2">
 
 <br>
 It can be verified that it is possible to see and manage `VirtualMachines` running inside of the native Kubernetes cluster.
 <br>
 
-<img src="/assets/2020-01-07-OKD-web-console-install/okd-console-vm.resized.png" alt="OKD vmr">
+<img src="/assets/2020-01-24-OKD-web-console-install/okd-console-vm.resized.png" alt="OKD vmr">
 
 <br>
 
@@ -419,7 +419,7 @@ It can be verified that it is possible to see and manage `VirtualMachines` runni
 The upgrade process is really straightforward. All available image versions of the OpenShift console can be consulted in the [official OpenShift container image repository](https://quay.io/repository/openshift/origin-console?tab=tags). Then, the deployment object must be modified accordingly to run the desired version of the OKD web console.
 
 <br>
-<img src="/assets/2020-01-07-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr">
+<img src="/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr">
 <br>
 
 In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. *Note that this is not linked with the latest tag, actually `latest` tag is the same as version `4.4`*. Upgrading process only involves updating the image value to the desired container image: `quay.io/openshift/origin-console:4.5` and save.
@@ -472,7 +472,7 @@ console-deployment-5588f98644-bw7jr                     0/1     ContainerCreatin
 console-deployment-59d8956db5-td462                     1/1     Running             0          16h
 ```
 <br>
-<img src="/assets/2020-01-07-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5">
+<img src="/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5">
 <br>
 
 In the video below, the procedure explained in this section is shown.
