@@ -10,7 +10,7 @@ pub-date: December 10
 pub-year: 2019
 ---
 
-In this video, we are showing the step by step of the [KubeVirt Laboratory 2: Experiment with CDI](https://kubevirt.io/labs/kubernetes/lab2.html)
+In this video, we are showing the step by step of the [KubeVirt Laboratory 2: Experiment with CDI]({% link labs/kubernetes/lab2.md %})
 
 ## Pre-requisites
 
@@ -32,9 +32,9 @@ The following operations are shown in the video:
 - Redirect a host port to the Virtual Machine to enable external SSH connectivity
 
 ## References
-- [Kubevirt Laboratory 2: Experimenting with CDI](https://kubevirt.io/labs/kubernetes/lab2.html)
-- [Kubevirt Laboratory 1 blogpost: Use Kubevirt](https://kubevirt.io/2019/KubeVirt_lab1_use_kubevirt.html)
-- [Kubevirt Laboratory 1: Use KubeVirt](https://kubevirt.io/labs/kubernetes/lab1.html)
+- [Kubevirt Laboratory 2: Experimenting with CDI]({% link labs/kubernetes/lab2.md %})
+- [Kubevirt Laboratory 1 blogpost: Use Kubevirt]({% post_url 2019-12-04-KubeVirt_lab1_use_kubevirt %})
+- [Kubevirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})
 - [KubeVirt basic operations video on youtube](https://www.youtube.com/watch?v=KC03G60shIc)
 - [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) 
 - [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)

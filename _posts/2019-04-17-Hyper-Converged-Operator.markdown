@@ -26,7 +26,7 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 We can use HCO both on minikube and also on Openshift 4. We will be using Openshift 4 for HCO in this Blog.
 
-**Note**: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link [Install_HCO_minikube](https://kubevirt.io/quickstart_minikube/) install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).
+**Note**: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link [Install_HCO_minikube]({% link pages/quickstart_minikube.md  %}) install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).
 
 ## Deploying HCO on Openshift 4 Cluster.
 
@@ -221,7 +221,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 
 - [CDI]({% post_url 2018-10-10-CDI-DataVolumes %})
 - [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
-- [KubeVirt](http://kubevirt.io/quickstart_minikube/)
+- [KubeVirt]({% link pages/quickstart_minikube.md  %})
 - [ssp-operator](https://github.com/MarSik/kubevirt-ssp-operator)
 - [kubevirt-web-ui](https://github.com/kubevirt/web-ui)
 - [NodeMaintenance](https://github.com/kubevirt/node-maintenance-operator)
@@ -339,7 +339,7 @@ We can see how OLM operator manages the HCO pods from the `openshift-operator-li
 
 The above method demonstrates the integration of HCO operator in Openshift4.
 
-So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart](https://kubevirt.io/quickstart_minikube/#install-virtctl):
+So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart]({% link pages/quickstart_minikube.md  %}#install-virtctl):
 
 ## Conclusion
 

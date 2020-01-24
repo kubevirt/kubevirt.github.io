@@ -131,7 +131,7 @@ virt-template-validator-76cbbd6f68-5fbzx           1/1     Running   0          
 
 As seen from above HCO deploys the `node-maintenance-operator`.
 
-Next, let's install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps [here](https://kubevirt.io/quickstart_minikube/#deploy-kubevirt) and deploy a VMI as explained. Please feel free to check the video that explains the [same](https://www.youtube.com/watch?v=LLNjyeB-3fI)
+Next, let's install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps [here]({% link pages/quickstart_minikube.md  %}#deploy-kubevirt) and deploy a VMI as explained. Please feel free to check the video that explains the [same](https://www.youtube.com/watch?v=LLNjyeB-3fI)
 
 ~~~sh
 $oc get vms

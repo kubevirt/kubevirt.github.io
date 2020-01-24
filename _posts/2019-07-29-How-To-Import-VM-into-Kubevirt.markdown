@@ -28,7 +28,7 @@ In this blog post we will show you how to deploy a VM as a yaml template and the
 
 - User has already installed KubeVirt in an available K8s environment, if not please follow the link [Installing KubeVirt](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#installation) to further proceed.
 
-- User is already familiar with VM operation with Kubernetes, for a refresher on how to use 'Virtual Machines' in Kubernetes, please do check [LAB 1](https://kubevirt.io/labs/kubernetes/lab1.html) before proceeding.
+- User is already familiar with VM operation with Kubernetes, for a refresher on how to use 'Virtual Machines' in Kubernetes, please do check [LAB 1]({% link labs/kubernetes/lab1.md %}) before proceeding.
 
 ## Creating Virtual Machines from local images with CDI and virtctl
 

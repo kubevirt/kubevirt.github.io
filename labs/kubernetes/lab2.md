@@ -83,19 +83,19 @@ Wait for the Virtual Machine to boot and to be available for login. You may moni
 
 Disconnect from the virtual machine console by typing: `ctrl+]`
 
-Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are **in the Kubernetes software defined network (SDN)**. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the [Easy install using AWS](https://kubevirt.io/pages/ec2.html) or [Easy install using GCP](https://kubevirt.io/pages/gcp.html) your cloud instance is already part of the cluster.
+Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are **in the Kubernetes software defined network (SDN)**. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the [Easy install using AWS]({% link pages/ec2.md %}) or [Easy install using GCP]({% link pages/gcp.md %}) your cloud instance is already part of the cluster.
 
 ```
 {% include scriptlets/lab2/13_ssh_to_vm1.sh -%}
 ```
 
-On the other side, if you followed [Easy install using minikube](https://kubevirt.io/quickstart_minikube/) take into account that you will need to ssh into Minikube first, as shown below.
+On the other side, if you followed [Easy install using minikube]({% link pages/quickstart_minikube.md %}) take into account that you will need to ssh into Minikube first, as shown below.
 
 ```
 {% include scriptlets/lab2/14_minikube_ssh_vm1.sh -%}
 ```
 
-Finally, on a usual situation you will probably want to give access to your vm1 VM to someone else from outside the Kubernetes cluster nodes. Someone who is actually connecting from his or her laptop. This can be achieved with the virtctl tool already installed in [Easy install using minikube](https://kubevirt.io/quickstart_minikube/). **Note that this is the same case as connecting from our laptop to vm1 VM running on our local Minikube instance**
+Finally, on a usual situation you will probably want to give access to your vm1 VM to someone else from outside the Kubernetes cluster nodes. Someone who is actually connecting from his or her laptop. This can be achieved with the virtctl tool already installed in [Easy install using minikube]({% link pages/quickstart_minikube.md %}). **Note that this is the same case as connecting from our laptop to vm1 VM running on our local Minikube instance**
 
 First, we are going expose the ssh port of the vm1 as NodePort type. Then verify that the Kubernetes object service was created successfully on a random port of the Minikube or cloud instance.
 
