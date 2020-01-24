@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: console-deployment
+  namespace: kube-system
+  labels:
+    app: console
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: console
+  template:
+    metadata:
+      labels:
+        app: console
+    spec:
+      containers:
+      - name: console-app
+        image: quay.io/openshift/origin-console:4.2
+        env:
+        - name: BRIDGE_USER_AUTH
+          value: disabled
+        - name: BRIDGE_K8S_MODE
+          value: off-cluster
+        - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
+          value: https://kubernetes.default
+        - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
+          value: "true"
+        - name: BRIDGE_K8S_AUTH
+          value: bearer-token
+        - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: <token_name>  #include the console token name
+              key: token
+
+---
+kind: Service
+apiVersion: v1
+metadata:
+  name: console-np-service
+  namespace: kube-system
+spec:
+  selector:
+    app: console
+  type: NodePort
+  ports:
+  - name: http
+    port: 9000
+    targetPort: 9000
+    nodePort: 30036
+    protocol: TCP
+
+---
