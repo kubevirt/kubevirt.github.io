@@ -10,7 +10,7 @@ pub-date: December 4
 pub-year: 2019
 ---
 
-In this video, we are showing the step by step of the [KubeVirt Laboratory 1: Use KubeVirt](https://kubevirt.io/labs/kubernetes/lab1.html)
+In this video, we are showing the step by step of the [KubeVirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})
 
 ## Pre-requisites
 
@@ -30,7 +30,7 @@ The following operations are shown in the video:
 - Stopping and removing the Virtual Machine
 
 ## References
-- [Kubevirt Laboratory 1: Use KubeVirt instructions](https://kubevirt.io/labs/kubernetes/lab1.html)
+- [Kubevirt Laboratory 1: Use KubeVirt instructions]({% link labs/kubernetes/lab1.md %})
 - [KubeVirt basic operations video on youtube](https://www.youtube.com/watch?v=KC03G60shIc)
 - [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) 
 - [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)

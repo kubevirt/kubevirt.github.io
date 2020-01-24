@@ -26,7 +26,7 @@ playbook, for the purpose of this introduction, we'll assume you have a working 
 running `kubectl get nodes` correctly returns a list of nodes and you've already deployed KubeVirt, then you're
 good to go. If not, here's a [KubeVirt quickstart (with Minikube)][quickstart minikube].
 
-[quickstart minikube]: https://kubevirt.io/quickstart_minikube/
+[quickstart minikube]: {% link pages/quickstart_minikube.md  %}
 
 ## Basic VM management
 
