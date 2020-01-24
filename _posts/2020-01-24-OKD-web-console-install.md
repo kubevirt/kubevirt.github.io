@@ -488,3 +488,14 @@ In this post *two ways to install the OKD web console to manage a KubeVirt deplo
 Personally, I would like to see more user interfaces to manage and configure KubeVirt deployments and their virtual machines. In a previous post, [KubeVirt user interface options](https://kubevirt.io/2019/KubeVirt_UI_options.html), some options were explored, however only OKD web console was found to be deeply integrated with KubeVirt.
 
 Ping us or feel free to comment this post in case there are some other existing options that we did not notice.
+
+
+## References
+
+- [KubeVirt user interface options]({% post_url 2019-12-17-KubeVirt_UI_options %})
+- [Managing KubeVirt with OpenShift web console running as a container application on Youtube](https://www.youtube.com/watch?v=xoL0UFI657I)
+- [ManagManaging KubeVirt with OpenShift web console running as a compiled binary on Youtube](https://www.youtube.com/watch?v=XQw4GkGHs44&t=37s)
+- [Kubevirt Laboratory 1 blogpost: Use Kubevirt]({% post_url 2019-12-04-KubeVirt_lab1_use_kubevirt %})
+- [KubeVirt basic operations video on Youtube](https://www.youtube.com/watch?v=KC03G60shIc)
+- [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html)
+- [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)
