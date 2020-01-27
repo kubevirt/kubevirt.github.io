@@ -11,13 +11,9 @@ before_install:
 
 install: true
 
-script: rake
-
-# branch whitelist, only for GitHub Pages
-# branches:
-#  only:
-#  - gh-pages     # test the gh-pages branch
-#  - /pages-(.*)/ # test every branch which starts with "pages-"
+script:
+- scripts/update_changelog.sh
+- rake
 
 env:
   global:

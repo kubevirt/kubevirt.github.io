@@ -69,7 +69,3 @@ gen_changelog
 for file in build/artifacts/*.markdown; do
 [ -f _posts/$(basename $file) ] || mv $file _posts/
 done
-
-git add _posts/
-git commit -m "Release autobot 🚗---->🤖"
-git push
