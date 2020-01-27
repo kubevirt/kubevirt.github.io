@@ -44,19 +44,17 @@ They also explain the common use cases, how people are using it today:
             - But: VNFs are hard to containerize!
 
 And also how the project actually works from an architectural perspective and the ideal environment.
-![architectural_perspective](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png)
-
-And how is the ideal environment with KubeVirt:
-![kubevirt_environment](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png)
+![architectural_perspective](/assets/images/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png)
+![kubevirt_environment](/assets/images/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png)
 
 
 A walk through the KubeVirt components is also shown:
-- virt-api-server: The entry point to KubeVirt for all virtualisation related flows and takes care to update the virtualisation related custom resource definition (CRD)
-- virt-Launcher: A VM is inside a POD launched by Virt-Launcher using Libvirt
-![pod_networking](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png)
+- virt-api-server: The entry point to KubeVirt for all virtualisation related flows and takes care to update the virtualisation related custom resource definition (CRD).
+- virt-Launcher: A VM is inside a POD launched by Virt-Launcher using Libvirt.
+![pod_networking](/assets/images/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png)
 - virt-Controller: Each Object has a corresponding controller
-- virt-Handler: is a Daemonset that acts as a minion communication to Libvirt via socker
-- libvirtd: toolkit to manage virtualization platforms
+- virt-Handler: is a Daemonset that acts as a minion communication to Libvirt via socker.
+- libvirtd: toolkit to manage virtualization platforms.
 
 In the Video, you will also see a short demo of the project in action where Chand shows how to install KubeVirt and bring up a Virtual Machine in a short time!
 
@@ -102,4 +100,3 @@ is towards CNCF projects. He was one of the speaker of 2018 DevOpsDays Event.
 ## References
 - [YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi](https://www.youtube.com/watch?v=_z5Pjyl0Dq4)
 - [Presentation: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi](https://static.sched.com/hosted_files/kccncna19/70/Introduction_to_KubeVirt-KUBECONNA19.pdf)
-- [KubeCon NA 2019 event](https://kccncna19.sched.com/event/VyBC)
