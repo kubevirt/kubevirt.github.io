@@ -44,14 +44,14 @@ They also explain the common use cases, how people are using it today:
             - But: VNFs are hard to containerize!
 
 And also how the project actually works from an architectural perspective and the ideal environment.
-![architectural_perspective](/assets/images/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png)
-![kubevirt_environment](/assets/images/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png)
+![architectural_perspective](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png)
+![kubevirt_environment](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png)
 
 
 A walk through the KubeVirt components is also shown:
 - virt-api-server: The entry point to KubeVirt for all virtualisation related flows and takes care to update the virtualisation related custom resource definition (CRD).
 - virt-Launcher: A VM is inside a POD launched by Virt-Launcher using Libvirt.
-![pod_networking](/assets/images/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png)
+![pod_networking](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png)
 - virt-Controller: Each Object has a corresponding controller
 - virt-Handler: is a Daemonset that acts as a minion communication to Libvirt via socker.
 - libvirtd: toolkit to manage virtualization platforms. 
