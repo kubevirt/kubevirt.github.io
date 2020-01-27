@@ -7,6 +7,8 @@ toc:
         url: pages/gcp.html
       - page: Easy install using Minikube
         url: quickstart_minikube/
+      - page: Easy install using Kind
+        url: quickstart_kind/
   - title: Labs
     subfolderitems:
       - page: Use KubeVirt

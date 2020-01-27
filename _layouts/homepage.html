@@ -62,14 +62,25 @@
                 <a href="{{ site.baseURL }}/pages/gcp" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try It!</a>
               </div>
             </div>
+            <div class="card" style="margin-right: .2rem;">
+              <div class="card-body">
+                <img src="./../assets/images/kind-logo.png" width="60px" height="41px" alt="Kind Logo">
+                <p class="card-text">
+                  KubeVirt on Kind
+                </p>
+              </div>
+              <div class="card-footer">
+                <a href="{{ site.baseURL }}quickstart_kind" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try It!</a>
           </div>
         </div>
       </div>
     </header>
 
+
     <main role="main">
       {{ content }}
     </main>
+
 
     <footer class="footer" role="contentinfo">
       {% include footer.html %}
