@@ -1,0 +1,396 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//quickstart_minikube/">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>KubeVirt Quickstart with Minikube | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="The KubeVirt.io website team, " >
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Virtual Machine Management on Kubernetes">
+    <meta name="keywords" content="updates, releases, uncategorized, news, " >
+    <meta property="og:title" content="KubeVirt Quickstart with Minikube | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//quickstart_minikube/" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="The KubeVirt.io website team" >
+    <meta property="og:article:published_time" content="2020-01-27 14:46:59 +0000" >
+    <meta name="twitter:title" content="KubeVirt Quickstart with Minikube | KubeVirt.io">
+    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+            <div class="accordion" id="accordionTOC">
+              <div class="card card--sidebar">
+                <div class="card-header card-header--sidebar" id="headingTOC">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
+                      Labs
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
+                  <div class="card-body card-body--sidebar">
+                    
+                      
+                        <h3>Installation</h3>
+                        
+                          
+                            <h3 class="labs-title">
+                              <a href="/pages/ec2.html"  class="labs-title--item" >Easy install using AWS</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/pages/gcp.html"  class="labs-title--item" >Easy install using GCP</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/quickstart_minikube/"  class="labs-title--item" >Easy install using Minikube</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/quickstart_kind/"  class="labs-title--item" >Easy install using Kind</a>
+                            </h3>
+                          
+                        
+                      
+                        <h3>Labs</h3>
+                        
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab1.html"  class="labs-title--item" >Use KubeVirt</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab2.html"  class="labs-title--item" >Experiment with CDI</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
+                            </h3>
+                          
+                        
+                      
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-8 col-lg-8 docs">
+            <h1 id="easy-install-using-minikube">Easy install using minikube</h1>
+
+<p>In Step 1, we guide you through setting up your environment to launch Kubernetes via minikube</p>
+
+<p>After it’s ready, dive into the two labs below to help you get
+acquainted with KubeVirt.</p>
+
+<h2 id="step-1-prepare-minikube-environment">Step 1: Prepare minikube environment</h2>
+
+<p>This guide will help you deploying <a href="https://kubevirt.io">KubeVirt</a> on
+Kubernetes, we’ll be using
+<a href="https://github.com/kubernetes/minikube/" target="_blank">Minikube</a>.</p>
+
+<p>Our recommendation is to always run the latest (*) version of
+<a href="https://github.com/kubernetes/minikube/" target="_blank">Minikube</a>
+available for your platform of choice, following their
+<a href="https://kubernetes.io/docs/tasks/tools/install-minikube/" target="_blank">installation intructions</a>. For instance, to write this guide, the <strong>Linux</strong> version has been used, together
+with the <a href="https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver" target="_blank"><strong>KVM2</strong></a>
+driver.</p>
+
+<p><em>(*): KubeVirt &gt;=v0.9.2 won’t run on Minikube &lt;v0.35.0 by default because of lack of vhost-net device. (see more details at <a href="https://github.com/kubevirt/kubevirt/issues/2056">Issue#2056</a>)</em></p>
+
+<p>Finally, you’ll need <em>kubectl</em> installed (*), it can be downloaded from <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl" target="_blank">here</a> or installed using the means available for your platform.</p>
+
+<p><em>(*): Ensure that *kubectl* version complies with the <a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew">supported release skew</a> (The version of kubectl should be close to Kubernetes server version).</em></p>
+
+<h3 id="start-minikube">Start Minikube</h3>
+
+<p>Before starting with Minikube, let’s verify whether nested virtualization is enabled on the
+host where Minikube is being installed on:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
+</code></pre></div></div>
+
+<p>If you get an <strong>N</strong>, follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="_blank">here</a> for enabling it.</p>
+
+<p><strong>Note</strong> that nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can’t be enabled, don’t forget to enable emulation as shown in the <em>Check for the Virtualization Extensions</em> section.</p>
+
+<p>Let’s begin, normally, Minikube can be started with default values and those will be enough
+to run this quickstart guide, that being said, if you can spare few more GiBs
+of RAM (by default it uses 2GiB), it’ll allow you to experiment further this guide.</p>
+
+<p>We’ll create a profile for KubeVirt so it gets its own settings without
+interfering what any configuration you might had already, let’s start by
+increasing the default memory to 4GiB:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube config <span class="nt">-p</span> kubevirt <span class="nb">set </span>memory 4096
+</code></pre></div></div>
+
+<p>Now, set the VM driver to KVM2:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube config <span class="nt">-p</span> kubevirt <span class="nb">set </span>vm-driver kvm2
+</code></pre></div></div>
+
+<p>We’re ready to start the Minikube VM:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube start <span class="nt">-p</span> kubevirt
+</code></pre></div></div>
+
+<h3 id="deploy-kubevirt-operator">Deploy KubeVirt Operator</h3>
+
+<p>Having the Minikube VM is up and running, let’s set the <em>version</em> environment
+variable that will be used on few commands:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On other OS you might need to define it like</span>
+<span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="s2">"v0.18.0"</span>
+
+<span class="c"># On Linux you can obtain it using 'curl' via:</span>
+<span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases|grep tag_name|sort <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs | <span class="nb">cut</span> <span class="nt">-d</span><span class="s1">'-'</span> <span class="nt">-f1</span><span class="si">)</span>
+
+<span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
+</code></pre></div></div>
+
+<p>Now, using the <code class="highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
+</code></pre></div></div>
+
+<p>Check it’s running:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+NAME                             READY     STATUS              RESTARTS   AGE
+virt-operator-6c5db798d4-9qg56   0/1       ContainerCreating   0          12s
+...
+virt-operator-6c5db798d4-9qg56   1/1       Running   0         28s
+</code></pre></div></div>
+
+<p>We’ll need to execute the command above few times (or add <em>-w</em> for <em>watching</em>
+the pods), until the operator is <em>Running</em> and <em>Ready</em> (1/1), then it’s time
+to head to the next section.</p>
+
+<h3 id="check-for-the-virtualization-extensions">Check for the Virtualization Extensions</h3>
+
+<p>To check if your VM’s CPU supports virtualization extensions execute the
+following command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube ssh <span class="nt">-p</span> kubevirt <span class="s2">"egrep 'svm|vmx' /proc/cpuinfo"</span>
+</code></pre></div></div>
+
+<p>If the command doesn’t generate any output, create the following <em>ConfigMap</em>
+so that KubeVirt uses emulation mode, otherwise skip to the next section:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<h3 id="deploy-kubevirt">Deploy KubeVirt</h3>
+
+<p>KubeVirt is then deployed by creating a dedicated custom resource:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
+</code></pre></div></div>
+
+<p>Check the deployment:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+NAME                               READY     STATUS    RESTARTS   AGE
+virt-api-649859444c-fmrb7          1/1       Running   0          2m12s
+virt-api-649859444c-qrtb6          1/1       Running   0          2m12s
+virt-controller-7f49b8f77c-kpfxw   1/1       Running   0          2m12s
+virt-controller-7f49b8f77c-m2h7d   1/1       Running   0          2m12s
+virt-handler-t4fgb                 1/1       Running   0          2m12s
+virt-operator-6c5db798d4-9qg56     1/1       Running   0          6m41s
+</code></pre></div></div>
+
+<p>Once we applied the <em>Custom Resource</em> the operator took care of deploying the
+actual KubeVirt pods (<em>virt-api</em>, <em>virt-controller</em> and <em>virt-handler</em>). Again
+we’ll need to execute the command until everything is <em>up&amp;running</em>
+(or use <em>-w</em>).</p>
+
+<h3 id="install-virtctl">Install virtctl</h3>
+
+<p>An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
+The tool is called <em>virtctl</em> and can be retrieved from the release page of KubeVirt:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
+    https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
+<span class="nb">chmod</span> +x virtctl
+</code></pre></div></div>
+
+<p>If <a href="https://krew.dev/"><code class="highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="highlighter-rouge">virtctl</code> can be installed via <code class="highlighter-rouge">krew</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
+</code></pre></div></div>
+
+<p>Then <code class="highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
+</code></pre></div></div>
+
+<p>Every occurrence throughout this guide of</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl &lt;<span class="nb">command</span><span class="o">&gt;</span>...
+</code></pre></div></div>
+
+<p>should then be read as</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt &lt;<span class="nb">command</span><span class="o">&gt;</span>...
+</code></pre></div></div>
+
+<h3 id="clean-up-after-lab-cleanups">Clean Up (after lab cleanups):</h3>
+
+<p>Delete the Kubevirt from minikube:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube delete <span class="nt">-p</span> kubevirt
+</code></pre></div></div>
+
+<h2 id="step-2-kubevirt-labs">Step 2: KubeVirt labs</h2>
+
+<p>After you have connected to your instance through SSH, you can
+work through a couple of labs to help you get acquainted with KubeVirt
+and how to use it to create and deploy VMs with Kubernetes.</p>
+
+<p>The first lab is <a href="../labs/kubernetes/lab1">“Use KubeVirt”</a>. This lab walks you
+through the creation of a Virtual Machine instance on Kubernetes and then
+shows you how to use virtctl to interact with its console.</p>
+
+<p>The second lab is <a href="../labs/kubernetes/lab2">“Experiment with CDI”</a>. This
+lab shows you how to use the <a href="https://github.com/kubevirt/containerized-data-importer" target="_blank">Containerized Data Importer</a>
+(CDI) to import a VM image into a <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">Persistent Volume Claim</a>
+(PVC) and then how to define a VM to make use of the PVC.</p>
+
+<h2 id="found-a-bug">Found a bug?</h2>
+
+<p>We are interested in hearing about your experience.</p>
+
+<p>If you encounter an issue with deploying your cloud instance or if
+Kubernetes or KubeVirt did not install correctly, please report it to
+the <a href="https://github.com/kubevirt/cloud-image-builder/issues" target="_blank">cloud-image-builder issue tracker</a>.</p>
+
+<p>If experience a problem with the labs, please report it to the <a href="https://github.com/kubevirt/kubevirt.github.io/issues" target="_blank">kubevirt.io issue tracker</a>.</p>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//community/contributing">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Contributing | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="The KubeVirt.io website team, " >
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Virtual Machine Management on Kubernetes">
+    <meta name="keywords" content="updates, releases, uncategorized, news, " >
+    <meta property="og:title" content="Contributing | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//community/contributing" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="The KubeVirt.io website team" >
+    <meta property="og:article:published_time" content="2020-01-27 14:46:59 +0000" >
+    <meta name="twitter:title" content="Contributing | KubeVirt.io">
+    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container post">
+  <h1 class="page-title">Contributing</h1>
+  <article class="post-content">
+    <h2 id="introduction">Introduction</h2>
+
+<p>Let’s start with the relationship between the two important components:</p>
+
+<ul>
+  <li><strong>Kubernetes</strong> is a container orchestration system, and is used to run containers on a cluster</li>
+  <li><strong>KubeVirt</strong> is an add-on which is installed on-top of Kubernetes, to be able to add basic virtualization functionality to Kubernetes.</li>
+</ul>
+
+<p>Even though KubeVirt is an add-on to Kubernetes, both of them have things in common:</p>
+
+<ul>
+  <li>Mostly written in golang</li>
+  <li>Often related to distributed microservice architectures</li>
+  <li>Declarative and Reactive (Operator pattern) approach</li>
+</ul>
+
+<p>This short page shall help to get started with the projects and topics surrounding them.</p>
+
+<h2 id="contributing-to-kubevirt">Contributing to KubeVirt</h2>
+
+<h3 id="our-workflow">Our workflow</h3>
+
+<p>Contributing to KubeVirt should be as simple as possible. Have a question? Want to discuss something? Want to contribute something? Just open an <a href="https://github.com/kubevirt/kubevirt/issues" target="_blank">Issue</a>, a <a href="https://github.com/kubevirt/kubevirt/pulls" target="_blank">Pull Request</a>, or send a mail to our <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" target="_blank">Google Group</a>.</p>
+
+<p>If you spot a bug or want to change something pretty simple, just go ahead and open an Issue and/or a Pull Request, including your changes at <a href="https://github.com/kubevirt/kubevirt" target="_blank">kubevirt/kubevirt</a>.</p>
+
+<p>For bigger changes, please create a tracker Issue, describing what you want to do. Then either as the first commit in a Pull Request, or as an independent Pull Request, provide an <strong>informal</strong> design proposal of your intended changes. The location for such propoals is <a href="https://github.com/kubevirt/kubevirt/tree/master/docs" target="_blank">/docs</a> in the KubeVirt core repository. Make sure that all your Pull Requests link back to the relevant Issues.</p>
+
+<h3 id="getting-started">Getting started</h3>
+
+<p>To make yourself comfortable with the code, you might want to work on some Issues marked with one or more of the following labels
+<a href="https://github.com/kubevirt/kubevirt/issues?q=is%3Aissue+is%3Aopen+label%3Abeginner" target="_blank">beginner</a>, <a href="https://github.com/kubevirt/kubevirt/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22" target="_blank">help
+wanted</a> or <a href="https://github.com/kubevirt/kubevirt/labels/bug" target="_blank">bug</a>. Any help is highly appreciated.</p>
+
+<h3 id="testing">Testing</h3>
+
+<p><strong>Untested features do not exist</strong>. To ensure that what we code really works, relevant flows should be covered via unit tests and functional tests. So when thinking about a contribution, also think about testability. All tests can be run local without the need of CI. Have a look at the Testing section in the <a href="/quickstart_minikube">Developer Guide</a>.</p>
+
+<h3 id="getting-your-code-reviewedmerged">Getting your code reviewed/merged</h3>
+
+<p>Maintainers are here to help you enabling your use-case in a reasonable amount of time. The maintainers will try to review your code and give you productive feedback in a reasonable amount of time. However, if you are blocked on a review, or your Pull Request does not get the attention you think it deserves, reach out for us via Comments in your Issues, or ping us on IRC <a href="https://kiwiirc.com/client/irc.freenode.net/kubevirt" target="_blank">#kubevirt @irc.freenode.net</a>.</p>
+
+<p>Maintainers are:</p>
+
+<ul>
+  <li>@admiyo</li>
+  <li>@berrange</li>
+  <li>@davidvossel</li>
+  <li>@fabiand</li>
+  <li>@rmohr</li>
+  <li>@stu-gott</li>
+  <li>@vladikr</li>
+</ul>
+
+<h2 id="projects--communities">Projects &amp; Communities</h2>
+
+<h3 id="kubevirt"><a href="https://github.com/kubevirt/" target="_blank">KubeVirt</a></h3>
+
+<ul>
+  <li>Getting started
+    <ul>
+      <li><a href="/quickstart_minikube">Developer Guide</a></li>
+      <li><a href="https://github.com/kubevirt/demo" target="_blank">Demo</a></li>
+      <li><a href="/docs">Documentation</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h3 id="kubernetes"><a href="http://kubernetes.io/" target="_blank">Kubernetes</a></h3>
+
+<ul>
+  <li>Getting started
+    <ul>
+      <li><a href="http://kubernetesbyexample.com" target="_blank">http://kubernetesbyexample.com</a></li>
+      <li><a href="https://kubernetes.io/docs/tutorials/stateless-application/hello-minikube/" target="_blank">Hello Minikube - Kubernetes</a></li>
+      <li><a href="https://kubernetes.io/docs/user-guide/" target="_blank">User Guide - Kubernetes</a></li>
+    </ul>
+  </li>
+  <li>Details
+    <ul>
+      <li><a href="https://kubernetes.io/docs/concepts/tools/kubectl/object-management-using-declarative-config/" target="_blank">Declarative Management of Kubernetes Objects Using Configuration Files - Kubernetes</a></li>
+      <li><a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/architecture/architecture.md" target="_blank">Kubernetes Architecture</a></li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="additional-topics">Additional Topics</h2>
+
+<ul>
+  <li>Golang
+    <ul>
+      <li><a href="https://golang.org/doc/" target="_blank">Documentation - The Go Programming Language</a></li>
+      <li><a href="https://golang.org/doc/install" target="_blank">Getting Started - The Go Programming Language</a></li>
+    </ul>
+  </li>
+  <li>Patterns
+    <ul>
+      <li><a href="https://coreos.com/blog/introducing-operators.html" target="_blank">Introducing Operators: Putting Operational Knowledge into Software</a></li>
+      <li><a href="https://martinfowler.com/articles/microservices.html" target="_blank">Microservices</a> nice
+content by Martin Fowler</li>
+    </ul>
+  </li>
+  <li>Testing
+    <ul>
+      <li><a href="https://onsi.github.io/ginkgo/" target="_blank">Ginkgo - A Golang BDD Testing Framework</a></li>
+    </ul>
+  </li>
+</ul>
+
+  </article>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

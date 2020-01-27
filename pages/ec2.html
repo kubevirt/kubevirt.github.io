@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//pages/ec2">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Easy install using AWS | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="The KubeVirt.io website team, " >
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Virtual Machine Management on Kubernetes">
+    <meta name="keywords" content="updates, releases, uncategorized, news, " >
+    <meta property="og:title" content="Easy install using AWS | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//pages/ec2" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="The KubeVirt.io website team" >
+    <meta property="og:article:published_time" content="2020-01-27 14:46:59 +0000" >
+    <meta name="twitter:title" content="Easy install using AWS | KubeVirt.io">
+    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+            <div class="accordion" id="accordionTOC">
+              <div class="card card--sidebar">
+                <div class="card-header card-header--sidebar" id="headingTOC">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
+                      Labs
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
+                  <div class="card-body card-body--sidebar">
+                    
+                      
+                        <h3>Installation</h3>
+                        
+                          
+                            <h3 class="labs-title">
+                              <a href="/pages/ec2.html"  class="labs-title--item active" >Easy install using AWS</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/pages/gcp.html"  class="labs-title--item" >Easy install using GCP</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/quickstart_minikube/"  class="labs-title--item" >Easy install using Minikube</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/quickstart_kind/"  class="labs-title--item" >Easy install using Kind</a>
+                            </h3>
+                          
+                        
+                      
+                        <h3>Labs</h3>
+                        
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab1.html"  class="labs-title--item" >Use KubeVirt</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab2.html"  class="labs-title--item" >Experiment with CDI</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
+                            </h3>
+                          
+                        
+                      
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-8 col-lg-8 docs">
+            <h1 id="easy-install-using-aws">Easy install using AWS</h1>
+
+<p>We have created AWS images that automatically install Kubernetes
+and KubeVirt inside an EC2 instance to help you quickly deploy
+a trial environment.</p>
+
+<p>In Step 1, we guide you through selecting an AMI and some factors to
+consider when launching the EC2 instance through the AWS console.</p>
+
+<p>After you have launched your EC2 instance, navigate back to this
+page and then dive into the two labs below to help you get
+acquainted with KubeVirt.</p>
+
+<h2 id="step-1-launch-kubevirt-in-amazon-ec2">Step 1: Launch KubeVirt in Amazon EC2</h2>
+
+<p>To use the images in the table below, you should already have an AWS
+account. The images are free to use but AWS will bill you for instance
+hours, storage, and associated services unless you are in an AWS trial
+period. These images are not meant to be used in production.</p>
+
+<ul>
+  <li>First, open one of the AMI links below in a new tab or window to start up an instance in your preferred
+EC2 region.</li>
+</ul>
+
+<table>
+  <thead>
+    <tr>
+      <th>EC2 Region</th>
+      <th>Location</th>
+      <th>AMI Type</th>
+      <th>AMI ID</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>us-east-1</td>
+      <td>N. Virginia</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=us-east-1#launchAmi=ami-0a931f01389894a65" target="_blank">ami-0a931f01389894a65</a></td>
+    </tr>
+    <tr>
+      <td>us-east-2</td>
+      <td>Ohio</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=us-east-2#launchAmi=ami-007e7962f0221bf3f" target="_blank">ami-007e7962f0221bf3f</a></td>
+    </tr>
+    <tr>
+      <td>us-west-1</td>
+      <td>N. California</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=us-west-1#launchAmi=ami-0213abf4e045cafdc" target="_blank">ami-0213abf4e045cafdc</a></td>
+    </tr>
+    <tr>
+      <td>us-west-2</td>
+      <td>Oregon</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=us-west-2#launchAmi=ami-0fc9402e92a34c972" target="_blank">ami-0fc9402e92a34c972</a></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>ca-central-1</td>
+      <td>Canada</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=ca-central-1#launchAmi=ami-0bbfb75f9c7f9cc6b" target="_blank">ami-0bbfb75f9c7f9cc6b</a></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>eu-west-1</td>
+      <td>Ireland</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=eu-west-1#launchAmi=ami-0f0f1099dbf06d9ff" target="_blank">ami-0f0f1099dbf06d9ff</a></td>
+    </tr>
+    <tr>
+      <td>eu-west-2</td>
+      <td>London</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=eu-west-2#launchAmi=ami-044fcec85282e0b84" target="_blank">ami-044fcec85282e0b84</a></td>
+    </tr>
+    <tr>
+      <td>eu-west-3</td>
+      <td>Paris</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=eu-west-3#launchAmi=ami-081dee4cf5fd48a0c" target="_blank">ami-081dee4cf5fd48a0c</a></td>
+    </tr>
+    <tr>
+      <td>eu-central-1</td>
+      <td>Frankfurt</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=eu-central-1#launchAmi=ami-0749b25ef0f69d33d" target="_blank">ami-0749b25ef0f69d33d</a></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>ap-northeast-1</td>
+      <td>Tokyo</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=ap-northeast-1#launchAmi=ami-0ffa71b8fe2bbea6e" target="_blank">ami-0ffa71b8fe2bbea6e</a></td>
+    </tr>
+    <tr>
+      <td>ap-southeast-1</td>
+      <td>Singapore</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=ap-southeast-1#launchAmi=ami-07838d9608605f303" target="_blank">ami-07838d9608605f303</a></td>
+    </tr>
+    <tr>
+      <td>ap-southeast-2</td>
+      <td>Sydney</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=ap-southeast-2#launchAmi=ami-0b07b77fd6396deab" target="_blank">ami-0b07b77fd6396deab</a></td>
+    </tr>
+    <tr>
+      <td>ap-south-1</td>
+      <td>Mumbai</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=ap-south-1#launchAmi=ami-0d64d9f3c68588fb1" target="_blank">ami-0d64d9f3c68588fb1</a></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+    <tr>
+      <td>sa-east-1</td>
+      <td>Sao Paulo</td>
+      <td>HVM</td>
+      <td><a href="https://console.aws.amazon.com/ec2/home?region=sa-east-1#launchAmi=ami-0230216ffe2936a55" target="_blank">ami-0230216ffe2936a55</a></td>
+    </tr>
+    <tr>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+      <td> </td>
+    </tr>
+  </tbody>
+</table>
+
+<ul>
+  <li>At the instance type selection screen, select a type that has at least
+4GB of memory. This is the minimum amount of memory required to complete
+the labs in Step 2. Select more memory or storage if you are planning
+to deploy VMs with larger memory or storage requirements than what is
+used in the labs.</li>
+</ul>
+
+<p><img src="/assets/images/kubevirt-button/ec2-instance-memory-selection.png" alt="instance-type-memory-selection" /></p>
+
+<ul>
+  <li>You will need to be able to log into your instance through SSH. Depending
+on your network configuration, you may need to enable public IP. To enable
+a public IP, in the “Instance Details” screen select “Enable” for
+“Auto-assign Public IP” or select “Use subnet setting” if public IPs
+are enabled for your subnet.</li>
+</ul>
+
+<p><img src="/assets/images/kubevirt-button/ec2-public-ip.png" alt="instance-enable-public-ip" /></p>
+
+<ul>
+  <li>At the security group configuration screen, allow ingress to SSH by
+enabling access to port 22 from your IP address.</li>
+</ul>
+
+<p><img src="/assets/images/kubevirt-button/ec2-ssh-ingress.png" alt="instance-enable-public-ip" /></p>
+
+<ul>
+  <li>Finally, you will need to associate a key pair with your instance. If
+you have created one before, select it. If haven’t created one before,
+select “Create a new key pair”, enter a name, download the private key,
+and note where you place it because you will use it in a few minutes.
+Once you made your selection, hit “Launch Instance”. It takes about
+5 mins after the EC2 instance is started for the instance to be ready
+for SSH login.</li>
+</ul>
+
+<p><img src="/assets/images/kubevirt-button/ec2-select-create-keypair.png" alt="instance-enable-public-ip" /></p>
+
+<ul>
+  <li>Once your instance is ready, SSH to your EC2 instance using your private
+key. Note “centos” is the default username.</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh <span class="nt">-i</span> &lt;aws-private-key&gt; centos@&lt;ec2_public_ip_or_hostname&gt;
+
+</code></pre></div></div>
+
+<h2 id="step-2-kubevirt-labs">Step 2: KubeVirt labs</h2>
+
+<p>After you have connected to your instance through SSH, you can
+work through a couple of labs to help you get acquainted with KubeVirt
+and how to use it to create and deploy VMs with Kubernetes.</p>
+
+<p>The first lab is <a href="../labs/kubernetes/lab1">“Use KubeVirt”</a>. This lab walks you
+through the creation of a Virtual Machine instance on Kubernetes and then
+shows you how to use virtctl to interact with its console.</p>
+
+<p>The second lab is <a href="../labs/kubernetes/lab2">“Experiment with CDI”</a>. This
+lab shows you how to use the <a href="https://github.com/kubevirt/containerized-data-importer" target="_blank">Containerized Data Importer</a>
+(CDI) to import a VM image into a <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">Persistent Volume Claim</a>
+(PVC) and then how to define a VM to make use of the PVC.</p>
+
+<h2 id="found-a-bug">Found a bug?</h2>
+
+<p>We are interested in hearing about your experience.</p>
+
+<p>If you encounter an issue with deploying your cloud instance or if
+Kubernetes or KubeVirt did not install correctly, please report it to
+the <a href="https://github.com/kubevirt/cloud-image-builder/issues" target="_blank">cloud-image-builder issue tracker</a>.</p>
+
+<p>If experience a problem with the labs, please report it to the <a href="https://github.com/kubevirt/kubevirt.github.io/issues" target="_blank">kubevirt.io issue tracker</a>.</p>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,336 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/new-volume-types.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>New Volume Types | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="slintes" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="New Volume Types - ConfigMap, Secret and ServiceAccount">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="New Volume Types | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/new-volume-types.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="New Volume Types - ConfigMap, Secret and ServiceAccount" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="slintes" >
+    <meta property="og:article:published_time" content="2018-11-16 00:00:00 +0000" >
+    <meta name="twitter:title" content="New Volume Types | KubeVirt.io">
+    <meta name="twitter:description" content="New Volume Types - ConfigMap, Secret and ServiceAccount">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">New Volume Types</h1>
+          <div class="post-info">
+            <span class="post-author">Author: slintes</span>
+            <div>
+              <span class="post-meta">Publication Date: November 16, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="introduction">Introduction</h2>
+
+<p>Recently three new volume types were introduced, which can be used for additional VM disks, and allow better integration of virtual machines with
+well known Kubernetes resources.</p>
+
+<h2 id="configmap-and-secret">ConfigMap and Secret</h2>
+
+<p>Both <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/">ConfigMaps</a>
+and <a href="https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/">Secrets</a> are used to provide configuration settings and credentials to Pods. In order to use them in your VM too, you can add them as additional disks, using the new <code class="highlighter-rouge">configMap</code>
+and <code class="highlighter-rouge">secret</code> volume types.</p>
+
+<h2 id="serviceaccount">ServiceAccount</h2>
+
+<p>Kubernetes pods can be configured to get a special type of secret injected, which can be used for
+<a href="https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/#accessing-the-api-from-a-pod">accessing the Kubernetes API</a>.
+With the third new volume type <code class="highlighter-rouge">serviceAccount</code> you can get this information into your VM, too.</p>
+
+<h2 id="example">Example</h2>
+
+<p>We assume that you already have a Kubernetes or Openshift cluster running with KubeVirt installed.</p>
+
+<h3 id="step-1">Step 1</h3>
+
+<p>Create a ConfigMap and Secret, which will be used in your VM:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create secret generic mysecret --from-literal=PASSWORD=hidden 
+secret "mysecret" created
+$ kubectl create configmap myconfigmap --from-literal=DATABASE=staging
+configmap "myconfigmap" created
+</code></pre></div></div>
+
+<h3 id="step-2">Step 2</h3>
+
+<p>Define a VirtualMachineInstance which uses all three new volume types, and save it to <code class="highlighter-rouge">vmi-fedora.yaml</code>.
+Note how we add 3 disks for the ConfigMap and Secret we just created, and for the <code class="highlighter-rouge">default</code> ServiceAccount.
+In order to automount these disks, we also add a <code class="highlighter-rouge">cloudInitNoCloud</code> disk with mount instructions. Details on
+how to do this might vary depending on the VM’s operating system.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha2
+kind: VirtualMachineInstance
+metadata:
+  name: vmi-fedora
+spec:
+  domain:
+    devices:
+      disks:
+      - name: registrydisk
+        volumeName: registryvolume
+      - name: cloudinitdisk
+        volumeName: cloudinitvolume
+      - name: configmap-disk
+        serial: configmap
+        volumeName: configmap-volume
+      - name: secret-disk
+        serial: secret
+        volumeName: secret-volume
+      - name: serviceaccount-disk
+        serial: serviceaccount
+        volumeName: serviceaccount-volume
+    resources:
+      requests:
+        memory: 1024M
+  volumes:
+  - name: registryvolume
+    registryDisk:
+      image: kubevirt/fedora-cloud-registry-disk-demo:latest
+  - name: cloudinitvolume
+    cloudInitNoCloud:
+      userData: |-
+        #cloud-config
+        password: fedora
+        chpasswd: { expire: False }
+        bootcmd:
+          # mount the disks
+          - "mkdir /mnt/{myconfigmap,mysecret,myserviceaccount}"
+          - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_configmap /mnt/myconfigmap"
+          - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_secret /mnt/mysecret"
+          - "mount /dev/disk/by-id/ata-QEMU_HARDDISK_serviceaccount /mnt/myserviceaccount"
+  - name: configmap-volume
+    configMap:
+      name: myconfigmap
+  - name: secret-volume
+    secret:
+      secretName: mysecret
+  - name: serviceaccount-volume
+    serviceAccount:
+      serviceAccountName: default
+</code></pre></div></div>
+
+<h3 id="step-3">Step 3</h3>
+
+<p>Create the VMI:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl apply -f vmi-fedora.yaml
+virtualmachineinstance "vmi-fedora" created
+</code></pre></div></div>
+
+<h3 id="step-4">Step 4</h3>
+
+<p>Inspect the new disks:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ virtctl console vmi-fedora
+
+vmi-fedora login: fedora
+Password:
+
+[fedora@vmi-fedora ~]$ ls -R /mnt/
+/mnt/:
+myconfigmap  mysecret  myserviceaccount
+
+/mnt/myconfigmap:
+DATABASE
+
+/mnt/mysecret:
+PASSWORD
+
+/mnt/myserviceaccount:
+ca.crt	namespace  token
+
+[fedora@vmi-fedora ~]$ cat /mnt/myconfigmap/DATABASE 
+staging
+
+[fedora@vmi-fedora ~]$ cat /mnt/mysecret/PASSWORD 
+hidden
+
+[fedora@vmi-fedora ~]$ cat /mnt/myserviceaccount/namespace 
+default
+</code></pre></div></div>
+
+<h2 id="summary">Summary</h2>
+
+<p>With these new volume types KubeVirt further improves the integration with native Kubernetes resources.
+Learn more about all available volume types on the <a href="https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes">userguide</a>.</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=New Volume Types&url=https://www.kubevirt.io/2018/new-volume-types.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

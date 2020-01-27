@@ -1,0 +1,144 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-01-27T14:46:59+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.25.0</title><link href="https://kubevirt.io//2020/changelog-v0.25.0.html" rel="alternate" type="text/html" title="KubeVirt v0.25.0" /><published>2020-01-13T00:00:00+00:00</published><updated>2020-01-13T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.25.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.25.0.html">&lt;h2 id=&quot;v0250&quot;&gt;v0.25.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Jan 13 20:37:15 2020 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.17&lt;/li&gt;
+  &lt;li&gt;Support emulator thread pinning&lt;/li&gt;
+  &lt;li&gt;Support virtctl restart –force&lt;/li&gt;
+  &lt;li&gt;Support virtctl migrate to trigger live migrations from the CLI&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.25.0</summary></entry><entry><title type="html">KubeVirt v0.24.0</title><link href="https://kubevirt.io//2019/changelog-v0.24.0.html" rel="alternate" type="text/html" title="KubeVirt v0.24.0" /><published>2019-12-03T00:00:00+00:00</published><updated>2019-12-03T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.24.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.24.0.html">&lt;h2 id=&quot;v0240&quot;&gt;v0.24.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Tue Dec 3 15:34:34 2019 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.15&lt;/li&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.16&lt;/li&gt;
+  &lt;li&gt;Add and fix a couple of test cases&lt;/li&gt;
+  &lt;li&gt;Support for pause and unpausing VMs&lt;/li&gt;
+  &lt;li&gt;Update of libvirt to 5.6.0&lt;/li&gt;
+  &lt;li&gt;Fix bug related to parallel scraping of Prometheus endpoints&lt;/li&gt;
+  &lt;li&gt;Fix to reliably test VNC&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.24.0</summary></entry><entry><title type="html">KubeVirt v0.23.0</title><link href="https://kubevirt.io//2019/changelog-v0.23.0.html" rel="alternate" type="text/html" title="KubeVirt v0.23.0" /><published>2019-11-04T00:00:00+00:00</published><updated>2019-11-04T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.23.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.23.0.html">&lt;h2 id=&quot;v0230&quot;&gt;v0.23.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Nov 4 16:42:54 2019 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Guest OS Information is available under the VMI status now&lt;/li&gt;
+  &lt;li&gt;Updated to Go 1.12.8 and latest bazel&lt;/li&gt;
+  &lt;li&gt;Updated go-yaml to v2.2.4, which has a ddos vulnerability fixed&lt;/li&gt;
+  &lt;li&gt;Cleaned up and fixed CRD scheme registration&lt;/li&gt;
+  &lt;li&gt;Several bugfixes&lt;/li&gt;
+  &lt;li&gt;Many CI improvements (e.g. more logs in case of test failures)&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.23.0</summary></entry><entry><title type="html">KubeVirt v0.22.0</title><link href="https://kubevirt.io//2019/changelog-v0.22.0.html" rel="alternate" type="text/html" title="KubeVirt v0.22.0" /><published>2019-10-10T00:00:00+00:00</published><updated>2019-10-10T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.22.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.22.0.html">&lt;h2 id=&quot;v0220&quot;&gt;v0.22.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Thu Oct 10 18:55:08 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Support for Nvidia GPUs and vGPUs exposed by Nvidia Kubevirt Device Plugin.&lt;/li&gt;
+  &lt;li&gt;VMIs now successfully start if they get a 0xfe prefixed MAC address assigned from the pod network&lt;/li&gt;
+  &lt;li&gt;Removed dependency on host semanage in SELinux Permissive mode&lt;/li&gt;
+  &lt;li&gt;Some changes as result of entering the CNCF sandbox (DCO check, FOSSA check, best practice badge)&lt;/li&gt;
+  &lt;li&gt;Many bug fixes and improvements in several areas&lt;/li&gt;
+  &lt;li&gt;CI: Introduced a OKD 4 test lane&lt;/li&gt;
+  &lt;li&gt;CI: Many improved tests, resulting in less flakyness&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.22.0</summary></entry><entry><title type="html">KubeVirt v0.21.0</title><link href="https://kubevirt.io//2019/changelog-v0.21.0.html" rel="alternate" type="text/html" title="KubeVirt v0.21.0" /><published>2019-09-09T00:00:00+00:00</published><updated>2019-09-09T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.21.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.21.0.html">&lt;h2 id=&quot;v0210&quot;&gt;v0.21.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Sep 9 09:59:08 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.14&lt;/li&gt;
+  &lt;li&gt;Many bug fixes in several areas&lt;/li&gt;
+  &lt;li&gt;Support for &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl migrate&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Support configurable number of controller threads&lt;/li&gt;
+  &lt;li&gt;Support to opt-out of bridge binding for podnetwork&lt;/li&gt;
+  &lt;li&gt;Support for OpenShift Prometheus monitoring&lt;/li&gt;
+  &lt;li&gt;Support for setting more SMBIOS fields&lt;/li&gt;
+  &lt;li&gt;Improved containerDisk memory usage and speed&lt;/li&gt;
+  &lt;li&gt;Fix CRI-O memory limit&lt;/li&gt;
+  &lt;li&gt;Drop spc_t from launcher&lt;/li&gt;
+  &lt;li&gt;Add feature gates to security sensitive features&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.21.0</summary></entry><entry><title type="html">KubeVirt v0.20.0</title><link href="https://kubevirt.io//2019/changelog-v0.20.0.html" rel="alternate" type="text/html" title="KubeVirt v0.20.0" /><published>2019-08-09T00:00:00+00:00</published><updated>2019-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.20.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.20.0.html">&lt;h2 id=&quot;v0200&quot;&gt;v0.20.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Aug 9 16:42:41 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Containerdisks are now secure and they are not copied anymore on every start.&lt;/li&gt;
+  &lt;li&gt;Create specific SecurityContextConstraints on OKD instead of using the&lt;/li&gt;
+  &lt;li&gt;Added clone authorization check for DataVolumes with PVC source&lt;/li&gt;
+  &lt;li&gt;The sidecar feature is feature-gated now&lt;/li&gt;
+  &lt;li&gt;Use container image shasums instead of tags for KubeVirt deployments&lt;/li&gt;
+  &lt;li&gt;Protect control plane components against voluntary evictions with a&lt;/li&gt;
+  &lt;li&gt;Replaced hardcoded &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; by using the basename of the call, this enables&lt;/li&gt;
+  &lt;li&gt;Added RNG device to all Fedora VMs in tests and examples (newer kernels might&lt;/li&gt;
+  &lt;li&gt;The virtual memory is now set to match the memory limit, if memory limit is&lt;/li&gt;
+  &lt;li&gt;Support nftable for CoreOS&lt;/li&gt;
+  &lt;li&gt;Added a block-volume flag to the virtctl image-upload command&lt;/li&gt;
+  &lt;li&gt;Improved virtctl console/vnc data flow&lt;/li&gt;
+  &lt;li&gt;Removed DataVolumes feature gate in favor of auto-detecting CDI support&lt;/li&gt;
+  &lt;li&gt;Removed SR-IOV feature gate, it is enabled by default now&lt;/li&gt;
+  &lt;li&gt;VMI-related metrics have been renamed from &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt_vm_&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt_vmi_&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Added metric to report the VMI count&lt;/li&gt;
+  &lt;li&gt;Improved integration with HCO by adding a CSV generator tool and modified&lt;/li&gt;
+  &lt;li&gt;CI Improvements:&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.20.0</summary></entry><entry><title type="html">KubeVirt v0.19.0</title><link href="https://kubevirt.io//2019/changelog-v0.19.0.html" rel="alternate" type="text/html" title="KubeVirt v0.19.0" /><published>2019-07-05T00:00:00+00:00</published><updated>2019-07-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.19.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.19.0.html">&lt;h2 id=&quot;v0190&quot;&gt;v0.19.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Jul 5 12:52:16 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Fixes when run on kind&lt;/li&gt;
+  &lt;li&gt;Fixes for sub-resource RBAC&lt;/li&gt;
+  &lt;li&gt;Limit pod network interface bindings&lt;/li&gt;
+  &lt;li&gt;Many additional bug fixes in many areas&lt;/li&gt;
+  &lt;li&gt;Additional testcases for updates, disk types, live migration with NFS&lt;/li&gt;
+  &lt;li&gt;Additional testcases for memory over-commit, block storage, cpu manager,&lt;/li&gt;
+  &lt;li&gt;Improvements around HyperV&lt;/li&gt;
+  &lt;li&gt;Improved error handling for runStartegies&lt;/li&gt;
+  &lt;li&gt;Improved update procedure&lt;/li&gt;
+  &lt;li&gt;Improved network metrics reporting (packets and errors)&lt;/li&gt;
+  &lt;li&gt;Improved guest overhead calculation&lt;/li&gt;
+  &lt;li&gt;Improved SR-IOV testsuite&lt;/li&gt;
+  &lt;li&gt;Support for live migration auto-converge&lt;/li&gt;
+  &lt;li&gt;Support for config-drive disks&lt;/li&gt;
+  &lt;li&gt;Support for setting a pullPolicy con containerDisks&lt;/li&gt;
+  &lt;li&gt;Support for unprivileged VMs when using SR-IOV&lt;/li&gt;
+  &lt;li&gt;Introduction of a project security policy&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.19.0</summary></entry><entry><title type="html">KubeVirt v0.18.0</title><link href="https://kubevirt.io//2019/changelog-v0.18.0.html" rel="alternate" type="text/html" title="KubeVirt v0.18.0" /><published>2019-06-05T00:00:00+00:00</published><updated>2019-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.18.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.18.0.html">&lt;h2 id=&quot;v0180&quot;&gt;v0.18.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Wed Jun 5 22:25:09 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Build: Use of go modules&lt;/li&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.13&lt;/li&gt;
+  &lt;li&gt;Countless testcase fixes and additions&lt;/li&gt;
+  &lt;li&gt;Several smaller bug fixes&lt;/li&gt;
+  &lt;li&gt;Improved upgrade documentation&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.18.0</summary></entry><entry><title type="html">KubeVirt v0.17.0</title><link href="https://kubevirt.io//2019/changelog-v0.17.0.html" rel="alternate" type="text/html" title="KubeVirt v0.17.0" /><published>2019-05-06T00:00:00+00:00</published><updated>2019-05-06T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.17.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.17.0.html">&lt;h2 id=&quot;v0170&quot;&gt;v0.17.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon May 6 16:18:01 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Several testcase additions&lt;/li&gt;
+  &lt;li&gt;Improved virt-controller node distribution&lt;/li&gt;
+  &lt;li&gt;Improved support between version migrations&lt;/li&gt;
+  &lt;li&gt;Support for a configurable MachineType default&lt;/li&gt;
+  &lt;li&gt;Support for live-migration of a VM on node taints&lt;/li&gt;
+  &lt;li&gt;Support for VM swap metrics&lt;/li&gt;
+  &lt;li&gt;Support for versioned virt-launcher / virt-handler communication&lt;/li&gt;
+  &lt;li&gt;Support for HyperV flags&lt;/li&gt;
+  &lt;li&gt;Support for different VM run strategies (i.e manual and rerunOnFailure)&lt;/li&gt;
+  &lt;li&gt;Several fixes for live-migration (TLS support, protected pods)&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.17.0</summary></entry><entry><title type="html">KubeVirt v0.16.0</title><link href="https://kubevirt.io//2019/changelog-v0.16.0.html" rel="alternate" type="text/html" title="KubeVirt v0.16.0" /><published>2019-04-05T00:00:00+00:00</published><updated>2019-04-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.16.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.16.0.html">&lt;h2 id=&quot;v0160&quot;&gt;v0.16.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Apr 5 23:18:22 2019 +0200&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Bazel fixes&lt;/li&gt;
+  &lt;li&gt;Initial work to support upgrades (not finalized)&lt;/li&gt;
+  &lt;li&gt;Initial support for HyperV features&lt;/li&gt;
+  &lt;li&gt;Support propagation of MAC addresses to multus&lt;/li&gt;
+  &lt;li&gt;Support live migration cancellation&lt;/li&gt;
+  &lt;li&gt;Support for table input devices&lt;/li&gt;
+  &lt;li&gt;Support for generating OLM metadata&lt;/li&gt;
+  &lt;li&gt;Support for triggering VM live migration on node taints&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.16.0</summary></entry></feed>

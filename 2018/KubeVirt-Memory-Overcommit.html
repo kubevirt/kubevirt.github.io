@@ -1,0 +1,324 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/KubeVirt-Memory-Overcommit.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Kubevirt Memory Overcommit | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="tripledes" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="KubeVirt Memory Overcommitment">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="Kubevirt Memory Overcommit | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/KubeVirt-Memory-Overcommit.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="KubeVirt Memory Overcommitment" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="tripledes" >
+    <meta property="og:article:published_time" content="2018-09-11 00:00:00 +0000" >
+    <meta name="twitter:title" content="Kubevirt Memory Overcommit | KubeVirt.io">
+    <meta name="twitter:description" content="KubeVirt Memory Overcommitment">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Kubevirt Memory Overcommit</h1>
+          <div class="post-info">
+            <span class="post-author">Author: tripledes</span>
+            <div>
+              <span class="post-meta">Publication Date: September 11, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h1 id="kubevirt-memory-overcommitment">KubeVirt memory overcommitment</h1>
+
+<p>One of the latest additions to KubeVirt has been the memory overcommitment feature which allows the memory being assigned to a Virtual Machine Instance to be different than what it requests to Kubernetes.</p>
+
+<h2 id="what-it-does">What it does</h2>
+
+<p>As you might already know, when a pod is created in Kubernetes, it can define requests for resources like CPU or memory, those requests are taken into account for deciding to what node the pod will be scheduled. Usually, on a node, there are already some resources reserved or requested, Kubernetes itself <a href="https://kubernetes.io/docs/tasks/administer-cluster/reserve-compute-resources/">reserves some resources for its processes</a> and there might be monitoring pods or storage pods already requesting resources as well, all those are also accounted for what is left to run pods.</p>
+
+<p>Having the memory overcommitment feature included in KubeVirt allows the users to assign the VMI more or less memory than set into the requests, offering more flexibility, giving the user the option to overcommit (or undercommit) the node’s memory if needed.</p>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>It’s not too complex to get this working, all that is needed is to have, at least, KubeVirt version <em>0.8.0</em> installed, which includes the aforementioned feature, and use the following settings on the VMI definition:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">domain.memory.guest</code>: Defines the amount memory assigned to the VMI process (by libvirt).</li>
+  <li><code class="highlighter-rouge">domain.resources.requests.memory</code>: Defines the memory requested to Kubernetes by the pod that will run the VMI.</li>
+  <li><code class="highlighter-rouge">domain.resources.overcommitGuestOverhead</code>: Boolean switch to enable the feature.</li>
+</ul>
+
+<p>Once those are in place, Kubernetes will consider the requested memory for scheduling while libvirt will define the domain with the amount of memory defined in <code class="highlighter-rouge">domain.memory.guest</code>. For example, let’s define a VMI which requests <em>24534983Ki</em> but wants to use <em>25761732Ki</em>
+ instead.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">testvm1</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">memory</span><span class="pi">:</span>
+      <span class="na">guest</span><span class="pi">:</span> <span class="s2">"</span><span class="s">25761732Ki"</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s2">"</span><span class="s">24534983Ki"</span>
+      <span class="na">overcommitGuestOverhead</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">volumeName</span><span class="pi">:</span> <span class="s">myvolume</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">mydisk</span>
+        <span class="na">disk</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+        <span class="na">volumeName</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+        <span class="na">cdrom</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myvolume</span>
+    <span class="na">registryDisk</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">&lt;registry_address&gt;/kubevirt/fedora-cloud-registry-disk-demo:latest</span>
+  <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+    <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+        <span class="s">#cloud-config</span>
+        <span class="s">hostname: testvm1</span>
+        <span class="s">users:</span>
+          <span class="s">- name: kubevirt</span>
+            <span class="s">gecos: KubeVirt Project</span>
+            <span class="s">sudo: ALL=(ALL) NOPASSWD:ALL</span>
+            <span class="s">passwd: $6$JXbc3063IJir.e5h$ypMlYScNMlUtvQ8Il1ldZi/mat7wXTiRioGx6TQmJjTVMandKqr.jJfe99.QckyfH/JJ.OdvLb5/OrCa8ftLr.</span>
+            <span class="s">shell: /bin/bash</span>
+            <span class="s">home: /home/kubevirt</span>
+            <span class="s">lock_passwd: false</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+</code></pre></div></div>
+
+<p>As explained already, the QEMU process spawn by libvirt, will get <em>25761732Ki</em> of RAM, minus some amount for the graphics and firmwares, the guest OS will see its total memory close to that amount, while Kubernetes would think the pod requests <em>24534983Ki</em>, making more room to schedule more pods if needed.</p>
+
+<p>Now let’s imagine we want to undercommit, here’s the same YAML definition but setting less memory than requested:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">testvm1</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">memory</span><span class="pi">:</span>
+      <span class="na">guest</span><span class="pi">:</span> <span class="s2">"</span><span class="s">23308234Ki"</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s2">"</span><span class="s">24534983Ki"</span>
+      <span class="na">overcommitGuestOverhead</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">volumeName</span><span class="pi">:</span> <span class="s">myvolume</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">mydisk</span>
+        <span class="na">disk</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+        <span class="na">volumeName</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+        <span class="na">cdrom</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myvolume</span>
+    <span class="na">registryDisk</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">&lt;registry_url&gt;/kubevirt/fedora-cloud-registry-disk-demo:latest</span>
+  <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+      <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+        <span class="s">#cloud-config</span>
+        <span class="s">hostname: testvm1</span>
+        <span class="s">users:</span>
+          <span class="s">- name: kubevirt</span>
+            <span class="s">gecos: KubeVirt Project</span>
+            <span class="s">sudo: ALL=(ALL) NOPASSWD:ALL</span>
+            <span class="s">passwd: $6$JXbc3063IJir.e5h$ypMlYScNMlUtvQ8Il1ldZi/mat7wXTiRioGx6TQmJjTVMandKqr.jJfe99.QckyfH/JJ.OdvLb5/OrCa8ftLr.</span>
+            <span class="s">shell: /bin/bash</span>
+            <span class="s">home: /home/kubevirt</span>
+            <span class="s">lock_passwd: false</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+</code></pre></div></div>
+
+<h2 id="why-this-is-needed">Why this is needed</h2>
+
+<p>At this point you might be asking yourself why would this feature be needed if Kubernetes already does resource management for you, right? Well, there might be few scenarios where this feature would be needed, for instance imagine you decide to have a cluster or few nodes
+ completely dedicated to run Virtual Machines, this feature allows you to make use of all the memory in the nodes without really accounting for the already reserved or requested memory in the system.
+Let’s put it as an example, say a node has 100GiB of RAM, with 2GiB of reserved memory plus 1GiB requested by monitoring and storage pods, that leaves the user 97GiB of allocatable memory to schedule pods, so each VMI that needs to be started on a node needs to request an
+ amount that would fit, if the user wants to run 10 VMIs on each node with 10GiB of RAM Kubernetes wouldn’t allow that cause the sum of their requests would be more than what’s allocatable in the node.
+Using the memory overcommitment feature the user can tell Kubernetes that each VMI requests 9.7GiB and set <code class="highlighter-rouge">domain.memory.guest</code> to 10GiB.</p>
+
+<p>The other way around, undercommitting the node, also works, for instance, to make sure that no matter how many VMIs will be under memory pressure the node will still be in good shape. Using the same node sizing, 100GiB, we could define 10 VMIs to request 9.7GiB, while giv
+ing them exactly 9.0GiB, that’d leave around 7GiB for the node processes while Kubernetes wouldn’t try to schedule any more pods on it cause all the requests already sum up to 100% of the allocatable memory.</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Kubevirt Memory Overcommit&url=https://www.kubevirt.io/2018/KubeVirt-Memory-Overcommit.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

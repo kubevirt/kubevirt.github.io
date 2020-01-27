@@ -1,0 +1,497 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/Run-Istio-with-kubevirt.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Run Istio With Kubevirt | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="SchSeba" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Use Istio with KubeVirt">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="Run Istio With Kubevirt | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/Run-Istio-with-kubevirt.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Use Istio with KubeVirt" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="SchSeba" >
+    <meta property="og:article:published_time" content="2018-06-21 00:00:00 +0000" >
+    <meta name="twitter:title" content="Run Istio With Kubevirt | KubeVirt.io">
+    <meta name="twitter:description" content="Use Istio with KubeVirt">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Run Istio With Kubevirt</h1>
+          <div class="post-info">
+            <span class="post-author">Author: SchSeba</span>
+            <div>
+              <span class="post-meta">Publication Date: June 21, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <p>On this blog post, we are going to deploy virtual machines with the KubeVirt project and insert them into the Istio service mesh.</p>
+
+<p>Some information about the technologies we are going to use in this blog post.</p>
+
+<h2 id="kubernetes">Kubernetes</h2>
+
+<p>Production-Grade Container Orchestration.</p>
+
+<p>Kubernetes is an open-source system for automating deployment, scaling, and management of containerized applications.</p>
+
+<h3 id="kubeadm">Kubeadm</h3>
+
+<p>kubeadm helps you bootstrap a minimum viable Kubernetes cluster that conforms to best practices.</p>
+
+<h2 id="calico">Calico</h2>
+
+<p>Calico provides secure network connectivity for containers and virtual machine workloads.</p>
+
+<p>Calico creates and manages a flat layer 3 network, assigning each workload a fully routable IP address. Workloads can communicate without IP encapsulation or network address translation for bare metal performance, easier troubleshooting, and better interoperability. In environments that require an overlay, Calico uses IP-in-IP tunneling or can work with other overlay networking such as flannel.</p>
+
+<h2 id="kubevirt">KubeVirt</h2>
+
+<p>Virtualization API for kubernetes in order to manage virtual machines</p>
+
+<p>KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.</p>
+
+<p>Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.</p>
+
+<h2 id="istio">Istio</h2>
+
+<p>An open platform to connect, manage, and secure microservices.</p>
+
+<p>Istio provides an easy way to create a network of deployed services with load balancing, service-to-service authentication, monitoring, and more, without requiring any changes in service code. You add Istio support to services by deploying a special sidecar proxy throughout your environment that intercepts all network communication between microservices, configured and managed using Istio’s control plane functionality.</p>
+
+<h2 id="bookinfo-application">Bookinfo application</h2>
+
+<p>A simple application that displays information about a book, similar to a single catalog entry of an online book store. Displayed on the page is a description of the book, book details (ISBN, number of pages, and so on), and a few book reviews.</p>
+
+<p>The Bookinfo application is broken into four separate microservices:</p>
+
+<p>productpage. The productpage microservice calls the details and reviews microservices to populate the page.</p>
+
+<p>details. The details microservice contains book information.</p>
+
+<p>reviews. The reviews microservice contains book reviews. It also calls the ratings microservice.</p>
+
+<p>ratings. The ratings microservice contains book ranking information that accompanies a book review.</p>
+
+<p><img src="../assets/2019-06-21-Run-Istio-with-kubevirt/Bookinfo.png" alt="Bookinfo-application" /></p>
+
+<p><strong>Note:</strong> This demo is going to be deployed on a kubernetes 1.10 cluster.</p>
+
+<h1 id="requirements">Requirements</h1>
+
+<ul>
+  <li>docker</li>
+  <li>kubeadm</li>
+</ul>
+
+<p>Follow this <a href="https://kubernetes.io/docs/setup/independent/install-kubeadm/">document</a> to install everything we need for the POC</p>
+
+<h1 id="deployment">Deployment</h1>
+
+<p>For the POC we clone <a href="https://github.com/SchSeba/kubevirt-istio-poc">this repo</a></p>
+
+<p>The repo contains all the configuration we need to deploy KubeVirt and Istio.</p>
+<ul>
+  <li>kubevirt.yaml</li>
+  <li>istio-demo-auth.yaml</li>
+</ul>
+
+<p>It also contains the deployment configuration of our sample application.</p>
+<ul>
+  <li>bookinfo.yaml</li>
+  <li>bookinfo-gateway.yaml</li>
+</ul>
+
+<p>Run the bash script</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-istio-poc
+./deploy-istio-poc.sh
+</code></pre></div></div>
+
+<h1 id="demo-application">Demo application</h1>
+
+<p>We are going to use the <a href="https://istio.io/docs/examples/bookinfo/">bookinfo sample application</a> from the istio webpage.</p>
+
+<p>The follow yaml will deploy the bookinfo application with a ‘small’ change the details service will run on a virtual machine inside our kubernetes cluster!</p>
+
+<p><strong>Note:</strong> it will take like 5 minutes for the application to by running inside the virtual machine because we install git and ruby, then clone the istio repo and start the application.</p>
+
+<h1 id="poc-details">POC details</h1>
+
+<p>Lets start with the bash script:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+
+<span class="nb">set</span> <span class="nt">-x</span>
+
+kubeadm init <span class="nt">--pod-network-cidr</span><span class="o">=</span>192.168.0.0/16
+
+<span class="nb">yes</span> | <span class="nb">cp</span> <span class="nt">-i</span> /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+
+kubectl apply <span class="nt">-f</span> https://docs.projectcalico.org/v3.0/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml
+
+<span class="k">while</span> <span class="o">[[</span> <span class="si">$(</span>kubectl get po <span class="nt">-n</span> kube-system | <span class="nb">grep </span>kube-dns | <span class="nb">grep </span>Running | <span class="nb">wc</span> <span class="nt">-l</span><span class="si">)</span> <span class="nt">-eq</span> 0 <span class="o">]]</span>
+<span class="k">do
+        </span><span class="nb">echo </span>Calico deployment is no ready yet.
+        <span class="nb">sleep </span>5
+<span class="k">done
+
+</span><span class="nb">echo </span>Calico is ready.
+
+<span class="nb">echo </span>Taint the master node.
+
+kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
+
+<span class="nb">echo </span>Deploy kubevirt.
+
+kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.7.0/kubevirt.yaml
+
+<span class="nb">echo </span>Deploy istio.
+
+kubectl apply <span class="nt">-f</span> istio-demo-auth.yaml
+
+<span class="nb">echo </span>Add istio-injection to the default namespace.
+
+kubectl label namespace default istio-injection<span class="o">=</span>enabled
+
+<span class="k">while</span> <span class="o">[[</span> <span class="si">$(</span>kubectl get po <span class="nt">-n</span> istio-system | <span class="nb">grep </span>sidecar-injector | <span class="nb">grep </span>Running | <span class="nb">wc</span> <span class="nt">-l</span><span class="si">)</span> <span class="nt">-eq</span> 0 <span class="o">]]</span>
+<span class="k">do
+        </span><span class="nb">echo </span>Istio deployment is no ready yet.
+        <span class="nb">sleep </span>5
+<span class="k">done
+
+</span><span class="nb">echo </span>Istio is ready.
+
+<span class="nb">sleep </span>20
+
+<span class="nb">echo </span>Deploy the bookinfo example application
+
+kubectl apply <span class="nt">-f</span> bookinfo.yaml
+
+kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
+</code></pre></div></div>
+
+<p>The follow script create a kubernetes cluster using the kubeadm command, deploy calico as a network CNI and taint the master node (have only one node in the cluster).</p>
+
+<p>After the cluster is up the script deploy both istio with mutual TLS and kubevirt projects, it also add the auto injection to the default namespace.</p>
+
+<p>At last the script deploy the bookinfo demo application that we change a bit.</p>
+
+<p>Lets take a closer look in the virtual machine part inside the bookinfo.yaml file</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>##################################################################################################
+# Details service
+##################################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: details
+  labels:
+    app: details
+spec:
+  ports:
+  - port: 9080
+    name: http
+  selector:
+    app: details
+---
+apiVersion: kubevirt.io/v1alpha2
+kind: VirtualMachineInstance
+metadata:
+  creationTimestamp: null
+  labels:
+    special: vmi-details
+    app: details
+    version: v1
+  name: vmi-details
+spec:
+  domain:
+    devices:
+      disks:
+      - disk:
+          bus: virtio
+        name: registrydisk
+        volumeName: registryvolume
+      - disk:
+          bus: virtio
+        name: cloudinitdisk
+        volumeName: cloudinitvolume
+      interfaces:
+      - name: testSlirp
+        slirp: {}
+        ports:
+        - name: http
+          port: 9080
+    machine:
+      type: ""
+    resources:
+      requests:
+        memory: 1024M
+  networks:
+  - name: testSlirp
+    pod: {}
+  terminationGracePeriodSeconds: 0
+  volumes:
+  - name: registryvolume
+    registryDisk:
+      image: kubevirt/fedora-cloud-registry-disk-demo:latest
+  - cloudInitNoCloud:
+      userData: |-
+        #!/bin/bash
+        echo "fedora" |passwd fedora --stdin
+        yum install git ruby -y
+        git clone https://github.com/istio/istio.git
+        cd istio/samples/bookinfo/src/details/
+        ruby details.rb 9080 &amp;
+    name: cloudinitvolume
+status: {}
+---
+..........
+</code></pre></div></div>
+
+<h3 id="details">Details:</h3>
+
+<ul>
+  <li>Create a network of type pod</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>networks:
+- name: testSlirp
+  pod: {}
+</code></pre></div></div>
+
+<ul>
+  <li>Create an interface of type slirp and connect it to the pod network by matching the pod network name</li>
+  <li>Add our application port</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>interfaces:
+- name: testSlirp
+  slirp: {}
+  ports:
+  - name: http
+    port: 9080
+</code></pre></div></div>
+
+<ul>
+  <li>Use the cloud init script to download install and run the details application</li>
+</ul>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>- cloudInitNoCloud:
+    userData: |-
+        #!/bin/bash
+        echo "fedora" |passwd fedora --stdin
+        yum install git ruby -y
+        git clone https://github.com/istio/istio.git
+        cd istio/samples/bookinfo/src/details/
+        ruby details.rb 9080 &amp;
+    name: cloudinitvolume
+</code></pre></div></div>
+
+<h1 id="poc-check">POC Check</h1>
+
+<p>After running the bash script the environment should look like this</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                              READY     STATUS    RESTARTS   AGE
+productpage-v1-7bbdd59459-w6nwq   2/2       Running   0          1h
+ratings-v1-76dc7f6b9-6n6s9        2/2       Running   0          1h
+reviews-v1-64545d97b4-tvgl2       2/2       Running   0          1h
+reviews-v2-8cb9489c6-wjp9x        2/2       Running   0          1h
+reviews-v3-6bc884b456-hr5bm       2/2       Running   0          1h
+virt-launcher-vmi-details-94pb6   3/3       Running   0          1h
+</code></pre></div></div>
+
+<p>Lets find the istio ingress service port</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># kubectl get service -n istio-system  | grep istio-ingressgateway
+istio-ingressgateway       LoadBalancer   10.97.163.91     &lt;pending&gt;     80:31380/TCP,443:31390/TCP,31400:31400/TCP                            3h
+</code></pre></div></div>
+
+<p>Then browse the follow url</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://&lt;k8s-node-ip-address&gt;:&lt;istio-ingress-service-port-exposed-by-k8s&gt;/productpage
+</code></pre></div></div>
+
+<p>Example:</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.0.0.1:31380/productpage
+</code></pre></div></div>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>This POC show how we can use KubeVirt with Istio to integrate the Istio service mesh to virtual machine workloads running inside our kubernetes cluster.</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Run Istio With Kubevirt&url=https://www.kubevirt.io/2018/Run-Istio-with-kubevirt.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

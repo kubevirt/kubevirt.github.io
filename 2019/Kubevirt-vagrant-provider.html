@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2019/Kubevirt-vagrant-provider.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>KubeVirt vagrant provider | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="pkliczewski" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="The post describes how to use kubevirt vagrant provider">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="KubeVirt vagrant provider | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2019/Kubevirt-vagrant-provider.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="The post describes how to use kubevirt vagrant provider" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="pkliczewski" >
+    <meta property="og:article:published_time" content="2019-06-04 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt vagrant provider | KubeVirt.io">
+    <meta name="twitter:description" content="The post describes how to use kubevirt vagrant provider">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt vagrant provider</h1>
+          <div class="post-info">
+            <span class="post-author">Author: pkliczewski</span>
+            <div>
+              <span class="post-meta">Publication Date: June 4, 2019  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h1 id="introduction">Introduction</h1>
+<p>Vagrant is a command line utility for managing the lifecycle of virtual machines. There are number of providers available which allow to control and provision virtual machines in different environment. In this blog post we update how to use the <a href="https://github.com/pkliczewski/vagrant-kubevirt">provider</a> to manage <a href="https://kubevirt.io/">KubeVirt</a>.</p>
+
+<p>The KubeVirt Vagrant provider implements the following features:</p>
+<ul>
+  <li>Manages virtual machines lifecycle - start, halt, status and destroy.</li>
+  <li>Creates virtual machines using templates, container disks or existing pvc.</li>
+  <li>Supports Vagrant built-in provisioners.</li>
+  <li>Provides ability to ssh to the virtual machines</li>
+  <li>Supports folder synchronization by using rsync</li>
+</ul>
+
+<h1 id="installation">Installation</h1>
+<p>In order to use the provider we need to install Vagrant first. The steps how to do it are available <a href="https://www.vagrantup.com/intro/getting-started/install.html">here</a>. Once command line tool is available in our system, we can install the plugin by running:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant plugin install vagrant-kubevirt
+</code></pre></div></div>
+
+<p>Now, we can obtain predefined box and start it using:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant up --provider=kubevirt
+</code></pre></div></div>
+
+<h1 id="virtual-machine-definition">Virtual machine definition</h1>
+<p>Instead of building a virtual machine from scratch, which would be a slow and tedious process, Vagrant uses a base image as template for virtual machines. These base images are known as “boxes” and every provider must introduce its own box format. The provider introduces <em>kubevirt</em> boxes.
+You can view an example box <a href="https://github.com/pkliczewski/vagrant-kubevirt/blob/master/example_box/">here</a>.</p>
+
+<p>There are two ways to tell Vagrant, how to connect to KubeVirt cluster in Vagrantfile:</p>
+<ul>
+  <li>use Kubernetes configuration file. When no other connection details provided, the provider will look for kubeconfig using value of KUBECONFIG environment variable or $HOME/.kube/config location.</li>
+  <li>define connection details as part of box definition</li>
+</ul>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provider</span> <span class="ss">:kubevirt</span> <span class="k">do</span> <span class="o">|</span><span class="n">kubevirt</span><span class="o">|</span>
+    <span class="n">kubevirt</span><span class="p">.</span><span class="nf">hostname</span> <span class="o">=</span> <span class="s1">'&lt;kubevirt host&gt;'</span>
+    <span class="n">kubevirt</span><span class="p">.</span><span class="nf">port</span> <span class="o">=</span> <span class="s1">'&lt;kubevirt port&gt;'</span>
+    <span class="n">kubevirt</span><span class="p">.</span><span class="nf">token</span> <span class="o">=</span> <span class="s1">'&lt;token&gt;'</span>
+  <span class="k">end</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<p>Values used in above sample box:</p>
+<ul>
+  <li>kubevirt host - Hostname where KubeVirt is deployed</li>
+  <li>kubevirt port - Port on where KubeVirt is listening</li>
+  <li>token - User token used to authenticate any request</li>
+</ul>
+
+<p>There are number of options we can customize for specific a virtal machine:</p>
+<ul>
+  <li>cpus - Number of cpus used by a virtual machine</li>
+  <li>memory - Amount of memory by a virtual machine</li>
+</ul>
+
+<p>We can choose one of the three following options:</p>
+<ul>
+  <li>template - Name of a template which will be used to create the virtual machine</li>
+  <li>image - Name of a container disk stored in a registry</li>
+  <li>pvc - Name of persistent volume claim containing virtual machine disk</li>
+</ul>
+
+<p>Below, you can find sample Vagrantfile exposing all the supported features:</p>
+
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+  <span class="c1"># name of the box</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">box</span> <span class="o">=</span> <span class="s1">'kubevirt'</span>
+  <span class="c1"># vm boot timeout</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">boot_timeout</span> <span class="o">=</span> <span class="mi">360</span>
+
+  <span class="c1"># disables default vagrant folder</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">synced_folder</span> <span class="s2">"."</span><span class="p">,</span> <span class="s2">"/vagrant"</span><span class="p">,</span> <span class="ss">disabled: </span><span class="kp">true</span>
+  <span class="c1"># synchoronizes a directory between a host and virtual machine</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">synced_folder</span> <span class="s2">"$HOME/src"</span><span class="p">,</span> <span class="s2">"/srv/website"</span><span class="p">,</span> <span class="ss">type: </span><span class="s2">"rsync"</span>
+
+  <span class="c1"># uses provision action to touch a file in a virtual machine</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provision</span> <span class="s2">"shell"</span> <span class="k">do</span> <span class="o">|</span><span class="n">s</span><span class="o">|</span>
+    <span class="n">s</span><span class="p">.</span><span class="nf">inline</span> <span class="o">=</span> <span class="s2">"touch example.txt"</span>
+  <span class="k">end</span>
+
+  <span class="c1"># defines virtual machine resources and source of disk</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provider</span> <span class="ss">:kubevirt</span> <span class="k">do</span> <span class="o">|</span><span class="n">kubevirt</span><span class="o">|</span>
+    <span class="n">kubevirt</span><span class="p">.</span><span class="nf">cpus</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">kubevirt</span><span class="p">.</span><span class="nf">memory</span> <span class="o">=</span> <span class="mi">512</span>
+    <span class="n">kubevirt</span><span class="p">.</span><span class="nf">image</span> <span class="o">=</span> <span class="s1">'kubevirt/fedora-cloud-registry-disk-demo'</span>
+  <span class="k">end</span>
+
+  <span class="c1"># defines a user configured on a virtual machine using cloud-init</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">ssh</span><span class="p">.</span><span class="nf">username</span> <span class="o">=</span> <span class="s1">'vagrant'</span>
+  <span class="n">config</span><span class="p">.</span><span class="nf">ssh</span><span class="p">.</span><span class="nf">password</span> <span class="o">=</span> <span class="s1">'vagrant'</span>
+<span class="k">end</span>
+</code></pre></div></div>
+
+<h1 id="usage">Usage</h1>
+<p>Now, once we defined a virtual machine we can see how to use the provider to manage it.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant up
+</code></pre></div></div>
+<p>The above command starts a virtual machines and performs any additonal operations defined in the Vagrantfile like provisioning, folder synchronization setup. For more information check <a href="https://www.vagrantup.com/docs/cli/up.html">here</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant halt
+</code></pre></div></div>
+<p>The above command stops a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/halt.html">here</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant status
+</code></pre></div></div>
+<p>The above command provides status of a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/status.html">here</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant destroy
+</code></pre></div></div>
+<p>The above command stops a virtual machine and destroys all the resources used. For more information check <a href="https://www.vagrantup.com/docs/cli/destroy.html">here</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant provision
+</code></pre></div></div>
+<p>The above command runs configured provisioners for specific virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/provision.html">here</a></p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant ssh
+</code></pre></div></div>
+<p>The above command ssh to running virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/ssh.html">here</a></p>
+
+<h1 id="future-work">Future work</h1>
+
+<p>There are still couple of features we would like to implement such as network management or user friendly box packaging.</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt vagrant provider&url=https://www.kubevirt.io/2019/Kubevirt-vagrant-provider.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

@@ -2,7 +2,7 @@
 - hosts: localhost
   gather_facts: False
   vars:
-    build_id: "{{ lookup('env', 'buildID') }}"
+    build_id: ""
   tasks:
   - name: "Fetch AMI Feed"
     get_url:
@@ -11,19 +11,19 @@
       mode: "0400"
   - name: "Import JSON into variable"
     set_fact:
-      recent_ami_json: "{{ lookup('file', 'existing-ami.json') | from_json }}"
+      recent_ami_json: ""
   - name: "Save AMI ID For Most Recent us-west-1 Image"
     set_fact:
-      recent_ami_id: "{{ recent_ami_json | json_query(\"[?region=='us-west-1'].ami_id\") }}"
+      recent_ami_id: ""
   - name: "Launch new instance on AWS"
     register: "ec2"
     ec2:
-      aws_access_key: "{{ lookup('env','AWS_ACCESS_KEY_ID') }}"
-      aws_secret_key: "{{ lookup('env','AWS_SECRET_ACCESS_KEY') }}"
-      key_name: "{{ lookup('env','AWS_KEY_NAME') }}"
+      aws_access_key: ""
+      aws_secret_key: ""
+      key_name: ""
       group_id: "sg-0d3bbafc626b5601f"
       instance_type: "t2.medium"
-      image: "{{ recent_ami_id[0] }}"
+      image: ""
       state: "present"
       wait: true
       region: "us-west-1"
@@ -31,20 +31,20 @@
       assign_public_ip: "yes"
       instance_tags:
         KubevirtCI: "yes"
-        Name: "kubevirt-labci-build{{ build_id }}"
+        Name: "kubevirt-labci-build"
   - name: "Write instance ID to /tmp/launched_instances"
     copy:
-      content: '{{ ec2.instance_ids }}'
+      content: ''
       dest: "/tmp/launched_instances"
     delegate_to: "localhost"
   - name: "Write instance IP to /tmp/inventory"
     copy:
-      content: '{{ ec2.instances[0].public_ip }}'
+      content: ''
       dest: "/tmp/inventory"
     delegate_to: "localhost"
   - name: "Wait for SSH to become available"
     wait_for:
-      host: "{{ ec2.instances[0].public_ip }}"
+      host: ""
       port: 22
       timeout: 620
       state: "started"
@@ -56,6 +56,6 @@
 #    register: kubevirt_pod_status
 #    shell: kubectl get pods -n kubevirt -o json | jq -r '.items[].status.conditions[] | select(.type=="Ready") .status' | uniq
 #    until: kubevirt_pod_status.stdout == "Ready"
-#    delegate_to: "centos@{{ ec2.instances[0].public_ip }}"
+#    delegate_to: "centos@"
 #    retries: 20
 #    delay: 2

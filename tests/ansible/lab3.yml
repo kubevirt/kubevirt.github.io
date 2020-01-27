@@ -4,7 +4,7 @@
   remote_user: centos
   tasks:
   - debug:
-      msg: "Starting Run At: {{ lookup('pipe','date +%Y-%m-%d-%H-%M-%S') }}"
+      msg: "Starting Run At: "
 
   - name: "(LAB 3) Copy Nuke script"
     copy:

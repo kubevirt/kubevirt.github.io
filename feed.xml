@@ -1,0 +1,980 @@
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-01-27T14:46:59+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Managing KubeVirt with Openshift Web Console</title><link href="https://kubevirt.io//2020/OKD-web-console-install.html" rel="alternate" type="text/html" title="Managing KubeVirt with Openshift Web Console" /><published>2020-01-24T00:00:00+00:00</published><updated>2020-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2020/OKD-web-console-install</id><content type="html" xml:base="https://kubevirt.io//2020/OKD-web-console-install.html">&lt;p&gt;In the previous post, &lt;a href=&quot;https://kubevirt.io/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt; were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.&lt;/p&gt;
+
+&lt;p&gt;There are two options to run the OKD web console to manage a Kubernetes cluster:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;#binary-installation&quot;&gt;Executing the web console as a binary&lt;/a&gt;. This installation method is the only one described in the &lt;a href=&quot;https://github.com/openshift/console#build-everything&quot;&gt;OKD web console repository&lt;/a&gt;. Personally, looks like more targetted at developers who want to quickly iterate over the development process while hacking in the web console. This development approach is described in the &lt;a href=&quot;https://github.com/openshift/console#native-kubernetes&quot;&gt;native Kubernetes&lt;/a&gt; section of the OpenShift console code repository.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;a href=&quot;#containerized-installation&quot;&gt;Executing the web console as another pod&lt;/a&gt;. The idea is leveraging the containerized version available as origin-console in the &lt;a href=&quot;https://quay.io/repository/openshift/origin-console?tag=latest&amp;amp;tab=tags&quot;&gt;OpenShift container image repository&lt;/a&gt; and execute it inside a Kubernetes cluster as a regular application, e.g. as a pod.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;what-is-the-okd-web-console&quot;&gt;What is the OKD web console&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;The &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OKD web console&lt;/a&gt; is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl&lt;/code&gt; in the form of a single page webapp. It integrates with other services like monitoring, chargeback and the &lt;a href=&quot;https://github.com/operator-framework/operator-lifecycle-manager&quot;&gt;Operator Lifecycle Manager or OLM&lt;/a&gt;. Some things that go on behind the scenes include:&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Proxying the Kubernetes API under /api/kubernetes&lt;/li&gt;
+  &lt;li&gt;Providing additional non-Kubernetes APIs for interacting with the cluster&lt;/li&gt;
+  &lt;li&gt;Serving all frontend static assets&lt;/li&gt;
+  &lt;li&gt;User Authentication&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;As it is stated in the official GitHub’s repository, the OKD web console runs as a binary listening in a local port. The static assets required to run the web console are served by the binary itself. It is possible to customize the web console using extensions. The extensions have to be committed to be to the sources of the console directly.&lt;/p&gt;
+
+&lt;p&gt;When the web console is accessed from a browser, it first loads all required static assets. Then makes requests to the Kubernetes API using the values defined as environment variables in the host where the console is running. Actually, there is a script called &lt;code class=&quot;highlighter-rouge&quot;&gt;environment.sh&lt;/code&gt; that helps exporting the proper values for these environment variables.&lt;/p&gt;
+
+&lt;p&gt;The web console uses WebSockets to maintain a persistent connection with the API server and receive updated information as soon as it is available. Note as well that JavaScript must be enabled to use the web console. For the best experience, use a web browser that supports WebSockets. OKD web console’s developers inform that Google Chrome/Chromium version 76 or greater is used in their integration tests.&lt;/p&gt;
+
+&lt;p&gt;Unlike what is explained in the &lt;a href=&quot;https://github.com/openshift/console#native-kubernetes&quot;&gt;official repository&lt;/a&gt;, OKD actually executes the OKD web console in a pod. Therefore, even not officially mentioned, information how to run the OKD web console as a pod in a &lt;em&gt;native Kubernetes&lt;/em&gt; cluster will be described later.&lt;/p&gt;
+
+&lt;h2 id=&quot;binary-installation&quot;&gt;Binary installation&lt;/h2&gt;
+
+&lt;p&gt;&lt;em&gt;This method is suggested to be a development installation since it is mainly used by the OKD web console developers to test new features.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;In this section the OKD web console will be compiled from the source code and executed as a binary artifact in a &lt;strong&gt;CentOS 8&lt;/strong&gt; server which does not belong to any Kubernetes cluster. The following diagram shows the relationship between all the components: user, OKD web console and Kubernetes cluster.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-01-24-OKD-web-console-install/OKD-console-kubevirt.png&quot; alt=&quot;Lab diagram&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note that it is possible to run the OKD web console in a Kubernetes master, in a regular node or, as shown, in a server outside the cluster. In the latter case, the external server must have access to the master API. &lt;em&gt;Notice also that it can be configured with different security and network settings or even different hardware resources&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;The first step when using the binary installation is cloning the &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;repository&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;dependencies&quot;&gt;Dependencies&lt;/h3&gt;
+
+&lt;p&gt;Below are detailed the dependencies needed to compile the OKD web console artifact:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Operating System&lt;/strong&gt;. CentOS 8 was chosen as our operating system for the server running the OKD web console. Kubernetes cluster is running latest CentOS 7.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /etc/redhat-release 
+CentOS Linux release 8.0.1905 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Core&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Kubernetes&lt;/strong&gt;. It has been deployed the latest available version at the moment of writing: &lt;code class=&quot;highlighter-rouge&quot;&gt;v1.17&lt;/code&gt;. Kubernetes cluster is comprised by one master node and one regular node with enough CPU (4vCPUs) and memory (16Gi) to run KubeVirt and a couple of KubeVirt’s &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt;. No extra storage was needed since the virtual machines will run as container-disk instances.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get nodes &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
+NAME                            STATUS   ROLES    AGE   VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION               CONTAINER-RUNTIME
+blog-master-00.kubevirt.local   Ready    master   29h   v1.17.0   192.168.123.250   &amp;lt;none&amp;gt;        CentOS Linux 7 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Core&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   3.10.0-957.27.2.el7.x86_64   docker://1.13.1
+blog-worker-00.kubevirt.local   Ready    &amp;lt;none&amp;gt;   29h   v1.17.0   192.168.123.232   &amp;lt;none&amp;gt;        CentOS Linux 7 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Core&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   3.10.0-957.27.2.el7.x86_64   docker://1.13.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Node.js &amp;gt;= 8&lt;/strong&gt;. Node.js 10 is available as an AppStream module.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;yum module &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;nodejs
+Installed:
+  nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64  
+
+Complete!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;yarn &amp;gt;= 1.3.2&lt;/strong&gt;. Yarn is a dependency of Node.js. In this case, the official yarn repository has to be added as a local repositories.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;--silent&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--location&lt;/span&gt; https://dl.yarnpkg.com/rpm/yarn.repo | &lt;span class=&quot;nb&quot;&gt;sudo tee&lt;/span&gt; /etc/yum.repos.d/yarn.repo
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;rpm &lt;span class=&quot;nt&quot;&gt;--import&lt;/span&gt; https://dl.yarnpkg.com/rpm/pubkey.gpg
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;yum &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;yarn
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yarn &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
+1.21.1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;go &amp;gt;= 1.11+&lt;/strong&gt;. Golang is available as an AppStream module in CentOS 8:&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;yum module &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;go-toolset
+
+Installed:
+  golang-1.11.6-1.module_el8.0.0+192+8b12aa21.x86_64
+                    
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;jq (for contrib/environment.sh)&lt;/strong&gt;. Finally, jq is installed in order to work with JSON data.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;jq
+
+Installed:
+  jq.x86_64 0:1.5-1.el7
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;compiling-okd-web-console&quot;&gt;Compiling OKD web console&lt;/h3&gt;
+
+&lt;p&gt;Once all dependencies are met, access the cloned directory and export the correct variables that will be used during the building process. Then, execute &lt;code class=&quot;highlighter-rouge&quot;&gt;build.sh&lt;/code&gt; script which actually calls the build-frontend and build-backend scripts.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/openshift/console.git
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;console/
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;~/.kube/config
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt; ./contrib/environment.sh
+Using https://192.168.123.250:6443
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./build.sh 
+...
+Done &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;215.91s.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The result of the process is a binary file called &lt;strong&gt;bridge&lt;/strong&gt; inside the bin folder. Prior to run the &lt;em&gt;“bridge”&lt;/em&gt;, it has to be verified that the port where the OKD web console is expecting connections is not blocked.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;iptables &lt;span class=&quot;nt&quot;&gt;-A&lt;/span&gt; INPUT &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; tcp &lt;span class=&quot;nt&quot;&gt;--dport&lt;/span&gt; 9000 &lt;span class=&quot;nt&quot;&gt;-m&lt;/span&gt; conntrack &lt;span class=&quot;nt&quot;&gt;--ctstate&lt;/span&gt; NEW,ESTABLISHED &lt;span class=&quot;nt&quot;&gt;-j&lt;/span&gt; ACCEPT
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, the artifact can be executed:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./bin/bridge 
+2020/01/7 10:21:17 cmd/main: cookies are not secure because base-address is not https!
+2020/01/7 10:21:17 cmd/main: running with AUTHENTICATION DISABLED!
+2020/01/7 10:21:17 cmd/main: Binding to 0.0.0.0:9000...
+2020/01/7 10:21:17 cmd/main: not using TLS
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At this point, the connection to the OKD web console from your network should be established successfully. Note that by default there is no authentication required to login into the console and the connection is using HTTP protocol. There are variables in the &lt;code class=&quot;highlighter-rouge&quot;&gt;environment.sh&lt;/code&gt; file that can change this default behaviour.&lt;/p&gt;
+
+&lt;p&gt;Probably, the following issue will be faced when connecting to the web user interface: &lt;code class=&quot;highlighter-rouge&quot;&gt;&quot;services is forbidden: User &quot;system:serviceaccount:kube-system:default&quot; cannot list resource &quot;services&quot; in API group &quot;&quot; in the namespace default&quot;&lt;/code&gt;. The problem is that the &lt;strong&gt;default service account&lt;/strong&gt; does not have enough privileges to show all the cluster objects.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-01-24-OKD-web-console-install/okd-serviceaccount-error.png&quot; alt=&quot;OKD sa error&quot; width=&quot;1110&quot; height=&quot;720&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;There are two options to fix the issue: one is granting cluster-admin permissions to the default service account. That, it is not recommended since default service account is, at its very name indicates, the default service account for all pods if not explicitly configured. This means granting cluster-admin permissions to some applications running in kube-system namespace and even future ones when no service account is configured.&lt;/p&gt;
+
+&lt;p&gt;The other option is create a new service account called &lt;strong&gt;console&lt;/strong&gt;, grant cluster-admin permissions to it and configure the web console to run with this new service account:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create serviceaccount console &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create clusterrolebinding console &lt;span class=&quot;nt&quot;&gt;--clusterrole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cluster-admin &lt;span class=&quot;nt&quot;&gt;--serviceaccount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kube-system:console &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once created, modify the &lt;code class=&quot;highlighter-rouge&quot;&gt;environment.sh&lt;/code&gt; file and change the line that starts with &lt;code class=&quot;highlighter-rouge&quot;&gt;secretname&lt;/code&gt; as shown below:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim contrib/environment.sh 
+&lt;span class=&quot;nv&quot;&gt;secretname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;kubectl get serviceaccount &lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;console&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kube-system &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'{.secrets[0].name}'&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now, variables configured in the &lt;code class=&quot;highlighter-rouge&quot;&gt;environment.sh&lt;/code&gt; file have to be exported again and the connection to the console must be reloaded.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt; ./contrib/environment.sh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;deploy-kubevirt-using-the-hyperconverged-cluster-operator-hco&quot;&gt;Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)&lt;/h2&gt;
+
+&lt;p&gt;In order to ease the installation of KubeVirt, the unified operator called &lt;strong&gt;&lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;HCO&lt;/a&gt;&lt;/strong&gt; will be deployed. The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - &lt;a href=&quot;https://blog.openshift.com/a-first-look-at-kubevirt/&quot;&gt;kubevirt&lt;/a&gt;, &lt;a href=&quot;http://kubevirt.io/2018/CDI-DataVolumes.html&quot;&gt;cdi&lt;/a&gt;, &lt;a href=&quot;https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md&quot;&gt;networking&lt;/a&gt;, etc… - where users can deploy and configure them in a single object.&lt;/p&gt;
+
+&lt;p&gt;This operator is sometimes referred to as a “meta operator” or an “operator for operators”. Most importantly, this operator doesn’t replace or interfere with OLM. It only creates operator CRs, which is the user’s prerogative. More information about HCO can be found in the post published in this blog by Ryan Hallisey: &lt;a href=&quot;https://kubevirt.io/2019/Hyper-Converged-Operator.html&quot;&gt;Hyper Converged Operator on OCP 4 and K8s(HCO)&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The HCO repository provides plenty of information on how to install the operator. In this lab, it has been installed as &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;Using the HCO without OLM or Marketplace&lt;/a&gt;, which basically executes this deployment script:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
++ kubectl create ns kubevirt-hyperconverged
+namespace/kubevirt-hyperconverged created
++ &lt;span class=&quot;nv&quot;&gt;namespaces&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=(&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;openshift&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
++ &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;namespace &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;namespaces&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[@]&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;
+++ kubectl get ns openshift
+Error from server &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;NotFound&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: namespaces &lt;span class=&quot;s2&quot;&gt;&quot;openshift&quot;&lt;/span&gt; not found
++ &lt;span class=&quot;o&quot;&gt;[[&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;''&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;]]&lt;/span&gt;
++ kubectl create ns openshift
+namespace/openshift created
+++ kubectl config current-context
++ kubectl config set-context kubernetes-admin@kubernetes &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt-hyperconverged
+Context &lt;span class=&quot;s2&quot;&gt;&quot;kubernetes-admin@kubernetes&quot;&lt;/span&gt; modified.
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/cluster-network-addons00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/containerized-data-importer00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/cdis.cdi.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/hco.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/hyperconvergeds.hco.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/kubevirt00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirts.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/node-maintenance00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirtcommontemplatesbundles.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance01.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirtmetricsaggregations.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance02.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirtnodelabellerbundles.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance03.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirttemplatevalidators.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/v2vvmware.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/v2vvmwares.kubevirt.io created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role.yaml
+role.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrole.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
+clusterrole.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrole.rbac.authorization.k8s.io/kubevirt-operator created
+clusterrole.rbac.authorization.k8s.io/kubevirt-ssp-operator created
+clusterrole.rbac.authorization.k8s.io/cdi-operator created
+clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/service_account.yaml
+serviceaccount/cdi-operator created
+serviceaccount/cluster-network-addons-operator created
+serviceaccount/hyperconverged-cluster-operator created
+serviceaccount/kubevirt-operator created
+serviceaccount/kubevirt-ssp-operator created
+serviceaccount/node-maintenance-operator created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role_binding.yaml
+rolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrolebinding.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
+clusterrolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrolebinding.rbac.authorization.k8s.io/kubevirt-operator created
+clusterrolebinding.rbac.authorization.k8s.io/kubevirt-ssp-operator created
+clusterrolebinding.rbac.authorization.k8s.io/cdi-operator created
+clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/operator.yaml
+deployment.apps/hyperconverged-cluster-operator created
+deployment.apps/cluster-network-addons-operator created
+deployment.apps/virt-operator created
+deployment.apps/kubevirt-ssp-operator created
+deployment.apps/cdi-operator created
+deployment.apps/node-maintenance-operator created
++ kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/hco.cr.yaml
+hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The result is a new namespace called &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt-hyperconverged&lt;/code&gt; with all the operators, Custom Resources (CRs) and objects needed by KubeVirt:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
+NAME                                                  READY   STATUS    RESTARTS   AGE   IP                NODE                            NOMINATED NODE   READINESS GATES
+bridge-marker-bwq6f                                   1/1     Running   0          12m   192.168.123.250   blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+bridge-marker-st7f7                                   1/1     Running   0          12m   192.168.123.232   blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+cdi-apiserver-6f59996849-2hmm9                        1/1     Running   0          12m   10.244.1.17       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+cdi-deployment-57c68dbddc-c4n8l                       1/1     Running   0          12m   10.244.1.22       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+cdi-operator-64bbf595c-48v7k                          1/1     Running   1          24m   10.244.1.12       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+cdi-uploadproxy-5cbf6f4897-95fn5                      1/1     Running   0          12m   10.244.1.16       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+cluster-network-addons-operator-5956598648-5r79l      1/1     Running   0          24m   10.244.1.10       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+hyperconverged-cluster-operator-d567b5dd8-7d8wq       0/1     Running   0          24m   10.244.1.9        blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kube-cni-linux-bridge-plugin-kljvq                    1/1     Running   0          12m   10.244.1.19       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kube-cni-linux-bridge-plugin-p6dkz                    1/1     Running   0          12m   10.244.0.7        blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kube-multus-ds-amd64-84gcj                            1/1     Running   1          12m   10.244.1.23       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kube-multus-ds-amd64-flq8s                            1/1     Running   2          12m   10.244.0.10       blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kubemacpool-mac-controller-manager-675ff47587-pb57c   1/1     Running   0          11m   10.244.1.20       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kubemacpool-mac-controller-manager-675ff47587-rf65j   1/1     Running   0          11m   10.244.0.8        blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+kubevirt-ssp-operator-7b5dcb45c4-qd54h                1/1     Running   0          24m   10.244.1.11       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+nmstate-handler-8r6d5                                 1/1     Running   0          11m   192.168.123.232   blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+nmstate-handler-cq5vs                                 1/1     Running   0          11m   192.168.123.250   blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+node-maintenance-operator-7f8f78c556-q6flt            1/1     Running   0          24m   10.244.0.5        blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+ovs-cni-amd64-4z2qt                                   2/2     Running   0          11m   192.168.123.250   blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+ovs-cni-amd64-w8fzj                                   2/2     Running   0          11m   192.168.123.232   blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-api-7b7d486d88-hg4rd                             1/1     Running   0          11m   10.244.1.21       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-api-7b7d486d88-r9s2d                             1/1     Running   0          11m   10.244.0.9        blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-controller-754466fb86-js6r7                      1/1     Running   0          10m   10.244.1.25       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-controller-754466fb86-mcxwd                      1/1     Running   0          10m   10.244.0.11       blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-handler-cz7q2                                    1/1     Running   0          10m   10.244.0.12       blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-handler-k6npr                                    1/1     Running   0          10m   10.244.1.24       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-operator-84f5588df6-2k49b                        1/1     Running   0          24m   10.244.1.14       blog-worker-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+virt-operator-84f5588df6-zzrsb                        1/1     Running   1          24m   10.244.0.4        blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;strong&gt;Note&lt;/strong&gt; that only once HCO is completely deployed, &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachines&lt;/code&gt; can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.&lt;/p&gt;
+
+&lt;p&gt;It is worth noting that there is an ongoing effort to adapt the OpenShift web console’s user interface in native Kubernetes additionally to OKD or OpenShift as they are expected. &lt;a href=&quot;https://github.com/openshift/console/pull/3848&quot;&gt;As an example&lt;/a&gt;, a few days ago, the non applicable Virtual Machine Templates option from the Workload menu was removed and the VM Wizard was made fully functional when native Kubernetes is detected.
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;1110&quot; height=&quot;650&quot; src=&quot;https://www.youtube.com/embed/XQw4GkGHs44&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+&lt;h2 id=&quot;containerized-installation&quot;&gt;Containerized installation&lt;/h2&gt;
+
+&lt;p&gt;The OKD web console actually runs as a pod in OKD along with its deployment, services and all objects needed to run properly. The idea is to take advantage of the containerized OKD web console available and execute it in one of the nodes of a native Kubernetes cluster.&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Note that unlike the binary installation the pod must run in a node inside our Kubernetes cluster&lt;/em&gt;. On the other side, running the OKD web console as a native Kubernetes application will benefit from all the Kubernetes advantages: rolling deployments, easy upgrades, high availability, scalability, auto-restart in case of failure, liveness and readiness probes… An example of how easy it is to update the OKD web console to a newer version will be presented as well.&lt;/p&gt;
+
+&lt;h3 id=&quot;deploying-okd-web-console&quot;&gt;Deploying OKD web console&lt;/h3&gt;
+
+&lt;p&gt;In order to configure the deployment of the OKD web console the proper Kubernetes objects have to be created. As shown in the previously &lt;a href=&quot;#compiling-okd-web-console&quot;&gt;Compiling OKD web console&lt;/a&gt; there are quite a few environment variables that needs to be set. When dealing with Kubernetes objects these variables should be included in the deployment object.&lt;/p&gt;
+
+&lt;p&gt;A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from &lt;a href=&quot;../assets/2020-01-24-OKD-web-console-install/okd-web-console-install.yaml&quot;&gt;here&lt;/a&gt; and configured depending on the user’s local installation.&lt;/p&gt;
+
+&lt;p&gt;Then, create a specific service account (&lt;strong&gt;console&lt;/strong&gt;) for running the OpenShift web console in case it is not created &lt;a href=&quot;#compiling-okd-web-console&quot;&gt;previously&lt;/a&gt; and grant cluster-admin permissions:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create serviceaccount console &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create clusterrolebinding console &lt;span class=&quot;nt&quot;&gt;--clusterrole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cluster-admin &lt;span class=&quot;nt&quot;&gt;--serviceaccount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kube-system:console &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, extract the &lt;strong&gt;token secret name&lt;/strong&gt; associated with the console service account:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get serviceaccount console &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kube-system &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'{.secrets[0].name}'&lt;/span&gt;
+console-token-ppfc2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, the downloaded YAML file must be modified assigning the proper values to the &lt;strong&gt;token&lt;/strong&gt; section. The following command may help to extract the token name from the user console, which is a user created by&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-deployment&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kube-system&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;containers&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-app&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;quay.io/openshift/origin-console:4.2&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_USER_AUTH&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;disabled&lt;/span&gt;         &lt;span class=&quot;c1&quot;&gt;# no authentication required&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_MODE&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;off-cluster&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;https://kubernetes.default&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;#master api&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true&quot;&lt;/span&gt;           &lt;span class=&quot;c1&quot;&gt;# no tls enabled&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_AUTH&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bearer-token&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_AUTH_BEARER_TOKEN&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;valueFrom&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;secretKeyRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-token-ppfc2&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;# console serviceaccount token&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;token&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Service&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-np-service&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kube-system&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NodePort&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;# nodePort configuration&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;http&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9000&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;targetPort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9000&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;nodePort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;30036&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;TCP&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; okd-web-console-install.yaml 
+deployment.apps/console-deployment created
+service/console-service created
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+NAME                                                    READY   STATUS    RESTARTS   AGE     IP                NODE                            NOMINATED NODE   READINESS GATES
+console-deployment-59d8956db5-td462                     1/1     Running   0          4m49s   10.244.0.13       blog-master-00.kubevirt.local   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get svc &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;                  AGE
+console-np-service   NodePort    10.96.195.45   &amp;lt;none&amp;gt;        9000:30036/TCP           19m
+kube-dns             ClusterIP   10.96.0.10     &amp;lt;none&amp;gt;        53/UDP,53/TCP,9153/TCP   20d
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once running, a connection to the &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeport&lt;/code&gt; defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-01-24-OKD-web-console-install/okd-pod-4.2.resized.png&quot; alt=&quot;OKD 4.2&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;
+It can be verified that it is possible to see and manage &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachines&lt;/code&gt; running inside of the native Kubernetes cluster.
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-01-24-OKD-web-console-install/okd-console-vm.resized.png&quot; alt=&quot;OKD vmr&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;upgrade-okd-web-console&quot;&gt;Upgrade OKD web console&lt;/h3&gt;
+
+&lt;p&gt;The upgrade process is really straightforward. All available image versions of the OpenShift console can be consulted in the &lt;a href=&quot;https://quay.io/repository/openshift/origin-console?tab=tags&quot;&gt;official OpenShift container image repository&lt;/a&gt;. Then, the deployment object must be modified accordingly to run the desired version of the OKD web console.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;
+&lt;img src=&quot;/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png&quot; alt=&quot;OKD vmr&quot; /&gt;
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. &lt;em&gt;Note that this is not linked with the latest tag, actually &lt;code class=&quot;highlighter-rouge&quot;&gt;latest&lt;/code&gt; tag is the same as version &lt;code class=&quot;highlighter-rouge&quot;&gt;4.4&lt;/code&gt;&lt;/em&gt;. Upgrading process only involves updating the image value to the desired container image: &lt;code class=&quot;highlighter-rouge&quot;&gt;quay.io/openshift/origin-console:4.5&lt;/code&gt; and save.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-deployment&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kube-system&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;containers&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-app&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;quay.io/openshift/origin-console:4.5&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#new image version&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;env&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_USER_AUTH&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;disabled&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_MODE&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;off-cluster&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;https://kubernetes.default&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true&quot;&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_AUTH&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bearer-token&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BRIDGE_K8S_AUTH_BEARER_TOKEN&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;valueFrom&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;secretKeyRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;console-token-ppfc2&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;token&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Once the deployment has been saved, a new pod with the configured version of the OKD web console is created and eventually will replace the old one.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kube-system
+NAME                                                    READY   STATUS              RESTARTS   AGE
+console-deployment-5588f98644-bw7jr                     0/1     ContainerCreating   0          5s
+console-deployment-59d8956db5-td462                     1/1     Running             0          16h
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;
+&lt;img src=&quot;/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png&quot; alt=&quot;OKD web console 4.5&quot; /&gt;
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the video below, the procedure explained in this section is shown.
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;iframe width=&quot;1110&quot; height=&quot;650&quot; src=&quot;https://www.youtube.com/embed/xoL0UFI657I&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this post &lt;em&gt;two ways to install the OKD web console to manage a KubeVirt deployment in a native Kubernetes cluster have been explored&lt;/em&gt;. Running the OKD web console will allow you to create, manage and delete virtual machines running in a native cluster from a friendly user interface. Also you will be able to delegate to the developers or other users the creation and maintenance of their virtual machines without having a deep knowledge of Kubernetes.&lt;/p&gt;
+
+&lt;p&gt;Personally, I would like to see more user interfaces to manage and configure KubeVirt deployments and their virtual machines. In a previous post, &lt;a href=&quot;https://kubevirt.io/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt;, some options were explored, however only OKD web console was found to be deeply integrated with KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;Ping us or feel free to comment this post in case there are some other existing options that we did not notice.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=xoL0UFI657I&quot;&gt;Managing KubeVirt with OpenShift web console running as a container application on Youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=XQw4GkGHs44&amp;amp;t=37s&quot;&gt;ManagManaging KubeVirt with OpenShift web console running as a compiled binary on Youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on Youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry><entry><title type="html">KubeVirt Laboratory 3, upgrades</title><link href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 3, upgrades" /><published>2020-01-21T00:00:00+00:00</published><updated>2020-01-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_lab3_upgrade</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;KubeVirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
+
+&lt;p&gt;In the video, there is a Kubernetes cluster already running.  Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
+
+&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/OAPzOvqp0is&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
+
+&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Install a specific version of the KubeVirt Operator and Custom Resource&lt;/li&gt;
+  &lt;li&gt;Create a cirros Virtual Machine running in KubeVirt&lt;/li&gt;
+  &lt;li&gt;Connect to the Virtual Machine using SSH&lt;/li&gt;
+  &lt;li&gt;Upgrade to a specific version of KubeVirt while the Virtual Machine is running&lt;/li&gt;
+  &lt;li&gt;Check the new KubeVirt version&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;Kubevirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab2_experiment_with_cdi.html&quot;&gt;Kubevirt Laboratory 2 blogpost: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;Kubevirt Laboratory 2: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 3: Upgrades</summary></entry><entry><title type="html">KubeVirt v0.25.0</title><link href="https://kubevirt.io//2020/changelog-v0.25.0.html" rel="alternate" type="text/html" title="KubeVirt v0.25.0" /><published>2020-01-13T00:00:00+00:00</published><updated>2020-01-13T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.25.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.25.0.html">&lt;h2 id=&quot;v0250&quot;&gt;v0.25.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Jan 13 20:37:15 2020 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.17&lt;/li&gt;
+  &lt;li&gt;Support emulator thread pinning&lt;/li&gt;
+  &lt;li&gt;Support virtctl restart –force&lt;/li&gt;
+  &lt;li&gt;Support virtctl migrate to trigger live migrations from the CLI&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.25.0</summary></entry><entry><title type="html">KubeVirt user interface options</title><link href="https://kubevirt.io//2019/KubeVirt_UI_options.html" rel="alternate" type="text/html" title="KubeVirt user interface options" /><published>2019-12-17T00:00:00+00:00</published><updated>2019-12-17T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_UI_options</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_UI_options.html">&lt;blockquote&gt;
+  &lt;p&gt;The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. &lt;a href=&quot;https://en.wikipedia.org/wiki/User_interface&quot;&gt;Wikipedia:User Interface&lt;/a&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;In this blogpost we show the results of a research about the different options existing in the market to enable KubeVirt with a user interface to manage, access and control the life cycle of the Virtual Machines inside Kubernetes with KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;The different UI options available for KubeVirt that we have been checking, at the moment of writing this article, are the following:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/vmware-tanzu/octant&quot;&gt;Octant&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD: The Origin Community Distribution of Kubernetes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/console&quot;&gt;Openshift console&lt;/a&gt; running on vanilla Kubernetes&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://novnc.com/info.html&quot;&gt;noVNC&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;octant&quot;&gt;Octant&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/octant-logo.png&quot; alt=&quot;Octant logo&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As the &lt;a href=&quot;https://octant.dev/&quot;&gt;Octant webpage&lt;/a&gt; claims:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Octant is an open-source developer-centric web interface for Kubernetes that lets you inspect a Kubernetes cluster and its applications. Octant is a tool for developers to understand how applications run on a Kubernetes cluster. It aims to be part of the developer’s toolkit for gaining insight and approaching complexity found in Kubernetes. Octant offers a combination of introspective tooling, cluster navigation, and object management along with a plugin system to further extend its capabilities.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;Some of the key features of this tool can be checked in their &lt;a href=&quot;https://octant.dev/docs/master/&quot;&gt;latest release notes&lt;/a&gt;:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;strong&gt;Resource Viewer&lt;/strong&gt;: Graphically visualize relationships between objects in a Kubernetes cluster. The status of individual objects is represented by colour to show workload performance.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Summary View&lt;/strong&gt;: Consolidated status and configuration information in a single page aggregated from output typically found using multiple kubectl commands.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Port Forward&lt;/strong&gt;: Forward a local port to a running pod with a single button for debugging applications and even port forward multiple pods across namespaces.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Log Stream&lt;/strong&gt;: View log streams of pod and container activity for troubleshooting or monitoring without holding multiple terminals open.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Label Filter&lt;/strong&gt;: Organize workloads with label filtering for inspecting clusters with a high volume of objects in a namespace.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Cluster Navigation&lt;/strong&gt;: Easily change between namespaces or contexts across different clusters. Multiple kubeconfig files are also supported.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;Plugin System&lt;/strong&gt;: Highly extensible plugin system for users to provide additional functionality through gRPC. Plugin authors can add components on top of existing views.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;We installed it and found out that:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Octant provides a very basic dashboard for Kubernetes and it is pretty straightforward to install. It can be installed in your laptop or in a remote server.&lt;/li&gt;
+  &lt;li&gt;Regular Kubernetes objects can be seen from the UI. Pod logs can be checked as well. However, mostly everything is in view mode, even the YAML description of the objects. Therefore, as a developer or cluster operator you cannot edit YAML files directly from the UI&lt;/li&gt;
+  &lt;li&gt;Custom resources (CRs) and custom resource definitions (CRDs) are automatically detected and shown in the UI. This means that KubeVirt CRs can be viewed from the dashboard. However, VirtualMachines and VirtualMachineInstances cannot be modified from Octant, they can only be deleted.&lt;/li&gt;
+  &lt;li&gt;There is an option to extend the functionality adding &lt;a href=&quot;https://octant.dev/docs/master/plugins/reference/&quot;&gt;plugins&lt;/a&gt; to the dashboard.&lt;/li&gt;
+  &lt;li&gt;No specific options to manage KubeVirt workloads have been found.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;video autoplay=&quot;&quot; loop=&quot;&quot; muted=&quot;&quot; playsinline=&quot;&quot; src=&quot;/assets/2019-12-19-KubeVirt_UI_options/octant.mp4&quot; type=&quot;video/mp4&quot; width=&quot;1280&quot; height=&quot;720&quot;&gt;&lt;/video&gt;
+
+&lt;p&gt;With further work and investigation, it could be an option to develop a specific plugin to enable remote console or VNC access to KubeVirt workloads.&lt;/p&gt;
+
+&lt;h2 id=&quot;okd-the-origin-community-distribution-of-kubernetes&quot;&gt;OKD: The Origin Community Distribution of Kubernetes&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png&quot; alt=&quot;OKD logo&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;As defined in the &lt;a href=&quot;https://www.okd.io/&quot;&gt;official webpage&lt;/a&gt;:&lt;/p&gt;
+&lt;blockquote&gt;
+  &lt;p&gt;OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;A few weeks ago Kubernetes distribution &lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD4&lt;/a&gt; was released as preview. OKD is the official upstream version of Red Hat’s Openshift. Since Openshift includes KubeVirt (Red Hat calls it &lt;a href=&quot;https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html&quot;&gt;CNV&lt;/a&gt;) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with Openshift. We have noticed that from the UI a user can:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Install the KubeVirt operator from the operator marketplace.&lt;/li&gt;
+  &lt;li&gt;Create Virtual Machines by importing YAML files or following a wizard. The wizard prevents you from moving to the next screen until you provide values in the required fields.&lt;/li&gt;
+  &lt;li&gt;Modify the status of the Virtual Machine: stop, start, migrate, clone, edit label, edit annotations, edit CD-ROMs and delete&lt;/li&gt;
+  &lt;li&gt;Edit network interfaces. It is possible to add multiple network interfaces to the VM.&lt;/li&gt;
+  &lt;li&gt;Add disks to the VM&lt;/li&gt;
+  &lt;li&gt;Connect to the VM via serial or VNC console.&lt;/li&gt;
+  &lt;li&gt;Edit the YAML object files online.&lt;/li&gt;
+  &lt;li&gt;Create VM templates. The web console features an interactive wizard that guides you through the Basic Settings, Networking, and Storage screens to simplify the process of creating virtual machine templates.&lt;/li&gt;
+  &lt;li&gt;Check VM events in real time.&lt;/li&gt;
+  &lt;li&gt;Gather metrics and utilization of the VM.&lt;/li&gt;
+  &lt;li&gt;Pretty much everything you can do with KubeVirt from the command line.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;video autoplay=&quot;&quot; loop=&quot;&quot; muted=&quot;&quot; playsinline=&quot;&quot; src=&quot;/assets/2019-12-19-KubeVirt_UI_options/okd.mp4&quot; type=&quot;video/mp4&quot; width=&quot;1280&quot; height=&quot;720&quot;&gt;&lt;/video&gt;
+
+&lt;p&gt;One of the drawbacks is that the current &lt;a href=&quot;https://operatorhub.io/operator/kubevirt&quot;&gt;KubeVirt HCO operator&lt;/a&gt; contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest &lt;a href=&quot;https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo&quot;&gt;Fedora cloud container disk image&lt;/a&gt; and instead we were forced to use the one tagged as v0.18.1 which matches the version of KubeVirt deployed.&lt;/p&gt;
+
+&lt;p&gt;If for any reason there is a need to deploy the latest version, it can be done by running the following script which applies directly the HCO operator: &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;unreleased bundles using the hco without marketplace&lt;/a&gt;. Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.&lt;/p&gt;
+
+&lt;h2 id=&quot;openshift-console-bridge&quot;&gt;OpenShift console (bridge)&lt;/h2&gt;
+
+&lt;p&gt;There is actually a &lt;a href=&quot;https://github.com/kubevirt/web-ui&quot;&gt;KubeVirt Web User Interface&lt;/a&gt;, however the standalone project was deprecated in favor of OpenShift Console where it is included as a plugin.&lt;/p&gt;
+
+&lt;p&gt;As we reviewed previously the &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OpenShift web console&lt;/a&gt; is just another piece inside OKD. It is an independent part and, as it is stated in their official GitHub repository, it can run on top of native Kubernetes. OpenShift Console a.k.a bridge is defined as:&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;a friendly kubectl in the form of a single page webapp. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Proxying the Kubernetes API under /api/kubernetes&lt;/li&gt;
+  &lt;li&gt;Providing additional non-Kubernetes APIs for interacting with the cluster&lt;/li&gt;
+  &lt;li&gt;Serving all frontend static assets&lt;/li&gt;
+  &lt;li&gt;User Authentication&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Then, as briefly explained in their &lt;a href=&quot;https://github.com/openshift/console#native-kubernetes&quot;&gt;repository&lt;/a&gt;, our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar to the ones found in the OKD installation except:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;KubeVirt installation is done using the &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;Hyperconverged Cluster Operator (HCO) without OL or Marketplace&lt;/a&gt; instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically&lt;/li&gt;
+  &lt;li&gt;Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.&lt;/li&gt;
+  &lt;li&gt;Connection to the VM via serial or VNC console is flaky.&lt;/li&gt;
+  &lt;li&gt;VM templates can only be created from YAML. The wizard dialog is based on OpenShift templates.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;video autoplay=&quot;&quot; loop=&quot;&quot; muted=&quot;&quot; playsinline=&quot;&quot; src=&quot;/assets/2019-12-19-KubeVirt_UI_options/bridge-k8s.mp4&quot; type=&quot;video/mp4&quot; width=&quot;1280&quot; height=&quot;720&quot;&gt;&lt;/video&gt;
+
+&lt;p&gt;Note that the OpenShift console documentation briefly points out how to integrate the OpenShift console with a native Kubernetes deployment. It is uncertain if it can be installed in any other Kubernetes cluster.&lt;/p&gt;
+
+&lt;h2 id=&quot;cockpit&quot;&gt;Cockpit&lt;/h2&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit-logo.png&quot; alt=&quot;Cockpit logo&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;When testing cockpit in a CentOS 7 server with a Kubernetes cluster and KubeVirt we have realised that some of the containers/k8s features have to be enabled installing extra cockpit packages:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;To see the containers and images the package &lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-docker&lt;/code&gt; has to be installed, then a new option called containers appears in the menu.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit_containers_800.png&quot; alt=&quot;Containers&quot; title=&quot;cockpit containers&quot; /&gt;&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;To see the k8s cluster the package &lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-kubernetes&lt;/code&gt; has to be installed and a new tab appears in the left menu. The new options allow you to:&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;Overview&lt;/strong&gt;: filtering by project, it shows Pods, volumes, Nodes, services and resources used.&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_cluster_overview_800.png&quot; alt=&quot;Cluster overview&quot; title=&quot;cockpit cluster overview&quot; /&gt;&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;Nodes&lt;/strong&gt;: nodes and the resources used are being shown here.&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Containers&lt;/strong&gt;: a full list of containers and some metadata about them is displayed in this option.&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Topology&lt;/strong&gt;: A graph with the pods, services and nodes is shown in this option.&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_topology_800.png&quot; alt=&quot;Cluster topology&quot; title=&quot;cockpit cluster topology&quot; /&gt;&lt;/p&gt;
+
+    &lt;ul&gt;
+      &lt;li&gt;&lt;strong&gt;Details&lt;/strong&gt;: allows to filter by project and type of resource and shows some metadata in the results.&lt;/li&gt;
+      &lt;li&gt;&lt;strong&gt;Volumes&lt;/strong&gt;: allows to filter by project and shows the volumes with the type and the status.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;In CentOS 7 there are also the following packages:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-machines.x86_64&lt;/code&gt; : Cockpit user interface for virtual machines. If “virt-install” is installed, you can also create new virtual machines. 
+It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-machines-ovirt.noarch&lt;/code&gt; : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;At the moment none of the cockpit complements has support for KubeVirt Virtual Machine.&lt;/p&gt;
+
+&lt;p&gt;KubeVirt support for cockpit was &lt;a href=&quot;https://bugzilla.redhat.com/show_bug.cgi?id=1629608&quot;&gt;removed from fedora 29&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;novnc&quot;&gt;noVNC&lt;/h2&gt;
+
+&lt;p&gt;noVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas.
+It just allows you to connect through VNC to the virtual Machine already deployed in KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;No VM management or even a dashboard is enabled with this option, it’s a pure DIY code that can embed the VNC access to the VM into HTML in any application or webpage.
+There is a &lt;a href=&quot;/2019/Access-Virtual-Machines-graphic-console-using-noVNC.html&quot;&gt;noVNC blogpost&lt;/a&gt; detailing how to install noVNC.&lt;/p&gt;
+
+&lt;p&gt;In this animation you can see the feature of connecting to the Virtual Machine with noVNC:
+&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/virtvnc.gif&quot; alt=&quot;noVNC&quot; title=&quot;noVNC&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a poweful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.&lt;/p&gt;
+
+&lt;p&gt;OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.&lt;/p&gt;
+
+&lt;p&gt;On the other hand, noVNC provides a lightweight interface to simply connect to the console of your virtual machine.&lt;/p&gt;
+
+&lt;p&gt;Octant, although it does not have any specific integration with KubeVirt, looks like a promising Kubernetes user interface that could be extended to manage our KubeVirt instances in the future.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Note: We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References:&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://octant.dev&quot;&gt;Octant&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.okd.io/&quot;&gt;OKD&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/origin-web-console&quot;&gt;OKD Console&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/wavezhang/virtVNC/&quot;&gt;virtVNC, noVNC for Kubevirt&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande, Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. Wikipedia:User Interface</summary></entry><entry><title type="html">KubeVirt Laboratory 2, experimenting with CDI</title><link href="https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 2, experimenting with CDI" /><published>2019-12-10T00:00:00+00:00</published><updated>2019-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;KubeVirt Laboratory 2: Experiment with CDI&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
+
+&lt;p&gt;In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt installation notes&lt;/a&gt; or try it yourself in the &lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt&lt;/a&gt; Katacoda scenario.
+Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
+
+&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/ZHqcHbCxzYM&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
+
+&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Configure the storage for the Virtual Machine&lt;/li&gt;
+  &lt;li&gt;Install the CDI Operator and the CR for the importer&lt;/li&gt;
+  &lt;li&gt;Create and customize the Fedora Virtual Machine from the cloud image&lt;/li&gt;
+  &lt;li&gt;Connect to the console of the Virtual Machine&lt;/li&gt;
+  &lt;li&gt;Connect to the Virtual Machine using SSH&lt;/li&gt;
+  &lt;li&gt;Redirect a host port to the Virtual Machine to enable external SSH connectivity&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;Kubevirt Laboratory 2: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 2: Experiment with CDI</summary></entry><entry><title type="html">KubeVirt Laboratory 1, use KubeVirt</title><link href="https://kubevirt.io//2019/KubeVirt_lab1_use_kubevirt.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 1, use KubeVirt" /><published>2019-12-04T00:00:00+00:00</published><updated>2019-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_lab1_use_kubevirt</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_lab1_use_kubevirt.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;KubeVirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
+
+&lt;p&gt;In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt installation notes&lt;/a&gt; or try it yourself in the &lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt&lt;/a&gt; Katacoda scenario.
+Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
+
+&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/eQZPCeOs9-c&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
+
+&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Creating a Virtual Machine from a YAML and a &lt;code class=&quot;highlighter-rouge&quot;&gt;containerdisk&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Starting the Virtual Machine&lt;/li&gt;
+  &lt;li&gt;Connecting to the Virtual Machine using the console&lt;/li&gt;
+  &lt;li&gt;Stopping and removing the Virtual Machine&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt instructions&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 1: Use KubeVirt</summary></entry><entry><title type="html">KubeVirt v0.24.0</title><link href="https://kubevirt.io//2019/changelog-v0.24.0.html" rel="alternate" type="text/html" title="KubeVirt v0.24.0" /><published>2019-12-03T00:00:00+00:00</published><updated>2019-12-03T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.24.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.24.0.html">&lt;h2 id=&quot;v0240&quot;&gt;v0.24.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Tue Dec 3 15:34:34 2019 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.15&lt;/li&gt;
+  &lt;li&gt;CI: Support for Kubernetes 1.16&lt;/li&gt;
+  &lt;li&gt;Add and fix a couple of test cases&lt;/li&gt;
+  &lt;li&gt;Support for pause and unpausing VMs&lt;/li&gt;
+  &lt;li&gt;Update of libvirt to 5.6.0&lt;/li&gt;
+  &lt;li&gt;Fix bug related to parallel scraping of Prometheus endpoints&lt;/li&gt;
+  &lt;li&gt;Fix to reliably test VNC&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.24.0</summary></entry><entry><title type="html">KubeVirt basic operations video</title><link href="https://kubevirt.io//2019/KubeVirt_basic_operations_video.html" rel="alternate" type="text/html" title="KubeVirt basic operations video" /><published>2019-11-28T00:00:00+00:00</published><updated>2019-11-28T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_basic_operations_video</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_basic_operations_video.html">&lt;p&gt;In this video, we are showing how KubeVirt can be used from a beginner point of view.&lt;/p&gt;
+
+&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
+
+&lt;p&gt;In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt installation notes&lt;/a&gt; or try it yourself in the &lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt&lt;/a&gt; Katacoda scenario.
+Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
+
+&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/KC03G60shIc&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
+
+&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Creating a Virtual Machine from a YAML and a cloud image&lt;/li&gt;
+  &lt;li&gt;Starting the Virtual Machine&lt;/li&gt;
+  &lt;li&gt;Connecting through the console and SSH to the Virtual Machine&lt;/li&gt;
+  &lt;li&gt;Connecting to the Virtual Machine through VNC&lt;/li&gt;
+  &lt;li&gt;Stopping and removing the Virtual Machine&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing how KubeVirt can be used from a beginner point of view.</summary></entry><entry><title type="html">Jenkins Infra upgrade</title><link href="https://kubevirt.io//2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt.html" rel="alternate" type="text/html" title="Jenkins Infra upgrade" /><published>2019-11-22T00:00:00+00:00</published><updated>2019-11-22T00:00:00+00:00</updated><id>https://kubevirt.io//2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt</id><content type="html" xml:base="https://kubevirt.io//2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;In the article &lt;a href=&quot;/2019/jenkins-jobs-for-kubevirt-lab-validation.html&quot;&gt;Jenkins Jobs for KubeVirt Lab Validation&lt;/a&gt;, we covered how Jenkins did get the information about the labs and jobs to perform from the KubeVirt repositories.&lt;/p&gt;
+
+&lt;p&gt;In this article, we’ll cover the configuration changes in both Jenkins and the JenkinsFiles required to get our CI setup updated to latest versions and syntax  .&lt;/p&gt;
+
+&lt;h2 id=&quot;jenkins&quot;&gt;Jenkins&lt;/h2&gt;
+
+&lt;p&gt;Our Jenkins instance, is running on top of &lt;a href=&quot;https://console.apps.ci.centos.org:8443/console/&quot;&gt;CentOS OpenShift&lt;/a&gt; and is one of the OS-enhanced Jenkins instances, that provide persistent storage and other pieces bundled, required for non-testing setups.&lt;/p&gt;
+
+&lt;p&gt;What we found is that Jenkins was already complaining because of pending updates (security, engine, etc), but the &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins.war&lt;/code&gt; was embedded in the container image we were using.&lt;/p&gt;
+
+&lt;p&gt;Initial attempts tried to use environment variables to override the WAR to use, but our image was not prepared for it, so we were given the option to just generate a new container for it, but this seemed a bad approach as our image, also contained custom libraries (&lt;code class=&quot;highlighter-rouge&quot;&gt;contra-lib&lt;/code&gt;) that enables communicating with OpenShift to run the tests inside containers there.&lt;/p&gt;
+
+&lt;p&gt;During the investigation and testing, we found that the persistent storage folder we were using (&lt;code class=&quot;highlighter-rouge&quot;&gt;/var/lib/jenkins&lt;/code&gt;) contained a &lt;code class=&quot;highlighter-rouge&quot;&gt;war&lt;/code&gt; folder which contained the unarchived &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins.war&lt;/code&gt;, so the next attempt was to manually download the latest &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins.war&lt;/code&gt;, and unzip it on that folder, which finally allowed us to upgrade Jenkins core.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-plugins&quot;&gt;The plugins&lt;/h2&gt;
+
+&lt;p&gt;After upgrading the Jenkins core, we could use the internal plugin manager to upgrade all the remaining plugins, however, that meant a big change in the plugins, configurations, etc.&lt;/p&gt;
+
+&lt;p&gt;After initially being able to run the lab validations for a while, on next morning we wanted to release a new image (from Cloud-Image-Builder) and it failed to build because of the external libraries, and also affected the lab validations again, so we got back to square one for the upgrade process, leaving us with the decision to go forward with the full upgrade: the latest stable jenkins and available plugins and reconfigure what was changed to suit the upgraded requirements.&lt;/p&gt;
+
+&lt;p&gt;Here we’ll show you the configuration settings for each one of the new/updated plugins.&lt;/p&gt;
+
+&lt;h3 id=&quot;openshift-plugin&quot;&gt;OpenShift Plugin&lt;/h3&gt;
+
+&lt;p&gt;Updated to configure the instance of CentOS OpenShift with the system account for accessing it:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-44-56.png&quot; alt=&quot;Jenkins OpenShift Client configuration&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;openshift-jenkins-sync&quot;&gt;OpenShift Jenkins Sync&lt;/h3&gt;
+
+&lt;p&gt;Updated and configured to use the console as well with &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt&lt;/code&gt; namespace:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-46-47.png&quot; alt=&quot;Jenkins OpenShift sync configuration&quot; /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;global-pipeline-libraries&quot;&gt;Global Pipeline Libraries&lt;/h3&gt;
+
+&lt;p&gt;Here we added the libraries we used, but instead of a specific commit, targetting the &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; branch.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;contra-lib: &lt;a href=&quot;https://github.com/openshift/contra-lib.git&quot;&gt;https://github.com/openshift/contra-lib.git&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;cico-pipeline-library: &lt;a href=&quot;https://github.com/CentOS/cico-pipeline-library.git&quot;&gt;https://github.com/CentOS/cico-pipeline-library.git&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;contra-library: &lt;a href=&quot;https://github.com/CentOS-PaaS-SIG/contra-env-sample-project&quot;&gt;https://github.com/CentOS-PaaS-SIG/contra-env-sample-project&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;For all of them, we ticked:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Load Implicitly&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Allow default version to be overriden&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Include @Library changes in job recent changes&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Jenkins replied with the ‘currently maps to revision: &lt;code class=&quot;highlighter-rouge&quot;&gt;hash&lt;/code&gt;’ for each one of them, after having loaded them properly, indicating that it was successful.&lt;/p&gt;
+
+&lt;h3 id=&quot;slack-plugin&quot;&gt;Slack plugin&lt;/h3&gt;
+
+&lt;p&gt;In addition to regular plugins used for builds, we incorporated the slack plugin to validate the notifications of build status to a test slack channel. Configuration is really easy, from within Slack, when added the jenkins notifications plugin, a &lt;code class=&quot;highlighter-rouge&quot;&gt;token&lt;/code&gt; is provided that must be configured in Jenkins as well as a default &lt;code class=&quot;highlighter-rouge&quot;&gt;room&lt;/code&gt; to send notifications to.&lt;/p&gt;
+
+&lt;p&gt;This allows us to get notified when a new build is started and the resulting status, just in case something was generated with errors or something external changed (remember that we use latest KubeVirt release, latest tools for virtctl, kubectl and a new image is generated out of them to validate the labs).&lt;/p&gt;
+
+&lt;h3 id=&quot;kubernetes-cloud&quot;&gt;Kubernetes ‘Cloud’&lt;/h3&gt;
+
+&lt;p&gt;In addition, Kubernets &lt;code class=&quot;highlighter-rouge&quot;&gt;Cloud&lt;/code&gt; was configured pointing to the same console access and using the &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt&lt;/code&gt; namespace:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-51-19.png&quot; alt=&quot;OpenShift Cloud definition and URL and tunnel settings&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The libraries we added, automatically add some pod templates for &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins-contra-slave&lt;/code&gt;:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-54-24.png&quot; alt=&quot;Jenkins-contra-slave container configuration&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;other-changes&quot;&gt;Other changes&lt;/h2&gt;
+
+&lt;p&gt;Our environment also used other helper tools as regular OpenShift builds (contra):&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-55-41.png&quot; alt=&quot;OpenShift Build repositories and status&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;We had to update the repositories from using some older forks (no longer valid and outdated) to use the latest versions, and for the ansible-executor we also created a fork to use the newest libraries for accessing Google Cloud environment and tuning some other variables (&lt;a href=&quot;https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59&quot;&gt;https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59&lt;/a&gt;) (changes have now landed the upstream repo).&lt;/p&gt;
+
+&lt;p&gt;The issue that we were facing was related with the failure to write temporary files to the &lt;code class=&quot;highlighter-rouge&quot;&gt;$HOME&lt;/code&gt; folder for the user so ansible configuration was forced to use one in a temporary and writable folder.&lt;/p&gt;
+
+&lt;p&gt;Additionally, Google Cloud access required updating libraries for authentication that were failing as well, that is fixed via the Dockerfile that generated &lt;code class=&quot;highlighter-rouge&quot;&gt;ansible-executor&lt;/code&gt; container image.&lt;/p&gt;
+
+&lt;h2 id=&quot;job-changes&quot;&gt;Job Changes&lt;/h2&gt;
+
+&lt;p&gt;Our Jenkins Jobs were defined (as documented in prior article) inside each repository that made that part easy on one side, but also required some tuning and changes:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;We have disabled minikube validation as it was failing for both AWS and GCP unless using baremetal (so we’re wondering about using another approach here)&lt;/li&gt;
+  &lt;li&gt;We’ve added code to do the actual ‘Slack’ notification we mentioned above&lt;/li&gt;
+  &lt;li&gt;Extend the try/catch block to include a ‘finally’ to send the notifications&lt;/li&gt;
+  &lt;li&gt;Change the syntax for ‘artifacts’ as it was previously &lt;code class=&quot;highlighter-rouge&quot;&gt;ArchiveArtifacts&lt;/code&gt; and now it’s a &lt;code class=&quot;highlighter-rouge&quot;&gt;postBuild&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;the-outcome&quot;&gt;The outcome&lt;/h2&gt;
+
+&lt;p&gt;After several attempts for fine-tuning the configuration, the builds started succeeding:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-11-02-34.png&quot; alt=&quot;Sunny build status&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Of course, one of the advantages is that builds happen automatically every day or on code changes on the repositories.&lt;/p&gt;
+
+&lt;p&gt;There’s still room for improvement identified that will happen in next iterations:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Find not needed running instances on Cloud providers for reducing the bills&lt;/li&gt;
+  &lt;li&gt;Trigger builds when new releases of KubeVirt happen (out of kubevirt/kubevirt repo)&lt;/li&gt;
+  &lt;li&gt;Unify testing on &lt;a href=&quot;/2019/prow-jobs-for-kubevirt.html&quot;&gt;Prow instance&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;Of course, the builds can be failing for external reasons (like VM in cloud provider taking longer to start up and have SSH available, or the nested VM inside after importing, etc), but still a great help for checking if things are working as they should and of course, to get the validations improved for reduce the number of false positives.&lt;/p&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><summary type="html">Introduction</summary></entry><entry><title type="html">KubeVirt at KubeCon + CloudNativeCon North America</title><link href="https://kubevirt.io//2019/kubecon-na-2019.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon + CloudNativeCon North America" /><published>2019-11-12T00:00:00+00:00</published><updated>2019-11-12T00:00:00+00:00</updated><id>https://kubevirt.io//2019/kubecon-na-2019</id><content type="html" xml:base="https://kubevirt.io//2019/kubecon-na-2019.html">&lt;p&gt;The &lt;a href=&quot;https://events.linuxfoundation.org/events/kubecon-cloudnativecon-north-america-2019/&quot;&gt;KubeCon + CloudNativeCon North America 2019&lt;/a&gt;
+conference is next week in San Diego, California.&lt;/p&gt;
+
+&lt;p&gt;KubeVirt will have a presence at the event and this post highlights some
+activities that will have a KubeVirt focus there.&lt;/p&gt;
+
+&lt;h3 id=&quot;sessions&quot;&gt;Sessions&lt;/h3&gt;
+
+&lt;p&gt;There are two sessions covering KubeVirt specifically:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;On Tuesday at 2:25 PM Chandrakanth Jakkidi and Steve Gordon will present an
+&lt;a href=&quot;https://sched.co/VyBC&quot;&gt;introduction to KubeVirt&lt;/a&gt; that will cover the
+background of the project, its motivation and use cases, and an architectural
+overview and demo.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;On Wednesday at 10:55 AM David Vossel and Vishesh Tanksale will take a deep-dive
+on &lt;a href=&quot;https://sched.co/VnjX&quot;&gt;virtualized GPU workloads on KubeVirt&lt;/a&gt; where they
+will show KubeVirt’s capabilities around host device passthrough using NVIDIA
+GPU workloads as a case study.&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;users-and-contributors-gathering&quot;&gt;Users and Contributors gathering&lt;/h3&gt;
+
+&lt;p&gt;KubeVirt users and contributors will get together to talk about KubeVirt,
+brainstorm ideas to help us shape the project’s next steps, and generally get
+some face to face time.&lt;/p&gt;
+
+&lt;p&gt;If you are already using or contributing to KubeVirt, you are considering to try
+it, or just want to present your use case and discuss KubeVirt’s fit or needs
+we’d be very glad to meet you there.&lt;/p&gt;
+
+&lt;p&gt;Red Hat is sponsoring a venue for the meetup right next to the conference’s
+venue. Space is limited, so we are asking people to &lt;a href=&quot;https://kubevirt-kubecon19na.eventbrite.com&quot;&gt;register in
+advance&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;demos&quot;&gt;Demos&lt;/h3&gt;
+
+&lt;p&gt;KubeVirt will also be featured in a couple of demos at the Red Hat booth in
+the exposition hall. You can find the demo schedule at their &lt;a href=&quot;https://www.redhat.com/en/events/red-hat-kubecon-cloudnativecon-north-america-2019&quot;&gt;event landing page&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h3 id=&quot;keeping-in-touch&quot;&gt;Keeping in touch&lt;/h3&gt;
+
+&lt;p&gt;Follow &lt;a href=&quot;https://twitter.com/kubevirt&quot;&gt;@kubevirt&lt;/a&gt; on Twitter for updates.&lt;/p&gt;
+
+&lt;p&gt;We look forward to seeing you at KubeCon + CloudNativeCon!&lt;/p&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><summary type="html">The KubeCon + CloudNativeCon North America 2019 conference is next week in San Diego, California.</summary></entry></feed>

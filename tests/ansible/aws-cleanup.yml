@@ -2,10 +2,10 @@
 - hosts: localhost
   gather_facts: False
   vars:
-    launched_instances: "{{ lookup('file','/tmp/launched_instances') | from_json }}"
+    launched_instances: ""
   tasks:
   - name: Shut Down Instances Recorded Into /tmp/launched_instances by aws-provision.yml
     ec2:
-      instance_ids: "{{ launched_instances }}"
+      instance_ids: ""
       region: "us-west-1"
       state: absent

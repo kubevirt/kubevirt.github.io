@@ -1,0 +1,487 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2019/NodeDrain-KubeVirt.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Node Drain in KubeVirt | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="DirectedSoul" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Evicting VM's using Node Drain Functionality">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="Node Drain in KubeVirt | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2019/NodeDrain-KubeVirt.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Evicting VM's using Node Drain Functionality" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="DirectedSoul" >
+    <meta property="og:article:published_time" content="2019-07-30 00:00:00 +0000" >
+    <meta name="twitter:title" content="Node Drain in KubeVirt | KubeVirt.io">
+    <meta name="twitter:description" content="Evicting VM's using Node Drain Functionality">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Node Drain in KubeVirt</h1>
+          <div class="post-info">
+            <span class="post-author">Author: DirectedSoul</span>
+            <div>
+              <span class="post-meta">Publication Date: July 30, 2019  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="introduction">Introduction</h2>
+
+<p>In a Kubernetes (k8s) cluster, the control plane(scheduler) is responsible for deploying workloads(pods, deployments, replicasets) on the worker nodes depending on the resource availability. What do we do with the workloads if the need arises for maintaining this node? Well, there is good news, <code class="highlighter-rouge">node-drain</code> feature and node maintenance operator(NMO) both come to our rescue in this situation.</p>
+
+<p>This post discusses evicting the <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/intro.html">VMI</a>(virtual machine images) and other resources from the node using node drain feature and NMO.</p>
+
+<p><strong>Note:</strong></p>
+
+<ul>
+  <li>
+    <p>The environment used for writing this post is based on <a href="https://cloud.redhat.com/openshift/install/aws/installer-provisioned">OpenShift 4</a> with 3 Masters and 3 Worker nodes.</p>
+  </li>
+  <li>
+    <p><a href="/2019/Hyper-Converged-Operator.html">HyperconvergedClusterOperator</a>: The goal of the hyper-converged-cluster-operator (HCO) is to provide a single entry point for multiple operators (kubevirt, cdi, networking, etc) where users can deploy and configure them in a single object. This operator is sometimes referred to as a “meta operator” or an “operator for operators”. Most importantly, this operator doesn’t replace or interfere with OLM which is an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way. Check for <a href="https://coreos.com/blog/introducing-operator-framework">more information about OLM</a>. It only creates operator CRs, which is the user’s prerogative.</p>
+  </li>
+</ul>
+
+<p>In our cluster (3 master and 3 nodes) we’ll be able to see something similar to:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$oc</span> get nodes
+ip-10-0-132-147.us-east-2.compute.internal   Ready  worker   14m   v1.13.4+27816e1b1
+ip-10-0-142-95.us-east-2.compute.internal    Ready  master   15m   v1.13.4+27816e1b1
+ip-10-0-144-125.us-east-2.compute.internal   Ready  worker   14m   v1.13.4+27816e1b1
+ip-10-0-150-125.us-east-2.compute.internal   Ready  master   14m   v1.13.4+27816e1b1
+ip-10-0-161-166.us-east-2.compute.internal   Ready  master   15m   v1.13.4+27816e1b1
+ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816e1b1
+</code></pre></div></div>
+
+<p>To test the node eviction, there are two methods.</p>
+
+<h2 id="method-1-use-kubectl-node-drain-command">Method 1: Use kubectl node drain command</h2>
+
+<p>Before sending a node into maintenance state it is very much necessary to evict the resources on it, VMI’s, pods, deployments etc. One of the easiest option for us is to stick to the oc adm drain command. For this, select the node from the cluster from which you want the VMIs to be evicted</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc get nodes
+</code></pre></div></div>
+
+<p>Here <code class="highlighter-rouge">ip-10-0-173-203.us-east-2.compute.internal</code>, then issue the following command.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc adm drain &lt;node-name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span> <span class="nt">--pod-selector</span><span class="o">=</span>kubevirt.io<span class="o">=</span>virt-launcher
+</code></pre></div></div>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">--delete-local-data</code> is used to remove any VMI’s that use <code class="highlighter-rouge">emptyDir</code> volumes, however the data in those volumes are ephemeral which means it is safe to delete after termination.</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">--ignore-daemonsets=true</code> is a must needed flag because when VMI is deployed a daemon set named <code class="highlighter-rouge">virt-handler</code> will be running on each node. DaemonSets are not allowed to be evicted using kubectl drain. By default, if this command encounters a DaemonSet on the target node, the command will fail. This flag tells the command it is safe to proceed with the eviction and to just ignore DaemonSets.</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">--pod-selector=kubevirt.io=virt-launcher</code> flag tells the command to evict the pods that are managed by kubevirt</p>
+  </li>
+</ul>
+
+<h3 id="evict-a-node">Evict a node</h3>
+
+<p>If you want to evict all pods from the node just use:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc adm drain &lt;node name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span>
+</code></pre></div></div>
+
+<h3 id="how-to-evacuate-vmis-via-live-migration-from-a-node">How to evacuate VMIs via Live Migration from a Node</h3>
+
+<p>If the <code class="highlighter-rouge">LiveMigration</code> feature gate is enabled, it is possible to specify an evictionStrategy on VMIs which will react with live-migrations on specific taints on nodes. The following snippet on a VMI ensures that the VMI is migrated if the <code class="highlighter-rouge">kubevirt.io/drain:NoSchedule</code> taint is added to a node:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
+  <span class="na">evictionStrategy</span><span class="pi">:</span> <span class="s">LiveMigrate</span>
+</code></pre></div></div>
+
+<p>Once the VMI is created, taint the node with</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl taint nodes foo kubevirt.io/drain<span class="o">=</span>draining:NoSchedule
+</code></pre></div></div>
+
+<p>This command will then trigger a migration.</p>
+
+<p>Behind the scenes a <strong>PodDisruptionBudget</strong> is created for each VMI which has an evictionStrategy defined. This ensures that evictions are be blocked on these VMIs and that we can guarantee that a VMI will be migrated instead of shut off.</p>
+
+<h3 id="re-enabling-a-node-after-eviction">Re-enabling a Node after Eviction</h3>
+
+<p>We have seen how to make the node unschedulable, now lets see how to re-enable the node.</p>
+
+<p>The <code class="highlighter-rouge">oc adm drain</code> will result in the target node being marked as unschedulable. This means the node will not be eligible for running new VirtualMachineInstances or Pods.</p>
+
+<p>If target node should become schedulable again, the following command must be run:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc adm uncordon &lt;node name&gt;
+</code></pre></div></div>
+
+<h2 id="method-2-use-node-maintenance-operator-nmo">Method 2: Use Node Maintenance Operator (NMO)</h2>
+
+<p>NMO is part of HyperConvergedClusterOperator, so we need to deploy it.</p>
+
+<p>Either check:</p>
+
+<ul>
+  <li>the <a href="https://gist.github.com/rthallisey/ed3417bc7f14f264030d26fee4032092">gist for deploying HCO</a></li>
+  <li>the <a href="/2019/Hyper-Converged-Operator.html">blog post on HCO</a></li>
+</ul>
+
+<p>Here will continue using the gist for demonstration purposes.</p>
+
+<p>Observe the resources that get created after the HCO is installed</p>
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$oc get pods -n kubevirt-hyperconverged
+NAME                                               READY   STATUS    RESTARTS   AGE
+cdi-apiserver-769fcc7bdf-xgpt8                     1/1     Running   0          12m
+cdi-deployment-8b64c5585-gq46b                     1/1     Running   0          12m
+cdi-operator-77b8847b96-kx8rx                      1/1     Running   0          13m
+cdi-uploadproxy-8dcdcbff-47lng                     1/1     Running   0          12m
+cluster-network-addons-operator-584dff99b8-2c96w   1/1     Running   0          13m
+hco-operator-59b559bd44-vpznq                      1/1     Running   0          13m
+kubevirt-ssp-operator-67b78446f7-b9klr             1/1     Running   0          13m
+kubevirt-web-ui-operator-9df6b67d9-f5l4l           1/1     Running   0          13m
+node-maintenance-operator-6b464dc85-zd6nt          1/1     Running   0          13m
+virt-api-7655b9696f-g48p8                          1/1     Running   1          12m
+virt-api-7655b9696f-zfsw9                          1/1     Running   0          12m
+virt-controller-7c4584f4bc-6lmxq                   1/1     Running   0          11m
+virt-controller-7c4584f4bc-6m62t                   1/1     Running   0          11m
+virt-handler-cfm5d                                 1/1     Running   0          11m
+virt-handler-ff6c8                                 1/1     Running   0          11m
+virt-handler-mcl7r                                 1/1     Running   1          11m
+virt-operator-87d7c98b-fvvzt                       1/1     Running   0          13m
+virt-operator-87d7c98b-xzc42                       1/1     Running   0          13m
+virt-template-validator-76cbbd6f68-5fbzx           1/1     Running   0          12m
+</code></pre></div></div>
+
+<p>As seen from above HCO deploys the <code class="highlighter-rouge">node-maintenance-operator</code>.</p>
+
+<p>Next, let’s install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps <a href="/quickstart_minikube/#deploy-kubevirt">here</a> and deploy a VMI as explained. Please feel free to check the video that explains the <a href="https://www.youtube.com/watch?v=LLNjyeB-3fI">same</a></p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$oc</span> get vms
+NAME     AGE     RUNNING   VOLUME
+testvm   2m13s   <span class="nb">true</span>
+</code></pre></div></div>
+
+<p>Deploy a node-maintenance-operator CR: As seen from above NMO is deployed from HCO, the purpose of this operator is to watch the node maintenance CustomResource(CR) called <code class="highlighter-rouge">NodeMaintenance</code> which mainly contains the node that needs a maintenance and the reason for it. The below actions are performed</p>
+
+<ul>
+  <li>If a <code class="highlighter-rouge">NodeMaintenance</code> CR is created: Marks the node as <code class="highlighter-rouge">unschedulable</code>, cordons it and evicts all the pods from that node</li>
+  <li>If a <code class="highlighter-rouge">NodeMaintenance</code> CR is deleted: Marks the node as <code class="highlighter-rouge">schedulable</code>, uncordons it, removes pod from maintenance.</li>
+</ul>
+
+<p>To install the NMO, please follow upsream instructions at <a href="https://github.com/kubevirt/node-maintenance-operator">NMO</a></p>
+
+<p>Either use HCO to create NMO Operator or deploy NMO operator as shown below</p>
+
+<p>After you follow the instructions:</p>
+
+<ol>
+  <li>Create a CRD
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> oc create <span class="nt">-f</span> deploy/crds/nodemaintenance_crd.yaml
+ customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
+</code></pre></div>    </div>
+  </li>
+  <li>Create the NS
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> oc create <span class="nt">-f</span> deploy/namespace.yaml
+ namespace/node-maintenance-operator created
+</code></pre></div>    </div>
+  </li>
+  <li>Create a Service Account:
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> oc create <span class="nt">-f</span> deploy/service_account.yaml
+ serviceaccount/node-maintenance-operator created
+</code></pre></div>    </div>
+  </li>
+  <li>Create a ROLE
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> oc create <span class="nt">-f</span> deploy/role.yaml
+ clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
+</code></pre></div>    </div>
+  </li>
+  <li>Create a ROLE Binding
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> oc create <span class="nt">-f</span> deploy/role_binding.yaml
+ clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
+</code></pre></div>    </div>
+  </li>
+  <li>Then finally make sure to add the image version of the NMO operator in the deploy/operator.yml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
+</code></pre></div>    </div>
+  </li>
+  <li>and then deploy the NMO Operator as shown
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> oc create <span class="nt">-f</span> deploy/operator.yaml
+ deployment.apps/node-maintenance-operator created
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<p>Finally, We can verify the deployment for the NMO Operator as below</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc get deployment <span class="nt">-n</span> node-maintenance-operator
+NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
+node-maintenance-operator   1/1     1            1           4m23s
+</code></pre></div></div>
+
+<p>Now that the NMO operator is created, we can create the NMO CR which puts the node into maintenance mode (this CR has the info about the node-&gt;from which the pods needs to be evicted and the reason for the maintenance)</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat deploy/crds/nodemaintenance_cr.yaml</span>
+
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NodeMaintenance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">nodemaintenance-xyz</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">nodeName</span><span class="pi">:</span> <span class="s">&lt;Node-Name&gt;</span>
+  <span class="na">reason</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Test</span><span class="nv"> </span><span class="s">node</span><span class="nv"> </span><span class="s">maintenance"</span>
+</code></pre></div></div>
+
+<p>For testing purpose, we can deploy a sample VM instance as shown:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+</code></pre></div></div>
+
+<p>Now start the VM <code class="highlighter-rouge">testvm</code></p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl start testvm
+</code></pre></div></div>
+
+<p>We can see that it’s up and running</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmis
+NAME     AGE   PHASE     IP            NODENAME
+testvm   92s   Running   10.131.0.17   ip-10-0-173-203.us-east-2.compute.internal
+</code></pre></div></div>
+
+<p>Also we can see the status:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">kubectl get vmis -o yaml testvm</span>
+<span class="s">.</span>
+<span class="s">.</span>
+<span class="s">.</span>
+  <span class="s">interfaces</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">ipAddress</span><span class="pi">:</span> <span class="s">10.131.0.17</span>
+    <span class="na">mac</span><span class="pi">:</span> <span class="s">0a:58:0a:83:00:11</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+  <span class="na">migrationMethod</span><span class="pi">:</span> <span class="s">BlockMigration</span>
+  <span class="na">nodeName</span><span class="pi">:</span> <span class="s">ip-10-0-173-203.us-east-2.compute.internal</span>    <span class="c1">#NoteDown the nodeName</span>
+  <span class="na">phase</span><span class="pi">:</span> <span class="s">Running</span>
+</code></pre></div></div>
+
+<p>Note down the node name and edit the <code class="highlighter-rouge">nodemaintenance_cr.yaml</code> file and then issue the CR manifest which sends the node into maintenance.</p>
+
+<p>Now to evict the pods from the node <code class="highlighter-rouge">ip-10-0-173-203.us-east-2.compute.internal</code>, edit the <code class="highlighter-rouge">node-maintenance_cr.yaml</code> as shown:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat deploy/crds/nodemaintenance_cr.yaml</span>
+
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NodeMaintenance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">nodemaintenance-xyz</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">nodeName</span><span class="pi">:</span> <span class="s">ip-10-0-173-203.us-east-2.compute.internal</span>
+  <span class="na">reason</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Test</span><span class="nv"> </span><span class="s">node</span><span class="nv"> </span><span class="s">maintenance"</span>
+</code></pre></div></div>
+
+<p>As soon as you apply the above CR, the current VM gets deployed in the other node,</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc apply <span class="nt">-f</span> deploy/crds/nodemaintenance_cr.yaml
+nodemaintenance.kubevirt.io/nodemaintenance-xyz created
+</code></pre></div></div>
+
+<p>Which immediately evicts the VMI</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmis
+NAME     AGE   PHASE        IP    NODENAME
+testvm   33s   Scheduling
+
+kubectl get vmis
+NAME     AGE    PHASE     IP            NODENAME
+testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.internal
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip-10-0-173-203.us-east-2.compute.internal   Ready,SchedulingDisabled   worker
+</code></pre></div></div>
+
+<p>When all of this happens, we can view the changes that are taking place with:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc logs pods/node-maintenance-operator-645f757d5-89d6r <span class="nt">-n</span> node-maintenance-operator
+<span class="nb">.</span>
+<span class="nb">.</span>
+<span class="nb">.</span>
+<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.650298,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Applying Maintenance mode on Node: ip-10-0-173-203.us-east-2.compute.internal with Reason: Test node maintenance"</span>,<span class="s2">"Request.Namespace"</span>:<span class="s2">""</span>,<span class="s2">"Request.Name"</span>:<span class="s2">"nodemaintenance-xyz"</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.7509086,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Taints: [{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">node.kubernetes.io/unschedulable</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">effect</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">NoSchedule</span><span class="se">\"</span><span class="s2">},{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">kubevirt.io/drain</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">effect</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">NoSchedule</span><span class="se">\"</span><span class="s2">}] will be added to node ip-10-0-173-203.us-east-2.compute.internal"</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.7509348,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Applying kubevirt.io/drain taint add on Node: ip-10-0-173-203.us-east-2.compute.internal"</span><span class="o">}</span>
+<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.7509415,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Patchi{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9903986,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>virt-controller-b94d69456-b9dkw<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.99049,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>community-operators-5cb68db58-4m66j<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9905066,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>alertmanager-main-1<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9905581,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>virt-launcher-testvm-q5t7l<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9905746,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>redhat-operators-6b6f6bd788-zx8nm<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.990588,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>image-registry-586d547bb5-t9lwr<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9906075,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>kube-state-metrics-5bbd4c45d5-sbnbg<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9906383,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>certified-operators-9f9f6fd5c-9ltn8<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9908028,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>virt-api-59d7c4b595-dkpvs<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9906204,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>router-default-6b57bcc884-frd57<span class="se">\"\n</span><span class="s2">"}
+{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9908257,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evict
+</code></pre></div></div>
+
+<p>Clearly we can see that the previous node went into <code class="highlighter-rouge">SchedulingDisabled</code> state and the VMI was evicted and placed into other node in the cluster. This demonstrates the node eviction using NMO.</p>
+
+<h2 id="virtualmachine-evictions-notes">VirtualMachine Evictions notes</h2>
+
+<p>The eviction of any VirtualMachineInstance that is owned by a VirtualMachine set to running=true will result in the VirtualMachineInstance being re-scheduled to another node.</p>
+
+<p>The VirtualMachineInstance in this case will be forced to power down and restart on another node. In the future once KubeVirt introduces live migration support, the VM will be able to seamlessly migrate to another node during eviction.</p>
+
+<h2 id="wrap-up">Wrap-up</h2>
+
+<p>The NMO achieved its aim of evicting the VMI’s successfully from the node, hence we can now safely repair/update the node and make it available for running the workloads again once the maintenance is over.</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Node Drain in KubeVirt&url=https://www.kubevirt.io/2019/NodeDrain-KubeVirt.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

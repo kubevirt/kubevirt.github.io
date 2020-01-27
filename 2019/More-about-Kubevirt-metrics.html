@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2019/More-about-Kubevirt-metrics.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>More About Kubevirt Metrics | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="fromanirh" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="A status update about KubeVirt metrics">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="More About Kubevirt Metrics | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2019/More-about-Kubevirt-metrics.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="A status update about KubeVirt metrics" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="fromanirh" >
+    <meta property="og:article:published_time" content="2019-03-14 00:00:00 +0000" >
+    <meta name="twitter:title" content="More About Kubevirt Metrics | KubeVirt.io">
+    <meta name="twitter:description" content="A status update about KubeVirt metrics">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">More About Kubevirt Metrics</h1>
+          <div class="post-info">
+            <span class="post-author">Author: fromanirh</span>
+            <div>
+              <span class="post-meta">Publication Date: March 14, 2019  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h1 id="more-about-kubevirt-and-prometheus-metrics">More about KubeVirt and Prometheus metrics</h1>
+
+<p>In this blog post, we update about the KubeVirt metrics, continuing <a href="/2019/An-overview-to-KubeVirt-metrics.html">the series started earlier this year</a>.
+Since the previous post, the <a href="https://github.com/kubevirt/kubevirt/pull/1840">initial groundwork and first set of metrics</a> was merged, and it is expected
+to be available with KubeVirt v0.15.0 and onwards.</p>
+
+<p>Make sure you followed <a href="/2019/An-overview-to-KubeVirt-metrics.html">the steps described in the previous post</a> to set up properly the monitoring stack
+in your KubeVirt-powered cluster.</p>
+
+<h2 id="new-metrics">New metrics</h2>
+
+<p>Let’s look at the initial set of metrics exposed by KubeVirt 0.15.0:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0-alpha.0.74+d7aaf3b5df4a60-dirty"}
+kubevirt_vm_memory_resident_bytes{domain="$VM_NAME"}
+kubevirt_vm_network_traffic_bytes_total{domain="$VM_NAME",interface="$IFACE_NAME0",type="rx"}
+kubevirt_vm_network_traffic_bytes_total{domain="$VM_NAME",interface="$IFACE_NAME0",type="tx"}
+kubevirt_vm_storage_iops_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="read"}
+kubevirt_vm_storage_iops_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="write"}
+kubevirt_vm_storage_times_ms_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="read"}
+kubevirt_vm_storage_times_ms_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="write"}
+kubevirt_vm_storage_traffic_bytes_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="read"}
+kubevirt_vm_storage_traffic_bytes_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="write"}
+kubevirt_vm_vcpu_seconds{domain="$VM_NAME",id="0",state="1"}
+</code></pre></div></div>
+
+<p>The metrics expose <a href="https://www.robustperception.io/exposing-the-software-version-to-prometheus">versioning information according to the recommendations</a> using the <code class="highlighter-rouge">kubevirt_info</code> metric; the other metrics should be self-explanatory.
+As we can expect, labels like <code class="highlighter-rouge">domain</code>, <code class="highlighter-rouge">drive</code> and <code class="highlighter-rouge">interface</code> depend on the specifics of the VM. <code class="highlighter-rouge">type</code>, however, is not and represents the subtype of the metric.</p>
+
+<p>Let’s now see a real life example, from this idle, diskless VM:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm-test-01</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-test-01</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm-test-01</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+        <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+<span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
+</code></pre></div></div>
+
+<p>Querying the endpoint (see below) yields something like</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0"} 1
+kubevirt_vm_memory_resident_bytes{domain="default_vm-test-01"} 4.25984e+07
+kubevirt_vm_network_traffic_bytes_total{domain="default_vm-test-01",interface="vnet0",type="rx"} 90
+kubevirt_vm_network_traffic_bytes_total{domain="default_vm-test-01",interface="vnet0",type="tx"} 0
+kubevirt_vm_vcpu_seconds{domain="default_vm-test-01",id="0",state="1"} 613
+</code></pre></div></div>
+
+<p>Example of how the <code class="highlighter-rouge">kubevirt_vm_memory_resident_bytes</code> metric looks like in the Prometheus UI</p>
+
+<p><img src="../assets/2019-03-14-More-about-KubeVirt-metrics/promui_graphs.png" alt="promui_graphs" /></p>
+
+<h2 id="accessing-the-metrics-programmatically">Accessing the metrics programmatically</h2>
+
+<p>We can access the VM metrics using the <a href="https://prometheus.io/docs/prometheus/latest/querying/api/">standard Prometheus API</a>.
+For example, let’s get the same data about the memory consumption we have seen above in the Prometheus UI.
+The following query yields all the data for the year 2019, aggregated every two hours.
+Not much data in this case, but beware of potentially large result sets.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-g</span> <span class="s1">'http://$CLUSTER_IP:9090/api/v1/query_range?query=kubevirt_vm_memory_resident_bytes&amp;start=2019-01-01T00:00:00.001Z&amp;end=2019-12-31T23:59:59.999Z&amp;step=7200s'</span> | json_pp
+</code></pre></div></div>
+
+<p>Which yields something like</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"data"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"resultType"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"matrix"</span><span class="p">,</span><span class="w">
+      </span><span class="nl">"result"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+         </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"values"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+               </span><span class="p">[</span><span class="w">
+                  </span><span class="mf">1552514400.001</span><span class="p">,</span><span class="w">
+                  </span><span class="s2">"44036096"</span><span class="w">
+               </span><span class="p">],</span><span class="w">
+               </span><span class="p">[</span><span class="w">
+                  </span><span class="mf">1552521600.001</span><span class="p">,</span><span class="w">
+                  </span><span class="s2">"42348544"</span><span class="w">
+               </span><span class="p">],</span><span class="w">
+               </span><span class="p">[</span><span class="w">
+                  </span><span class="mf">1552528800.001</span><span class="p">,</span><span class="w">
+                  </span><span class="s2">"44040192"</span><span class="w">
+               </span><span class="p">],</span><span class="w">
+               </span><span class="p">[</span><span class="w">
+                  </span><span class="mf">1552536000.001</span><span class="p">,</span><span class="w">
+                  </span><span class="s2">"42291200"</span><span class="w">
+               </span><span class="p">],</span><span class="w">
+               </span><span class="p">[</span><span class="w">
+                  </span><span class="mf">1552543200.001</span><span class="p">,</span><span class="w">
+                  </span><span class="s2">"42450944"</span><span class="w">
+               </span><span class="p">],</span><span class="w">
+               </span><span class="p">[</span><span class="w">
+                  </span><span class="mf">1552550400.001</span><span class="p">,</span><span class="w">
+                  </span><span class="s2">"43315200"</span><span class="w">
+               </span><span class="p">]</span><span class="w">
+            </span><span class="p">],</span><span class="w">
+            </span><span class="nl">"metric"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+               </span><span class="nl">"__name__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt_vm_memory_resident_bytes"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"endpoint"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"domain"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"default_vm-test-01"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"instance"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.29:8443"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"service"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+         </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="nl">"status"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<h2 id="troubleshooting-tips">Troubleshooting tips</h2>
+
+<p>We strive to make the monitoring experience seamless, streamlined and working out of the box, but the stack is still evolving fast,
+and there are many options to actually set up the monitoring stack. Here we present some troubleshooting tips for the most common issues.</p>
+
+<h3 id="prometheus-targets">prometheus targets</h3>
+
+<p>An underused feature of the Prometheus server is the <em>target configuration</em>. The Prometehus server exposes data about the targets it is
+looking for, so we can easily asses if the Prometheus server knows that it must scrape the <code class="highlighter-rouge">kubevirt</code> endpoints for metrics.
+We can see this both in the  Prometheus UI:</p>
+
+<p><img src="../assets/2019-03-14-More-about-KubeVirt-metrics/promui_targets_1.png" alt="promui_targets_1" /></p>
+
+<p>Or programmatically, with the Prometheus REST API:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-g</span> <span class="s1">'http://192.168.48.7:9090/api/v1/targets'</span> | json_pp
+</code></pre></div></div>
+
+<p>(output trimmed for brevity):</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
+   </span><span class="nl">"data"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="nl">"activeTargets"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+         </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"lastError"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"lastScrape"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-03-14T13:38:52.886262669Z"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"scrapeUrl"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"https://10.244.0.72:8443/metrics"</span><span class="p">,</span><span class="w">
+            </span><span class="nl">"labels"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+               </span><span class="nl">"service"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"instance"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72:8443"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"endpoint"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"discoveredLabels"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_phase"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Running"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoints_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_pod_template_generation"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_label_app_kubernetes_io_managed_by"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-operator"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__address__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72:8443"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_port_number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"8443"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_controller_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"DaemonSet"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_controller_revision_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"7bc9c7665b"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__scheme__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"https"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_tolerations"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"[{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">CriticalAddonsOnly</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">operator</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Exists</span><span class="se">\"</span><span class="s2">}]"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_critical_pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_prometheus_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__metrics_path__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"/metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_controller_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_node_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"c7-allinone-2.kube.lan"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_label_prometheus_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_uid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"7d65f67a-45c8-11e9-8567-5254000be9ec"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt/kubevirt/0"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_host_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.48.7"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="nl">"health"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"up"</span><span class="w">
+         </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="nl">"droppedTargets"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+         </span><span class="p">{</span><span class="w">
+            </span><span class="nl">"discoveredLabels"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c-dnvnm"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_phase"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Running"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoints_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_label_app_kubernetes_io_managed_by"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-operator"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c-dnvnm"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__address__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.59:8443"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_controller_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"ReplicaSet"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_port_number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"8443"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_tolerations"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"[{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">CriticalAddonsOnly</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">operator</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Exists</span><span class="se">\"</span><span class="s2">}]"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__scheme__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"https"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_prometheus_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_critical_pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_container_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__metrics_path__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"/metrics"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_controller_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_label_pod_template_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"649859444c"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_node_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"c7-allinone-2.kube.lan"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_host_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.48.7"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt/kubevirt/0"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_service_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_endpoint_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.59"</span><span class="p">,</span><span class="w">
+               </span><span class="nl">"__meta_kubernetes_pod_uid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"7d5c3299-45c8-11e9-8567-5254000be9ec"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+         </span><span class="p">}</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+   </span><span class="p">},</span><span class="w">
+   </span><span class="nl">"status"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div></div>
+
+<p>The Prometheus target state gives us a very useful information that shapes the next steps during the troubleshooting:</p>
+<ul>
+  <li>does the Prometheus server know it should scrape our target? If no, we should check the Prometheus configuration, which is, in our case, driven by the Prometheus operator. Otherwise:</li>
+  <li>can the Prometheus server access the endpoint? If no, we need to check the network connectivity/DNS configuration, or the endpoint itself</li>
+</ul>
+
+<h3 id="servicemonitors">servicemonitors</h3>
+
+<p><code class="highlighter-rouge">servicemonitors</code> are the objects the <code class="highlighter-rouge">prometheus-operator</code> consume to produce the right <code class="highlighter-rouge">prometheus</code> configuration that the server running in the cluster
+will consume to scrape the metrics endpoints. See the <a href="https://github.com/coreos/prometheus-operator#customresourcedefinitions">documentation</a> for all the details.
+We describe two of the most common pitfalls.</p>
+
+<h4 id="create-the-servicemonitor-in-the-right-namespace">create the servicemonitor in the right namespace</h4>
+
+<p>KubeVirt services run in the <code class="highlighter-rouge">kubevirt</code> namespace. Make sure to <a href="https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#integrating-with-the-prometheus-operator">create the servicemonitor</a> in the same namespace:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+NAME                               READY   STATUS    RESTARTS   AGE
+virt-api-649859444c-dnvnm          1/1     Running   2          19h
+virt-api-649859444c-j9d94          1/1     Running   2          19h
+virt-controller-7f49b8f77c-8kh46   1/1     Running   2          19h
+virt-controller-7f49b8f77c-qk4hq   1/1     Running   2          19h
+virt-handler-6ng6j                 1/1     Running   2          19h
+virt-operator-6c5db798d4-wr9wl     1/1     Running   6          19h
+
+kubectl get servicemonitor <span class="nt">-n</span> kubevirt
+NAME       AGE
+kubevirt   16h
+</code></pre></div></div>
+
+<p>Actually, the servicemonitor should be created in the same namespace on which the <code class="highlighter-rouge">kubevirt-prometheus-metrics</code> service is defined:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get svc <span class="nt">-n</span> kubevirt
+NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>   AGE
+kubevirt-prometheus-metrics   ClusterIP   10.109.85.101    &lt;none&gt;        443/TCP   19h
+virt-api                      ClusterIP   10.109.162.102   &lt;none&gt;        443/TCP   19h
+</code></pre></div></div>
+
+<p>See <a href="https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#custom-service-discovery">the KubeVirt documentation</a> for all the details.</p>
+
+<h4 id="configure-the-prometheus-instance-to-look-in-the-right-namespace">configure the Prometheus instance to look in the right namespace</h4>
+
+<p>The <code class="highlighter-rouge">prometheus</code> server instance(s) run by default in their own namespace; this is the recommended configuration, and running them in the same <code class="highlighter-rouge">kubevirt</code> namespace
+is not recommended anyway.
+So, make sure that the <code class="highlighter-rouge">prometheus</code> configuration we use looks in all the relevant namespaces, using something like</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">monitoring.coreos.com/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Prometheus</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">prometheus</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">prometheus</span>
+  <span class="na">serviceMonitorNamespaceSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+  <span class="na">serviceMonitorSelector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">memory</span><span class="pi">:</span> <span class="s">400Mi</span>
+</code></pre></div></div>
+
+<p>Please note the usage of the <code class="highlighter-rouge">serviceMonitorNamespaceSelector</code>.
+See <a href="https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md">here</a> and <a href="https://github.com/coreos/prometheus-operator/issues/1331">here</a>
+for more details.</p>
+
+<p>Namespaces must have the right label, <code class="highlighter-rouge">prometheus.kubevirt.io</code>, to be searched for servicemonitors. The <code class="highlighter-rouge">kubevirt</code> namespace is, of course, set correctly by default</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Namespace</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2019-03-13T19:43:25Z"</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+    <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt</span>
+  <span class="na">resourceVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">228178"</span>
+  <span class="na">selfLink</span><span class="pi">:</span> <span class="s">/api/v1/namespaces/kubevirt</span>
+  <span class="na">uid</span><span class="pi">:</span> <span class="s">44a0783f-45c8-11e9-8567-5254000be9ec</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">finalizers</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">kubernetes</span>
+<span class="na">status</span><span class="pi">:</span>
+  <span class="na">phase</span><span class="pi">:</span> <span class="s">Active</span>
+</code></pre></div></div>
+
+<p>But please make sure that any other namespace you may want to monitor has the correct <code class="highlighter-rouge">label</code>.</p>
+
+<h3 id="endpoint-state">endpoint state</h3>
+
+<p>As in KubeVirt 0.15.0, <code class="highlighter-rouge">virt-handler</code> is the component which exposes the VM metrics through its Prometheus endpoint. Let’s check it reports the data correctly.</p>
+
+<p>First, let’s get the virt-handler IP address. We look out the instance we want to check with</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+</code></pre></div></div>
+
+<p>Then we query the address:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt <span class="nv">$VIRT_HANDLER_POD</span> | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span>
+</code></pre></div></div>
+
+<p>Prometheus tooling adds lots of metrics about internal state.
+In this case we care only about kubevirt-related metrics, so we filter out everything else with something like</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
+</code></pre></div></div>
+
+<p>Putting all together:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-s</span> <span class="nt">-k</span> <span class="nt">-L</span> https://<span class="si">$(</span>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt virt-handler-6ng6j | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span><span class="si">)</span>:8443/metrics | <span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
+</code></pre></div></div>
+
+<p>Let’s see how a healthy output looks like:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info<span class="o">{</span><span class="nv">goversion</span><span class="o">=</span><span class="s2">"go1.11.4"</span>,kubeversion<span class="o">=</span><span class="s2">"v0.15.0"</span><span class="o">}</span> 1
+kubevirt_vm_memory_resident_bytes<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span><span class="o">}</span> 4.1168896e+07
+kubevirt_vm_network_traffic_bytes_total<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,interface<span class="o">=</span><span class="s2">"vnet0"</span>,type<span class="o">=</span><span class="s2">"rx"</span><span class="o">}</span> 90
+kubevirt_vm_network_traffic_bytes_total<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,interface<span class="o">=</span><span class="s2">"vnet0"</span>,type<span class="o">=</span><span class="s2">"tx"</span><span class="o">}</span> 0
+kubevirt_vm_vcpu_seconds<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,id<span class="o">=</span><span class="s2">"0"</span>,state<span class="o">=</span><span class="s2">"1"</span><span class="o">}</span> 5173
+</code></pre></div></div>
+
+<p>Please remember that some metrics can be correctly omitted for some VMs.
+In general, we should always see metrics about version (pseudo metric), memory, network, and CPU.
+But there are known cases on which not having storage metrics is expected and correct: for example this case, since we are using a diskless VM.</p>
+
+<h2 id="coming-next">Coming next</h2>
+
+<p>The <em>KubeVirt team</em> is still working to enhance and refine the metrics support. There are two main active topics. First, discussion is ongoing about adding more metrics,
+depending on the <a href="https://github.com/kubevirt/kubevirt/issues/2023">needs of the community</a> or the <a href="https://github.com/kubevirt/kubevirt/pull/2077">needs of the ecosystem</a>.
+Furthermore, there is <a href="https://github.com/kubevirt/kubevirt/issues/2011">work in</a> <a href="https://github.com/kubevirt/kubevirt/issues/2012">progress</a> to increase the robustness
+and the reliability of the monitoring. We also have <a href="https://github.com/kubevirt/kubevirt/issues/2108">plans</a> to improve the integration with kubernetes.
+Stay tuned for more updates!</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=More About Kubevirt Metrics&url=https://www.kubevirt.io/2019/More-about-Kubevirt-metrics.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

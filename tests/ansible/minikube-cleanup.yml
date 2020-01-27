@@ -2,15 +2,15 @@
 - hosts: localhost
   gather_facts: False
   vars:
-    credentials_file: "{{ lookup('env', 'GOOGLE_APPLICATION_CREDENTIALS') }}"
-    build_id: "{{ lookup('env', 'buildID') }}"
+    credentials_file: ""
+    build_id: ""
   tasks:
   - name: Delete GCE test VM
     gce:
-      instance_names: "kubevirt-labci-minikube{{build_id}}"
+      instance_names: "kubevirt-labci-minikube"
       zone: "us-central1-b"
       state: "absent"
       service_account_email: "push-button-ci@cnvlab-209908.iam.gserviceaccount.com"
-      credentials_file: "{{ credentials_file }}"
+      credentials_file: ""
       project_id: "cnvlab-209908"
     ignore_errors: yes

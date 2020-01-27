@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>This Week In Kube Virt 23 | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="fabiand" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This is a close-to weekly update from the KubeVirt team.">
+    <meta name="keywords" content="updates" >
+    <meta property="og:title" content="This Week In Kube Virt 23 | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This is a close-to weekly update from the KubeVirt team." >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="fabiand" >
+    <meta property="og:article:published_time" content="2018-04-27 00:00:00 +0000" >
+    <meta name="twitter:title" content="This Week In Kube Virt 23 | KubeVirt.io">
+    <meta name="twitter:description" content="This is a close-to weekly update from the KubeVirt team.">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">This Week In Kube Virt 23</h1>
+          <div class="post-info">
+            <span class="post-author">Author: fabiand</span>
+            <div>
+              <span class="post-meta">Publication Date: April 27, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: updates
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <p>This is a close-to weekly update from the KubeVirt team.</p>
+
+<p>In general there is now more work happening outside of the core kubevirt
+repository.</p>
+
+<p>We are currently driven by</p>
+
+<ul>
+  <li>
+    <p>Closing a lot of loose ends</p>
+  </li>
+  <li>
+    <p>Stepping back to identify gaps for 1.0</p>
+  </li>
+</ul>
+
+<p>Within the last two weeks we achieved to:</p>
+
+<ul>
+  <li>
+    <p>Release KubeVirt v0.4.1 to address some shutdown issues</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.4.1">https://github.com/kubevirt/kubevirt/releases/tag/v0.4.1</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Many VM life-cycle and guarantee fixes (@rmohr @vossel)</p>
+
+    <ul>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/951">https://github.com/kubevirt/kubevirt/pull/951</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/948">https://github.com/kubevirt/kubevirt/pull/948</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/935">https://github.com/kubevirt/kubevirt/pull/935</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/838">https://github.com/kubevirt/kubevirt/pull/838</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/907">https://github.com/kubevirt/kubevirt/pull/907</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/883">https://github.com/kubevirt/kubevirt/pull/883</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Pass labels from VM to pod for better Service integration (@rmohr)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/939">https://github.com/kubevirt/kubevirt/pull/939</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Packaging preparations (@rmohr)</p>
+
+    <ul>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/941">https://github.com/kubevirt/kubevirt/pull/941</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/issues/924">https://github.com/kubevirt/kubevirt/issues/924</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/950">https://github.com/kubevirt/kubevirt/pull/950</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Controller readiness clarifications (@rmohr)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/901">https://github.com/kubevirt/kubevirt/pull/901</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Validation improvements using CRD scheme and webhooks (@vossel)</p>
+
+    <ul>
+      <li>
+        <p>Webhook: <a href="https://github.com/kubevirt/kubevirt/pull/911">https://github.com/kubevirt/kubevirt/pull/911</a></p>
+      </li>
+      <li>
+        <p>Scheme: <a href="https://github.com/kubevirt/kubevirt/pull/850">https://github.com/kubevirt/kubevirt/pull/850</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/917">https://github.com/kubevirt/kubevirt/pull/917</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Add Windows tests (@alukiano)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/809">https://github.com/kubevirt/kubevirt/pull/809</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Improve PVC tests (@petrkotas)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/862">https://github.com/kubevirt/kubevirt/pull/862</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Enable SELinux in OpenShift CI environment</p>
+  </li>
+  <li>
+    <p>Tests to run KubeVirt on Kubernetes 1.10</p>
+  </li>
+</ul>
+
+<p>In addition to this, we are also working on:</p>
+
+<ul>
+  <li>
+    <p>virtctl expose convenience verb (@yuvalif)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/962">https://github.com/kubevirt/kubevirt/pull/962</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>CRIO support in CI</p>
+  </li>
+  <li>
+    <p>virtctl bash/zsh completion (@rmohr)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/916">https://github.com/kubevirt/kubevirt/pull/916</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Improved error messages from virtctl (@fromanirh)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/934">https://github.com/kubevirt/kubevirt/pull/934</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Improved validation feedback (@vossel)</p>
+
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/960">https://github.com/kubevirt/kubevirt/pull/960</a></li>
+    </ul>
+  </li>
+</ul>
+
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
+
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
+
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
+
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>
+
+        </article>
+
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=This Week In Kube Virt 23&url=https://www.kubevirt.io/2018/This-Week-in-Kube-Virt-23.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

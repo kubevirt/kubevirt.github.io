@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//labs/kubernetes/lab2">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Experiment with CDI | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="The KubeVirt.io website team, " >
+    
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Virtual Machine Management on Kubernetes">
+    <meta name="keywords" content="updates, releases, uncategorized, news, " >
+    <meta property="og:title" content="Experiment with CDI | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//labs/kubernetes/lab2" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="The KubeVirt.io website team" >
+    <meta property="og:article:published_time" content="2020-01-27 14:46:59 +0000" >
+    <meta name="twitter:title" content="Experiment with CDI | KubeVirt.io">
+    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+    </ul>
+  </div>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+            <div class="accordion" id="accordionTOC">
+              <div class="card card--sidebar">
+                <div class="card-header card-header--sidebar" id="headingTOC">
+                  <h5 class="mb-0">
+                    <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
+                      Labs
+                    </button>
+                  </h5>
+                </div>
+                <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
+                  <div class="card-body card-body--sidebar">
+                    
+                      
+                        <h3>Installation</h3>
+                        
+                          
+                            <h3 class="labs-title">
+                              <a href="/pages/ec2.html"  class="labs-title--item" >Easy install using AWS</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/pages/gcp.html"  class="labs-title--item" >Easy install using GCP</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/quickstart_minikube/"  class="labs-title--item" >Easy install using Minikube</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/quickstart_kind/"  class="labs-title--item" >Easy install using Kind</a>
+                            </h3>
+                          
+                        
+                      
+                        <h3>Labs</h3>
+                        
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab1.html"  class="labs-title--item" >Use KubeVirt</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab2.html"  class="labs-title--item active" >Experiment with CDI</a>
+                            </h3>
+                          
+                            <h3 class="labs-title">
+                              <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
+                            </h3>
+                          
+                        
+                      
+                    
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-12 col-md-8 col-lg-8 docs">
+            <h1 id="experiment-with-the-containerized-data-importer-cdi">Experiment with the Containerized Data Importer (CDI)</h1>
+
+<p><a href="https://github.com/kubevirt/containerized-data-importer">CDI</a> is an utility designed to import Virtual Machine images for use with Kubevirt.</p>
+
+<p>At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named <em>disk.img</em> with the desired content into the associated PVC.</p>
+
+<p><strong>NOTE</strong>: This ‘lab’ targets deployment on <em>one node</em> as it uses <code class="highlighter-rouge">hostpath</code> storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.</p>
+
+<h4 id="install-the-cdi">Install the CDI</h4>
+
+<p>We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class. Also we will deploy the CDI component using the Operator.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/storage-setup.yml
+<span class="nb">cat </span>storage-setup.yml
+kubectl create <span class="nt">-f</span> storage-setup.yml
+<span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
+kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-operator.yaml
+kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-cr.yaml
+</code></pre></div></div>
+
+<p>Review the “cdi” pods that were added.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods -n cdi
+</code></pre></div></div>
+
+<h4 id="use-the-cdi">Use the CDI</h4>
+
+<p>As an example, we will import a Fedora30 Cloud Image as a PVC and launch a Virtual Machine making use of it.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
+</code></pre></div></div>
+
+<p>This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the <em>cdi.kubevirt.io/storage.import.endpoint</em> annotation.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc fedora -o yaml
+kubectl get pod # Make note of the pod name assigned to the import process
+kubectl logs -f importer-fedora-pnbqh   # Substitute your importer-fedora pod name here.
+</code></pre></div></div>
+
+<p>Notice that the importer downloaded the publicly available Fedora Cloud qcow image. Once the importer pod completes, this PVC is ready for use in kubevirt.</p>
+
+<p>If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the  PVC, and then recreate the  PVC.</p>
+
+<p>Let’s create a Virtual Machine making use of it. Review the file <em>vm1_pvc.yml</em>.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm1_pvc.yml
+<span class="nb">cat </span>vm1_pvc.yml
+</code></pre></div></div>
+
+<p>We change the yaml definition of this Virtual Machine to inject the default public key of user in the cloud instance.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Generate a password-less SSH key using the default location.
+ssh-keygen
+PUBKEY=`cat ~/.ssh/id_rsa.pub`
+sed -i "s%ssh-rsa.*%$PUBKEY%" vm1_pvc.yml
+kubectl create -f vm1_pvc.yml
+</code></pre></div></div>
+
+<p>This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to <code class="highlighter-rouge">gather its IP</code>. You are looking for the IP address beside the <code class="highlighter-rouge">virt-launcher</code> pod.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pod -o wide
+</code></pre></div></div>
+
+<p>Since we are running an all in one setup, the corresponding Virtual Machine is actually running on the same node, we can check its qemu process.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps -ef | grep qemu | grep vm1
+</code></pre></div></div>
+
+<p>Wait for the Virtual Machine to boot and to be available for login. You may monitor its progress through the console. The speed at which the VM boots depends on whether baremetal hardware is used. It is much slower when nested virtualization is used, which is likely the case if you are completing this lab on an instance on a cloud provider.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console vm1
+</code></pre></div></div>
+
+<p>Disconnect from the virtual machine console by typing: <code class="highlighter-rouge">ctrl+]</code></p>
+
+<p>Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are <strong>in the Kubernetes software defined network (SDN)</strong>. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the <a href="/pages/ec2">Easy install using AWS</a> or <a href="/pages/gcp">Easy install using GCP</a> your cloud instance is already part of the cluster.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh fedora@VM_IP
+</code></pre></div></div>
+
+<p>On the other side, if you followed <a href="/quickstart_minikube/">Easy install using minikube</a> take into account that you will need to ssh into Minikube first, as shown below.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vmi
+NAME      AGE       PHASE     IP            NODENAME
+vm1       109s      Running   172.17.0.16   minikube
+
+$ minikube ssh
+                         _             _            
+            _         _ ( )           ( )           
+  ___ ___  (_)  ___  (_)| |/')  _   _ | |_      __  
+/' _ ` _ `\| |/' _ `\| || , &lt;  ( ) ( )| '_`\  /'__`\
+| ( ) ( ) || || ( ) || || |\`\ | (_) || |_) )(  ___/
+(_) (_) (_)(_)(_) (_)(_)(_) (_)`\___/'(_,__/'`\____)
+
+$ ssh fedora@172.17.0.16
+The authenticity of host '172.17.0.16 (172.17.0.16)' can't be established.
+ECDSA key fingerprint is SHA256:QmJUvc8vbM2oXiEonennW7+lZ8rVRGyhUtcQBVBTnHs.
+Are you sure you want to continue connecting (yes/no)? yes
+Warning: Permanently added '172.17.0.16' (ECDSA) to the list of known hosts.
+fedora@172.17.0.16's password: 
+</code></pre></div></div>
+
+<p>Finally, on a usual situation you will probably want to give access to your vm1 VM to someone else from outside the Kubernetes cluster nodes. Someone who is actually connecting from his or her laptop. This can be achieved with the virtctl tool already installed in <a href="/quickstart_minikube/">Easy install using minikube</a>. <strong>Note that this is the same case as connecting from our laptop to vm1 VM running on our local Minikube instance</strong></p>
+
+<p>First, we are going expose the ssh port of the vm1 as NodePort type. Then verify that the Kubernetes object service was created successfully on a random port of the Minikube or cloud instance.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ virtctl expose vmi vm1 --name=vm1-ssh --port=20222 --target-port=22 --type=NodePort
+  Service vm1-ssh successfully exposed for vmi vm1
+
+$ kubectl get svc
+NAME      TYPE       CLUSTER-IP       EXTERNAL-IP   PORT(S)           AGE
+vm1-ssh   NodePort   10.101.226.150   &lt;none&gt;        20222:32495/TCP   24m
+</code></pre></div></div>
+
+<p>Once exposed successfully, check the IP of your Minikube VM or cloud instance and verify you can reach the VM using your public SSH key previously configured. In case of cloud instances verify that security group applied allows traffic to the random port created.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ minikube status
+  host: Running
+  kubelet: Running
+  apiserver: Running
+  kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.74
+</code></pre></div></div>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh -i ~/.ssh/id_rsa.pub fedora@192.168.39.74 -p 32495 
+  Last login: Wed Oct  9 13:59:29 2019 from 172.17.0.1
+  [fedora@vm1 ~]$ 
+</code></pre></div></div>
+
+<p>This concludes this section of the lab.</p>
+
+<p>You can watch how the laboratory is done in the following video:</p>
+
+<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/ZHqcHbCxzYM" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p><a href="/labs/kubernetes/lab1">Previous Lab</a></p>
+
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>.
+    </div>
+  </div>
+</div>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>
