@@ -8,9 +8,9 @@ lab: kubernetes
 
 # Easy install using Kind
 
-kind is a tool for running local Kubernetes clusters using Docker container "nodes".
+Kind (Kubernetes in Docker) is a tool for running local Kubernetes clusters using Docker container "nodes".
 
-kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
+Kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
 
 In Step 1, we guide you through setting up your environment to launch Kubernetes via Kind
 
@@ -24,7 +24,11 @@ Kubernetes, we'll be using
 [Kind](https://github.com/kubernetes-sigs/kind){:target="_blank"}.
 
 If you have [go](https://golang.org/) ([1.11+](https://golang.org/doc/devel/release.html#policy)) and [docker](https://www.docker.com/) 
-already installed `GO111MODULE="on" go get sigs.k8s.io/kind@v0.7.0 && kind create` cluster is all you need!
+already installed the following command is all you need:
+```bash
+GO111MODULE="on" go get sigs.k8s.io/kind@v0.7.0 && kind create cluster
+``` 
+
 
 NOTE: please use the latest go to do this, ideally go 1.13 or greater.
 
@@ -64,12 +68,13 @@ host where Kind is being installed on:
 
 If you get an **N**, follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="_blank"} for enabling it.
 
-**Note** that nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can't be enabled, don't forget to enable emulation as shown in the *Check for the Virtualization Extensions* section.
+**Note** that nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can't be enabled, 
+don't forget to enable emulation as shown in the *[Check for the Virtualization Extensions](#check-for-the-virtualization-extensions)* section.
 
 Let's begin, normally, Kind can be started with default values and those will be enough
 to run this quickstart guide.
 
-For examle to create a basic cluster of 1 node you can use the following command:
+For example to create a basic cluster of 1 node you can use the following command:
 
 ```bash
 $ kind create cluster # Default cluster context name is `kind`.
@@ -139,8 +144,8 @@ virt-operator-6c5db798d4-9qg56   0/1       ContainerCreating   0          12s
 virt-operator-6c5db798d4-9qg56   1/1       Running   0         28s
 ```
 
-We'll need to execute the command above few times (or add *-w* for *watching*
-the pods), until the operator is *Running* and *Ready* (1/1), then it's time
+We can execute the command above few times or add the (*-w*) flag for *watching*
+the pods until the operator is in *Running* and *Ready* (1/1) status, then it's time
 to head to the next section.
 
 ### Check for the Virtualization Extensions
@@ -182,10 +187,10 @@ virt-handler-t4fgb                 1/1       Running   0          2m12s
 virt-operator-6c5db798d4-9qg56     1/1       Running   0          6m41s
 ```
 
-Once we applied the *Custom Resource* the operator took care of deploying the
+Once we applied the KubeVirt's *Custom Resource* the operator took care of deploying the
 actual KubeVirt pods (*virt-api*, *virt-controller* and *virt-handler*). Again
-we'll need to execute the command until everything is *up&running*
-(or use *-w*).
+we'll need to execute the command until everything is *up and running*
+(or use the *-w* flag).
 
 ### Install virtctl
 
@@ -234,17 +239,17 @@ After you have connected to your instance through SSH, you can
 work through a couple of labs to help you get acquainted with KubeVirt
 and how to use it to create and deploy VMs with Kubernetes.
 
-The first lab is ["Use KubeVirt"](../labs/kubernetes/lab1). This lab walks you
-through the creation of a Virtual Machine instance on Kubernetes and then
-shows you how to use virtctl to interact with its console.
+The first lab is ["Use KubeVirt"](../labs/kubernetes/lab1). This lab walks 
+through the creation of a Virtual Machine Instance (VMI) on Kubernetes and then
+it is shown how virtctl is used to interact with its console.
 
 The second lab is ["Experiment with CDI"](../labs/kubernetes/lab2). This
-lab shows you how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
+lab shows how to use the [Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer){:target="_blank"}
 (CDI) to import a VM image into a [Persistent Volume Claim](https://kubernetes.io/docs/concepts/storage/persistent-volumes/){:target="_blank"}
 (PVC) and then how to define a VM to make use of the PVC.
 
 The third lab is ["KubeVirt upgrades"](../labs/kubernetes/lab3). This lab shows
-how easy and safe is to upgrada your KubeVirt installation with zero down-time.
+how easy and safe is to upgrade your KubeVirt installation with zero down-time.
 
 
 ## Found a bug?
