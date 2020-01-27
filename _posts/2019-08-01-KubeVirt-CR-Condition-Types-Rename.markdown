@@ -39,7 +39,10 @@ We're renaming some of the prior 'conditions' reported by the Custom Resources.
 
 ## What does it mean to us
 
-We're making KubeVirt more compatible with the standard for Operators, when doing so, some of the `conditions` are changing, so check your scripts using checks for conditions to use the new ones.
+> warning "CR Rename"
+> We're making KubeVirt more compatible with the standard for Operators, when doing so, some of the `conditions` are changing, so check your scripts using checks for conditions to use the new ones.
+>
+
 
 |  **Prior**   |    **Actual**     | **Note**          |
 | :----------: | :---------------: | :---------------- |
