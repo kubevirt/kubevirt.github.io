@@ -45,16 +45,18 @@ They also explain the common use cases, how people are using it today:
 
 And also how the project actually works from an architectural perspective and the ideal environment.
 ![architectural_perspective](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png)
+
+And how is the ideal environment with KubeVirt:
 ![kubevirt_environment](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png)
 
 
 A walk through the KubeVirt components is also shown:
-- virt-api-server: The entry point to KubeVirt for all virtualisation related flows and takes care to update the virtualisation related custom resource definition (CRD).
-- virt-Launcher: A VM is inside a POD launched by Virt-Launcher using Libvirt.
+- virt-api-server: The entry point to KubeVirt for all virtualisation related flows and takes care to update the virtualisation related custom resource definition (CRD)
+- virt-Launcher: A VM is inside a POD launched by Virt-Launcher using Libvirt
 ![pod_networking](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png)
 - virt-Controller: Each Object has a corresponding controller
-- virt-Handler: is a Daemonset that acts as a minion communication to Libvirt via socker.
-- libvirtd: toolkit to manage virtualization platforms. 
+- virt-Handler: is a Daemonset that acts as a minion communication to Libvirt via socker
+- libvirtd: toolkit to manage virtualization platforms
 
 In the Video, you will also see a short demo of the project in action where Chand shows how to install KubeVirt and bring up a Virtual Machine in a short time!
 
@@ -69,7 +71,6 @@ Finally, you will hear about future plans for developing KubeVirt’s capabiliti
 - Hotplugging of CPUs, RAM, disks, and NICs (not necessarily in that order!).
 
 ## Video
-
 
 <iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/_z5Pjyl0Dq4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
