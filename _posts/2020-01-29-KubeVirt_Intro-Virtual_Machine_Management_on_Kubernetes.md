@@ -102,3 +102,4 @@ is towards CNCF projects. He was one of the speaker of 2018 DevOpsDays Event.
 ## References
 - [YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi](https://www.youtube.com/watch?v=_z5Pjyl0Dq4)
 - [Presentation: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi](https://static.sched.com/hosted_files/kccncna19/70/Introduction_to_KubeVirt-KUBECONNA19.pdf)
+- [KubeCon NA 2019 event](https://kccncna19.sched.com/event/VyBC)
