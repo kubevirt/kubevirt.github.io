@@ -24,7 +24,26 @@ navbar_active: blogs
         <article class="post-content">
           {{ content }}
         </article>
+        {% if page.galleria %}
+          <div class="galleria">
+          </div>
+          <script src="//cdn.jsdelivr.net/npm/galleria@1.6.1/dist/galleria.min.js"></script>
+          <script>
+          $.getJSON('/assets/galleria/{{ page.galleria }}', function(data) {
+              Galleria.loadTheme('https://cdn.jsdelivr.net/npm/galleria@1.6.1/dist/themes/twelve/galleria.twelve.min.js');
+              Galleria.run('.galleria', {
+              dataSource: data,
+              autoplay: true,
+              responsive: true,
+              maxVideoSize: 1300,
+              imageCrop: false,
+              imageTimeout: 1E10,
+              wait: true,
+          });
+          });
+          </script>
 
+        {% endif %}
         {% include share_twitter.html text = page.title %}
 
         {% if page.comments %}

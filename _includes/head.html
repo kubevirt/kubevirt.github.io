@@ -23,4 +23,20 @@
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     {% include metas-ogp.html %}
     {% feed_meta %}
+    {% if page.galleria %}
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/galleria@1.6.1/dist/themes/twelve/galleria.twelve.min.css">
+    <style>
+        .galleria { width: 700px; height: 400px; background: #FFFFFF }
+        .galleria-stage {
+            height:450px; <-- set this to any height and i should work :)
+            position: absolute;
+            top: 10px;
+            bottom: 60px;
+            left: 10px;
+            right: 10px;
+            overflow:hidden;}
+        .galleria-errors {display: none;}
+    </style>
+    {% endif %}
 </head>
