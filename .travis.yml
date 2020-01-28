@@ -12,6 +12,7 @@ before_install:
 install: true
 
 script:
+- wget -O _data/amis.json "https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json"
 - scripts/update_changelog.sh
 - rake
 
