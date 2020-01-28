@@ -11,7 +11,7 @@ pub-year: 2019
 ---
 
 
-In this session, Steve and Chand provide an introduction to the KubeVirt project, which turns Kubernetes into an 
+In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
 orchestration engine for not just application containers but virtual machine workloads as well. This provides a 
 unified development platform where developers can build, modify, and deploy applications made up of both Application 
 Containers as well as Virtual Machines (VM) in a common, shared environment. 
@@ -59,7 +59,7 @@ A walk through the KubeVirt components is also shown:
 - virt-handler: is a Daemonset that acts as a minion communication to Libvirt via socket
 - libvirtd: toolkit to manage virtualization platforms
 
-In the Video, a short demo of the project in action is shown. Eventually, Chand shows how to install KubeVirt and bring up a virtual machine in a short time!
+In the Video, a short demo of the project in action is shown. Eventually, Chandra shows how to install KubeVirt and bring up a virtual machine in a short time!
 
 Finally, you will hear about future plans for developing KubeVirt’s capabilities that are emerging from the community. Some hints:
 - Better support for deterministic workloads:
@@ -98,7 +98,7 @@ Chandrakanth is having 14+ years experience in Networking ,Virtualization, Cloud
 
 He is currently working with F5 Networks as Senior Software Engineer. He previously worked with Cisco Systems, Starent Networks, Emerson/Artesyn Embedded 
 Technologies and NXP/Freescale Semiconductors/Intoto Network Security companies. He is a speaker and driven local open source meetups. His present passion 
-is towards CNCF projects. In 2018, he was a speaker of 2018 DevOpsDays Event.
+is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.
 
 ## References
 - [YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi](https://www.youtube.com/watch?v=_z5Pjyl0Dq4)
