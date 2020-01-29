@@ -16,8 +16,9 @@ order: 10
     </div>
     <div class="col-sm-12 col-md-9 blogs">
         Jump to year:
-        {% assign posts = site.posts %}
-        {% assign groupedByYear = posts | group_by_exp:"post","post.date | date:'%Y' " %}
+        {% assign groupedByYear = site.posts | group_by_exp:"post","post.date | date:'%Y' " %}
+        {% assign postsByYearMonth = site.posts | group_by_exp:"post", "post.date | date: '%B %Y'"  %}
+
         <!-- Print clickable year list -->
         {% for yearitem in groupedByYear %}
           <a href="#{{ yearitem.name }}">{{ yearitem.name }}&nbsp;</a>
@@ -27,15 +28,28 @@ order: 10
         <!-- Print articles per year -->
         {% for yearitem in groupedByYear %}
           <h2><a name="{{ yearitem.name }}">{{ yearitem.name }}</a></h2>
-
-          <ul>
-          {% for item in yearitem.items %}
-            <li>
-              <date>{{ item.date | date:'%B %e'}}</date>
-              <span><a href="{{ item.url }}">{{ item.title }}</a></span>
-            </li>
+          {% for yearMonth in postsByYearMonth %}
+            {{ yearMonth}}
+            IRANZO
+            <hr>
+            {% assign mymonthposts = yearMonth.items %}
+            {% if mymonthposts.size > 0 %}
+              {% if yearMonth.name contains yearitem.name %}
+                <h3>{{ yearMonth.name | split: " "|first }}</h3>
+                <ul>
+                  {% for item in yearitem.items %}
+                    {% assign mymonth = yearMonth.name | split: " "|first %}
+                    {% if item.pub-date contains mymonth %}
+                      <li>
+                        <date>{{ item.date | date:'%B %e'}}</date>
+                        <span><a href="{{ item.url }}">{{ item.title }}</a></span>
+                      </li>
+                    {% endif %}
+                  {% endfor %}
+                </ul>
+              {% endif %}
+            {% endif %}
           {% endfor %}
-          </ul>
         {% endfor %}
     </div>
   </div>
