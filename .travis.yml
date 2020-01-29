@@ -14,6 +14,7 @@ install: true
 script:
 - scripts/update_changelog.sh
 - rake
+- touch _site/.nojekyll
 
 env:
   global:
