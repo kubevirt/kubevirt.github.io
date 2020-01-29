@@ -15,15 +15,28 @@ order: 10
       {% include sidebar-blogs.html %}
     </div>
     <div class="col-sm-12 col-md-9 blogs">
-      {% assign postsByYearMonth = site.posts | group_by_exp:"post", "post.date | date: '%B %Y'"  %}
-      {% for yearMonth in postsByYearMonth %}
-        <h3>{{ yearMonth.name }}</h3>
+        Jump to year:
+        {% assign posts = site.posts %}
+        {% assign groupedByYear = posts | group_by_exp:"post","post.date | date:'%Y' " %}
+        <!-- Print clickable year list -->
+        {% for yearitem in groupedByYear %}
+          <a href="#{{ yearitem.name }}">{{ yearitem.name }}&nbsp;</a>
+        {% endfor %}
+        <hr/>
+
+        <!-- Print articles per year -->
+        {% for yearitem in groupedByYear %}
+          <h2><a name="{{ yearitem.name }}">{{ yearitem.name }}</a></h2>
+
           <ul>
-            {% for post in yearMonth.items %}
-              <li><a href="{{ post.baseurl }}">{{ post.title }}</a></li>
-            {% endfor %}
+          {% for item in yearitem.items %}
+            <li>
+              <date>{{ item.date | date:'%B %e'}}</date>
+              <span><a href="{{ item.url }}">{{ item.title }}</a></span>
+            </li>
+          {% endfor %}
           </ul>
-      {% endfor %}
+        {% endfor %}
     </div>
   </div>
 </div>
