@@ -13,6 +13,12 @@
           <a class="nav-link text-uppercase" href="{{ item.url | prepend: site.baseurl }}">{{ item.title }}</a>
         </li>
       {% endfor %}
-
+      <li class='nav-item'>
+          <form action="/search.html" method="get">
+            <i class="fas fa-search docs-search"></i>
+            <input type="text" id="search-input" class="docs-search--input" placeholder="Type to search" name="query">
+            <input type="submit" value="🔍" style="display: none;">
+          </form>
+      </li>
     </ul>
   </div>
