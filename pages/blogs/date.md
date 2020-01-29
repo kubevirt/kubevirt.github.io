@@ -96,7 +96,7 @@ order: 10
 
 {% endfor %}
 
-<h2>All Posts By Date</h2>
+<h2>Post calendar</h2>
 <table class="table table-striped blogcalendar">
   <tbody>
     {{ tableContent }}
@@ -109,7 +109,7 @@ order: 10
 {% assign lastPostIndex = site.posts.size | minus: 1 %}
 
 {% for year in (startYear...endYear) reversed %}
-  <h3>{{year}}</h3>
+  <h2>{{year}}</h2>
   {% assign currentYear = year %}
   {% for month in (1...12) reversed %}
 
@@ -141,19 +141,14 @@ order: 10
 
       {% assign monthId = year | append: "-" | append: month %}
 
-      <h4 id="{{ monthId }}">{{ monthName }} {{ year }}</h4>
-      <table class="table table-striped">
+      <h4 id="{{ monthId }}">{{ monthName }}</h4>
+      <ul style="list-style: none;">
       {% for p in postsArray %}
-        <tr>
-          <td>{{ p.date | date: "%Y-%m-%d" }}</td>
-          <td>
-              <a href="{{ site.baseurl }}{{ p.url }}">
-                  {{ p.title }}
-              </a>
-          </td>
-        </tr>
+        <li>
+          📅 {{ p.date | date: "%d" }}: <a href="{{ site.baseurl }}{{ p.url }}">{{ p.title }}</a>
+        </li>
       {% endfor %}
-      </table>
+      </ul>
     {% endif %}
 
   {% endfor %}
