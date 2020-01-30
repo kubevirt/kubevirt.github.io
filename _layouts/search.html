@@ -28,24 +28,24 @@
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
-    <script src="{{ site.baseurl }}/js/kubevirt-io.js"></script>
-    <script src="{{ site.baseurl }}/js/lunr.min.js"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <script src="/js/lunr.min.js"></script>
 
 <script>
 {% assign counter = 0 %}
 var documents = [{% for page in site.pages %}{% if page.url contains '.xml' or page.url contains 'assets' %}{% else %}{
     "id": {{ counter }},
-    "url": "{{ site.url }}{{ page.url }}",
+    "url": "{{ page.url }}",
     "title": "{{ page.title }}",
     "body": "{{ page.content | markdownify | replace: '.', '. ' | replace: '</h2>', ': ' | replace: '</h3>', ': ' | replace: '</h4>', ': ' | replace: '</p>', ' ' | strip_html | strip_newlines | replace: '  ', ' ' | replace: '"', ' ' }}"{% assign counter = counter | plus: 1 %}
     }, {% endif %}{% endfor %}{% for page in site.without-plugin %}{
     "id": {{ counter }},
-    "url": "{{ site.url }}{{ page.url }}",
+    "url": "{{ page.url }}",
     "title": "{{ page.title }}",
     "body": "{{ page.content | markdownify | replace: '.', '. ' | replace: '</h2>', ': ' | replace: '</h3>', ': ' | replace: '</h4>', ': ' | replace: '</p>', ' ' | strip_html | strip_newlines | replace: '  ', ' ' | replace: '"', ' ' }}"{% assign counter = counter | plus: 1 %}
     }, {% endfor %}{% for page in site.posts %}{
     "id": {{ counter }},
-    "url": "{{ site.url }}{{ page.url }}",
+    "url": "{{ page.url }}",
     "title": "{{ page.title }}",
     "body": "{{ page.date | date: "%Y/%m/%d" }} - {{ page.content | markdownify | replace: '.', '. ' | replace: '</h2>', ': ' | replace: '</h3>', ': ' | replace: '</h4>', ': ' | replace: '</p>', ' ' | strip_html | strip_newlines | replace: '  ', ' ' | replace: '"', ' ' }}"{% assign counter = counter | plus: 1 %}
     }{% if forloop.last %}{% else %}, {% endif %}{% endfor %}];
