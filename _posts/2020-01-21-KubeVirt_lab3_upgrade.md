@@ -7,7 +7,7 @@ category: news
 comments: true
 title: KubeVirt Laboratory 3, upgrades
 pub-date: January, 21
-pub-year: 2019
+pub-year: 2020
 ---
 
 In this video, we are showing the step by step of the [KubeVirt Laboratory 3: Upgrades]({% link labs/kubernetes/lab3.md %})
