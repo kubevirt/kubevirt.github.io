@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: KubeVirt basic operations video
-pub-date: October 28
+pub-date: November 28
 pub-year: 2019
 ---
 
@@ -33,5 +33,5 @@ The following operations are shown in the video:
 ## References
 
 - [KubeVirt basic operations video on youtube](https://www.youtube.com/watch?v=KC03G60shIc)
-- [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) 
+- [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html)
 - [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)
