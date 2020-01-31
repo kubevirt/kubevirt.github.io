@@ -94,7 +94,7 @@ are taking advance of the GPU workloads. Nowadays the Big data is one of the mai
 still need to run VMs and have native GPU functionalities, that is why NVIDIA decided to work with KubeVirt.
 ![gpus_on_kubevirt](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png "GPU/vGPU on KubeVirt")
 
-To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in GitHub: https://github.com/NVIDIA/kubevirt-gpu-device-plugin
+To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in [GitHub](https://github.com/NVIDIA/kubevirt-gpu-device-plugin)
 It's opensource and anybody can take a look to it and download it.
 
 Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs, 
