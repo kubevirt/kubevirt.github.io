@@ -79,7 +79,7 @@ needs to be created.
 
 ![kubevirt_volumes](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_volumes.png "KubeVirt volumes")
 
-For example, if you have a VM in your laptop, you can upload that image using the containerized-data-importer (CDI) to a PVC and then you can attach
+For example, if you have a VM in your laptop, you can upload that image using the [containerized-data-importer](https://github.com/kubevirt/containerized-data-importer) (CDI) to a PVC and then you can attach
 that PVC to the VM pod to get it running.
 
 About the use of network services, the traffic routes to the KubeVirt VM in the same way it does to container workloads. Also with Multus there is
@@ -87,13 +87,13 @@ the possibility to have different network interfaces per VM.
 
 For using the Host Resources:
 - VM Guest CPU and NUMA Affinity
-		- CPU Manager (pining)
-		- Topology Manager (NUMA nodes)
+  - CPU Manager (pining)
+  - Topology Manager (NUMA nodes)
 - VM Guest CPU/MEM requirements
-		- POD resource request/limits
+  - POD resource request/limits
 - VM Guest use of Host Devices
-		- Device Plugins for access to (/dev/kvm, SR-IOV, GPU passthrough)
-		- POD resource request/limits for device allocation
+  - Device Plugins for access to (/dev/kvm, SR-IOV, GPU passthrough)
+  - POD resource request/limits for device allocation
 
 ## GPU/vGPU in Kubevirt VMs
 
@@ -122,14 +122,14 @@ any other else in Kubernetes.
 
 The main Device Plugin Functions are:
 - GPU and vGPU device Discovery
-	− GPUs with VFIO-PCI driver on the host are identified
-	− vGPUs configured using Nvidia vGPU manager are identified
+  − GPUs with VFIO-PCI driver on the host are identified
+  − vGPUs configured using Nvidia vGPU manager are identified
 - GPU and vGPU device Advertising
-	− Discovered devices are advertised to kubelet as allocatable resources
+  − Discovered devices are advertised to kubelet as allocatable resources
 - GPU and vGPU device Allocation
-	− Returns the PCI address of allocated GPU device
+  − Returns the PCI address of allocated GPU device
 - GPU and vGPU Health Check
-		− Performs health check on the discovered GPU and vGPU devices
+  − Performs health check on the discovered GPU and vGPU devices
 
 To understand how the GPU passthrough lifecycle works Vishesh shows the different phases involve in the process using the following diagram:
 
