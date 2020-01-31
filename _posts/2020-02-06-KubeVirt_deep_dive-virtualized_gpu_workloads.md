@@ -122,14 +122,14 @@ any other else in Kubernetes.
 
 The main Device Plugin Functions are:
 - GPU and vGPU device Discovery
-  − GPUs with VFIO-PCI driver on the host are identified
-  − vGPUs configured using Nvidia vGPU manager are identified
+  - GPUs with VFIO-PCI driver on the host are identified
+  - vGPUs configured using Nvidia vGPU manager are identified
 - GPU and vGPU device Advertising
-  − Discovered devices are advertised to kubelet as allocatable resources
+  - Discovered devices are advertised to kubelet as allocatable resources
 - GPU and vGPU device Allocation
-  − Returns the PCI address of allocated GPU device
+  - Returns the PCI address of allocated GPU device
 - GPU and vGPU Health Check
-  − Performs health check on the discovered GPU and vGPU devices
+  - Performs health check on the discovered GPU and vGPU devices
 
 To understand how the GPU passthrough lifecycle works Vishesh shows the different phases involve in the process using the following diagram:
 
