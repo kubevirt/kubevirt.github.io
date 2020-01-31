@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi
-pub-date: January, 29
+pub-date: February, 01
 pub-year: 2019
 ---
 
