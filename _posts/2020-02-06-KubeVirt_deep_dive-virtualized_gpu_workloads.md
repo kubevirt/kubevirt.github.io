@@ -33,14 +33,14 @@ But why KubeVirt?
 The answer is that the initial motivation for it was this idea of infrastructure convergence:
 ![kubevirt_infrastructure_convergence](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_infrastructure_convergence.png "KubeVirt infrastructure convergence")
 
-The transition to the cloud model involves multiple stacks, containers and virtual machines, old code and new code. 
-With KubeVirt all this is simplified with just one stack to manage containers and virtual machines to run old code and new code.
+The transition to the cloud model involves multiple stacks, containers and VMs, old code and new code. 
+With KubeVirt all this is simplified with just one stack to manage containers and VMs to run old code and new code.
 ![kubevirt_one_stack](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_one_stack.png "KubeVirt one stack")
 
 
 The workflow convergence means that:
 - Converging VM management into container management workflows
-- Using the same tooling (kubectl) for containers and Virtual Machines (VM)
+- Using the same tooling (kubectl) for containers and Virtual Machines
 - Keeping the declarative API for VM management (just like pods, deployments, etc...)
 
 An example of a VM Instance in YAML could be so simple as the following example:
@@ -49,12 +49,12 @@ $ cat <<EOF | kubectl create -f -
 apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachineInstance
 ...
-	spec:
-		domain:
-			cpu: 
-				cores: 2
-			devices:
-				disk: fedora29
+ spec:
+  domain:
+   cpu: 
+    cores: 2
+   devices:
+    disk: fedora29
 ```
 ## Architecture
 
@@ -89,7 +89,7 @@ For using the Host Resources:
 
 ## GPU/vGPU in Kubevirt VMs
 
-After the introduction of David, Vishesh takes over and talks in-depth the whys and hows of GPUs in Virtual Machines. Lots of new Machine and Deep learning applications
+After the introduction of David, Vishesh takes over and talks in-depth the whys and hows of GPUs in VM. Lots of new Machine and Deep learning applications
 are taking advance of the GPU workloads. Nowadays the Big data is one of the main consumers of GPUs but there are some gaps, the gaming and professional graphics sector 
 still need to run VMs and have native GPU functionalities, that is why NVIDIA decided to work with KubeVirt.
 ![gpus_on_kubevirt](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png "GPU/vGPU on KubeVirt")
@@ -123,8 +123,8 @@ To understand how the GPU passthrough lifecycle works Vishesh shows the differen
 In the following diagram there are some of the Key features that NVIDIA is using with KubeVirt:
 ![NVIDIA_usecase_keyfeatures](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/NVIDIA_usecase_keyfeatures.png "KubeVirt NVIDIA usecase keyfeatures")
 
-If you are interested in the details of how the lifecycle works or in why NVIDIA is highly using some of the KubeVirt features listed above you may 
-take a look to the video included in the following section.
+If you are interested in the details of how the lifecycle works or in why NVIDIA is highly using some of the KubeVirt features listed above, you may be interested in
+taking a look to the following video.
 
 ## Video
 
