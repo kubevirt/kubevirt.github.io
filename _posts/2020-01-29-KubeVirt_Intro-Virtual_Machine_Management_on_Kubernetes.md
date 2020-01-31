@@ -14,7 +14,7 @@ pub-year: 2019
 In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
 orchestration engine for not just application containers but virtual machine workloads as well. This provides a 
 unified development platform where developers can build, modify, and deploy applications made up of both Application 
-Containers as well as Virtual Machines (VM) in a common, shared environment. 
+Containers as well as the Virtual Machines (VM) in a common, shared environment.
 
 They show how the KubeVirt community is continuously growing and helping with their contributions to the code in
 [KubeVirt GitHub repository](https://github.com/kubevirt).
@@ -44,7 +44,7 @@ They also explain the common use cases, how people are using it today:
             - Compute features and management approach is appealing.
             - But: VNFs are hard to containerize!
 
-And also how the project actually works from an architectural perspective and the ideal environment.
+They also cover how the project actually works from an architectural perspective and the ideal environment.
 ![architectural_perspective](/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png)
 
 And how is the ideal environment with KubeVirt:
