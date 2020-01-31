@@ -22,6 +22,7 @@ David introduces the talk showing what KubeVirt is and what is not:
 - KubeVirt is not a container runtime replacement
 
 He likes to define KubeVirt as:
+> note ""
 > KubeVirt is a Kubernetes extension that allows running traditional VM workloads natively side by side with Container workloads.
 
 But why KubeVirt?
