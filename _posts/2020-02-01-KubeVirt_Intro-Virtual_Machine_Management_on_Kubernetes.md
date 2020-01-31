@@ -13,8 +13,8 @@ pub-year: 2019
 
 In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
 orchestration engine for not just application containers but virtual machine workloads as well. This provides a 
-unified development platform where developers can build, modify, and deploy applications made up of both Application 
-Containers as well as the Virtual Machines (VM) in a common, shared environment.
+unified development platform where developers can build, modify, and deploy applications made up of both application 
+containers as well as the virtual machines (VM) in a common, shared environment.
 
 They show how the KubeVirt community is continuously growing and helping with their contributions to the code in
 [KubeVirt GitHub repository](https://github.com/kubevirt).
@@ -28,18 +28,18 @@ In the session, you will learn more about why KubeVirt exists:
 - ...or will be decomposed over a longer time horizon.
 
 They also explain the common use cases, how people are using it today:
-- To run VM to support new development
+- To run VMs to support new development
     - Build new applications relying on existing VM-based applications and APIs.
     - Leverage Kubernetes-based developer flows while bringing in these VM-based dependencies.
-- To run VM to support applications that can’t lift and shift
+- To run VMs to support applications that can’t lift and shift
     - Users with very old applications who are not in a position to change them significantly.
     - Vendors with appliances (customer kernels, custom kmods, optimized workflows to build appliances, ...) they want to bring to the cloud-native ecosystem.
-- To run Kubernetes (!)
+- To run Kubernetes in Kubernetes (!)
     - KubeVirt as a Cluster API provider
         - Hard Multi-Tenancy
     - Community provided cloud-provider-kubevirt
 - To run Virtual Network Functions (VNFs) and other virtual appliances
-    - VNFs in the context of Kubernetes are of continued interest, in parallel to Cloud-Native Network Function exploration.
+    - VNFs in the context of Kubernetes are of continued interest, in parallel to Cloud-native Network Function exploration.
         - Kubernetes is an attractive target for VNFs.
             - Compute features and management approach is appealing.
             - But: VNFs are hard to containerize!
@@ -82,7 +82,7 @@ Focused on building infrastructure solutions for compute use cases using a spect
 and bare-metal provisioning technologies. 
 
 He got his start in Open Source while building out and managing web-based solutions for the Earth Systems Science Computational 
-Centre (ESSCC) at the University of Queensland. After graduating with degrees in Information Technology and Commerce. Stephen took 
+Centre (ESSCC) at the University of Queensland. After graduating with degrees in Information Technology and Commerce, Stephen took 
 a multi-year detour into the wonderful world of the z-Series mainframe while writing new COBOL applications for the Australian Tax Office (ATO).
 
 Stephen then landed at Red Hat where he has grown his knowledge of the infrastructure space working across multiple roles and solutions 
@@ -92,12 +92,12 @@ team attempting to realize a vision for unification of application containers an
 Stephen has previously presented on a variety of infrastructure topics at OpenStack Summit, multiple Red Hat Summit, KVM Forum, OpenStack Days Canada, 
 OpenStack Silicon Valley, and local meetups.
 
-[Chandrakanth Reddy Jakkidi](https://www.linkedin.com/in/jakkidi-chandrakanth-reddy-149a5920/) is an active OpenSource Contributor. He is involved in CNCF and open infrastructure community projects.
-He has contributed to Openstack, Kubernetes projects. Presently an active contributor to Kubevirt Project.
-Chandrakanth is having 14+ years experience in Networking ,Virtualization, Cloud, K8S, SDN, NFV, Openstack, Infrastructure Technologies.
+[Chandrakanth Reddy Jakkidi](https://www.linkedin.com/in/jakkidi-chandrakanth-reddy-149a5920/) is an active Open Source Contributor. He is involved in CNCF and open infrastructure community projects.
+He has contributed to OpenStack and Kubernetes projects. Presently an active contributor to the Kubevirt Project.
+Chandrakanth is having 14+ years experience in networking, virtualization, cloud, Kubernetes, SDN, NFV, OpenStack and infrastructure technologies.
 
 He is currently working with F5 Networks as Senior Software Engineer. He previously worked with Cisco Systems, Starent Networks, Emerson/Artesyn Embedded 
-Technologies and NXP/Freescale Semiconductors/Intoto Network Security companies. He is a speaker and driven local open source meetups. His present passion 
+Technologies and NXP/Freescale Semiconductors/Intoto Network Security companies. He is a speaker and drives local open source meetups. His present passion 
 is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.
 
 ## References
