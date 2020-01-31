@@ -5,7 +5,7 @@ description: "KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David 
 navbar_active: Blogs
 category: news
 comments: true
-title: NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat & Vishesh Tanksale, NVIDIA
+title: "NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat & Vishesh Tanksale, NVIDIA"
 pub-date: February, 06
 pub-year: 2019
 ---
