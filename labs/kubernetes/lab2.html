@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-01-30 15:16:54 +0000" >
+    <meta property="og:article:published_time" content="2020-01-31 09:50:45 +0000" >
     <meta name="twitter:title" content="Experiment with CDI | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -85,9 +85,9 @@
       <li class='nav-item'>
         <form action="/search.html" method="get" autocomplete="off">
           <div class="autocomplete" style="width:150px;">
-            <input type="text" id="search-input" class="docs-search--input" placeholder="Input search term" name="query">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
           </div>
-          <input type="submit" value="🔍">
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
         </form>
       </li>
 
@@ -136,6 +136,7 @@ function autocomplete(inp, arr) {
   });
   /*execute a function presses a key on the keyboard:*/
   inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
       var x = document.getElementById(this.id + "autocomplete-list");
       if (x) x = x.getElementsByTagName("div");
       if (e.keyCode == 40) {
@@ -158,6 +159,9 @@ function autocomplete(inp, arr) {
             x[currentFocus].click();
             e.preventDefault();
           }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
         }
       }
   });
