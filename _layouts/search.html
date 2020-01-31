@@ -33,7 +33,7 @@
 
 <script>
 {% assign counter = 0 %}
-var documents = [{% for page in site.pages %}{% if page.url contains '.xml' or page.url contains 'assets' %}{% else %}{
+var documents = [{% for page in site.pages %}{% if page.url contains '.xml' or page.url contains 'assets' or page.title == '' or page.url == "/" or page.url contains 'css' or page.url contains 'js' or page.url contains 'tests'%}{% else %}{
     "id": {{ counter }},
     "url": "{{ page.url }}",
     "title": "{{ page.title }}",
