@@ -22,26 +22,26 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//blogs/page18/">
+    <link rel="canonical" href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Blogs | KubeVirt.io</title>
+    <title>NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="Pedro Ibáñez Requena" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="updates, releases, uncategorized, news, " >
-    <meta property="og:title" content="Blogs | KubeVirt.io">
+    <meta name="description" content="KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi">
+    <meta name="keywords" content="news" >
+    <meta property="og:title" content="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//blogs/page18/" >
+    <meta property="og:url" content="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-02 13:59:07 +0000" >
-    <meta name="twitter:title" content="Blogs | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="Pedro Ibáñez Requena" >
+    <meta property="og:article:published_time" content="2020-02-01 00:00:00 +0000" >
+    <meta name="twitter:title" content="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi | KubeVirt.io">
+    <meta name="twitter:description" content="KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon & Chandrakanth Jakkidi">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     
@@ -208,216 +208,189 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <main role="main" style="margin-top: 60px;">
       <div class="container">
   <div class="row">
-    <h1 class="page-title">Blogs</h1>
-  </div>
-  <div class="row">
-    <div class="col-sm-12 col-md-3">
-      
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Pedro Ibáñez Requena</span>
+            <div>
+              <span class="post-meta">Publication Date: February 1, 2020  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <p>In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
+orchestration engine for not just application containers but virtual machine workloads as well. This provides a 
+unified development platform where developers can build, modify, and deploy applications made up of both application 
+containers as well as the virtual machines (VM) in a common, shared environment.</p>
+
+<p>They show how the KubeVirt community is continuously growing and helping with their contributions to the code in
+<a href="https://github.com/kubevirt">KubeVirt GitHub repository</a>.</p>
+
+<p>In the session, you will learn more about why KubeVirt exists:</p>
+<ul>
+  <li>Growing velocity behind Kubernetes and surrounding ecosystem for new applications.</li>
+  <li>Reality that users will be dealing with virtual machine workloads for many years to come.</li>
+  <li>Focus on building transition paths for users with workloads that will either never be containerized:
+    <ul>
+      <li>Technical reasons (e.g. older operating system or kernel)</li>
+      <li>Business reasons (e.g. time to market, cost of conversion)</li>
+    </ul>
+  </li>
+  <li>…or will be decomposed over a longer time horizon.</li>
+</ul>
+
+<p>They also explain the common use cases, how people are using it today:</p>
+<ul>
+  <li>To run VMs to support new development
+    <ul>
+      <li>Build new applications relying on existing VM-based applications and APIs.</li>
+      <li>Leverage Kubernetes-based developer flows while bringing in these VM-based dependencies.</li>
+    </ul>
+  </li>
+  <li>To run VMs to support applications that can’t lift and shift
+    <ul>
+      <li>Users with very old applications who are not in a position to change them significantly.</li>
+      <li>Vendors with appliances (customer kernels, custom kmods, optimized workflows to build appliances, …) they want to bring to the cloud-native ecosystem.</li>
+    </ul>
+  </li>
+  <li>To run Kubernetes in Kubernetes (!)
+    <ul>
+      <li>KubeVirt as a Cluster API provider
+        <ul>
+          <li>Hard Multi-Tenancy</li>
+        </ul>
+      </li>
+      <li>Community provided cloud-provider-kubevirt</li>
+    </ul>
+  </li>
+  <li>To run Virtual Network Functions (VNFs) and other virtual appliances
+    <ul>
+      <li>VNFs in the context of Kubernetes are of continued interest, in parallel to Cloud-native Network Function exploration.
+        <ul>
+          <li>Kubernetes is an attractive target for VNFs.
+            <ul>
+              <li>Compute features and management approach is appealing.</li>
+              <li>But: VNFs are hard to containerize!</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
+
+<p>They also cover how the project actually works from an architectural perspective and the ideal environment.
+<img src="/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png" alt="architectural_perspective" /></p>
+
+<p>And how is the ideal environment with KubeVirt:
+<img src="/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png" alt="kubevirt_environment" /></p>
+
+<p>A walk through the KubeVirt components is also shown:</p>
+<ul>
+  <li>virt-api-server: The entry point to KubeVirt for all virtualization related flows and takes care to update the virtualization related custom resource definition (CRD)</li>
+  <li>virt-launcher: A VM is inside a POD launched by virt-launcher using Libvirt
+<img src="/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png" alt="pod_networking" /></li>
+  <li>virt-controller: Each Object has a corresponding controller</li>
+  <li>virt-handler: is a Daemonset that acts as a minion communication to Libvirt via socket</li>
+  <li>libvirtd: toolkit to manage virtualization platforms</li>
+</ul>
+
+<p>In the Video, a short demo of the project in action is shown. Eventually, Chandra shows how to install KubeVirt and bring up a virtual machine in a short time!</p>
+
+<p>Finally, you will hear about future plans for developing KubeVirt’s capabilities that are emerging from the community. Some hints:</p>
+<ul>
+  <li>Better support for deterministic workloads:
+    <ul>
+      <li>CPU Pinning○NUMA Topology Alignment</li>
+      <li>IO Thread pinning</li>
+    </ul>
+  </li>
+  <li>Storage-assisted snapshot and cloning.</li>
+  <li>Forensic virtual machine capture</li>
+  <li>GPU passthrough</li>
+  <li>Policy-based live migration and additional migration modes.</li>
+  <li>Hotplugging of CPUs, RAM, disks, and NICs (not necessarily in that order!).</li>
+</ul>
+
+<h2 id="video">Video</h2>
+
+<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/_z5Pjyl0Dq4" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<h2 id="speakers">Speakers</h2>
+
+<p><a href="https://twitter.com/xsgordon">Steve Gordon</a> is currently a Principal Product Manager at Red Hat based in Toronto, Canada.<br />
+Focused on building infrastructure solutions for compute use cases using a spectrum of virtualization, containerization, 
+and bare-metal provisioning technologies.</p>
+
+<p>He got his start in Open Source while building out and managing web-based solutions for the Earth Systems Science Computational 
+Centre (ESSCC) at the University of Queensland. After graduating with degrees in Information Technology and Commerce, Stephen took 
+a multi-year detour into the wonderful world of the z-Series mainframe while writing new COBOL applications for the Australian Tax Office (ATO).</p>
+
+<p>Stephen then landed at Red Hat where he has grown his knowledge of the infrastructure space working across multiple roles and solutions 
+at the intersection of the Linux virtualization stack (KVM, QEMU, Libvirt), OpenStack, and more recently Kubernetes. Now he is working with a 
+team attempting to realize a vision for unification of application containers and virtual machines enabled by the KubeVirt project.</p>
+
+<p>Stephen has previously presented on a variety of infrastructure topics at OpenStack Summit, multiple Red Hat Summit, KVM Forum, OpenStack Days Canada, 
+OpenStack Silicon Valley, and local meetups.</p>
+
+<p><a href="https://www.linkedin.com/in/jakkidi-chandrakanth-reddy-149a5920/">Chandrakanth Reddy Jakkidi</a> is an active Open Source Contributor. He is involved in CNCF and open infrastructure community projects.
+He has contributed to OpenStack and Kubernetes projects. Presently an active contributor to the Kubevirt Project.
+Chandrakanth is having 14+ years experience in networking, virtualization, cloud, Kubernetes, SDN, NFV, OpenStack and infrastructure technologies.</p>
+
+<p>He is currently working with F5 Networks as Senior Software Engineer. He previously worked with Cisco Systems, Starent Networks, Emerson/Artesyn Embedded 
+Technologies and NXP/Freescale Semiconductors/Intoto Network Security companies. He is a speaker and drives local open source meetups. His present passion 
+is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.</p>
+
+<h2 id="references">References</h2>
+<ul>
+  <li><a href="https://www.youtube.com/watch?v=_z5Pjyl0Dq4">YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp; Chandrakanth Jakkidi</a></li>
+  <li><a href="https://static.sched.com/hosted_files/kccncna19/70/Introduction_to_KubeVirt-KUBECONNA19.pdf">Presentation: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp; Chandrakanth Jakkidi</a></li>
+  <li><a href="https://kccncna19.sched.com/event/VyBC">KubeCon NA 2019 event</a></li>
+</ul>
+
+        </article>
         
-          
-          <ul class="blogs-navigation">
-            <h3>Categories</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/news.html"  class="blogs-navigation--item_link" >
-                  News
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/updates.html"  class="blogs-navigation--item_link" >
-                  Weekly Updates
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/releases.html"  class="blogs-navigation--item_link" >
-                  Releases
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/uncategorized.html"  class="blogs-navigation--item_link" >
-                  Uncategorized
-                </a>
-                
-              </li>
-            
-          </ul>
-          
         
-          
-          <ul class="blogs-navigation">
-            <h3>Additional Resources</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/date.html"  class="blogs-navigation--item_link" >
-                  Grouped by Date
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/2020/posts.html"  class="blogs-navigation--item_link" >
-                  2020 Posts
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/2019/posts.html"  class="blogs-navigation--item_link" >
-                  2019 Posts
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/2018/posts.html"  class="blogs-navigation--item_link" >
-                  2018 Posts
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/2017/posts.html"  class="blogs-navigation--item_link" >
-                  2017 Posts
-                </a>
-                
-              </li>
-            
-          </ul>
-          
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi&url=https://www.kubevirt.io/2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
         
-      
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
     </div>
-    <div class="col-sm-12 col-md-9">
-      <ul class="posts">
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-16-size-XL.html">This Week In Kube Virt 16 Size Xl</a></h2>
-            <div class="posts-date">January 19, 2018</div>
-            This is a weekly update from the KubeVirt team - including the holiday backlog update.
-            
-            <div class="readmore">
-    <a href="/2018/This-Week-in-Kube-Virt-16-size-XL.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html">This Week In Kube Virt 16 Holiday Wrap Up Edition</a></h2>
-            <div class="posts-date">January 19, 2018</div>
-            This is a weekly update from the KubeVirt team - including the holiday backlog update.
-            
-            <div class="readmore">
-    <a href="/2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Some-notes-on-some-highlights-of-v020.html">Some Notes On Some Highlights Of V020</a></h2>
-            <div class="posts-date">January 05, 2018</div>
-            The very first KubeVirt release of KubeVirt in the new year () had a few notable highlights which were brewing over the last few weeks.
-            
-            <div class="readmore">
-    <a href="/2018/Some-notes-on-some-highlights-of-v020.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Kube-Virt-v020.html">Kube Virt v0.2.0</a></h2>
-            <div class="posts-date">January 05, 2018</div>
-            This release follows v0.1.0 and consists of 131 changes, contributed by 6 people, leading to 148 files changed, 9096 insertions(+), 5871 deletions(-).
-            
-            <div class="readmore">
-    <a href="/2018/Kube-Virt-v020.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-15.html">This Week In Kube Virt 15</a></h2>
-            <div class="posts-date">December 15, 2017</div>
-            This is a weekly update from the KubeVirt team.
-            
-            <div class="readmore">
-    <a href="/2017/This-Week-in-Kube-Virt-15.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-      </ul>
-    </div>
-    
-<div class="pagination align-items-center">
-  
-    <a href="/blogs/page17" class="btn btn-outline-secondary btn-light mr-2">
-      <i class="fas fa-angle-left"></i> New
-    </a>
-  
-
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-        <strong class="font-weight-bold">18</strong>
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-  <strong>of 22</strong>
-
-  
-    <a href="/blogs/page19" class="btn btn-outline-secondary btn-light ml-2">
-      Old <i class="fas fa-angle-right"></i>
-    </a>
-  
-
-</div>
-
   </div>
 </div>
 

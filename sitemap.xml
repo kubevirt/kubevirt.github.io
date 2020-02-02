@@ -421,6 +421,10 @@
 <lastmod>2020-01-24T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html</loc>
+<lastmod>2020-02-01T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -611,5 +615,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page21/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page22/</loc>
 </url>
 </urlset>
