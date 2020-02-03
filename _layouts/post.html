@@ -46,7 +46,7 @@ navbar_active: blogs
         {% endif %}
         {% include share_twitter.html text = page.title %}
 
-        {% if page.comments %}
+        {% if page.comments or page.comments == nil %}
           <div id="disqus_thread"></div>
           <script>
 
