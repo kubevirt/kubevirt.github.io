@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-03 11:15:00 +0000" >
+    <meta property="og:article:published_time" content="2020-02-03 15:57:54 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -335,7 +335,7 @@ variable that will be used on few commands:</p>
 <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="s2">"v0.18.0"</span>
 
 <span class="c"># On Linux you can obtain it using 'curl' via:</span>
-<span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases|grep tag_name|sort <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs | <span class="nb">cut</span> <span class="nt">-d</span><span class="s1">'-'</span> <span class="nt">-f1</span><span class="si">)</span>
+<span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> - | <span class="nb">sort</span> <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
 
 <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
 </code></pre></div></div>
