@@ -3,34 +3,28 @@ cache:
   bundler: true
 rvm:
 - 2.3.3
-
-# Assume bundler is being used, therefore
-# the `install` step will run `bundle install` by default.
 before_install:
-  - bundle install
-
+- bundle install
 install: true
-
 script:
 - wget -O _data/amis.json "https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json"
 - scripts/update_changelog.sh
 - rake
 - touch _site/.nojekyll
-
 env:
   global:
   - NOKOGIRI_USE_SYSTEM_LIBRARIES=true
-
 sudo: false
-
-
 deploy:
   fqdn: kubevirt.io
   provider: pages
   skip_cleanup: true
-  github_token: $GITHUB_TOKEN  # Set in the settings page of your repository, as a secure variable
+  github_token: "$GITHUB_TOKEN"
   keep_history: true
   target_branch: master
   local_dir: _site
   on:
     branch: source
+notifications:
+  slack:
+    secure: YVa/pgQIUtrMH1p3emXjsUJmPCb2MXx8abdEe6qXdrjqM3j0VdpYKvAkxOtUEz9WXWNgDMyOj6ZCXhEXoN/j/uFhiBxPRYs5t0GDWwy+Pt4qP7x9bJeYkt96hCjTiaXXz7zsehi4qCxoUzPHIPMVzfl818h691Qj8qxk82EXPOaX0VeU63iofqpyrXGeX6GxvAfv5yCi/cHhhmyk9g2l9viOgXDeVCGYynlnTA7nqGDoedMAB3689MNYleYzCaYO/FuvTTpmgoZUdr4VtPiu3jnHH2o6qqSEFAR8ok3ioAm6fYszyfJ94kfayjKgzQcCTrYC79Prq2UV6BPCrzNVXxZUZuoK3cSOoZHi3IQdS4U5K03yNTHRzhPkG/BnsiGYq8cGMSOAwbrdegMrD5GgaUC6a18ItGRq7VeTTZTEMSxaLNYWbcdMPirwul3ei5c7qfgB3ftX2SggPl44imbFUAhmyGhgKsJiLt0j8GNg+S1XA3zylYTTDLPsHBQ9bTyaEEdMB496+8fe5t1q48CaWiG6UzwjX6LCcz5C3U6Y2wb6p14NunVH8Cj4IRQzp91hO/J6Ig+8h/OfUc9KVw/lAiNY8vaArkOx/H0g98e6XJIc+4peY99lt6OVYES7SVnHT72o6YB+LRhoXRMmL/4KZIri9IxDEDmI4SiXUlhbTlw=
