@@ -26,21 +26,23 @@ Please use the following as general guidelines on any kind of contents generated
   * Keep your bullets symmetrical. 1-2 lines each
   * Avoid bullet clutter. Don’t write paragraphs in bullets
   * Remember bullets are not sentences. They’re just like headlines
+* Use *admonitions* to highlight text like for example `note`, `info`, `warning`, `error` (Check reference at <https://github.com/lazee/premonition> which is the plugin we use)
 * Use of images
   * Images are another great way to express information, for instance, instead of trying to describe your way around a UI, just add a snippet of the UI, readers will understand it easier and quicker
   * Avoid large images, if you have to try to resize them, otherwise the image will be wider than the writing when your contents is rendered
-  * Linking or HTTP references
-    * Linking externally can be problematic, some time after the publication of your contents, try linking to the repositories or directories, website's front page rather than to a page, etc.
-    * For linking internally use [Jekyll's tags](https://jekyllrb.com/docs/liquid/tags/#links)
-      * For blog posts
-        ```markdown
-        [Name of Link]({{ site.baseurl }}{% post_url 2010-07-21-name-of-post %})
-        ```
-      * For pages, collections, assets, etc
-        ```markdown
-        [Link to a document]({% link _collection/name-of-document.md %})
-        [Link to a file]({% link /assets/files/doc.pdf %})
-        ```
+  * For galleries of pictures available externally, create a json file similar to <https://github.com/kubevirt/kubevirt.github.io/pull/450/files#diff-9a59c35a6f79bc2711649c016037114a> and define them with `galleria: filename` in yaml preamble.
+* Linking or HTTP references
+  * Linking externally can be problematic, some time after the publication of your contents, try linking to the repositories or directories, website's front page rather than to a page, etc.
+  * For linking internally use [Jekyll's tags](https://jekyllrb.com/docs/liquid/tags/#links)
+    * For blog posts
+      ```markdown
+      [Name of Link]({{ site.baseurl }}{% post_url 2010-07-21-name-of-post %})
+      ```
+    * For pages, collections, assets, etc
+      ```markdown
+      [Link to a document]({% link _collection/name-of-document.md %})
+      [Link to a file]({% link /assets/files/doc.pdf %})
+      ```
 
 ## Contents types
 
@@ -61,6 +63,7 @@ All Blog posts are located in the [_posts](/_posts/) directory, each entry is a 
   pub-date: June 20
   pub-year: 2019
   category: news
+  tags: list, of, tags
   comments: true
   ---
   ```
@@ -72,10 +75,11 @@ All Blog posts are located in the [_posts](/_posts/) directory, each entry is a 
   * **navbar_active**: Defines settings for the navigation bar, type *Blogs* is the only choice available
   * **pub-date**: Month and day, together with *pub-year* form the date that will be shown in the blog post as the date it was published, must match the date on the file name
   * **pub-year**: Blog post publication year, must match the year in the file name
-  * **category**: Array of categories for your blog post, some common ones are community, news and releases, as last resort, use uncategorized. If you'd like to add multiple categories, used *categories* instead of *category* and a [YAML list](https://en.wikipedia.org/wiki/YAML#Basic_components)
-  * **comments**: This enables comments your blog post. Please consider setting this to *true* and allow discussion around the topic you're writing, otherwise skip the field or set it to false
+  * **category**: Array of categories for your blog post, some common ones are community, news and releases, as last resort, use uncategorized. If you'd like to add multiple categories, use *categories* instead of *category* and a [YAML list](https://en.wikipedia.org/wiki/YAML#Basic_components)
+  * **comments**: This enables comments your blog post. Please consider setting this to *true* or empty to allow discussion around the topic you're writing, otherwise set to false to disable them
+  * **tags**: This defines a set of tags that will be used in post meta keywords and search autocompletion
 
-* Blog post contents recommendation: 
+* Blog post contents recommendation:
 
   * Title is a very important piece of your blog post, a catchy title will likely have more readers, write a bad title and no matter how good the contents is, you'll likely get less readers
   * After the title, write a brief introduction of what you're going to be writing about, which will help the reader to get a grasp on the topic
@@ -100,7 +104,7 @@ All Blog posts are located in the [_posts](/_posts/) directory, each entry is a 
 * The fields have the same function as for blog posts, but some values are different, as we're producing different contents.
   * **permalink** tells *Jekyll* what the output path for your page will be, it's useful for linking and web indexers
   * **navbar_active** will add your page to the navigation bar you specify as value, commonly used values are *Docs* or *Videos*
-  * **layout**, just use *default* as value, it'll include all the necessary parts when your page is generated 
+  * **layout**, just use *default* as value, it'll include all the necessary parts when your page is generated
 
 * As for the contents, follow the general guidelines above
 
@@ -137,7 +141,7 @@ These are the pages containing actual lab, exercises, documentations, etc... and
 
 ```yaml
 ---
-layout: labs 
+layout: labs
 title: Installing KubeVirt
 permalink: /labs/kubevirt101/lab01
 lab: KubeVirt 101 Lab
