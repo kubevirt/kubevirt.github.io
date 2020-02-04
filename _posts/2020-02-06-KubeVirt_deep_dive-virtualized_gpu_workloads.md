@@ -10,7 +10,7 @@ pub-date: February, 06
 pub-year: 2019
 ---
 
-In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
+In this [video](https://www.youtube.com/watch?v=Qejlyny0G58), David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
 Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some 
 performance metrics comparing KubeVirt to standalone KVM. 
 
@@ -63,7 +63,7 @@ kind: VirtualMachineInstance
 
 ## Architecture
 
-The truth here is that a KubeVirt VM is a KVM+qemu process running inside a pod. Simple like that.
+The truth here is that a KubeVirt VM is a KVM+qemu process running inside a pod. It's as simple as that.
 
 ![kubevirt_virtual_machine](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_virtual_machine.png "KubeVirt VM = KVM+qemu")
 
@@ -87,7 +87,7 @@ the possibility to have different network interfaces per VM.
 
 For using the Host Resources:
 - VM Guest CPU and NUMA Affinity
-  - CPU Manager (pining)
+  - CPU Manager (pinning)
   - Topology Manager (NUMA nodes)
 - VM Guest CPU/MEM requirements
   - POD resource request/limits
