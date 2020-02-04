@@ -151,9 +151,9 @@ taking a look to the following video.
 
 ## Speakers
 
-[David Vossel]() is currently a Principal Software Engineer at Red Hat ...
+[David Vossel](https://github.com/davidvossel) is currently a Principal Software Engineer at Red Hat. ... And also he loves to play music in his free time.
 
-[Vishesh Tanksale]() is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster. 
+[Vishesh Tanksale](www.linkedin.com/in/vishesh-tanksale) is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster. 
 He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sanbox Project.
 
 
