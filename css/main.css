@@ -542,10 +542,10 @@ table {
   margin-bottom: 2rem; }
   .footer a {
     color: #006166; }
-    .footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar {
+    .footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar, .footer a.link-social-slack {
       color: #72767b; }
       @media (max-width: 576px) {
-        .footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar {
+        .footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar, .footer a.link-social-slack {
           font-size: 2rem; } }
     .footer a.link-social-twitter {
       margin-right: 1rem; }
@@ -561,6 +561,10 @@ table {
         color: #ffb300; }
     .footer a.link-social-calendar:hover {
       color: #07a692; }
+    .footer a.link-social-slack {
+      margin-right: 1rem; }
+      .footer a.link-social-slack:hover {
+        color: #0099a0; }
     .footer a.privacy-statement-link:hover {
       color: #00aab2; }
     .footer a:hover {
