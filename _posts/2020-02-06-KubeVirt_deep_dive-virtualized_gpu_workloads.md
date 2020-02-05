@@ -1,7 +1,8 @@
 ---
 layout: post
 author: Pedro Ibáñez Requena
-description: "KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat & Vishesh Tanksale, NVIDIA"
+description: "In this blogpost we talk about the presentation that David Vossel and Vishesh Tanksale did at the KubeCon 2019 in North America. The talk is called 
+KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt and they go through from a KubeVirt introduction until a complex arquitecture with NVIDIA GPU devices"
 navbar_active: Blogs
 category: news
 comments: true
