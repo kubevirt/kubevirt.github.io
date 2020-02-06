@@ -1,4 +1,177 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-05T13:00:50+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-06T07:01:47+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA</title><link href="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA" /><published>2020-02-06T00:00:00+00:00</published><updated>2020-02-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">&lt;p&gt;In this &lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;video&lt;/a&gt;, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
+Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some 
+performance metrics comparing KubeVirt to standalone KVM.&lt;/p&gt;
+
+&lt;h2 id=&quot;kubevirt-intro&quot;&gt;KubeVirt Intro&lt;/h2&gt;
+
+&lt;p&gt;David introduces the talk showing what KubeVirt is and what is not:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;KubeVirt is not involved with managing AWS or GCP instances&lt;/li&gt;
+  &lt;li&gt;KubeVirt is not a competitor to Firecracker or Kata containers&lt;/li&gt;
+  &lt;li&gt;KubeVirt is not a container runtime replacement&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;He likes to define KubeVirt as:&lt;/p&gt;
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;KubeVirt is a Kubernetes extension that allows running traditional VM workloads natively side by side with Container workloads.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;But why KubeVirt?&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Already have on-premise solutions like OpenStack, oVirt&lt;/li&gt;
+  &lt;li&gt;And then there’s the public cloud, AWS, GCP, Azure&lt;/li&gt;
+  &lt;li&gt;Why are we doing this VM management stuff yet again?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The answer is that the initial motivation for it was this idea of infrastructure convergence:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_infrastructure_convergence.png&quot; alt=&quot;kubevirt_infrastructure_convergence&quot; title=&quot;KubeVirt infrastructure convergence&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The transition to the cloud model involves multiple stacks, containers and VMs, old code and new code. 
+With KubeVirt all this is simplified with just one stack to manage containers and VMs to run old code and new code.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_one_stack.png&quot; alt=&quot;kubevirt_one_stack&quot; title=&quot;KubeVirt one stack&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The workflow convergence means that:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Converging VM management into container management workflows&lt;/li&gt;
+  &lt;li&gt;Using the same tooling (kubectl) for containers and Virtual Machines&lt;/li&gt;
+  &lt;li&gt;Keeping the declarative API for VM management (just like pods, deployments, etc…)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;An example of a VM Instance in YAML could be so simple as the following example:&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;$ cat &amp;lt;&amp;lt;EOF | kubectl create -f -&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstance&lt;/span&gt;
+&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; 
+    &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora29&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;architecture&quot;&gt;Architecture&lt;/h2&gt;
+
+&lt;p&gt;The truth here is that a KubeVirt VM is a KVM+qemu process running inside a pod. It’s as simple as that.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_virtual_machine.png&quot; alt=&quot;kubevirt_virtual_machine&quot; title=&quot;KubeVirt VM = KVM+qemu&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The VM Launch flow is shown in the following diagram. Since the user posts a VM manifest to the cluster until the Kubelet spins up the VM pod.
+And finaly the virt-handler instructs the virt-launcher how to launch the qemu.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_vm_launch_flow.png&quot; alt=&quot;kubevirt_vm_launch_flow&quot; title=&quot;KubeVirt VM launch flow&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The storage in KubeVirt is used in the same way as the pods, if there is a need to have persistent storage in a VM a PVC (Persistent Volume Claim) 
+needs to be created.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_volumes.png&quot; alt=&quot;kubevirt_volumes&quot; title=&quot;KubeVirt volumes&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For example, if you have a VM in your laptop, you can upload that image using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;containerized-data-importer&lt;/a&gt; (CDI) to a PVC and then you can attach
+that PVC to the VM pod to get it running.&lt;/p&gt;
+
+&lt;p&gt;About the use of network services, the traffic routes to the KubeVirt VM in the same way it does to container workloads. Also with Multus there is
+the possibility to have different network interfaces per VM.&lt;/p&gt;
+
+&lt;p&gt;For using the Host Resources:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;VM Guest CPU and NUMA Affinity
+    &lt;ul&gt;
+      &lt;li&gt;CPU Manager (pinning)&lt;/li&gt;
+      &lt;li&gt;Topology Manager (NUMA nodes)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;VM Guest CPU/MEM requirements
+    &lt;ul&gt;
+      &lt;li&gt;POD resource request/limits&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;VM Guest use of Host Devices
+    &lt;ul&gt;
+      &lt;li&gt;Device Plugins for access to (/dev/kvm, SR-IOV, GPU passthrough)&lt;/li&gt;
+      &lt;li&gt;POD resource request/limits for device allocation&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;gpuvgpu-in-kubevirt-vms&quot;&gt;GPU/vGPU in Kubevirt VMs&lt;/h2&gt;
+
+&lt;p&gt;After the introduction of David, Vishesh takes over and talks in-depth the whys and hows of GPUs in VM. Lots of new Machine and Deep learning applications
+are taking advance of the GPU workloads. Nowadays the Big data is one of the main consumers of GPUs but there are some gaps, the gaming and professional graphics sector 
+still need to run VMs and have native GPU functionalities, that is why NVIDIA decided to work with KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png&quot; alt=&quot;gpus_on_kubevirt&quot; title=&quot;GPU/vGPU on KubeVirt&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in &lt;a href=&quot;https://github.com/NVIDIA/kubevirt-gpu-device-plugin&quot;&gt;GitHub&lt;/a&gt;
+It’s opensource and anybody can take a look to it and download it.&lt;/p&gt;
+
+&lt;p&gt;Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs, 
+the following diagram shows the different layers involved in the GPU pass-through architecture:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png&quot; alt=&quot;kubevirt_gpu_passthrough&quot; title=&quot;KubeVirt GPU passthrough&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUS in that node), the Virtual Machine specification
+containing the &lt;code class=&quot;highlighter-rouge&quot;&gt;deviceName&lt;/code&gt; that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as 
+any other else in Kubernetes.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_yaml.png&quot; alt=&quot;kubevirt_gpu_pass_yaml&quot; title=&quot;KubeVirt GPU passthrough yaml&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The main Device Plugin Functions are:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;GPU and vGPU device Discovery
+    &lt;ul&gt;
+      &lt;li&gt;GPUs with VFIO-PCI driver on the host are identified&lt;/li&gt;
+      &lt;li&gt;vGPUs configured using Nvidia vGPU manager are identified&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GPU and vGPU device Advertising
+    &lt;ul&gt;
+      &lt;li&gt;Discovered devices are advertised to kubelet as allocatable resources&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GPU and vGPU device Allocation
+    &lt;ul&gt;
+      &lt;li&gt;Returns the PCI address of allocated GPU device&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GPU and vGPU Health Check
+    &lt;ul&gt;
+      &lt;li&gt;Performs health check on the discovered GPU and vGPU devices&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To understand how the GPU passthrough lifecycle works Vishesh shows the different phases involve in the process using the following diagram:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_lifecycle.png&quot; alt=&quot;gpu_pass_lifecycle&quot; title=&quot;KubeVirt GPU passthrough lifecycle&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the following diagram there are some of the Key features that NVIDIA is using with KubeVirt:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/NVIDIA_usecase_keyfeatures.png&quot; alt=&quot;NVIDIA_usecase_keyfeatures&quot; title=&quot;KubeVirt NVIDIA usecase keyfeatures&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you are interested in the details of how the lifecycle works or in why NVIDIA is highly using some of the KubeVirt features listed above, you may be interested in
+taking a look to the following video.&lt;/p&gt;
+
+&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/Qejlyny0G58&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;speakers&quot;&gt;Speakers&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/davidvossel&quot;&gt;David Vossel&lt;/a&gt; David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift’s Container Native Virtualization (CNV) 
+and is a core contributor to the open source KubeVirt project.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.linkedin.com/in/vishesh-tanksale&quot;&gt;Vishesh Tanksale&lt;/a&gt; is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster. 
+He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sanbox Project.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;YouTube video: KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/31/KubeCon%202019%20-%20Virtualized%20GPU%20Workloads%20on%20KubeVirt.pdf&quot;&gt;Presentation: Virtualized GPU workloads on KubeVirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VnjX&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
 orchestration engine for not just application containers but virtual machine workloads as well. This provides a 
 unified development platform where developers can build, modify, and deploy applications made up of both application 
 containers as well as the virtual machines (VM) in a common, shared environment.&lt;/p&gt;
@@ -1084,234 +1257,4 @@ the exposition hall. You can find the demo schedule at their &lt;a href=&quot;ht
 
 &lt;p&gt;Follow &lt;a href=&quot;https://twitter.com/kubevirt&quot;&gt;@kubevirt&lt;/a&gt; on Twitter for updates.&lt;/p&gt;
 
-&lt;p&gt;We look forward to seeing you at KubeCon + CloudNativeCon!&lt;/p&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><summary type="html">The KubeCon + CloudNativeCon North America 2019 conference is next week in San Diego, California.</summary></entry><entry><title type="html">Access Virtual Machines’ graphic console using noVNC</title><link href="https://kubevirt.io//2019/Access-Virtual-Machines-graphic-console-using-noVNC.html" rel="alternate" type="text/html" title="Access Virtual Machines' graphic console using noVNC" /><published>2019-11-11T00:00:00+00:00</published><updated>2019-11-11T00:00:00+00:00</updated><id>https://kubevirt.io//2019/Access-Virtual-Machines-graphic-console-using-noVNC</id><content type="html" xml:base="https://kubevirt.io//2019/Access-Virtual-Machines-graphic-console-using-noVNC.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://novnc.com/&quot;&gt;NoVNC&lt;/a&gt; is a JavaScript VNC client using WebSockets and HTML5 Canvas. We provide websocket api for VNC access under&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-url&quot;&gt;APISERVER:/apis/subresources.kubevirt.io/v1alpha3/namespaces/NAMESPACE/virtualmachineinstances/VM/vnc
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provide a component using &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl proxy&lt;/code&gt; to provide a authorized vnc acess, we name this Component &lt;a href=&quot;https://github.com/wavezhang/virtVNC&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;virtVNC&lt;/code&gt;&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;In this post we are going to show how to do this in detail.&lt;/p&gt;
-&lt;h2 id=&quot;the-detailed-method&quot;&gt;The detailed method&lt;/h2&gt;
-&lt;h3 id=&quot;prepare-docker-image&quot;&gt;Prepare Docker Image&lt;/h3&gt;
-&lt;p&gt;First prepare docker build dicrectory.&lt;/p&gt;
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; virtvnc/static
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Then clone noVNC files from github.&lt;/p&gt;
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/novnc/noVNC
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;And then copy noVNC files to docker build directory.&lt;/p&gt;
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;noVNC/app virtvnc/static/
-&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;noVNC/core virtvnc/static/
-&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;noVNC/vender virtvnc/static/
-&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;noVNC/&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.html virtvnc/static/
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Create a file &lt;code class=&quot;highlighter-rouge&quot;&gt;index.html&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;virtvnc/static/&lt;/code&gt; with the following content. The page will display VMs and corresponding VNC links.&lt;/p&gt;
-&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
-  &lt;span class=&quot;nt&quot;&gt;&amp;lt;meta&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;charset=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;utf-8&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;style&amp;gt;&lt;/span&gt;
-     &lt;span class=&quot;nt&quot;&gt;td&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;nl&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-     &lt;span class=&quot;nc&quot;&gt;.button&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;border&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2px&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;solid&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;black&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;black&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;padding&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;text-align&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;center&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;text-decoration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;none&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;display&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;inline-block&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;font-size&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;16px&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;-webkit-transition-duration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.4s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;transition-duration&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0.4s&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-     &lt;span class=&quot;nc&quot;&gt;.button&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;background-color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;black&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;cursor&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;pointer&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-     &lt;span class=&quot;nt&quot;&gt;button&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;disabled&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;opacity&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;.65&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-     &lt;span class=&quot;nt&quot;&gt;button&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;disabled&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;]&lt;/span&gt;&lt;span class=&quot;nd&quot;&gt;:hover&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;color&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;black&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-       &lt;span class=&quot;nl&quot;&gt;background&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;white&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-     &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;&amp;lt;/style&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- Promise polyfill for IE11 --&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vendor/promise.js&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
-
-    &lt;span class=&quot;c&quot;&gt;&amp;lt;!-- ES2015/ES6 modules polyfill --&amp;gt;&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;nomodule&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;src=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vendor/browser-es-module-loader/dist/browser-es-module-loader.js&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
-
-
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;script &lt;/span&gt;&lt;span class=&quot;na&quot;&gt;type=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;module&quot;&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;crossorigin=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;anonymous&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-      &lt;span class=&quot;k&quot;&gt;import&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;as&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WebUtil&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;from&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;./app/webutil.js&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-      &lt;span class=&quot;kd&quot;&gt;const&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;apiPrefix&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;k8s/apis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;
-      &lt;span class=&quot;kd&quot;&gt;function&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;loadVMI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;nx&quot;&gt;WebUtil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;fetchJSON&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;apiPrefix&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;/kubevirt.io/v1alpha3/namespaces/&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;/virtualmachineinstances/&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;
-          &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;then&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;((&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-            &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;vmis&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[];&lt;/span&gt; 
-            &lt;span class=&quot;nx&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;forEach&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
-              &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;tr&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;createElement&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;tr&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-              &lt;span class=&quot;nx&quot;&gt;tr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;innerHTML&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;lt;td&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;phase&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;interfaces&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;undefined&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;interfaces&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;].&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;ipAddress&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;nodeName&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;!==&lt;/span&gt; &lt;span class=&quot;kc&quot;&gt;undefined&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;nodeName&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;''&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;lt;/td&amp;gt;&amp;lt;td&amp;gt;&amp;lt;button class='button' &lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;String&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;phase&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Running&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;?&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&quot;&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;disabled&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;  &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt; onclick=&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;window.open('vnc_lite.html?path=&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;apiPrefix&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/subresources.kubevirt.io/v1alpha3/namespaces/&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/virtualmachineinstances/&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;i&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/vnc', 'novnc_window', 'resizable=yes,toolbar=no,location=no,status=no,scrollbars=no,menubar=no,width=1030,height=800')&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&amp;gt;VNC&amp;lt;/button&amp;gt;&amp;lt;/td&amp;gt;&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;
-              &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getElementById&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;vmis&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;).&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;appendChild&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;tr&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;});&lt;/span&gt;
-            &lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;resp&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;items&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;length&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;===&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;{&lt;/span&gt; 
-              &lt;span class=&quot;nb&quot;&gt;document&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;body&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;append&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;No virtual machines in the namespace.&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-            &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-          &lt;span class=&quot;p&quot;&gt;})&lt;/span&gt;
-          &lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;catch&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&amp;gt;&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;console&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;log&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;Failed to get vmis: &lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;err&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;));&lt;/span&gt;
-       &lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
-       &lt;span class=&quot;kd&quot;&gt;let&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;namespace&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nx&quot;&gt;WebUtil&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;.&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;getQueryVar&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;dl&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-       &lt;span class=&quot;nx&quot;&gt;loadVMI&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nx&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;);&lt;/span&gt;
-    &lt;span class=&quot;nt&quot;&gt;&amp;lt;/script&amp;gt;&lt;/span&gt;
-  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/meta&amp;gt;&lt;/span&gt;
-
-  &lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;&amp;lt;table&amp;gt;&amp;lt;tbody&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;id=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;vmis&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;&amp;lt;/tbody&amp;gt;&amp;lt;/table&amp;gt;&lt;/span&gt;
-  &lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Create dockerfile with following content to add static html files and set up &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl proxy&lt;/code&gt; command line args.&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-Dockerfile&quot;&gt;FROM quay.io/bitnami/kubectl:1.15
-ADD static /static
-CMD [&quot;proxy&quot;, &quot;--www=/static&quot;, &quot;--accept-hosts=^.*$&quot;, &quot;--address=[::]&quot;, &quot;--api-prefix=/k8s/&quot;, &quot;--www-prefix=&quot;]
-&lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;Finally use &lt;code class=&quot;highlighter-rouge&quot;&gt;docker build&lt;/code&gt; to build docker image.&lt;/p&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd virtvnc
-docker build -t quay.io/samblade/virtvnc:v0.1 .
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;setting-up-rbac&quot;&gt;Setting Up RBAC&lt;/h3&gt;
-&lt;p&gt;Create a service account for virtvnc.&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ServiceAccount&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Then define cluster role for kubevirt, setting up permissions needed.&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRole&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io/v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;rules&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiGroups&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;subresources.kubevirt.io&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachineinstances/console&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachineinstances/vnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;verbs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;get&lt;/span&gt;
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiGroups&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachines&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachineinstances&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachineinstancepresets&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachineinstancereplicasets&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtualmachineinstancemigrations&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;verbs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;get&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;list&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;watch&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;And then binding cluster role to service accout.&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRoleBinding&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io/v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;subjects&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ServiceAccount&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;roleRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRole&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;apiGroup&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;deploy-to-kubernetes&quot;&gt;Deploy to kubernetes&lt;/h3&gt;
-&lt;p&gt;Create following yaml, and then apply to kubernetes to setup &lt;code class=&quot;highlighter-rouge&quot;&gt;virtvnc&lt;/code&gt; deployment.&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;extensions/v1beta1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;serviceAccountName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;node-role.kubernetes.io/master&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;'&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;tolerations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; 
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-role.kubernetes.io/master&quot;&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Equal&quot;&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;effect&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;NoSchedule&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;containers&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;quay.io/samblade/virtvnc:v0.1&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;livenessProbe&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;httpGet&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8001&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;scheme&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;HTTP&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;failureThreshold&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;30&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;initialDelaySeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;30&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;periodSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;successThreshold&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;timeoutSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Expose a &lt;code class=&quot;highlighter-rouge&quot;&gt;NodePort&lt;/code&gt; service, then we can access the web page from node network.&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Service&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8001&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;TCP&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;targetPort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;8001&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtvnc&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NodePort&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;blockquote&gt;
-  &lt;p&gt;&lt;strong&gt;Note that this will make all your virtual machines vnc &amp;amp; console accessible to node network.&lt;/strong&gt;&lt;/p&gt;
-  &lt;h2 id=&quot;the-simple-way&quot;&gt;The Simple Way&lt;/h2&gt;
-  &lt;p&gt;In this &lt;a href=&quot;https://github.com/wavezhang/virtVNC&quot;&gt;github repo&lt;/a&gt; and &lt;a href=&quot;https://quay.io/repository/samblade/virtvnc&quot;&gt;registry&lt;/a&gt; you’ll find a ready to use version of the above which you can deploy in a single command like this:&lt;/p&gt;
-  &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl apply -f https://github.com/wavezhang/virtVNC/raw/master/k8s/virtvnc.yaml
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
-  &lt;h2 id=&quot;access-vnc&quot;&gt;Access VNC&lt;/h2&gt;
-  &lt;p&gt;First get node port of &lt;code class=&quot;highlighter-rouge&quot;&gt;virtvnc&lt;/code&gt; service.&lt;/p&gt;
-  &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get svc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt virtvnc
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
-  &lt;p&gt;Then visit the following url in browser:&lt;/p&gt;
-  &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://NODEIP:NODEPORT/
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
-  &lt;p&gt;If you want manage virtual machines in other namespace, you can specify namespace using query param &lt;code class=&quot;highlighter-rouge&quot;&gt;namespace&lt;/code&gt; like following:&lt;/p&gt;
-  &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;http://NODEIP:NODEPORT/?namespace=test
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;  &lt;/div&gt;
-  &lt;p&gt;&lt;img src=&quot;/assets/2019-11-11-Access-Virtual-Machines-graphic-console-using-noVNC/virtvnc.gif&quot; alt=&quot;VirtVNC&quot; title=&quot;VirtVNC&quot; /&gt;&lt;/p&gt;
-  &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-&lt;/blockquote&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/novnc/noVNC/blob/master/docs/EMBEDDING.md&quot;&gt;Embedding and Deploying noVNC Application
-&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2018/KubeVirt-API-Access-Control.html&quot;&gt;Kubevirt Api Access Control
-&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/tasks/access-kubernetes-api/http-proxy-access-api/&quot;&gt;Use an HTTP Proxy to Access the Kubernetes API
-&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Yafei Bao</name></author><category term="news" /><summary type="html">Introduction</summary></entry></feed>
+&lt;p&gt;We look forward to seeing you at KubeCon + CloudNativeCon!&lt;/p&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><summary type="html">The KubeCon + CloudNativeCon North America 2019 conference is next week in San Diego, California.</summary></entry></feed>

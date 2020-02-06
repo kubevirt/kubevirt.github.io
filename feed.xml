@@ -1,4 +1,177 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-05T13:00:50+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-06T07:01:47+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA</title><link href="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA" /><published>2020-02-06T00:00:00+00:00</published><updated>2020-02-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">&lt;p&gt;In this &lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;video&lt;/a&gt;, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
+Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some 
+performance metrics comparing KubeVirt to standalone KVM.&lt;/p&gt;
+
+&lt;h2 id=&quot;kubevirt-intro&quot;&gt;KubeVirt Intro&lt;/h2&gt;
+
+&lt;p&gt;David introduces the talk showing what KubeVirt is and what is not:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;KubeVirt is not involved with managing AWS or GCP instances&lt;/li&gt;
+  &lt;li&gt;KubeVirt is not a competitor to Firecracker or Kata containers&lt;/li&gt;
+  &lt;li&gt;KubeVirt is not a container runtime replacement&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;He likes to define KubeVirt as:&lt;/p&gt;
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;KubeVirt is a Kubernetes extension that allows running traditional VM workloads natively side by side with Container workloads.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;But why KubeVirt?&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Already have on-premise solutions like OpenStack, oVirt&lt;/li&gt;
+  &lt;li&gt;And then there’s the public cloud, AWS, GCP, Azure&lt;/li&gt;
+  &lt;li&gt;Why are we doing this VM management stuff yet again?&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The answer is that the initial motivation for it was this idea of infrastructure convergence:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_infrastructure_convergence.png&quot; alt=&quot;kubevirt_infrastructure_convergence&quot; title=&quot;KubeVirt infrastructure convergence&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The transition to the cloud model involves multiple stacks, containers and VMs, old code and new code. 
+With KubeVirt all this is simplified with just one stack to manage containers and VMs to run old code and new code.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_one_stack.png&quot; alt=&quot;kubevirt_one_stack&quot; title=&quot;KubeVirt one stack&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The workflow convergence means that:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Converging VM management into container management workflows&lt;/li&gt;
+  &lt;li&gt;Using the same tooling (kubectl) for containers and Virtual Machines&lt;/li&gt;
+  &lt;li&gt;Keeping the declarative API for VM management (just like pods, deployments, etc…)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;An example of a VM Instance in YAML could be so simple as the following example:&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;$ cat &amp;lt;&amp;lt;EOF | kubectl create -f -&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstance&lt;/span&gt;
+&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; 
+    &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora29&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;architecture&quot;&gt;Architecture&lt;/h2&gt;
+
+&lt;p&gt;The truth here is that a KubeVirt VM is a KVM+qemu process running inside a pod. It’s as simple as that.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_virtual_machine.png&quot; alt=&quot;kubevirt_virtual_machine&quot; title=&quot;KubeVirt VM = KVM+qemu&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The VM Launch flow is shown in the following diagram. Since the user posts a VM manifest to the cluster until the Kubelet spins up the VM pod.
+And finaly the virt-handler instructs the virt-launcher how to launch the qemu.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_vm_launch_flow.png&quot; alt=&quot;kubevirt_vm_launch_flow&quot; title=&quot;KubeVirt VM launch flow&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The storage in KubeVirt is used in the same way as the pods, if there is a need to have persistent storage in a VM a PVC (Persistent Volume Claim) 
+needs to be created.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_volumes.png&quot; alt=&quot;kubevirt_volumes&quot; title=&quot;KubeVirt volumes&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;For example, if you have a VM in your laptop, you can upload that image using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;containerized-data-importer&lt;/a&gt; (CDI) to a PVC and then you can attach
+that PVC to the VM pod to get it running.&lt;/p&gt;
+
+&lt;p&gt;About the use of network services, the traffic routes to the KubeVirt VM in the same way it does to container workloads. Also with Multus there is
+the possibility to have different network interfaces per VM.&lt;/p&gt;
+
+&lt;p&gt;For using the Host Resources:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;VM Guest CPU and NUMA Affinity
+    &lt;ul&gt;
+      &lt;li&gt;CPU Manager (pinning)&lt;/li&gt;
+      &lt;li&gt;Topology Manager (NUMA nodes)&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;VM Guest CPU/MEM requirements
+    &lt;ul&gt;
+      &lt;li&gt;POD resource request/limits&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;VM Guest use of Host Devices
+    &lt;ul&gt;
+      &lt;li&gt;Device Plugins for access to (/dev/kvm, SR-IOV, GPU passthrough)&lt;/li&gt;
+      &lt;li&gt;POD resource request/limits for device allocation&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;gpuvgpu-in-kubevirt-vms&quot;&gt;GPU/vGPU in Kubevirt VMs&lt;/h2&gt;
+
+&lt;p&gt;After the introduction of David, Vishesh takes over and talks in-depth the whys and hows of GPUs in VM. Lots of new Machine and Deep learning applications
+are taking advance of the GPU workloads. Nowadays the Big data is one of the main consumers of GPUs but there are some gaps, the gaming and professional graphics sector 
+still need to run VMs and have native GPU functionalities, that is why NVIDIA decided to work with KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png&quot; alt=&quot;gpus_on_kubevirt&quot; title=&quot;GPU/vGPU on KubeVirt&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in &lt;a href=&quot;https://github.com/NVIDIA/kubevirt-gpu-device-plugin&quot;&gt;GitHub&lt;/a&gt;
+It’s opensource and anybody can take a look to it and download it.&lt;/p&gt;
+
+&lt;p&gt;Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs, 
+the following diagram shows the different layers involved in the GPU pass-through architecture:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png&quot; alt=&quot;kubevirt_gpu_passthrough&quot; title=&quot;KubeVirt GPU passthrough&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUS in that node), the Virtual Machine specification
+containing the &lt;code class=&quot;highlighter-rouge&quot;&gt;deviceName&lt;/code&gt; that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as 
+any other else in Kubernetes.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_yaml.png&quot; alt=&quot;kubevirt_gpu_pass_yaml&quot; title=&quot;KubeVirt GPU passthrough yaml&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;The main Device Plugin Functions are:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;GPU and vGPU device Discovery
+    &lt;ul&gt;
+      &lt;li&gt;GPUs with VFIO-PCI driver on the host are identified&lt;/li&gt;
+      &lt;li&gt;vGPUs configured using Nvidia vGPU manager are identified&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GPU and vGPU device Advertising
+    &lt;ul&gt;
+      &lt;li&gt;Discovered devices are advertised to kubelet as allocatable resources&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GPU and vGPU device Allocation
+    &lt;ul&gt;
+      &lt;li&gt;Returns the PCI address of allocated GPU device&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;GPU and vGPU Health Check
+    &lt;ul&gt;
+      &lt;li&gt;Performs health check on the discovered GPU and vGPU devices&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;To understand how the GPU passthrough lifecycle works Vishesh shows the different phases involve in the process using the following diagram:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_lifecycle.png&quot; alt=&quot;gpu_pass_lifecycle&quot; title=&quot;KubeVirt GPU passthrough lifecycle&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;In the following diagram there are some of the Key features that NVIDIA is using with KubeVirt:&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/NVIDIA_usecase_keyfeatures.png&quot; alt=&quot;NVIDIA_usecase_keyfeatures&quot; title=&quot;KubeVirt NVIDIA usecase keyfeatures&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;If you are interested in the details of how the lifecycle works or in why NVIDIA is highly using some of the KubeVirt features listed above, you may be interested in
+taking a look to the following video.&lt;/p&gt;
+
+&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
+
+&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/Qejlyny0G58&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
+
+&lt;h2 id=&quot;speakers&quot;&gt;Speakers&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://github.com/davidvossel&quot;&gt;David Vossel&lt;/a&gt; David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift’s Container Native Virtualization (CNV) 
+and is a core contributor to the open source KubeVirt project.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.linkedin.com/in/vishesh-tanksale&quot;&gt;Vishesh Tanksale&lt;/a&gt; is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster. 
+He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sanbox Project.&lt;/p&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;YouTube video: KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/31/KubeCon%202019%20-%20Virtualized%20GPU%20Workloads%20on%20KubeVirt.pdf&quot;&gt;Presentation: Virtualized GPU workloads on KubeVirt&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VnjX&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an 
 orchestration engine for not just application containers but virtual machine workloads as well. This provides a 
 unified development platform where developers can build, modify, and deploy applications made up of both application 
 containers as well as the virtual machines (VM) in a common, shared environment.&lt;/p&gt;
@@ -946,115 +1119,4 @@ Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; c
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing how KubeVirt can be used from a beginner point of view.</summary></entry><entry><title type="html">Jenkins Infra upgrade</title><link href="https://kubevirt.io//2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt.html" rel="alternate" type="text/html" title="Jenkins Infra upgrade" /><published>2019-11-22T00:00:00+00:00</published><updated>2019-11-22T00:00:00+00:00</updated><id>https://kubevirt.io//2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt</id><content type="html" xml:base="https://kubevirt.io//2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
-
-&lt;p&gt;In the article &lt;a href=&quot;/2019/jenkins-jobs-for-kubevirt-lab-validation.html&quot;&gt;Jenkins Jobs for KubeVirt Lab Validation&lt;/a&gt;, we covered how Jenkins did get the information about the labs and jobs to perform from the KubeVirt repositories.&lt;/p&gt;
-
-&lt;p&gt;In this article, we’ll cover the configuration changes in both Jenkins and the JenkinsFiles required to get our CI setup updated to latest versions and syntax  .&lt;/p&gt;
-
-&lt;h2 id=&quot;jenkins&quot;&gt;Jenkins&lt;/h2&gt;
-
-&lt;p&gt;Our Jenkins instance, is running on top of &lt;a href=&quot;https://console.apps.ci.centos.org:8443/console/&quot;&gt;CentOS OpenShift&lt;/a&gt; and is one of the OS-enhanced Jenkins instances, that provide persistent storage and other pieces bundled, required for non-testing setups.&lt;/p&gt;
-
-&lt;p&gt;What we found is that Jenkins was already complaining because of pending updates (security, engine, etc), but the &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins.war&lt;/code&gt; was embedded in the container image we were using.&lt;/p&gt;
-
-&lt;p&gt;Initial attempts tried to use environment variables to override the WAR to use, but our image was not prepared for it, so we were given the option to just generate a new container for it, but this seemed a bad approach as our image, also contained custom libraries (&lt;code class=&quot;highlighter-rouge&quot;&gt;contra-lib&lt;/code&gt;) that enables communicating with OpenShift to run the tests inside containers there.&lt;/p&gt;
-
-&lt;p&gt;During the investigation and testing, we found that the persistent storage folder we were using (&lt;code class=&quot;highlighter-rouge&quot;&gt;/var/lib/jenkins&lt;/code&gt;) contained a &lt;code class=&quot;highlighter-rouge&quot;&gt;war&lt;/code&gt; folder which contained the unarchived &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins.war&lt;/code&gt;, so the next attempt was to manually download the latest &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins.war&lt;/code&gt;, and unzip it on that folder, which finally allowed us to upgrade Jenkins core.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-plugins&quot;&gt;The plugins&lt;/h2&gt;
-
-&lt;p&gt;After upgrading the Jenkins core, we could use the internal plugin manager to upgrade all the remaining plugins, however, that meant a big change in the plugins, configurations, etc.&lt;/p&gt;
-
-&lt;p&gt;After initially being able to run the lab validations for a while, on next morning we wanted to release a new image (from Cloud-Image-Builder) and it failed to build because of the external libraries, and also affected the lab validations again, so we got back to square one for the upgrade process, leaving us with the decision to go forward with the full upgrade: the latest stable jenkins and available plugins and reconfigure what was changed to suit the upgraded requirements.&lt;/p&gt;
-
-&lt;p&gt;Here we’ll show you the configuration settings for each one of the new/updated plugins.&lt;/p&gt;
-
-&lt;h3 id=&quot;openshift-plugin&quot;&gt;OpenShift Plugin&lt;/h3&gt;
-
-&lt;p&gt;Updated to configure the instance of CentOS OpenShift with the system account for accessing it:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-44-56.png&quot; alt=&quot;Jenkins OpenShift Client configuration&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;openshift-jenkins-sync&quot;&gt;OpenShift Jenkins Sync&lt;/h3&gt;
-
-&lt;p&gt;Updated and configured to use the console as well with &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt&lt;/code&gt; namespace:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-46-47.png&quot; alt=&quot;Jenkins OpenShift sync configuration&quot; /&gt;&lt;/p&gt;
-
-&lt;h3 id=&quot;global-pipeline-libraries&quot;&gt;Global Pipeline Libraries&lt;/h3&gt;
-
-&lt;p&gt;Here we added the libraries we used, but instead of a specific commit, targetting the &lt;code class=&quot;highlighter-rouge&quot;&gt;master&lt;/code&gt; branch.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;contra-lib: &lt;a href=&quot;https://github.com/openshift/contra-lib.git&quot;&gt;https://github.com/openshift/contra-lib.git&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;cico-pipeline-library: &lt;a href=&quot;https://github.com/CentOS/cico-pipeline-library.git&quot;&gt;https://github.com/CentOS/cico-pipeline-library.git&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;contra-library: &lt;a href=&quot;https://github.com/CentOS-PaaS-SIG/contra-env-sample-project&quot;&gt;https://github.com/CentOS-PaaS-SIG/contra-env-sample-project&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;For all of them, we ticked:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Load Implicitly&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Allow default version to be overriden&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;Include @Library changes in job recent changes&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Jenkins replied with the ‘currently maps to revision: &lt;code class=&quot;highlighter-rouge&quot;&gt;hash&lt;/code&gt;’ for each one of them, after having loaded them properly, indicating that it was successful.&lt;/p&gt;
-
-&lt;h3 id=&quot;slack-plugin&quot;&gt;Slack plugin&lt;/h3&gt;
-
-&lt;p&gt;In addition to regular plugins used for builds, we incorporated the slack plugin to validate the notifications of build status to a test slack channel. Configuration is really easy, from within Slack, when added the jenkins notifications plugin, a &lt;code class=&quot;highlighter-rouge&quot;&gt;token&lt;/code&gt; is provided that must be configured in Jenkins as well as a default &lt;code class=&quot;highlighter-rouge&quot;&gt;room&lt;/code&gt; to send notifications to.&lt;/p&gt;
-
-&lt;p&gt;This allows us to get notified when a new build is started and the resulting status, just in case something was generated with errors or something external changed (remember that we use latest KubeVirt release, latest tools for virtctl, kubectl and a new image is generated out of them to validate the labs).&lt;/p&gt;
-
-&lt;h3 id=&quot;kubernetes-cloud&quot;&gt;Kubernetes ‘Cloud’&lt;/h3&gt;
-
-&lt;p&gt;In addition, Kubernets &lt;code class=&quot;highlighter-rouge&quot;&gt;Cloud&lt;/code&gt; was configured pointing to the same console access and using the &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt&lt;/code&gt; namespace:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-51-19.png&quot; alt=&quot;OpenShift Cloud definition and URL and tunnel settings&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The libraries we added, automatically add some pod templates for &lt;code class=&quot;highlighter-rouge&quot;&gt;jenkins-contra-slave&lt;/code&gt;:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-54-24.png&quot; alt=&quot;Jenkins-contra-slave container configuration&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;other-changes&quot;&gt;Other changes&lt;/h2&gt;
-
-&lt;p&gt;Our environment also used other helper tools as regular OpenShift builds (contra):&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-55-41.png&quot; alt=&quot;OpenShift Build repositories and status&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;We had to update the repositories from using some older forks (no longer valid and outdated) to use the latest versions, and for the ansible-executor we also created a fork to use the newest libraries for accessing Google Cloud environment and tuning some other variables (&lt;a href=&quot;https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59&quot;&gt;https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59&lt;/a&gt;) (changes have now landed the upstream repo).&lt;/p&gt;
-
-&lt;p&gt;The issue that we were facing was related with the failure to write temporary files to the &lt;code class=&quot;highlighter-rouge&quot;&gt;$HOME&lt;/code&gt; folder for the user so ansible configuration was forced to use one in a temporary and writable folder.&lt;/p&gt;
-
-&lt;p&gt;Additionally, Google Cloud access required updating libraries for authentication that were failing as well, that is fixed via the Dockerfile that generated &lt;code class=&quot;highlighter-rouge&quot;&gt;ansible-executor&lt;/code&gt; container image.&lt;/p&gt;
-
-&lt;h2 id=&quot;job-changes&quot;&gt;Job Changes&lt;/h2&gt;
-
-&lt;p&gt;Our Jenkins Jobs were defined (as documented in prior article) inside each repository that made that part easy on one side, but also required some tuning and changes:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;We have disabled minikube validation as it was failing for both AWS and GCP unless using baremetal (so we’re wondering about using another approach here)&lt;/li&gt;
-  &lt;li&gt;We’ve added code to do the actual ‘Slack’ notification we mentioned above&lt;/li&gt;
-  &lt;li&gt;Extend the try/catch block to include a ‘finally’ to send the notifications&lt;/li&gt;
-  &lt;li&gt;Change the syntax for ‘artifacts’ as it was previously &lt;code class=&quot;highlighter-rouge&quot;&gt;ArchiveArtifacts&lt;/code&gt; and now it’s a &lt;code class=&quot;highlighter-rouge&quot;&gt;postBuild&lt;/code&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;the-outcome&quot;&gt;The outcome&lt;/h2&gt;
-
-&lt;p&gt;After several attempts for fine-tuning the configuration, the builds started succeeding:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-11-02-34.png&quot; alt=&quot;Sunny build status&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Of course, one of the advantages is that builds happen automatically every day or on code changes on the repositories.&lt;/p&gt;
-
-&lt;p&gt;There’s still room for improvement identified that will happen in next iterations:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Find not needed running instances on Cloud providers for reducing the bills&lt;/li&gt;
-  &lt;li&gt;Trigger builds when new releases of KubeVirt happen (out of kubevirt/kubevirt repo)&lt;/li&gt;
-  &lt;li&gt;Unify testing on &lt;a href=&quot;/2019/prow-jobs-for-kubevirt.html&quot;&gt;Prow instance&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Of course, the builds can be failing for external reasons (like VM in cloud provider taking longer to start up and have SSH available, or the nested VM inside after importing, etc), but still a great help for checking if things are working as they should and of course, to get the validations improved for reduce the number of false positives.&lt;/p&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><summary type="html">Introduction</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing how KubeVirt can be used from a beginner point of view.</summary></entry></feed>
