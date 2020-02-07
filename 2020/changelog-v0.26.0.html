@@ -22,26 +22,26 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//blogs/page13/">
+    <link rel="canonical" href="https://kubevirt.io//2020/changelog-v0.26.0.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Blogs | KubeVirt.io</title>
+    <title>KubeVirt v0.26.0 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="updates, releases, uncategorized, news, " >
-    <meta property="og:title" content="Blogs | KubeVirt.io">
+    <meta name="description" content="This article provides information about KubeVirt release v0.26.0 changes">
+    <meta name="keywords" content="releases" >
+    <meta property="og:title" content="KubeVirt v0.26.0 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//blogs/page13/" >
+    <meta property="og:url" content="https://kubevirt.io//2020/changelog-v0.26.0.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This article provides information about KubeVirt release v0.26.0 changes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-07 09:25:26 +0000" >
-    <meta name="twitter:title" content="Blogs | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2020-02-07 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v0.26.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v0.26.0 changes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     
@@ -208,188 +208,76 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <main role="main" style="margin-top: 60px;">
       <div class="container">
   <div class="row">
-    <h1 class="page-title">Blogs</h1>
-  </div>
-  <div class="row">
-    <div class="col-sm-12 col-md-3">
-      
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v0.26.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-meta">Publication Date: February 7, 2020  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="v0260">v0.26.0</h2>
+
+<p>Released on: Fri Feb 7 09:40:07 2020 +0100</p>
+
+<ul>
+  <li>Fix incorrect ownerReferences to avoid VMs getting GCed</li>
+  <li>Fixes for several tests</li>
+  <li>Fix greedy permissions around Secrets by delegating them to kubelet</li>
+  <li>Fix OOM infra pod by increasing it’s memory request</li>
+  <li>Clarify device support around live migrations</li>
+  <li>Support for an uninstall strategy to protect workloads during uninstallation</li>
+  <li>Support for more prometheus metrics and alert rules</li>
+  <li>Support for testing SRIOV connectivity in functional tests</li>
+  <li>Update Kubernetes client-go to 1.16.4</li>
+  <li>FOSSA fixes and status</li>
+</ul>
+
+        </article>
         
-          
-          <ul class="blogs-navigation">
-            <h3>Categories</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/news.html"  class="blogs-navigation--item_link" >
-                  News
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/updates.html"  class="blogs-navigation--item_link" >
-                  Weekly Updates
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/releases.html"  class="blogs-navigation--item_link" >
-                  Releases
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/uncategorized.html"  class="blogs-navigation--item_link" >
-                  Uncategorized
-                </a>
-                
-              </li>
-            
-          </ul>
-          
         
-          
-          <ul class="blogs-navigation">
-            <h3>Additional filters</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/date.html"  class="blogs-navigation--item_link" >
-                  Grouped by Date
-                </a>
-                
-              </li>
-            
-          </ul>
-          
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v0.26.0&url=https://www.kubevirt.io/2020/changelog-v0.26.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
         
-      
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
     </div>
-    <div class="col-sm-12 col-md-9">
-      <ul class="posts">
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/changelog-v0.7.0.html">KubeVirt v0.7.0</a></h2>
-            <div class="posts-date">July 04, 2018</div>
-            This article provides information about KubeVirt release v0.7.0 changes
-            
-            <div class="readmore">
-    <a href="/2018/changelog-v0.7.0.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Unit-Test-Howto.html">Unit Test Howto</a></h2>
-            <div class="posts-date">July 3, 2018</div>
-            This post tries to demystify some of our unit test mechanism, hopefully will make it easier to write more tests and increase our code coverage!
-            
-            <div class="readmore">
-    <a href="/2018/Unit-Test-Howto.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Run-Istio-with-kubevirt.html">Run Istio With Kubevirt</a></h2>
-            <div class="posts-date">June 21, 2018</div>
-            Use Istio with KubeVirt
-            
-            <div class="readmore">
-    <a href="/2018/Run-Istio-with-kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/KVM-Using-Device-Plugins.html">Kvm Using Device Plugins</a></h2>
-            <div class="posts-date">June 20, 2018</div>
-            KubeVirt Using Device Plugins For KVM
-            
-            <div class="readmore">
-    <a href="/2018/KVM-Using-Device-Plugins.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Hello-KubeVirt-on-Minikube.html">Hello Kubevirt On Minikube</a></h2>
-            <div class="posts-date">June 20, 2018</div>
-            Hello KubeVirt on MiniKube
-            
-            <div class="readmore">
-    <a href="/2018/Hello-KubeVirt-on-Minikube.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-      </ul>
-    </div>
-    
-<div class="pagination align-items-center">
-  
-    <a href="/blogs/page12" class="btn btn-outline-secondary btn-light mr-2">
-      <i class="fas fa-angle-left"></i> New
-    </a>
-  
-
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-        <strong class="font-weight-bold">13</strong>
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-  <strong>of 22</strong>
-
-  
-    <a href="/blogs/page14" class="btn btn-outline-secondary btn-light ml-2">
-      Old <i class="fas fa-angle-right"></i>
-    </a>
-  
-
-</div>
-
   </div>
 </div>
 

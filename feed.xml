@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-07T07:02:03+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA</title><link href="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA" /><published>2020-02-06T00:00:00+00:00</published><updated>2020-02-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">&lt;p&gt;In this &lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;video&lt;/a&gt;, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-07T09:25:26+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Feb 7 09:40:07 2020 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Fix incorrect ownerReferences to avoid VMs getting GCed&lt;/li&gt;
+  &lt;li&gt;Fixes for several tests&lt;/li&gt;
+  &lt;li&gt;Fix greedy permissions around Secrets by delegating them to kubelet&lt;/li&gt;
+  &lt;li&gt;Fix OOM infra pod by increasing it’s memory request&lt;/li&gt;
+  &lt;li&gt;Clarify device support around live migrations&lt;/li&gt;
+  &lt;li&gt;Support for an uninstall strategy to protect workloads during uninstallation&lt;/li&gt;
+  &lt;li&gt;Support for more prometheus metrics and alert rules&lt;/li&gt;
+  &lt;li&gt;Support for testing SRIOV connectivity in functional tests&lt;/li&gt;
+  &lt;li&gt;Update Kubernetes client-go to 1.16.4&lt;/li&gt;
+  &lt;li&gt;FOSSA fixes and status&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.26.0</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA</title><link href="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA" /><published>2020-02-06T00:00:00+00:00</published><updated>2020-02-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">&lt;p&gt;In this &lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;video&lt;/a&gt;, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
 Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some 
 performance metrics comparing KubeVirt to standalone KVM.&lt;/p&gt;
 
@@ -1091,32 +1106,4 @@ Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; c
   &lt;li&gt;Update of libvirt to 5.6.0&lt;/li&gt;
   &lt;li&gt;Fix bug related to parallel scraping of Prometheus endpoints&lt;/li&gt;
   &lt;li&gt;Fix to reliably test VNC&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.24.0</summary></entry><entry><title type="html">KubeVirt basic operations video</title><link href="https://kubevirt.io//2019/KubeVirt_basic_operations_video.html" rel="alternate" type="text/html" title="KubeVirt basic operations video" /><published>2019-11-28T00:00:00+00:00</published><updated>2019-11-28T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_basic_operations_video</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_basic_operations_video.html">&lt;p&gt;In this video, we are showing how KubeVirt can be used from a beginner point of view.&lt;/p&gt;
-
-&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
-
-&lt;p&gt;In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt installation notes&lt;/a&gt; or try it yourself in the &lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt&lt;/a&gt; Katacoda scenario.
-Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/KC03G60shIc&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
-
-&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;Creating a Virtual Machine from a YAML and a cloud image&lt;/li&gt;
-  &lt;li&gt;Starting the Virtual Machine&lt;/li&gt;
-  &lt;li&gt;Connecting through the console and SSH to the Virtual Machine&lt;/li&gt;
-  &lt;li&gt;Connecting to the Virtual Machine through VNC&lt;/li&gt;
-  &lt;li&gt;Stopping and removing the Virtual Machine&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this video, we are showing how KubeVirt can be used from a beginner point of view.</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.24.0</summary></entry></feed>
