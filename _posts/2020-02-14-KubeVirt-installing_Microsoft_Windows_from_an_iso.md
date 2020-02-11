@@ -10,9 +10,9 @@ pub-date: February, 14
 pub-year: 2020
 ---
 
-Hello! nowadays each operating system vendor has its own cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
+Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
 but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?
-In this blogpost we are going to explain how to prepare that VM with the iso file and the needed drivers to proceed with the installation of Microsoft Windows.
+In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.
 
 
 ## Pre-requisites
@@ -25,8 +25,8 @@ In this blogpost we are going to explain how to prepare that VM with the iso fil
 ## Preparation
 
 To proceed with the Installation steps the different elements involved are commented:
-> NOTE
-> no need of executing any command until the Installation section.
+> NOTE:
+> no need for executing any command until the Installation section.
 
 1. An empty KubeVirt Virtual Machine
 ```yaml
@@ -58,7 +58,7 @@ spec:
 First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
 the ISO files to download for evaluation purposes:
 ![win2k12_download_iso.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png "KubeVirt Microsoft windows iso download")
-To be able to start the evaluation some personal data has to be filled to continue. Afterwards the architecture to be checked is "64 bit" and the language wished as the following
+To be able to start the evaluation some personal data has to be filled to continue. Afterwards, the architecture to be checked is "64 bit" and the language wished as the following
 diagram shows:
 ![win2k12_download_iso_64.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png "KubeVirt Microsoft windows iso download")
 Once the ISO file is downloaded it has to be uploaded with `virtctl`, the parameters used in this example are the following:
@@ -66,18 +66,18 @@ Once the ISO file is downloaded it has to be uploaded with `virtctl`, the parame
 - `--image-path`: The path of the ISO file
 - `--pvc-name`: The name of the PVC to store the ISO file, in this example is `iso-win2k12`
 - `--access-mode`: the access mode for the PVC, in the example `ReadOnlyMany` has been used.
-- `--pvc-size`: The size of the PVC, is where the ISO will be stored, in this case the ISO is 4.3G so a PVC os 5G should be enough
+- `--pvc-size`: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough
 - `--uploadproxy-url`: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is `10.96.164.35` and the PORT is `443`
 >NOTE:
-> In order to upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. 
-In a production environment, this probably involves setting up a Ingress or a LoadBalancer Service. 
+> To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. 
+In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
 ```sh
 $ kubectl get services -n cdi
 NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
 cdi-api           ClusterIP   10.96.117.29   <none>        443/TCP   6d18h
 cdi-uploadproxy   ClusterIP   10.96.164.35   <none>        443/TCP   6d18h
 ```
-In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` find it and to simplify the operation.
+In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` to find it and to simplify the operation.
 - `--insecure`: Allow insecure server connections when using HTTPS
 - `--wait-secs`: The time in seconds to wait for upload pod to start. (default 60)
 
@@ -92,7 +92,7 @@ $ virtctl image-upload \
 --insecure \
 --wait-secs=240
 ```
-3. A PVC for the hard drive where the Operating System is going to be installed, in this example it is called `winhd` and the space requeste is 15Gi:
+3. A PVC for the hard drive where the Operating System is going to be installed, in this example it is called `winhd` and the space requested is 15Gi:
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -124,7 +124,7 @@ And also it has to be referenced in the VM YAML, in this example the name for th
   name: virtiocontainerdisk
 ```
 
-If the pre-requisites are fullfiled the final YAML ([win2k12.yml](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml)) will look like:
+If the pre-requisites are fullfilled the final YAML ([win2k12.yml](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml)) will look like:
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -232,10 +232,12 @@ $ virtctl vnc win2k12-iso
 ```
 ![windows2k12_install.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png "KubeVirt Microsoft Windows installation")
 
-Here is important to comment that to be able to connect through VNC using `virtctl` it's necessary to have access to the Kubernetes API listening in the port 443 of the loadbalancer
+Here is important to comment that to be able to connect through VNC using `virtctl` it's necessary to have access to the Kubernetes API listening in the port 443 of the load balancer
 or one of the Masters of the cluster. The following video shows how to go through the installation process:
 
 ![kubevirt_install_windows.mp4](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4 "KubeVirt Microsoft Windows installation")
+
+Once the Virtual Machine is created the PVC with the ISO and the `virtio` drivers can be unattached from the Virtual Machine.
 
 
 ## References
