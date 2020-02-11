@@ -305,7 +305,7 @@ $ curl -v --insecure -H "Authorization: Bearer $TOKEN" --data-binary @tests/imag
 
 ## RBAC Roles
 
-CDI runs under a custom ServiceAccount (cdi-sa) and uses the [Kubernetes RBAC model](https://kubernetes.io/docs/reference/access-authn-authz/rbac/) to apply an application specific custom ClusterRole with rules to properly access needed resources such as PersistentVolumeClaims and Pods.
+CDI runs under a custom ServiceAccount (cdi-sa) and uses the [Kubernetes RBAC model](https://v1-13.docs.kubernetes.io/docs/reference/access-authn-authz/rbac/) to apply an application specific custom ClusterRole with rules to properly access needed resources such as PersistentVolumeClaims and Pods.
 
 ## Protecting VM Image Namespaces
 
