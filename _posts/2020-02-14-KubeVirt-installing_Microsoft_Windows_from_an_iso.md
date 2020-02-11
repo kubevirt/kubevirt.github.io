@@ -258,7 +258,7 @@ Once the Virtual Machine is created the PVC with the ISO and the `virtio` driver
 
 
 ## References
-- [KubeVirt user-guide: Virtio Windows Driver disk usage] (https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html)
+- [KubeVirt user-guide: Virtio Windows Driver disk usage](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html)
 - [Creating a registry image with a VM disk](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md)
 - [CDI Upload User Guide](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md)
 - [KubeVirt user-guide: How to obtain virtio drivers?](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers)
