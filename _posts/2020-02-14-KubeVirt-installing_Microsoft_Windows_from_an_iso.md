@@ -96,6 +96,7 @@ $ virtctl image-upload \
 --insecure \
 --wait-secs=240
 ```
+
 3. A PVC for the hard drive where the Operating System is going to be installed, in this example it is called `winhd` and the space requested is 15Gi:
 ```yaml
 apiVersion: v1
@@ -124,7 +125,7 @@ And also it has to be referenced in the VM YAML, in this example the name for th
   name: virtiocontainerdisk
 ...
 - containerDisk:
-		image: kubevirt/virtio-container-disk
+    image: kubevirt/virtio-container-disk
   name: virtiocontainerdisk
 ```
 
@@ -187,7 +188,9 @@ spec:
 
 ## Installation
 To proceed with the installation the commands commented above are going to be executed:
+
 1. Uploading the ISO file to the PVC:
+
 ```sh
 $ virtctl image-upload \
 --image-path=/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO \
@@ -207,6 +210,7 @@ Uploading data to https://10.96.164.35:443
 
 Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO completed successfully
 ```
+
 2. Pulling the `virtio` container to the local registry:
 ```sh
 $ docker pull kubevirt/virtio-container-disk
@@ -216,12 +220,14 @@ latest: Pulling from docker.io/kubevirt/virtio-container-disk
 Digest: sha256:7e5449cb6a4a9586a3cd79433eeaafd980cb516119c03e499492e1e37965fe82
 Status: Image is up to date for docker.io/kubevirt/virtio-container-disk:latest
 ```
+
 3. Creating the PVC and Virtual Machine definitions:
 ```sh
 $ kubectl create -f win2k12.yml
 virtualmachine.kubevirt.io/win2k12-iso configured
 persistentvolumeclaim/winhd created
 ```
+
 4. Starting the Virtual Machine Instance:
 ```sh
 $ virtctl start win2k12-iso
@@ -230,6 +236,7 @@ $ kubectl get vmi
 NAME          AGE   PHASE     IP            NODENAME
 win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
 ```
+
 5. Once the status of the VMI is `RUNNING` it's time to connect using VNC:
 ```sh
 $ virtctl vnc win2k12-iso
@@ -239,7 +246,12 @@ $ virtctl vnc win2k12-iso
 Here is important to comment that to be able to connect through VNC using `virtctl` it's necessary to have access to the Kubernetes API listening in the port 443 of the load balancer
 or one of the Masters of the cluster. The following video shows how to go through the installation process:
 
-![kubevirt_install_windows.mp4](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4 "KubeVirt Microsoft Windows installation")
+<figure class="video_container">
+  <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4">
+    <source src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" type="video/mp4">
+  </video>
+</figure>
+
 
 Once the Virtual Machine is created the PVC with the ISO and the `virtio` drivers can be unattached from the Virtual Machine.
 
