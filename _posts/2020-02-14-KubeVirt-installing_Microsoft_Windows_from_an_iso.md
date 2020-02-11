@@ -57,10 +57,14 @@ spec:
 2. A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the `virtctl` command when uploading the file
 First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
 the ISO files to download for evaluation purposes:
+
 ![win2k12_download_iso.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png "KubeVirt Microsoft windows iso download")
+
 To be able to start the evaluation some personal data has to be filled to continue. Afterwards, the architecture to be checked is "64 bit" and the language wished as the following
 diagram shows:
+
 ![win2k12_download_iso_64.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png "KubeVirt Microsoft windows iso download")
+
 Once the ISO file is downloaded it has to be uploaded with `virtctl`, the parameters used in this example are the following:
 - `image-upload`: Upload a VM image to a PersistentVolumeClaim
 - `--image-path`: The path of the ISO file
