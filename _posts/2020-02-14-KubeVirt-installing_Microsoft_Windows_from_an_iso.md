@@ -1,17 +1,18 @@
 ---
 layout: post
 author: Pedro Ibáñez Requena
-description: "In this blogpost a Virtual Machine is created to install Microsoft Windows in KubeVirt from an iso following the traditional way."
+description: "In this blogpost a Virtual Machine is created to install Microsoft Windows in KubeVirt from an ISO following the traditional way."
 navbar_active: Blogs
 category: news
 comments: true
-title: "KubeVirt: installing Microsoft Windows from an iso"
+title: "KubeVirt: installing Microsoft Windows from an ISO"
 pub-date: February, 14
 pub-year: 2020
 ---
 
 Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
 but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?
+
 In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.
 
 
@@ -19,12 +20,12 @@ In this blogpost, we are going to explain how to prepare that VM with the ISO fi
 
 - A Kubernetes cluster is already up and running 
 - [KubeVirt](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) and [CDI](https://github.com/kubevirt/containerized-data-importer/blob/master/README.md) are already installed
-- There is enough free CPU, Memory and disk space n the cluster to deploy a Microsoft Windows, in this example the version 2012 R2 VM is going to be used
+- There is enough free CPU, Memory and disk space in the cluster to deploy a Microsoft Windows VM, in this example, the version 2012 R2 VM is going to be used
 
 
 ## Preparation
 
-To proceed with the Installation steps the different elements involved are commented:
+To proceed with the Installation steps the different elements involved are listed:
 > NOTE:
 > no need for executing any command until the Installation section.
 
@@ -45,14 +46,14 @@ spec:
         cpu:
          cores: 4
         devices:
-				...
+        ...
         machine:
           type: q35
         resources:
           requests:
             memory: 8G
       volumes:
-				...
+      ...
 ```
 2. A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the `virtctl` command when uploading the file
 First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
