@@ -29,7 +29,7 @@ In this blogpost, we are going to explain how to prepare that VM with the ISO fi
 To proceed with the Installation steps the different elements involved are listed:
 
 > NOTE ""
-> no need for executing any command until the Installation section.
+> No need for executing any command until the Installation section.
 
 1. An empty KubeVirt Virtual Machine
     ```yaml
@@ -65,7 +65,7 @@ To proceed with the Installation steps the different elements involved are liste
     ![win2k12_download_iso.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png "KubeVirt Microsoft windows iso download")
 
     To be able to start the evaluation some personal data has to be filled in. Afterwards, the architecture to be checked is "64 bit" and the language selected as shown in 
-    the following diagram:
+    the following picture:
 
     ![win2k12_download_iso_64.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png "KubeVirt Microsoft windows iso download")
 
@@ -119,7 +119,6 @@ To proceed with the Installation steps the different elements involved are liste
     ```
 
 4. A [container with the virtio drivers](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers) attached as a CDROM to the VM. 
-
     The container image has to be pulled to have it available in the local registry.
     ```sh
     $ docker pull kubevirt/virtio-container-disk
@@ -193,8 +192,8 @@ To proceed with the Installation steps the different elements involved are liste
             name: virtiocontainerdisk
     ```
 
-    > NOTE ""
-    > Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
+> NOTE ""
+> Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
 
 ## Installation
 To proceed with the installation the commands commented above are going to be executed:
@@ -242,6 +241,7 @@ To proceed with the installation the commands commented above are going to be ex
     ```sh
     $ virtctl start win2k12-iso
     VM win2k12-iso was scheduled to start
+
     $ kubectl get vmi
     NAME          AGE   PHASE     IP            NODENAME
     win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
@@ -254,8 +254,7 @@ To proceed with the installation the commands commented above are going to be ex
     ![windows2k12_install.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png "KubeVirt Microsoft Windows installation")
 
     Here is important to comment that to be able to connect through VNC using `virtctl` it's necessary to have access to the Kubernetes API listening in the port 443 of the load balancer
-    or one of the Masters of the cluster. The following video shows how to go through the installation process:
-
+    or one of the Masters of the cluster. The following video shows how to go through the Microsoft Windows installation process:
     <figure class="video_container">
     <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4"  width="800" height="600">
         <source src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" type="video/mp4">
