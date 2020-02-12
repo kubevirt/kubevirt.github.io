@@ -28,8 +28,8 @@ In this blogpost, we are going to explain how to prepare that VM with the ISO fi
 
 To proceed with the Installation steps the different elements involved are listed:
 
-!!! NOTE:
-    no need for executing any command until the Installation section.
+> NOTE ""
+> no need for executing any command until the Installation section.
 
 1. An empty KubeVirt Virtual Machine
     ```yaml
@@ -77,9 +77,9 @@ To proceed with the Installation steps the different elements involved are liste
     - `--pvc-size`: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough
     - `--uploadproxy-url`: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is `10.96.164.35` and the PORT is `443`
 
-    !!! NOTE:
-        To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. 
-        In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
+    > NOTE ""
+    > To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. 
+    > In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
 
     ```sh
     $ kubectl get services -n cdi
@@ -193,8 +193,8 @@ To proceed with the Installation steps the different elements involved are liste
             name: virtiocontainerdisk
     ```
 
-!!! NOTE:
-    Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
+    > NOTE ""
+    > Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
 
 ## Installation
 To proceed with the installation the commands commented above are going to be executed:
