@@ -36,7 +36,7 @@ To proceed with the Installation steps the different elements involved are liste
     apiVersion: kubevirt.io/v1alpha3
     kind: VirtualMachine
     metadata:
-    name: win2k12-iso
+      name: win2k12-iso
     spec:
       running: false
       template:
@@ -44,17 +44,17 @@ To proceed with the Installation steps the different elements involved are liste
           labels:
             kubevirt.io/domain: win2k12-iso
         spec:
-        domain:
-          cpu:
-            cores: 4
-          devices:
+          domain:
+            cpu:
+              cores: 4
+            devices:
         ...
-          machine:
-            type: q35
-          resources:
-            requests:
-              memory: 8G
-        volumes:
+            machine:
+              type: q35
+            resources:
+              requests:
+                memory: 8G
+          volumes:
         ...
     ```
 2. A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the `virtctl` command when uploading the file
