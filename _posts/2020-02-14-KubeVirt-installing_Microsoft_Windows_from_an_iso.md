@@ -191,8 +191,8 @@ To proceed with the Installation steps the different elements involved are liste
             name: virtiocontainerdisk
     ```
 
-> info "Information"
-> Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
+    > info "Information"
+    > Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
 
 ## Installation
 To proceed with the installation the commands commented above are going to be executed:
