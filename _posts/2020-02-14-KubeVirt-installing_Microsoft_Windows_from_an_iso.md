@@ -5,7 +5,6 @@ description: "In this blogpost a Virtual Machine is created to install Microsoft
 navbar_active: Blogs
 category: news
 comments: true
-tags: "KubeVirt", "Microsoft Windows", "Container", "Virtual Machine", "Virtual Machine in Kubernetes", "Kubernetes"
 title: "KubeVirt: installing Microsoft Windows from an ISO"
 pub-date: February, 14
 pub-year: 2020
@@ -255,7 +254,7 @@ To proceed with the installation the commands commented above are going to be ex
     or one of the Masters of the cluster. The following video shows how to go through the installation process:
 
     <figure class="video_container">
-    <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4">
+    <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4"  width="800" height="600">
         <source src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" type="video/mp4">
     </video>
     </figure>
