@@ -261,7 +261,7 @@ To proceed with the installation the commands commented above are going to be ex
     </figure>
 
 
-Once the Virtual Machine is created the PVC with the ISO and the `virtio` drivers can be unattached from the Virtual Machine.
+Once the Virtual Machine is created, the PVC with the ISO and the `virtio` drivers can be unattached from the Virtual Machine.
 
 
 ## References
