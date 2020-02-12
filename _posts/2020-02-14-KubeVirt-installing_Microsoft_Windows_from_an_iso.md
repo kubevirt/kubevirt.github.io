@@ -38,22 +38,22 @@ To proceed with the Installation steps the different elements involved are liste
     metadata:
     name: win2k12-iso
     spec:
-    running: false
-    template:
+      running: false
+      template:
         metadata:
-        labels:
+          labels:
             kubevirt.io/domain: win2k12-iso
         spec:
         domain:
-            cpu:
+          cpu:
             cores: 4
-            devices:
-            ...
-            machine:
+          devices:
+        ...
+          machine:
             type: q35
-            resources:
+          resources:
             requests:
-                memory: 8G
+              memory: 8G
         volumes:
         ...
     ```
@@ -108,12 +108,12 @@ To proceed with the Installation steps the different elements involved are liste
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-    name: winhd
+      name: winhd
     spec:
-    accessModes:
+      accessModes:
         - ReadWriteOnce
     resources:
-        requests:
+      requests:
         storage: 15Gi
     storageClassName: hostpath
     ```
@@ -128,11 +128,11 @@ To proceed with the Installation steps the different elements involved are liste
     ```yaml
     - disk:
         bus: sata
-    name: virtiocontainerdisk
+      name: virtiocontainerdisk
     ...
     - containerDisk:
         image: kubevirt/virtio-container-disk
-    name: virtiocontainerdisk
+      name: virtiocontainerdisk
     ```
 
     If the pre-requisites are fullfilled, the final YAML ([win2k12.yml](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml)), will look like:
@@ -140,55 +140,55 @@ To proceed with the Installation steps the different elements involved are liste
     apiVersion: v1
     kind: PersistentVolumeClaim
     metadata:
-    name: winhd
+      name: winhd
     spec:
-    accessModes:
+      accessModes:
         - ReadWriteOnce
-    resources:
+      resources:
         requests:
-        storage: 15Gi
-    storageClassName: hostpath
+          storage: 15Gi
+      storageClassName: hostpath
 
     apiVersion: kubevirt.io/v1alpha3
     kind: VirtualMachine
     metadata:
-    name: win2k12-iso
+      name: win2k12-iso
     spec:
-    running: false
-    template:
+      running: false
+      template:
         metadata:
-        labels:
+          labels:
             kubevirt.io/domain: win2k12-iso
         spec:
-        domain:
+          domain:
             cpu:
-            cores: 4
+              cores: 4
             devices:
-            disks:
-            - bootOrder: 1
+              disks:
+              - bootOrder: 1
                 cdrom:
-                bus: sata
+                  bus: sata
                 name: cdromiso
-            - disk:
-                bus: virtio
+              - disk:
+                  bus: virtio
                 name: harddrive
-            - cdrom:
-                bus: sata
+              - cdrom:
+                  bus: sata
                 name: virtiocontainerdisk
             machine:
-            type: q35
+              type: q35
             resources:
-            requests:
+              requests:
                 memory: 8G
-        volumes:
-        - name: cdromiso
+          volumes:
+          - name: cdromiso
             persistentVolumeClaim:
-            claimName: iso-win2k12
-        - name: harddrive
+              claimName: iso-win2k12
+          - name: harddrive
             persistentVolumeClaim:
-            claimName: winhd
-        - containerDisk:
-            image: kubevirt/virtio-container-disk
+              claimName: winhd
+          - containerDisk:
+              image: kubevirt/virtio-container-disk
             name: virtiocontainerdisk
     ```
 
