@@ -77,8 +77,10 @@ To proceed with the Installation steps the different elements involved are liste
     - `--pvc-size`: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough
     - `--uploadproxy-url`: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is `10.96.164.35` and the PORT is `443`
 
-    > info "Information"
-    > To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
+<div class="premonition info"><div class="fa fa-check-square"></div><div class="content"><p class="header">Information</p><p>
+To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
+</p></div></div>
+
 
     ```sh
     $ kubectl get services -n cdi
