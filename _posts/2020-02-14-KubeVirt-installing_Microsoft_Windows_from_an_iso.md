@@ -5,6 +5,7 @@ description: "In this blogpost a Virtual Machine is created to install Microsoft
 navbar_active: Blogs
 category: news
 comments: true
+tags: [ kubevirt, kubernetes, "virtual machine", "microsoft windows kubernetes", "microsoft windows container" ]
 title: "KubeVirt: installing Microsoft Windows from an ISO"
 pub-date: February, 14
 pub-year: 2020
@@ -26,8 +27,9 @@ In this blogpost, we are going to explain how to prepare that VM with the ISO fi
 ## Preparation
 
 To proceed with the Installation steps the different elements involved are listed:
-> NOTE:
-> no need for executing any command until the Installation section.
+
+!!! NOTE:
+    no need for executing any command until the Installation section.
 
 1. An empty KubeVirt Virtual Machine
     ```yaml
@@ -190,6 +192,7 @@ To proceed with the Installation steps the different elements involved are liste
             image: kubevirt/virtio-container-disk
             name: virtiocontainerdisk
     ```
+
 !!! NOTE:
     Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
 
