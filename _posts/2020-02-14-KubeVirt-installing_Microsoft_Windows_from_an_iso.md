@@ -62,12 +62,12 @@ To proceed with the Installation steps the different elements involved are liste
     First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
     the ISO files to download for evaluation purposes:
 
-    ![win2k12_download_iso.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png "KubeVirt Microsoft windows iso download")
+    ![win2k12_download_iso.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png "KubeVirt Microsoft Windows iso download")
 
     To be able to start the evaluation some personal data has to be filled in. Afterwards, the architecture to be checked is "64 bit" and the language selected as shown in 
     the following picture:
 
-    ![win2k12_download_iso_64.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png "KubeVirt Microsoft windows iso download")
+    ![win2k12_download_iso_64.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png "KubeVirt Microsoft Windows iso download")
 
     Once the ISO file is downloaded it has to be uploaded with `virtctl`, the parameters used in this example are the following:
     - `image-upload`: Upload a VM image to a PersistentVolumeClaim
@@ -191,8 +191,8 @@ To proceed with the Installation steps the different elements involved are liste
             name: virtiocontainerdisk
     ```
 
-    > info "Information"
-    > Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
+> info "Information"
+> Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
 
 ## Installation
 To proceed with the installation the commands commented above are going to be executed:
