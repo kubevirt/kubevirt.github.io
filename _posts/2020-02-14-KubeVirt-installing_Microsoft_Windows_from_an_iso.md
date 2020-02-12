@@ -78,8 +78,7 @@ To proceed with the Installation steps the different elements involved are liste
     - `--uploadproxy-url`: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is `10.96.164.35` and the PORT is `443`
 
     > NOTE "INFO"
-    > To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. 
-    > In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
+    > To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
 
     ```sh
     $ kubectl get services -n cdi
@@ -192,7 +191,7 @@ To proceed with the Installation steps the different elements involved are liste
             name: virtiocontainerdisk
     ```
 
-> NOTE "NOTE"
+> NOTE "INFO"
 > Special attention to the `bootOrder: 1` parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.
 
 ## Installation
