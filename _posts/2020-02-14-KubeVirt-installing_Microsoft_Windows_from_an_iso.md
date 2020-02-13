@@ -221,7 +221,7 @@ To proceed with the installation the commands commented above are going to be ex
     Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO completed successfully
     ```
 
-2. Pulling the `virtio` container to the local registry:
+2. Pulling the `virtio` container image to the locally:
     ```sh
     $ docker pull kubevirt/virtio-container-disk
     Using default tag: latest
@@ -254,8 +254,8 @@ To proceed with the installation the commands commented above are going to be ex
     ```
     ![windows2k12_install.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png "KubeVirt Microsoft Windows installation")
 
-    Here is important to comment that to be able to connect through VNC using `virtctl` it's necessary to have access to the Kubernetes API listening in the port 443 of the load balancer
-    or one of the Masters of the cluster. The following video shows how to go through the Microsoft Windows installation process:
+    Here is important to comment that to be able to connect through VNC using `virtctl` it's necessary to reach the Kubernetes API. 
+    The following video shows how to go through the Microsoft Windows installation process:
     <figure class="video_container">
     <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4"  width="800" height="600">
         <source src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" type="video/mp4">
