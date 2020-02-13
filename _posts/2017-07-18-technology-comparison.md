@@ -1,4 +1,14 @@
-# Comparing KubeVirt to other technologies
+---
+layout: post
+author: Fabian Deustch
+description: "In this blogpost, we discuss on the technology provided by KubeVirt and how it stands against other technologies available"
+navbar_active: Blogs
+category: news
+comments: true
+title: "Comparing KubeVirt to other technologies"
+pub-date: July, 18
+pub-year: 2017
+---
 
 ## Is KubeVirt a replacement for $MYVMMGMTSYSTEM?
 
@@ -12,7 +22,6 @@ That being said, KubeVirt is intended to be part of a virtualization management
 system. It can be seen as an VM cluster runtime, and additional components
 provide additional functionality to provide a nice coherent user-experience.
 
-
 ## Is KubeVirt like ClearContainers?
 
 No. [ClearContainers](https://github.com/clearcontainers/runtime)
@@ -24,7 +33,6 @@ cluster level.
 But beyond that it's also how virtual machines are exposed.
 ClearContainers hide the fact that a virtual machine is used, but KubeVirt is
 highly interested in providing an API to configure a virtual machine.
-
 
 ## Is KubeVirt like virtlet?
 
@@ -44,10 +52,8 @@ The key differences to KubeVirt are:
   KubeVirt on the other hand exposes a VM specific API, which tries to cover
   all properties of a VM.
 
-
 ## Why Kubernetes and not bringing containers to OpenStack or oVirt ?
 
 We think that Container workloads are the future. Therefore we want to add VM
 support on top of a container management system instead of building container
 support into a  VM management system.
-
