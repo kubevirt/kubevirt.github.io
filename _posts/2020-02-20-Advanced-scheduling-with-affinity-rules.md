@@ -4,6 +4,7 @@ author: Alberto Losada Grande
 description: KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to VMs. Basically, the same or even more complex affinity and anti-affinity rules can be assigned to virtual machines (VMs) or Pods in Kubernetes than in a regular virtualization solutions.
 navbar_active: Blogs
 category: news
+tags: [ "kubevirt", "kubernetes", "virtual machine", "affinity", "scheduling", "anti-affinity", "topologyKeys" ]
 comments: true
 title: Advanced scheduling using affinity and anti-affinity rules
 pub-date: February 20
