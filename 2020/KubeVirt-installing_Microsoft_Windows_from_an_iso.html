@@ -296,37 +296,38 @@ but what if you want to follow the traditional way of installing a VM using an e
       <li><code class="highlighter-rouge">--pvc-size</code>: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough</li>
       <li><code class="highlighter-rouge">--uploadproxy-url</code>: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is <code class="highlighter-rouge">10.96.164.35</code> and the PORT is <code class="highlighter-rouge">443</code></li>
     </ul>
+
+    <div class="premonition info">
+ <div class="fa fa-check-square"></div>
+ <div class="content"><p class="header">Information</p>
+ <p>
+ To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
+ </p>
+ </div>
+ </div>
+
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>kubectl get services <span class="nt">-n</span> cdi
+ NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>   AGE
+ cdi-api           ClusterIP   10.96.117.29   &lt;none&gt;        443/TCP   6d18h
+ cdi-uploadproxy   ClusterIP   10.96.164.35   &lt;none&gt;        443/TCP   6d18h
+</code></pre></div>    </div>
+    <p>In this example the ISO file was copied to the Kubernetes node, to allow the <code class="highlighter-rouge">virtctl</code> to find it and to simplify the operation.</p>
+    <ul>
+      <li><code class="highlighter-rouge">--insecure</code>: Allow insecure server connections when using HTTPS</li>
+      <li><code class="highlighter-rouge">--wait-secs</code>: The time in seconds to wait for upload pod to start. (default 60)</li>
+    </ul>
+
+    <p>The final command with the parameters and the values would look like:</p>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
+ <span class="nt">--image-path</span><span class="o">=</span>/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO <span class="se">\</span>
+ <span class="nt">--pvc-name</span><span class="o">=</span>iso-win2k12 <span class="se">\</span>
+ <span class="nt">--access-mode</span><span class="o">=</span>ReadOnlyMany <span class="se">\</span>
+ <span class="nt">--pvc-size</span><span class="o">=</span>5G <span class="se">\</span>
+ <span class="nt">--uploadproxy-url</span><span class="o">=</span>https://10.96.164.35:443 <span class="se">\</span>
+ <span class="nt">--insecure</span> <span class="se">\</span>
+ <span class="nt">--wait-secs</span><span class="o">=</span>240
+</code></pre></div>    </div>
   </li>
-</ol>
-
-<div class="premonition info"><div class="fa fa-check-square"></div><div class="content"><p class="header">Information</p><p>
-To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
-</p></div></div>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>```sh
-$ kubectl get services -n cdi
-NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
-cdi-api           ClusterIP   10.96.117.29   &lt;none&gt;        443/TCP   6d18h
-cdi-uploadproxy   ClusterIP   10.96.164.35   &lt;none&gt;        443/TCP   6d18h
-```
-In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` to find it and to simplify the operation.
-- `--insecure`: Allow insecure server connections when using HTTPS
-- `--wait-secs`: The time in seconds to wait for upload pod to start. (default 60)
-
-The final command with the parameters and the values would look like:
-```sh
-$ virtctl image-upload \
---image-path=/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO \
---pvc-name=iso-win2k12 \
---access-mode=ReadOnlyMany \
---pvc-size=5G \
---uploadproxy-url=https://10.96.164.35:443 \
---insecure \
---wait-secs=240
-```
-</code></pre></div></div>
-
-<ol>
   <li>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="highlighter-rouge">winhd</code> and the space requested is 15Gi:
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
  <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>

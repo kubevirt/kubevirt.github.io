@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-14T08:00:43+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt: installing Microsoft Windows from an ISO</title><link href="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows from an ISO" /><published>2020-02-14T00:00:00+00:00</published><updated>2020-02-14T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">&lt;p&gt;Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-14T09:46:38+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt: installing Microsoft Windows from an ISO</title><link href="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows from an ISO" /><published>2020-02-14T00:00:00+00:00</published><updated>2020-02-14T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">&lt;p&gt;Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
 but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?&lt;/p&gt;
 
 &lt;p&gt;In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.&lt;/p&gt;
@@ -68,37 +68,38 @@ but what if you want to follow the traditional way of installing a VM using an e
       &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--pvc-size&lt;/code&gt;: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough&lt;/li&gt;
       &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--uploadproxy-url&lt;/code&gt;: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is &lt;code class=&quot;highlighter-rouge&quot;&gt;10.96.164.35&lt;/code&gt; and the PORT is &lt;code class=&quot;highlighter-rouge&quot;&gt;443&lt;/code&gt;&lt;/li&gt;
     &lt;/ul&gt;
+
+    &lt;div class=&quot;premonition info&quot;&gt;
+ &lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;
+ &lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;
+ &lt;p&gt;
+ To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
+ &lt;/p&gt;
+ &lt;/div&gt;
+ &lt;/div&gt;
+
+    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get services &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi
+ NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   AGE
+ cdi-api           ClusterIP   10.96.117.29   &amp;lt;none&amp;gt;        443/TCP   6d18h
+ cdi-uploadproxy   ClusterIP   10.96.164.35   &amp;lt;none&amp;gt;        443/TCP   6d18h
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
+    &lt;p&gt;In this example the ISO file was copied to the Kubernetes node, to allow the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; to find it and to simplify the operation.&lt;/p&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--insecure&lt;/code&gt;: Allow insecure server connections when using HTTPS&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--wait-secs&lt;/code&gt;: The time in seconds to wait for upload pod to start. (default 60)&lt;/li&gt;
+    &lt;/ul&gt;
+
+    &lt;p&gt;The final command with the parameters and the values would look like:&lt;/p&gt;
+    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl image-upload &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iso-win2k12 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--access-mode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ReadOnlyMany &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--pvc-size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5G &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://10.96.164.35:443 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+ &lt;span class=&quot;nt&quot;&gt;--wait-secs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;240
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
   &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;
-To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
-&lt;/p&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;```sh
-$ kubectl get services -n cdi
-NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
-cdi-api           ClusterIP   10.96.117.29   &amp;lt;none&amp;gt;        443/TCP   6d18h
-cdi-uploadproxy   ClusterIP   10.96.164.35   &amp;lt;none&amp;gt;        443/TCP   6d18h
-```
-In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` to find it and to simplify the operation.
-- `--insecure`: Allow insecure server connections when using HTTPS
-- `--wait-secs`: The time in seconds to wait for upload pod to start. (default 60)
-
-The final command with the parameters and the values would look like:
-```sh
-$ virtctl image-upload \
---image-path=/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO \
---pvc-name=iso-win2k12 \
---access-mode=ReadOnlyMany \
---pvc-size=5G \
---uploadproxy-url=https://10.96.164.35:443 \
---insecure \
---wait-secs=240
-```
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;ol&gt;
   &lt;li&gt;A PVC for the hard drive where the Operating System is going to be installed, in this example it is called &lt;code class=&quot;highlighter-rouge&quot;&gt;winhd&lt;/code&gt; and the space requested is 15Gi:
     &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt; &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
  &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolumeClaim&lt;/span&gt;
