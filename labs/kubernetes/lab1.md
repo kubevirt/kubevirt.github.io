@@ -8,6 +8,8 @@ order: 1
 
 # Use KubeVirt
 
+You can experiment this lab online at [![Katacoda](/assets/images/katacoda-logo.png)](https://katacoda.com/kubevirt/scenarios/kubevirt-101)
+
 ### Create a Virtual Machine
 
 Download the VM manifest and explore it. Note it uses a [registry disk](https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk) and as such doesn't persist data. Such registry disks currently exist for alpine, cirros and fedora.
