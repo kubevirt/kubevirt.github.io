@@ -12,7 +12,7 @@ comments: true
 # Introduction
 Virtual Machines often need multiple interfaces connected to different networks. This could be because the application running on it expect to be connected to different interfaces (e.g. a virtual router running on the VM); because the VM need L2 connectivity to a network not managed by Kubernetes (e.g. allow for PXE booting); because an **existing** VM, ported into KubeVirt, runs applications that expect multiple interfaces to exists; or any other reason - which we'll be happy to hear about in the comment section!
 
-In KubeVirt, as nicely explained in this [blog post]({{ site.baseurl }}/2018/KubeVirt-Network-Deep-Dive.html), there is already a mechanism to take an interface from the pod and move it into the Virtual Machine. However, Kubernetes allows for a single network plugin to be used in a cluster (across all pods), and provide one interface for each pod. This forces us to choose between having pod network connectivity and any other network connectivity for the pod and, in the context of KubeVirt, the Virtual Machine within.
+In KubeVirt, as nicely explained in this [blog post]({% post_url 2018-04-25-KubeVirt-Network-Deep-Dive %}), there is already a mechanism to take an interface from the pod and move it into the Virtual Machine. However, Kubernetes allows for a single network plugin to be used in a cluster (across all pods), and provide one interface for each pod. This forces us to choose between having pod network connectivity and any other network connectivity for the pod and, in the context of KubeVirt, the Virtual Machine within.
 
 To overcome this limitation, we use [Multus](https://github.com/intel/multus-cni), which is a "meta" CNI (Container Network Interface), allowing multiple CNIs to coexist, and allow for a pod to use the right ones for its networking needs.
 
@@ -64,7 +64,7 @@ apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: flannel-network
-spec: 
+spec:
   config: '{
     "cniVersion": "0.3.0",
     "type": "flannel",
@@ -77,7 +77,7 @@ spec:
 Add a reference to it in the pod's annotation, and have two interfaces, connected to two different networks on the pod.
 
 It is quite common that basic networking is provided by one of the mainstream CNIs (flannel, calico, weave etc.) for all pods, and more advanced cases are added specifically when needed. For that, a default CNI could be configured for Multus, so that a ```NetworkAttachmentDefinition``` object is not needed, nor any annotation at pod level. The interface provided for such a network wil be marked as ```eth0``` on the pod, for smooth transition when Multus is introduced into an cluster with networking. Any other interface added to the pod due to an explicit ```NetworkAttachmentDefinition``` object, will be marked as: ```net1```, ```net2``` and so on.
- 
+
 # How Does it Work in KubeVirt?
 Most initial steps would be the same as in the pod's case:
 - Install the different CNIs that you would like to provide networks to our Virtual Machines
@@ -105,25 +105,25 @@ In the following example we use flannel as the CNI that provides the primary pod
 
 ## Install Kubernetes
 - This was tested with latest version, on a single node cluster. Best would be to just follow [these instructions](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/)
-- Since we use a single node cluster, Don't forget to allow scheduling pods on the master: 
+- Since we use a single node cluster, Don't forget to allow scheduling pods on the master:
 
 ```bash
 $ kubectl taint nodes --all node-role.kubernetes.io/master-
 ```
 
-- If running ```kubectl``` from master itself, don't forget to copy over the conf file: 
+- If running ```kubectl``` from master itself, don't forget to copy over the conf file:
 
 ```bash
 $ mkdir -p /$USER/.kube && cp /etc/kubernetes/admin.conf /$USER/.kube/config
 ```
 ## Install Flannel
-- Make sure pass these parameters are used  when starting ```kubeadm```: 
+- Make sure pass these parameters are used  when starting ```kubeadm```:
 
  ```bash
  $ kubeadm init --pod-network-cidr=10.244.0.0/16
  ```
 
-- Then call: 
+- Then call:
 
  ```bash
  $ kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
