@@ -226,7 +226,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <p>In the previous post, <a href="https://kubevirt.io/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a> were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</p>
+          <p>In the previous post, <a href="/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a> were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</p>
 
 <p>There are two options to run the OKD web console to manage a Kubernetes cluster:</p>
 
@@ -280,7 +280,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li><strong>Operating System</strong>. CentOS 8 was chosen as our operating system for the server running the OKD web console. Kubernetes cluster is running latest CentOS 7.</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /etc/redhat-release 
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /etc/redhat-release
 CentOS Linux release 8.0.1905 <span class="o">(</span>Core<span class="o">)</span>
 </code></pre></div></div>
 
@@ -300,7 +300,7 @@ blog-worker-00.kubevirt.local   Ready    &lt;none&gt;   29h   v1.17.0   192.168.
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>nodejs
 Installed:
-  nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64  
+  nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64
 
 Complete!
 </code></pre></div></div>
@@ -325,7 +325,7 @@ Complete!
 
 Installed:
   golang-1.11.6-1.module_el8.0.0+192+8b12aa21.x86_64
-                    
+
 </code></pre></div></div>
 
 <ul>
@@ -348,7 +348,7 @@ Installed:
 <span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
 Using https://192.168.123.250:6443
 
-<span class="nv">$ </span>./build.sh 
+<span class="nv">$ </span>./build.sh
 ...
 Done <span class="k">in </span>215.91s.
 </code></pre></div></div>
@@ -360,7 +360,7 @@ Done <span class="k">in </span>215.91s.
 
 <p>Then, the artifact can be executed:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./bin/bridge 
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./bin/bridge
 2020/01/7 10:21:17 cmd/main: cookies are not secure because base-address is not https!
 2020/01/7 10:21:17 cmd/main: running with AUTHENTICATION DISABLED!
 2020/01/7 10:21:17 cmd/main: Binding to 0.0.0.0:9000...
@@ -387,7 +387,7 @@ Done <span class="k">in </span>215.91s.
 
 <p>Once created, modify the <code class="highlighter-rouge">environment.sh</code> file and change the line that starts with <code class="highlighter-rouge">secretname</code> as shown below:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim contrib/environment.sh 
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim contrib/environment.sh
 <span class="nv">secretname</span><span class="o">=</span><span class="si">$(</span>kubectl get serviceaccount <span class="k">**</span>console<span class="k">**</span> <span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.secrets[0].name}'</span><span class="si">)</span>
 </code></pre></div></div>
 
@@ -599,7 +599,7 @@ console-token-ppfc2
 
 <p>Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> okd-web-console-install.yaml 
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> okd-web-console-install.yaml
 deployment.apps/console-deployment created
 service/console-service created
 

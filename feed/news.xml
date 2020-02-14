@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-14T11:42:43+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt: installing Microsoft Windows from an ISO</title><link href="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows from an ISO" /><published>2020-02-14T00:00:00+00:00</published><updated>2020-02-14T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">&lt;p&gt;Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-14T14:42:49+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt: installing Microsoft Windows from an ISO</title><link href="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows from an ISO" /><published>2020-02-14T00:00:00+00:00</published><updated>2020-02-14T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">&lt;p&gt;Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
 but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?&lt;/p&gt;
 
 &lt;p&gt;In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.&lt;/p&gt;
@@ -565,7 +565,7 @@ is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.&lt;
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=_z5Pjyl0Dq4&quot;&gt;YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp;amp; Chandrakanth Jakkidi&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/70/Introduction_to_KubeVirt-KUBECONNA19.pdf&quot;&gt;Presentation: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp;amp; Chandrakanth Jakkidi&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VyBC&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an orchestration engine for not just application containers but virtual machine workloads as well. This provides a unified development platform where developers can build, modify, and deploy applications made up of both application containers as well as the virtual machines (VM) in a common, shared environment.</summary></entry><entry><title type="html">Managing KubeVirt with Openshift Web Console</title><link href="https://kubevirt.io//2020/OKD-web-console-install.html" rel="alternate" type="text/html" title="Managing KubeVirt with Openshift Web Console" /><published>2020-01-24T00:00:00+00:00</published><updated>2020-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2020/OKD-web-console-install</id><content type="html" xml:base="https://kubevirt.io//2020/OKD-web-console-install.html">&lt;p&gt;In the previous post, &lt;a href=&quot;https://kubevirt.io/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt; were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.&lt;/p&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><summary type="html">In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an orchestration engine for not just application containers but virtual machine workloads as well. This provides a unified development platform where developers can build, modify, and deploy applications made up of both application containers as well as the virtual machines (VM) in a common, shared environment.</summary></entry><entry><title type="html">Managing KubeVirt with Openshift Web Console</title><link href="https://kubevirt.io//2020/OKD-web-console-install.html" rel="alternate" type="text/html" title="Managing KubeVirt with Openshift Web Console" /><published>2020-01-24T00:00:00+00:00</published><updated>2020-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2020/OKD-web-console-install</id><content type="html" xml:base="https://kubevirt.io//2020/OKD-web-console-install.html">&lt;p&gt;In the previous post, &lt;a href=&quot;/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt; were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.&lt;/p&gt;
 
 &lt;p&gt;There are two options to run the OKD web console to manage a Kubernetes cluster:&lt;/p&gt;
 
@@ -619,7 +619,7 @@ is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.&lt;
   &lt;li&gt;&lt;strong&gt;Operating System&lt;/strong&gt;. CentOS 8 was chosen as our operating system for the server running the OKD web console. Kubernetes cluster is running latest CentOS 7.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /etc/redhat-release 
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /etc/redhat-release
 CentOS Linux release 8.0.1905 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Core&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -639,7 +639,7 @@ blog-worker-00.kubevirt.local   Ready    &amp;lt;none&amp;gt;   29h   v1.17.0   
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;yum module &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;nodejs
 Installed:
-  nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64  
+  nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64
 
 Complete!
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -664,7 +664,7 @@ Complete!
 
 Installed:
   golang-1.11.6-1.module_el8.0.0+192+8b12aa21.x86_64
-                    
+
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;ul&gt;
@@ -687,7 +687,7 @@ Installed:
 &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt; ./contrib/environment.sh
 Using https://192.168.123.250:6443
 
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./build.sh 
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./build.sh
 ...
 Done &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;215.91s.
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -699,7 +699,7 @@ Done &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;215.91s.
 
 &lt;p&gt;Then, the artifact can be executed:&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./bin/bridge 
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./bin/bridge
 2020/01/7 10:21:17 cmd/main: cookies are not secure because base-address is not https!
 2020/01/7 10:21:17 cmd/main: running with AUTHENTICATION DISABLED!
 2020/01/7 10:21:17 cmd/main: Binding to 0.0.0.0:9000...
@@ -726,7 +726,7 @@ Done &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;215.91s.
 
 &lt;p&gt;Once created, modify the &lt;code class=&quot;highlighter-rouge&quot;&gt;environment.sh&lt;/code&gt; file and change the line that starts with &lt;code class=&quot;highlighter-rouge&quot;&gt;secretname&lt;/code&gt; as shown below:&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim contrib/environment.sh 
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim contrib/environment.sh
 &lt;span class=&quot;nv&quot;&gt;secretname&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;kubectl get serviceaccount &lt;span class=&quot;k&quot;&gt;**&lt;/span&gt;console&lt;span class=&quot;k&quot;&gt;**&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kube-system &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'{.secrets[0].name}'&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -938,7 +938,7 @@ console-token-ppfc2
 
 &lt;p&gt;Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; okd-web-console-install.yaml 
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; okd-web-console-install.yaml
 deployment.apps/console-deployment created
 service/console-service created
 
