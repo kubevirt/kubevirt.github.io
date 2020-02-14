@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: Advanced scheduling using affinity and anti-affinity rules
-pub-date: February 12
+pub-date: February 20
 pub-year: 2020
 ---
 
@@ -68,7 +68,7 @@ There exist some labels that are important when creating advanced scheduling wor
 
 Basically they are a prepopulated Kubernetes label that the system uses to denote such a topology domain. In our case, the cluster is running in *Iberia* **region** across three different **zones**: *mad, bcn and vlc*. Therefore, it must be labelled accordingly since advanced scheduling rules are going to be applied:
 
-![cluster labelling](/assets/2020-02-14-Advanced-scheduling-with-affinity-rules/kubevirt-blog-affinity.resized.png)
+![cluster labelling](/assets/2020-02-20-Advanced-scheduling-with-affinity-rules/kubevirt-blog-affinity.resized.png)
 
 Below, it is shown the cluster labeling where topology is based in one region and several zones spread across geographically. Additionally, special **high performing nodes** composed by nodes with a high number of resources available including memory, cpu, storage and network are marked as well.
 
