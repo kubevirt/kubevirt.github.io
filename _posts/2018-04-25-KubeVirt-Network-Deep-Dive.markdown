@@ -11,6 +11,8 @@ comments: true
 
 In this post we will research and discover how [KubeVirt](https://github.com/kubevirt/kubevirt) networking functions along with Kubernetes objects services and ingress. This should also provide enough technical details to start troubleshooting your own environment if a problem should arise. So with that let’s get started.
 
+Remember to also check [KubeVirt Network Rehash]({%post_url 2018-10-03-KubeVirt-Network-Rehash %}) which provides updates to this article.
+
 # Component Installation
 
 We are going to walk through the installation that assisted me to write this post. I have created three CentOS 7.4 with nested virtualization enabled where Kubernetes will be installed, which is up next.
