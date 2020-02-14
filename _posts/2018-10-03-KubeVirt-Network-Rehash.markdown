@@ -11,10 +11,10 @@ comments: true
 
 # Introduction
 
-This post is a quick rehash of the previous [post]({{ site.baseurl }}/2018/KubeVirt-Network-Deep-Dive.html) regarding KubeVirt networking.
+This post is a quick rehash of the previous [post]({% post_url 2018-04-25-KubeVirt-Network-Deep-Dive %}) regarding KubeVirt networking.
 It has been updated to reflect the updates that are included with v0.8.0 which includes
 optional layer 2 support via Multus and the ovs-cni. I won't be covering the installation
-of [OKD](https://docs.okd.io/), Kubernetes, KubeVirt, [Multus or ovs-cni]({{site.baseurl}}/2018/attaching-to-multiple-networks.html) all can be found in other documentation or
+of [OKD](https://docs.okd.io/), Kubernetes, KubeVirt, [Multus or ovs-cni]({% post_url 2018-09-12-attaching-to-multiple-networks %}) all can be found in other documentation or
 posts.
 
 # KubeVirt Virtual Machines
@@ -330,7 +330,7 @@ Showing the bridge `k6t-eth0` and `k6t-net` member ports.
 
 The virtual machine network is configured by DHCP. You can see `virt-launcher` has UDP port 67 open
 on the `k6t-eth0` interface to serve DHCP to the virtual machine. As described in the previous
-[post]({{ site.baseurl }}/2018/KubeVirt-Network-Deep-Dive.html) the `virt-launcher` process contains
+[post]({% post_url 2018-04-25-KubeVirt-Network-Deep-Dive %}) the `virt-launcher` process contains
 a simple DHCP server that provides an offer and typical options to the virtual machine instance.
 
 `~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- ss -tuanp`
