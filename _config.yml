@@ -25,6 +25,9 @@ collections:
   labs:
     output: true
     permalink: /:collection/:path
+  galleries:
+    output: true
+    permalink: /:collection/:path
 
 plugins: [jekyll-paginate, jekyll-asciidoc, jekyll-redirect-from, jekyll-feed, jekyll-sitemap, premonition]
 paginate: 5

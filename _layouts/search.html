@@ -38,20 +38,30 @@ var documents = [{% for page in site.posts %}{% if page.title == nil %}{% else %
     "url": "{{ page.url }}",
     "title": "{{ page.title }}",
     "author" : "{{ page.author }}",
+    "tags" : "{{ page.tags| join: ", " }}",
+    "body": "{{ page.content | markdownify | replace: '.', '. ' | replace: '</h2>', ': ' | replace: '</h3>', ': ' | replace: '</h4>', ': ' | replace: '</p>', ' ' | strip_html | strip_newlines | replace: '  ', ' ' | replace: '"', ' ' }}"{% assign counter = counter | plus: 1 %}
+    }, {% endif %}{% endfor %}{% for page in site.galleries %}{% if page.title == nil %}{% else %}{
+    "id": {{ counter }},
+    "url": "{{ page.url }}",
+    "title": "{{ page.title }}",
+    "author" : "{{ page.author }}",
+    "tags" : "{{ page.tags| join: ", " }}",
     "body": "{{ page.content | markdownify | replace: '.', '. ' | replace: '</h2>', ': ' | replace: '</h3>', ': ' | replace: '</h4>', ': ' | replace: '</p>', ' ' | strip_html | strip_newlines | replace: '  ', ' ' | replace: '"', ' ' }}"{% assign counter = counter | plus: 1 %}
     }, {% endif %}{% endfor %}{% for page in site.pages %}{% if page.title == nil %}{% else %}{
     "id": {{ counter }},
     "url": "{{ page.url }}",
     "title": "{{ page.title }}",
     "author" : "{{ page.author }}",
+    "tags" : "{{ page.tags| join: ", " }}",
     "body": "{{ page.date | date: "%Y/%m/%d" }} - {{ page.content | markdownify | replace: '.', '. ' | replace: '</h2>', ': ' | replace: '</h3>', ': ' | replace: '</h4>', ': ' | replace: '</p>', ' ' | strip_html | strip_newlines | replace: '  ', ' ' | replace: '"', ' ' }}"{% assign counter = counter | plus: 1 %}
     }{% endif %}{% if forloop.last %}{% else %}, {% endif %}{% endfor %}];
 
 var idx = lunr(function () {
     this.ref('id')
-    this.field('title')
+    this.field('title', { boost: 2 })
     this.field('body')
     this.field('author')
+    this.field('tags', { boost: 2 })
     documents.forEach(function (doc) {
         this.add(doc)
     }, this)

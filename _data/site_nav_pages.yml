@@ -7,6 +7,10 @@ nav:
     page: Videos
     url: /videos/
 
+  - title: Gallery
+    page: Gallery
+    url: /gallery/
+
   - title: Docs
     url: //kubevirt.io/user-guide
 
