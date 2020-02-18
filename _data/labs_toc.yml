@@ -1,14 +1,12 @@
 toc:
   - title: Installation
     subfolderitems:
-      - page: Easy install using AWS
-        url: pages/ec2.html
-      - page: Easy install using GCP
-        url: pages/gcp.html
-      - page: Easy install using Minikube
+      - page: Minikube
         url: quickstart_minikube/
-      - page: Easy install using Kind
+      - page: Kind
         url: quickstart_kind/
+      - page: Cloud providers
+        url: pages/cloud.html
   - title: Labs
     subfolderitems:
       - page: Use KubeVirt
