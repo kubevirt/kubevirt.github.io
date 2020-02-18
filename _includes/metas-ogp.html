@@ -5,7 +5,7 @@
     {% if page.author %}<meta property="og:type" content="article" >{% endif %}
     <meta name="twitter:card" content="summary">
     <meta name="description" content="{% if page.description %}{{ page.description }}{% else %}{{ site.description }}{% endif %}">
-    <meta name="keywords" content="{% if page.categories %}{{ page.categories | join: ', ' }}{% else %}{% for category in site.categories %}{{ category | first | slugify }}, {% endfor %}{% endif %}" >
+    <meta name="keywords" content="{% if page.tags %}{{ page.tags | join: ', ' }}{% else %}{% for category in site.categories %}{{ category | first | slugify }}, {% endfor %}{% endif %}" >
     <meta property="og:title" content="{% if page.title %}{{ page.title }} | {{ site.title }}{% else %}{{ site.title }}{% endif %}">
     <meta property="og:type" content="{% if page.type %}{{ page.type }} | {{ site.type }}{% else %}{{ site.type }}{% endif %}">
     <meta property="og:url" content="{{site.url}}{{ page.url }}" >
