@@ -451,6 +451,9 @@
 <loc>https://kubevirt.io//cloud-provider-kubevirt/</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//pages/cloud</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//cluster-api-provider-external/</loc>
 </url>
 <url>
@@ -475,13 +478,7 @@
 <loc>https://kubevirt.io//docs/</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//pages/ec2</loc>
-</url>
-<url>
 <loc>https://kubevirt.io//gallery/</loc>
-</url>
-<url>
-<loc>https://kubevirt.io//pages/gcp</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/</loc>
