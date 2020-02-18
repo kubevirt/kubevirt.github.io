@@ -266,7 +266,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <li>The resulting Minikube image is used for lab validation</li>
     </ul>
   </li>
-  <li><a href="https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/">Lab Validation</a> which uses above created images with the contents of the <code class="highlighter-rouge">/tests</code> folder at <a href="https://github.com/kubevirt/kubevirt.github.io/tree/master/tests">Kubevirt.github.io repository</a> to spin up instances and validate that the contents of the labs are valid</li>
+  <li><a href="https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/">Lab Validation</a> which uses above created images with the contents of the <code class="highlighter-rouge">/tests</code> folder at <a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests">Kubevirt.github.io repository</a> to spin up instances and validate that the contents of the labs are valid</li>
 </ul>
 
 <p>Both tests can be executed periodically (by default each day), causing a repository rescan to detect new changes and later validation of them and only on branch <code class="highlighter-rouge">master</code>.</p>
@@ -274,7 +274,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>If you’re curious about what Jenkins does, check the file <code class="highlighter-rouge">JenkinsFile</code> at the root of each repository:</p>
 
 <ul>
-  <li><a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/Jenkinsfile">https://github.com/kubevirt/kubevirt.github.io/blob/master/Jenkinsfile</a></li>
+  <li><a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/Jenkinsfile">https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/Jenkinsfile</a></li>
   <li><a href="https://github.com/kubevirt/cloud-image-builder/blob/master/Jenkinsfile">https://github.com/kubevirt/cloud-image-builder/blob/master/Jenkinsfile</a></li>
 </ul>
 
@@ -307,15 +307,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>In opposition to <a href="/2019/prow-jobs-for-kubevirt.html">KubeVirt Tutorial</a>, it doesn’t use <code class="highlighter-rouge">mdsh</code> yet for extracting the actual commands out of the lab text and uses ansible playbooks to imitate the lab execution:</p>
 
 <ul>
-  <li><a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/ansible/lab1.yml">https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/ansible/lab1.yml</a></li>
-  <li><a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/ansible/lab2.yml">https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/ansible/lab2.yml</a></li>
+  <li><a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/ansible/lab1.yml">https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/ansible/lab1.yml</a></li>
+  <li><a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/ansible/lab2.yml">https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/ansible/lab2.yml</a></li>
 </ul>
 
 <p>In addition, it contains files for also setting up the instance for running the tests (<code class="highlighter-rouge">${environment}-provision.yml</code>) and doing the later cleanup (<code class="highlighter-rouge">$environment-cleanup.yml</code>).</p>
 
 <p>The first playbook, does create a new instance on the environment being checked using the images created by the Cloud Image Builder, so this means that not only the labs are validated, but also the images generated are validated to detect possible defects like missing binaries, wrongly installed software, etc.</p>
 
-<p>The biggest part on the lab validation is with the <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/shell/lab.sh">lab.sh</a> script, which accepts the lab being executed and the environment as parameters, and takes care of provisioning the instance, run the lab and perform cleanup afterwards.</p>
+<p>The biggest part on the lab validation is with the <a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/shell/lab.sh">lab.sh</a> script, which accepts the lab being executed and the environment as parameters, and takes care of provisioning the instance, run the lab and perform cleanup afterwards.</p>
 
         </article>
         
