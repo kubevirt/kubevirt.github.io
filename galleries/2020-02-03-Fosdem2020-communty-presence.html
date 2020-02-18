@@ -22,28 +22,43 @@
 
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//2018/Non-Dockerized-Build.html">
+    <link rel="canonical" href="https://kubevirt.io//galleries/2020-02-03-Fosdem2020-communty-presence">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Non Dockerized Build | KubeVirt.io</title>
+    <title>Fosdem 2020 in pictures | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="yuvalif" >
+    <meta name="author" content="Pablo Iranzo Gómez" >
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host">
-    <meta name="keywords" content="uncategorized" >
-    <meta property="og:title" content="Non Dockerized Build | KubeVirt.io">
+    <meta name="description" content="This article shows KubeVirt presence at Fosdem 2020">
+    <meta name="keywords" content="gallery" >
+    <meta property="og:title" content="Fosdem 2020 in pictures | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//2018/Non-Dockerized-Build.html" >
+    <meta property="og:url" content="https://kubevirt.io//galleries/2020-02-03-Fosdem2020-communty-presence" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host" >
+    <meta property="og:description" content="This article shows KubeVirt presence at Fosdem 2020" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="yuvalif" >
-    <meta property="og:article:published_time" content="2018-06-07 00:00:00 +0000" >
-    <meta name="twitter:title" content="Non Dockerized Build | KubeVirt.io">
-    <meta name="twitter:description" content="This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host">
+    <meta property="og:article:author" content="Pablo Iranzo Gómez" >
+    <meta property="og:article:published_time" content="2020-02-03 00:00:00 +0000" >
+    <meta name="twitter:title" content="Fosdem 2020 in pictures | KubeVirt.io">
+    <meta name="twitter:description" content="This article shows KubeVirt presence at Fosdem 2020">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    <link type="text/css" rel="stylesheet" href="//cdn.jsdelivr.net/npm/galleria@1.6.1/dist/themes/twelve/galleria.twelve.min.css">
+    <style>
+        .galleria { width: 700px; height: 400px; background: #FFFFFF }
+        .galleria-stage {
+            height:450px; <-- set this to any height and i should work :)
+            position: absolute;
+            top: 10px;
+            bottom: 60px;
+            left: 10px;
+            right: 10px;
+            overflow:hidden;}
+        .galleria-errors {display: none;}
+    </style>
     
 </head>
 
@@ -216,156 +231,46 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <div class="post">
         <header class="post-header">
           <h1></h1>
-          <h1 class="post-title">Non Dockerized Build</h1>
+          <h1 class="post-title">Fosdem 2020 in pictures</h1>
           <div class="post-info">
-            <span class="post-author">Author: yuvalif</span>
+            <span class="post-author">Author: Pablo Iranzo Gómez</span>
             <div>
-              <span class="post-meta">Publication Date: June 7, 2018  </span>
+              <span class="post-meta">Publication Date: February 3, 2020  </span>
             </div>
             <div>
               <span class="post-category-name">
-                Category: uncategorized
+                Category: gallery
               </span>
             </div>
           </div>
         </header>
         <article class="post-content">
-          <p>In this post we will set up an alternative to the existing containerized build system used in KubeVirt.</p>
-
-<p>A <a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">new makefile</a> will be presented here, which you can for experimenting (if you are brave enough…)</p>
-
-<h1 id="why">Why?</h1>
-
-<p>Current build system for KubeVirt is done inside docker. This ensures a robust and consistent build environment:</p>
-<ul>
-  <li>No need to install system dependencies</li>
-  <li>Controlled versions of these dependencies</li>
-  <li>Agnostic of local golang environment</li>
-</ul>
-
-<p>So, in general, <strong>you should just use the dockerized build system</strong>.</p>
-
-<p>Still, there are some drawbacks there:</p>
-<ul>
-  <li>Tool integration:
-    <ul>
-      <li>Since your tools are not running in the dockerized environment, they may give different outcome than the ones running in the dockerized environment</li>
-      <li>Invoking any of the dockerized scripts (under <code class="highlighter-rouge">hack</code> directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)</li>
-    </ul>
-  </li>
-  <li>Build time: the dockerized build has some small overheads, and some improvements are still needed to make sure that caching work properly and build is optimized</li>
-  <li>And last, but not least, <em>sometimes it is just hard to resist the tinkering…</em></li>
-</ul>
-
-<h2 id="how">How?</h2>
-
-<p>Currently, the Makefile includes targets that address different things: building, dependencies, cluster management, testing etc. - here I tried to modify the minimum which is required for non-containerized build. Anything not related to it, should just be done using the existing Makefile.</p>
-
-<blockquote>
-  <p>Note that cross compilation is not covered here (e.g. building virtctl for mac and windows)</p>
-</blockquote>
-
-<h3 id="prerequisites">Prerequisites</h3>
-
-<p>Best place to look for that is in the docker file definition for the build environment: <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/builder/Dockerfile">hack/docker-builder/Dockerfile</a></p>
-
-<p>Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install -y git
-sudo dnf install -y libvirt-devel
-sudo dnf install -y golang
-sudo dnf install -y docker
-sudo dnf install -y qemu-img
-</code></pre></div></div>
-<p><em>Similarly to the containerized case</em>, docker is still needed (e.g. all the cluster stuff is done via docker),  and therefore, any docker related preparations are needed as well. This would include running docker on startup and making sure that docker commands does not need root privileges. On Fedora27 this would mean:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo groupadd docker
-sudo usermod -aG docker $USER
-sudo systemctl enable docker
-sudo systemctl start docker
-</code></pre></div></div>
-<p>Now, getting the actual code could be done either via <code class="highlighter-rouge">go get</code> (don’t forget to set the <code class="highlighter-rouge">GOPATH</code> environment variable):</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get -d kubevirt.io/kubevirt/...
-</code></pre></div></div>
-<p>Or <code class="highlighter-rouge">git clone</code>:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir -p $GOPATH/src/kubevirt.io/ &amp;&amp; cd $GOPATH/src/kubevirt.io/
-git clone https://github.com/kubevirt/kubevirt
-</code></pre></div></div>
-
-<h3 id="makefilenocontainer"><a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">Makefile.nocontainer</a></h3>
-<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
-
-<span class="nl">bootstrap</span><span class="o">:</span>
-    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">github.com/onsi/ginkgo/ginkgo</span>
-    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">mvdan.cc/sh/cmd/shfmt</span>
-    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/deepcopy-gen</span>
-    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/defaulter-gen</span>
-    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/openapi-gen</span>
-    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/deepcopy-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
-    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/defaulter-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
-    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/openapi-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
-
-<span class="nl">generate</span><span class="o">:</span>
-    <span class="err">./hack/generate.sh</span>
-
-<span class="nl">apidocs</span><span class="o">:</span> <span class="nf">generate</span>
-    <span class="err">./hack/gen-swagger-doc/gen-swagger-docs.sh</span> <span class="err">v1</span> <span class="err">html</span>
-
-<span class="nl">build</span><span class="o">:</span> <span class="nf">check</span>
-    <span class="err">go</span> <span class="err">install</span> <span class="err">-v</span> <span class="err">./cmd/...</span> <span class="err">./pkg/...</span>
-    <span class="err">./hack/copy-cmd.sh</span>
-
-<span class="nl">test</span><span class="o">:</span> <span class="nf">build</span>
-    <span class="err">go</span> <span class="err">test</span> <span class="err">-v</span> <span class="err">-cover</span> <span class="err">./pkg/...</span>
-
-<span class="nl">check</span><span class="o">:</span>
-    <span class="err">./hack/check.sh</span>
-
-<span class="nv">OUT_DIR</span><span class="o">=</span>./_out
-<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="nv">${OUT_DIR}</span>/tests
-
-<span class="nl">functest</span><span class="o">:</span> <span class="nf">build</span>
-    <span class="err">go</span> <span class="err">build</span> <span class="err">-v</span> <span class="err">./tests/...</span>
-    <span class="err">ginkgo</span> <span class="err">build</span> <span class="err">./tests</span>
-    <span class="err">mkdir</span> <span class="err">-p</span> <span class="err">${TESTS_OUT_DIR}/</span>
-    <span class="err">mv</span> <span class="err">./tests/tests.test</span> <span class="err">${TESTS_OUT_DIR}/</span>
-    <span class="err">./hack/functests.sh</span>
-
-<span class="nl">cluster-sync</span><span class="o">:</span> <span class="nf">build</span>
-    <span class="err">./hack/build-copy-artifacts.sh</span>
-    <span class="err">./hack/build-manifests.sh</span>
-    <span class="err">./hack/build-docker.sh</span> <span class="err">build</span>
-    <span class="err">./cluster/clean.sh</span>
-    <span class="err">./cluster/deploy.sh</span>
-
-<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">bootstrap generate apidocs build test check functest cluster-sync</span>
-</code></pre></div></div>
-<h3 id="targets">Targets</h3>
-
-<p>To execute any of the targets use:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make -f Makefile.nocontainer &lt;target&gt;
-</code></pre></div></div>
-<p>File has the following targets:</p>
-
-<ul>
-  <li><strong>bootstrap</strong>: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
-    <ul>
-      <li>Note that the k8s code generators use specific version</li>
-      <li>Note that these are not code dependencies, as they are handled by using a <code class="highlighter-rouge">vendor</code> directory, as well as the distclean,  deps-install and deps-update targets in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
-    </ul>
-  </li>
-  <li><strong>generate</strong>: Calling <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh">hack/generate.sh</a> script similarly to the <a href="https://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a>. It builds all generators (under the <code class="highlighter-rouge">tools</code> directory) and use them to generate: test mocks, KubeVirt resources and test yamls</li>
-  <li><strong>apidocs</strong>: this is similar to apidocs target in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
-  <li><strong>build</strong>: this is building all product binaries, and then using a script (<a href="../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh">copy-cmd.sh</a>, should be placed under: <code class="highlighter-rouge">hack</code>) to copy the binaries from their standard location into the <code class="highlighter-rouge">_out</code> directory, where the cluster management scripts expect them</li>
-  <li><strong>test</strong>: building and running unit tests
-check: using similar code to the one used in the standard makefile: formatting files, fixing package imports and calling go vet</li>
-  <li><strong>functest</strong>: building and running integration tests. After tests are built , they are moved to the <code class="highlighter-rouge">_out</code> directory so that the standard script for running integration tests would find them</li>
-  <li><strong>cluster-sync</strong>: this is the only “cluster management” target that had to be modified from the standard makefile</li>
-</ul>
+          <p>Here are some of the pictures of KubeVirt presence at <a href="https://fosdem.org/2020/">Fosdem 2020</a>.</p>
 
         </article>
         
+          <div class="galleria">
+          </div>
+          <script src="//cdn.jsdelivr.net/npm/galleria@1.6.1/dist/galleria.min.js"></script>
+          <script>
+          $.getJSON('/assets/galleria/fosdem2020.json', function(data) {
+              Galleria.loadTheme('https://cdn.jsdelivr.net/npm/galleria@1.6.1/dist/themes/twelve/galleria.twelve.min.js');
+              Galleria.run('.galleria', {
+              dataSource: data,
+              autoplay: true,
+              responsive: true,
+              maxVideoSize: 1300,
+              imageCrop: false,
+              imageTimeout: 1E10,
+              wait: true,
+          });
+          });
+          </script>
+
+        
         
 
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Non Dockerized Build&url=https://www.kubevirt.io/2018/Non-Dockerized-Build.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Fosdem 2020 in pictures&url=https://www.kubevirt.io/galleries/2020-02-03-Fosdem2020-communty-presence&screen_name=kubevirt" aria-label="Share this on Twitter">
   <i class="fab fa-twitter mr-1"></i> Tweet
 </a>
 <hr/>

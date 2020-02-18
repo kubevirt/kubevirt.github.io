@@ -1111,6 +1111,17 @@
   
    {
      
+        "title"    : "Gallery",
+        "category" : "",
+        "tags"     : "",
+        "url"      : "/gallery/",
+        "date"     : "",
+        "content": "<div class=\"container\">\n  <div class=\"row\">\n    <div class=\"col-sm-12 col-md-9 blogs\">\n      <ul class=\"posts\">\n      \n        \n          <li>\n            <h2 class=\"posts-title\">\n                <a href=\"/galleries/2020-02-03-Fosdem2020-communty-presence\">\n                  Fosdem 2020 in pictures\n                  <div id=\"/galleries/2020-02-03-Fosdem2020-communty-presence\"></div>\n                </a>\n            </h2>\n            <div class=\"posts-date\">February 2, 2020</div>\n                \n\n                    <script src=\"//code.jquery.com/jquery.min.js\"></script>\n                    <script>\n                        $.getJSON('/assets/galleria/fosdem2020.json', function(data) {\n                            var up = document.getElementById('/galleries/2020-02-03-Fosdem2020-communty-presence');\n                            up.innerHTML = '<img src=\"' + data[0]['image'] + '\"widht=\"100\" height=\"100\" align=\"right\" />';\n                        });\n                    </script>\n              \n              This article shows KubeVirt presence at Fosdem 2020\n              \n              <div class=\"readmore\">\n    <a href=\"/galleries/2020-02-03-Fosdem2020-communty-presence\" aria-label=\"Read more about this blog post\">Read More <i class=\"fas fa-angle-right\"></i></a>\n</div>\n\n          </li>\n        \n      \n      </ul>\n    </div>\n  </div>\n</div>\n"
+     
+   } ,
+  
+   {
+     
    } ,
   
    {
