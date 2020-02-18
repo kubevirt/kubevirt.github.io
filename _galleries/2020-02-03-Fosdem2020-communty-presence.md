@@ -2,7 +2,7 @@
 layout: post
 author: Pablo Iranzo Gómez
 description: This article shows KubeVirt presence at Fosdem 2020
-navbar_active: Blogs
+navbar_active: Gallery
 category: gallery
 comments: true
 title: Fosdem 2020 in pictures

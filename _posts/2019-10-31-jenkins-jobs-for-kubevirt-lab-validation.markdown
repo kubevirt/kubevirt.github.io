@@ -39,13 +39,13 @@ There, we've two jobs we're currently refining to get better results:
   - The [resulting AWS images](https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json) are copied to each region.
   - The resulting GCP images are also copied
   - The resulting Minikube image is used for lab validation
-- [Lab Validation](https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/) which uses above created images with the contents of the `/tests` folder at [Kubevirt.github.io repository](https://github.com/kubevirt/kubevirt.github.io/tree/master/tests) to spin up instances and validate that the contents of the labs are valid
+- [Lab Validation](https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/) which uses above created images with the contents of the `/tests` folder at [Kubevirt.github.io repository](https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests) to spin up instances and validate that the contents of the labs are valid
 
 Both tests can be executed periodically (by default each day), causing a repository rescan to detect new changes and later validation of them and only on branch `master`.
 
 If you're curious about what Jenkins does, check the file `JenkinsFile` at the root of each repository:
 
-- <https://github.com/kubevirt/kubevirt.github.io/blob/master/Jenkinsfile>
+- <https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/Jenkinsfile>
 - <https://github.com/kubevirt/cloud-image-builder/blob/master/Jenkinsfile>
 
 Both of them define pipelines so that runs can be executed in parallel for each one of the environments: GCP, AWS, Minikube.
@@ -72,11 +72,11 @@ Lab Validation is meant to check that the labs described in the website are work
 
 In opposition to [KubeVirt Tutorial]({% post_url 2019-10-31-prow-jobs-for-kubevirt %}), it doesn't use `mdsh` yet for extracting the actual commands out of the lab text and uses ansible playbooks to imitate the lab execution:
 
-- <https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/ansible/lab1.yml>
-- <https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/ansible/lab2.yml>
+- <https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/ansible/lab1.yml>
+- <https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/ansible/lab2.yml>
 
 In addition, it contains files for also setting up the instance for running the tests (`${environment}-provision.yml`) and doing the later cleanup (`$environment-cleanup.yml`).
 
 The first playbook, does create a new instance on the environment being checked using the images created by the Cloud Image Builder, so this means that not only the labs are validated, but also the images generated are validated to detect possible defects like missing binaries, wrongly installed software, etc.
 
-The biggest part on the lab validation is with the [lab.sh](https://github.com/kubevirt/kubevirt.github.io/blob/master/tests/shell/lab.sh) script, which accepts the lab being executed and the environment as parameters, and takes care of provisioning the instance, run the lab and perform cleanup afterwards.
+The biggest part on the lab validation is with the [lab.sh](https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests/shell/lab.sh) script, which accepts the lab being executed and the environment as parameters, and takes care of provisioning the instance, run the lab and perform cleanup afterwards.
