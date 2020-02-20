@@ -9,8 +9,6 @@ order: 20
 
 As Kubevirt.io and most of the infrastructure of the Kubevirt Project are currently hosted by Red Hat Inc., this site falls under the [Red Hat Privacy Policy](https://www.redhat.com/en/about/privacy-policy){:target="_blank"}.  All terms of that privacy policy apply to this site.  Should we change our hosting in the future, this Privacy Policy will be updated.
 
-KubeVirt.io uses [Netlify](https://Netlify.com) [Open Source Plan](https://www.netlify.com/legal/open-source-policy/) to render the Pull Requests made against the source repo for the website.
-
 ## How to Contact Us
 
 If you have any questions about any of these practices or KubeVirt's use of your personal information, please feel free to [contact us](mailto:privacy@kubevirt.io) or [file an Issue](https://github.com/kubevirt/kubevirt.github.io/issues){:target="_blank"} in our Github repo.
