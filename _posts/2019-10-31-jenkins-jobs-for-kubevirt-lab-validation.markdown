@@ -7,6 +7,15 @@ navbar_active: Blogs
 pub-date: Oct 31
 pub-year: 2019
 category: news
+tags:
+  [
+    prow,
+    infrastructure,
+    kubevirt-tutorial,
+    CI-CD,
+    continuous integration,
+    jenkins,
+  ]
 ---
 
 ## Introduction

@@ -1,0 +1,17 @@
+---
+layout: page
+---
+<h2>Articles tagged with {{ page.tag }}</h2>
+<ul>
+{% for post in page.posts %}
+  <li><a href="{{ post.url }}">{{ post.title }}</a> ({{ post.date | date_to_string }} | {{ post | tags }})</li>
+{% endfor %}
+</ul>
+<h2>Other tags to explore</h2>
+<div class="tagcloud">
+
+{% capture site_tags %}{% for tag in site.tags %}{{ tag | first }}{% unless forloop.last %},{% endunless %}{% endfor %}{% endcapture %}
+{% assign tags = site_tags | split:',' | sort %}
+{% render_tagcloud %}
+
+</div>

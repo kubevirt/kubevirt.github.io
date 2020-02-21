@@ -6,6 +6,7 @@ navbar_active: Blogs
 pub-date: Feb 22
 pub-year: 2019
 category: news
+tags: [federation, kubefed, multicluster]
 comments: true
 ---
 
@@ -24,7 +25,7 @@ We assume federation is already deployed (using latest stable version) and you h
 
 ## Federated KubeVirt Deployment
 
-We create kubevirt namespace on first cluster:
+We create KubeVirt namespace on first cluster:
 
 ```
 kubectl create ns kubevirt
@@ -44,13 +45,14 @@ We create the federated objects required as per kubevirt deployment:
 kubefed2 enable ClusterRoleBinding
 kubefed2 enable CustomResourceDefinition
 ```
+
 And [federated kubevirt](/assets/2019-02-22-federated-kubevirt/federated_kubevirt-operator.yaml) itself, with placements so that it gets deployed at both sites.
 
 ```
 kubectl create -f federated_kubevirt-operator.yaml
 ```
 
-This gets kubevirt operator deployed at both sites, which creates the Custom Resource definition *KubeVirt*. We then deploy kubevirt by federating this CRD and creates [an instance of it](/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml).
+This gets KubeVirt operator deployed at both sites, which creates the Custom Resource definition _KubeVirt_. We then deploy kubevirt by federating this CRD and creates [an instance of it](/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml).
 
 ```
 kubefed2 enable kubevirts
@@ -88,7 +90,7 @@ virt-handler-bldss                 1/1       Running   0          3m
 virt-operator-67c86544f7-zz5jc     1/1       Running   0          5m
 ```
 
-Now that kubevirt is up and created its own custom resource types, we federate them:
+Now that KubeVirt is up and created its own custom resource types, we federate them:
 
 ```
 kubefed2 enable virtualmachines

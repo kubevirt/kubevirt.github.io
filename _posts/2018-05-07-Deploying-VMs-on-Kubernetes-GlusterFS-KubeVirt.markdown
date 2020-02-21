@@ -6,6 +6,7 @@ navbar_active: Blogs
 pub-date: May 07
 pub-year: 2018
 category: uncategorized
+tags: [glusterfs, heketi, virtual machine, weavenet]
 comments: true
 ---
 
@@ -13,12 +14,12 @@ Kubernetes is traditionally used to deploy and manage containerized applications
 
 ## Contents
 
-* Prerequisites
-* Known Issues
-* Installing Kubernetes
-* Installing GlusterFS and Heketi using gk-deploy
-* Installing KubeVirt
-* Deploying Virtual Machines
+- Prerequisites
+- Known Issues
+- Installing Kubernetes
+- Installing GlusterFS and Heketi using gk-deploy
+- Installing KubeVirt
+- Deploying Virtual Machines
 
 ## Prerequisites
 
@@ -28,17 +29,17 @@ You may use virtual machines in lieu of baremetal servers. Performance may suffe
 
 For reference, I used the following components and versions:
 
-* baremetal servers with CentOS version 7.4 as the base OS
-* latest version of Kubernetes (at the time v1.10.1)
-* Weave Net as the Container Network Interface (CNI), v2.3.0
-* [gluster-kubernetes](https://github.com/gluster/gluster-kubernetes) master commit 2a2a68ce5739524802a38f3871c545e4f57fa20a
-* KubeVirt v0.4.1.
+- baremetal servers with CentOS version 7.4 as the base OS
+- latest version of Kubernetes (at the time v1.10.1)
+- Weave Net as the Container Network Interface (CNI), v2.3.0
+- [gluster-kubernetes](https://github.com/gluster/gluster-kubernetes) master commit 2a2a68ce5739524802a38f3871c545e4f57fa20a
+- KubeVirt v0.4.1.
 
 ## Known Issues
 
-* You may need to set SELinux to permissive mode prior to running "kubeadm init" if you see failures attributed to etcd in /var/log/audit.log.
-* Prior to installing GlusterFS, you may need to disable firewalld until this issue is resolved: https://github.com/gluster/gluster-kubernetes/issues/471
-* kubevirt-ansible install may fail in storage-glusterfs role: https://github.com/kubevirt/kubevirt-ansible/issues/219
+- You may need to set `SELinux` to permissive mode prior to running "kubeadm init" if you see failures attributed to etcd in `/var/log/audit.log`.
+- Prior to installing GlusterFS, you may need to disable firewalld until this issue is resolved: https://github.com/gluster/gluster-kubernetes/issues/471
+- kubevirt-ansible install may fail in storage-glusterfs role: https://github.com/kubevirt/kubevirt-ansible/issues/219
 
 ## Installing Kubernetes
 
@@ -48,7 +49,7 @@ Use Weave Net as the CNI. Other CNIs may work, but I have only tested Weave Net.
 
 If you are using only 2 servers as workers, then you will need to allow scheduling of pods on the master node because GlusterFS requires at least three nodes. To schedule pods on the master node, see "Master Isolation" in the kubeadm guide or execute this command:
 
-```
+```sh
 kubectl taint nodes --all node-role.kubernetes.io/master-
 ```
 
@@ -96,7 +97,7 @@ To aid you, below are the commands you will need to run if you are following the
 
 On all nodes:
 
-```
+```sh
 # Open ports for GlusterFS communications
 sudo iptables -I INPUT 1 -p tcp --dport 2222 -j ACCEPT
 sudo iptables -I INPUT 1 -p tcp --dport 24007 -j ACCEPT
@@ -112,7 +113,7 @@ sudo yum install -y glusterfs-fuse git
 
 On the master node:
 
-```
+```sh
 # checkout gluster-kubernetes repo
 git clone https://github.com/gluster/gluster-kubernetes
 cd gluster-kubernetes/deploy
@@ -184,7 +185,7 @@ Under "hostnames", the node's hostname is listed under "manage" and its IP addre
 
 Once you have your topology.json file and saved it in gluster-kubernetes/deploy, we can execute gk-deploy to create the GlusterFS and Heketi pods. You will need to specify an admin-key which will be used in the next step and will be discovered during the KubeVirt installation.
 
-```
+```sh
 # from gluster-kubernetes/deploy
 ./gk-deploy -g -v -n kube-system --admin-key my-admin-key
 ```
@@ -227,14 +228,14 @@ We will use [kubevirt-ansible](https://github.com/kubevirt/kubevirt-ansible/) to
 
 Let's first clone the kubevirt-ansible repo.
 
-```
+```sh
 git clone https://github.com/kubevirt/kubevirt-ansible
 cd kubevirt-ansible
 ```
 
 Edit the [inventory](https://github.com/kubevirt/kubevirt-ansible/blob/master/inventory) file in the kubevirt-ansible checkout. Modify the section that starts with "#BEGIN CUSTOM SETTINGS". As an example using the servers from above:
 
-```
+```conf
 # BEGIN CUSTOM SETTINGS
 [masters]
 # Your master FQDN
@@ -268,9 +269,9 @@ worker1.somewhere.com
 # END CUSTOM SETTINGS
 ```
 
-Now let's run the kubevirt.yml playbook:
+Now let's run the `kubevirt.yml` playbook:
 
-```
+```sh
 ansible-playbook -i inventory playbooks/kubevirt.yml -e cluster=k8s -e storage_role=storage-glusterfs -e namespace=kube-system -e glusterfs_namespace=kube-system -e glusterfs_name= -e heketi_url=http://10.32.0.4:8080 -v
 ```
 
@@ -296,14 +297,14 @@ The [containerized data importer (CDI)](https://github.com/kubevirt/containerize
 
 On master or on a node where kubectl is configured correctly install and start httpd.
 
-```
+```sh
 sudo yum install -y httpd
 sudo systemctl start httpd
 ```
 
 Download the cirros cloud image and convert it into raw format.
 
-```
+```sh
 curl http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img -o /var/www/html/cirros-0.4.0-x86_64-disk.img
 sudo yum install -y qemu-img
 qemu-img convert /var/www/html/cirros-0.4.0-x86_64-disk.img /var/www/html/cirros-0.4.0-x86_64-disk.raw

@@ -10,23 +10,23 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 
 ### Run a jekyll container
 
-* On a SELinux enabled OS:
+- On a SELinux enabled OS:
 
-    ```console
-    cd kubevirt.github.io
-    mkdir .jekyll-cache
-    podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch --future
-    ```
+  ```console
+  cd kubevirt.github.io
+  mkdir .jekyll-cache
+  podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch --future
+  ```
 
-    **NOTE**: Be sure to cd into the *kubevirt.github.io* directory before running the above command as the Z at the end of the volume (-v) will relabel its contents so it can be written from within the container, like running `chcon -Rt svirt_sandbox_file_t -l s0:c1,c2` yourself.
+  **NOTE**: Be sure to cd into the _kubevirt.github.io_ directory before running the above command as the Z at the end of the volume (-v) will relabel its contents so it can be written from within the container, like running `chcon -Rt svirt_sandbox_file_t -l s0:c1,c2` yourself.
 
-* On an OS without SELinux:
+- On an OS without SELinux:
 
-    ```console
-    cd kubevirt.github.io
-    mkdir .jekyll-cache
-    podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch --future
-    ```
+  ```console
+  cd kubevirt.github.io
+  mkdir .jekyll-cache
+  podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch --future
+  ```
 
 ### View the site
 

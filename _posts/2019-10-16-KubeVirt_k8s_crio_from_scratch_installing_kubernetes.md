@@ -8,15 +8,16 @@ comments: true
 title: KubeVirt on Kubernetes with CRI-O from scratch - Installing Kubernetes
 pub-date: Oct 16
 pub-year: 2019
+tags: [cri-o, kubernetes, ansible]
 ---
 
 Building your environment for testing or automation purposes can be difficult when using different technologies. In this guide you'll find how to set up your system step-by-step to work with the latest versions of Kubernetes (up to today), CRI-O and KubeVirt.
 
 In this series of blogposts the following topics are going to be covered en each post:
 
-* [Requirements: dependencies and containers runtime]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %})
-* [Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})
-* [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %})
+- [Requirements: dependencies and containers runtime]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %})
+- [Kubernetes: Cluster and Network]({% post_url 2019-10-16-KubeVirt_k8s_crio_from_scratch_installing_kubernetes %})
+- [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %})
 
 In the first blogpost of the series ([KubeVirt on Kubernetes with CRI-O from scratch)]({% post_url 2019-10-09-KubeVirt_k8s_crio_from_scratch %}) the initial set up for a CRI-O runtime environment has been covered. In this post is shown the installation and configuration of Kubernetes based in the previous CRI-O environment.
 
@@ -48,7 +49,8 @@ k8s-test.local# yum install -y kubelet kubeadm kubectl
 
 Once the Kubelet is configured and CRI-O also ready, the CRI-O daemon can be started and the setup of the cluster can be done:
 
-> Note that kubelet will not start successfully until the Kubernetes cluster is installed.
+> note "Note"
+> The kubelet will not start successfully until the Kubernetes cluster is installed.
 
 ```sh
 k8s-test.local# systemctl restart crio
@@ -109,6 +111,7 @@ In this example Virtual Machines will be deployed with KubeVirt and also they wi
 
 Some of the [Multus Prequisites](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md) indicate:
 
+> note ""
 > After installing Kubernetes, you must install a default network CNI plugin. If you're using kubeadm, refer to the "Installing a pod network add-on" section in the kubeadm documentation. If it's your first time, we generally recommend using Flannel for the sake of simplicity.
 
 So flannel is going to be installed running the following commands:
@@ -180,4 +183,3 @@ daemonset.apps/kube-multus-ds-ppc64le created
 ```
 
 In the next post [KubeVirt: requirements and first Virtual Machine]({% post_url 2019-10-23-KubeVirt_k8s_crio_from_scratch_installing_KubeVirt %}), the KubeVirt requirements will be set up together with the binaries and YAML files and also the first virtual Machines will be deployed.
-

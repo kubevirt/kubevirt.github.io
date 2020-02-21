@@ -4,6 +4,16 @@ title: Use KubeVirt
 permalink: /labs/kubernetes/lab1
 lab: kubernetes
 order: 1
+tags:
+  [
+    laboratory,
+    kubevirt installation,
+    start vm,
+    stop vm,
+    delete vm,
+    access console,
+    lab,
+  ]
 ---
 
 # Use KubeVirt

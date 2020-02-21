@@ -1,0 +1,175 @@
+---
+layout: post
+author: karmab
+description: KubeVirt 0.7.0 Highlights
+navbar_active: Blogs
+pub-date: July 23
+pub-year: 2018
+category: news
+comments: true
+tags: [hilights, release notes, review, hugepages]
+---
+
+# Introduction
+
+KubeVirt v0.7.0 was released a few weeks ago and brings a bunch of new features that this blog post will detail.
+
+The full list is visible [here](https://github.com/kubevirt/kubevirt/releases/tag/v0.7.0) but we will pick the ones oriented to the end user
+
+# Features
+
+## hugepages support
+
+To use hugepages as backing memory, we need to indicate a desired amount of memory (`resources.requests.memory`) and size of hugepages to use (`memory.hugepages.pageSize`)
+
+```yaml
+apiVersion: kubevirt.io/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: myvm
+spec:
+  domain:
+    resources:
+      requests:
+        memory: "64Mi"
+    memory:
+      hugepages:
+        pageSize: "2Mi"
+    disks:
+      - name: myimage
+        volumeName: myimage
+        disk: {}
+  volumes:
+    - name: myimage
+      persistentVolumeClaim:
+        claimname: myclaim
+```
+
+Note that
+
+- a node must have pre-allocated hugepages
+- hugepages size cannot be bigger than requested memory
+- requested memory must be divisible by hugepages size
+
+## setting network interface model and MAC address
+
+the following syntax within interfaces section allows us to set both a mac address and network model
+
+```yaml
+kind: VM
+spec:
+  domain:
+    devices:
+      interfaces:
+        - name: red
+          macAddress: de:ad:00:00:be:af
+          model: e1000
+          bridge: {}
+  networks:
+    - name: red
+      pod: {}
+```
+
+alternative network models can be
+
+- e1000
+- e1000e
+- ne2k_pci
+- pcnet
+- rtl8139
+- virtio
+
+## setting a disks serial number
+
+The new keyword `serial` in the disks section allows us to specify a serial number
+
+```yaml
+apiVersion: kubevirt.io/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: myvm
+spec:
+  domain:
+    resources:
+      requests:
+        memory: "64Mi"
+    disks:
+      - name: myimage
+        volumeName: myimage
+        serial: sn-11223344
+        disk: {}
+  volumes:
+    - name: myimage
+      persistentVolumeClaim:
+        claimname: myclaim
+```
+
+## specifying the CPU model
+
+Setting the CPU model is possible via `spec.domain.cpu.model`. The following VM will have a CPU with the Conroe model:
+
+```yaml
+metadata:
+  name: myvmi
+spec:
+  domain:
+    cpu:
+      # this sets the CPU model
+      model: Conroe
+```
+
+The available models are listed [here](https://github.com/libvirt/libvirt/blob/master/src/cpu_map)
+
+Additionally, we can also use
+
+- host-model
+- host-passthrough
+
+## virtctl expose
+
+To access services listening within vms, we can expose their ports using standard kubernetes services. Alternatively, we can make use of the _virtctl_ binary to achieve the same result:
+
+- to expose a cluster ip service
+
+```
+virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
+```
+
+- to expose a node port service
+
+```
+virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
+```
+
+- to expose a load balancer service
+
+```
+virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
+```
+
+## Kubernetes compatible networking approach (SLIRP)
+
+In slirp mode, virtual machines are connected to the network backend using QEMU user networking mode. In this mode, QEMU allocates internal IP addresses to virtual machines and hides them behind NAT.
+
+```yaml
+kind: VM
+spec:
+  domain:
+    devices:
+      interfaces:
+        - name: red
+          slirp: {} # connect using SLIRP mode
+  networks:
+    - name: red
+      pod: {}
+```
+
+## Role aggregation for our roles
+
+Every KubeVirt installation after version v0.5.1 comes a set of default RBAC cluster roles that can be used to grant users access to VirtualMachineInstances.
+
+The `kubevirt.io:admin` and `kubevirt.io:edit` ClusterRoles have console and VNC access permissions built into them.
+
+# Conclusion
+
+This concludes our review of latest kubevirt features. Enjoy them !

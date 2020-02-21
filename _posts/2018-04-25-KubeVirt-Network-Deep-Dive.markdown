@@ -6,6 +6,7 @@ navbar_active: Blogs
 pub-date: April 25
 pub-year: 2018
 category: uncategorized
+tags: [network, flannel, kubevirt-ansible, Skydive]
 comments: true
 ---
 
@@ -73,12 +74,14 @@ In this section we continue with the required prerequistes. This is also describ
 
 This is a requirement for Flannel - pass bridged IPv4 traffic to iptables' chains
 
+```sh
     cat <<EOF >  /etc/sysctl.d/k8s.conf
     net.bridge.bridge-nf-call-ip6tables = 1
     net.bridge.bridge-nf-call-iptables = 1
     EOF
 
     sysctl --system
+```
 
 Temporarily disable selinux so we can run `kubeadm init`
 
@@ -86,6 +89,7 @@ Temporarily disable selinux so we can run `kubeadm init`
 
 And let’s also permanently disable selinux - yes I know. If this isn’t done once you reboot your node kubernetes won’t start and then you will be wondering what happened :)
 
+```sh
     cat <<EOF > /etc/selinux/config
     # This file controls the state of SELinux on the system.
     # SELINUX= can take one of these three values:
@@ -99,13 +103,13 @@ And let’s also permanently disable selinux - yes I know. If this isn’t done 
     #     mls - Multi Level Security protection.
     SELINUXTYPE=targeted
     EOF
+```
 
 ## Initialize cluster
 
 Now we are ready to [create our cluster](https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/) starting with the first and only master.
 
-> **Note**
->
+> note "Note"
 > `--pod-network-cidr` is required for Flannel
 
     kubeadm init --pod-network-cidr=10.244.0.0/16
@@ -136,7 +140,8 @@ Once all the nodes have been joined check the status.
 ## Additional Components
 
 ### [KubeVirt](http://www.kubevirt.io)
-----------------------------------
+
+---
 
 The recommended installation method is to use [kubevirt-ansible](https://github.com/kubevirt/kubevirt-ansible). For this example I don’t require storage so just deploying using `kubectl create`.
 
@@ -177,15 +182,15 @@ Check the status of Skydive agent and analyzer
 
 ### ingress-nginx
 
-To provide external access our example NodeJS application we need to an ingress controller. For this example we are going to using [ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/master/deploy)
+To provide external access our example NodeJS application we need to an ingress controller. For this example we are going to use [ingress-nginx](https://github.com/kubernetes/ingress-nginx/tree/master/deploy)
 
 I created a simple script `ingress.sh` that follows the installation documentation for ingress-nginx with a couple minor modifications:
 
--   Patch the `nginx-configuration` ConfigMap to enable vts status
+- Patch the `nginx-configuration` ConfigMap to enable vts status
 
--   Add an additional `containerPort` to the deployment and an additional port to the service.
+- Add an additional `containerPort` to the deployment and an additional port to the service.
 
--   Create an ingress to access nginx status page
+- Create an ingress to access nginx status page
 
 The script and additional files are available in the github repo listed below.
 
@@ -202,7 +207,7 @@ After the script is complete confirm that ingress-nginx pods are running.
 
 # KubeVirt Virtual Machines
 
-Now we are at a point where we can deploy our first KubeVirt virtual machines. These instances are where we will install our simple NodeJS and MongoDB application.
+Now, we are at a point where we can deploy our first KubeVirt virtual machines. These instances are where we will install our simple NodeJS and MongoDB application.
 
 ## Create objects
 
@@ -249,8 +254,7 @@ Where are the virtual machines and what is their IP address?
     virt-launcher-mongodb-qdpmg   2/2       Running   0          4m        10.244.2.7   kn2.virtomation.com
     virt-launcher-nodejs-5r59c    2/2       Running   0          4m        10.244.1.8   kn1.virtomation.com
 
-> **Note**
->
+> note "Note"
 > To test virtual machine to virtual machine network connectivity I purposely set the host where which instance would run by using a `nodeSelector`.
 
 ## Installing the NodeJS Example Application
@@ -280,8 +284,7 @@ First let’s find the host. This is defined within the `Ingress` object. In thi
 
 What are the NodePorts? For this installation Service spec was modified to include `nodePort` for http (30000) and http-mgmt (32000).
 
-> **Note**
->
+> note "Note"
 > When deploying ingress-nginx using the provided Service definition the `nodePort` is undefined. Kubernetes will assign a random port to ports defined in the spec.
 
     $ kubectl get service ingress-nginx -n ingress-nginx
@@ -337,7 +340,6 @@ Now that we shown that kubernetes, kubevirt, ingress-nginx and flannel work toge
 
 ## virt-launcher - [virtwrap](https://github.com/kubevirt/kubevirt/tree/master/pkg/virt-launcher/virtwrap)
 
-
 virt-launcher is the pod that runs the necessary components instantiate and run a virtual machine. We are only going to concentrate on the network portion in this post.
 
 ### [virtwrap manager](https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/manager.go)
@@ -352,13 +354,13 @@ This function calls three functions that are detailed below `discoverPodNetworkI
 
 This function gathers the following information about the pod interface:
 
--   IP Address
+- IP Address
 
--   Routes
+- Routes
 
--   Gateway
+- Gateway
 
--   MAC address
+- MAC address
 
 This is stored for later use in configuring DHCP.
 
@@ -366,17 +368,17 @@ This is stored for later use in configuring DHCP.
 
 Once the current details of the pod interface have been stored following operations are performed:
 
--   Delete the IP address from the pod interface
+- Delete the IP address from the pod interface
 
--   Set the pod interface down
+- Set the pod interface down
 
--   Change the pod interface MAC address
+- Change the pod interface MAC address
 
--   Set the pod interface up
+- Set the pod interface up
 
--   Create the bridge
+- Create the bridge
 
--   Add the pod interface to the bridge
+- Add the pod interface to the bridge
 
 This will provide libvirt a bridge to use for the virtual machine that will be created.
 
@@ -467,11 +469,11 @@ A few important interfaces to note. The `flannel.1` interface is type `vxlan` fo
 
 The pod network subnet is `10.244.0.0/16` and broken up per host:
 
--   km1 - `10.244.0.0/24`
+- km1 - `10.244.0.0/24`
 
--   kn1 - `10.244.1.0/24`
+- kn1 - `10.244.1.0/24`
 
--   kn2 - `10.244.2.0/24`
+- kn2 - `10.244.2.0/24`
 
 So the table will route the packets to correct interface.
 
@@ -505,8 +507,7 @@ To also support kubernetes services kube-proxy writes iptables rules for those s
 
 The bridge `br1` is the main focus in the pod level. It contains the `eth0` and `vnet0` ports. `eth0` becomes the uplink to the bridge which is the other side of the veth pair which is a port on the host’s `cni0` bridge.
 
-> **Important**
->
+> warning "Important"
 > Since `eth0` has no IP address and `br1` is in the self-assigned range the pod has no network access. There are also no routes in the pod. This can be resolved for troubleshooting by creating a veth pair, adding one of the interfaces to the bridge and assigning an IP address in the pod subnet for the host. Routes are also required to be added. This is performed for running skydive in the pod see [skydive.sh](https://github.com/jcpowermac/kubevirt-network-deepdive/blob/master/kubernetes/skydive/skydive.sh) for more details.
 
     $ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- ip a
@@ -554,8 +555,7 @@ With `virsh domiflist` we can also see that the `vnet0` interface is a port on t
 
 Fortunately the vm interfaces are fairly typical. Just the single interface that has been assigned the original pod ip address.
 
-> **Warning**
->
+> warning "Warning"
 > The MTU of the virtual machine interface is set to 1500. The network interfaces upstream are set to 1450.
 
     [fedora@nodejs ~]$ ip a
@@ -663,7 +663,6 @@ In the section where we installed the application we already tested for connecti
 
 ingress-nginx provides an optional setting to enable traffic status - which we already enabled. The screenshot below shows the requests that Nginx is receiving for `nodejs.ingress.virtomation.com`.
 
-
 ![nginx-vts](/assets/images/nginx-vts.png)
 
 #### Service NodePort to Nginx Pod
@@ -715,4 +714,5 @@ In (1) we can see flows to and from `10.244.1.4` and `10.244.1.8`. `.8` is the n
 ![ingress-vm](/assets/images/skydive-ingress-vm.png)
 
 # Final Thoughts
+
 We have went through quite a bit in this deep dive from installation, KubeVirt specific networking details and kubernetes, host, pod and virtual machine level configurations. Finishing up with the packet flow between virtual machine to virtual machine and ingress to virtual machine.

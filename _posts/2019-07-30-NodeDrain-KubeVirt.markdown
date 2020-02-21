@@ -7,22 +7,23 @@ navbar_active: Blogs
 pub-date: Jul 30
 pub-year: 2019
 category: news
+tags: [node drain, eviction, nmo]
 ---
+
 ## Introduction
 
-In a Kubernetes (k8s) cluster, the control plane(scheduler) is responsible for deploying workloads(pods, deployments, replicasets) on the worker nodes depending on the resource availability. What do we do with the workloads if the need arises for maintaining this node? Well, there is good news, `node-drain` feature and node maintenance operator(NMO) both come to our rescue in this situation.
+In a Kubernetes (k8s) cluster, the control plane(scheduler) is responsible for deploying workloads(`pods`, `deployments`, `replicasets`) on the worker nodes depending on the resource availability. What do we do with the workloads if the need arises for maintaining this node? Well, there is good news, `node-drain` feature and node maintenance operator(NMO) both come to our rescue in this situation.
 
 This post discusses evicting the [VMI](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/intro.html)(virtual machine images) and other resources from the node using node drain feature and NMO.
 
-**Note:**
-
-- The environment used for writing this post is based on [OpenShift 4](https://cloud.redhat.com/openshift/install/aws/installer-provisioned) with 3 Masters and 3 Worker nodes.
+> note "Note"
+> The environment used for writing this post is based on [OpenShift 4](https://cloud.redhat.com/openshift/install/aws/installer-provisioned) with 3 Masters and 3 Worker nodes.
 
 - [HyperconvergedClusterOperator]({% post_url 2019-04-17-Hyper-Converged-Operator %}): The goal of the hyper-converged-cluster-operator (HCO) is to provide a single entry point for multiple operators (kubevirt, cdi, networking, etc) where users can deploy and configure them in a single object. This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM which is an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way. Check for [more information about OLM](https://coreos.com/blog/introducing-operator-framework). It only creates operator CRs, which is the user's prerogative.
 
 In our cluster (3 master and 3 nodes) we'll be able to see something similar to:
 
-~~~sh
+```sh
 $oc get nodes
 ip-10-0-132-147.us-east-2.compute.internal   Ready  worker   14m   v1.13.4+27816e1b1
 ip-10-0-142-95.us-east-2.compute.internal    Ready  master   15m   v1.13.4+27816e1b1
@@ -30,7 +31,7 @@ ip-10-0-144-125.us-east-2.compute.internal   Ready  worker   14m   v1.13.4+27816
 ip-10-0-150-125.us-east-2.compute.internal   Ready  master   14m   v1.13.4+27816e1b1
 ip-10-0-161-166.us-east-2.compute.internal   Ready  master   15m   v1.13.4+27816e1b1
 ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816e1b1
-~~~
+```
 
 To test the node eviction, there are two methods.
 
@@ -38,15 +39,15 @@ To test the node eviction, there are two methods.
 
 Before sending a node into maintenance state it is very much necessary to evict the resources on it, VMI's, pods, deployments etc. One of the easiest option for us is to stick to the oc adm drain command. For this, select the node from the cluster from which you want the VMIs to be evicted
 
-~~~sh
+```sh
 oc get nodes
-~~~
+```
 
 Here `ip-10-0-173-203.us-east-2.compute.internal`, then issue the following command.
 
-~~~sh
+```sh
 oc adm drain <node-name> --delete-local-data --ignore-daemonsets=true --force --pod-selector=kubevirt.io=virt-launcher
-~~~
+```
 
 - `--delete-local-data` is used to remove any VMI's that use `emptyDir` volumes, however the data in those volumes are ephemeral which means it is safe to delete after termination.
 
@@ -58,24 +59,24 @@ oc adm drain <node-name> --delete-local-data --ignore-daemonsets=true --force --
 
 If you want to evict all pods from the node just use:
 
-~~~sh
+```sh
 oc adm drain <node name> --delete-local-data --ignore-daemonsets=true --force
-~~~
+```
 
 ### How to evacuate VMIs via Live Migration from a Node
 
 If the `LiveMigration` feature gate is enabled, it is possible to specify an evictionStrategy on VMIs which will react with live-migrations on specific taints on nodes. The following snippet on a VMI ensures that the VMI is migrated if the `kubevirt.io/drain:NoSchedule` taint is added to a node:
 
-~~~yaml
+```yaml
 spec:
   evictionStrategy: LiveMigrate
-~~~
+```
 
 Once the VMI is created, taint the node with
 
-~~~sh
+```sh
 kubectl taint nodes foo kubevirt.io/drain=draining:NoSchedule
-~~~
+```
 
 This command will then trigger a migration.
 
@@ -89,9 +90,9 @@ The `oc adm drain` will result in the target node being marked as unschedulable.
 
 If target node should become schedulable again, the following command must be run:
 
-~~~sh
+```sh
 oc adm uncordon <node name>
-~~~
+```
 
 ## Method 2: Use Node Maintenance Operator (NMO)
 
@@ -105,7 +106,8 @@ Either check:
 Here will continue using the gist for demonstration purposes.
 
 Observe the resources that get created after the HCO is installed
-~~~
+
+```
 $oc get pods -n kubevirt-hyperconverged
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-xgpt8                     1/1     Running   0          12m
@@ -127,17 +129,17 @@ virt-handler-mcl7r                                 1/1     Running   1          
 virt-operator-87d7c98b-fvvzt                       1/1     Running   0          13m
 virt-operator-87d7c98b-xzc42                       1/1     Running   0          13m
 virt-template-validator-76cbbd6f68-5fbzx           1/1     Running   0          12m
-~~~
+```
 
 As seen from above HCO deploys the `node-maintenance-operator`.
 
 Next, let's install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps [here]({% link pages/quickstart_minikube.md  %}#deploy-kubevirt) and deploy a VMI as explained. Please feel free to check the video that explains the [same](https://www.youtube.com/watch?v=LLNjyeB-3fI)
 
-~~~sh
+```sh
 $oc get vms
 NAME     AGE     RUNNING   VOLUME
 testvm   2m13s   true
-~~~
+```
 
 Deploy a node-maintenance-operator CR: As seen from above NMO is deployed from HCO, the purpose of this operator is to watch the node maintenance CustomResource(CR) called `NodeMaintenance` which mainly contains the node that needs a maintenance and the reason for it. The below actions are performed
 
@@ -151,51 +153,51 @@ Either use HCO to create NMO Operator or deploy NMO operator as shown below
 After you follow the instructions:
 
 1. Create a CRD
-    ~~~sh
-    oc create -f deploy/crds/nodemaintenance_crd.yaml
-    customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
-    ~~~
+   ```sh
+   oc create -f deploy/crds/nodemaintenance_crd.yaml
+   customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
+   ```
 2. Create the NS
-    ~~~sh
-    oc create -f deploy/namespace.yaml
-    namespace/node-maintenance-operator created
-    ~~~
+   ```sh
+   oc create -f deploy/namespace.yaml
+   namespace/node-maintenance-operator created
+   ```
 3. Create a Service Account:
-    ~~~sh
-    oc create -f deploy/service_account.yaml
-    serviceaccount/node-maintenance-operator created
-    ~~~
+   ```sh
+   oc create -f deploy/service_account.yaml
+   serviceaccount/node-maintenance-operator created
+   ```
 4. Create a ROLE
-    ~~~sh
-    oc create -f deploy/role.yaml
-    clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
-    ~~~
+   ```sh
+   oc create -f deploy/role.yaml
+   clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
+   ```
 5. Create a ROLE Binding
-    ~~~sh
-    oc create -f deploy/role_binding.yaml
-    clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
-    ~~~
+   ```sh
+   oc create -f deploy/role_binding.yaml
+   clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
+   ```
 6. Then finally make sure to add the image version of the NMO operator in the deploy/operator.yml
-    ~~~sh
-    image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
-    ~~~
+   ```sh
+   image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
+   ```
 7. and then deploy the NMO Operator as shown
-    ~~~sh
-    oc create -f deploy/operator.yaml
-    deployment.apps/node-maintenance-operator created
-    ~~~
+   ```sh
+   oc create -f deploy/operator.yaml
+   deployment.apps/node-maintenance-operator created
+   ```
 
 Finally, We can verify the deployment for the NMO Operator as below
 
-~~~sh
+```sh
 oc get deployment -n node-maintenance-operator
 NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
 node-maintenance-operator   1/1     1            1           4m23s
-~~~
+```
 
 Now that the NMO operator is created, we can create the NMO CR which puts the node into maintenance mode (this CR has the info about the node->from which the pods needs to be evicted and the reason for the maintenance)
 
-~~~yaml
+```yaml
 cat deploy/crds/nodemaintenance_cr.yaml
 
 apiVersion: kubevirt.io/v1alpha1
@@ -205,31 +207,31 @@ metadata:
 spec:
   nodeName: <Node-Name>
   reason: "Test node maintenance"
-~~~
+```
 
 For testing purpose, we can deploy a sample VM instance as shown:
 
-~~~sh
+```sh
 kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
-~~~
+```
 
 Now start the VM `testvm`
 
-~~~sh
+```sh
 ./virtctl start testvm
-~~~
+```
 
 We can see that it's up and running
 
-~~~sh
+```sh
 kubectl get vmis
 NAME     AGE   PHASE     IP            NODENAME
 testvm   92s   Running   10.131.0.17   ip-10-0-173-203.us-east-2.compute.internal
-~~~
+```
 
-Also we can see the status:
+Also, we can see the status:
 
-~~~yaml
+```yaml
 kubectl get vmis -o yaml testvm
 .
 .
@@ -241,13 +243,13 @@ kubectl get vmis -o yaml testvm
   migrationMethod: BlockMigration
   nodeName: ip-10-0-173-203.us-east-2.compute.internal    #NoteDown the nodeName
   phase: Running
-~~~
+```
 
 Note down the node name and edit the `nodemaintenance_cr.yaml` file and then issue the CR manifest which sends the node into maintenance.
 
 Now to evict the pods from the node `ip-10-0-173-203.us-east-2.compute.internal`, edit the `node-maintenance_cr.yaml` as shown:
 
-~~~yaml
+```yaml
 cat deploy/crds/nodemaintenance_cr.yaml
 
 apiVersion: kubevirt.io/v1alpha1
@@ -257,18 +259,18 @@ metadata:
 spec:
   nodeName: ip-10-0-173-203.us-east-2.compute.internal
   reason: "Test node maintenance"
-~~~
+```
 
 As soon as you apply the above CR, the current VM gets deployed in the other node,
 
-~~~sh
+```sh
 oc apply -f deploy/crds/nodemaintenance_cr.yaml
 nodemaintenance.kubevirt.io/nodemaintenance-xyz created
-~~~
+```
 
 Which immediately evicts the VMI
 
-~~~sh
+```sh
 kubectl get vmis
 NAME     AGE   PHASE        IP    NODENAME
 testvm   33s   Scheduling
@@ -276,15 +278,15 @@ testvm   33s   Scheduling
 kubectl get vmis
 NAME     AGE    PHASE     IP            NODENAME
 testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.internal
-~~~
+```
 
-~~~
+```
 ip-10-0-173-203.us-east-2.compute.internal   Ready,SchedulingDisabled   worker
-~~~
+```
 
 When all of this happens, we can view the changes that are taking place with:
 
-~~~sh
+```json
 oc logs pods/node-maintenance-operator-645f757d5-89d6r -n node-maintenance-operator
 .
 .
@@ -303,7 +305,7 @@ oc logs pods/node-maintenance-operator-645f757d5-89d6r -n node-maintenance-opera
 {"level":"info","ts":1559681430.9908028,"logger":"controller_nodemaintenance","msg":"evicting pod \"virt-api-59d7c4b595-dkpvs\"\n"}
 {"level":"info","ts":1559681430.9906204,"logger":"controller_nodemaintenance","msg":"evicting pod \"router-default-6b57bcc884-frd57\"\n"}
 {"level":"info","ts":1559681430.9908257,"logger":"controller_nodemaintenance","msg":"evict
-~~~
+```
 
 Clearly we can see that the previous node went into `SchedulingDisabled` state and the VMI was evicted and placed into other node in the cluster. This demonstrates the node eviction using NMO.
 

@@ -8,6 +8,7 @@ pub-date: 8 Jul
 pub-year: 2019
 category: news
 comments: true
+tags: [ansible]
 ---
 
 [Part 1][blog part 1] contained a short introduction to basic VM management with Ansible's `kubevirt_vm` module.
@@ -22,32 +23,28 @@ many more ways of using the modules than can reasonably fit here.
 [blog part 1]: {% post_url 2019-05-21-kubevirt-with-ansible-part-1 %}
 [blog examples]: https://github.com/kubevirt/ansible-kubevirt-modules/tree/master/examples/blog
 
-
 ## More VM management
-
 
 Virtual machines managed by KubeVirt are highly customizable. Among the features accessible from Ansible, are:
 
-* various libvirt–level virtualized hardware tweaks (e.g. `machine_type` or `cpu_model`),
-* network interface configuration (`interfaces`), including multi–NIC utilizing the Multus CNI,
-* non–persistent VMs (`ephemeral: yes`),
-* direct DataVolumes support (`datavolumes`),
-* and OpenShift Templates support (`template`).
+- various libvirt–level virtualized hardware tweaks (e.g. `machine_type` or `cpu_model`),
+- network interface configuration (`interfaces`), including multi–NIC utilizing the Multus CNI,
+- non–persistent VMs (`ephemeral: yes`),
+- direct DataVolumes support (`datavolumes`),
+- and OpenShift Templates support (`template`).
 
 [datavols]: {% post_url 2018-10-10-CDI-DataVolumes %}
 
 ### Further resources
 
-* [Ansible module documentation](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html)
-  * [Examples, lots of examples](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html#examples)
-* DataVolumes
-  * [Introductory blog post]({% post_url 2018-10-10-CDI-DataVolumes %})
-  * [Upstream documentation](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md)
-* Multus
-  * [Introductory blog post]({% post_url 2018-09-12-attaching-to-multiple-networks %})
-  * [GitHub repo](https://github.com/intel/multus-cni)
-
-
+- [Ansible module documentation](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html)
+  - [Examples, lots of examples](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html#examples)
+- DataVolumes
+  - [Introductory blog post]({% post_url 2018-10-10-CDI-DataVolumes %})
+  - [Upstream documentation](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md)
+- Multus
+  - [Introductory blog post]({% post_url 2018-09-12-attaching-to-multiple-networks %})
+  - [GitHub repo](https://github.com/intel/multus-cni)
 
 ## VM Image Management with the Containerized Data Importer
 
@@ -79,10 +76,11 @@ kubectl apply -f https://github.com/kubevirt/containerized-data-importer/release
 Once `kubectl get pods -n cdi` confirms all pods are ready, CDI is good to go.
 
 The module can instruct CDI to fill the PVC with data from:
-* a remote HTTP(S) server (`http:`),
-* a container registry (`registry:`),
-* a local file (`upload: yes`), though this requires using `kubevirt_cdi_upload` for the actual upload step,
-* or nowhere (the `blank: yes` option).
+
+- a remote HTTP(S) server (`http:`),
+- a container registry (`registry:`),
+- a local file (`upload: yes`), though this requires using `kubevirt_cdi_upload` for the actual upload step,
+- or nowhere (the `blank: yes` option).
 
 Here's a simple example:
 
@@ -99,7 +97,9 @@ cdi_source:
     url: https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
 ```
 
-Please notice the `wait: yes` parameter. The module will only exit after CDI has completed transfering its data.
+> info
+> Please notice the `wait: yes` parameter. The module will only exit after CDI has completed transferring its data.
+
 Let's see this in action:
 
 ```bash
@@ -124,14 +124,11 @@ pvc2      Bound     local-pv-6b6380e2   37Gi       RWO            local         
 
 Everything worked as expected.
 
-
 ### Further resources
 
-* [Ansible module documentation (kubevirt_pvc)](https://docs.ansible.com/ansible/latest/modules/kubevirt_pvc_module.html)
-* [Ansible module documentation (kubevirt_cdi_upload)](https://docs.ansible.com/ansible/latest/modules/kubevirt_cdi_upload_module.html)
-* [CDI GitHub Repo](https://github.com/kubevirt/containerized-data-importer/)
-
-
+- [Ansible module documentation (kubevirt_pvc)](https://docs.ansible.com/ansible/latest/modules/kubevirt_pvc_module.html)
+- [Ansible module documentation (kubevirt_cdi_upload)](https://docs.ansible.com/ansible/latest/modules/kubevirt_cdi_upload_module.html)
+- [CDI GitHub Repo](https://github.com/kubevirt/containerized-data-importer/)
 
 ## Inventory plugin
 
@@ -188,20 +185,17 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 
 Works!
 
-
 ### Further resources
 
-* [Ansible inventory plugin documentation](https://docs.ansible.com/ansible/latest/plugins/inventory/kubevirt.html)
-
-
+- [Ansible inventory plugin documentation](https://docs.ansible.com/ansible/latest/plugins/inventory/kubevirt.html)
 
 ## More
 
 Lastly, for the sake of brevity, a quick mention of the remaining modules:
 
-* [kubevirt_presets](https://docs.ansible.com/ansible/latest/modules/kubevirt_preset_module.html) allows setting up
-VM presets to be used by deployed VMs,
-* [kubevirt_template](https://docs.ansible.com/ansible/latest/modules/kubevirt_template_module.html) brings in a generic
-templating mechanism, when running on top of OpenShift or OKD,
-* and [kubevirt_rs](https://docs.ansible.com/ansible/latest/modules/kubevirt_rs_module.html) lets one configure KubeVirt's
-own ReplicaSets for running multiple instances of a specified virtual machine.
+- [kubevirt_presets](https://docs.ansible.com/ansible/latest/modules/kubevirt_preset_module.html) allows setting up
+  VM presets to be used by deployed VMs,
+- [kubevirt_template](https://docs.ansible.com/ansible/latest/modules/kubevirt_template_module.html) brings in a generic
+  templating mechanism, when running on top of OpenShift or OKD,
+- and [kubevirt_rs](https://docs.ansible.com/ansible/latest/modules/kubevirt_rs_module.html) lets one configure KubeVirt's
+  own ReplicaSets for running multiple instances of a specified virtual machine.

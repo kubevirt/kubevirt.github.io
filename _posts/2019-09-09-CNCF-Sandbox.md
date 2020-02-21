@@ -6,10 +6,10 @@ navbar_active: Blogs
 category: news
 comments: true
 title: KubeVirt is now part of CNCF Sandbox
+tags: [CNCF, sandbox]
 pub-date: September
 pub-year: 2019
 ---
-
 
 Some time ago, with the PR <https://github.com/cncf/toc/pull/265>, KubeVirt was proposed to be part of the CNCF Sandbox.
 

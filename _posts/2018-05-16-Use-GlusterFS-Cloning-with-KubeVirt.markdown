@@ -6,6 +6,7 @@ navbar_active: Blogs
 pub-date: May 16
 pub-year: 2018
 category: uncategorized
+tags: [glusterfs, storage]
 comments: true
 ---
 
@@ -15,10 +16,10 @@ That's where cloning feature of gluster comes at rescue!
 
 ## Contents
 
-* Prerequisites
-* Installing Gluster provisioner
-* Using The cloning feature
-* Conclusion
+- Prerequisites
+- Installing Gluster provisioner
+- Using The cloning feature
+- Conclusion
 
 ## Prerequisites
 
@@ -26,16 +27,15 @@ I assume you already have a running instance of openshift and kubevirt along wit
 
 For reference, I used the following components and versions:
 
-* 3 baremetal servers with Rhel 7.4 as base OS
-* Openshift and Cns 3.9
-* KubeVirt latest
+- 3 baremetal servers with Rhel 7.4 as base OS
+- Openshift and Cns 3.9
+- KubeVirt latest
 
 ## Installing Gluster provisioner
 
 ### initial deployment
 
 We will deploy the custom provisioner using [this template](../assets/2018-05-16-use-glustercloning-with-kubevirt/glusterfile-provisioner-template.yml), along with cluster rules located in [this file](../assets/2018-05-16-use-glustercloning-with-kubevirt/openshift-clusterrole.yaml)
-
 
 Note that we also patch the image to use an existing one from gluster org located at docker.io instead of quay.io, as the corresponding repository is private by the time of this writing, and the heketi one, to make sure it has the code required to handle cloning
 
@@ -67,10 +67,10 @@ heketi-storage-2-qdrks            1/1       Running   0          6h
 for the custom provisioner to work, we need two additional things:
 
 - a storage class pointing to it, but also containing the details of the current heketi installation
-- a secret similar to the one used by the current heketi installation, but using a different *type*
-
+- a secret similar to the one used by the current heketi installation, but using a different _type_
 
 You can use the following
+
 ```
 NAMESPACE="app-storage"
 oc get sc glusterfs-storage -o yaml
@@ -116,14 +116,13 @@ reclaimPolicy: Delete
 
 The full set of supported parameters can be found [here](https://github.com/kubernetes-incubator/external-storage/blob/master/gluster/file/README.md)
 
-
 ## Using the cloning feature
 
 Once deployed, you can now provision pvcs from a base origin
 
 ### Cloning single pvcs
 
-For instance, provided you have an existing pvc named *cirros* containing this base operating system, and that this PVC contains an annotion of the following
+For instance, provided you have an existing pvc named _cirros_ containing this base operating system, and that this PVC contains an annotion of the following
 
 ```
 (...)
@@ -133,7 +132,7 @@ metadata:
 (...)
 ```
 
- you can create a cloned pvc with the following yaml ( note that we simply indicate a clone request in the annotations)
+A cloned pvc can be created with the following yaml ( note that we simply indicate a clone request in the annotations)
 
 ```
 apiVersion: v1
@@ -184,4 +183,4 @@ oc process -f template.yml -p Name=myvm | oc process -f - -n default
 
 ## Conclusion
 
-cloning features in the storage backend allow us to simply use a given set of pvcs as base os for the deployment of our vms. this feature is growing in gluster, worth giving it a try!
+Cloning features in the storage backend allow us to simply use a given set of pvcs as base os for the deployment of our vms. This feature is growing in gluster, worth giving it a try!

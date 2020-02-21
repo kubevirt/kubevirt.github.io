@@ -7,6 +7,7 @@ pub-date: June 21
 pub-year: 2018
 category: news
 comments: true
+tags: [istio, service mesh]
 ---
 
 On this blog post, we are going to deploy virtual machines with the KubeVirt project and insert them into the Istio service mesh.
@@ -43,20 +44,16 @@ An open platform to connect, manage, and secure microservices.
 
 Istio provides an easy way to create a network of deployed services with load balancing, service-to-service authentication, monitoring, and more, without requiring any changes in service code. You add Istio support to services by deploying a special sidecar proxy throughout your environment that intercepts all network communication between microservices, configured and managed using Istio’s control plane functionality.
 
-
 ## Bookinfo application
 
 A simple application that displays information about a book, similar to a single catalog entry of an online book store. Displayed on the page is a description of the book, book details (ISBN, number of pages, and so on), and a few book reviews.
 
 The Bookinfo application is broken into four separate microservices:
 
-productpage. The productpage microservice calls the details and reviews microservices to populate the page.
-
-details. The details microservice contains book information.
-
-reviews. The reviews microservice contains book reviews. It also calls the ratings microservice.
-
-ratings. The ratings microservice contains book ranking information that accompanies a book review.
+- `productpage`. The productpage microservice calls the details and reviews microservices to populate the page.
+- `details`. The details microservice contains book information.
+- `reviews`. The reviews microservice contains book reviews. It also calls the ratings microservice.
+- `ratings`. The ratings microservice contains book ranking information that accompanies a book review.
 
 ![Bookinfo-application](../assets/2019-06-21-Run-Istio-with-kubevirt/Bookinfo.png)
 
@@ -64,23 +61,24 @@ ratings. The ratings microservice contains book ranking information that accompa
 
 # Requirements
 
-* docker
-* kubeadm
+- docker
+- kubeadm
 
 Follow this [document](https://kubernetes.io/docs/setup/independent/install-kubeadm/) to install everything we need for the POC
-
 
 # Deployment
 
 For the POC we clone [this repo](https://github.com/SchSeba/kubevirt-istio-poc)
 
 The repo contains all the configuration we need to deploy KubeVirt and Istio.
-* kubevirt.yaml
-* istio-demo-auth.yaml
+
+- kubevirt.yaml
+- istio-demo-auth.yaml
 
 It also contains the deployment configuration of our sample application.
-* bookinfo.yaml
-* bookinfo-gateway.yaml
+
+- bookinfo.yaml
+- bookinfo-gateway.yaml
 
 Run the bash script
 
@@ -93,7 +91,7 @@ cd kubevirt-istio-poc
 
 We are going to use the [bookinfo sample application](https://istio.io/docs/examples/bookinfo/) from the istio webpage.
 
-The follow yaml will deploy the bookinfo application with a 'small' change the details service will run on a virtual machine inside our kubernetes cluster!
+The following yaml will deploy the bookinfo application with a 'small' change the details service will run on a virtual machine inside our kubernetes cluster!
 
 **Note:** it will take like 5 minutes for the application to by running inside the virtual machine because we install git and ruby, then clone the istio repo and start the application.
 
@@ -101,7 +99,7 @@ The follow yaml will deploy the bookinfo application with a 'small' change the d
 
 Lets start with the bash script:
 
-```
+```sh
 #!/bin/bash
 
 set -x
@@ -161,7 +159,7 @@ At last the script deploy the bookinfo demo application that we change a bit.
 
 Lets take a closer look in the virtual machine part inside the bookinfo.yaml file
 
-```
+```yaml
 ##################################################################################################
 # Details service
 ##################################################################################################
@@ -173,8 +171,8 @@ metadata:
     app: details
 spec:
   ports:
-  - port: 9080
-    name: http
+    - port: 9080
+      name: http
   selector:
     app: details
 ---
@@ -191,42 +189,42 @@ spec:
   domain:
     devices:
       disks:
-      - disk:
-          bus: virtio
-        name: registrydisk
-        volumeName: registryvolume
-      - disk:
-          bus: virtio
-        name: cloudinitdisk
-        volumeName: cloudinitvolume
+        - disk:
+            bus: virtio
+          name: registrydisk
+          volumeName: registryvolume
+        - disk:
+            bus: virtio
+          name: cloudinitdisk
+          volumeName: cloudinitvolume
       interfaces:
-      - name: testSlirp
-        slirp: {}
-        ports:
-        - name: http
-          port: 9080
+        - name: testSlirp
+          slirp: {}
+          ports:
+            - name: http
+              port: 9080
     machine:
       type: ""
     resources:
       requests:
         memory: 1024M
   networks:
-  - name: testSlirp
-    pod: {}
+    - name: testSlirp
+      pod: {}
   terminationGracePeriodSeconds: 0
   volumes:
-  - name: registryvolume
-    registryDisk:
-      image: kubevirt/fedora-cloud-registry-disk-demo:latest
-  - cloudInitNoCloud:
-      userData: |-
-        #!/bin/bash
-        echo "fedora" |passwd fedora --stdin
-        yum install git ruby -y
-        git clone https://github.com/istio/istio.git
-        cd istio/samples/bookinfo/src/details/
-        ruby details.rb 9080 &
-    name: cloudinitvolume
+    - name: registryvolume
+      registryDisk:
+        image: kubevirt/fedora-cloud-registry-disk-demo:latest
+    - cloudInitNoCloud:
+        userData: |-
+          #!/bin/bash
+          echo "fedora" |passwd fedora --stdin
+          yum install git ruby -y
+          git clone https://github.com/istio/istio.git
+          cd istio/samples/bookinfo/src/details/
+          ruby details.rb 9080 &
+      name: cloudinitvolume
 status: {}
 ---
 ..........
@@ -234,37 +232,37 @@ status: {}
 
 ### Details:
 
-* Create a network of type pod
+- Create a network of type pod
 
-```
+```yaml
 networks:
-- name: testSlirp
-  pod: {}
+  - name: testSlirp
+    pod: {}
 ```
 
-* Create an interface of type slirp and connect it to the pod network by matching the pod network name
-* Add our application port
+- Create an interface of type slirp and connect it to the pod network by matching the pod network name
+- Add our application port
 
-```
+```yaml
 interfaces:
-- name: testSlirp
-  slirp: {}
-  ports:
-  - name: http
-    port: 9080
+  - name: testSlirp
+    slirp: {}
+    ports:
+      - name: http
+        port: 9080
 ```
 
-* Use the cloud init script to download install and run the details application
+- Use the cloud init script to download install and run the details application
 
-```
+```yaml
 - cloudInitNoCloud:
     userData: |-
-        #!/bin/bash
-        echo "fedora" |passwd fedora --stdin
-        yum install git ruby -y
-        git clone https://github.com/istio/istio.git
-        cd istio/samples/bookinfo/src/details/
-        ruby details.rb 9080 &
+      #!/bin/bash
+      echo "fedora" |passwd fedora --stdin
+      yum install git ruby -y
+      git clone https://github.com/istio/istio.git
+      cd istio/samples/bookinfo/src/details/
+      ruby details.rb 9080 &
     name: cloudinitvolume
 ```
 
@@ -282,20 +280,21 @@ reviews-v3-6bc884b456-hr5bm       2/2       Running   0          1h
 virt-launcher-vmi-details-94pb6   3/3       Running   0          1h
 ```
 
-Lets find the istio ingress service port
+Let's find the istio ingress service port
 
 ```
 # kubectl get service -n istio-system  | grep istio-ingressgateway
 istio-ingressgateway       LoadBalancer   10.97.163.91     <pending>     80:31380/TCP,443:31390/TCP,31400:31400/TCP                            3h
 ```
 
-Then browse the follow url
+Then browse the following url
 
 ```
 http://<k8s-node-ip-address>:<istio-ingress-service-port-exposed-by-k8s>/productpage
 ```
 
 Example:
+
 ```
 http://10.0.0.1:31380/productpage
 ```

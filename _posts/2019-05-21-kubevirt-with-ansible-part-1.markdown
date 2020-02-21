@@ -8,6 +8,7 @@ pub-date: May 21
 pub-year: 2019
 category: news
 comments: true
+tags: [ansible]
 ---
 
 KubeVirt is a great solution for migrating existing workloads towards Kubernetes without having to containerize
@@ -35,7 +36,7 @@ To get actually runnable versions of each example, take a look at [this code rep
 
 [examples repo]: https://github.com/kubevirt/ansible-kubevirt-modules/tree/master/examples/blog/part1
 
-Let's start with creating the most basic VM by utilizing the *kubevirt_vm* module, like so:
+Let's start with creating the most basic VM by utilizing the _kubevirt_vm_ module, like so:
 
 ```yaml
 kubevirt_vm:
@@ -86,7 +87,7 @@ PLAY RECAP *********************************************************************
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
 ```
 
-It worked! One thing to note is that by default *kubevirt_vm* will not start a newly–created VM. Running `kubectl get vms -n default` will confirm as much.
+It worked! One thing to note is that by default _kubevirt_vm_ will not start a newly–created VM. Running `kubectl get vms -n default` will confirm as much.
 
 Changing this behavior requires specifying `state: running` as one of the module's parameters when creating a new VM. Or we can get _vm1_ to
 boot by running the first playbook one more time, since this time the task will be interpreted as attempting to change the _state_ of
@@ -122,12 +123,14 @@ localhost                  : ok=2    changed=0    unreachable=0    failed=0    s
 ```
 
 The output is almost the same as on the previous run, with the one difference being that this time no changes were reported (`changed=0`).
+
 This is a concept called idempotency and is present in both Kubernetes and Ansible (though not everywhere).
+
 In this context it means that if the state you want to achieve with your playbook (have the VM running) is the state that the cluster
 currently is in (the VM is already running) then nothing will change, no matter how many times you attempt the operation.
 
-__NOTE:__ Kubernetes versions prior to 1.12 contain a bug that might report operations that didn't really do anything as having
-changed things. If your second (and third, etc.) run of `01_vm1_running.yaml` keep reporting `changed=1`, this might be the reason why.
+> note "Note"
+> Kubernetes versions prior to 1.12 contain a bug that might report operations that didn't really do anything as having changed things. If your second (and third, etc.) run of `01_vm1_running.yaml` keep reporting `changed=1`, this might be the reason why.
 
 Let's finish with cleaning up after ourselves by removing _vm1_. First the relevant YAML:
 
@@ -152,7 +155,6 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 
 Now the VM is gone, which running `kubectl get vms -n default` will confirm.
 Just like before, if you run the playbook a few more times, the _play recap_ will keep reporting `changed=0`.
-
 
 ## Next
 

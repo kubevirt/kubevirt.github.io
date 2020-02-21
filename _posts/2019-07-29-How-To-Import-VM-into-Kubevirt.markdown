@@ -7,7 +7,9 @@ navbar_active: Blogs
 pub-date: Jul 29
 pub-year: 2019
 category: news
+tags: [cdi, vm import]
 ---
+
 ## Introduction
 
 Kubernetes has become the new way to orchestrate the containers and to handle the microservices, but what if I already have applications running on my old VM's in my datacenter ? Can those apps ever be made k8s friendly ? Well, if that is the use-case for you, then we have a solution with KubeVirt!
@@ -47,6 +49,7 @@ Please follow the instructions for the [installation of CDI](https://github.com/
 **Expose cdi-uploadproxy service:**
 
 The cdi-uploadproxy service must be accessible from outside the cluster. Here are some ways to do that:
+
 - [NodePort Service](https://kubernetes.io/docs/concepts/services-networking/service/#nodeport)
 - [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 - [Route](https://docs.openshift.com/container-platform/3.9/architecture/networking/routes.html)
@@ -64,7 +67,7 @@ We will use [this image](http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86
 
 We can use `virtctl` command for uploading the image as shown below:
 
-~~~shell
+```shell
 virtctl image-upload --help
 Upload a VM image to a PersistentVolumeClaim.
 
@@ -88,7 +91,7 @@ Flags:
       --wait-secs uint           Seconds to wait for upload pod to start. (default 60)
 
 Use "virtctl options" for a list of global command-line options (applies to all commands).
-~~~
+```
 
 ### Creation of VirtualMachineInstance from a PVC
 
@@ -131,7 +134,7 @@ A `PersistentVolume` can be in `filesystem` or `block` mode:
 
 - `Filesystem`: For KubeVirt to be able to consume the disk present on a PersistentVolume’s filesystem, the disk must be named `disk.img` and be placed in the root path of the filesystem. Currently the disk is also required to be in `raw` format.
 
-    **Important**: The `disk.img` image file needs to be owned by the user-id `107` in order to avoid permission issues. Additionally, if the `disk.img` image file has not been created manually before starting a VM then it will be created automatically with the PersistentVolumeClaim size. Since not every storage provisioner provides volumes with the exact usable amount of space as requested (e.g. due to filesystem overhead), KubeVirt tolerates up to 10% less available space. This can be configured with the `pvc-tolerate-less-space-up-to-percent` value in the `kubevirt-config` ConfigMap.
+  **Important**: The `disk.img` image file needs to be owned by the user-id `107` in order to avoid permission issues. Additionally, if the `disk.img` image file has not been created manually before starting a VM then it will be created automatically with the PersistentVolumeClaim size. Since not every storage provisioner provides volumes with the exact usable amount of space as requested (e.g. due to filesystem overhead), KubeVirt tolerates up to 10% less available space. This can be configured with the `pvc-tolerate-less-space-up-to-percent` value in the `kubevirt-config` ConfigMap.
 
 - `Block`: Use a block volume for consuming raw block devices. To do that, `BlockVolume` feature gate must be enabled.
 
@@ -149,8 +152,8 @@ spec:
         memory: 64M
     devices:
       disks:
-      - name: mypvcdisk
-        lun: {}
+        - name: mypvcdisk
+          lun: {}
   volumes:
     - name: mypvcdisk
       persistentVolumeClaim:
@@ -182,29 +185,29 @@ spec:
       domain:
         devices:
           disks:
-          - disk:
-              bus: virtio
-            name: datavolumedisk1
+            - disk:
+                bus: virtio
+              name: datavolumedisk1
         resources:
           requests:
             memory: 64M
       volumes:
-      - dataVolume:                #Note the type is dataVolume
-          name: alpine-dv
-        name: datavolumedisk1
-  dataVolumeTemplates:             # Automatically a PVC of size 2Gi is created
-  - metadata:
-      name: alpine-dv
-    spec:
-      pvc:
-        accessModes:
-        - ReadWriteOnce
-        resources:
-          requests:
-            storage: 2Gi
-      source:                      #This is the source where the iso file resides
-        http:
-          url: http://cdi-http-import-server.kubevirt/images/alpine.iso
+        - dataVolume: #Note the type is dataVolume
+            name: alpine-dv
+          name: datavolumedisk1
+  dataVolumeTemplates: # Automatically a PVC of size 2Gi is created
+    - metadata:
+        name: alpine-dv
+      spec:
+        pvc:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 2Gi
+        source: #This is the source where the iso file resides
+          http:
+            url: http://cdi-http-import-server.kubevirt/images/alpine.iso
 ```
 
 From the above manifest the two main sections that needs an attention are **`source`** and **`pvc`**.

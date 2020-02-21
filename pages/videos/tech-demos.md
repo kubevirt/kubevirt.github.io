@@ -33,4 +33,3 @@ order: 10
     </figure>
   </div>
 </div>
-

@@ -6,12 +6,13 @@ navbar_active: Blogs
 pub-date: May 08
 pub-year: 2018
 category: uncategorized
+tags: [custom resources, kubevirt objects, objects, VirtualMachine]
 comments: true
 ---
 
 The [KubeVirt](https://github.com/kubevirt/kubevirt/) project provides extensions to Kubernetes via [custom resources](https://kubernetes.io/docs/concepts/api-extension/custom-resources/).
-These resources are a collection a API objects that defines
-a virtual machine within Kubernetes.
+
+These resources are a collection a API objects that defines a virtual machine within Kubernetes.
 
 I think it's important to point out the two great resources that I used to
 compile information for this post:
@@ -21,18 +22,17 @@ compile information for this post:
 
 With that let’s take a look at the objects that are available.
 
-KubeVirt top-level objects
-==========================
+# KubeVirt top-level objects
 
 Below is a list of the top level API objects and descriptions that KubeVirt provides.
 
--   VirtualMachine (vm\[s\]) - represents a virtual machine in the runtime environment of Kubernetes.
+- VirtualMachine (vm\[s\]) - represents a virtual machine in the runtime environment of Kubernetes.
 
--   OfflineVirtualMachine (ovm\[s\]) - handles the virtual machines that are not running or are in a stopped state.
+- OfflineVirtualMachine (ovm\[s\]) - handles the virtual machines that are not running or are in a stopped state.
 
--   VirtualMachinePreset (vmpreset\[s\]) - is an extension to general VirtualMachine configuration behaving much like PodPresets from Kubernetes. When a VirtualMachine is created, any applicable VirtualMachinePresets will be applied to the existing spec for the VirtualMachine. This allows for re-use of common settings that should apply to multiple VirtualMachines.
+- VirtualMachinePreset (vmpreset\[s\]) - is an extension to general VirtualMachine configuration behaving much like PodPresets from Kubernetes. When a VirtualMachine is created, any applicable VirtualMachinePresets will be applied to the existing spec for the VirtualMachine. This allows for re-use of common settings that should apply to multiple VirtualMachines.
 
--   VirtualMachineReplicaSet (vmrs\[s\]) - tries to ensures that a specified number of VirtualMachine replicas are running at any time.
+- VirtualMachineReplicaSet (vmrs\[s\]) - tries to ensures that a specified number of VirtualMachine replicas are running at any time.
 
 [DomainSpec](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_domainspec) is listed as a top-level object but is only used within all of the objects above. Currently the `DomainSpec` is a subset of what is configurable via [libvirt domain XML](https://libvirt.org/formatdomain.html).
 
@@ -80,14 +80,16 @@ And just in case if you want to return the yaml definition of a `VirtualMachine`
 
 The first object we will annotate is `VirtualMachine`. The important sections `.spec` for `VirtualMachineSpec` and `.spec.domain` for `DomainSpec` will be annotated only in this section then referred to in the other object sections.
 
-    apiVersion: kubevirt.io/v1alpha1
-    kind: VirtualMachine
-    metadata:
-      annotations: {}
-      labels: {}
-      name: string
-      namespace: string
-    spec: {}
+```yaml
+apiVersion: kubevirt.io/v1alpha1
+kind: VirtualMachine
+metadata:
+  annotations: {}
+  labels: {}
+  name: string
+  namespace: string
+spec: {}
+```
 
 ### Node Placement
 
@@ -95,80 +97,94 @@ Kubernetes has the ability to schedule a pod to specific nodes based on [affinit
 
 [Node affinity](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_nodeaffinity) is also possible with KubeVirt. To [constrain a virtual machine](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/assigning-vms-to-nodes?id=affinity-and-anti-affinity) to run on a node define a matching expressions using node labels.
 
-      affinity:
-        nodeAffinity:
-          preferredDuringSchedulingIgnoredDuringExecution:
-          - preference:
-              matchExpressions:
-              - key: string
-                operator: string
-                values:
+```yaml
+affinity:
+  nodeAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - preference:
+          matchExpressions:
+            - key: string
+              operator: string
+              values:
                 - string
-            weight: 0
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key: string
-                operator: string
-                values:
+        weight: 0
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: string
+              operator: string
+              values:
                 - string
+```
 
 A virtual machine can also more easily be constrained by using [nodeSelector](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/assigning-vms-to-nodes?id=nodeselector) which is defined by node’s label and value. Here is an example
 
-      nodeSelector:
-        kubernetes.io/hostname: kn1.virtomation.com
+```yaml
+nodeSelector:
+  kubernetes.io/hostname: kn1.virtomation.com
+```
 
 ### Clocks and Timers
 
 Configures the [virtualize hardware](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=clock) clock provided by [QEMU](https://qemu.weilnetz.de/doc/qemu-doc.html#Debug_002fExpert-options).
 
-      domain:
-        clock:
-          timezone: string
-          utc:
-            offsetSeconds: 0
+```yaml
+domain:
+  clock:
+    timezone: string
+    utc:
+      offsetSeconds: 0
+```
 
 The [timer](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=timers) defines the [type and policy attribute](https://libvirt.org/formatdomain.html#elementsTime) that determines what action is take when QEMU misses a deadline for injecting a tick to the guest.
 
-      domain:
-        clock:
-          timer:
-            hpet:
-              present: true
-              tickPolicy: string
-            hyperv:
-              present: true
-            kvm:
-              present: true
-            pit:
-              present: true
-              tickPolicy: string
-            rtc:
-              present: true
-              tickPolicy: string
-              track: string
+```yaml
+domain:
+  clock:
+    timer:
+      hpet:
+        present: true
+        tickPolicy: string
+      hyperv:
+        present: true
+      kvm:
+        present: true
+      pit:
+        present: true
+        tickPolicy: string
+      rtc:
+        present: true
+        tickPolicy: string
+        track: string
+```
 
 ### CPU and Memory
 
 The number of [CPU cores](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=cpu) a virtual machine will be assigned. [.spec.domain.cpu.cores](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_cpu) will not be used for scheduling use [.spec.domain.resources.requests.cpu](http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_resourcerequirements) instead.
 
-        cpu:
-          cores: 1
+```yaml
+cpu:
+  cores: 1
+```
 
 There are two supported [resource limits and requests](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=resources-requests-and-limits): `cpu` and `memory`. A `.spec.domain.resources.requests.memory` should be defined to determine the allocation of memory provided to the virtual machine. These values will be used to in scheduling decisions.
 
-        resources:
-          limits: {}
-          requests: {}
+```yaml
+resources:
+  limits: {}
+  requests: {}
+```
 
 ### Watchdog Devices
 
 [.spec.domain.watchdog](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog) automatically triggers an action via [Libvirt](https://libvirt.org/formatdomain.html#elementsWatchdog) and [QEMU](https://qemu.weilnetz.de/doc/qemu-doc.html#Debug_002fExpert-options) when the virtual machine operating system hangs or crashes.
 
-          watchdog:
-            i6300esb:
-              action: string
-            name: string
+```yaml
+watchdog:
+  i6300esb:
+    action: string
+  name: string
+```
 
 ### Features
 
@@ -181,43 +197,48 @@ both acpi and
 should be enabled.
 The [hyperv](http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_featurehyperv) features should be enabled only for Windows-based virtual machines. For additional information regarding features please visit the [virtual hardware configuration](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=features) in the kubevirt user guide.
 
-        features:
-          acpi:
-            enabled: true
-          apic:
-            enabled: true
-            endOfInterrupt: true
-          hyperv:
-            relaxed:
-              enabled: true
-            reset:
-              enabled: true
-            runtime:
-              enabled: true
-            spinlocks:
-              enabled: true
-              spinlocks: 0
-            synic:
-              enabled: true
-            synictimer:
-              enabled: true
-            vapic:
-              enabled: true
-            vendorid:
-              enabled: true
-              vendorid: string
-            vpindex:
-              enabled: true
+```yaml
+features:
+  acpi:
+    enabled: true
+  apic:
+    enabled: true
+    endOfInterrupt: true
+  hyperv:
+    relaxed:
+      enabled: true
+    reset:
+      enabled: true
+    runtime:
+      enabled: true
+    spinlocks:
+      enabled: true
+      spinlocks: 0
+    synic:
+      enabled: true
+    synictimer:
+      enabled: true
+    vapic:
+      enabled: true
+    vendorid:
+      enabled: true
+      vendorid: string
+    vpindex:
+      enabled: true
+```
 
 ### QEMU Machine Type
 
 [.spec.domain.machine.type](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=machine-type) is the emulated machine architecture provided by [QEMU](https://qemu.weilnetz.de/doc/qemu-doc.html#Standard-options).
 
-        machine:
-          type: string
+```yaml
+machine:
+  type: string
+```
 
 Here is an example how to retrieve the supported QEMU machine types.
 
+```sh
     $ qemu-system-x86_64 --machine help
     Supported machines are:
     ...output...
@@ -226,28 +247,31 @@ Here is an example how to retrieve the supported QEMU machine types.
     ...output...
     q35                  Standard PC (Q35 + ICH9, 2009) (alias of pc-q35-2.10)
     pc-q35-2.10          Standard PC (Q35 + ICH9, 2009)
+```
 
 ### Disks and Volumes
 
 [.spec.domain.devices.disks](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk) configures a [QEMU](https://qemu.weilnetz.de/doc/qemu-doc.html#Block-device-options) type of [disk](https://libvirt.org/formatdomain.html#elementsDisks) to the virtual machine and assigns a specific [volume and its type to that disk](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes) via the `volumeName`.
 
-        devices:
-          disks:
-          - cdrom:
-              bus: string
-              readonly: true
-              tray: string
-            disk:
-              bus: string
-              readonly: true
-            floppy:
-              readonly: true
-              tray: string
-            lun:
-              bus: string
-              readonly: true
-            name: string
-            volumeName: string
+```yaml
+devices:
+  disks:
+    - cdrom:
+        bus: string
+        readonly: true
+        tray: string
+      disk:
+        bus: string
+        readonly: true
+      floppy:
+        readonly: true
+        tray: string
+      lun:
+        bus: string
+        readonly: true
+      name: string
+      volumeName: string
+```
 
 [cloudInitNoCloud](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_cloudinitnocloudsource)
 injects scripts and configuration into a virtual machine operating system.
@@ -256,37 +280,47 @@ cloud-init coniguration: `secretRef`, `userData` or `userDataBase64`.
 
 See the user-guide for examples of how to use [.spec.volumes.cloudInitNoCloud](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/startup-scripts?id=cloud-init-examples).
 
-      volumes:
-      - cloudInitNoCloud:
-          secretRef:
-            name: string
-          userData: string
-          userDataBase64: string
+```yaml
+volumes:
+  - cloudInitNoCloud:
+      secretRef:
+        name: string
+      userData: string
+      userDataBase64: string
+```
 
 An [emptyDisk volume](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=emptydisk) creates an extra qcow2 disk that is created with the virtual machine. It will be removed if the `VirtualMachine` object is deleted.
 
-        emptyDisk:
-          capacity: string
+```yaml
+emptyDisk:
+  capacity: string
+```
 
 [Ephemeral volume](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=ephemeral) creates a temporary local copy on write image storage that will be discarded when the `VirtualMachine` is removed.
 
-        ephemeral:
-          persistentVolumeClaim:
-            claimName: string
-            readOnly: true
-        name: string
+```yaml
+ephemeral:
+  persistentVolumeClaim:
+    claimName: string
+    readOnly: true
+name: string
+```
 
 [persistentVolumeClaim volume](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=persistentvolumeclaim) persists after the `VirtualMachine` is deleted.
 
-        persistentVolumeClaim:
-          claimName: string
-          readOnly: true
+```yaml
+persistentVolumeClaim:
+  claimName: string
+  readOnly: true
+```
 
 [registryDisk volume](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk) type uses a virtual machine disk that is stored in a container image registry.
 
-        registryDisk:
-          image: string
-          imagePullSecret: string
+```yaml
+registryDisk:
+  image: string
+  imagePullSecret: string
+```
 
 ### Virtual Machine Status
 
@@ -308,7 +342,7 @@ Example using `--template` to retrieve the `.status.phase` of the `VirtualMachin
 
 ### Examples
 
--   <https://www.kubevirt.io/user-guide/#/workloads/virtual-machines/creation?id=virtualmachine-api>
+- <https://www.kubevirt.io/user-guide/#/workloads/virtual-machines/creation?id=virtualmachine-api>
 
 ## OfflineVirtualMachine
 
@@ -335,14 +369,16 @@ And display the object in yaml.
 
 We continue by annotating `OfflineVirtualMachine` object.
 
-    apiVersion: kubevirt.io/v1alpha1
-    kind: OfflineVirtualMachine
-    metadata:
-      annotations: {}
-      labels: {}
-      name: string
-      namespace: string
-    spec:
+```yaml
+apiVersion: kubevirt.io/v1alpha1
+kind: OfflineVirtualMachine
+metadata:
+  annotations: {}
+  labels: {}
+  name: string
+  namespace: string
+spec:
+```
 
 ### What is Running in OfflineVirtualMachine?
 
@@ -362,7 +398,7 @@ And if you would rather not have to remember the `kubectl patch` command above
 the KubeVirt team has provided a cli tool `virtctl` that can start and stop
 a guest.
 
-```
+```sh
 ./virtctl start mongodb -n nodejs-ex
 ./virtctl stop mongodb -n nodejs-ex
 ```
@@ -385,7 +421,7 @@ Example using `--template` to retrieve the `.status.conditions[0].type` of `Offl
 
 ### Examples
 
--   <https://www.kubevirt.io/user-guide/#/workloads/controllers/offline-virtual-machine?id=example>
+- <https://www.kubevirt.io/user-guide/#/workloads/controllers/offline-virtual-machine?id=example>
 
 ## VirtualMachineReplicaSet
 
@@ -418,13 +454,15 @@ The [.spec.replicas](http://www.kubevirt.io/user-guide/#/workloads/controllers/v
 
 The [selector](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_labelselector) must be defined and match labels defined in the template. It is used by the controller to keep track of managed virtual machines.
 
-      selector:
-        matchExpressions:
-        - key: string
-          operator: string
-          values:
-          - string
-        matchLabels: {}
+```yaml
+selector:
+  matchExpressions:
+    - key: string
+      operator: string
+      values:
+        - string
+  matchLabels: {}
+```
 
 ### [Virtual Machine Template Spec](http://www.kubevirt.io/user-guide/#/workloads/controllers/virtual-machine-replica-set?id=how-to-use-a-virtualmachinereplicaset)
 
@@ -432,21 +470,25 @@ The `VMTemplateSpec` is the definition of a `VirtualMachine` objects that will b
 
 In the `VirtualMachine` section the `.spec` `VirtualMachineSpec` describes the available parameters for that object.
 
-      template:
-        metadata:
-          annotations: {}
-          labels: {}
-          name: string
-          namespace: string
-        spec: {}
+```yaml
+template:
+  metadata:
+    annotations: {}
+    labels: {}
+    name: string
+    namespace: string
+  spec: {}
+```
 
 ### Replica Status
 
 Like the other objects we already have discussed [VMReplicaSetStatus](http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_vmreplicasetstatus) is an important object to use for automation.
 
-    status:
-      readyReplicas: 0
-      replicas: 0
+```yaml
+status:
+  readyReplicas: 0
+  replicas: 0
+```
 
 Example using `--template` to retrieve the `.status.readyReplicas` and `.status.replicas` of `VirtualMachineReplicaSet`.
 
@@ -457,7 +499,7 @@ Example using `--template` to retrieve the `.status.readyReplicas` and `.status.
 
 ### Examples
 
--   <https://www.kubevirt.io/user-guide/#/workloads/controllers/virtual-machine-replica-set?id=example>
+- <https://www.kubevirt.io/user-guide/#/workloads/controllers/virtual-machine-replica-set?id=example>
 
 ## VirtualMachinePreset
 
@@ -480,16 +522,18 @@ See the `VirtualMachine` section above for annotated details of the `DomainSpec`
 
 The [selector](http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/presets?id=virtalmachine-selector) is optional but if not defined will be applied to all `VirtualMachine` objects; which is probably not the intended purpose so I recommend always including a selector.
 
-      selector:
-        matchExpressions:
-        - key: string
-          operator: string
-          values:
-          - string
-        matchLabels: {}
+```yaml
+selector:
+  matchExpressions:
+    - key: string
+      operator: string
+      values:
+        - string
+  matchLabels: {}
+```
 
 ### Examples
 
--   <https://www.kubevirt.io/user-guide/#/workloads/virtual-machines/presets?id=examples>
+- <https://www.kubevirt.io/user-guide/#/workloads/virtual-machines/presets?id=examples>
 
-We provided an annotated view into the KubeVirt objects - VirtualMachine, OfflineVirtualMachine, VirtualMachineReplicaSet and VirtualMachienPreset. Hopefully this will help a user of KubeVirt to understand the options and parameters that are currently available when creating a virtual machine on Kubernetes.
+We provided an annotated view into the KubeVirt objects - VirtualMachine, OfflineVirtualMachine, VirtualMachineReplicaSet and VirtualMachinePreset. Hopefully this will help a user of KubeVirt to understand the options and parameters that are currently available when creating a virtual machine on Kubernetes.

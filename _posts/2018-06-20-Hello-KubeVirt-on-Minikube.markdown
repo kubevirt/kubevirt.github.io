@@ -7,14 +7,16 @@ pub-date: June 20
 pub-year: 2018
 category: uncategorized
 comments: true
+tags: [kvm, minikube, qemu]
 ---
 
-In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt.  We will also go through the process of installing [Minikube](https://kubernetes.io/docs/setup/minikube/) and KubeVirt on a Fedora 28 workstation.
+In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt. We will also go through the process of installing [Minikube](https://kubernetes.io/docs/setup/minikube/) and KubeVirt on a Fedora 28 workstation.
 
 <!-- more -->
+
 ## Install KVM
 
-MiniKube will create a single node Kubernetes cluster in a KVM virtual machine on our Fedora host.  KVM is also the virtualization technology used by KubeVirt so we have to make sure that the host is configured to support nested virtual machines.  Fedora does not have that feature enabled by default.
+MiniKube will create a single node Kubernetes cluster in a KVM virtual machine on our Fedora host. KVM is also the virtualization technology used by KubeVirt so we have to make sure that the host is configured to support nested virtual machines. Fedora does not have that feature enabled by default.
 
 ```bash
 # install packages
@@ -34,7 +36,7 @@ Y
 
 ## Install KVM2 driver for Minikube
 
-Minikube requires a special driver to manage Docker Machine VMs running in KVM.  KVM2 is the latest iteration of the driver.  Read more about it [here](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver)
+Minikube requires a special driver to manage Docker Machine VMs running in KVM. KVM2 is the latest iteration of the driver. Read more about it [here](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver)
 
 ```bash
 # install driver to /usr/local/bin
@@ -43,7 +45,7 @@ $ curl -LO https://storage.googleapis.com/minikube/releases/latest/docker-machin
 
 ## Install Minikube
 
-Minikube is responsible for creating and managing a local single-node Kubernetes cluster.  It is installed as a single executable.
+Minikube is responsible for creating and managing a local single-node Kubernetes cluster. It is installed as a single executable.
 
 ```bash
 #install minikube to /usr/local/bin
@@ -58,7 +60,7 @@ $ minikube start --vm-driver kvm2 --network-plugin cni
 
 ## Install kubectl
 
-Now that we have a Kubernetes cluster running, we need some way to communicate with it.  That is where the kubectl CLI comes in.
+Now that we have a Kubernetes cluster running, we need some way to communicate with it. That is where the kubectl CLI comes in.
 
 ```bash
 # install kubectl to /usr/local/bin
@@ -71,7 +73,7 @@ NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)   AGE
 kubernetes   ClusterIP   10.96.0.1    <none>        443/TCP   5m
 ```
 
-You may be wondering how kubectl knows where to look for the Kubernetes API endpoint.  `minikube start` actually takes care of creating the kubectl configuration file.  Take a look at `~/.kube/config`
+You may be wondering how kubectl knows where to look for the Kubernetes API endpoint. `minikube start` actually takes care of creating the kubectl configuration file. Take a look at `~/.kube/config`
 
 ## Deploy KubeVirt
 
@@ -113,13 +115,13 @@ $ curl -Lo virtctl https://github.com/kubevirt/kubevirt/releases/download/{{ sit
 
 ## Create a VM
 
-Apply manifest for VM.  If you're curious, download the manifest file locally and take a look.
+Apply manifest for VM. If you're curious, download the manifest file locally and take a look.
 
 ```bash
 $ kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
 
 # check that VM successfully created
-$ kubectl get vms 
+$ kubectl get vms
 NAME      AGE
 testvm    7s
 # for more detailed info, run
@@ -144,9 +146,10 @@ testvm    4s
 # for more detailed info
 $ kubectl get vmis -o yaml testvm
 ```
+
 ## Connect to VM
 
-The VM is running CirrOS, which is "a Tiny OS that specializes in running on a cloud."  Don't expect anything fancy.  Look [here](https://launchpad.net/cirros) for more info on CirrOS
+The VM is running CirrOS, which is "a Tiny OS that specializes in running on a cloud." Don't expect anything fancy. Look [here](https://launchpad.net/cirros) for more info on CirrOS
 
 ```bash
 $ virtctl console testvm
@@ -157,6 +160,7 @@ $ virtctl console testvm
 # 'exit' to logout
 # quit virtctl by providing escape sequence '^]
 ```
+
 ## Stop a VM
 
 ```bash
@@ -169,6 +173,7 @@ $ watch kubectl get pods
 $ kubectl get vmis
 No resources found.
 ```
+
 ## Delete a VM
 
 ```bash

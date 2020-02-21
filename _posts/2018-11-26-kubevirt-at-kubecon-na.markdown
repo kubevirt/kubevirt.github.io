@@ -7,6 +7,7 @@ pub-date: Nov 26
 pub-year: 2018
 category: news
 comments: true
+tags: [kubecon, conference]
 ---
 
 [KubeCon + CloudNativeCon North America 2018][1] (Seattle, December 11-13) is
@@ -19,21 +20,24 @@ These sessions will provide you an opportunity not just to learn about
 KubeVirt's to turning [Kubernetes][3] into a common platform for containers and
 virtual machines, but also to meet other members of the community:
 
-* [KubeVirt Introductory Birds of a Feather (BoF) Session][4] led by Ryan
+- [KubeVirt Introductory Birds of a Feather (BoF) Session][4] led by Ryan
   Hallisey, Software Engineer, [Red Hat][8] and Daniel Gonzalez Nothnagel, Cloud
   Infrastructure Developer, [SAP][9]
+
   - Tuesday, December 11 @ 10:50 AM PST
 
-* [KubeVirt Deep Dive Birds of a Feather (BoF) Session][5] led by Scott Collier,
+- [KubeVirt Deep Dive Birds of a Feather (BoF) Session][5] led by Scott Collier,
   Consulting Engineer, [Red Hat][8] and Vishesh Ajay Tanksale, [nVidia][10]
+
   - Tuesday, December 11 @ 1:45 PM PST
 
-* [Connecting and Testing Virtual Network Topologies on Kubernetes][6] presented
+- [Connecting and Testing Virtual Network Topologies on Kubernetes][6] presented
   by Gage Orsburn, Software Architect, [One Source Integrations][11] and Rich
   Renner, Solutions Architect, [One Source Integrations][11]
+
   - Tuesday, December 11 @ 2:35 PM PST
 
-* [Running VM Workloads Side by Side with Container Workloads][7] presented by
+- [Running VM Workloads Side by Side with Container Workloads][7] presented by
   Sebastian Scheele, Co-founder and CEO, [Loodse][12]
   - Thursday, December 13 @ 10:50 AM PST
 
@@ -41,10 +45,10 @@ As [previously announced][13] on the [kubevirt-dev][14] mailing list we will
 also be holding a users and contributors meetup on the Tuesday evening of the
 event:
 
-* Location: [Sheraton Grand, Seattle][15]
-* Room: Aspen Room, 2nd Floor (Union Street Tower)
-* Date: Tuesday, December 11th
-* Time: 6:45 - 8:45 PM PST
+- Location: [Sheraton Grand, Seattle][15]
+- Room: Aspen Room, 2nd Floor (Union Street Tower)
+- Date: Tuesday, December 11th
+- Time: 6:45 - 8:45 PM PST
 
 While we wont have Ice Cube, we do plan to have food, so if you plan to attend
 please [register][16] your interest so that we can cater accordingly! We look

@@ -6,6 +6,7 @@ title: Jenkins Infra upgrade
 navbar_active: Blogs
 pub-date: Nov 22
 pub-year: 2019
+tags: [jenkins, community, infrastructure, contra-lib]
 category: news
 ---
 
@@ -13,7 +14,7 @@ category: news
 
 In the article [Jenkins Jobs for KubeVirt Lab Validation]({% post_url 2019-10-31-jenkins-jobs-for-kubevirt-lab-validation %}), we covered how Jenkins did get the information about the labs and jobs to perform from the KubeVirt repositories.
 
-In this article, we'll cover the configuration changes in both Jenkins and the JenkinsFiles required to get our CI setup updated to latest versions and syntax  .
+In this article, we'll cover the configuration changes in both Jenkins and the JenkinsFiles required to get our CI setup updated to latest versions and syntax .
 
 ## Jenkins
 
@@ -38,7 +39,6 @@ Here we'll show you the configuration settings for each one of the new/updated p
 Updated to configure the instance of CentOS OpenShift with the system account for accessing it:
 
 ![Jenkins OpenShift Client configuration](/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-44-56.png)
-
 
 ### OpenShift Jenkins Sync
 

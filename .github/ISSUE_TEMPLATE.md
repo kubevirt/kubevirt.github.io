@@ -7,12 +7,11 @@
 > /kind bug
 > /kind enhancement
 
-
 **What happened**:
 
 **What you expected to happen**:
 
 **Anything else we need to know?**:
 
-> URL where the problem can be found ... 
+> URL where the problem can be found ...
 > If the issue is with a lab, please provide information about your environment, platform, versions, ...
