@@ -13,8 +13,21 @@ codes.forEach((code) => {
 
   let div = document.createElement('div');
   div.appendChild(btn);
-
   code.after(div);
+
+  var codeblock = code.parentNode
+  var container = codeblock.parentNode
+  var row = container.parentNode;
+  var table = row.parentNode;
+  var pre = table.parentNode;
+
+  if (pre.parentNode.classList.contains('highlight')) {
+    var highlight = pre.parentNode;
+    highlight.parentNode.insertBefore(btn, highlight);
+  } else {
+    pre.parentNode.insertBefore(btn, pre);
+  }
+
 
   countID++;
 });
