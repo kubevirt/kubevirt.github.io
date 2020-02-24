@@ -1,0 +1,1 @@
+./virtctl vnc testvm
