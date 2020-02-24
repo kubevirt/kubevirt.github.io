@@ -45,6 +45,16 @@
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
 </head>
 
 
@@ -836,7 +846,14 @@ between virtual machine and hosts. Here we finally get to use <a href="https://g
 The real-time topology below along with
 arrows annotate the flow of packets between the host and virtual machine network devices.</p>
 
-<p><img src="/assets/images/skydive_vm_to_vm.png" alt="vm-to-vm" /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/skydive_vm_to_vm.png" itemprop="contentUrl" data-size="1601x589">
+            <img src="/assets/images/skydive_vm_to_vm.png" width="600" height="220" itemprop="thumbnail" alt="VM to VM" />
+        </a>
+        <figcaption itemprop="caption description">VM to VM</figcaption>
+    </figure>
+</div>
 
 <h3 id="connectivity-tests">Connectivity Tests</h3>
 
@@ -891,7 +908,14 @@ Oct 01 18:28:10 nodejs.localdomain node[12893]: Connected to MongoDB at: mongodb
 <p>OKD HAProxy provides optional traffic status - which we already enabled. The screenshot below shows
 the requests that Nginx is receiving for <code class="language-html highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
 
-<p><img src="/assets/images/haproxy_stats.png" alt="haproxy-stats" /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/haproxy_stats.png" itemprop="contentUrl" data-size="1642x449">
+            <img src="/assets/images/haproxy_stats.png" width="600" height="220" itemprop="thumbnail" alt="haproxy-stats" />
+        </a>
+        <figcaption itemprop="caption description">haproxy-stats</figcaption>
+    </figure>
+</div>
 
 <h3 id="haproxy-to-nodejs-vm">HAProxy to NodeJS VM</h3>
 
@@ -905,7 +929,14 @@ the requests that Nginx is receiving for <code class="language-html highlighter-
 router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.168.122.101.nip.io   <span class="nt">&lt;none&gt;</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p><img src="/assets/images/skydive_haproxy_to_vm.png" alt="haproxy-vm" /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/skydive_haproxy_to_vm.png" itemprop="contentUrl" data-size="1601x438">
+            <img src="/assets/images/skydive_haproxy_to_vm.png" width="600" height="220" itemprop="thumbnail" alt="haproxy-vm" />
+        </a>
+        <figcaption itemprop="caption description">haproxy-vm</figcaption>
+    </figure>
+</div>
 
         </article>
         
@@ -944,6 +975,55 @@ router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.
     </div>
   </div>
 </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 
@@ -999,6 +1079,11 @@ router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
     <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
     <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
 
     <!-- This comes from DTM/DPAL and must be latest entry in body-->
 
