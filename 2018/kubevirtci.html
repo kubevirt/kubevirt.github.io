@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="This post tries to give a quick overview of kubevirtci and why we use it to build our testing clusters.">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="kubevirtci, ci-cd, cicd, qemu, virtual machine, container" >
     <meta property="og:title" content="Kubevirtci | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/kubevirtci.html" >
@@ -203,7 +203,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirt", "kubernetes", "virtual machine", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,12 +232,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
         <article class="post-content">
           <h1 id="building-clusters-with-kubevirtci">Building Clusters with kubevirtci</h1>
 
-<p>One of the projects in the KubeVirt github organization is a project called kubevirtci.  While this may sound like it’s the repo containing the KubeVirt CI system and scripts, that’s not completely accurate.  We leverage kubevirtci for our CI process, but there’s more to the CI system than just this repo.  Today, we’re not going to talk about the CI system in general, but instead we’re going to talk about the kubevirtci project, what it does, how it does it and why it’s pretty cool.</p>
+<p>One of the projects in the KubeVirt github organization is a project called kubevirtci. While this may sound like it’s the repo containing the KubeVirt CI system and scripts, that’s not completely accurate.</p>
+
+<p>We leverage kubevirtci for our CI process, but there’s more to the CI system than just this repo. Today, we’re not going to talk about the CI system in general, but instead we’re going to talk about the kubevirtci project, what it does, how it does it and why it’s pretty cool.</p>
 
 <h2 id="what-it-does">What it does</h2>
+
 <p>In short: Deploys a Kubernetes (or OpenShift) cluster using QEMU Virtual Machines, that run inside Docker containers. First a base image is <a href="https://github.com/kubevirt/kubevirtci/blob/master/cluster-provision/k8s/provision.sh">provisioned</a>, this image contains a stock a Kubernetes node. Then one or more of these images are deployed in the target environment to make up the cluster.</p>
+
 <h3 id="provisioning">Provisioning</h3>
+
 <p>Building the Kubernetes Node virtual machine happens in several steps:</p>
+
 <ol>
   <li>Use a Fedora cloud image.</li>
   <li>Provision Kubernetes using Ansible onto that image.</li>
@@ -248,11 +254,13 @@ Once the node is provisioned, it is packaged inside a Docker container and publi
 <p><img src="../assets/2018-08-08-kubevirtci/provisioning.png" alt="provision_vm" /></p>
 
 <h3 id="deployment">Deployment</h3>
-<p>To create a cluster, all one has to do is start up a number of containers, which in turn start up the Virtual Machine contained within that container. The first node is designated as the master node and a <a href="https://github.com/kubevirt/kubevirtci/blob/master/cluster-provision/k8s/scripts/node01.sh">script</a> is run during startup to configure any master node specific configuration. Any additional nodes have a post startup <a href="https://github.com/kubevirt/kubevirtci/blob/master/cluster-provision/k8s/scripts/nodes.sh">script</a> run to register themselves as nodes with the master. As this point we have a basic kubernetes cluster running the number of specified nodes. Plus some other interesting services described later.</p>
+
+<p>To create a cluster, all one has to do is start up a number of containers, which in turn start up the Virtual Machine contained within that container. The first node is designated as the master node and a <a href="https://github.com/kubevirt/kubevirtci/blob/8c311c6ede0400b510aee4eeb37dac5068d92fff/cluster-provision/k8s/scripts/node01.sh">script</a> is run during startup to configure any master node specific configuration. Any additional nodes have a post startup <a href="https://github.com/kubevirt/kubevirtci/blob/8c311c6ede0400b510aee4eeb37dac5068d92fff/cluster-provision/k8s/scripts/nodes.sh">script</a> run to register themselves as nodes with the master. As this point we have a basic kubernetes cluster running the number of specified nodes. Plus some other interesting services described later.</p>
 
 <p><img src="../assets/2018-08-08-kubevirtci/default_cluster.png" alt="default_cluster" /></p>
 
 <h3 id="how-does-it-work">How does it work?</h3>
+
 <p>After the provision step, which has created a pre-built Kubernetes node in a virtual machine, the deployment step doesn’t happen all by itself. Starting up the cluster is handled by a cli application, aptly named <a href="https://github.com/kubevirt/kubevirtci/tree/master/cluster-provision/gocli">‘gocli’</a>.</p>
 
 <p>Gocli is a go application that contains the knowledge needed to start the cluster, make a node the master node, and then register the other nodes with the master node as compute nodes. It also does a few other nice things, like start a dnsmasq container for dns inside the cluster, and a docker registry container for images. It also can extract and update the kubeconfig for the cluster, to make it possible for external tools to interact with the cluster (such as kubectl). And it can of course shut down the cluster in an orderly fashion.</p>
@@ -264,7 +272,9 @@ Once the node is provisioned, it is packaged inside a Docker container and publi
 <p><img src="../assets/2018-08-08-kubevirtci/running_cluster.png" alt="running_cluster" /></p>
 
 <p>All of the above allows you to now with a few commands, spin up a kubernetes cluster, build application images, push those images into a registry inside that cluster, and deploy that application inside the cluster. As a developer this allows quick compile/test scenarios in a somewhat realistic environment on a regular workstation. It allows for automatic end to end testing in a real cluster, and it allows for CI/CD tools to run tests against an ephemeral cluster that can be spun up and destroyed easily.</p>
+
 <h2 id="why-this-is-cool">Why this is cool</h2>
+
 <p>So how is this better than simply creating some Virtual Machines and cloning them to add new nodes? For one packaging is much easier, you can simply drop it in a container registry and its available everywhere the registry is available. Another thing is a lot of the configuration is stored in the container instead of in the Virtual Machine, so it is easy to layer on top of that container a different configuration for different use cases. The Virtual Machine stays the same, it’s the container that changes to meet the needs of the use case. Since the container knows all the details of the Virtual Machine it is also possible to construct utilities that retrieve information about the Virtual Machine or pass new information to the Virtual Machine through the container.</p>
 
 <p>But the biggest advantage is that this can all be easily automated and repeated. Each time you spin up a cluster, it will be identical from a previous run. You have a mechanism to allow you to populate the cluster with an application you are developing/testing and then running automated processes against that application.</p>
@@ -272,7 +282,6 @@ Once the node is provisioned, it is packaged inside a Docker container and publi
 <p>KubeVirt itself works on a similar principal, embed a QEMU process in a container to start a Virtual Machine with configuration obtained from the encapsulating container. And the KubeVirt development team uses kubevirtci images in their development workflow as well.</p>
 
 <p>And a final interesting thought: Everything mentioned in this article is a container, from the Virtual Machine images, to the gocli utility. It might be an interesting exercise to see if we can leverage kubernetes to manage the life cycle in a CI/CD system. We would then be creating Kubernetes clusters inside a kubernetes cluster to run CI/CD.</p>
-
 
         </article>
         
