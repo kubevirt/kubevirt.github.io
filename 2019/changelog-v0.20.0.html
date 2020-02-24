@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -241,7 +243,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>The sidecar feature is feature-gated now</li>
   <li>Use container image shasums instead of tags for KubeVirt deployments</li>
   <li>Protect control plane components against voluntary evictions with a</li>
-  <li>Replaced hardcoded <code class="highlighter-rouge">virtctl</code> by using the basename of the call, this enables</li>
+  <li>Replaced hardcoded <code class="language-html highlighter-rouge">virtctl</code> by using the basename of the call, this enables</li>
   <li>Added RNG device to all Fedora VMs in tests and examples (newer kernels might</li>
   <li>The virtual memory is now set to match the memory limit, if memory limit is</li>
   <li>Support nftable for CoreOS</li>
@@ -249,7 +251,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>Improved virtctl console/vnc data flow</li>
   <li>Removed DataVolumes feature gate in favor of auto-detecting CDI support</li>
   <li>Removed SR-IOV feature gate, it is enabled by default now</li>
-  <li>VMI-related metrics have been renamed from <code class="highlighter-rouge">kubevirt_vm_</code> to <code class="highlighter-rouge">kubevirt_vmi_</code></li>
+  <li>VMI-related metrics have been renamed from <code class="language-html highlighter-rouge">kubevirt_vm_</code> to <code class="language-html highlighter-rouge">kubevirt_vmi_</code></li>
   <li>Added metric to report the VMI count</li>
   <li>Improved integration with HCO by adding a CSV generator tool and modified</li>
   <li>CI Improvements:</li>
@@ -337,6 +339,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

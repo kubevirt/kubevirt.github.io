@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -236,7 +238,24 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>As per the message from Marc Sluiter on our <a href="https://groups.google.com/d/msg/kubevirt-dev/LhTm77nWxzM/Qr3c-hDWCQAJ">mailing list</a>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hello everybody,
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="rouge-code"><pre>Hello everybody,
 
 today we merged a PR [0], which renamed the condition types on the KubeVirt custom resources.
 This was done for alignment of conditions of all components in the KubeVirt ecosystem, which are deployed by the Hyperconverged Cluster Operator (HCO)[1], in order to make it easier for HCO to determine the deployment status of these components. The conditions are explained in detail in [2].
@@ -253,13 +272,13 @@ These changes take effect immediately if you are deploying KubeVirt from the mas
 [2] https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md
 
 Best regards,
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>We’re renaming some of the prior ‘conditions’ reported by the Custom Resources.</p>
 
 <h2 id="what-does-it-mean-to-us">What does it mean to us</h2>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">CR Rename</p><p>We’re making KubeVirt more compatible with the standard for Operators, when doing so, some of the <code class="highlighter-rouge">conditions</code> are changing, so check your scripts using checks for conditions to use the new ones.</p>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">CR Rename</p><p>We’re making KubeVirt more compatible with the standard for Operators, when doing so, some of the <code class="language-html highlighter-rouge">conditions</code> are changing, so check your scripts using checks for conditions to use the new ones.</p>
 
 
 </div></div>
@@ -275,27 +294,27 @@ Best regards,
   <tbody>
     <tr>
       <td style="text-align: center"><del>Ready</del></td>
-      <td style="text-align: center"><strong><code class="highlighter-rouge">Available</code></strong></td>
+      <td style="text-align: center"><strong><code class="language-html highlighter-rouge">Available</code></strong></td>
       <td style="text-align: left"><strong>Updated</strong></td>
     </tr>
     <tr>
       <td style="text-align: center"><del>Updating</del></td>
-      <td style="text-align: center"><strong><code class="highlighter-rouge">Progressing</code></strong></td>
+      <td style="text-align: center"><strong><code class="language-html highlighter-rouge">Progressing</code></strong></td>
       <td style="text-align: left"><strong>Updated</strong></td>
     </tr>
     <tr>
       <td style="text-align: center">-</td>
-      <td style="text-align: center"><code class="highlighter-rouge">Degraded</code></td>
+      <td style="text-align: center"><code class="language-html highlighter-rouge">Degraded</code></td>
       <td style="text-align: left"><strong>New condition</strong></td>
     </tr>
     <tr>
       <td style="text-align: center">Created</td>
-      <td style="text-align: center"><code class="highlighter-rouge">Created</code></td>
+      <td style="text-align: center"><code class="language-html highlighter-rouge">Created</code></td>
       <td style="text-align: left"><strong>Unchanged</strong></td>
     </tr>
     <tr>
       <td style="text-align: center">Synchronized</td>
-      <td style="text-align: center"><code class="highlighter-rouge">Synchronized</code></td>
+      <td style="text-align: center"><code class="language-html highlighter-rouge">Synchronized</code></td>
       <td style="text-align: left"><strong>Unchanged</strong></td>
     </tr>
   </tbody>
@@ -393,6 +412,7 @@ Best regards,
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

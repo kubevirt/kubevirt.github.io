@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -240,9 +242,29 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="hugepages-support">hugepages support</h2>
 
-<p>To use hugepages as backing memory, we need to indicate a desired amount of memory (<code class="highlighter-rouge">resources.requests.memory</code>) and size of hugepages to use (<code class="highlighter-rouge">memory.hugepages.pageSize</code>)</p>
+<p>To use hugepages as backing memory, we need to indicate a desired amount of memory (<code class="language-html highlighter-rouge">resources.requests.memory</code>) and size of hugepages to use (<code class="language-html highlighter-rouge">memory.hugepages.pageSize</code>)</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachine
 metadata:
   name: myvm
@@ -262,7 +284,7 @@ spec:
     - name: myimage
       persistentVolumeClaim:
         claimname: myclaim
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Note that</p>
 
@@ -276,7 +298,19 @@ spec:
 
 <p>the following syntax within interfaces section allows us to set both a mac address and network  model</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kind: VM
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre>kind: VM
 spec:
   domain:
     devices:
@@ -288,7 +322,7 @@ spec:
   networks:
   - name: red
     pod: {}
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>alternative network models can be</p>
 
@@ -303,9 +337,27 @@ spec:
 
 <h2 id="setting-a-disks-serial-number">setting a disks serial number</h2>
 
-<p>The new keyword <code class="highlighter-rouge">serial</code> in the disks section allows us to specify a serial number</p>
+<p>The new keyword <code class="language-html highlighter-rouge">serial</code> in the disks section allows us to specify a serial number</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachine
 metadata:
   name: myvm
@@ -323,13 +375,21 @@ spec:
     - name: myimage
       persistentVolumeClaim:
         claimname: myclaim
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="specifying-the-cpu-model">specifying the CPU model</h2>
 
-<p>Setting the CPU model is possible via <code class="highlighter-rouge">spec.domain.cpu.model</code>. The following VM will have a CPU with the Conroe model:</p>
+<p>Setting the CPU model is possible via <code class="language-html highlighter-rouge">spec.domain.cpu.model</code>. The following VM will have a CPU with the Conroe model:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>metadata:
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre>metadata:
   name: myvmi
 spec:
   domain:
@@ -337,7 +397,7 @@ spec:
       # this sets the CPU model
       model: Conroe
 ...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The available models are listed <a href="https://github.com/libvirt/libvirt/blob/master/src/cpu_map">here</a></p>
 
@@ -356,28 +416,41 @@ spec:
   <li>to expose a cluster ip service</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>to expose a node port service</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>to expose a load balancer service</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="kubernetes-compatible-networking-approach-slirp">Kubernetes compatible networking approach (SLIRP)</h2>
 
 <p>In slirp mode, virtual machines are connected to the network backend using QEMU user networking mode. In this mode, QEMU allocates internal IP addresses to virtual machines and hides them behind NAT.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kind: VM
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>kind: VM
 spec:
   domain:
     devices:
@@ -387,7 +460,7 @@ spec:
   networks:
   - name: red
     pod: {}
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="role-aggregation-for-our-roles">Role aggregation for our roles</h2>
 
@@ -481,6 +554,7 @@ spec:
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

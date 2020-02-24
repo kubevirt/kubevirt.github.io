@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -250,7 +252,16 @@ Ignition support is still needed in the guest operating system.</p>
 
 <p>A minimal config map would look like this:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: ConfigMap
 metadata:
   name: kubevirt-config
@@ -259,12 +270,13 @@ metadata:
     kubevirt.io: ""
 data:
   feature-gates: ExperimentalIgnitionSupport
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Make sure to delete kubevirt related pods afterward for the configuration to be taken into account:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete pod --all -n kubevirt
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl delete pod --all -n kubevirt
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="workthrough">WorkThrough</h2>
 
@@ -274,7 +286,56 @@ data:
 
 <p>Create The following VM spec in the file <em>myvm1.yml</em>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha3
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachine
 metadata:
   name: myvm1
@@ -323,7 +384,7 @@ spec:
         - name: containerdisk
           containerDisk:
             image: kubevirt/fedora-cloud-container-disk-demo
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Note we simply inject the ignition data as a string in <em>vm/spec/domain/spec/metadata/annotations</em>, using <em>kubevirt.io/ignitiondata</em> as an annotation</p>
 
@@ -331,9 +392,11 @@ spec:
 
 <p>Create the VM:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl apply -f myvm1.yml
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>$ kubectl apply -f myvm1.yml
 virtualmachine "myvm1" created
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>At this point, when VM boots, ignition data will be injected.</p>
 
@@ -427,6 +490,7 @@ virtualmachine "myvm1" created
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

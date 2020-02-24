@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -238,9 +240,26 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>To overcome this limitation, we use <a href="https://github.com/intel/multus-cni">Multus</a>, which is a “meta” CNI (Container Network Interface), allowing multiple CNIs to coexist, and allow for a pod to use the right ones for its networking needs.</p>
 
 <h1 id="how-does-it-work-for-pods">How Does it Work for Pods?</h1>
-<p>The magic is done via a new CRD (Custom Resource Definition) called <code class="highlighter-rouge">NetworkAttachmentDefinition</code> introduced by the Multus project, and adopted by the Kubernetes community as the <a href="https://docs.google.com/document/d/1Ny03h6IDVy_e_vmElOqR7UdTPAG_RNydhVE1Kx54kFQ/edit#heading=h.hylsbqoj5fxd">de-facto standard</a> for attaching pods to one or more networks. These network definition contains a field called <code class="highlighter-rouge">type</code> which indicates the name of the actual CNI that provide the network, and different configuration payloads which the Multus CNI is passing to the actual CNI. For example, the following network definition:</p>
+<p>The magic is done via a new CRD (Custom Resource Definition) called <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> introduced by the Multus project, and adopted by the Kubernetes community as the <a href="https://docs.google.com/document/d/1Ny03h6IDVy_e_vmElOqR7UdTPAG_RNydhVE1Kx54kFQ/edit#heading=h.hylsbqoj5fxd">de-facto standard</a> for attaching pods to one or more networks. These network definition contains a field called <code class="language-html highlighter-rouge">type</code> which indicates the name of the actual CNI that provide the network, and different configuration payloads which the Multus CNI is passing to the actual CNI. For example, the following network definition:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
 <span class="na">metadata</span><span class="pi">:</span>
  <span class="s"> name</span><span class="pi">:</span> <span class="s">a-bridge-network</span>
@@ -257,13 +276,21 @@ autocomplete(document.getElementById("search-input"), mykeywords);
  <span class="s">     "dataDir":</span><span class="nv"> </span><span class="s">"/mnt/cluster-ipam"</span>
  <span class="s">   }</span>
 <span class="s">}'</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Allows attaching a pod into a network provided by the <a href="https://github.com/containernetworking/plugins/tree/master/plugins/main/bridge">bridge CNI</a>.</p>
 
 <p>Once a pod with the following annotation is created:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">samplepod</span>
@@ -271,14 +298,26 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <span class="s">k8s.v1.cni.cncf.io/networks</span><span class="pi">:</span> <span class="s">a-bridge-network</span>
 <span class="na">spec</span><span class="pi">:</span>
 <span class="nn">...</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>The Multus CNI will find out whether a CNI of type <code class="highlighter-rouge">bridge</code> exists, and invoke it with the rest of the configuration in the CRD.</p>
+<p>The Multus CNI will find out whether a CNI of type <code class="language-html highlighter-rouge">bridge</code> exists, and invoke it with the rest of the configuration in the CRD.</p>
 
-<p>Note that, even without Multus, this exact configuration could have been put under <code class="highlighter-rouge">/etc/cni/net.d</code>, and provide the same network to the pod, using the bride CNI. But, in such a case, this would have been the <strong>only</strong> network interface to the pod, since Kubernetes just takes the first configuration file from that directory (sorted by alphabetical order) and use it to provide a single interface for all pods.
-If we have Multus around, and some other CNI (e.g. flannel), in addition to the bridge one, we could have have defined another <code class="highlighter-rouge">NetworkAttachmentDefinition</code> object, of type <code class="highlighter-rouge">flannel</code>, with its configuration, for example:</p>
+<p>Note that, even without Multus, this exact configuration could have been put under <code class="language-html highlighter-rouge">/etc/cni/net.d</code>, and provide the same network to the pod, using the bride CNI. But, in such a case, this would have been the <strong>only</strong> network interface to the pod, since Kubernetes just takes the first configuration file from that directory (sorted by alphabetical order) and use it to provide a single interface for all pods.
+If we have Multus around, and some other CNI (e.g. flannel), in addition to the bridge one, we could have have defined another <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> object, of type <code class="language-html highlighter-rouge">flannel</code>, with its configuration, for example:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">flannel-network</span>
@@ -290,37 +329,43 @@ If we have Multus around, and some other CNI (e.g. flannel), in addition to the 
       <span class="s">"isDefaultGateway":</span><span class="nv"> </span><span class="s">true</span>
     <span class="s">}</span>
   <span class="s">}'</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Add a reference to it in the pod’s annotation, and have two interfaces, connected to two different networks on the pod.</p>
 
-<p>It is quite common that basic networking is provided by one of the mainstream CNIs (flannel, calico, weave etc.) for all pods, and more advanced cases are added specifically when needed. For that, a default CNI could be configured for Multus, so that a <code class="highlighter-rouge">NetworkAttachmentDefinition</code> object is not needed, nor any annotation at pod level. The interface provided for such a network wil be marked as <code class="highlighter-rouge">eth0</code> on the pod, for smooth transition when Multus is introduced into an cluster with networking. Any other interface added to the pod due to an explicit <code class="highlighter-rouge">NetworkAttachmentDefinition</code> object, will be marked as: <code class="highlighter-rouge">net1</code>, <code class="highlighter-rouge">net2</code> and so on.</p>
+<p>It is quite common that basic networking is provided by one of the mainstream CNIs (flannel, calico, weave etc.) for all pods, and more advanced cases are added specifically when needed. For that, a default CNI could be configured for Multus, so that a <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> object is not needed, nor any annotation at pod level. The interface provided for such a network wil be marked as <code class="language-html highlighter-rouge">eth0</code> on the pod, for smooth transition when Multus is introduced into an cluster with networking. Any other interface added to the pod due to an explicit <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> object, will be marked as: <code class="language-html highlighter-rouge">net1</code>, <code class="language-html highlighter-rouge">net2</code> and so on.</p>
 
 <h1 id="how-does-it-work-in-kubevirt">How Does it Work in KubeVirt?</h1>
 <p>Most initial steps would be the same as in the pod’s case:</p>
 <ul>
   <li>Install the different CNIs that you would like to provide networks to our Virtual Machines</li>
   <li>Install Multus</li>
-  <li>Configure Multus with some default CNI that we would like to provide <code class="highlighter-rouge">eth0</code> for all Virtual Machines</li>
-  <li>Add <code class="highlighter-rouge">NetworkAttachmentDefinition</code> object for each network that we would like some of our Virtual Machines to be using
-Now, inside the VMI (virtual Machine Instance) definition, a new type of <code class="highlighter-rouge">network</code> called <code class="highlighter-rouge">multus</code> should be added:</li>
+  <li>Configure Multus with some default CNI that we would like to provide <code class="language-html highlighter-rouge">eth0</code> for all Virtual Machines</li>
+  <li>Add <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> object for each network that we would like some of our Virtual Machines to be using
+Now, inside the VMI (virtual Machine Instance) definition, a new type of <code class="language-html highlighter-rouge">network</code> called <code class="language-html highlighter-rouge">multus</code> should be added:</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">networks</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre> <span class="na">networks</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default-net</span>
 <span class="s">￼     pod</span><span class="pi">:</span> <span class="pi">{}</span>
 <span class="s">￼   - name</span><span class="pi">:</span> <span class="s">another-net</span>
 <span class="s">￼     multus</span><span class="pi">:</span>
 <span class="s">￼       networkName</span><span class="pi">:</span> <span class="s">a-bridge-network</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>This would allow VMI interfaces to be connected to two networks:</p>
 <ul>
   <li>
-    <p><code class="highlighter-rouge">default</code> which is connected to the CNI which is defined as the default one for Multus. No <code class="highlighter-rouge">NetworkAttachmentDefinition</code> CRD is needed for this one, and we assume that the needed configuration is just taken from the default CNI’s configuration under <code class="highlighter-rouge">/etc/cni/net.d/</code>. We also assume that an IP address will be provided to <code class="highlighter-rouge">eth0</code> on the pod, which will be delegated to the Virtual Machine’s <code class="highlighter-rouge">eth0</code> interface.</p>
+    <p><code class="language-html highlighter-rouge">default</code> which is connected to the CNI which is defined as the default one for Multus. No <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> CRD is needed for this one, and we assume that the needed configuration is just taken from the default CNI’s configuration under <code class="language-html highlighter-rouge">/etc/cni/net.d/</code>. We also assume that an IP address will be provided to <code class="language-html highlighter-rouge">eth0</code> on the pod, which will be delegated to the Virtual Machine’s <code class="language-html highlighter-rouge">eth0</code> interface.</p>
   </li>
   <li>
-    <p><code class="highlighter-rouge">another-net</code> which is connected to the network defined by a <code class="highlighter-rouge">NetworkAttachmentDefinition</code> CRD named <code class="highlighter-rouge">a-bridge-network</code>. The identity fo the CNI that would actually provide the network, as well as the configuration for this network are all defined in the CRD. An interface named <code class="highlighter-rouge">net1</code> connected to that network wil be created on the pod. If this interface get an IP address from the CNI, this IP will be delegated to the Virtual Machine’s <code class="highlighter-rouge">eth1</code> interface. If no IP address is given by the CNI, no IP will be given to <code class="highlighter-rouge">eth1</code> on the Virtual Machine, and only L2 connectivity will be provided.</p>
+    <p><code class="language-html highlighter-rouge">another-net</code> which is connected to the network defined by a <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> CRD named <code class="language-html highlighter-rouge">a-bridge-network</code>. The identity fo the CNI that would actually provide the network, as well as the configuration for this network are all defined in the CRD. An interface named <code class="language-html highlighter-rouge">net1</code> connected to that network wil be created on the pod. If this interface get an IP address from the CNI, this IP will be delegated to the Virtual Machine’s <code class="language-html highlighter-rouge">eth1</code> interface. If no IP address is given by the CNI, no IP will be given to <code class="language-html highlighter-rouge">eth1</code> on the Virtual Machine, and only L2 connectivity will be provided.</p>
   </li>
 </ul>
 
@@ -333,49 +378,56 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
   <li>Since we use a single node cluster, Don’t forget to allow scheduling pods on the master:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>If running <code class="highlighter-rouge">kubectl</code> from master itself, don’t forget to copy over the conf file:</li>
+  <li>If running <code class="language-html highlighter-rouge">kubectl</code> from master itself, don’t forget to copy over the conf file:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> /<span class="nv">$USER</span>/.kube <span class="o">&amp;&amp;</span> <span class="nb">cp</span> /etc/kubernetes/admin.conf /<span class="nv">$USER</span>/.kube/config
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">mkdir</span> <span class="nt">-p</span> /<span class="nv">$USER</span>/.kube <span class="o">&amp;&amp;</span> <span class="nb">cp</span> /etc/kubernetes/admin.conf /<span class="nv">$USER</span>/.kube/config
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h2 id="install-flannel">Install Flannel</h2>
 <ul>
-  <li>Make sure pass these parameters are used  when starting <code class="highlighter-rouge">kubeadm</code>:</li>
+  <li>Make sure pass these parameters are used  when starting <code class="language-html highlighter-rouge">kubeadm</code>:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>kubeadm init <span class="nt">--pod-network-cidr</span><span class="o">=</span>10.244.0.0/16
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>kubeadm init <span class="nt">--pod-network-cidr</span><span class="o">=</span>10.244.0.0/16
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>Then call:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/coreos/flannel/v0.10.0/Documentation/kube-flannel.yml
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="install-and-start-ovs">Install and Start OVS</h2>
 <ul>
   <li>On Fedora28 that would be (see <a href="http://docs.openvswitch.org/en/latest/intro/install/general/">here</a> for other options):</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>dnf <span class="nb">install </span>openvswitch
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>dnf <span class="nb">install </span>openvswitch
  <span class="nv">$ </span>systemctl start openvswitch
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="install-and-configure-multus">Install and Configure Multus</h2>
 <ul>
   <li>Install Multus as a daemon set (flannel is already set as the default CNI in the yaml below):</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/intel/multus-cni/master/images/multus-daemonset.yml
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/intel/multus-cni/master/images/multus-daemonset.yml
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>Make sure that Multus is the first CNI under: <code class="highlighter-rouge">/etc/cni/net.d/</code>. If not, rename it so it would be the first, e.g.: <code class="highlighter-rouge">mv /etc/cni/net.d/70-multus.conf /etc/cni/net.d/00-multus.conf</code></li>
+  <li>Make sure that Multus is the first CNI under: <code class="language-html highlighter-rouge">/etc/cni/net.d/</code>. If not, rename it so it would be the first, e.g.: <code class="language-html highlighter-rouge">mv /etc/cni/net.d/70-multus.conf /etc/cni/net.d/00-multus.conf</code></li>
 </ul>
 
 <h2 id="install-and-configure-ovs-cni">Install and Configure OVS CNI</h2>
@@ -383,21 +435,33 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
   <li>First step would be to create the OVS bridge:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ovs-vsctl add-br blue
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ovs-vsctl add-br blue
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>To install the OVS CNI use:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/ovs-cni/master/examples/ovs-cni.yml
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/ovs-cni/master/examples/ovs-cni.yml
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>Create a <code class="highlighter-rouge">NetworkAttachmentDefinition</code> CRD for the “blue” bridge:</li>
+  <li>Create a <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> CRD for the “blue” bridge:</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">ovs-blue</span>
@@ -407,20 +471,32 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
       <span class="s">"type":</span><span class="nv"> </span><span class="s">"ovs",</span>
       <span class="s">"bridge":</span><span class="nv"> </span><span class="s">"blue"</span>
     <span class="s">}'</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>To use as specific port/vlan from that bridge, you should first create one:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ovs-vsctl add-br blue1 blue 100
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ovs-vsctl add-br blue1 blue 100
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>Then, define its <code class="highlighter-rouge">NetworkAttachmentDefinition</code> CRD:</li>
+  <li>Then, define its <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code> CRD:</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">ovs-blue100</span>
@@ -431,7 +507,7 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
       <span class="s">"bridge":</span><span class="nv"> </span><span class="s">"blue100",</span>
       <span class="s">"vlan":</span><span class="nv"> </span><span class="s">100</span>
     <span class="s">}'</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>More information could be found in the <a href="https://github.com/kubevirt/ovs-cni/blob/master/docs/deployment-on-arbitrary-cluster.md">OVS CNI documentation</a></li>
@@ -442,15 +518,63 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
   <li>First step would be to deploy KubeVirt (note that 0.8 is needed for Multus support):</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span>v0.8.0
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span>v0.8.0
 <span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="nv">$VERSION</span>/kubevirt.yaml
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li>Now, create a VMI with 2 interfaces, one connected to the default network (flannel in our case) and one to the OVS “blue” bridge:</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
@@ -496,10 +620,10 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
         <span class="s">echo "fedora" | passwd fedora --stdin</span>
     <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
 <span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li>Once the machine is up and running, you can use <code class="highlighter-rouge">virtctl</code> to log into it and make sure that <code class="highlighter-rouge">eth0</code> exists as the default interface (with an IP address on the flannel subnet) and <code class="highlighter-rouge">eth1</code> as the interface connected to the OVS bridge (without an IP)</li>
+  <li>Once the machine is up and running, you can use <code class="language-html highlighter-rouge">virtctl</code> to log into it and make sure that <code class="language-html highlighter-rouge">eth0</code> exists as the default interface (with an IP address on the flannel subnet) and <code class="language-html highlighter-rouge">eth1</code> as the interface connected to the OVS bridge (without an IP)</li>
 </ul>
 
         </article>
@@ -584,6 +708,7 @@ Now, inside the VMI (virtual Machine Instance) definition, a new type of <code c
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

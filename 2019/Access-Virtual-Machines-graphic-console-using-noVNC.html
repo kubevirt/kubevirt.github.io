@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -235,25 +237,97 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p><a href="https://novnc.com/">NoVNC</a> is a JavaScript VNC client using WebSockets and HTML5 Canvas. We provide websocket api for VNC access under</p>
 <pre><code class="language-url">APISERVER:/apis/subresources.kubevirt.io/v1alpha3/namespaces/NAMESPACE/virtualmachineinstances/VM/vnc
 </code></pre>
-<p>but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provide a component using <code class="highlighter-rouge">kubectl proxy</code> to provide a authorized vnc acess, we name this Component <a href="https://github.com/wavezhang/virtVNC"><code class="highlighter-rouge">virtVNC</code></a>.</p>
+<p>but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provide a component using <code class="language-html highlighter-rouge">kubectl proxy</code> to provide a authorized vnc acess, we name this Component <a href="https://github.com/wavezhang/virtVNC"><code class="language-html highlighter-rouge">virtVNC</code></a>.</p>
 
 <p>In this post we are going to show how to do this in detail.</p>
 <h2 id="the-detailed-method">The detailed method</h2>
 <h3 id="prepare-docker-image">Prepare Docker Image</h3>
 <p>First prepare docker build dicrectory.</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> virtvnc/static
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">mkdir</span> <span class="nt">-p</span> virtvnc/static
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>Then clone noVNC files from github.</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/novnc/noVNC
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>git clone https://github.com/novnc/noVNC
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>And then copy noVNC files to docker build directory.</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cp </span>noVNC/app virtvnc/static/
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nb">cp </span>noVNC/app virtvnc/static/
 <span class="nb">cp </span>noVNC/core virtvnc/static/
 <span class="nb">cp </span>noVNC/vender virtvnc/static/
 <span class="nb">cp </span>noVNC/<span class="k">*</span>.html virtvnc/static/
-</code></pre></div></div>
-<p>Create a file <code class="highlighter-rouge">index.html</code> to <code class="highlighter-rouge">virtvnc/static/</code> with the following content. The page will display VMs and corresponding VNC links.</p>
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Create a file <code class="language-html highlighter-rouge">index.html</code> to <code class="language-html highlighter-rouge">virtvnc/static/</code> with the following content. The page will display VMs and corresponding VNC links.</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+</pre></td><td class="rouge-code"><pre><span class="nt">&lt;html&gt;</span>
   <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
     <span class="nt">&lt;style&gt;</span>
      <span class="nt">td</span> <span class="p">{</span>
@@ -319,26 +393,57 @@ autocomplete(document.getElementById("search-input"), mykeywords);
    <span class="nt">&lt;/tbody&gt;&lt;/table&gt;</span>
   <span class="nt">&lt;/body&gt;</span>
 <span class="nt">&lt;/html&gt;</span>
-</code></pre></div></div>
-<p>Create dockerfile with following content to add static html files and set up <code class="highlighter-rouge">kubectl proxy</code> command line args.</p>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Create dockerfile with following content to add static html files and set up <code class="language-html highlighter-rouge">kubectl proxy</code> command line args.</p>
 <pre><code class="language-Dockerfile">FROM quay.io/bitnami/kubectl:1.15
 ADD static /static
 CMD ["proxy", "--www=/static", "--accept-hosts=^.*$", "--address=[::]", "--api-prefix=/k8s/", "--www-prefix="]
 </code></pre>
-<p>Finally use <code class="highlighter-rouge">docker build</code> to build docker image.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd virtvnc
+<p>Finally use <code class="language-html highlighter-rouge">docker build</code> to build docker image.</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>cd virtvnc
 docker build -t quay.io/samblade/virtvnc:v0.1 .
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h3 id="setting-up-rbac">Setting Up RBAC</h3>
 <p>Create a service account for virtvnc.</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">ServiceAccount</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">virtvnc</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>Then define cluster role for kubevirt, setting up permissions needed.</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">virtvnc</span>
@@ -362,9 +467,21 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
   <span class="pi">-</span> <span class="s">get</span>
   <span class="pi">-</span> <span class="s">list</span>
   <span class="pi">-</span> <span class="s">watch</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>And then binding cluster role to service accout.</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRoleBinding</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRoleBinding</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">virtvnc</span>
@@ -376,10 +493,46 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
   <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">virtvnc</span>
   <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h3 id="deploy-to-kubernetes">Deploy to kubernetes</h3>
-<p>Create following yaml, and then apply to kubernetes to setup <code class="highlighter-rouge">virtvnc</code> deployment.</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<p>Create following yaml, and then apply to kubernetes to setup <code class="language-html highlighter-rouge">virtvnc</code> deployment.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">virtvnc</span>
@@ -415,9 +568,24 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
           <span class="na">periodSeconds</span><span class="pi">:</span> <span class="m">10</span>
           <span class="na">successThreshold</span><span class="pi">:</span> <span class="m">1</span>
           <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">5</span>
-</code></pre></div></div>
-<p>Expose a <code class="highlighter-rouge">NodePort</code> service, then we can access the web page from node network.</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Expose a <code class="language-html highlighter-rouge">NodePort</code> service, then we can access the web page from node network.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">labels</span><span class="pi">:</span>
@@ -432,23 +600,27 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
   <span class="na">selector</span><span class="pi">:</span>
     <span class="na">app</span><span class="pi">:</span> <span class="s">virtvnc</span>
   <span class="na">type</span><span class="pi">:</span> <span class="s">NodePort</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <blockquote>
   <p><strong>Note that this will make all your virtual machines vnc &amp; console accessible to node network.</strong></p>
   <h2 id="the-simple-way">The Simple Way</h2>
   <p>In this <a href="https://github.com/wavezhang/virtVNC">github repo</a> and <a href="https://quay.io/repository/samblade/virtvnc">registry</a> you’ll find a ready to use version of the above which you can deploy in a single command like this:</p>
-  <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply -f https://github.com/wavezhang/virtVNC/raw/master/k8s/virtvnc.yaml
-</code></pre></div>  </div>
+  <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl apply -f https://github.com/wavezhang/virtVNC/raw/master/k8s/virtvnc.yaml
+</pre></td></tr></tbody></table></code></pre></div>  </div>
   <h2 id="access-vnc">Access VNC</h2>
-  <p>First get node port of <code class="highlighter-rouge">virtvnc</code> service.</p>
-  <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get svc <span class="nt">-n</span> kubevirt virtvnc
-</code></pre></div>  </div>
+  <p>First get node port of <code class="language-html highlighter-rouge">virtvnc</code> service.</p>
+  <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl get svc <span class="nt">-n</span> kubevirt virtvnc
+</pre></td></tr></tbody></table></code></pre></div>  </div>
   <p>Then visit the following url in browser:</p>
-  <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://NODEIP:NODEPORT/
-</code></pre></div>  </div>
-  <p>If you want manage virtual machines in other namespace, you can specify namespace using query param <code class="highlighter-rouge">namespace</code> like following:</p>
-  <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://NODEIP:NODEPORT/?namespace=test
-</code></pre></div>  </div>
+  <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>http://NODEIP:NODEPORT/
+</pre></td></tr></tbody></table></code></pre></div>  </div>
+  <p>If you want manage virtual machines in other namespace, you can specify namespace using query param <code class="language-html highlighter-rouge">namespace</code> like following:</p>
+  <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>http://NODEIP:NODEPORT/?namespace=test
+</pre></td></tr></tbody></table></code></pre></div>  </div>
   <p><img src="/assets/2019-11-11-Access-Virtual-Machines-graphic-console-using-noVNC/virtvnc.gif" alt="VirtVNC" title="VirtVNC" /></p>
   <h2 id="references">References</h2>
 </blockquote>
@@ -545,6 +717,7 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

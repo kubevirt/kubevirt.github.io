@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -230,7 +232,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <p><a href="/2019/kubevirt-with-ansible-part-1.html">Part 1</a> contained a short introduction to basic VM management with Ansible’s <code class="highlighter-rouge">kubevirt_vm</code> module.
+          <p><a href="/2019/kubevirt-with-ansible-part-1.html">Part 1</a> contained a short introduction to basic VM management with Ansible’s <code class="language-html highlighter-rouge">kubevirt_vm</code> module.
 This time we’ll paint a more complete picture of all the features on offer.</p>
 
 <p>As before, examples found herein are also available as full working playbooks in our
@@ -244,11 +246,11 @@ many more ways of using the modules than can reasonably fit here.</p>
 <p>Virtual machines managed by KubeVirt are highly customizable. Among the features accessible from Ansible, are:</p>
 
 <ul>
-  <li>various libvirt–level virtualized hardware tweaks (e.g. <code class="highlighter-rouge">machine_type</code> or <code class="highlighter-rouge">cpu_model</code>),</li>
-  <li>network interface configuration (<code class="highlighter-rouge">interfaces</code>), including multi–NIC utilizing the Multus CNI,</li>
-  <li>non–persistent VMs (<code class="highlighter-rouge">ephemeral: yes</code>),</li>
-  <li>direct DataVolumes support (<code class="highlighter-rouge">datavolumes</code>),</li>
-  <li>and OpenShift Templates support (<code class="highlighter-rouge">template</code>).</li>
+  <li>various libvirt–level virtualized hardware tweaks (e.g. <code class="language-html highlighter-rouge">machine_type</code> or <code class="language-html highlighter-rouge">cpu_model</code>),</li>
+  <li>network interface configuration (<code class="language-html highlighter-rouge">interfaces</code>), including multi–NIC utilizing the Multus CNI,</li>
+  <li>non–persistent VMs (<code class="language-html highlighter-rouge">ephemeral: yes</code>),</li>
+  <li>direct DataVolumes support (<code class="language-html highlighter-rouge">datavolumes</code>),</li>
+  <li>and OpenShift Templates support (<code class="language-html highlighter-rouge">template</code>).</li>
 </ul>
 
 <h3 id="further-resources">Further resources</h3>
@@ -275,42 +277,61 @@ many more ways of using the modules than can reasonably fit here.</p>
 
 <h2 id="vm-image-management-with-the-containerized-data-importer">VM Image Management with the Containerized Data Importer</h2>
 
-<p>The main functionality of the <code class="highlighter-rouge">kubevirt_pvc</code> module is to manage Persistent Volume Claims. The following snippet
+<p>The main functionality of the <code class="language-html highlighter-rouge">kubevirt_pvc</code> module is to manage Persistent Volume Claims. The following snippet
 should seem familiar to anyone who dealt with PVCs before:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_pvc</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_pvc</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">pvc1</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
   <span class="na">size</span><span class="pi">:</span> <span class="s">100Mi</span>
   <span class="na">access_modes</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Running it inside a playbook will result in a new PVC named <em>pvc1</em> with the access mode <em>ReadWriteOnce</em> and at least
 100Mi of storage assigned.</p>
 
-<p>The option dedicated to working with VM images is named <code class="highlighter-rouge">cdi_source</code> and lets one fill a PVC with data immediately
+<p>The option dedicated to working with VM images is named <code class="language-html highlighter-rouge">cdi_source</code> and lets one fill a PVC with data immediately
 upon creation. But before we get to the examples, the Containerized Data Importer needs to be properly deployed,
 which is as simple as running the following commands:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">CDI_VER</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">CDI_VER</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
 kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VER</span>/cdi-operator.yaml
 kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VER</span>/cdi-cr.yaml
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Once <code class="highlighter-rouge">kubectl get pods -n cdi</code> confirms all pods are ready, CDI is good to go.</p>
+<p>Once <code class="language-html highlighter-rouge">kubectl get pods -n cdi</code> confirms all pods are ready, CDI is good to go.</p>
 
 <p>The module can instruct CDI to fill the PVC with data from:</p>
 <ul>
-  <li>a remote HTTP(S) server (<code class="highlighter-rouge">http:</code>),</li>
-  <li>a container registry (<code class="highlighter-rouge">registry:</code>),</li>
-  <li>a local file (<code class="highlighter-rouge">upload: yes</code>), though this requires using <code class="highlighter-rouge">kubevirt_cdi_upload</code> for the actual upload step,</li>
-  <li>or nowhere (the <code class="highlighter-rouge">blank: yes</code> option).</li>
+  <li>a remote HTTP(S) server (<code class="language-html highlighter-rouge">http:</code>),</li>
+  <li>a container registry (<code class="language-html highlighter-rouge">registry:</code>),</li>
+  <li>a local file (<code class="language-html highlighter-rouge">upload: yes</code>), though this requires using <code class="language-html highlighter-rouge">kubevirt_cdi_upload</code> for the actual upload step,</li>
+  <li>or nowhere (the <code class="language-html highlighter-rouge">blank: yes</code> option).</li>
 </ul>
 
 <p>Here’s a simple example:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_pvc</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_pvc</span><span class="pi">:</span>
 <span class="na">name</span><span class="pi">:</span> <span class="s">pvc2</span>
 <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
 <span class="na">size</span><span class="pi">:</span> <span class="s">100Mi</span>
@@ -320,12 +341,29 @@ kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containeriz
 <span class="na">cdi_source</span><span class="pi">:</span>
   <span class="na">http</span><span class="pi">:</span>
     <span class="na">url</span><span class="pi">:</span> <span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Please notice the <code class="highlighter-rouge">wait: yes</code> parameter. The module will only exit after CDI has completed transfering its data.
+<p>Please notice the <code class="language-html highlighter-rouge">wait: yes</code> parameter. The module will only exit after CDI has completed transfering its data.
 Let’s see this in action:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook pvc_cdi.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="rouge-code"><pre><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook pvc_cdi.yaml
 <span class="o">(</span>…<span class="o">)</span>
 
 TASK <span class="o">[</span>Create pvc and fetch data] <span class="k">**********************************************************************************</span>
@@ -342,7 +380,7 @@ pvc2      Bound     local-pv-6b6380e2   37Gi       RWO            <span class="n
     cdi.kubevirt.io/storage.import.importPodName: importer-pvc2-gvn5c
     cdi.kubevirt.io/storage.import.source: http
     cdi.kubevirt.io/storage.pod.phase: Succeeded
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Everything worked as expected.</p>
 
@@ -360,35 +398,60 @@ pvc2      Bound     local-pv-6b6380e2   37Gi       RWO            <span class="n
 Listing KubeVirt VMs can be done using the KubeVirt inventory plugin. It needs a bit of setting up before it can
 be used.</p>
 
-<p>First, enable the plugin in <code class="highlighter-rouge">ansible.cfg</code>:</p>
+<p>First, enable the plugin in <code class="language-html highlighter-rouge">ansible.cfg</code>:</p>
 
-<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">inventory</span>]
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>[<span class="n">inventory</span>]
 <span class="n">enable_plugins</span> = <span class="n">kubevirt</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Then configure the plugin using a file named <code class="highlighter-rouge">kubevirt.yml</code> or <code class="highlighter-rouge">kubevirt.yaml</code>:</p>
+<p>Then configure the plugin using a file named <code class="language-html highlighter-rouge">kubevirt.yml</code> or <code class="language-html highlighter-rouge">kubevirt.yaml</code>:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">plugin</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="na">plugin</span><span class="pi">:</span> <span class="s">kubevirt</span>
 <span class="na">connections</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">default</span>
     <span class="na">network_name</span><span class="pi">:</span> <span class="s">default</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>And now let’s see if it worked and there’s a VM running in the default namespace (as represented by the
-<code class="highlighter-rouge">namespace_default</code> inventory group):</p>
+<code class="language-html highlighter-rouge">namespace_default</code> inventory group):</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
  <span class="o">[</span>WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not
 match <span class="s1">'all'</span>
 
   hosts <span class="o">(</span>0<span class="o">)</span>:
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Right, we don’t have any VMs running. Let’s go back to <a href="/2019/kubevirt-with-ansible-part-1.html">part 1</a>, create <code class="highlighter-rouge">vm1</code>, make sure it’s runing
+<p>Right, we don’t have any VMs running. Let’s go back to <a href="/2019/kubevirt-with-ansible-part-1.html">part 1</a>, create <code class="language-html highlighter-rouge">vm1</code>, make sure it’s runing
 and then try again:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook  ../part1/02_vm1.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook  ../part1/02_vm1.yaml
 <span class="o">(</span>…<span class="o">)</span>
 PLAY RECAP <span class="k">********************************************************************************************************</span>
 localhost                  : <span class="nv">ok</span><span class="o">=</span>2    <span class="nv">changed</span><span class="o">=</span>1    <span class="nv">unreachable</span><span class="o">=</span>0    <span class="nv">failed</span><span class="o">=</span>0    <span class="nv">skipped</span><span class="o">=</span>0    <span class="nv">rescued</span><span class="o">=</span>0    <span class="nv">ignored</span><span class="o">=</span>0
@@ -401,7 +464,7 @@ localhost                  : <span class="nv">ok</span><span class="o">=</span>2
 <span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
   hosts <span class="o">(</span>1<span class="o">)</span>:
     default-vm1-2c680040-9e75-11e9-8839-525500d15501
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Works!</p>
 
@@ -506,6 +569,7 @@ own ReplicaSets for running multiple instances of a specified virtual machine.</
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

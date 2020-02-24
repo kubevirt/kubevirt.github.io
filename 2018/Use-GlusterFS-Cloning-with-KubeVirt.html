@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -263,18 +265,33 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Note that we also patch the image to use an existing one from gluster org located at docker.io instead of quay.io, as the corresponding repository is private by the time of this writing, and the heketi one, to make sure it has the code required to handle cloning</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAMESPACE="app-storage"
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>NAMESPACE="app-storage"
 oc create -f openshift-clusterrole.yaml
 oc process -f glusterfile-provisioner-template.yml | oc apply -f - -n $NAMESPACE
 oc adm policy add-cluster-role-to-user cluster-admin -z glusterfile-provisioner -n $NAMESPACE
 oc adm policy add-scc-to-user privileged -z glusterfile-provisioner
 oc set image dc/heketi-storage heketi=gluster/heketiclone:latest  -n $NAMESPACE
 oc set image dc/glusterfile-provisioner glusterfile-provisioner=gluster/glusterfileclone:latest  -n $NAMESPACE
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>And you will see something similar to this in your storage namespace</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master01 ~]# NAMESPACE="app-storage"
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre>[root@master01 ~]# NAMESPACE="app-storage"
 [root@master01 ~]# kubectl get pods -n $NAMESPACE
 NAME                              READY     STATUS    RESTARTS   AGE
 glusterfile-provisioner-3-vhkx6   1/1       Running   0          1d
@@ -282,7 +299,7 @@ glusterfs-storage-b82x4           1/1       Running   1          23d
 glusterfs-storage-czthc           1/1       Running   0          23d
 glusterfs-storage-z68hm           1/1       Running   0          23d
 heketi-storage-2-qdrks            1/1       Running   0          6h
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="additional-configuration">additional configuration</h3>
 
@@ -294,10 +311,13 @@ heketi-storage-2-qdrks            1/1       Running   0          6h
 </ul>
 
 <p>You can use the following</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAMESPACE="app-storage"
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>NAMESPACE="app-storage"
 oc get sc glusterfs-storage -o yaml
 oc get secret heketi-storage-admin-secret -n $NAMESPACE-o yaml
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>then, create the following objects:</p>
 
@@ -310,7 +330,15 @@ oc get secret heketi-storage-admin-secret -n $NAMESPACE-o yaml
 
 <p>Note how we change the type for the secret and add extra options for our storage class (in particular, enabling smartclone).</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 data:
   key: eEt0NUJ4cklPSmpJb2RZcFpqVExSSjUveFV5WHI4L0NxcEtMME1WVlVjQT0=
 kind: Secret
@@ -318,9 +346,23 @@ metadata:
   name: glustercloning-heketi-secret
   namespace: app-storage
 type: gluster.org/glusterfile
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: storage.k8s.io/v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre>apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
   name: glustercloning
@@ -334,7 +376,7 @@ parameters:
   volumeoptions: group virt
 provisioner: gluster.org/glusterfile
 reclaimPolicy: Delete
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The full set of supported parameters can be found <a href="https://github.com/kubernetes-incubator/external-storage/blob/master/gluster/file/README.md">here</a></p>
 
@@ -346,16 +388,40 @@ reclaimPolicy: Delete
 
 <p>For instance, provided you have an existing pvc named <em>cirros</em> containing this base operating system, and that this PVC contains an annotion of the following</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(...)
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre>(...)
 metadata:
  annotations:
   gluster.org/heketi-volume-id: f0cbbb29ef4202c5226f87708da57e5c
 (...)
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>you can create a cloned pvc with the following yaml ( note that we simply indicate a clone request in the annotations)</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: testclone1
@@ -374,17 +440,23 @@ status:
   - ReadWriteOnce
   capacity:
     storage: 1Gi
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Once provisioned, the pvc will contain this additional annotation created by the provisioner</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>(...)
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>(...)
 metadata:
  annotations:
       k8s.io/CloneOf: cirros
 
 (...)
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="leveraging-the-feature-in-openshift-templates">Leveraging the feature in openshift templates</h3>
 
@@ -398,8 +470,9 @@ metadata:
 
 <p>you can use it with something like</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc process -f template.yml -p Name=myvm | oc process -f - -n default
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>oc process -f template.yml -p Name=myvm | oc process -f - -n default
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="conclusion">Conclusion</h2>
 
@@ -487,6 +560,7 @@ metadata:
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

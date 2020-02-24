@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -236,7 +238,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="so-what-did-i-come-up-with">So What did i come up with</h2>
 
-<p>the image is called <code class="highlighter-rouge">autolatest</code> and can be found on <a href="https://console.cloud.google.com/storage/browser/kubevirt-button">Google Storage</a></p>
+<p>the image is called <code class="language-html highlighter-rouge">autolatest</code> and can be found on <a href="https://console.cloud.google.com/storage/browser/kubevirt-button">Google Storage</a></p>
 
 <p>I assume that you have a Google account with an active payment method
 or a free trial. You also need to make sure that you have a default keypair
@@ -266,7 +268,7 @@ Go to “Compute Engine”, then to “VM instances”, and then click on “Cre
 
 <ul>
   <li>the 2 CPU / 7.5GB instance</li>
-  <li>a zone that supports the Haswell CPU Platform or newer (for nested virtualization to work), <code class="highlighter-rouge">us-central1-b</code> for instance</li>
+  <li>a zone that supports the Haswell CPU Platform or newer (for nested virtualization to work), <code class="language-html highlighter-rouge">us-central1-b</code> for instance</li>
 </ul>
 
 <p>Under “boot disk”, select the image that you created above.</p>
@@ -394,6 +396,7 @@ Go to “Compute Engine”, then to “VM instances”, and then click on “Cre
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

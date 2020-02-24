@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -265,11 +267,11 @@ inbound access to the graphical and serial consoel of VMs. But this does
 not work with CRDs and thus we are now using a different approach to
 provide access to those.</p>
 
-<p>The new implementation leverages the <code class="highlighter-rouge">kubectl exec</code> path in order to
+<p>The new implementation leverages the <code class="language-html highlighter-rouge">kubectl exec</code> path in order to
 pipe the graphical and serial console from the VM to the client. This is
 pretty nice, as we are leveraging Kubernetes for doing the piping, we
-merely provide a <code class="highlighter-rouge">kubectl</code> plugin in order to ease the consumption of
-this. Side note is that the API of the <code class="highlighter-rouge">kubectl</code> plugin did actually not
+merely provide a <code class="language-html highlighter-rouge">kubectl</code> plugin in order to ease the consumption of
+this. Side note is that the API of the <code class="language-html highlighter-rouge">kubectl</code> plugin did actually not
 change.</p>
 
         </article>
@@ -354,6 +356,7 @@ change.</p>
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -356,14 +358,14 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>When testing cockpit in a CentOS 7 server with a Kubernetes cluster and KubeVirt we have realised that some of the containers/k8s features have to be enabled installing extra cockpit packages:</p>
 
 <ul>
-  <li>To see the containers and images the package <code class="highlighter-rouge">cockpit-docker</code> has to be installed, then a new option called containers appears in the menu.</li>
+  <li>To see the containers and images the package <code class="language-html highlighter-rouge">cockpit-docker</code> has to be installed, then a new option called containers appears in the menu.</li>
 </ul>
 
 <p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_containers_800.png" alt="Containers" title="cockpit containers" /></p>
 
 <ul>
   <li>
-    <p>To see the k8s cluster the package <code class="highlighter-rouge">cockpit-kubernetes</code> has to be installed and a new tab appears in the left menu. The new options allow you to:</p>
+    <p>To see the k8s cluster the package <code class="language-html highlighter-rouge">cockpit-kubernetes</code> has to be installed and a new tab appears in the left menu. The new options allow you to:</p>
 
     <ul>
       <li><strong>Overview</strong>: filtering by project, it shows Pods, volumes, Nodes, services and resources used.</li>
@@ -389,9 +391,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>In CentOS 7 there are also the following packages:</p>
 
 <ul>
-  <li><code class="highlighter-rouge">cockpit-machines.x86_64</code> : Cockpit user interface for virtual machines. If “virt-install” is installed, you can also create new virtual machines. 
+  <li><code class="language-html highlighter-rouge">cockpit-machines.x86_64</code> : Cockpit user interface for virtual machines. If “virt-install” is installed, you can also create new virtual machines. 
 It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.</li>
-  <li><code class="highlighter-rouge">cockpit-machines-ovirt.noarch</code> : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.</li>
+  <li><code class="language-html highlighter-rouge">cockpit-machines-ovirt.noarch</code> : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.</li>
 </ul>
 
 <p>At the moment none of the cockpit complements has support for KubeVirt Virtual Machine.</p>
@@ -513,6 +515,7 @@ There is a <a href="/2019/Access-Virtual-Machines-graphic-console-using-noVNC.ht
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

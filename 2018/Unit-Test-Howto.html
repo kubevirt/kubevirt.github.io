@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -236,7 +238,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <ul>
   <li>They are much faster to run (~30 seconds in our case)</li>
   <li>You get nice coverage reports with <a href="https://coveralls.io/github/kubevirt/kubevirt">coveralls</a></li>
-  <li>No need to: <code class="highlighter-rouge">make cluster up/sync</code></li>
+  <li>No need to: <code class="language-html highlighter-rouge">make cluster up/sync</code></li>
   <li>Cover corner cases and easier to debug</li>
 </ul>
 
@@ -256,7 +258,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <ul>
   <li>The tests themselves are written using <a href="https://github.com/onsi/ginkgo">ginkgo</a>, which is a <a href="https://en.wikipedia.org/wiki/Behavior-driven_development">Behavior-Driven Development (BDD)</a> framework</li>
   <li>The library used for assertions in the tests is <a href="https://github.com/onsi/gomega">gomega</a>. It has a very rich set of matchers, so, before you write you own code around the “equal” matcher, check <a href="http://onsi.github.io/gomega/#provided-matchers">here</a> to see if there is a more expressive assertion you can use</li>
-  <li>We use <a href="https://github.com/golang/mock">GoMock</a> to generate mocks for the different kubevirt interfaces and objects. The command <code class="highlighter-rouge">make generate</code> will (among other things) create a <a href="https://github.com/kubevirt/kubevirt/blob/release-0.18/pkg/kubecli/generated_mock_kubevirt.go">file</a> holding the mocked version of our objects and interfaces
+  <li>We use <a href="https://github.com/golang/mock">GoMock</a> to generate mocks for the different kubevirt interfaces and objects. The command <code class="language-html highlighter-rouge">make generate</code> will (among other things) create a <a href="https://github.com/kubevirt/kubevirt/blob/release-0.18/pkg/kubecli/generated_mock_kubevirt.go">file</a> holding the mocked version of our objects and interfaces
     <ul>
       <li>Many examples exist in our code on how to use this framework</li>
       <li>Also see <a href="https://github.com/golang/mock/tree/master/sample">here</a> for sample code from GoMock</li>
@@ -286,11 +288,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>Don’t assume the “It” clauses, which are at the same level, are invoked in any specific order
     <h2 id="gomega">gomega</h2>
     <p>Be verbose and use specific matchers. For example, to check that an array has N elements, you can use:</p>
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(len(arr)).To(Equal(N))
-</code></pre></div>    </div>
+    <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>Expect(len(arr)).To(Equal(N))
+</pre></td></tr></tbody></table></code></pre></div>    </div>
     <p>But a better way would be:</p>
-    <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(arr).To(HaveLen(N))
-</code></pre></div>    </div>
+    <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>Expect(arr).To(HaveLen(N))
+</pre></td></tr></tbody></table></code></pre></div>    </div>
     <h2 id="function-override">Function Override</h2>
     <p>Sometimes the code under test is invoking a function which is not mocked. In most cases, this is an indication that the code needs to be refactored, so this function, or its return values, will be passed as part of the API of the code being tested.
 However, if this refactoring is not possible (or too costly), you can inject your own implementation of this function. The original function should be defined as a closure, and assigned to a global variable. Since functions are 1st class citizens in go, you can assign your implementation to that function variable. More detailed example is <a href="https://gist.github.com/yuvalif/006c48c563f264041f4ada5f90ddfd0c">here</a></p>
@@ -379,6 +383,7 @@ However, if this refactoring is not possible (or too costly), you can inject you
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

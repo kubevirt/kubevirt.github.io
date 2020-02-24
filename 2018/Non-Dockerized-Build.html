@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -250,7 +252,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>Tool integration:
     <ul>
       <li>Since your tools are not running in the dockerized environment, they may give different outcome than the ones running in the dockerized environment</li>
-      <li>Invoking any of the dockerized scripts (under <code class="highlighter-rouge">hack</code> directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)</li>
+      <li>Invoking any of the dockerized scripts (under <code class="language-html highlighter-rouge">hack</code> directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)</li>
     </ul>
   </li>
   <li>Build time: the dockerized build has some small overheads, and some improvements are still needed to make sure that caching work properly and build is optimized</li>
@@ -270,28 +272,86 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Best place to look for that is in the docker file definition for the build environment: <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/builder/Dockerfile">hack/docker-builder/Dockerfile</a></p>
 
 <p>Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf install -y git
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre>sudo dnf install -y git
 sudo dnf install -y libvirt-devel
 sudo dnf install -y golang
 sudo dnf install -y docker
 sudo dnf install -y qemu-img
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p><em>Similarly to the containerized case</em>, docker is still needed (e.g. all the cluster stuff is done via docker),  and therefore, any docker related preparations are needed as well. This would include running docker on startup and making sure that docker commands does not need root privileges. On Fedora27 this would mean:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo groupadd docker
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>sudo groupadd docker
 sudo usermod -aG docker $USER
 sudo systemctl enable docker
 sudo systemctl start docker
-</code></pre></div></div>
-<p>Now, getting the actual code could be done either via <code class="highlighter-rouge">go get</code> (don’t forget to set the <code class="highlighter-rouge">GOPATH</code> environment variable):</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get -d kubevirt.io/kubevirt/...
-</code></pre></div></div>
-<p>Or <code class="highlighter-rouge">git clone</code>:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir -p $GOPATH/src/kubevirt.io/ &amp;&amp; cd $GOPATH/src/kubevirt.io/
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Now, getting the actual code could be done either via <code class="language-html highlighter-rouge">go get</code> (don’t forget to set the <code class="language-html highlighter-rouge">GOPATH</code> environment variable):</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>go get -d kubevirt.io/kubevirt/...
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>Or <code class="language-html highlighter-rouge">git clone</code>:</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>mkdir -p $GOPATH/src/kubevirt.io/ <span class="err">&amp;&amp;</span> cd $GOPATH/src/kubevirt.io/
 git clone https://github.com/kubevirt/kubevirt
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="makefilenocontainer"><a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">Makefile.nocontainer</a></h3>
-<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
+<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+</pre></td><td class="rouge-code"><pre><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
 
 <span class="nl">bootstrap</span><span class="o">:</span>
     <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">github.com/onsi/ginkgo/ginkgo</span>
@@ -337,27 +397,28 @@ git clone https://github.com/kubevirt/kubevirt
     <span class="err">./cluster/deploy.sh</span>
 
 <span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">bootstrap generate apidocs build test check functest cluster-sync</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h3 id="targets">Targets</h3>
 
 <p>To execute any of the targets use:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make -f Makefile.nocontainer &lt;target&gt;
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>make -f Makefile.nocontainer <span class="nt">&lt;target&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>File has the following targets:</p>
 
 <ul>
   <li><strong>bootstrap</strong>: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
     <ul>
       <li>Note that the k8s code generators use specific version</li>
-      <li>Note that these are not code dependencies, as they are handled by using a <code class="highlighter-rouge">vendor</code> directory, as well as the distclean,  deps-install and deps-update targets in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
+      <li>Note that these are not code dependencies, as they are handled by using a <code class="language-html highlighter-rouge">vendor</code> directory, as well as the distclean,  deps-install and deps-update targets in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
     </ul>
   </li>
-  <li><strong>generate</strong>: Calling <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh">hack/generate.sh</a> script similarly to the <a href="https://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a>. It builds all generators (under the <code class="highlighter-rouge">tools</code> directory) and use them to generate: test mocks, KubeVirt resources and test yamls</li>
+  <li><strong>generate</strong>: Calling <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh">hack/generate.sh</a> script similarly to the <a href="https://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a>. It builds all generators (under the <code class="language-html highlighter-rouge">tools</code> directory) and use them to generate: test mocks, KubeVirt resources and test yamls</li>
   <li><strong>apidocs</strong>: this is similar to apidocs target in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
-  <li><strong>build</strong>: this is building all product binaries, and then using a script (<a href="../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh">copy-cmd.sh</a>, should be placed under: <code class="highlighter-rouge">hack</code>) to copy the binaries from their standard location into the <code class="highlighter-rouge">_out</code> directory, where the cluster management scripts expect them</li>
+  <li><strong>build</strong>: this is building all product binaries, and then using a script (<a href="../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh">copy-cmd.sh</a>, should be placed under: <code class="language-html highlighter-rouge">hack</code>) to copy the binaries from their standard location into the <code class="language-html highlighter-rouge">_out</code> directory, where the cluster management scripts expect them</li>
   <li><strong>test</strong>: building and running unit tests
 check: using similar code to the one used in the standard makefile: formatting files, fixing package imports and calling go vet</li>
-  <li><strong>functest</strong>: building and running integration tests. After tests are built , they are moved to the <code class="highlighter-rouge">_out</code> directory so that the standard script for running integration tests would find them</li>
+  <li><strong>functest</strong>: building and running integration tests. After tests are built , they are moved to the <code class="language-html highlighter-rouge">_out</code> directory so that the standard script for running integration tests would find them</li>
   <li><strong>cluster-sync</strong>: this is the only “cluster management” target that had to be modified from the standard makefile</li>
 </ul>
 
@@ -443,6 +504,7 @@ check: using similar code to the one used in the standard makefile: formatting f
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

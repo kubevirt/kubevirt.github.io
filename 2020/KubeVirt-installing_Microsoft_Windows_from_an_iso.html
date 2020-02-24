@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -253,7 +255,30 @@ but what if you want to follow the traditional way of installing a VM using an e
 </div></div>
 <ol>
   <li>An empty KubeVirt Virtual Machine
-    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+</pre></td><td class="rouge-code"><pre> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
  <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
  <span class="na">metadata</span><span class="pi">:</span>
    <span class="na">name</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
@@ -276,10 +301,10 @@ but what if you want to follow the traditional way of installing a VM using an e
              <span class="na">memory</span><span class="pi">:</span> <span class="s">8G</span>
        <span class="na">volumes</span><span class="pi">:</span>
      <span class="s">...</span>
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>
-    <p>A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the <code class="highlighter-rouge">virtctl</code> command when uploading the file</p>
+    <p>A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the <code class="language-html highlighter-rouge">virtctl</code> command when uploading the file</p>
 
     <p>First thing here is to download the ISO file of the Microsoft Windows, for that the <a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2">Microsoft Evaluation Center</a> offers
  the ISO files to download for evaluation purposes:</p>
@@ -291,14 +316,14 @@ but what if you want to follow the traditional way of installing a VM using an e
 
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png" alt="win2k12_download_iso_64.png" title="KubeVirt Microsoft Windows iso download" /></p>
 
-    <p>Once the ISO file is downloaded it has to be uploaded with <code class="highlighter-rouge">virtctl</code>, the parameters used in this example are the following:</p>
+    <p>Once the ISO file is downloaded it has to be uploaded with <code class="language-html highlighter-rouge">virtctl</code>, the parameters used in this example are the following:</p>
     <ul>
-      <li><code class="highlighter-rouge">image-upload</code>: Upload a VM image to a PersistentVolumeClaim</li>
-      <li><code class="highlighter-rouge">--image-path</code>: The path of the ISO file</li>
-      <li><code class="highlighter-rouge">--pvc-name</code>: The name of the PVC to store the ISO file, in this example is <code class="highlighter-rouge">iso-win2k12</code></li>
-      <li><code class="highlighter-rouge">--access-mode</code>: the access mode for the PVC, in the example <code class="highlighter-rouge">ReadOnlyMany</code> has been used.</li>
-      <li><code class="highlighter-rouge">--pvc-size</code>: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough</li>
-      <li><code class="highlighter-rouge">--uploadproxy-url</code>: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is <code class="highlighter-rouge">10.96.164.35</code> and the PORT is <code class="highlighter-rouge">443</code></li>
+      <li><code class="language-html highlighter-rouge">image-upload</code>: Upload a VM image to a PersistentVolumeClaim</li>
+      <li><code class="language-html highlighter-rouge">--image-path</code>: The path of the ISO file</li>
+      <li><code class="language-html highlighter-rouge">--pvc-name</code>: The name of the PVC to store the ISO file, in this example is <code class="language-html highlighter-rouge">iso-win2k12</code></li>
+      <li><code class="language-html highlighter-rouge">--access-mode</code>: the access mode for the PVC, in the example <code class="language-html highlighter-rouge">ReadOnlyMany</code> has been used.</li>
+      <li><code class="language-html highlighter-rouge">--pvc-size</code>: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough</li>
+      <li><code class="language-html highlighter-rouge">--uploadproxy-url</code>: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is <code class="language-html highlighter-rouge">10.96.164.35</code> and the PORT is <code class="language-html highlighter-rouge">443</code></li>
     </ul>
 
     <div class="premonition info">
@@ -310,19 +335,31 @@ but what if you want to follow the traditional way of installing a VM using an e
  </div>
  </div>
 
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>kubectl get services <span class="nt">-n</span> cdi
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>kubectl get services <span class="nt">-n</span> cdi
  NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>   AGE
  cdi-api           ClusterIP   10.96.117.29   &lt;none&gt;        443/TCP   6d18h
  cdi-uploadproxy   ClusterIP   10.96.164.35   &lt;none&gt;        443/TCP   6d18h
-</code></pre></div>    </div>
-    <p>In this example the ISO file was copied to the Kubernetes node, to allow the <code class="highlighter-rouge">virtctl</code> to find it and to simplify the operation.</p>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
+    <p>In this example the ISO file was copied to the Kubernetes node, to allow the <code class="language-html highlighter-rouge">virtctl</code> to find it and to simplify the operation.</p>
     <ul>
-      <li><code class="highlighter-rouge">--insecure</code>: Allow insecure server connections when using HTTPS</li>
-      <li><code class="highlighter-rouge">--wait-secs</code>: The time in seconds to wait for upload pod to start. (default 60)</li>
+      <li><code class="language-html highlighter-rouge">--insecure</code>: Allow insecure server connections when using HTTPS</li>
+      <li><code class="language-html highlighter-rouge">--wait-secs</code>: The time in seconds to wait for upload pod to start. (default 60)</li>
     </ul>
 
     <p>The final command with the parameters and the values would look like:</p>
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
  <span class="nt">--image-path</span><span class="o">=</span>/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO <span class="se">\</span>
  <span class="nt">--pvc-name</span><span class="o">=</span>iso-win2k12 <span class="se">\</span>
  <span class="nt">--access-mode</span><span class="o">=</span>ReadOnlyMany <span class="se">\</span>
@@ -330,10 +367,21 @@ but what if you want to follow the traditional way of installing a VM using an e
  <span class="nt">--uploadproxy-url</span><span class="o">=</span>https://10.96.164.35:443 <span class="se">\</span>
  <span class="nt">--insecure</span> <span class="se">\</span>
  <span class="nt">--wait-secs</span><span class="o">=</span>240
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="highlighter-rouge">winhd</code> and the space requested is 15Gi:
-    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+  <li>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="language-html highlighter-rouge">winhd</code> and the space requested is 15Gi:
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+</pre></td><td class="rouge-code"><pre> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
  <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
  <span class="na">metadata</span><span class="pi">:</span>
    <span class="na">name</span><span class="pi">:</span> <span class="s">winhd</span>
@@ -344,25 +392,86 @@ but what if you want to follow the traditional way of installing a VM using an e
    <span class="na">requests</span><span class="pi">:</span>
      <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>A <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers">container with the virtio drivers</a> attached as a CDROM to the VM. 
  The container image has to be pulled to have it available in the local registry.
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
-</code></pre></div>    </div>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
+</pre></td></tr></tbody></table></code></pre></div>    </div>
 
-    <p>And also it has to be referenced in the VM YAML, in this example the name for the <code class="highlighter-rouge">containerDisk</code> is <code class="highlighter-rouge">virtiocontainerdisk</code>.</p>
-    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+    <p>And also it has to be referenced in the VM YAML, in this example the name for the <code class="language-html highlighter-rouge">containerDisk</code> is <code class="language-html highlighter-rouge">virtiocontainerdisk</code>.</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre> <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
      <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
    <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
  <span class="s">...</span>
  <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
      <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
    <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
 
     <p>If the pre-requisites are fullfilled, the final YAML (<a href="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml">win2k12.yml</a>), will look like:</p>
-    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+</pre></td><td class="rouge-code"><pre> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
  <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
  <span class="na">metadata</span><span class="pi">:</span>
    <span class="na">name</span><span class="pi">:</span> <span class="s">winhd</span>
@@ -415,11 +524,11 @@ but what if you want to follow the traditional way of installing a VM using an e
        <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
            <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
          <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
 </ol>
 
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Special attention to the <code class="highlighter-rouge">bootOrder: 1</code> parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.</p>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Special attention to the <code class="language-html highlighter-rouge">bootOrder: 1</code> parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.</p>
 
 
 </div></div>
@@ -430,7 +539,24 @@ but what if you want to follow the traditional way of installing a VM using an e
   <li>
     <p>Uploading the ISO file to the PVC:</p>
 
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
  <span class="nt">--image-path</span><span class="o">=</span>/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO <span class="se">\</span>
  <span class="nt">--pvc-name</span><span class="o">=</span>iso-win2k12 <span class="se">\</span>
  <span class="nt">--access-mode</span><span class="o">=</span>ReadOnlyMany <span class="se">\</span>
@@ -447,38 +573,54 @@ but what if you want to follow the traditional way of installing a VM using an e
  4.23 GiB / 4.23 GiB <span class="o">[=======================================================================================================================================================================]</span> 100.00% 1m21s
 
  Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO completed successfully
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>Pulling the <code class="highlighter-rouge">virtio</code> container image to the locally:
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
+  <li>Pulling the <code class="language-html highlighter-rouge">virtio</code> container image to the locally:
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
  Using default tag: latest
  Trying to pull repository docker.io/kubevirt/virtio-container-disk ... 
  latest: Pulling from docker.io/kubevirt/virtio-container-disk
  Digest: sha256:7e5449cb6a4a9586a3cd79433eeaafd980cb516119c03e499492e1e37965fe82
  Status: Image is up to <span class="nb">date </span><span class="k">for </span>docker.io/kubevirt/virtio-container-disk:latest
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Creating the PVC and Virtual Machine definitions:
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>kubectl create <span class="nt">-f</span> win2k12.yml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>kubectl create <span class="nt">-f</span> win2k12.yml
  virtualmachine.kubevirt.io/win2k12-iso configured
  persistentvolumeclaim/winhd created
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Starting the Virtual Machine Instance:
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>virtctl start win2k12-iso
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl start win2k12-iso
  VM win2k12-iso was scheduled to start
 
  <span class="nv">$ </span>kubectl get vmi
  NAME          AGE   PHASE     IP            NODENAME
  win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
-</code></pre></div>    </div>
+</pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>Once the status of the VMI is <code class="highlighter-rouge">RUNNING</code> it’s time to connect using VNC:
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="nv">$ </span>virtctl vnc win2k12-iso
-</code></pre></div>    </div>
+  <li>Once the status of the VMI is <code class="language-html highlighter-rouge">RUNNING</code> it’s time to connect using VNC:
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl vnc win2k12-iso
+</pre></td></tr></tbody></table></code></pre></div>    </div>
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png" alt="windows2k12_install.png" title="KubeVirt Microsoft Windows installation" /></p>
 
-    <p>Here is important to comment that to be able to connect through VNC using <code class="highlighter-rouge">virtctl</code> it’s necessary to reach the Kubernetes API. 
+    <p>Here is important to comment that to be able to connect through VNC using <code class="language-html highlighter-rouge">virtctl</code> it’s necessary to reach the Kubernetes API. 
  The following video shows how to go through the Microsoft Windows installation process:</p>
     <figure class="video_container">
  <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" width="800" height="600">
@@ -488,7 +630,7 @@ but what if you want to follow the traditional way of installing a VM using an e
   </li>
 </ol>
 
-<p>Once the Virtual Machine is created, the PVC with the ISO and the <code class="highlighter-rouge">virtio</code> drivers can be unattached from the Virtual Machine.</p>
+<p>Once the Virtual Machine is created, the PVC with the ISO and the <code class="language-html highlighter-rouge">virtio</code> drivers can be unattached from the Virtual Machine.</p>
 
 <h2 id="references">References</h2>
 <ul>
@@ -580,6 +722,7 @@ but what if you want to follow the traditional way of installing a VM using an e
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

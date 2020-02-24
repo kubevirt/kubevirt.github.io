@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -253,7 +255,26 @@ of such devices when scheduling pods.</p>
 starts up on each node, it registers with the Kubernetes Device Plugin API and
 advertises KVM and TUN devices.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: Node
 metadata:
   ...
@@ -272,22 +293,48 @@ status:
     devices.kubevirt.io/tun: "110"
     pods: "110"
     ...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>In this case advertising 110 KVM or TUN devices is simply an arbitrary default
 based on the number of pods that node is limited to.</p>
 
 <h3 id="consuming-devices">Consuming Devices</h3>
 
-<p>Now any pod that requests a <code class="highlighter-rouge">devices.kubevirt.io/kvm</code> or
-<code class="highlighter-rouge">devices.kubevirt.io/tun</code> device can only be scheduled on nodes which provide
+<p>Now any pod that requests a <code class="language-html highlighter-rouge">devices.kubevirt.io/kvm</code> or
+<code class="language-html highlighter-rouge">devices.kubevirt.io/tun</code> device can only be scheduled on nodes which provide
 them. On clusters where KubeVirt is deployed this conveniently happens to be
 all nodes in the cluster that have these physical devices, which normally means
 all nodes in the cluster.</p>
 
 <p>Here’s an excerpt of what the pod spec looks like in this case.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: Pod
 metadata:
   ...
@@ -313,10 +360,10 @@ spec:
       privileged: false
       runAsUser: 0
     ...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Of special note is the securityContext stanza. The only special privilege
-required is the <code class="highlighter-rouge">NET_ADMIN</code> capability! This is needed by libvirt to set up the
+required is the <code class="language-html highlighter-rouge">NET_ADMIN</code> capability! This is needed by libvirt to set up the
 domain’s networking stack.</p>
 
         </article>
@@ -401,6 +448,7 @@ domain’s networking stack.</p>
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

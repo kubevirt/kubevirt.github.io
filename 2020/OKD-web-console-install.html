@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -246,7 +248,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <h2 id="what-is-the-okd-web-console">What is the OKD web console</h2>
 
 <blockquote>
-  <p>The <a href="https://github.com/openshift/console">OKD web console</a> is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly <code class="highlighter-rouge">kubectl</code> in the form of a single page webapp. It integrates with other services like monitoring, chargeback and the <a href="https://github.com/operator-framework/operator-lifecycle-manager">Operator Lifecycle Manager or OLM</a>. Some things that go on behind the scenes include:</p>
+  <p>The <a href="https://github.com/openshift/console">OKD web console</a> is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly <code class="language-html highlighter-rouge">kubectl</code> in the form of a single page webapp. It integrates with other services like monitoring, chargeback and the <a href="https://github.com/operator-framework/operator-lifecycle-manager">Operator Lifecycle Manager or OLM</a>. Some things that go on behind the scenes include:</p>
 </blockquote>
 
 <ul>
@@ -258,7 +260,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>As it is stated in the official GitHub’s repository, the OKD web console runs as a binary listening in a local port. The static assets required to run the web console are served by the binary itself. It is possible to customize the web console using extensions. The extensions have to be committed to be to the sources of the console directly.</p>
 
-<p>When the web console is accessed from a browser, it first loads all required static assets. Then makes requests to the Kubernetes API using the values defined as environment variables in the host where the console is running. Actually, there is a script called <code class="highlighter-rouge">environment.sh</code> that helps exporting the proper values for these environment variables.</p>
+<p>When the web console is accessed from a browser, it first loads all required static assets. Then makes requests to the Kubernetes API using the values defined as environment variables in the host where the console is running. Actually, there is a script called <code class="language-html highlighter-rouge">environment.sh</code> that helps exporting the proper values for these environment variables.</p>
 
 <p>The web console uses WebSockets to maintain a persistent connection with the API server and receive updated information as soon as it is available. Note as well that JavaScript must be enabled to use the web console. For the best experience, use a web browser that supports WebSockets. OKD web console’s developers inform that Google Chrome/Chromium version 76 or greater is used in their integration tests.</p>
 
@@ -284,69 +286,104 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li><strong>Operating System</strong>. CentOS 8 was chosen as our operating system for the server running the OKD web console. Kubernetes cluster is running latest CentOS 7.</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /etc/redhat-release
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">cat</span> /etc/redhat-release
 CentOS Linux release 8.0.1905 <span class="o">(</span>Core<span class="o">)</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
-  <li><strong>Kubernetes</strong>. It has been deployed the latest available version at the moment of writing: <code class="highlighter-rouge">v1.17</code>. Kubernetes cluster is comprised by one master node and one regular node with enough CPU (4vCPUs) and memory (16Gi) to run KubeVirt and a couple of KubeVirt’s <code class="highlighter-rouge">VirtualMachineInstances</code>. No extra storage was needed since the virtual machines will run as container-disk instances.</li>
+  <li><strong>Kubernetes</strong>. It has been deployed the latest available version at the moment of writing: <code class="language-html highlighter-rouge">v1.17</code>. Kubernetes cluster is comprised by one master node and one regular node with enough CPU (4vCPUs) and memory (16Gi) to run KubeVirt and a couple of KubeVirt’s <code class="language-html highlighter-rouge">VirtualMachineInstances</code>. No extra storage was needed since the virtual machines will run as container-disk instances.</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get nodes <span class="nt">-o</span> wide
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl get nodes <span class="nt">-o</span> wide
 NAME                            STATUS   ROLES    AGE   VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION               CONTAINER-RUNTIME
 blog-master-00.kubevirt.local   Ready    master   29h   v1.17.0   192.168.123.250   &lt;none&gt;        CentOS Linux 7 <span class="o">(</span>Core<span class="o">)</span>   3.10.0-957.27.2.el7.x86_64   docker://1.13.1
 blog-worker-00.kubevirt.local   Ready    &lt;none&gt;   29h   v1.17.0   192.168.123.232   &lt;none&gt;        CentOS Linux 7 <span class="o">(</span>Core<span class="o">)</span>   3.10.0-957.27.2.el7.x86_64   docker://1.13.1
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li><strong>Node.js &gt;= 8</strong>. Node.js 10 is available as an AppStream module.</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>nodejs
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>nodejs
 Installed:
   nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64
 
 Complete!
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li><strong>yarn &gt;= 1.3.2</strong>. Yarn is a dependency of Node.js. In this case, the official yarn repository has to be added as a local repositories.</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>curl <span class="nt">--silent</span> <span class="nt">--location</span> https://dl.yarnpkg.com/rpm/yarn.repo | <span class="nb">sudo tee</span> /etc/yum.repos.d/yarn.repo
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>curl <span class="nt">--silent</span> <span class="nt">--location</span> https://dl.yarnpkg.com/rpm/yarn.repo | <span class="nb">sudo tee</span> /etc/yum.repos.d/yarn.repo
 <span class="nv">$ </span><span class="nb">sudo </span>rpm <span class="nt">--import</span> https://dl.yarnpkg.com/rpm/pubkey.gpg
 <span class="nv">$ </span><span class="nb">sudo </span>yum <span class="nb">install </span>yarn
 
 <span class="nv">$ </span>yarn <span class="nt">--version</span>
 1.21.1
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li><strong>go &gt;= 1.11+</strong>. Golang is available as an AppStream module in CentOS 8:</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>go-toolset
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>go-toolset
 
 Installed:
   golang-1.11.6-1.module_el8.0.0+192+8b12aa21.x86_64
 
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <ul>
   <li><strong>jq (for contrib/environment.sh)</strong>. Finally, jq is installed in order to work with JSON data.</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>jq
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>yum <span class="nb">install </span>jq
 
 Installed:
   jq.x86_64 0:1.5-1.el7
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="compiling-okd-web-console">Compiling OKD web console</h3>
 
-<p>Once all dependencies are met, access the cloned directory and export the correct variables that will be used during the building process. Then, execute <code class="highlighter-rouge">build.sh</code> script which actually calls the build-frontend and build-backend scripts.</p>
+<p>Once all dependencies are met, access the cloned directory and export the correct variables that will be used during the building process. Then, execute <code class="language-html highlighter-rouge">build.sh</code> script which actually calls the build-frontend and build-backend scripts.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/openshift/console.git
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>git clone https://github.com/openshift/console.git
 <span class="nv">$ </span><span class="nb">cd </span>console/
 <span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
 <span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
@@ -355,25 +392,31 @@ Using https://192.168.123.250:6443
 <span class="nv">$ </span>./build.sh
 ...
 Done <span class="k">in </span>215.91s.
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The result of the process is a binary file called <strong>bridge</strong> inside the bin folder. Prior to run the <em>“bridge”</em>, it has to be verified that the port where the OKD web console is expecting connections is not blocked.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 9000 <span class="nt">-m</span> conntrack <span class="nt">--ctstate</span> NEW,ESTABLISHED <span class="nt">-j</span> ACCEPT
-</code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 9000 <span class="nt">-m</span> conntrack <span class="nt">--ctstate</span> NEW,ESTABLISHED <span class="nt">-j</span> ACCEPT
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Then, the artifact can be executed:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./bin/bridge
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>./bin/bridge
 2020/01/7 10:21:17 cmd/main: cookies are not secure because base-address is not https!
 2020/01/7 10:21:17 cmd/main: running with AUTHENTICATION DISABLED!
 2020/01/7 10:21:17 cmd/main: Binding to 0.0.0.0:9000...
 2020/01/7 10:21:17 cmd/main: not using TLS
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>At this point, the connection to the OKD web console from your network should be established successfully. Note that by default there is no authentication required to login into the console and the connection is using HTTP protocol. There are variables in the <code class="highlighter-rouge">environment.sh</code> file that can change this default behaviour.</p>
+<p>At this point, the connection to the OKD web console from your network should be established successfully. Note that by default there is no authentication required to login into the console and the connection is using HTTP protocol. There are variables in the <code class="language-html highlighter-rouge">environment.sh</code> file that can change this default behaviour.</p>
 
-<p>Probably, the following issue will be faced when connecting to the web user interface: <code class="highlighter-rouge">"services is forbidden: User "system:serviceaccount:kube-system:default" cannot list resource "services" in API group "" in the namespace default"</code>. The problem is that the <strong>default service account</strong> does not have enough privileges to show all the cluster objects.</p>
+<p>Probably, the following issue will be faced when connecting to the web user interface: <code class="language-html highlighter-rouge">"services is forbidden: User "system:serviceaccount:kube-system:default" cannot list resource "services" in API group "" in the namespace default"</code>. The problem is that the <strong>default service account</strong> does not have enough privileges to show all the cluster objects.</p>
 
 <p><br /></p>
 
@@ -385,20 +428,25 @@ Done <span class="k">in </span>215.91s.
 
 <p>The other option is create a new service account called <strong>console</strong>, grant cluster-admin permissions to it and configure the web console to run with this new service account:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
 <span class="nv">$ </span>kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Once created, modify the <code class="highlighter-rouge">environment.sh</code> file and change the line that starts with <code class="highlighter-rouge">secretname</code> as shown below:</p>
+<p>Once created, modify the <code class="language-html highlighter-rouge">environment.sh</code> file and change the line that starts with <code class="language-html highlighter-rouge">secretname</code> as shown below:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim contrib/environment.sh
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>vim contrib/environment.sh
 <span class="nv">secretname</span><span class="o">=</span><span class="si">$(</span>kubectl get serviceaccount <span class="k">**</span>console<span class="k">**</span> <span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.secrets[0].name}'</span><span class="si">)</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Now, variables configured in the <code class="highlighter-rouge">environment.sh</code> file have to be exported again and the connection to the console must be reloaded.</p>
+<p>Now, variables configured in the <code class="language-html highlighter-rouge">environment.sh</code> file have to be exported again and the connection to the console must be reloaded.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
-</code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p><br /></p>
 
 <h2 id="deploy-kubevirt-using-the-hyperconverged-cluster-operator-hco">Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)</h2>
@@ -409,7 +457,72 @@ Done <span class="k">in </span>215.91s.
 
 <p>The HCO repository provides plenty of information on how to install the operator. In this lab, it has been installed as <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">Using the HCO without OLM or Marketplace</a>, which basically executes this deployment script:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
 + kubectl create ns kubevirt-hyperconverged
 namespace/kubevirt-hyperconverged created
 + <span class="nv">namespaces</span><span class="o">=(</span><span class="s2">"openshift"</span><span class="o">)</span>
@@ -474,11 +587,41 @@ deployment.apps/cdi-operator created
 deployment.apps/node-maintenance-operator created
 + kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/hco.cr.yaml
 hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>The result is a new namespace called <code class="highlighter-rouge">kubevirt-hyperconverged</code> with all the operators, Custom Resources (CRs) and objects needed by KubeVirt:</p>
+<p>The result is a new namespace called <code class="language-html highlighter-rouge">kubevirt-hyperconverged</code> with all the operators, Custom Resources (CRs) and objects needed by KubeVirt:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods <span class="nt">-n</span> kubevirt-hyperconverged <span class="nt">-o</span> wide
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl get pods <span class="nt">-n</span> kubevirt-hyperconverged <span class="nt">-o</span> wide
 NAME                                                  READY   STATUS    RESTARTS   AGE   IP                NODE                            NOMINATED NODE   READINESS GATES
 bridge-marker-bwq6f                                   1/1     Running   0          12m   192.168.123.250   blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
 bridge-marker-st7f7                                   1/1     Running   0          12m   192.168.123.232   blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
@@ -508,9 +651,9 @@ virt-handler-cz7q2                                    1/1     Running   0       
 virt-handler-k6npr                                    1/1     Running   0          10m   10.244.1.24       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
 virt-operator-84f5588df6-2k49b                        1/1     Running   0          24m   10.244.1.14       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
 virt-operator-84f5588df6-zzrsb                        1/1     Running   1          24m   10.244.0.4        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p><br />
-<strong>Note</strong> that only once HCO is completely deployed, <code class="highlighter-rouge">VirtualMachines</code> can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.</p>
+<strong>Note</strong> that only once HCO is completely deployed, <code class="language-html highlighter-rouge">VirtualMachines</code> can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.</p>
 
 <p>It is worth noting that there is an ongoing effort to adapt the OpenShift web console’s user interface in native Kubernetes additionally to OKD or OpenShift as they are expected. <a href="https://github.com/openshift/console/pull/3848">As an example</a>, a few days ago, the non applicable Virtual Machine Templates option from the Workload menu was removed and the VM Wizard was made fully functional when native Kubernetes is detected.
 <br /></p>
@@ -532,19 +675,78 @@ virt-operator-84f5588df6-zzrsb                        1/1     Running   1       
 
 <p>Then, create a specific service account (<strong>console</strong>) for running the OpenShift web console in case it is not created <a href="#compiling-okd-web-console">previously</a> and grant cluster-admin permissions:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
 <span class="nv">$ </span>kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Next, extract the <strong>token secret name</strong> associated with the console service account:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get serviceaccount console <span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.secrets[0].name}'</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl get serviceaccount console <span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.secrets[0].name}'</span>
 console-token-ppfc2
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Finally, the downloaded YAML file must be modified assigning the proper values to the <strong>token</strong> section. The following command may help to extract the token name from the user console, which is a user created by</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">console-deployment</span>
@@ -599,11 +801,23 @@ console-token-ppfc2
     <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
 
 <span class="nn">---</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> okd-web-console-install.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create <span class="nt">-f</span> okd-web-console-install.yaml
 deployment.apps/console-deployment created
 service/console-service created
 
@@ -615,15 +829,15 @@ console-deployment-59d8956db5-td462                     1/1     Running   0     
 NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>                  AGE
 console-np-service   NodePort    10.96.195.45   &lt;none&gt;        9000:30036/TCP           19m
 kube-dns             ClusterIP   10.96.0.10     &lt;none&gt;        53/UDP,53/TCP,9153/TCP   20d
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Once running, a connection to the <code class="highlighter-rouge">nodeport</code> defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.
+<p>Once running, a connection to the <code class="language-html highlighter-rouge">nodeport</code> defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.
 <br /></p>
 
 <p><img src="/assets/2020-01-24-OKD-web-console-install/okd-pod-4.2.resized.png" alt="OKD 4.2" /></p>
 
 <p><br />
-It can be verified that it is possible to see and manage <code class="highlighter-rouge">VirtualMachines</code> running inside of the native Kubernetes cluster.
+It can be verified that it is possible to see and manage <code class="language-html highlighter-rouge">VirtualMachines</code> running inside of the native Kubernetes cluster.
 <br /></p>
 
 <p><img src="/assets/2020-01-24-OKD-web-console-install/okd-console-vm.resized.png" alt="OKD vmr" /></p>
@@ -638,9 +852,46 @@ It can be verified that it is possible to see and manage <code class="highlighte
 <img src="/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr" />
 <br /></p>
 
-<p>In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. <em>Note that this is not linked with the latest tag, actually <code class="highlighter-rouge">latest</code> tag is the same as version <code class="highlighter-rouge">4.4</code></em>. Upgrading process only involves updating the image value to the desired container image: <code class="highlighter-rouge">quay.io/openshift/origin-console:4.5</code> and save.</p>
+<p>In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. <em>Note that this is not linked with the latest tag, actually <code class="language-html highlighter-rouge">latest</code> tag is the same as version <code class="language-html highlighter-rouge">4.4</code></em>. Upgrading process only involves updating the image value to the desired container image: <code class="language-html highlighter-rouge">quay.io/openshift/origin-console:4.5</code> and save.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">console-deployment</span>
@@ -677,14 +928,18 @@ It can be verified that it is possible to see and manage <code class="highlighte
               <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span>
               <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
 
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>Once the deployment has been saved, a new pod with the configured version of the OKD web console is created and eventually will replace the old one.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods <span class="nt">-n</span> kube-system
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl get pods <span class="nt">-n</span> kube-system
 NAME                                                    READY   STATUS              RESTARTS   AGE
 console-deployment-5588f98644-bw7jr                     0/1     ContainerCreating   0          5s
 console-deployment-59d8956db5-td462                     1/1     Running             0          16h
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p><br />
 <img src="/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5" />
 <br /></p>
@@ -797,6 +1052,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

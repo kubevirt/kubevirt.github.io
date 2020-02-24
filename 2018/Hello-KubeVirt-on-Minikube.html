@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -237,7 +239,20 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>MiniKube will create a single node Kubernetes cluster in a KVM virtual machine on our Fedora host.  KVM is also the virtualization technology used by KubeVirt so we have to make sure that the host is configured to support nested virtual machines.  Fedora does not have that feature enabled by default.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># install packages</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre><span class="c"># install packages</span>
 <span class="nv">$ </span><span class="nb">sudo </span>yum <span class="nb">install </span>libvirt-daemon-kvm qemu-kvm
 
 <span class="c"># enable nested virtualization</span>
@@ -250,34 +265,47 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <span class="c">#verify nested virtualization enabled</span>
 <span class="nv">$ </span><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
 Y
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="install-kvm2-driver-for-minikube">Install KVM2 driver for Minikube</h2>
 
 <p>Minikube requires a special driver to manage Docker Machine VMs running in KVM.  KVM2 is the latest iteration of the driver.  Read more about it <a href="https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver">here</a></p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># install driver to /usr/local/bin</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="c"># install driver to /usr/local/bin</span>
 <span class="nv">$ </span>curl <span class="nt">-LO</span> https://storage.googleapis.com/minikube/releases/latest/docker-machine-driver-kvm2 <span class="o">&amp;&amp;</span> <span class="nb">chmod</span> +x docker-machine-driver-kvm2 <span class="o">&amp;&amp;</span> <span class="nb">sudo mv </span>docker-machine-driver-kvm2 /usr/local/bin/
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="install-minikube">Install Minikube</h2>
 
 <p>Minikube is responsible for creating and managing a local single-node Kubernetes cluster.  It is installed as a single executable.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#install minikube to /usr/local/bin</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="c">#install minikube to /usr/local/bin</span>
 <span class="nv">$ </span>curl <span class="nt">-Lo</span> minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 <span class="o">&amp;&amp;</span> <span class="nb">chmod</span> +x minikube <span class="o">&amp;&amp;</span> <span class="nb">sudo mv </span>minikube /usr/local/bin/
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="start-minikube">Start Minikube</h2>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>minikube start <span class="nt">--vm-driver</span> kvm2 <span class="nt">--network-plugin</span> cni
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>minikube start <span class="nt">--vm-driver</span> kvm2 <span class="nt">--network-plugin</span> cni
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="install-kubectl">Install kubectl</h2>
 
 <p>Now that we have a Kubernetes cluster running, we need some way to communicate with it.  That is where the kubectl CLI comes in.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># install kubectl to /usr/local/bin</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="c"># install kubectl to /usr/local/bin</span>
 <span class="nv">$ </span>curl <span class="nt">-Lo</span> kubectl https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl <span class="o">&amp;&amp;</span> <span class="nb">chmod</span> +x kubectl <span class="o">&amp;&amp;</span> <span class="nb">sudo mv </span>kubectl /usr/local/bin/
 
 <span class="c"># try out the cli</span>
@@ -285,15 +313,37 @@ Y
 <span class="nv">$ </span>kubectl get all
 NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>   AGE
 kubernetes   ClusterIP   10.96.0.1    &lt;none&gt;        443/TCP   5m
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>You may be wondering how kubectl knows where to look for the Kubernetes API endpoint.  <code class="highlighter-rouge">minikube start</code> actually takes care of creating the kubectl configuration file.  Take a look at <code class="highlighter-rouge">~/.kube/config</code></p>
+<p>You may be wondering how kubectl knows where to look for the Kubernetes API endpoint.  <code class="language-html highlighter-rouge">minikube start</code> actually takes care of creating the kubectl configuration file.  Take a look at <code class="language-html highlighter-rouge">~/.kube/config</code></p>
 
 <h2 id="deploy-kubevirt">Deploy KubeVirt</h2>
 
 <p>Get KubeVirt components running on the Kubernetes cluster.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.15.0/kubevirt.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.15.0/kubevirt.yaml
 
 <span class="c"># watch for KubeVirt components to start (bebin with 'virt-')</span>
 <span class="c"># may take awhile as containers are downloaded and started</span>
@@ -315,21 +365,31 @@ kube-system   virt-api-7797f95869-fqnhk               1/1	Running   1          2
 kube-system   virt-controller-69cc6b4897-nlffm        1/1	Running   0          2m
 kube-system   virt-controller-69cc6b4897-xsxmt        1/1	Running   0          2m
 kube-system   virt-handler-f7str                      1/1	Running   0          2m
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="install-virtctl">Install virtctl</h2>
 
 <p>Virtctl is the CLI for creating and managing KubeVirt virtual machines.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># install virtctl to /usr/local/bin</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="c"># install virtctl to /usr/local/bin</span>
 <span class="nv">$ </span>curl <span class="nt">-Lo</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/v0.15.0/virtctl-v0.15.0-linux-amd64 <span class="o">&amp;&amp;</span> <span class="nb">chmod</span> +x virtctl <span class="o">&amp;&amp;</span> <span class="nb">sudo mv </span>virtctl /usr/local/bin
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="create-a-vm">Create a VM</h2>
 
 <p>Apply manifest for VM.  If you’re curious, download the manifest file locally and take a look.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
 
 <span class="c"># check that VM successfully created</span>
 <span class="nv">$ </span>kubectl get vms 
@@ -337,13 +397,25 @@ NAME      AGE
 testvm    7s
 <span class="c"># for more detailed info, run</span>
 <span class="nv">$ </span>kubectl get vms <span class="nt">-o</span> yaml testvm
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="start-a-vm">Start a VM</h2>
 
 <p>Time to try out virtctl.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl start testvm
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl start testvm
 
 <span class="c"># wait for VM to be running</span>
 <span class="nv">$ </span>watch kubectl get pods
@@ -355,22 +427,37 @@ testvm    4s
 
 <span class="c"># for more detailed info</span>
 <span class="nv">$ </span>kubectl get vmis <span class="nt">-o</span> yaml testvm
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h2 id="connect-to-vm">Connect to VM</h2>
 
 <p>The VM is running CirrOS, which is “a Tiny OS that specializes in running on a cloud.”  Don’t expect anything fancy.  Look <a href="https://launchpad.net/cirros">here</a> for more info on CirrOS</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl console testvm
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl console testvm
 
 <span class="c"># note escape sequence of '^]'</span>
 <span class="c"># login with creds provided and poke around</span>
 <span class="c"># you are connected to a VM running in Kubernetes!  Pretty cool!</span>
 <span class="c"># 'exit' to logout</span>
 <span class="c"># quit virtctl by providing escape sequence '^]</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h2 id="stop-a-vm">Stop a VM</h2>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl stop testvm
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl stop testvm
 
 <span class="c"># wait for termination to complete</span>
 <span class="nv">$ </span>watch kubectl get pods
@@ -378,15 +465,20 @@ testvm    4s
 <span class="c"># confirm with kubectl</span>
 <span class="nv">$ </span>kubectl get vmis
 No resources found.
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 <h2 id="delete-a-vm">Delete a VM</h2>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl delete vms testvm
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl delete vms testvm
 
 <span class="c"># confirm with kubectl</span>
 <span class="nv">$ </span>kubectl get vms
 No resources found.
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="next-steps">Next Steps</h2>
 
@@ -474,6 +566,7 @@ No resources found.
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

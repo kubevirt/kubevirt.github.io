@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-24T08:48:46+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-24T09:16:51+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Feb 7 09:40:07 2020 +0100&lt;/p&gt;
 
@@ -64,7 +64,7 @@
 &lt;ul&gt;
   &lt;li&gt;CI: Support for Kubernetes 1.14&lt;/li&gt;
   &lt;li&gt;Many bug fixes in several areas&lt;/li&gt;
-  &lt;li&gt;Support for &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl migrate&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Support for &lt;code class=&quot;language-html highlighter-rouge&quot;&gt;virtctl migrate&lt;/code&gt;&lt;/li&gt;
   &lt;li&gt;Support configurable number of controller threads&lt;/li&gt;
   &lt;li&gt;Support to opt-out of bridge binding for podnetwork&lt;/li&gt;
   &lt;li&gt;Support for OpenShift Prometheus monitoring&lt;/li&gt;
@@ -84,7 +84,7 @@
   &lt;li&gt;The sidecar feature is feature-gated now&lt;/li&gt;
   &lt;li&gt;Use container image shasums instead of tags for KubeVirt deployments&lt;/li&gt;
   &lt;li&gt;Protect control plane components against voluntary evictions with a&lt;/li&gt;
-  &lt;li&gt;Replaced hardcoded &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; by using the basename of the call, this enables&lt;/li&gt;
+  &lt;li&gt;Replaced hardcoded &lt;code class=&quot;language-html highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; by using the basename of the call, this enables&lt;/li&gt;
   &lt;li&gt;Added RNG device to all Fedora VMs in tests and examples (newer kernels might&lt;/li&gt;
   &lt;li&gt;The virtual memory is now set to match the memory limit, if memory limit is&lt;/li&gt;
   &lt;li&gt;Support nftable for CoreOS&lt;/li&gt;
@@ -92,7 +92,7 @@
   &lt;li&gt;Improved virtctl console/vnc data flow&lt;/li&gt;
   &lt;li&gt;Removed DataVolumes feature gate in favor of auto-detecting CDI support&lt;/li&gt;
   &lt;li&gt;Removed SR-IOV feature gate, it is enabled by default now&lt;/li&gt;
-  &lt;li&gt;VMI-related metrics have been renamed from &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt_vm_&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt_vmi_&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;VMI-related metrics have been renamed from &lt;code class=&quot;language-html highlighter-rouge&quot;&gt;kubevirt_vm_&lt;/code&gt; to &lt;code class=&quot;language-html highlighter-rouge&quot;&gt;kubevirt_vmi_&lt;/code&gt;&lt;/li&gt;
   &lt;li&gt;Added metric to report the VMI count&lt;/li&gt;
   &lt;li&gt;Improved integration with HCO by adding a CSV generator tool and modified&lt;/li&gt;
   &lt;li&gt;CI Improvements:&lt;/li&gt;

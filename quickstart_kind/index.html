@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-24 08:48:46 +0000" >
+    <meta property="og:article:published_time" content="2020-02-24 09:16:51 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Kind | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -286,8 +288,9 @@ Kubernetes, we’ll be using
 
 <p>If you have <a href="https://golang.org/">go</a> (<a href="https://golang.org/doc/devel/release.html#policy">1.11+</a>) and <a href="https://www.docker.com/">docker</a> 
 already installed the following command is all you need:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">"on"</span> go get sigs.k8s.io/kind@v0.7.0 <span class="o">&amp;&amp;</span> kind create cluster
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">"on"</span> go get sigs.k8s.io/kind@v0.7.0 <span class="o">&amp;&amp;</span> kind create cluster
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>NOTE: please use the latest go to do this, ideally go 1.13 or greater.</p>
 
@@ -296,12 +299,15 @@ either add that directory to your $PATH as shown <a href="https://golang.org/doc
 the repo and run make build from the repository.</p>
 
 <p>Stable binaries are also available on the <a href="https://github.com/kubernetes-sigs/kind/releases">releases</a> page. Stable releases are generally 
-recommended for CI usage in particular. To install, download the binary for your platform from “Assets” and place this into your <code class="highlighter-rouge">$PATH</code>:</p>
+recommended for CI usage in particular. To install, download the binary for your platform from “Assets” and place this into your <code class="language-html highlighter-rouge">$PATH</code>:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-Lo</span> ./kind <span class="s2">"https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-</span><span class="si">$(</span><span class="nb">uname</span><span class="si">)</span><span class="s2">-amd64"</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>curl <span class="nt">-Lo</span> ./kind <span class="s2">"https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-</span><span class="si">$(</span><span class="nb">uname</span><span class="si">)</span><span class="s2">-amd64"</span>
 <span class="nb">chmod</span> +x ./kind
 <span class="nb">mv</span> ./kind /some-dir-in-your-PATH/kind
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Our recommendation is to always run the latest (*) version of
 <a href="https://github.com/kubernetes-sigs/kind" target="_blank">Kind</a>
@@ -319,8 +325,9 @@ available for your platform of choice, following their
 <p>Before starting with Kind, let’s verify whether nested virtualization is enabled on the
 host where Kind is being installed on:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>If you get an <strong>N</strong>, follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="_blank">here</a> for enabling it.</p>
 
@@ -332,27 +339,56 @@ to run this quickstart guide.</p>
 
 <p>For example to create a basic cluster of 1 node you can use the following command:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kind create cluster <span class="c"># Default cluster context name is `kind`.</span>
-</code></pre></div></div>
-<p>If you want to have multiple clusters in the same server you can name them with the <code class="highlighter-rouge">--name</code> parameter:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kind create cluster <span class="c"># Default cluster context name is `kind`.</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>If you want to have multiple clusters in the same server you can name them with the <code class="language-html highlighter-rouge">--name</code> parameter:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kind create cluster <span class="nt">--name</span> kind
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kind create cluster <span class="nt">--name</span> kind
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>To retrieve the existing clusters you can execute the following commands:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kind get clusters
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kind get clusters
 kind
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>In order to interact with a specific cluster, you only need to specify the cluster name as a context in kubectl:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl cluster-info <span class="nt">--context</span> kind-kind
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl cluster-info <span class="nt">--context</span> kind-kind
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>We’re ready to create the cluster with Kind, in this case we are using a cluster with one control-plane and two workers:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">tee </span>cluster.yaml <span class="o">&lt;&lt;</span><span class="no">EOC</span><span class="sh">
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="rouge-code"><pre><span class="nb">tee </span>cluster.yaml <span class="o">&lt;&lt;</span><span class="no">EOC</span><span class="sh">
 kind: Cluster
 apiVersion: kind.sigs.k8s.io/v1alpha3
 nodes:
@@ -376,35 +412,48 @@ You can now use your cluster with:
 kubectl cluster-info <span class="nt">--context</span> kind-kind
 
 Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="deploy-kubevirt-operator">Deploy KubeVirt Operator</h3>
 
 <p>Having the Kind cluster up and running, let’s set the <em>version</em> environment
 variable that will be used on few commands:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On other OS you might need to define it like</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre><span class="c"># On other OS you might need to define it like</span>
 <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="s2">"v0.25.0"</span>
 
 <span class="c"># On Linux you can obtain it using 'curl' via:</span>
 <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> - | <span class="nb">sort</span> <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
 
 <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Now, using the <code class="highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
+<p>Now, using the <code class="language-html highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Check that it’s running:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                             READY     STATUS              RESTARTS   AGE
 virt-operator-6c5db798d4-9qg56   0/1       ContainerCreating   0          12s
 ...
 virt-operator-6c5db798d4-9qg56   1/1       Running   0         28s
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>We can execute the command above few times or add the (<em>-w</em>) flag for <em>watching</em>
 the pods until the operator is in <em>Running</em> and <em>Ready</em> (1/1) status, then it’s time
@@ -415,25 +464,36 @@ to head to the next section.</p>
 <p>To check if your CPU supports virtualization extensions execute the
 following command:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>egrep <span class="s1">'svm|vmx'</span> /proc/cpuinfo
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>egrep <span class="s1">'svm|vmx'</span> /proc/cpuinfo
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>If the command doesn’t generate any output, create the following <em>ConfigMap</em>
 so that KubeVirt uses emulation mode, otherwise skip to the next section:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="deploy-kubevirt">Deploy KubeVirt</h3>
 
 <p>KubeVirt is then deployed by creating a dedicated custom resource:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Check the deployment:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                               READY     STATUS    RESTARTS   AGE
 virt-api-649859444c-fmrb7          1/1       Running   0          2m12s
 virt-api-649859444c-qrtb6          1/1       Running   0          2m12s
@@ -441,7 +501,7 @@ virt-controller-7f49b8f77c-kpfxw   1/1       Running   0          2m12s
 virt-controller-7f49b8f77c-m2h7d   1/1       Running   0          2m12s
 virt-handler-t4fgb                 1/1       Running   0          2m12s
 virt-operator-6c5db798d4-9qg56     1/1       Running   0          6m41s
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Once we applied the KubeVirt’s <em>Custom Resource</em> the operator took care of deploying the
 actual KubeVirt pods (<em>virt-api</em>, <em>virt-controller</em> and <em>virt-handler</em>). Again
@@ -453,37 +513,45 @@ we’ll need to execute the command until everything is <em>up and running</em>
 <p>An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
 The tool is called <em>virtctl</em> and can be retrieved from the release page of KubeVirt:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
     https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
 <span class="nb">chmod</span> +x virtctl
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>If <a href="https://krew.dev/"><code class="highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="highlighter-rouge">virtctl</code> can be installed via <code class="highlighter-rouge">krew</code>:</p>
+<p>If <a href="https://krew.dev/"><code class="language-html highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="language-html highlighter-rouge">virtctl</code> can be installed via <code class="language-html highlighter-rouge">krew</code>:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Then <code class="highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
+<p>Then <code class="language-html highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Every occurrence throughout this guide of</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl &lt;<span class="nb">command</span><span class="o">&gt;</span>...
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>./virtctl &lt;<span class="nb">command</span><span class="o">&gt;</span>...
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>should then be read as</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt &lt;<span class="nb">command</span><span class="o">&gt;</span>...
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl virt &lt;<span class="nb">command</span><span class="o">&gt;</span>...
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="clean-up-after-lab-cleanups">Clean Up (after lab cleanups):</h3>
 
 <p>Delete the Kubernetes cluster with kind:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kind delete cluster
-</code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kind delete cluster
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="step-2-kubevirt-labs">Step 2: KubeVirt labs</h2>
 
@@ -560,6 +628,7 @@ the <a href="https://github.com/kubevirt/cloud-image-builder/issues" target="_bl
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

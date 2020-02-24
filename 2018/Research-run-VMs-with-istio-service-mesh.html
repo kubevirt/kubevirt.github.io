@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -244,7 +246,200 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>With the follow yaml configuration</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: Service
 metadata:
   name: application-devel
@@ -388,7 +583,7 @@ spec:
             - NET_ADMIN
       - args:
         - -c
-        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t &amp;&amp; ulimit -c
+        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t <span class="err">&amp;&amp;</span> ulimit -c
           unlimited
         command:
         - /bin/sh
@@ -437,18 +632,25 @@ spec:
         backend:
           serviceName: application-devel
           servicePort: 9080
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>When the my-libvirt container starts it runs an entry point script for iptables configuration.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. iptables -t nat -D PREROUTING 1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>1. iptables -t nat -D PREROUTING 1
 2. iptables -t nat -A PREROUTING -p tcp -m comment --comment "KubeVirt Spice"  --dport 5900 -j ACCEPT
 3. iptables -t nat -A PREROUTING -p tcp -m comment --comment "KubeVirt virt-manager"  --dport 16509 -j ACCEPT
 4. iptables -t nat  -A PREROUTING -d 10.96.0.0/12 -m comment --comment "istio/redirect-ip-range-10.96.0.0/12-service cidr" -j ISTIO_REDIRECT
 5. iptables -t nat  -A PREROUTING -d 192.168.0.0/16 -m comment --comment "istio/redirect-ip-range-192.168.0.0/16-Pod cidr" -j ISTIO_REDIRECT
 6. iptables -t nat  -A OUTPUT -d 127.0.0.1/32 -p tcp -m comment --comment "KubeVirt mesh application port" --dport 9080 -j DNAT --to-destination 10.0.0.2
 7. iptables -t nat  -A POSTROUTING -s 127.0.0.1/32 -d 10.0.0.2/32 -m comment --comment "KubeVirt VM Forward" -j SNAT --to-source `ifconfig eth0 | grep inet | awk '{print $2}'
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Now lets explain every one of this lines:</p>
 
@@ -493,7 +695,212 @@ Also all the traffic that came into the pod will be pass to envoy and after that
 <p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/nat-proxy.png" alt="nat-proxy-Diagram" /></p>
 
 <p>With the follow yaml configuration</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: Service
 metadata:
   name: application-nat-proxt
@@ -649,7 +1056,7 @@ spec:
             - NET_ADMIN
       - args:
         - -c
-        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t &amp;&amp; ulimit -c
+        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t <span class="err">&amp;&amp;</span> ulimit -c
           unlimited
         command:
         - /bin/sh
@@ -698,14 +1105,17 @@ spec:
         backend:
           serviceName: application-nat-proxt
           servicePort: 9080
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>When the mynatproxy container starts it runs an entry point script for iptables configuration.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. iptables -t nat -I PREROUTING 1 -p tcp -s 10.0.1.2 -m comment --comment "nat-proxy redirect" -j REDIRECT --to-ports 8080
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>1. iptables -t nat -I PREROUTING 1 -p tcp -s 10.0.1.2 -m comment --comment "nat-proxy redirect" -j REDIRECT --to-ports 8080
 2. iptables -t nat -I OUTPUT 1 -p tcp -s 10.0.1.2 -j ACCEPT
 3. iptables -t nat -I POSTROUTING 1 -s 10.0.1.2 -p udp -m comment --comment "nat udp connections" -j MASQUERADE
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Now lets explain every one of this lines:</p>
 
@@ -721,7 +1131,71 @@ For the egress traffic i used a program writed in golang, and for the ingress tr
 <p>The nat-proxy used a system call to get the original destination address and port that its been redirected to us from the iptable rules I created.</p>
 
 <p>The extract function:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>func getOriginalDst(clientConn *net.TCPConn) (ipv4 string, port uint16, newTCPConn *net.TCPConn, err error) {
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+</pre></td><td class="rouge-code"><pre>func getOriginalDst(clientConn *net.TCPConn) (ipv4 string, port uint16, newTCPConn *net.TCPConn, err error) {
     if clientConn == nil {
         log.Printf("copy(): oops, dst is nil!")
         err = errors.New("ERR: clientConn is nil")
@@ -753,7 +1227,7 @@ For the egress traffic i used a program writed in golang, and for the ingress tr
 
     // Get original destination
     // this is the only syscall in the Golang libs that I can find that returns 16 bytes
-    // Example result: &amp;{Multiaddr:[2 0 31 144 206 190 36 45 0 0 0 0 0 0 0 0] Interface:0}
+    // Example result: <span class="err">&amp;</span>{Multiaddr:[2 0 31 144 206 190 36 45 0 0 0 0 0 0 0 0] Interface:0}
     // port starts at the 3rd byte and is 2 bytes long (31 144 = port 8080)
     // IPv4 address starts at the 5th byte, 4 bytes long (206 190 36 45)
     addr, err := syscall.GetsockoptIPv6Mreq(int(clientConnFile.Fd()), syscall.IPPROTO_IP, SO_ORIGINAL_DST)
@@ -781,14 +1255,26 @@ For the egress traffic i used a program writed in golang, and for the ingress tr
         itod(uint(addr.Multiaddr[5])) + "." +
         itod(uint(addr.Multiaddr[6])) + "." +
         itod(uint(addr.Multiaddr[7]))
-    port = uint16(addr.Multiaddr[2])&lt;&lt;8 + uint16(addr.Multiaddr[3])
+    port = uint16(addr.Multiaddr[2])<span class="nt">&lt;</span><span class="err">&lt;</span><span class="na">8</span> <span class="err">+</span> <span class="na">uint16</span><span class="err">(</span><span class="na">addr</span><span class="err">.</span><span class="na">Multiaddr</span><span class="err">[</span><span class="na">3</span><span class="err">])</span>
 
-    return
-}
-</code></pre></div></div>
+    <span class="na">return</span>
+<span class="err">}</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>After we get the original destination address and port we start a connection to it and copy all the packets.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var streamWait sync.WaitGroup
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre>var streamWait sync.WaitGroup
 streamWait.Add(2)
 
 streamConn := func(dst io.Writer, src io.Reader) {
@@ -800,17 +1286,24 @@ go streamConn(remoteConn, VMconn)
 go streamConn(VMconn, remoteConn)
 
 streamWait.Wait()
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The Haproxy help us with the ingress traffic with the follow configuration</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>defaults
   mode tcp
 frontend main
   bind *:9080
   default_backend guest
 backend guest
   server guest 10.0.1.2:9080 maxconn 2048
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>It send all the traffic to our virtual machine on the service port the machine is listening.</p>
 
@@ -849,7 +1342,212 @@ backend guest
 <p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/semi-tproxy-diagram.png" alt="semi-tproxy-Diagram" /></p>
 
 <p>With the follow yaml configuration</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: v1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+38
+39
+40
+41
+42
+43
+44
+45
+46
+47
+48
+49
+50
+51
+52
+53
+54
+55
+56
+57
+58
+59
+60
+61
+62
+63
+64
+65
+66
+67
+68
+69
+70
+71
+72
+73
+74
+75
+76
+77
+78
+79
+80
+81
+82
+83
+84
+85
+86
+87
+88
+89
+90
+91
+92
+93
+94
+95
+96
+97
+98
+99
+100
+101
+102
+103
+104
+105
+106
+107
+108
+109
+110
+111
+112
+113
+114
+115
+116
+117
+118
+119
+120
+121
+122
+123
+124
+125
+126
+127
+128
+129
+130
+131
+132
+133
+134
+135
+136
+137
+138
+139
+140
+141
+142
+143
+144
+145
+146
+147
+148
+149
+150
+151
+152
+153
+154
+155
+156
+157
+158
+159
+160
+161
+162
+163
+164
+165
+166
+167
+168
+169
+170
+171
+172
+173
+174
+175
+176
+177
+178
+179
+180
+181
+182
+183
+184
+185
+186
+187
+188
+189
+190
+191
+192
+193
+194
+195
+196
+197
+198
+199
+200
+201
+202
+203
+204
+205
+</pre></td><td class="rouge-code"><pre>apiVersion: v1
 kind: Service
 metadata:
   name: application-devel
@@ -1005,7 +1703,7 @@ spec:
             - NET_ADMIN
       - args:
         - -c
-        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t &amp;&amp; ulimit -c
+        - sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t <span class="err">&amp;&amp;</span> ulimit -c
           unlimited
         command:
         - /bin/sh
@@ -1054,21 +1752,60 @@ spec:
         backend:
           serviceName: application-devel
           servicePort: 9080
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>When the tproxy container starts it runs an entry point script for iptables configuration but this time the proxy redirect came in the mangle table and not in the nat table that because TPROXY module avilable only in the mangle table.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TPROXY
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>TPROXY
 This target is only valid in the mangle table, in the
 PREROUTING chain and user-defined chains which are only
 called from this chain.  It redirects the packet to a local
 socket without changing the packet header in any way. It can
 also change the mark value which can then be used in
 advanced routing rules.
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>iptables rules:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iptables -t mangle -vL
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+</pre></td><td class="rouge-code"><pre>iptables -t mangle -vL
 iptables -t mangle -N KUBEVIRT_DIVERT
 iptables -t mangle -A KUBEVIRT_DIVERT -j MARK --set-mark 8
 iptables -t mangle -A KUBEVIRT_DIVERT -j ACCEPT
@@ -1100,37 +1837,63 @@ iptables -t ${table} -I OUTPUT 1 -d 10.0.1.2 -j ACCEPT
 
 # Allow guest -&gt; world -- using nat for UDP
 iptables -t ${table} -I POSTROUTING 1 -s 10.0.1.2 -p udp -j MASQUERADE
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>For this solution we also need to load the bridge kernel module</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>modprobe bridge
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>modprobe bridge
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>And create some ebtables rules so egress and ingress traffict from the virtial machine will exit the l2 rules and pass to the l3 rules:</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ebtables -t broute -F # Flush the table
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>  ebtables -t broute -F # Flush the table
     # inbound traffic
     ebtables -t broute -A BROUTING -p IPv4 --ip-dst 10.0.1.2 \
     -j redirect --redirect-target DROP
     # returning outbound traffic
     ebtables -t broute -A BROUTING -p IPv4 --ip-src 10.0.1.2 \
     -j redirect --redirect-target DROP
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>We also need to disable rp_filter on the virtual machine interface and the libvirt bridge interface</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>echo 0 &gt; /proc/sys/net/ipv4/conf/virbr0/rp_filter
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>echo 0 &gt; /proc/sys/net/ipv4/conf/virbr0/rp_filter
 echo 0 &gt; /proc/sys/net/ipv4/conf/virbr0-nic/rp_filter
 echo 0 &gt; /proc/sys/net/ipv4/conf/vnet0/rp_filter
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>After this configuration the container start the semi-tproxy process for egress traffic and the haproxy process for the ingress traffic.</p>
 
 <p>The semi-tproxy program is a golag program,binding a listener socket with the IP_TRANSPARENT socket option
 Preparing a socket to receive connections with TProxy is really no different than what is normally done when setting up a socket to listen for connections. The only difference in the process is before the socket is bound, the IP_TRANSPARENT socket option.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>syscall.SetsockoptInt(fileDescriptor, syscall.SOL_IP, syscall.IP_TRANSPARENT, 1)
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>syscall.SetsockoptInt(fileDescriptor, syscall.SOL_IP, syscall.IP_TRANSPARENT, 1)
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>About IP_TRANSPARENT</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IP_TRANSPARENT (since Linux 2.6.24)
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre>IP_TRANSPARENT (since Linux 2.6.24)
 Setting this boolean option enables transparent proxying on
 this socket.  This socket option allows the calling applica‐
 tion to bind to a nonlocal IP address and operate both as a
@@ -1144,13 +1907,25 @@ Enabling this socket option requires superuser privileges
 
 TProxy redirection with the iptables TPROXY target also
 requires that this option be set on the redirected socket.
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Then we set the IP_TRANSPARENT socket option on outbound connections
 Same goes for making connections to a remote host pretending to be the client, the IP_TRANSPARENT socket option is set and the Linux kernel will allow the bind so along as a connection was intercepted with those details being used for the bind.</p>
 
 <p>When the process get a new connection we start a connection to the real destination address and copy the traffic between both sockets</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>var streamWait sync.WaitGroup
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+</pre></td><td class="rouge-code"><pre>var streamWait sync.WaitGroup
 streamWait.Add(2)
 
 streamConn := func(dst io.Writer, src io.Reader) {
@@ -1162,17 +1937,24 @@ go streamConn(remoteConn, VMconn)
 go streamConn(VMconn, remoteConn)
 
 streamWait.Wait()
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The Haproxy helps us with the ingress traffic with the follow configuration</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>defaults
   mode tcp
 frontend main
   bind *:9080
   default_backend guest
 backend guest
   server guest 10.0.1.2:9080 maxconn 2048
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>It send all the traffic to our virtual machine on the service port the machine is listening.</p>
 
@@ -1289,6 +2071,7 @@ backend guest
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 

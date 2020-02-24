@@ -207,6 +207,8 @@ var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd",
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
+<script src="/js/clipboard.min.js"></script>
+
     </nav>
 
     <main role="main" style="margin-top: 60px;">
@@ -245,9 +247,19 @@ These instances are where we will install our simple NodeJS and MongoDB applicat
 
 <h2 id="create-objects-and-start-the-virtual-machines">Create Objects and Start the Virtual Machines</h2>
 
-<p>One of the first objects to create is the <code class="highlighter-rouge">NetworkAttachmentDefinition</code>.
-We are using a fairly simple definition for this post with an ovs bridge <code class="highlighter-rouge">br1</code> and no vlan configured.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: "k8s.cni.cncf.io/v1"
+<p>One of the first objects to create is the <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code>.
+We are using a fairly simple definition for this post with an ovs bridge <code class="language-html highlighter-rouge">br1</code> and no vlan configured.</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: ovs-net-br1
@@ -257,21 +269,43 @@ spec:
       "type": "ovs",
       "bridge": "br1"
     }'
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/mongodb.yaml
-</code></pre></div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/nodejs.yaml
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/mongodb.yaml
+</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/nodejs.yaml
+</pre></td></tr></tbody></table></code></pre></div></div>
 <p>Start the virtual machines instances</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>~/virtctl start nodejs
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>~/virtctl start nodejs
 ~/virtctl start mongodb
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Review KubeVirt virtual machine related objects</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oc get net-attach-def
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+</pre></td><td class="rouge-code"><pre>$ oc get net-attach-def
 NAME          AGE
 ovs-net-br1   16d
 
@@ -289,7 +323,7 @@ $ oc get pod
 NAME                          READY     STATUS    RESTARTS   AGE
 virt-launcher-mongodb-bw2t8   2/2       Running   0          3h
 virt-launcher-nodejs-dlgv6    2/2       Running   0          3h
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="service-and-endpoints">Service and Endpoints</h2>
 
@@ -297,11 +331,35 @@ virt-launcher-nodejs-dlgv6    2/2       Running   0          3h
 multiple interfaces.
 The service object below is considered
 <a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">headless</a>
-because the <code class="highlighter-rouge">clusterIP</code> is set to <code class="highlighter-rouge">None</code>. We don’t want load-balancing or single service IP as
+because the <code class="language-html highlighter-rouge">clusterIP</code> is set to <code class="language-html highlighter-rouge">None</code>. We don’t want load-balancing or single service IP as
 this would force traffic over the cluster network which in this example we are trying to avoid.</p>
 
 <h3 id="mongo">Mongo</h3>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+</pre></td><td class="rouge-code"><pre><span class="nn">---</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -325,23 +383,60 @@ this would force traffic over the cluster network which in this example we are t
     <span class="na">ports</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">27017</span>
         <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
-</code></pre></div></div>
-<p>The above ip address is provided by DHCP via dnsmasq to the virtual machine instance’s <code class="highlighter-rouge">eth1</code> interface.
+</pre></td></tr></tbody></table></code></pre></div></div>
+<p>The above ip address is provided by DHCP via dnsmasq to the virtual machine instance’s <code class="language-html highlighter-rouge">eth1</code> interface.
 All the nodes are virtual instances configured by libvirt.</p>
 
 <p>After creating the service and endpoints objects lets confirm that DNS is resolving correctly.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh fedora@$(oc get pod -l kubevirt-vm=nodejs --template '') \
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+</pre></td><td class="rouge-code"><pre>$ ssh fedora@$(oc get pod -l kubevirt-vm=nodejs --template '') \
 "python3 -c \"import socket;print(socket.gethostbyname('mongo.vm.svc.cluster.local'))\""
 192.168.123.139
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="node">Node</h3>
 
-<p>We can also add a <code class="highlighter-rouge">service</code>, <code class="highlighter-rouge">endpoints</code> and <code class="highlighter-rouge">route</code> for the nodejs virtual machine so the application
+<p>We can also add a <code class="language-html highlighter-rouge">service</code>, <code class="language-html highlighter-rouge">endpoints</code> and <code class="language-html highlighter-rouge">route</code> for the nodejs virtual machine so the application
 is accessible from the defined subdomain.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
@@ -375,16 +470,26 @@ is accessible from the defined subdomain.</p>
   <span class="na">to</span><span class="pi">:</span>
     <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
     <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="testing-our-application">Testing our application</h2>
 
 <p>I am using the same application and method of installation as the previous post so I won’t
 duplicate it here.  Just in case though let’s make sure that the application is available
-via the <code class="highlighter-rouge">route</code>.</p>
+via the <code class="language-html highlighter-rouge">route</code>.</p>
 
-<p><code class="highlighter-rouge">$ curl http://node-vm.apps.192.168.122.101.nip.io</code></p>
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;!doctype html&gt;</span>
+<p><code class="language-html highlighter-rouge">$ curl http://node-vm.apps.192.168.122.101.nip.io</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;!doctype html&gt;</span>
 <span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
 <span class="nt">&lt;head&gt;</span>
   <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
@@ -394,7 +499,7 @@ via the <code class="highlighter-rouge">route</code>.</p>
 <span class="nt">&lt;p&gt;</span>Page view count:
 <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"code"</span> <span class="na">id=</span><span class="s">"count-value"</span><span class="nt">&gt;</span>2<span class="nt">&lt;/span&gt;</span>
 ...output...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="networking-in-detail">Networking in Detail</h1>
 
@@ -408,66 +513,106 @@ communication and route to virtual machine.</p>
 <p>We have created two headless services one for node and one for mongo.
 This allows us to use the hostname mongo to connect to MongoDB via the alternative interface.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oc get services
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+</pre></td><td class="rouge-code"><pre>$ oc get services
 NAME      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)     AGE
-mongo     ClusterIP   None         &lt;none&gt;        27017/TCP   8h
-node      ClusterIP   None         &lt;none&gt;        8080/TCP    7h
+mongo     ClusterIP   None         <span class="nt">&lt;none&gt;</span>        27017/TCP   8h
+node      ClusterIP   None         <span class="nt">&lt;none&gt;</span>        8080/TCP    7h
 
 $ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') cat /etc/sysconfig/nodejs
 MONGO_URL=mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="endpoints">endpoints</h3>
 
-<p>The endpoints below were manually created for each virtual machine based on the IP Address of <code class="highlighter-rouge">eth1</code>.</p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ oc get endpoints
+<p>The endpoints below were manually created for each virtual machine based on the IP Address of <code class="language-html highlighter-rouge">eth1</code>.</p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>$ oc get endpoints
 NAME      ENDPOINTS               AGE
 mongo     192.168.123.139:27017   8h
 node      192.168.123.140:8080    7h
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="route">route</h3>
 
 <p>This will allow us access the NodeJS example application using the route url.</p>
 
-<p><code class="highlighter-rouge">$ oc get route</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME      HOST/PORT                             PATH      SERVICES   PORT      TERMINATION   WILDCARD
-node      node-vm.apps.192.168.122.101.nip.io             node       &lt;all&gt;                   None
-</code></pre></div></div>
+<p><code class="language-html highlighter-rouge">$ oc get route</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>NAME      HOST/PORT                             PATH      SERVICES   PORT      TERMINATION   WILDCARD
+node      node-vm.apps.192.168.122.101.nip.io             node       <span class="nt">&lt;all&gt;</span>                   None
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="host-level">Host-level</h2>
 
-<p>In addition to the existing interface <code class="highlighter-rouge">eth0</code> and bridge <code class="highlighter-rouge">br0</code>, <code class="highlighter-rouge">eth1</code> is the uplink for the ovs-cni bridge <code class="highlighter-rouge">br1</code>. This needs to be manually configured prior to use.</p>
+<p>In addition to the existing interface <code class="language-html highlighter-rouge">eth0</code> and bridge <code class="language-html highlighter-rouge">br0</code>, <code class="language-html highlighter-rouge">eth1</code> is the uplink for the ovs-cni bridge <code class="language-html highlighter-rouge">br1</code>. This needs to be manually configured prior to use.</p>
 
 <h3 id="interfaces">interfaces</h3>
 
-<p><code class="highlighter-rouge">ip a</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...output...
-2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
+<p><code class="language-html highlighter-rouge">ip a</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+</pre></td><td class="rouge-code"><pre>...output...
+2: eth0: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
     link/ether 52:54:00:5f:90:85 brd ff:ff:ff:ff:ff:ff
     inet 192.168.122.111/24 brd 192.168.122.255 scope global noprefixroute dynamic eth0
        valid_lft 2282sec preferred_lft 2282sec
     inet6 fe80::5054:ff:fe5f:9085/64 scope link
        valid_lft forever preferred_lft forever
-3: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast master ovs-system state UP group default qlen 1000
+3: eth1: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 qdisc pfifo_fast master ovs-system state UP group default qlen 1000
     link/ether 52:54:01:5f:90:85 brd ff:ff:ff:ff:ff:ff
 ...output...
-5: ovs-system: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN group default qlen 1000
+5: ovs-system: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="nt">&gt;</span> mtu 1500 qdisc noop state DOWN group default qlen 1000
     link/ether 2a:6e:65:7e:65:3a brd ff:ff:ff:ff:ff:ff
-9: br1: &lt;BROADCAST,MULTICAST&gt; mtu 1500 qdisc noop state DOWN group default qlen 1000
+9: br1: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="nt">&gt;</span> mtu 1500 qdisc noop state DOWN group default qlen 1000
     link/ether 6e:d5:db:12:b5:43 brd ff:ff:ff:ff:ff:ff
-10: br0: &lt;BROADCAST,MULTICAST&gt; mtu 1450 qdisc noop state DOWN group default qlen 1000
+10: br0: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="nt">&gt;</span> mtu 1450 qdisc noop state DOWN group default qlen 1000
     link/ether aa:3c:bd:5a:ac:46 brd ff:ff:ff:ff:ff:ff
 ...output...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="bridge">Bridge</h3>
 
-<p>The command and output below shows the Open vSwitch bridge and interfaces. The <code class="highlighter-rouge">veth8bf25a9b</code> interface
+<p>The command and output below shows the Open vSwitch bridge and interfaces. The <code class="language-html highlighter-rouge">veth8bf25a9b</code> interface
 is one of the veth pair created to connect the virtual machine to the Open vSwitch bridge.</p>
 
-<p><code class="highlighter-rouge">ovs-vsctl show</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>77147900-3d26-46c6-ac0b-755da3aa4b97
+<p><code class="language-html highlighter-rouge">ovs-vsctl show</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+</pre></td><td class="rouge-code"><pre>77147900-3d26-46c6-ac0b-755da3aa4b97
     Bridge "br1"
         Port "br1"
             Interface "br1"
@@ -477,113 +622,173 @@ is one of the veth pair created to connect the virtual machine to the Open vSwit
         Port "eth1"
             Interface "eth1"
 ...output...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="pod-level">Pod-level</h2>
 
 <h3 id="interfaces-1">interfaces</h3>
 
-<p>There are two bridges <code class="highlighter-rouge">k6t-eth0</code> and <code class="highlighter-rouge">k6t-net0</code>. <code class="highlighter-rouge">eth0</code> and <code class="highlighter-rouge">net1</code> are a veth pair with the alternate side
-available on the host.  <code class="highlighter-rouge">eth0</code> is a member of the <code class="highlighter-rouge">k6t-eth0</code> bridge.  <code class="highlighter-rouge">net1</code> is a member of the <code class="highlighter-rouge">k6t-net0</code> bridge.</p>
+<p>There are two bridges <code class="language-html highlighter-rouge">k6t-eth0</code> and <code class="language-html highlighter-rouge">k6t-net0</code>. <code class="language-html highlighter-rouge">eth0</code> and <code class="language-html highlighter-rouge">net1</code> are a veth pair with the alternate side
+available on the host.  <code class="language-html highlighter-rouge">eth0</code> is a member of the <code class="language-html highlighter-rouge">k6t-eth0</code> bridge.  <code class="language-html highlighter-rouge">net1</code> is a member of the <code class="language-html highlighter-rouge">k6t-net0</code> bridge.</p>
 
-<p><code class="highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-76xk7 -- ip a</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...output
-3: eth0@if41: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master k6t-eth0 state UP group default
+<p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-76xk7 -- ip a</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+</pre></td><td class="rouge-code"><pre>...output
+3: eth0@if41: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1450 qdisc noqueue master k6t-eth0 state UP group default
     link/ether 0a:58:0a:17:79:04 brd ff:ff:ff:ff:ff:ff link-netnsid 0
     inet6 fe80::858:aff:fe17:7904/64 scope link
        valid_lft forever preferred_lft forever
-5: net1@if42: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue master k6t-net1 state UP group default
+5: net1@if42: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 qdisc noqueue master k6t-net1 state UP group default
     link/ether 02:00:00:74:17:75 brd ff:ff:ff:ff:ff:ff link-netnsid 0
     inet6 fe80::ff:fe74:1775/64 scope link
        valid_lft forever preferred_lft forever
-6: k6t-eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue state UP group default
+6: k6t-eth0: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1450 qdisc noqueue state UP group default
     link/ether 0a:58:0a:17:79:04 brd ff:ff:ff:ff:ff:ff
     inet 169.254.75.10/32 brd 169.254.75.10 scope global k6t-eth0
        valid_lft forever preferred_lft forever
     inet6 fe80::858:aff:fe82:21/64 scope link
        valid_lft forever preferred_lft forever
-7: k6t-net1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc noqueue state UP group default
+7: k6t-net1: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 qdisc noqueue state UP group default
     link/ether 02:00:00:74:17:75 brd ff:ff:ff:ff:ff:ff
     inet 169.254.75.11/32 brd 169.254.75.11 scope global k6t-net1
        valid_lft forever preferred_lft forever
     inet6 fe80::ff:fe07:2182/64 scope link dadfailed tentative
        valid_lft forever preferred_lft forever
-8: vnet0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc pfifo_fast master k6t-eth0 state UNKNOWN group default qlen 1000
+8: vnet0: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1450 qdisc pfifo_fast master k6t-eth0 state UNKNOWN group default qlen 1000
     link/ether fe:58:0a:82:00:21 brd ff:ff:ff:ff:ff:ff
     inet6 fe80::fc58:aff:fe82:21/64 scope link
        valid_lft forever preferred_lft forever
-9: vnet1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast master k6t-net1 state UNKNOWN group default qlen 1000
+9: vnet1: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 qdisc pfifo_fast master k6t-net1 state UNKNOWN group default qlen 1000
     link/ether fe:37:cf:e0:ad:f2 brd ff:ff:ff:ff:ff:ff
     inet6 fe80::fc37:cfff:fee0:adf2/64 scope link
        valid_lft forever preferred_lft forever
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Showing the bridge <code class="highlighter-rouge">k6t-eth0</code> and <code class="highlighter-rouge">k6t-net</code> member ports.</p>
+<p>Showing the bridge <code class="language-html highlighter-rouge">k6t-eth0</code> and <code class="language-html highlighter-rouge">k6t-net</code> member ports.</p>
 
-<p><code class="highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- bridge link show</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>3: eth0 state UP @if41: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master k6t-eth0 state forwarding priority 32 cost 2
-5: net1 state UP @if42: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 master k6t-net1 state forwarding priority 32 cost 2
-8: vnet0 state UNKNOWN : &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master k6t-eth0 state forwarding priority 32 cost 100
-9: vnet1 state UNKNOWN : &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 master k6t-net1 state forwarding priority 32 cost 100
-</code></pre></div></div>
+<p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- bridge link show</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>3: eth0 state UP @if41: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1450 master k6t-eth0 state forwarding priority 32 cost 2
+5: net1 state UP @if42: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 master k6t-net1 state forwarding priority 32 cost 2
+8: vnet0 state UNKNOWN : <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1450 master k6t-eth0 state forwarding priority 32 cost 100
+9: vnet1 state UNKNOWN : <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 master k6t-net1 state forwarding priority 32 cost 100
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="dhcp">DHCP</h3>
 
-<p>The virtual machine network is configured by DHCP. You can see <code class="highlighter-rouge">virt-launcher</code> has UDP port 67 open
-on the <code class="highlighter-rouge">k6t-eth0</code> interface to serve DHCP to the virtual machine. As described in the previous
-<a href="/2018/KubeVirt-Network-Deep-Dive.html">post</a> the <code class="highlighter-rouge">virt-launcher</code> process contains
+<p>The virtual machine network is configured by DHCP. You can see <code class="language-html highlighter-rouge">virt-launcher</code> has UDP port 67 open
+on the <code class="language-html highlighter-rouge">k6t-eth0</code> interface to serve DHCP to the virtual machine. As described in the previous
+<a href="/2018/KubeVirt-Network-Deep-Dive.html">post</a> the <code class="language-html highlighter-rouge">virt-launcher</code> process contains
 a simple DHCP server that provides an offer and typical options to the virtual machine instance.</p>
 
-<p><code class="highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- ss -tuanp</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Netid State   Recv-Q   Send-Q         Local Address:Port     Peer Address:Port
+<p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- ss -tuanp</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>Netid State   Recv-Q   Send-Q         Local Address:Port     Peer Address:Port
 udp   UNCONN  0        0           0.0.0.0%k6t-eth0:67            0.0.0.0:*      users:(("virt-launcher",pid=7,fd=15))
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="libvirt">libvirt</h3>
 
-<p>With <code class="highlighter-rouge">virsh domiflist</code> we can also see that the <code class="highlighter-rouge">vnet0</code> interface is a member on the <code class="highlighter-rouge">k6t-eth0</code> bridge and <code class="highlighter-rouge">vnet1</code> is a member of the k6t-net1 bridge.</p>
+<p>With <code class="language-html highlighter-rouge">virsh domiflist</code> we can also see that the <code class="language-html highlighter-rouge">vnet0</code> interface is a member on the <code class="language-html highlighter-rouge">k6t-eth0</code> bridge and <code class="language-html highlighter-rouge">vnet1</code> is a member of the k6t-net1 bridge.</p>
 
-<p><code class="highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- virsh domiflist vm_nodejs</code></p>
+<p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- virsh domiflist vm_nodejs</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Interface  Type       Source     Model       MAC
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+</pre></td><td class="rouge-code"><pre>Interface  Type       Source     Model       MAC
 -------------------------------------------------------
 vnet0      bridge     k6t-eth0   virtio      0a:58:0a:82:00:2a
 vnet1      bridge     k6t-net1   virtio      20:37:cf:e0:ad:f2
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="vm-level">VM-level</h2>
 
 <h3 id="interfaces-2">interfaces</h3>
 
 <p>Fortunately the vm interfaces are fairly typical. Two interfaces: one that has been assigned the original
-pod ip address and the other the <code class="highlighter-rouge">ovs-cni</code> layer 2 interface. The <code class="highlighter-rouge">eth1</code> interface receives a IP address
+pod ip address and the other the <code class="language-html highlighter-rouge">ovs-cni</code> layer 2 interface. The <code class="language-html highlighter-rouge">eth1</code> interface receives a IP address
 from DHCP provided by dnsmasq that was configured by libvirt network on the physical host.</p>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo ip a</code></p>
+<p><code class="language-html highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo ip a</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...output...
-2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc fq_codel state UP group default qlen 1000
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+</pre></td><td class="rouge-code"><pre>...output...
+2: eth0: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1450 qdisc fq_codel state UP group default qlen 1000
     link/ether 0a:58:0a:82:00:2a brd ff:ff:ff:ff:ff:ff
     inet 10.130.0.42/23 brd 10.130.1.255 scope global dynamic eth0
        valid_lft 86239518sec preferred_lft 86239518sec
     inet6 fe80::858:aff:fe82:2a/64 scope link tentative dadfailed
        valid_lft forever preferred_lft forever
-3: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP group default qlen 1000
+3: eth1: <span class="nt">&lt;BROADCAST</span><span class="err">,</span><span class="na">MULTICAST</span><span class="err">,</span><span class="na">UP</span><span class="err">,</span><span class="na">LOWER_UP</span><span class="nt">&gt;</span> mtu 1500 qdisc fq_codel state UP group default qlen 1000
     link/ether 20:37:cf:e0:ad:f2 brd ff:ff:ff:ff:ff:ff
     inet 192.168.123.140/24 brd 192.168.123.255 scope global dynamic eth1
        valid_lft 3106sec preferred_lft 3106sec
     inet6 fe80::2237:cfff:fee0:adf2/64 scope link
        valid_lft forever preferred_lft forever
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h4 id="configuration-and-dns">Configuration and DNS</h4>
 
 <p>In this example we want to use Kubernetes services so special care must be used when
 configuring the network interfaces.  The default route and dns configuration must be
-maintained by <code class="highlighter-rouge">eth0</code>.  <code class="highlighter-rouge">eth1</code> has both route and dns configuration disabled.</p>
+maintained by <code class="language-html highlighter-rouge">eth0</code>.  <code class="language-html highlighter-rouge">eth1</code> has both route and dns configuration disabled.</p>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BOOTPROTO=dhcp
+<p><code class="language-html highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+</pre></td><td class="rouge-code"><pre>BOOTPROTO=dhcp
 DEVICE=eth0
 ONBOOT=yes
 TYPE=Ethernet
@@ -591,11 +796,20 @@ USERCTL=no
 # Use route and dns from DHCP
 DEFROUTE=yes
 PEERDNS=yes
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth1</code></p>
+<p><code class="language-html highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth1</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BOOTPROTO=dhcp
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+7
+8
+9
+</pre></td><td class="rouge-code"><pre>BOOTPROTO=dhcp
 DEVICE=eth1
 IPV6INIT=no
 NM_CONTROLLED=no
@@ -604,14 +818,16 @@ TYPE=Ethernet
 # Do not use route and dns from DHCP
 PEERDNS=no
 DEFROUTE=no
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Just quickly wanted to cat the <code class="highlighter-rouge">/etc/resolv.conf</code> file to show that DNS is configured so that kube-dns will be properly queried.</p>
+<p>Just quickly wanted to cat the <code class="language-html highlighter-rouge">/etc/resolv.conf</code> file to show that DNS is configured so that kube-dns will be properly queried.</p>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '') sudo cat /etc/resolv.conf</code></p>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>search vm.svc.cluster.local. svc.cluster.local. cluster.local. 168.122.112.nip.io.
+<p><code class="language-html highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '') sudo cat /etc/resolv.conf</code></p>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>search vm.svc.cluster.local. svc.cluster.local. cluster.local. 168.122.112.nip.io.
 nameserver 192.168.122.112
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="vm-to-vm-communication">VM to VM communication</h2>
 
@@ -629,31 +845,42 @@ connection to MongoDB and finally check the NodeJS logs looking for confirmation
 
 <h4 id="tcp-connection">TCP connection</h4>
 
-<p>After connecting to the nodejs virtual machine via ssh we can use <code class="highlighter-rouge">ss</code> to determine the current TCP connections.
+<p>After connecting to the nodejs virtual machine via ssh we can use <code class="language-html highlighter-rouge">ss</code> to determine the current TCP connections.
 We are specifically looking for the established connections to the MongoDB service that is running on the mongodb virtual machine.</p>
 
-<p><code class="highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo ss -tanp</code></p>
+<p><code class="language-html highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo ss -tanp</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>State      Recv-Q Send-Q Local Address:Port               Peer Address:Port
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+6
+</pre></td><td class="rouge-code"><pre>State      Recv-Q Send-Q Local Address:Port               Peer Address:Port
 ...output...
 ESTAB      0      0      192.168.123.140:33156              192.168.123.139:27017               users:(("node",pid=12893,fd=11))
 ESTAB      0      0      192.168.123.140:33162              192.168.123.139:27017               users:(("node",pid=12893,fd=13))
 ESTAB      0      0      192.168.123.140:33164              192.168.123.139:27017               users:(("node",pid=12893,fd=14))
 ...output...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h4 id="logs">Logs</h4>
 
 <p>Here we are reviewing the logs of node to confirm we have a database connection to mongo via the service hostname.</p>
 
-<p><code class="highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo journalctl -u nodejs</code></p>
+<p><code class="language-html highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo journalctl -u nodejs</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...output...
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+3
+4
+5
+</pre></td><td class="rouge-code"><pre>...output...
 Oct 01 18:28:09 nodejs.localdomain systemd[1]: Started OpenShift NodeJS Example.
 Oct 01 18:28:10 nodejs.localdomain node[12893]: Server running on http://0.0.0.0:8080
 Oct 01 18:28:10 nodejs.localdomain node[12893]: Connected to MongoDB at: mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
 ...output...
-</code></pre></div></div>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="route-to-vm-communication">Route to VM communication</h2>
 
@@ -662,7 +889,7 @@ Oct 01 18:28:10 nodejs.localdomain node[12893]: Connected to MongoDB at: mongodb
 <h3 id="haproxy-traffic-status">HAProxy Traffic Status</h3>
 
 <p>OKD HAProxy provides optional traffic status - which we already enabled. The screenshot below shows
-the requests that Nginx is receiving for <code class="highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
+the requests that Nginx is receiving for <code class="language-html highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
 
 <p><img src="/assets/images/haproxy_stats.png" alt="haproxy-stats" /></p>
 
@@ -670,11 +897,13 @@ the requests that Nginx is receiving for <code class="highlighter-rouge">nodejs.
 
 <p>The HAProxy pod runs on the master OKD in this scenario.  Using <a href="https://github.com/skydive-project/skydive">skydive</a> we can see a TCP 8080 connection to nodejs eth1 interface exiting eth1 of the master.</p>
 
-<p><code class="highlighter-rouge">$ oc get pod -o wide -n default -l router=router</code></p>
+<p><code class="language-html highlighter-rouge">$ oc get pod -o wide -n default -l router=router</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME             READY     STATUS    RESTARTS   AGE       IP                NODE                     NOMINATED NODE
-router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.168.122.101.nip.io   &lt;none&gt;
-</code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>NAME             READY     STATUS    RESTARTS   AGE       IP                NODE                     NOMINATED NODE
+router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.168.122.101.nip.io   <span class="nt">&lt;none&gt;</span>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p><img src="/assets/images/skydive_haproxy_to_vm.png" alt="haproxy-vm" /></p>
 
@@ -760,6 +989,7 @@ router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.
     </div>
   </div>
 </div>
+<script src="/js/copy.js"></script>
 
     </footer>
 
