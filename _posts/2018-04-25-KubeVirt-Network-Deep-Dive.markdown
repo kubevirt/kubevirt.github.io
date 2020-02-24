@@ -580,7 +580,14 @@ Just quickly wanted to cat the `/etc/resolv.conf` file to show that DNS is confi
 
 The virtual machines are on differnet hosts. This was done purposely to show that connectivity between virtual machine and hosts. Here we finally get to use Skydive. The real-time topology below along with arrows annotate the flow of packets between the host, pod and virtual machine network devices.
 
-![vm-to-vm](/assets/images/kubevirt-skydive-vm-to-vm.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/kubevirt-skydive-vm-to-vm.png" itemprop="contentUrl" data-size="2496x2269">
+            <img src="/assets/images/kubevirt-skydive-vm-to-vm.png" width="249" height="226" itemprop="thumbnail" alt="VM to VM" />
+        </a>
+        <figcaption itemprop="caption description">VM to VM</figcaption>
+    </figure>
+</div>
 
 ### Connectivity Tests
 
@@ -618,8 +625,14 @@ After connecting to the nodejs virtual machine via ssh we can use `ss` to determ
 
 The topology image below shows the packet flow when using a ingress kubernetes object. The commands below the image will provide additional details.
 
-
-![skydive-ingress-path](/assets/images/skydive-ingress-path.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/skydive-ingress-path.png" itemprop="contentUrl" data-size="1461x960">
+            <img src="/assets/images/skydive-ingress-path.png" width="300" height="196" itemprop="thumbnail" alt="Ingress to VM" />
+        </a>
+        <figcaption itemprop="caption description">Ingress to VM</figcaption>
+    </figure>
+</div>
 
 The [kube-proxy](https://kubernetes.io/docs/reference/generated/kube-proxy/) has port 30000 open that was defined by the `nodePort` of the `ingress-nginx` service. Additional details on kube-proxy and iptables role is available from [Service - IPs and VIPs](https://kubernetes.io/docs/concepts/services-networking/service/#ips-and-vips) in the Kubernetes documentation.
 

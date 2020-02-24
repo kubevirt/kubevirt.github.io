@@ -426,7 +426,14 @@ between virtual machine and hosts. Here we finally get to use [Skydive](https://
 The real-time topology below along with
 arrows annotate the flow of packets between the host and virtual machine network devices.
 
-![vm-to-vm](/assets/images/skydive_vm_to_vm.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/skydive_vm_to_vm.png" itemprop="contentUrl" data-size="1601x589">
+            <img src="/assets/images/skydive_vm_to_vm.png" width="600" height="220" itemprop="thumbnail" alt="VM to VM" />
+        </a>
+        <figcaption itemprop="caption description">VM to VM</figcaption>
+    </figure>
+</div>
 
 ### Connectivity Tests
 
@@ -473,9 +480,14 @@ Finally let's confirm that when using the OKD route that traffic is successfully
 OKD HAProxy provides optional traffic status - which we already enabled. The screenshot below shows
 the requests that Nginx is receiving for `nodejs.ingress.virtomation.com`.
 
-
-![haproxy-stats](/assets/images/haproxy_stats.png)
-
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/haproxy_stats.png" itemprop="contentUrl" data-size="1642x449">
+            <img src="/assets/images/haproxy_stats.png" width="600" height="220" itemprop="thumbnail" alt="haproxy-stats" />
+        </a>
+        <figcaption itemprop="caption description">haproxy-stats</figcaption>
+    </figure>
+</div>
 
 ### HAProxy to NodeJS VM
 
@@ -488,4 +500,11 @@ NAME             READY     STATUS    RESTARTS   AGE       IP                NODE
 router-2-nfqr4   0/1       Running   0          20h       192.168.122.101   192.168.122.101.nip.io   <none>
 ```
 
-![haproxy-vm](/assets/images/skydive_haproxy_to_vm.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/skydive_haproxy_to_vm.png" itemprop="contentUrl" data-size="1601x438">
+            <img src="/assets/images/skydive_haproxy_to_vm.png" width="600" height="220" itemprop="thumbnail" alt="haproxy-vm" />
+        </a>
+        <figcaption itemprop="caption description">haproxy-vm</figcaption>
+    </figure>
+</div>
