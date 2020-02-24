@@ -51,3 +51,17 @@ exclude:
   - GUIDELINES.md
   - README.md
   - TODO.md
+
+tag_page_layout: tag
+tag_page_dir: /tag/
+
+kramdown:
+  input: GFM
+  syntax_highlighter_opts:
+    default_lang: html
+    css_class: 'highlight'
+    span:
+      line_numbers: false
+    block:
+      line_numbers: true
+      start_line: 1
