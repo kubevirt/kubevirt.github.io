@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="KubeVirt Autodeployer">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="gcp, autodeployer" >
     <meta property="og:title" content="Kubevirt Autolatest | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/kubevirt-autolatest.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: karmab</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/gcp">gcp</a>&nbsp;|&nbsp;<a href="/tag/autodeployer">autodeployer</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: December 13, 2018  </span>
             </div>
             <div>
@@ -239,14 +244,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <h1 id="how-to-easily-test-specific-versions-of-kubevirt-on-gcp">How to easily test specific versions of kubevirt on gcp</h1>
+          <h1 id="how-to-easily-test-specific-versions-of-kubevirt-on-gcp">How to easily test specific versions of KubeVirt on GCP</h1>
 
-<p>At kubevirt, we created cloud images on gcp and aws to ease evaluation of the project. It works fine, has a dedicated CI and is updated when new releases come out, but i wanted to go a little bit further and see if i could easily spawn a vm which would default to latest versions of the components, or that would allow me to test a given PR without focusing on deployment details</p>
+<p>At KubeVirt, we created cloud images on gcp and aws to ease evaluation of the project. It works fine, has a dedicated CI and is updated when new releases come out, but i wanted to go a little bit further and see if i could easily spawn a vm which would default to latest versions of the components, or that would allow me to test a given PR without focusing on deployment details</p>
 
-<h2 id="so-what-did-i-come-up-with">So What did i come up with</h2>
+<h2 id="so-what-did-i-come-up-with">So What did I come up with</h2>
 
 <p>the image is called <code class="language-html highlighter-rouge">autolatest</code> and can be found on <a href="https://console.cloud.google.com/storage/browser/kubevirt-button">Google Storage</a></p>
 
@@ -254,8 +260,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 or a free trial. You also need to make sure that you have a default keypair
 installed.</p>
 
-<p>From console.cloud.google.com, go to “Compute Engine”, “Images” and then click
-on “Create Image” or click this <a href="https://console.cloud.google.com/compute/imagesAdd?" target="_blank">link</a>.</p>
+<p>From <code class="language-html highlighter-rouge">console.cloud.google.com</code>, go to “Compute Engine”, “Images” and then click
+on “Create Image” or click this <a href="https://console.cloud.google.com/compute/imagesAdd?" target="\_blank">link</a>.</p>
 
 <p><img src="/assets/images/autodeployer/image.png" alt="screenshot0042" /></p>
 
@@ -281,7 +287,7 @@ Go to “Compute Engine”, then to “VM instances”, and then click on “Cre
   <li>a zone that supports the Haswell CPU Platform or newer (for nested virtualization to work), <code class="language-html highlighter-rouge">us-central1-b</code> for instance</li>
 </ul>
 
-<p>Under “boot disk”, select the image that you created above.</p>
+<p>Under <code class="language-html highlighter-rouge">boot disk</code>, select the image that you created above.</p>
 
 <p>If you want to use specific versions for any of the following components, create the corresponding metadata entry in Management/Metadata</p>
 
@@ -294,7 +300,7 @@ Go to “Compute Engine”, then to “VM instances”, and then click on “Cre
 
 <p><img src="/assets/images/autodeployer/metadata.png" alt="screenshot0042" /></p>
 
-<p>Now hit “Create” to start the instance.</p>
+<p>Now hit <code class="language-html highlighter-rouge">Create</code> to start the instance.</p>
 
 <p>Once vm is up, you should be able to connect and see through the presented banner which components got deployed</p>
 
@@ -303,7 +309,9 @@ Go to “Compute Engine”, then to “VM instances”, and then click on “Cre
 <p>When the vm boots, it executes a boot script which does the following:</p>
 
 <ul>
-  <li>Gather metadata for the following variables
+  <li>
+    <p>Gather metadata for the following variables</p>
+
     <ul>
       <li>k8s_version</li>
       <li>flannel_version</li>
@@ -314,7 +322,8 @@ Go to “Compute Engine”, then to “VM instances”, and then click on “Cre
   <li>
     <p>If those metadata variables are not set, rely on values fetched from this <a href="https://github.com/karmab/kubevirt-autodeployer/blob/master/versions.sh">url</a></p>
   </li>
-  <li>Once those variables are set, the corresponding elements are deployed.
+  <li>
+    <p>Once those variables are set, the corresponding elements are deployed.</p>
     <ul>
       <li>When latest or a PR number is specified for one of the components, we gather the corresponding latest release tag from the product repo and use it to deploy</li>
       <li>When master or a number is specified for kubevirt, we build containers from source and deploy kubevirt with them</li>

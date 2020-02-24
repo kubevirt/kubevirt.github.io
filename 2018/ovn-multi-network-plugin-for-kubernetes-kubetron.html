@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="OVN Multi-Network Plugin for Kubernetes, Kubetron">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="ovn, kubetron, network, neutron" >
     <meta property="og:title" content="Ovn Multi Network Plugin For Kubernetes Kubetron | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/ovn-multi-network-plugin-for-kubernetes-kubetron.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: phoracek</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/ovn">ovn</a>&nbsp;|&nbsp;<a href="/tag/kubetron">kubetron</a>&nbsp;|&nbsp;<a href="/tag/network">network</a>&nbsp;|&nbsp;<a href="/tag/neutron">neutron</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: May 16, 2018  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: uncategorized
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -311,11 +317,11 @@ kubectl get networks
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">network-consumer</span>
   <span class="na">annotations</span><span class="pi">:</span>
-    <span class="s">kubernetes.v1.cni.cncf.io/networks</span><span class="pi">:</span> <span class="s">red</span>  <span class="c1"># requested networks</span>
+    <span class="s">kubernetes.v1.cni.cncf.io/networks</span><span class="pi">:</span> <span class="s">red</span> <span class="c1"># requested networks</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">containers</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">busybox</span>
-    <span class="na">image</span><span class="pi">:</span> <span class="s">busybox</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">busybox</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">busybox</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="access-the-network-from-the-pod">Access the Network from the pod</h3>

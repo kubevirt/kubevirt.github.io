@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Federated KubeVirt">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="federation, kubefed, multicluster" >
     <meta property="og:title" content="Federated Kubevirt | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/federated-kubevirt.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: karmab</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/federation">federation</a>&nbsp;|&nbsp;<a href="/tag/kubefed">kubefed</a>&nbsp;|&nbsp;<a href="/tag/multicluster">multicluster</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: February 22, 2019  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -257,7 +263,7 @@ clusters.</p>
 
 <h2 id="federated-kubevirt-deployment">Federated KubeVirt Deployment</h2>
 
-<p>We create kubevirt namespace on first cluster:</p>
+<p>We create KubeVirt namespace on first cluster:</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>kubectl create ns kubevirt
@@ -278,13 +284,14 @@ clusters.</p>
 </pre></td><td class="rouge-code"><pre>kubefed2 enable ClusterRoleBinding
 kubefed2 enable CustomResourceDefinition
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>And <a href="/assets/2019-02-22-federated-kubevirt/federated_kubevirt-operator.yaml">federated kubevirt</a> itself, with placements so that it gets deployed at both sites.</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>kubectl create -f federated_kubevirt-operator.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>This gets kubevirt operator deployed at both sites, which creates the Custom Resource definition <em>KubeVirt</em>. We then deploy kubevirt by federating this CRD and creates <a href="/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml">an instance of it</a>.</p>
+<p>This gets KubeVirt operator deployed at both sites, which creates the Custom Resource definition <em>KubeVirt</em>. We then deploy kubevirt by federating this CRD and creates <a href="/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml">an instance of it</a>.</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -340,7 +347,7 @@ virt-handler-bldss                 1/1       Running   0          3m
 virt-operator-67c86544f7-zz5jc     1/1       Running   0          5m
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Now that kubevirt is up and created its own custom resource types, we federate them:</p>
+<p>Now that KubeVirt is up and created its own custom resource types, we federate them:</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2

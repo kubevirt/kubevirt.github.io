@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Hello KubeVirt on MiniKube">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="kvm, minikube, qemu" >
     <meta property="og:title" content="Hello Kubevirt On Minikube | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/Hello-KubeVirt-on-Minikube.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: mhenriks</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kvm">kvm</a>&nbsp;|&nbsp;<a href="/tag/minikube">minikube</a>&nbsp;|&nbsp;<a href="/tag/qemu">qemu</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: June 20, 2018  </span>
             </div>
             <div>
@@ -239,15 +244,17 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: uncategorized
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <p>In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt.  We will also go through the process of installing <a href="https://kubernetes.io/docs/setup/minikube/">Minikube</a> and KubeVirt on a Fedora 28 workstation.</p>
+          <p>In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt. We will also go through the process of installing <a href="https://kubernetes.io/docs/setup/minikube/">Minikube</a> and KubeVirt on a Fedora 28 workstation.</p>
 
 <!-- more -->
+
 <h2 id="install-kvm">Install KVM</h2>
 
-<p>MiniKube will create a single node Kubernetes cluster in a KVM virtual machine on our Fedora host.  KVM is also the virtualization technology used by KubeVirt so we have to make sure that the host is configured to support nested virtual machines.  Fedora does not have that feature enabled by default.</p>
+<p>MiniKube will create a single node Kubernetes cluster in a KVM virtual machine on our Fedora host. KVM is also the virtualization technology used by KubeVirt so we have to make sure that the host is configured to support nested virtual machines. Fedora does not have that feature enabled by default.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -279,7 +286,7 @@ Y
 
 <h2 id="install-kvm2-driver-for-minikube">Install KVM2 driver for Minikube</h2>
 
-<p>Minikube requires a special driver to manage Docker Machine VMs running in KVM.  KVM2 is the latest iteration of the driver.  Read more about it <a href="https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver">here</a></p>
+<p>Minikube requires a special driver to manage Docker Machine VMs running in KVM. KVM2 is the latest iteration of the driver. Read more about it <a href="https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver">here</a></p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -289,7 +296,7 @@ Y
 
 <h2 id="install-minikube">Install Minikube</h2>
 
-<p>Minikube is responsible for creating and managing a local single-node Kubernetes cluster.  It is installed as a single executable.</p>
+<p>Minikube is responsible for creating and managing a local single-node Kubernetes cluster. It is installed as a single executable.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -305,7 +312,7 @@ Y
 
 <h2 id="install-kubectl">Install kubectl</h2>
 
-<p>Now that we have a Kubernetes cluster running, we need some way to communicate with it.  That is where the kubectl CLI comes in.</p>
+<p>Now that we have a Kubernetes cluster running, we need some way to communicate with it. That is where the kubectl CLI comes in.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -325,7 +332,7 @@ NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT<span class="o">(</span>
 kubernetes   ClusterIP   10.96.0.1    &lt;none&gt;        443/TCP   5m
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>You may be wondering how kubectl knows where to look for the Kubernetes API endpoint.  <code class="language-html highlighter-rouge">minikube start</code> actually takes care of creating the kubectl configuration file.  Take a look at <code class="language-html highlighter-rouge">~/.kube/config</code></p>
+<p>You may be wondering how kubectl knows where to look for the Kubernetes API endpoint. <code class="language-html highlighter-rouge">minikube start</code> actually takes care of creating the kubectl configuration file. Take a look at <code class="language-html highlighter-rouge">~/.kube/config</code></p>
 
 <h2 id="deploy-kubevirt">Deploy KubeVirt</h2>
 
@@ -389,7 +396,7 @@ kube-system   virt-handler-f7str                      1/1	Running   0          2
 
 <h2 id="create-a-vm">Create a VM</h2>
 
-<p>Apply manifest for VM.  If you’re curious, download the manifest file locally and take a look.</p>
+<p>Apply manifest for VM. If you’re curious, download the manifest file locally and take a look.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -402,7 +409,7 @@ kube-system   virt-handler-f7str                      1/1	Running   0          2
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
 
 <span class="c"># check that VM successfully created</span>
-<span class="nv">$ </span>kubectl get vms 
+<span class="nv">$ </span>kubectl get vms
 NAME      AGE
 testvm    7s
 <span class="c"># for more detailed info, run</span>
@@ -438,9 +445,10 @@ testvm    4s
 <span class="c"># for more detailed info</span>
 <span class="nv">$ </span>kubectl get vmis <span class="nt">-o</span> yaml testvm
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <h2 id="connect-to-vm">Connect to VM</h2>
 
-<p>The VM is running CirrOS, which is “a Tiny OS that specializes in running on a cloud.”  Don’t expect anything fancy.  Look <a href="https://launchpad.net/cirros">here</a> for more info on CirrOS</p>
+<p>The VM is running CirrOS, which is “a Tiny OS that specializes in running on a cloud.” Don’t expect anything fancy. Look <a href="https://launchpad.net/cirros">here</a> for more info on CirrOS</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -457,6 +465,7 @@ testvm    4s
 <span class="c"># 'exit' to logout</span>
 <span class="c"># quit virtctl by providing escape sequence '^]</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <h2 id="stop-a-vm">Stop a VM</h2>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -476,6 +485,7 @@ testvm    4s
 <span class="nv">$ </span>kubectl get vmis
 No resources found.
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <h2 id="delete-a-vm">Delete a VM</h2>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1

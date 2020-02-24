@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="This post describes how to import, clone and upload a Virtual Machine disk image to kubernetes cluster.">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="import, clone, upload, virtual machine, disk image, cdi" >
     <meta property="og:title" content="Containerized Data Importer | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/containerized-data-importer.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: tavni</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/import">import</a>&nbsp;|&nbsp;<a href="/tag/clone">clone</a>&nbsp;|&nbsp;<a href="/tag/upload">upload</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/disk-image">disk image</a>&nbsp;|&nbsp;<a href="/tag/cdi">cdi</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: October 9, 2018  </span>
             </div>
             <div>
@@ -239,10 +244,12 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
           <h1 id="introduction">Introduction</h1>
+
 <p>Containerized Data Importer (CDI) is a utility to import, upload and clone Virtual Machine images for use with <a href="https://github.com/kubevirt/kubevirt">KubeVirt</a>. At a high level, a persistent volume claim (PVC), which defines VM-suitable storage via a storage class, is created.</p>
 
 <p>A custom controller watches for specific annotation on the persistent volume claim, and when discovered, starts an import, upload or clone process. The status of the each process is reflected in an additional annotation on the associated claim, and when the process completes KubeVirt can create the VM based on the new image.</p>
@@ -261,6 +268,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>For an in depth look at the system and workflow, see the <a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design">Design</a> documentation.</p>
 
 <h1 id="data-format">Data Format</h1>
+
 <p>The Containerized Data Importer is capable of performing certain functions that streamline its use with KubeVirt. It automatically decompresses gzip and xz files, and un-tar’s tar archives. Also, qcow2 images are converted into the raw format which is required by KubeVirt, resulting in the final file being a simple .img file.</p>
 
 <p>Supported file formats are:</p>
@@ -277,7 +285,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Note: CDI also supports combinations of these formats such as gzipped tar archives, gzipped raw images, etc.</p>
 
 <h1 id="deploying-cdi">Deploying CDI</h1>
+
 <h2 id="assumptions">Assumptions</h2>
+
 <ul>
   <li>A running Kubernetes cluster that is capable of binding PVCs to dynamically or statically provisioned PVs.</li>
   <li>A storage class and provisioner (only for dynamically provisioned PVs).</li>
@@ -286,14 +296,21 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </ul>
 
 <h2 id="deploy-cdi-from-a-release">Deploy CDI from a release</h2>
+
 <p>Deploying the CDI controller is straight forward. In this document the default namespace is used, but in a production setup a <a href="https://github.com/kubevirt/containerized-data-importer#protecting-the-golden-image-namespace">protected namespace</a> that is inaccessible to regular users should be used instead.</p>
 
-<p>1) Ensure that the cdi-sa service account has proper authority to run privileged containers, typically in a kube environment this is true by default. If you are running an openshift variation of kubernetes you may need to enable privileged containers in the security context:</p>
+<ol>
+  <li>Ensure that the cdi-sa service account has proper authority to run privileged containers, typically in a kube environment this is true by default. If you are running an openshift variation of kubernetes you may need to enable privileged containers in the security context:</li>
+</ol>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc adm policy add-scc-to-user privileged <span class="nt">-z</span> cdi-sa
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>2) Deploy the controller from the release manifest:</p>
+<ol>
+  <li>Deploy the controller from the release manifest:</li>
+</ol>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ VERSION</span><span class="o">=</span>&lt;cdi version&gt;
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -303,15 +320,20 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="deploy-cdi-using-a-template">Deploy CDI using a template</h2>
+
 <p>By default when using manifests/generated/cdi-controller.yaml CDI will deploy into the kube-system namespace using default settings. You can customize the deployment by using the generated manifests/generated/cdi-controller.yaml.j2 jinja2 template. This allows you to alter the install namespace, docker image repo, docker image tags, etc. To deploy using the template follow these steps:</p>
 
-<p>1) Install j2cli:</p>
+<ol>
+  <li>Install j2cli:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>pip <span class="nb">install </span>j2cli
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>2) Install CDI:</p>
+<ol>
+  <li>Install CDI:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -330,35 +352,43 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Check the template file and make sure to supply values for all variables.</p>
 
 <p>Notes:</p>
+
 <ul>
   <li>The default verbosity level is set to 1 in the controller deployment file, which is minimal logging. If greater details are desired increase the -v number to 2 or 3.</li>
   <li>The importer pod uses the same logging verbosity as the controller. If a different level of logging is required after the controller has been started, the deployment can be edited and applied by using kubectl apply -f <CDI-MANIFEST>. This will not alter the running controller's logging level but will affect importer pods created after the change. To change the running controller's log level requires it to be restarted after the deployment has been edited.</CDI-MANIFEST></li>
 </ul>
 
 <h1 id="download-cdi">Download CDI</h1>
+
 <p>There are few ways to download CDI through command line:</p>
 
 <ul>
-  <li>git clone command:
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+  <li>git clone command:</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>git clone https://github.com/kubevirt/containerized-data-importer.git <span class="nv">$GOPATH</span>/src/kubevirt.io/containerized-data-importer
-</pre></td></tr></tbody></table></code></pre></div>    </div>
-  </li>
-  <li>download only the yamls:
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<ul>
+  <li>download only the yamls:</li>
+</ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">mkdir </span>cdi-manifests <span class="o">&amp;&amp;</span> <span class="nb">cd </span>cdi-manifests
 <span class="nv">$ </span>wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/kubevirt-centric-readme/manifests/example/golden-pvc.yaml
 <span class="nv">$ </span>wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/kubevirt-centric-readme/manifests/example/endpoint-secret.yaml
-</pre></td></tr></tbody></table></code></pre></div>    </div>
-  </li>
-  <li>go get command:
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>go get kubevirt.io/containerized-data-importer
-</pre></td></tr></tbody></table></code></pre></div>    </div>
-  </li>
+</pre></td></tr></tbody></table></code></pre></div></div>
+
+<ul>
+  <li>go get command:</li>
 </ul>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>go get kubevirt.io/containerized-data-importer
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="start-importing-images">Start Importing Images</h1>
 
@@ -389,17 +419,19 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <span class="na">labels</span><span class="pi">:</span>
     <span class="na">app</span><span class="pi">:</span> <span class="s">containerized-data-importer</span>
   <span class="na">annotations</span><span class="pi">:</span>
-    <span class="s">cdi.kubevirt.io/storage.import.endpoint</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"</span>  <span class="c1"># Required. Format: (http||s3)://www.myUrl.com/path/of/data</span>
+    <span class="s">cdi.kubevirt.io/storage.import.endpoint</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"</span> <span class="c1"># Required. Format: (http||s3)://www.myUrl.com/path/of/data</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">accessModes</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
   <span class="na">resources</span><span class="pi">:</span>
     <span class="na">requests</span><span class="pi">:</span>
       <span class="na">storage</span><span class="pi">:</span> <span class="s">10Gi</span>
   <span class="c1"># Optional: Set the storage class or omit to accept the default</span>
   <span class="c1"># storageClassName: local</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Edit the PVC above -</p>
+
 <ul>
   <li>cdi.kubevirt.io/storage.import.endpoint: The full URL to the VM image in the format of: http://www.myUrl.com/path/of/data or s3://bucketName/fileName.</li>
   <li>storageClassName: The default StorageClass will be used if not set. Otherwise, set to a desired StorageClass.</li>
@@ -409,29 +441,38 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="deploy-the-manifest-yaml-files">Deploy the manifest yaml files</h2>
 
-<p>1) Create the persistent volume claim to trigger the import process:</p>
+<ol>
+  <li>Create the persistent volume claim to trigger the import process:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; create <span class="nt">-f</span> golden-pvc.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>2) (Optional) Monitor the cdi-controller:</p>
+<ol>
+  <li>(Optional) Monitor the cdi-controller:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;CDI-NAMESPACE&gt; logs cdi-deployment-&lt;RANDOM&gt;
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>3) (Optional )Monitor the importer pod:</p>
+<ol>
+  <li>(Optional )Monitor the importer pod:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; logs importer-&lt;PVC-NAME&gt; <span class="c"># pvc name is shown in controller log</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>4) Verify the import is completed by checking the following annotation value:</p>
+<ol>
+  <li>Verify the import is completed by checking the following annotation value:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; get pvc golden-pvc.yaml <span class="nt">-o</span> yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>annotation to verify - cdi.kubevirt.io/storage.pod.phase: Succeeded</p>
 
 <h1 id="start-cloning-disk-image">Start cloning disk image</h1>
@@ -467,7 +508,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
 
 <h2 id="create-a-pvc-yaml-file-named-target-pvcyaml">Create a PVC yaml file named target-pvc.yaml</h2>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -482,24 +523,25 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
 13
 14
 15
-</pre></td><td class="rouge-code"><pre>apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: "target-pvc"
-  namespace: "target-ns"
-  labels:
-    app: Host-Assisted-Cloning
-  annotations:
-    k8s.io/CloneRequest: "source-ns/golden-pvc"
-spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 10Gi
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">target-pvc"</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s2">"</span><span class="s">target-ns"</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">Host-Assisted-Cloning</span>
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="s">k8s.io/CloneRequest</span><span class="pi">:</span> <span class="s2">"</span><span class="s">source-ns/golden-pvc"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">10Gi</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Edit the PVC above -</p>
+
 <ul>
   <li>k8s.io/CloneRequest: The name of the PVC we copy the image from (including its namespace). For example: “source-ns/golden-pvc”.</li>
   <li>add the name of the storage class which defines volumeBindingMode per above. Note, this is not required in Kubernetes 1.10 and later.</li>
@@ -507,19 +549,25 @@ spec:
 
 <h2 id="deploy-the-manifest-yaml-files-1">Deploy the manifest yaml files</h2>
 
-<p>1) (Optional) Create the namespace where the target PVC will be deployed:</p>
+<ol>
+  <li>(Optional) Create the namespace where the target PVC will be deployed:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create ns &lt;TARGET-NAMESPACE&gt;
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>2) Deploy the target PVC:</p>
+<ol>
+  <li>Deploy the target PVC:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; create <span class="nt">-f</span> target-pvc.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>3) (Optional) Monitor the cloning pods:</p>
+<ol>
+  <li>(Optional) Monitor the cloning pods:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;SOURCE-NAMESPACE&gt; logs &lt;clone-source-pod-name&gt;
@@ -529,7 +577,9 @@ spec:
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; logs &lt;clone-target-pod-name&gt;
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>4) Check the target PVC for ‘k8s.io/CloneOf’ annotation:</p>
+<ol>
+  <li>Check the target PVC for ‘k8s.io/CloneOf’ annotation:</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; get pvc &lt;target-pvc-name&gt; <span class="nt">-o</span> yaml
@@ -565,7 +615,7 @@ spec:
     <span class="s">cdi.kubevirt.io/storage.upload.target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">accessModes</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
   <span class="na">resources</span><span class="pi">:</span>
     <span class="na">requests</span><span class="pi">:</span>
       <span class="na">storage</span><span class="pi">:</span> <span class="s">1Gi</span>
@@ -591,19 +641,25 @@ spec:
 
 <h2 id="upload-an-image">Upload an image</h2>
 
-<p>1) deploy the upload-pvc</p>
+<ol>
+  <li>deploy the upload-pvc</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> upload-pvc.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>2) Request for upload token</p>
+<ol>
+  <li>Request for upload token</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ TOKEN</span><span class="o">=</span><span class="si">$(</span>kubectl apply <span class="nt">-f</span> upload-token.yaml <span class="nt">-o</span><span class="o">=</span><span class="s2">"jsonpath={.status.token}"</span><span class="si">)</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>3) Upload the image</p>
+<ol>
+  <li>Upload the image</li>
+</ol>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="nt">--insecure</span> <span class="nt">-H</span> <span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span> <span class="nt">--data-binary</span> @tests/images/cirros-qcow2.img https://<span class="si">$(</span>minikube ip<span class="si">)</span>:31001/v1alpha1/upload
@@ -639,8 +695,10 @@ spec:
     <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>NOTE: .storageclass.storage.k8s.io/persistentvolumeclaims: “0” would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-html highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "0"</code> would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
 
+
+</div></div>
 <ul>
   <li>Open Up StorageClass Usage for Namespace:</li>
 </ul>
@@ -661,7 +719,10 @@ spec:
     <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">500Gi"</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>NOTE: .storageclass.storage.k8s.io/persistentvolumeclaims: “4” could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-html highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "4"</code> could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>
+
+
+</div></div>
 
         </article>
         

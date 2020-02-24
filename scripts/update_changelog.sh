@@ -42,6 +42,7 @@ comments: true
 title: KubeVirt $REL
 pub-date: July 23
 pub-year: 2018
+tags: [release notes, changelog]
 ---
 
 EOF
@@ -67,5 +68,5 @@ EOF
 gen_changelog
 
 for file in build/artifacts/*.markdown; do
-[ -f _posts/$(basename $file) ] || mv $file _posts/
+[ -f _posts/$(basename $file) ] || mv $file _posts/releases/
 done

@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="In this blogpost a Virtual Machine is created to install Microsoft Windows in KubeVirt from an ISO following the traditional way.">
-    <meta name="keywords" content="kubevirt, kubernetes, virtual machine, microsoft windows kubernetes, microsoft windows container" >
+    <meta name="keywords" content="kubevirt, kubernetes, virtual machine, microsoft windows kubernetes, microsoft windows container, windows" >
     <meta property="og:title" content="KubeVirt: installing Microsoft Windows from an ISO | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: Pedro Ibáñez Requena</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/microsoft-windows-kubernetes">microsoft windows kubernetes</a>&nbsp;|&nbsp;<a href="/tag/microsoft-windows-container">microsoft windows container</a>&nbsp;|&nbsp;<a href="/tag/windows">windows</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: February 14, 2020  </span>
             </div>
             <div>
@@ -239,10 +244,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <p>Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, 
+          <p>Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt,
 but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?</p>
 
 <p>In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.</p>
@@ -288,45 +294,46 @@ but what if you want to follow the traditional way of installing a VM using an e
 21
 22
 23
-</pre></td><td class="rouge-code"><pre> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
- <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
- <span class="na">metadata</span><span class="pi">:</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
- <span class="na">spec</span><span class="pi">:</span>
-   <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
-   <span class="na">template</span><span class="pi">:</span>
-     <span class="na">metadata</span><span class="pi">:</span>
-       <span class="na">labels</span><span class="pi">:</span>
-         <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
-     <span class="na">spec</span><span class="pi">:</span>
-       <span class="na">domain</span><span class="pi">:</span>
-         <span class="na">cpu</span><span class="pi">:</span>
-           <span class="na">cores</span><span class="pi">:</span> <span class="m">4</span>
-         <span class="na">devices</span><span class="pi">:</span>
-     <span class="s">...</span>
-         <span class="s">machine</span><span class="pi">:</span>
-           <span class="na">type</span><span class="pi">:</span> <span class="s">q35</span>
-         <span class="na">resources</span><span class="pi">:</span>
-           <span class="na">requests</span><span class="pi">:</span>
-             <span class="na">memory</span><span class="pi">:</span> <span class="s">8G</span>
-       <span class="na">volumes</span><span class="pi">:</span>
-     <span class="s">...</span>
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">cpu</span><span class="pi">:</span>
+          <span class="na">cores</span><span class="pi">:</span> <span class="m">4</span>
+        <span class="na">devices</span><span class="pi">:</span>
+    <span class="s">...</span>
+        <span class="s">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s">q35</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">8G</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+    <span class="s">...</span>
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>
     <p>A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the <code class="language-html highlighter-rouge">virtctl</code> command when uploading the file</p>
 
     <p>First thing here is to download the ISO file of the Microsoft Windows, for that the <a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2">Microsoft Evaluation Center</a> offers
- the ISO files to download for evaluation purposes:</p>
+the ISO files to download for evaluation purposes:</p>
 
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png" alt="win2k12_download_iso.png" title="KubeVirt Microsoft Windows iso download" /></p>
 
-    <p>To be able to start the evaluation some personal data has to be filled in. Afterwards, the architecture to be checked is “64 bit” and the language selected as shown in 
- the following picture:</p>
+    <p>To be able to start the evaluation some personal data has to be filled in. Afterwards, the architecture to be checked is “64 bit” and the language selected as shown in
+the following picture:</p>
 
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png" alt="win2k12_download_iso_64.png" title="KubeVirt Microsoft Windows iso download" /></p>
 
     <p>Once the ISO file is downloaded it has to be uploaded with <code class="language-html highlighter-rouge">virtctl</code>, the parameters used in this example are the following:</p>
+
     <ul>
       <li><code class="language-html highlighter-rouge">image-upload</code>: Upload a VM image to a PersistentVolumeClaim</li>
       <li><code class="language-html highlighter-rouge">--image-path</code>: The path of the ISO file</li>
@@ -337,13 +344,13 @@ but what if you want to follow the traditional way of installing a VM using an e
     </ul>
 
     <div class="premonition info">
- <div class="fa fa-check-square"></div>
- <div class="content"><p class="header">Information</p>
- <p>
- To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service. 
- </p>
- </div>
- </div>
+<div class="fa fa-check-square"></div>
+<div class="content"><p class="header">Information</p>
+<p>
+To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service.
+</p>
+</div>
+</div>
 
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -379,7 +386,9 @@ but what if you want to follow the traditional way of installing a VM using an e
  <span class="nt">--wait-secs</span><span class="o">=</span>240
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="language-html highlighter-rouge">winhd</code> and the space requested is 15Gi:
+  <li>
+    <p>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="language-html highlighter-rouge">winhd</code> and the space requested is 15Gi:</p>
+
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -391,26 +400,29 @@ but what if you want to follow the traditional way of installing a VM using an e
 9
 10
 11
-</pre></td><td class="rouge-code"><pre> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
- <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
- <span class="na">metadata</span><span class="pi">:</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">winhd</span>
- <span class="na">spec</span><span class="pi">:</span>
-   <span class="na">accessModes</span><span class="pi">:</span>
-     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
- <span class="na">resources</span><span class="pi">:</span>
-   <span class="na">requests</span><span class="pi">:</span>
-     <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
- <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">winhd</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+<span class="na">resources</span><span class="pi">:</span>
+  <span class="na">requests</span><span class="pi">:</span>
+    <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+<span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>A <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers">container with the virtio drivers</a> attached as a CDROM to the VM. 
- The container image has to be pulled to have it available in the local registry.
+  <li>
+    <p>A <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers">container with the virtio drivers</a> attached as a CDROM to the VM.
+The container image has to be pulled to have it available in the local registry.</p>
+
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
 </pre></td></tr></tbody></table></code></pre></div>    </div>
 
     <p>And also it has to be referenced in the VM YAML, in this example the name for the <code class="language-html highlighter-rouge">containerDisk</code> is <code class="language-html highlighter-rouge">virtiocontainerdisk</code>.</p>
+
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -418,16 +430,17 @@ but what if you want to follow the traditional way of installing a VM using an e
 5
 6
 7
-</pre></td><td class="rouge-code"><pre> <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-     <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
- <span class="s">...</span>
- <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-     <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
+</pre></td><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
+<span class="nn">---</span>
+<span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+    <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
 </pre></td></tr></tbody></table></code></pre></div>    </div>
 
     <p>If the pre-requisites are fullfilled, the final YAML (<a href="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml">win2k12.yml</a>), will look like:</p>
+
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -481,59 +494,59 @@ but what if you want to follow the traditional way of installing a VM using an e
 51
 52
 53
-</pre></td><td class="rouge-code"><pre> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
- <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
- <span class="na">metadata</span><span class="pi">:</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">winhd</span>
- <span class="na">spec</span><span class="pi">:</span>
-   <span class="na">accessModes</span><span class="pi">:</span>
-     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
-   <span class="na">resources</span><span class="pi">:</span>
-     <span class="na">requests</span><span class="pi">:</span>
-       <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
-   <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">winhd</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
 
- <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
- <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
- <span class="na">metadata</span><span class="pi">:</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
- <span class="na">spec</span><span class="pi">:</span>
-   <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
-   <span class="na">template</span><span class="pi">:</span>
-     <span class="na">metadata</span><span class="pi">:</span>
-       <span class="na">labels</span><span class="pi">:</span>
-         <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
-     <span class="na">spec</span><span class="pi">:</span>
-       <span class="na">domain</span><span class="pi">:</span>
-         <span class="na">cpu</span><span class="pi">:</span>
-           <span class="na">cores</span><span class="pi">:</span> <span class="m">4</span>
-         <span class="na">devices</span><span class="pi">:</span>
-           <span class="na">disks</span><span class="pi">:</span>
-           <span class="pi">-</span> <span class="na">bootOrder</span><span class="pi">:</span> <span class="m">1</span>
-             <span class="na">cdrom</span><span class="pi">:</span>
-               <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
-             <span class="na">name</span><span class="pi">:</span> <span class="s">cdromiso</span>
-           <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-               <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-             <span class="na">name</span><span class="pi">:</span> <span class="s">harddrive</span>
-           <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
-               <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
-             <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
-         <span class="na">machine</span><span class="pi">:</span>
-           <span class="na">type</span><span class="pi">:</span> <span class="s">q35</span>
-         <span class="na">resources</span><span class="pi">:</span>
-           <span class="na">requests</span><span class="pi">:</span>
-             <span class="na">memory</span><span class="pi">:</span> <span class="s">8G</span>
-       <span class="na">volumes</span><span class="pi">:</span>
-       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cdromiso</span>
-         <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
-           <span class="na">claimName</span><span class="pi">:</span> <span class="s">iso-win2k12</span>
-       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">harddrive</span>
-         <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
-           <span class="na">claimName</span><span class="pi">:</span> <span class="s">winhd</span>
-       <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-           <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
-         <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">win2k12-iso</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">cpu</span><span class="pi">:</span>
+          <span class="na">cores</span><span class="pi">:</span> <span class="m">4</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">bootOrder</span><span class="pi">:</span> <span class="m">1</span>
+            <span class="na">cdrom</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">cdromiso</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">harddrive</span>
+          <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s">q35</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">8G</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cdromiso</span>
+        <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+          <span class="na">claimName</span><span class="pi">:</span> <span class="s">iso-win2k12</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">harddrive</span>
+        <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+          <span class="na">claimName</span><span class="pi">:</span> <span class="s">winhd</span>
+      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
 </ol>
@@ -543,6 +556,7 @@ but what if you want to follow the traditional way of installing a VM using an e
 
 </div></div>
 <h2 id="installation">Installation</h2>
+
 <p>To proceed with the installation the commands commented above are going to be executed:</p>
 
 <ol>
@@ -566,83 +580,94 @@ but what if you want to follow the traditional way of installing a VM using an e
 15
 16
 17
-</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
- <span class="nt">--image-path</span><span class="o">=</span>/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO <span class="se">\</span>
- <span class="nt">--pvc-name</span><span class="o">=</span>iso-win2k12 <span class="se">\</span>
- <span class="nt">--access-mode</span><span class="o">=</span>ReadOnlyMany <span class="se">\</span>
- <span class="nt">--pvc-size</span><span class="o">=</span>5G <span class="se">\</span>
- <span class="nt">--uploadproxy-url</span><span class="o">=</span>https://10.96.164.35:443 <span class="se">\</span>
- <span class="nt">--insecure</span> <span class="se">\</span>
- <span class="nt">--wait-secs</span><span class="o">=</span>240
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
+<span class="nt">--image-path</span><span class="o">=</span>/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO <span class="se">\</span>
+<span class="nt">--pvc-name</span><span class="o">=</span>iso-win2k12 <span class="se">\</span>
+<span class="nt">--access-mode</span><span class="o">=</span>ReadOnlyMany <span class="se">\</span>
+<span class="nt">--pvc-size</span><span class="o">=</span>5G <span class="se">\</span>
+<span class="nt">--uploadproxy-url</span><span class="o">=</span>https://10.96.164.35:443 <span class="se">\</span>
+<span class="nt">--insecure</span> <span class="se">\</span>
+<span class="nt">--wait-secs</span><span class="o">=</span>240
 
- DataVolume default/iso-win2k12 created
- Waiting <span class="k">for </span>PVC iso-win2k12 upload pod to be ready...
- Pod now ready
- Uploading data to https://10.96.164.35:443
+DataVolume default/iso-win2k12 created
+Waiting <span class="k">for </span>PVC iso-win2k12 upload pod to be ready...
+Pod now ready
+Uploading data to https://10.96.164.35:443
 
- 4.23 GiB / 4.23 GiB <span class="o">[=======================================================================================================================================================================]</span> 100.00% 1m21s
+4.23 GiB / 4.23 GiB <span class="o">[=======================================================================================================================================================================]</span> 100.00% 1m21s
 
- Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO completed successfully
+Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO completed successfully
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>Pulling the <code class="language-html highlighter-rouge">virtio</code> container image to the locally:
+  <li>
+    <p>Pulling the <code class="language-html highlighter-rouge">virtio</code> container image to the locally:</p>
+
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
 5
 6
-</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
- Using default tag: latest
- Trying to pull repository docker.io/kubevirt/virtio-container-disk ... 
- latest: Pulling from docker.io/kubevirt/virtio-container-disk
- Digest: sha256:7e5449cb6a4a9586a3cd79433eeaafd980cb516119c03e499492e1e37965fe82
- Status: Image is up to <span class="nb">date </span><span class="k">for </span>docker.io/kubevirt/virtio-container-disk:latest
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
+Using default tag: latest
+Trying to pull repository docker.io/kubevirt/virtio-container-disk ...
+latest: Pulling from docker.io/kubevirt/virtio-container-disk
+Digest: sha256:7e5449cb6a4a9586a3cd79433eeaafd980cb516119c03e499492e1e37965fe82
+Status: Image is up to <span class="nb">date </span><span class="k">for </span>docker.io/kubevirt/virtio-container-disk:latest
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>Creating the PVC and Virtual Machine definitions:
+  <li>
+    <p>Creating the PVC and Virtual Machine definitions:</p>
+
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
-</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>kubectl create <span class="nt">-f</span> win2k12.yml
- virtualmachine.kubevirt.io/win2k12-iso configured
- persistentvolumeclaim/winhd created
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create <span class="nt">-f</span> win2k12.yml
+virtualmachine.kubevirt.io/win2k12-iso configured
+persistentvolumeclaim/winhd created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>Starting the Virtual Machine Instance:
+  <li>
+    <p>Starting the Virtual Machine Instance:</p>
+
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
 5
 6
-</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl start win2k12-iso
- VM win2k12-iso was scheduled to start
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl start win2k12-iso
+VM win2k12-iso was scheduled to start
 
- <span class="nv">$ </span>kubectl get vmi
- NAME          AGE   PHASE     IP            NODENAME
- win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
+<span class="nv">$ </span>kubectl get vmi
+NAME          AGE   PHASE     IP            NODENAME
+win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
-  <li>Once the status of the VMI is <code class="language-html highlighter-rouge">RUNNING</code> it’s time to connect using VNC:
+  <li>
+    <p>Once the status of the VMI is <code class="language-html highlighter-rouge">RUNNING</code> it’s time to connect using VNC:</p>
+
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre> <span class="nv">$ </span>virtctl vnc win2k12-iso
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl vnc win2k12-iso
 </pre></td></tr></tbody></table></code></pre></div>    </div>
+
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png" alt="windows2k12_install.png" title="KubeVirt Microsoft Windows installation" /></p>
 
-    <p>Here is important to comment that to be able to connect through VNC using <code class="language-html highlighter-rouge">virtctl</code> it’s necessary to reach the Kubernetes API. 
- The following video shows how to go through the Microsoft Windows installation process:</p>
+    <p>Here is important to comment that to be able to connect through VNC using <code class="language-html highlighter-rouge">virtctl</code> it’s necessary to reach the Kubernetes API.
+The following video shows how to go through the Microsoft Windows installation process:</p>
+
     <figure class="video_container">
- <video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" width="800" height="600">
-     <source src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" type="video/mp4" />
- </video>
- </figure>
+<video controls="true" allowfullscreen="true" poster="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" width="800" height="600">
+    <source src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4" type="video/mp4" />
+</video>
+</figure>
   </li>
 </ol>
 
 <p>Once the Virtual Machine is created, the PVC with the ISO and the <code class="language-html highlighter-rouge">virtio</code> drivers can be unattached from the Virtual Machine.</p>
 
 <h2 id="references">References</h2>
+
 <ul>
   <li><a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html">KubeVirt user-guide: Virtio Windows Driver disk usage</a></li>
   <li><a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md">Creating a registry image with a VM disk</a></li>

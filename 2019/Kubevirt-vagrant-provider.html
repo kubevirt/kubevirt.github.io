@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="The post describes how to use kubevirt vagrant provider">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="vagrant, lifecycle, virtual machines" >
     <meta property="og:title" content="KubeVirt vagrant provider | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/Kubevirt-vagrant-provider.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: pkliczewski</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/vagrant">vagrant</a>&nbsp;|&nbsp;<a href="/tag/lifecycle">lifecycle</a>&nbsp;|&nbsp;<a href="/tag/virtual-machines">virtual machines</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: June 4, 2019  </span>
             </div>
             <div>
@@ -239,13 +244,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
           <h1 id="introduction">Introduction</h1>
+
 <p>Vagrant is a command line utility for managing the lifecycle of virtual machines. There are number of providers available which allow to control and provision virtual machines in different environment. In this blog post we update how to use the <a href="https://github.com/pkliczewski/vagrant-kubevirt">provider</a> to manage <a href="https://kubevirt.io/">KubeVirt</a>.</p>
 
 <p>The KubeVirt Vagrant provider implements the following features:</p>
+
 <ul>
   <li>Manages virtual machines lifecycle - start, halt, status and destroy.</li>
   <li>Creates virtual machines using templates, container disks or existing pvc.</li>
@@ -255,6 +263,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </ul>
 
 <h1 id="installation">Installation</h1>
+
 <p>In order to use the provider we need to install Vagrant first. The steps how to do it are available <a href="https://www.vagrantup.com/intro/getting-started/install.html">here</a>. Once command line tool is available in our system, we can install the plugin by running:</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -268,10 +277,12 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="virtual-machine-definition">Virtual machine definition</h1>
+
 <p>Instead of building a virtual machine from scratch, which would be a slow and tedious process, Vagrant uses a base image as template for virtual machines. These base images are known as “boxes” and every provider must introduce its own box format. The provider introduces <em>kubevirt</em> boxes.
 You can view an example box <a href="https://github.com/pkliczewski/vagrant-kubevirt/blob/master/example_box/">here</a>.</p>
 
 <p>There are two ways to tell Vagrant, how to connect to KubeVirt cluster in Vagrantfile:</p>
+
 <ul>
   <li>use Kubernetes configuration file. When no other connection details provided, the provider will look for kubeconfig using value of KUBECONFIG environment variable or $HOME/.kube/config location.</li>
   <li>define connection details as part of box definition</li>
@@ -294,6 +305,7 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Values used in above sample box:</p>
+
 <ul>
   <li>kubevirt host - Hostname where KubeVirt is deployed</li>
   <li>kubevirt port - Port on where KubeVirt is listening</li>
@@ -301,12 +313,14 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
 </ul>
 
 <p>There are number of options we can customize for specific a virtal machine:</p>
+
 <ul>
   <li>cpus - Number of cpus used by a virtual machine</li>
   <li>memory - Amount of memory by a virtual machine</li>
 </ul>
 
 <p>We can choose one of the three following options:</p>
+
 <ul>
   <li>template - Name of a template which will be used to create the virtual machine</li>
   <li>image - Name of a container disk stored in a registry</li>
@@ -372,36 +386,43 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="usage">Usage</h1>
+
 <p>Now, once we defined a virtual machine we can see how to use the provider to manage it.</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>vagrant up
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above command starts a virtual machines and performs any additonal operations defined in the Vagrantfile like provisioning, folder synchronization setup. For more information check <a href="https://www.vagrantup.com/docs/cli/up.html">here</a></p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>vagrant halt
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above command stops a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/halt.html">here</a></p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>vagrant status
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above command provides status of a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/status.html">here</a></p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>vagrant destroy
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above command stops a virtual machine and destroys all the resources used. For more information check <a href="https://www.vagrantup.com/docs/cli/destroy.html">here</a></p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>vagrant provision
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above command runs configured provisioners for specific virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/provision.html">here</a></p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>vagrant ssh
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above command ssh to running virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/ssh.html">here</a></p>
 
 <h1 id="future-work">Future work</h1>

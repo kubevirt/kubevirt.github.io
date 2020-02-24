@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Ignition Support">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="ignition, coreos, rhcos" >
     <meta property="og:title" content="Ignition Support | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/ignition-support.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: karmab</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/ignition">ignition</a>&nbsp;|&nbsp;<a href="/tag/coreos">coreos</a>&nbsp;|&nbsp;<a href="/tag/rhcos">rhcos</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: November 20, 2018  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -258,11 +264,11 @@ Ignition support is still needed in the guest operating system.</p>
 
 <h2 id="enabling-ignition-support">Enabling Ignition Support</h2>
 
-<p>Ignition Support has be enabled through a <em>[feature gate</em>. This is achieved by creating (or editing ) the <em>kubevirt-config</em> ConfigMap in the kubevirt namespace.</p>
+<p>Ignition Support has to be enabled through a <em>feature gate</em>. This is achieved by creating (or editing ) the <em>kubevirt-config</em> ConfigMap in the kubevirt namespace.</p>
 
 <p>A minimal config map would look like this:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -271,21 +277,21 @@ Ignition support is still needed in the guest operating system.</p>
 7
 8
 9
-</pre></td><td class="rouge-code"><pre>apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: kubevirt-config
-  namespace: kubevirt
-  labels:
-    kubevirt.io: ""
-data:
-  feature-gates: ExperimentalIgnitionSupport
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">feature-gates</span><span class="pi">:</span> <span class="s">ExperimentalIgnitionSupport</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Make sure to delete kubevirt related pods afterward for the configuration to be taken into account:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl delete pod --all -n kubevirt
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl delete pod <span class="nt">--all</span> <span class="nt">-n</span> kubevirt
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="workthrough">WorkThrough</h2>
@@ -296,7 +302,7 @@ data:
 
 <p>Create The following VM spec in the file <em>myvm1.yml</em>:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -345,67 +351,69 @@ data:
 47
 48
 49
-</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha3
-kind: VirtualMachine
-metadata:
-  name: myvm1
-spec:
-  running: true
-  template:
-    metadata:
-      labels:
-        kubevirt.io/size: small
-      annotations:
-        kubevirt.io/ignitiondata: |
-          {
-              "ignition": {
-                  "config": {},
-                  "version": "2.2.0"
-              },
-              "networkd": {},
-              "passwd": {
-                  "users": [
-                      {
-                          "name": "core",
-                          "sshAuthorizedKeys": [
-                              "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/AvM9VbO2yiIb9AillBp/kTr8jqIErRU1LFKqhwPTm4AtVIjFSaOuM4AlspfCUIz9IHBrDcZmbcYKai3lC3JtQic7M/a1OWUjWE1ML8CEvNsGPGu5yNVUQoWC0lmW5rzX9c6HvH8AcmfMmdyQ7SgcAnk0zir9jw8ed2TRAzHn3vXFd7+saZLihFJhXG4zB8vh7gJHjLfjIa3JHptWzW9AtqF9QsoBY/iu58Rf/hRnrfWscyN3x9pGCSEqdLSDv7HFuH2EabnvNFFQZr4J1FYzH/fKVY3Ppt3rf64UWCztDu7L44fPwwkI7nAzdmQVTaMoD3Ej8i7/OSFZsC2V5IBT kboumedh@bumblefoot"
-                          ]
-                      },
-                  ]
-              }
-          }
-    spec:
-      domain:
-        devices:
-          disks:
-            - name: containerdisk
-              disk:
-                bus: virtio
-          interfaces:
-          - name: default
-            bridge: {}
-        resources:
-          requests:
-            memory: 64M
-      networks:
-      - name: default
-        pod: {}
-      volumes:
-        - name: containerdisk
-          containerDisk:
-            image: kubevirt/fedora-cloud-container-disk-demo
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">myvm1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/size</span><span class="pi">:</span> <span class="s">small</span>
+      <span class="na">annotations</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/ignitiondata</span><span class="pi">:</span> <span class="pi">|</span>
+          <span class="s">{</span>
+              <span class="s">"ignition": {</span>
+                  <span class="s">"config": {},</span>
+                  <span class="s">"version": "2.2.0"</span>
+              <span class="s">},</span>
+              <span class="s">"networkd": {},</span>
+              <span class="s">"passwd": {</span>
+                  <span class="s">"users": [</span>
+                      <span class="s">{</span>
+                          <span class="s">"name": "core",</span>
+                          <span class="s">"sshAuthorizedKeys": [</span>
+                              <span class="s">"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQC/AvM9VbO2yiIb9AillBp/kTr8jqIErRU1LFKqhwPTm4AtVIjFSaOuM4AlspfCUIz9IHBrDcZmbcYKai3lC3JtQic7M/a1OWUjWE1ML8CEvNsGPGu5yNVUQoWC0lmW5rzX9c6HvH8AcmfMmdyQ7SgcAnk0zir9jw8ed2TRAzHn3vXFd7+saZLihFJhXG4zB8vh7gJHjLfjIa3JHptWzW9AtqF9QsoBY/iu58Rf/hRnrfWscyN3x9pGCSEqdLSDv7HFuH2EabnvNFFQZr4J1FYzH/fKVY3Ppt3rf64UWCztDu7L44fPwwkI7nAzdmQVTaMoD3Ej8i7/OSFZsC2V5IBT kboumedh@bumblefoot"</span>
+                          <span class="s">]</span>
+                      <span class="s">},</span>
+                  <span class="s">]</span>
+              <span class="s">}</span>
+          <span class="s">}</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+              <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/fedora-cloud-container-disk-demo</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Note we simply inject the ignition data as a string in <em>vm/spec/domain/spec/metadata/annotations</em>, using <em>kubevirt.io/ignitiondata</em> as an annotation</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>We simply inject the ignition data as a string in <em>vm/spec/domain/spec/metadata/annotations</em>, using <em>kubevirt.io/ignitiondata</em> as an annotation</p>
 
+
+</div></div>
 <h3 id="step-2">Step 2</h3>
 
 <p>Create the VM:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre>$ kubectl apply -f myvm1.yml
-virtualmachine "myvm1" created
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> myvm1.yml
+virtualmachine <span class="s2">"myvm1"</span> created
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>At this point, when VM boots, ignition data will be injected.</p>
@@ -416,7 +424,7 @@ virtualmachine "myvm1" created
 
 <h2 id="summary">Summary</h2>
 
-<p>Ignition Support brings the ability to run coreos/rhcos distros on KubeVirt and to customize them at boot time.</p>
+<p>Ignition Support brings the ability to run CoreOS/RHCOS distros on KubeVirt and to customize them at boot time.</p>
 
         </article>
         

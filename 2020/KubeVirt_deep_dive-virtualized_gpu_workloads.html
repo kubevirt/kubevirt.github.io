@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="In this blogpost, we talk about the presentation that David Vossel and Vishesh Tanksale did at the KubeCon 2019 in North America. The talk is called KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt and they go through from a KubeVirt introduction until a complex architecture with NVIDIA GPU devices">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="kubecon, gpu, nvidia, gpu workloads, pass-through, passthru, kvm, qemu" >
     <meta property="og:title" content="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat & Vishesh Tanksale, NVIDIA | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: Pedro Ibáñez Requena</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubecon">kubecon</a>&nbsp;|&nbsp;<a href="/tag/gpu">gpu</a>&nbsp;|&nbsp;<a href="/tag/nvidia">nvidia</a>&nbsp;|&nbsp;<a href="/tag/gpu-workloads">gpu workloads</a>&nbsp;|&nbsp;<a href="/tag/pass-through">pass-through</a>&nbsp;|&nbsp;<a href="/tag/passthru">passthru</a>&nbsp;|&nbsp;<a href="/tag/kvm">kvm</a>&nbsp;|&nbsp;<a href="/tag/qemu">qemu</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: February 6, 2020  </span>
             </div>
             <div>
@@ -239,16 +244,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <p>In this <a href="https://www.youtube.com/watch?v=Qejlyny0G58">video</a>, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. 
-Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some 
+          <p>In this <a href="https://www.youtube.com/watch?v=Qejlyny0G58">video</a>, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes.
+Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some
 performance metrics comparing KubeVirt to standalone KVM.</p>
 
 <h2 id="kubevirt-intro">KubeVirt Intro</h2>
 
 <p>David introduces the talk showing what KubeVirt is and what is not:</p>
+
 <ul>
   <li>KubeVirt is not involved with managing AWS or GCP instances</li>
   <li>KubeVirt is not a competitor to Firecracker or Kata containers</li>
@@ -256,11 +263,13 @@ performance metrics comparing KubeVirt to standalone KVM.</p>
 </ul>
 
 <p>He likes to define KubeVirt as:</p>
+
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>KubeVirt is a Kubernetes extension that allows running traditional VM workloads natively side by side with Container workloads.</p>
 
 
 </div></div>
 <p>But why KubeVirt?</p>
+
 <ul>
   <li>Already have on-premise solutions like OpenStack, oVirt</li>
   <li>And then there’s the public cloud, AWS, GCP, Azure</li>
@@ -271,12 +280,13 @@ performance metrics comparing KubeVirt to standalone KVM.</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_infrastructure_convergence.png" alt="kubevirt_infrastructure_convergence" title="KubeVirt infrastructure convergence" /></p>
 
-<p>The transition to the cloud model involves multiple stacks, containers and VMs, old code and new code. 
+<p>The transition to the cloud model involves multiple stacks, containers and VMs, old code and new code.
 With KubeVirt all this is simplified with just one stack to manage containers and VMs to run old code and new code.</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_one_stack.png" alt="kubevirt_one_stack" title="KubeVirt one stack" /></p>
 
 <p>The workflow convergence means that:</p>
+
 <ul>
   <li>Converging VM management into container management workflows</li>
   <li>Using the same tooling (kubectl) for containers and Virtual Machines</li>
@@ -284,6 +294,7 @@ With KubeVirt all this is simplified with just one stack to manage containers an
 </ul>
 
 <p>An example of a VM Instance in YAML could be so simple as the following example:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -300,7 +311,7 @@ With KubeVirt all this is simplified with just one stack to manage containers an
 <span class="nn">...</span>
  <span class="na">spec</span><span class="pi">:</span>
   <span class="na">domain</span><span class="pi">:</span>
-   <span class="na">cpu</span><span class="pi">:</span> 
+   <span class="na">cpu</span><span class="pi">:</span>
     <span class="na">cores</span><span class="pi">:</span> <span class="m">2</span>
    <span class="na">devices</span><span class="pi">:</span>
     <span class="na">disk</span><span class="pi">:</span> <span class="s">fedora29</span>
@@ -317,7 +328,7 @@ And finaly the virt-handler instructs the virt-launcher how to launch the qemu.<
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_vm_launch_flow.png" alt="kubevirt_vm_launch_flow" title="KubeVirt VM launch flow" /></p>
 
-<p>The storage in KubeVirt is used in the same way as the pods, if there is a need to have persistent storage in a VM a PVC (Persistent Volume Claim) 
+<p>The storage in KubeVirt is used in the same way as the pods, if there is a need to have persistent storage in a VM a PVC (Persistent Volume Claim)
 needs to be created.</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_volumes.png" alt="kubevirt_volumes" title="KubeVirt volumes" /></p>
@@ -329,6 +340,7 @@ that PVC to the VM pod to get it running.</p>
 the possibility to have different network interfaces per VM.</p>
 
 <p>For using the Host Resources:</p>
+
 <ul>
   <li>VM Guest CPU and NUMA Affinity
     <ul>
@@ -352,7 +364,7 @@ the possibility to have different network interfaces per VM.</p>
 <h2 id="gpuvgpu-in-kubevirt-vms">GPU/vGPU in Kubevirt VMs</h2>
 
 <p>After the introduction of David, Vishesh takes over and talks in-depth the whys and hows of GPUs in VM. Lots of new Machine and Deep learning applications
-are taking advance of the GPU workloads. Nowadays the Big data is one of the main consumers of GPUs but there are some gaps, the gaming and professional graphics sector 
+are taking advance of the GPU workloads. Nowadays the Big data is one of the main consumers of GPUs but there are some gaps, the gaming and professional graphics sector
 still need to run VMs and have native GPU functionalities, that is why NVIDIA decided to work with KubeVirt.</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png" alt="gpus_on_kubevirt" title="GPU/vGPU on KubeVirt" /></p>
@@ -360,18 +372,19 @@ still need to run VMs and have native GPU functionalities, that is why NVIDIA de
 <p>To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in <a href="https://github.com/NVIDIA/kubevirt-gpu-device-plugin">GitHub</a>
 It’s opensource and anybody can take a look to it and download it.</p>
 
-<p>Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs, 
+<p>Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs,
 the following diagram shows the different layers involved in the GPU pass-through architecture:</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png" alt="kubevirt_gpu_passthrough" title="KubeVirt GPU passthrough" /></p>
 
 <p>Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUS in that node), the Virtual Machine specification
-containing the <code class="language-html highlighter-rouge">deviceName</code> that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as 
+containing the <code class="language-html highlighter-rouge">deviceName</code> that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as
 any other else in Kubernetes.</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_yaml.png" alt="kubevirt_gpu_pass_yaml" title="KubeVirt GPU passthrough yaml" /></p>
 
 <p>The main Device Plugin Functions are:</p>
+
 <ul>
   <li>GPU and vGPU device Discovery
     <ul>
@@ -413,10 +426,10 @@ taking a look to the following video.</p>
 
 <h2 id="speakers">Speakers</h2>
 
-<p><a href="https://github.com/davidvossel">David Vossel</a> David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift’s Container Native Virtualization (CNV) 
+<p><a href="https://github.com/davidvossel">David Vossel</a> David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift’s Container Native Virtualization (CNV)
 and is a core contributor to the open source KubeVirt project.</p>
 
-<p><a href="https://www.linkedin.com/in/vishesh-tanksale">Vishesh Tanksale</a> is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster. 
+<p><a href="https://www.linkedin.com/in/vishesh-tanksale">Vishesh Tanksale</a> is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster.
 He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sanbox Project.</p>
 
 <h2 id="references">References</h2>

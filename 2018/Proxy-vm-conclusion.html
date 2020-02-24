@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="This is a roadmap blog post for the network implementation in the kubevirt project">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="istio, multus, roadmap" >
     <meta property="og:title" content="Proxy VM Conclusion | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/Proxy-vm-conclusion.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: SchSeba</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/istio">istio</a>&nbsp;|&nbsp;<a href="/tag/multus">multus</a>&nbsp;|&nbsp;<a href="/tag/roadmap">roadmap</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: June 13, 2018  </span>
             </div>
             <div>
@@ -239,17 +244,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: uncategorized
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <p>This blog post follow my previous reseach on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.</p>
+          <p>This blog post follow my previous research on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.</p>
 
 <h1 id="research-conclusions-and-network-roadmap">Research conclusions and network roadmap</h1>
 
 <p>After the deep research about different options/ways to connect VM to pods, we find that all the solution have different pros and cons.
 All the represented solution need access to kernel modules and have the risk of conflicting with other networking tools.</p>
 
-<p>We decided to implement a 100% Kubernetes compatible network approach on the kubevirt project by using the slirp interface qemu provides.
+<p>We decided to implement a 100% Kubernetes compatible network approach on the KubeVirt project by using the slirp interface qemu provides.
 This approach let the VM (from a networking perspective) behave like a process. Thus all traffic is going in and out of TCP or UDP sockets. The approach especially needs to avoid to rely on any specific Kernel configurations (like iptables, ebtables, tc, …) in order to not conflict with other Kubernetes networking tools like Istio or multus.</p>
 
 <p>This is just an intermediate solution, because it’s shortcomings (unmaintained, unsafe, not performing well)</p>
@@ -257,6 +263,7 @@ This approach let the VM (from a networking perspective) behave like a process. 
 <h3 id="slirp-interface">Slirp interface</h3>
 
 <p>Pros:</p>
+
 <ul>
   <li>vm ack like a process</li>
   <li>No external modules needed</li>
@@ -267,6 +274,7 @@ This approach let the VM (from a networking perspective) behave like a process. 
 </ul>
 
 <p>Cons:</p>
+
 <ul>
   <li>poor performance</li>
   <li>use userspace network stack</li>
@@ -275,6 +283,7 @@ This approach let the VM (from a networking perspective) behave like a process. 
 <h3 id="iptables-only">Iptables only</h3>
 
 <p>Pros:</p>
+
 <ul>
   <li>No external modules needed</li>
   <li>No external process needed</li>
@@ -282,6 +291,7 @@ This approach let the VM (from a networking perspective) behave like a process. 
 </ul>
 
 <p>Cons:</p>
+
 <ul>
   <li><span style="color:red;">Istio dedicated solution!</span></li>
   <li>Not other process can change the iptables rules</li>
@@ -290,12 +300,14 @@ This approach let the VM (from a networking perspective) behave like a process. 
 <h3 id="iptables-with-a-nat-proxy">Iptables with a nat-proxy</h3>
 
 <p>Pros:</p>
+
 <ul>
   <li>No external modules needed</li>
   <li>Works with any sidecar solution</li>
 </ul>
 
 <p>Cons:</p>
+
 <ul>
   <li>Not other process can change the iptables rules</li>
   <li>External process needed</li>
@@ -306,6 +318,7 @@ This approach let the VM (from a networking perspective) behave like a process. 
 <h3 id="iptables-with-a-trasperent-proxy">Iptables with a trasperent-proxy</h3>
 
 <p>Pros:</p>
+
 <ul>
   <li>other process can change the nat table (this solution works on the mangle table)</li>
   <li>better preformance comparing to nat-proxy</li>
@@ -313,6 +326,7 @@ This approach let the VM (from a networking perspective) behave like a process. 
 </ul>
 
 <p>Cons:</p>
+
 <ul>
   <li>Need NET_ADMIN capability for the docker</li>
   <li>External process needed</li>

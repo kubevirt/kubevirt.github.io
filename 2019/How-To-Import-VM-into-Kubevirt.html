@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Import a VM into the Kubernetes Platform using CDI">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="cdi, vm import" >
     <meta property="og:title" content="How to import VM into KubeVirt | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/How-To-Import-VM-into-Kubevirt.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: DirectedSoul</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/cdi">cdi</a>&nbsp;|&nbsp;<a href="/tag/vm-import">vm import</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: July 29, 2019  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -293,6 +299,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p><strong>Expose cdi-uploadproxy service:</strong></p>
 
 <p>The cdi-uploadproxy service must be accessible from outside the cluster. Here are some ways to do that:</p>
+
 <ul>
   <li><a href="https://kubernetes.io/docs/concepts/services-networking/service/#nodeport">NodePort Service</a></li>
   <li><a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Ingress</a></li>
@@ -465,8 +472,8 @@ status: {}
         <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
     <span class="na">devices</span><span class="pi">:</span>
       <span class="na">disks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">mypvcdisk</span>
-        <span class="na">lun</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">mypvcdisk</span>
+          <span class="na">lun</span><span class="pi">:</span> <span class="pi">{}</span>
   <span class="na">volumes</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">mypvcdisk</span>
       <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
@@ -536,29 +543,29 @@ status: {}
       <span class="na">domain</span><span class="pi">:</span>
         <span class="na">devices</span><span class="pi">:</span>
           <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
         <span class="na">resources</span><span class="pi">:</span>
           <span class="na">requests</span><span class="pi">:</span>
             <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
       <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span>                <span class="c1">#Note the type is dataVolume</span>
-          <span class="na">name</span><span class="pi">:</span> <span class="s">alpine-dv</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
-  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>             <span class="c1"># Automatically a PVC of size 2Gi is created</span>
-  <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">name</span><span class="pi">:</span> <span class="s">alpine-dv</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">pvc</span><span class="pi">:</span>
-        <span class="na">accessModes</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">storage</span><span class="pi">:</span> <span class="s">2Gi</span>
-      <span class="na">source</span><span class="pi">:</span>                      <span class="c1">#This is the source where the iso file resides</span>
-        <span class="na">http</span><span class="pi">:</span>
-          <span class="na">url</span><span class="pi">:</span> <span class="s">http://cdi-http-import-server.kubevirt/images/alpine.iso</span>
+        <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span> <span class="c1">#Note the type is dataVolume</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">alpine-dv</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span> <span class="c1"># Automatically a PVC of size 2Gi is created</span>
+    <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">alpine-dv</span>
+      <span class="na">spec</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">accessModes</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+          <span class="na">resources</span><span class="pi">:</span>
+            <span class="na">requests</span><span class="pi">:</span>
+              <span class="na">storage</span><span class="pi">:</span> <span class="s">2Gi</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="c1">#This is the source where the iso file resides</span>
+          <span class="na">http</span><span class="pi">:</span>
+            <span class="na">url</span><span class="pi">:</span> <span class="s">http://cdi-http-import-server.kubevirt/images/alpine.iso</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>From the above manifest the two main sections that needs an attention are <strong><code class="language-html highlighter-rouge">source</code></strong> and <strong><code class="language-html highlighter-rouge">pvc</code></strong>.</p>

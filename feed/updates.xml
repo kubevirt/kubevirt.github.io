@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/updates.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-24T15:44:46+00:00</updated><id>https://kubevirt.io//feed/updates.xml</id><title type="html">KubeVirt.io | Updates</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">This Week In Kube Virt 23</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html" rel="alternate" type="text/html" title="This Week In Kube Virt 23" /><published>2018-04-27T00:00:00+00:00</published><updated>2018-04-27T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-23</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html">&lt;p&gt;This is a close-to weekly update from the KubeVirt team.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/updates.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-24T17:08:48+00:00</updated><id>https://kubevirt.io//feed/updates.xml</id><title type="html">KubeVirt.io | Updates</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">This Week In Kube Virt 23</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html" rel="alternate" type="text/html" title="This Week In Kube Virt 23" /><published>2018-04-27T00:00:00+00:00</published><updated>2018-04-27T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-23</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html">&lt;p&gt;This is a close-to weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;In general there is now more work happening outside of the core kubevirt
 repository.&lt;/p&gt;
@@ -160,7 +160,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a close-to weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 22</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html" rel="alternate" type="text/html" title="This Week In Kube Virt 22" /><published>2018-04-06T00:00:00+00:00</published><updated>2018-04-06T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-22</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html">&lt;p&gt;This is a close-to weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a close-to weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 22</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html" rel="alternate" type="text/html" title="This Week In Kube Virt 22" /><published>2018-04-06T00:00:00+00:00</published><updated>2018-04-06T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-22</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html">&lt;p&gt;This is a close-to weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;In general there is now more work happening outside of the core kubevirt
 repository.&lt;/p&gt;
@@ -258,12 +258,13 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a close-to weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 21</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html" rel="alternate" type="text/html" title="This Week In Kube Virt 21" /><published>2018-03-20T00:00:00+00:00</published><updated>2018-03-20T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-21</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a close-to weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 21</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html" rel="alternate" type="text/html" title="This Week In Kube Virt 21" /><published>2018-03-20T00:00:00+00:00</published><updated>2018-03-20T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-21</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;In general there is now more work happening outside of the core kubevirt
 repository.&lt;/p&gt;
 
 &lt;!-- more --&gt;
+
 &lt;p&gt;We are currently driven by&lt;/p&gt;
 
 &lt;ul&gt;
@@ -340,11 +341,12 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 20</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html" rel="alternate" type="text/html" title="This Week In Kube Virt 20" /><published>2018-03-08T00:00:00+00:00</published><updated>2018-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-20</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 20</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html" rel="alternate" type="text/html" title="This Week In Kube Virt 20" /><published>2018-03-08T00:00:00+00:00</published><updated>2018-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-20</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;We are currently driven by&lt;/p&gt;
 
 &lt;!-- more --&gt;
+
 &lt;ul&gt;
   &lt;li&gt;
     &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
@@ -434,7 +436,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 19</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html" rel="alternate" type="text/html" title="This Week In Kube Virt 19" /><published>2018-02-23T00:00:00+00:00</published><updated>2018-02-23T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-19</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html">&lt;p&gt;This is a bi-weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 19</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html" rel="alternate" type="text/html" title="This Week In Kube Virt 19" /><published>2018-02-23T00:00:00+00:00</published><updated>2018-02-23T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-19</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html">&lt;p&gt;This is a bi-weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;We are currently driven by&lt;/p&gt;
 
@@ -528,9 +530,10 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a bi-weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 18</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html" rel="alternate" type="text/html" title="This Week In Kube Virt 18" /><published>2018-02-10T00:00:00+00:00</published><updated>2018-02-10T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-18</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a bi-weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 18</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html" rel="alternate" type="text/html" title="This Week In Kube Virt 18" /><published>2018-02-10T00:00:00+00:00</published><updated>2018-02-10T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-18</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;!-- more --&gt;
+
 &lt;p&gt;We are currently driven by&lt;/p&gt;
 
 &lt;ul&gt;
@@ -618,7 +621,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 17</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html" rel="alternate" type="text/html" title="This Week In Kube Virt 17" /><published>2018-01-30T00:00:00+00:00</published><updated>2018-01-30T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-17</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 17</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html" rel="alternate" type="text/html" title="This Week In Kube Virt 17" /><published>2018-01-30T00:00:00+00:00</published><updated>2018-01-30T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-17</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;We are currently driven by&lt;/p&gt;
 
@@ -714,7 +717,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 16 Holiday Wrap Up Edition</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Holiday Wrap Up Edition" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html">&lt;p&gt;This is a weekly update from the KubeVirt team - including the holiday
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 16 Holiday Wrap Up Edition</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Holiday Wrap Up Edition" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html">&lt;p&gt;This is a weekly update from the KubeVirt team - including the holiday
 backlog update.&lt;/p&gt;
 
 &lt;p&gt;We are currently driven by&lt;/p&gt;
@@ -735,6 +738,7 @@ backlog update.&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;!-- more --&gt;
+
 &lt;p&gt;Within the last weeks we achieved to:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -908,7 +912,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team - including the holiday backlog update.</summary></entry><entry><title type="html">This Week In Kube Virt 16 Size Xl</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Size Xl" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html">&lt;p&gt;This is a weekly update from the KubeVirt team - including the holiday
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team - including the holiday backlog update.</summary></entry><entry><title type="html">This Week In Kube Virt 16 Size Xl</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Size Xl" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html">&lt;p&gt;This is a weekly update from the KubeVirt team - including the holiday
 backlog update.&lt;/p&gt;
 
 &lt;p&gt;We are currently driven by&lt;/p&gt;
@@ -935,6 +939,7 @@ backlog update.&lt;/p&gt;
 &lt;/ul&gt;
 
 &lt;!-- more --&gt;
+
 &lt;p&gt;Within the last weeks we achieved to:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -1145,7 +1150,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team - including the holiday backlog update.</summary></entry><entry><title type="html">This Week In Kube Virt 15</title><link href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html" rel="alternate" type="text/html" title="This Week In Kube Virt 15" /><published>2017-12-15T00:00:00+00:00</published><updated>2017-12-15T00:00:00+00:00</updated><id>https://kubevirt.io//2017/This-Week-in-Kube-Virt-15</id><content type="html" xml:base="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team - including the holiday backlog update.</summary></entry><entry><title type="html">This Week In Kube Virt 15</title><link href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html" rel="alternate" type="text/html" title="This Week In Kube Virt 15" /><published>2017-12-15T00:00:00+00:00</published><updated>2017-12-15T00:00:00+00:00</updated><id>https://kubevirt.io//2017/This-Week-in-Kube-Virt-15</id><content type="html" xml:base="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
 
 &lt;p&gt;We are currently driven by&lt;/p&gt;
 
@@ -1162,6 +1167,7 @@ week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https
 &lt;/ul&gt;
 
 &lt;!-- more --&gt;
+
 &lt;p&gt;This week we achieved to:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -1216,4 +1222,4 @@ the pulse, to get an overview over all changes of this week:
 &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry></feed>
+&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry></feed>

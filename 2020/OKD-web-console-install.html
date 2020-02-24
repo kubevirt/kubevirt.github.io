@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="openshift web console, web interface, okd" >
     <meta property="og:title" content="Managing KubeVirt with Openshift Web Console | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2020/OKD-web-console-install.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: Alberto Losada Grande</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/openshift-web-console">openshift web console</a>&nbsp;|&nbsp;<a href="/tag/web-interface">web interface</a>&nbsp;|&nbsp;<a href="/tag/okd">okd</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: January 24, 2020  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -428,11 +434,7 @@ Done <span class="k">in </span>215.91s.
 
 <p>Probably, the following issue will be faced when connecting to the web user interface: <code class="language-html highlighter-rouge">"services is forbidden: User "system:serviceaccount:kube-system:default" cannot list resource "services" in API group "" in the namespace default"</code>. The problem is that the <strong>default service account</strong> does not have enough privileges to show all the cluster objects.</p>
 
-<p><br /></p>
-
 <p><img src="/assets/2020-01-24-OKD-web-console-install/okd-serviceaccount-error.png" alt="OKD sa error" width="1110" height="720" /></p>
-
-<p><br /></p>
 
 <p>There are two options to fix the issue: one is granting cluster-admin permissions to the default service account. That, it is not recommended since default service account is, at its very name indicates, the default service account for all pods if not explicitly configured. This means granting cluster-admin permissions to some applications running in kube-system namespace and even future ones when no service account is configured.</p>
 
@@ -457,7 +459,6 @@ Done <span class="k">in </span>215.91s.
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p><br /></p>
 
 <h2 id="deploy-kubevirt-using-the-hyperconverged-cluster-operator-hco">Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)</h2>
 
@@ -662,20 +663,24 @@ virt-handler-k6npr                                    1/1     Running   0       
 virt-operator-84f5588df6-2k49b                        1/1     Running   0          24m   10.244.1.14       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
 virt-operator-84f5588df6-zzrsb                        1/1     Running   1          24m   10.244.0.4        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p><br />
-<strong>Note</strong> that only once HCO is completely deployed, <code class="language-html highlighter-rouge">VirtualMachines</code> can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.</p>
 
-<p>It is worth noting that there is an ongoing effort to adapt the OpenShift web console’s user interface in native Kubernetes additionally to OKD or OpenShift as they are expected. <a href="https://github.com/openshift/console/pull/3848">As an example</a>, a few days ago, the non applicable Virtual Machine Templates option from the Workload menu was removed and the VM Wizard was made fully functional when native Kubernetes is detected.
-<br /></p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Only once HCO is completely deployed, <code class="language-html highlighter-rouge">VirtualMachines</code> can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.</p>
+
+
+</div></div>
+<p>It is worth noting that there is an ongoing effort to adapt the OpenShift web console’s user interface in native Kubernetes additionally to OKD or OpenShift as they are expected. <a href="https://github.com/openshift/console/pull/3848">As an example</a>, a few days ago, the non applicable Virtual Machine Templates option from the Workload menu was removed and the VM Wizard was made fully functional when native Kubernetes is detected.</p>
 
 <iframe width="1110" height="650" src="https://www.youtube.com/embed/XQw4GkGHs44" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
 
-<p><br /></p>
 <h2 id="containerized-installation">Containerized installation</h2>
 
 <p>The OKD web console actually runs as a pod in OKD along with its deployment, services and all objects needed to run properly. The idea is to take advantage of the containerized OKD web console available and execute it in one of the nodes of a native Kubernetes cluster.</p>
 
-<p><em>Note that unlike the binary installation the pod must run in a node inside our Kubernetes cluster</em>. On the other side, running the OKD web console as a native Kubernetes application will benefit from all the Kubernetes advantages: rolling deployments, easy upgrades, high availability, scalability, auto-restart in case of failure, liveness and readiness probes… An example of how easy it is to update the OKD web console to a newer version will be presented as well.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>Note that unlike the binary installation the pod must run in a node inside our Kubernetes cluster</p>
+
+
+</div></div>
+<p>Running the OKD web console as a native Kubernetes application will benefit from all the Kubernetes advantages: rolling deployments, easy upgrades, high availability, scalability, auto-restart in case of failure, liveness and readiness probes… An example of how easy it is to update the OKD web console to a newer version will be presented as well.</p>
 
 <h3 id="deploying-okd-web-console">Deploying OKD web console</h3>
 
@@ -756,6 +761,7 @@ console-token-ppfc2
 53
 54
 55
+56
 </pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -774,24 +780,24 @@ console-token-ppfc2
         <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">containers</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">console-app</span>
-        <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/openshift/origin-console:4.2</span>
-        <span class="na">env</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_USER_AUTH</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">disabled</span>         <span class="c1"># no authentication required</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">off-cluster</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">https://kubernetes.default</span>  <span class="c1">#master api</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>           <span class="c1"># no tls enabled</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">bearer-token</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH_BEARER_TOKEN</span>
-          <span class="na">valueFrom</span><span class="pi">:</span>
-            <span class="na">secretKeyRef</span><span class="pi">:</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span> <span class="c1"># console serviceaccount token</span>
-              <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">console-app</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/openshift/origin-console:4.2</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_USER_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">disabled</span> <span class="c1"># no authentication required</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">off-cluster</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">https://kubernetes.default</span> <span class="c1">#master api</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span> <span class="c1"># no tls enabled</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">bearer-token</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH_BEARER_TOKEN</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">secretKeyRef</span><span class="pi">:</span>
+                  <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span> <span class="c1"># console serviceaccount token</span>
+                  <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
 
 <span class="nn">---</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
@@ -802,15 +808,16 @@ console-token-ppfc2
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">selector</span><span class="pi">:</span>
     <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
-  <span class="na">type</span><span class="pi">:</span> <span class="s">NodePort</span>    <span class="c1"># nodePort configuration</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">NodePort</span> <span class="c1"># nodePort configuration</span>
   <span class="na">ports</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
-    <span class="na">port</span><span class="pi">:</span> <span class="m">9000</span>
-    <span class="na">targetPort</span><span class="pi">:</span> <span class="m">9000</span>
-    <span class="na">nodePort</span><span class="pi">:</span> <span class="m">30036</span>
-    <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="m">9000</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">9000</span>
+      <span class="na">nodePort</span><span class="pi">:</span> <span class="m">30036</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
 
 <span class="nn">---</span>
+
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.</p>
@@ -841,26 +848,19 @@ console-np-service   NodePort    10.96.195.45   &lt;none&gt;        9000:30036/T
 kube-dns             ClusterIP   10.96.0.10     &lt;none&gt;        53/UDP,53/TCP,9153/TCP   20d
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Once running, a connection to the <code class="language-html highlighter-rouge">nodeport</code> defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.
-<br /></p>
+<p>Once running, a connection to the <code class="language-html highlighter-rouge">nodeport</code> defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.</p>
 
 <p><img src="/assets/2020-01-24-OKD-web-console-install/okd-pod-4.2.resized.png" alt="OKD 4.2" /></p>
 
-<p><br />
-It can be verified that it is possible to see and manage <code class="language-html highlighter-rouge">VirtualMachines</code> running inside of the native Kubernetes cluster.
-<br /></p>
+<p>It can be verified that it is possible to see and manage <code class="language-html highlighter-rouge">VirtualMachines</code> running inside of the native Kubernetes cluster.</p>
 
 <p><img src="/assets/2020-01-24-OKD-web-console-install/okd-console-vm.resized.png" alt="OKD vmr" /></p>
-
-<p><br /></p>
 
 <h3 id="upgrade-okd-web-console">Upgrade OKD web console</h3>
 
 <p>The upgrade process is really straightforward. All available image versions of the OpenShift console can be consulted in the <a href="https://quay.io/repository/openshift/origin-console?tab=tags">official OpenShift container image repository</a>. Then, the deployment object must be modified accordingly to run the desired version of the OKD web console.</p>
 
-<p><br />
-<img src="/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr" />
-<br /></p>
+<p><img src="/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr" /></p>
 
 <p>In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. <em>Note that this is not linked with the latest tag, actually <code class="language-html highlighter-rouge">latest</code> tag is the same as version <code class="language-html highlighter-rouge">4.4</code></em>. Upgrading process only involves updating the image value to the desired container image: <code class="language-html highlighter-rouge">quay.io/openshift/origin-console:4.5</code> and save.</p>
 
@@ -900,7 +900,6 @@ It can be verified that it is possible to see and manage <code class="language-h
 34
 35
 36
-37
 </pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -919,26 +918,26 @@ It can be verified that it is possible to see and manage <code class="language-h
         <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">containers</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">console-app</span>
-        <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/openshift/origin-console:4.5</span> <span class="c1">#new image version</span>
-        <span class="na">env</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_USER_AUTH</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">disabled</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">off-cluster</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">https://kubernetes.default</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s">bearer-token</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH_BEARER_TOKEN</span>
-          <span class="na">valueFrom</span><span class="pi">:</span>
-            <span class="na">secretKeyRef</span><span class="pi">:</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span>
-              <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
-
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">console-app</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/openshift/origin-console:4.5</span> <span class="c1">#new image version</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_USER_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">disabled</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">off-cluster</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">https://kubernetes.default</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">bearer-token</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH_BEARER_TOKEN</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">secretKeyRef</span><span class="pi">:</span>
+                  <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span>
+                  <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Once the deployment has been saved, a new pod with the configured version of the OKD web console is created and eventually will replace the old one.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -950,15 +949,12 @@ NAME                                                    READY   STATUS          
 console-deployment-5588f98644-bw7jr                     0/1     ContainerCreating   0          5s
 console-deployment-59d8956db5-td462                     1/1     Running             0          16h
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p><br />
-<img src="/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5" />
-<br /></p>
 
-<p>In the video below, the procedure explained in this section is shown.
-<br /></p>
+<p><img src="/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5" /></p>
+
+<p>In the video below, the procedure explained in this section is shown.</p>
 
 <iframe width="1110" height="650" src="https://www.youtube.com/embed/xoL0UFI657I" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
-<p><br /></p>
 
 <h2 id="summary">Summary</h2>
 

@@ -31,7 +31,7 @@
     
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
+    <meta name="keywords" content="kind, quickstart, tutorial" >
     <meta property="og:title" content="KubeVirt Quickstart with Kind | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//quickstart_kind/" >
@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-24 15:44:46 +0000" >
+    <meta property="og:article:published_time" content="2020-02-24 17:08:48 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Kind | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -294,21 +294,24 @@ acquainted with KubeVirt.</p>
 
 <p>This guide will help you deploying <a href="https://kubevirt.io">KubeVirt</a> on
 Kubernetes, we’ll be using
-<a href="https://github.com/kubernetes-sigs/kind" target="_blank">Kind</a>.</p>
+<a href="https://github.com/kubernetes-sigs/kind" target="\_blank">Kind</a>.</p>
 
-<p>If you have <a href="https://golang.org/">go</a> (<a href="https://golang.org/doc/devel/release.html#policy">1.11+</a>) and <a href="https://www.docker.com/">docker</a> 
+<p>If you have <a href="https://golang.org/">go</a> (<a href="https://golang.org/doc/devel/release.html#policy">1.11+</a>) and <a href="https://www.docker.com/">docker</a>
 already installed the following command is all you need:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">"on"</span> go get sigs.k8s.io/kind@v0.7.0 <span class="o">&amp;&amp;</span> kind create cluster
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>NOTE: please use the latest go to do this, ideally go 1.13 or greater.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Please use the latest <code class="language-html highlighter-rouge">go</code> to do this, ideally go 1.13 or greater.</p>
 
-<p>This will put kind in $(go env GOPATH)/bin. If you encounter the error kind: command not found after installation then you may need to 
-either add that directory to your $PATH as shown <a href="https://golang.org/doc/code.html#GOPATH">here</a> or do a manual installation by cloning 
+
+</div></div>
+<p>This will put kind in $(go env GOPATH)/bin. If you encounter the error kind: command not found after installation then you may need to
+either add that directory to your $PATH as shown <a href="https://golang.org/doc/code.html#GOPATH">here</a> or do a manual installation by cloning
 the repo and run make build from the repository.</p>
 
-<p>Stable binaries are also available on the <a href="https://github.com/kubernetes-sigs/kind/releases">releases</a> page. Stable releases are generally 
+<p>Stable binaries are also available on the <a href="https://github.com/kubernetes-sigs/kind/releases">releases</a> page. Stable releases are generally
 recommended for CI usage in particular. To install, download the binary for your platform from “Assets” and place this into your <code class="language-html highlighter-rouge">$PATH</code>:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -320,13 +323,13 @@ recommended for CI usage in particular. To install, download the binary for your
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Our recommendation is to always run the latest (*) version of
-<a href="https://github.com/kubernetes-sigs/kind" target="_blank">Kind</a>
+<a href="https://github.com/kubernetes-sigs/kind" target="\_blank">Kind</a>
 available for your platform of choice, following their
-<a href="https://kind.sigs.k8s.io/docs/user/quick-start/" target="_blank">quick start</a>.</p>
+<a href="https://kind.sigs.k8s.io/docs/user/quick-start/" target="\_blank">quick start</a>.</p>
 
 <p>To use kind, you will need to install <a href="https://docs.docker.com/install/">docker</a>.</p>
 
-<p>Finally, you’ll need <em>kubectl</em> installed (*), it can be downloaded from <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl" target="_blank">here</a> or installed using the means available for your platform.</p>
+<p>Finally, you’ll need <em>kubectl</em> installed (*), it can be downloaded from <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl" target="\_blank">here</a> or installed using the means available for your platform.</p>
 
 <p><em>(*): Ensure that *kubectl* version complies with the <a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew">supported release skew</a> (The version of kubectl should be close to Kubernetes server version).</em></p>
 
@@ -339,11 +342,13 @@ host where Kind is being installed on:</p>
 </pre></td><td class="rouge-code"><pre><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>If you get an <strong>N</strong>, follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="_blank">here</a> for enabling it.</p>
+<p>If you get an <strong>N</strong>, follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="\_blank">here</a> for enabling it.</p>
 
-<p><strong>Note</strong> that nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can’t be enabled, 
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can’t be enabled,
 don’t forget to enable emulation as shown in the <em><a href="#check-for-the-virtualization-extensions">Check for the Virtualization Extensions</a></em> section.</p>
 
+
+</div></div>
 <p>Let’s begin, normally, Kind can be started with default values and those will be enough
 to run this quickstart guide.</p>
 
@@ -352,6 +357,7 @@ to run this quickstart guide.</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kind create cluster <span class="c"># Default cluster context name is `kind`.</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>If you want to have multiple clusters in the same server you can name them with the <code class="language-html highlighter-rouge">--name</code> parameter:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -410,12 +416,12 @@ nodes:
 </span>kind create cluster <span class="nt">--config</span> cluster.yaml
 Creating cluster <span class="s2">"kind"</span> ...
  ✓ Ensuring node image <span class="o">(</span>kindest/node:v1.17.0<span class="o">)</span> 🖼
- ✓ Preparing nodes 📦 📦 📦  
- ✓ Writing configuration 📜 
- ✓ Starting control-plane 🕹️ 
- ✓ Installing CNI 🔌 
- ✓ Installing StorageClass 💾 
- ✓ Joining worker nodes 🚜 
+ ✓ Preparing nodes 📦 📦 📦
+ ✓ Writing configuration 📜
+ ✓ Starting control-plane 🕹️
+ ✓ Installing CNI 🔌
+ ✓ Installing StorageClass 💾
+ ✓ Joining worker nodes 🚜
 Set kubectl context to <span class="s2">"kind-kind"</span>
 You can now use your cluster with:
 
@@ -569,13 +575,13 @@ The tool is called <em>virtctl</em> and can be retrieved from the release page o
 work through a couple of labs to help you get acquainted with KubeVirt
 and how to use it to create and deploy VMs with Kubernetes.</p>
 
-<p>The first lab is <a href="../labs/kubernetes/lab1">“Use KubeVirt”</a>. This lab walks 
+<p>The first lab is <a href="../labs/kubernetes/lab1">“Use KubeVirt”</a>. This lab walks
 through the creation of a Virtual Machine Instance (VMI) on Kubernetes and then
 it is shown how virtctl is used to interact with its console.</p>
 
 <p>The second lab is <a href="../labs/kubernetes/lab2">“Experiment with CDI”</a>. This
-lab shows how to use the <a href="https://github.com/kubevirt/containerized-data-importer" target="_blank">Containerized Data Importer</a>
-(CDI) to import a VM image into a <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="_blank">Persistent Volume Claim</a>
+lab shows how to use the <a href="https://github.com/kubevirt/containerized-data-importer" target="\_blank">Containerized Data Importer</a>
+(CDI) to import a VM image into a <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/" target="\_blank">Persistent Volume Claim</a>
 (PVC) and then how to define a VM to make use of the PVC.</p>
 
 <p>The third lab is <a href="../labs/kubernetes/lab3">“KubeVirt upgrades”</a>. This lab shows
@@ -587,9 +593,9 @@ how easy and safe is to upgrade your KubeVirt installation with zero down-time.<
 
 <p>If you encounter an issue with deploying your cloud instance or if
 Kubernetes or KubeVirt did not install correctly, please report it to
-the <a href="https://github.com/kubevirt/cloud-image-builder/issues" target="_blank">cloud-image-builder issue tracker</a>.</p>
+the <a href="https://github.com/kubevirt/cloud-image-builder/issues" target="\_blank">cloud-image-builder issue tracker</a>.</p>
 
-<p>If experience a problem with the labs, please report it to the <a href="https://github.com/kubevirt/kubevirt.github.io/issues" target="_blank">kubevirt.io issue tracker</a>.</p>
+<p>If experience a problem with the labs, please report it to the <a href="https://github.com/kubevirt/kubevirt.github.io/issues" target="\_blank">kubevirt.io issue tracker</a>.</p>
 
           </div>
         </div>

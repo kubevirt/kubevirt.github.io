@@ -50,6 +50,8 @@ GEM
       sass (~> 3.4)
     jekyll-sitemap (1.4.0)
       jekyll (>= 3.7, < 5.0)
+    jekyll-tagging (1.1.0)
+      nuggets
     jekyll-watch (2.2.1)
       listen (~> 3.0)
     kramdown (1.17.0)
@@ -63,6 +65,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     nokogumbo (2.0.2)
       nokogiri (~> 1.8, >= 1.8.4)
+    nuggets (1.6.0)
     parallel (1.19.1)
     pathutil (0.16.2)
       forwardable-extended (~> 2.6)
@@ -95,6 +98,7 @@ DEPENDENCIES
   jekyll-paginate
   jekyll-redirect-from
   jekyll-sitemap
+  jekyll-tagging
   premonition (~> 2.0.0)
   rake
 

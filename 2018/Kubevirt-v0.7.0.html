@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="KubeVirt 0.7.0 Highlights">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="hilights, release notes, review, hugepages" >
     <meta property="og:title" content="Kubevirt V0.7.0 | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/Kubevirt-v0.7.0.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: karmab</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/hilights">hilights</a>&nbsp;|&nbsp;<a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/review">review</a>&nbsp;|&nbsp;<a href="/tag/hugepages">hugepages</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: July 23, 2018  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -246,7 +252,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>KubeVirt v0.7.0 was released a few weeks ago and brings a bunch of new features that this blog post will detail.</p>
 
-<p>the full list is visible <a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.7.0">here</a> but we will pick the ones oriented to the end user</p>
+<p>The full list is visible <a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.7.0">here</a> but we will pick the ones oriented to the end user</p>
 
 <h1 id="features">Features</h1>
 
@@ -254,7 +260,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>To use hugepages as backing memory, we need to indicate a desired amount of memory (<code class="language-html highlighter-rouge">resources.requests.memory</code>) and size of hugepages to use (<code class="language-html highlighter-rouge">memory.hugepages.pageSize</code>)</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -274,26 +280,26 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 18
 19
 20
-</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha1
-kind: VirtualMachine
-metadata:
-  name: myvm
-spec:
-  domain:
-    resources:
-      requests:
-        memory: "64Mi"
-    memory:
-      hugepages:
-        pageSize: "2Mi"
-    disks:
-    - name: myimage
-      volumeName: myimage
-      disk: {}
-  volumes:
-    - name: myimage
-      persistentVolumeClaim:
-        claimname: myclaim
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s2">"</span><span class="s">64Mi"</span>
+    <span class="na">memory</span><span class="pi">:</span>
+      <span class="na">hugepages</span><span class="pi">:</span>
+        <span class="na">pageSize</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2Mi"</span>
+    <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myimage</span>
+        <span class="na">volumeName</span><span class="pi">:</span> <span class="s">myimage</span>
+        <span class="na">disk</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myimage</span>
+      <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+        <span class="na">claimname</span><span class="pi">:</span> <span class="s">myclaim</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Note that</p>
@@ -306,9 +312,9 @@ spec:
 
 <h2 id="setting-network-interface-model-and-mac-address">setting network interface model and MAC address</h2>
 
-<p>the following syntax within interfaces section allows us to set both a mac address and network  model</p>
+<p>the following syntax within interfaces section allows us to set both a mac address and network model</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -320,18 +326,18 @@ spec:
 10
 11
 12
-</pre></td><td class="rouge-code"><pre>kind: VM
-spec:
-  domain:
-    devices:
-      interfaces:
-        - name: red
-          macAddress: de:ad:00:00:be:af
-          model: e1000
-          bridge: {}
-  networks:
-  - name: red
-    pod: {}
+</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">VM</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">interfaces</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">red</span>
+          <span class="na">macAddress</span><span class="pi">:</span> <span class="s">de:ad:00:00:be:af</span>
+          <span class="na">model</span><span class="pi">:</span> <span class="s">e1000</span>
+          <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">networks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">red</span>
+      <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>alternative network models can be</p>
@@ -349,7 +355,7 @@ spec:
 
 <p>The new keyword <code class="language-html highlighter-rouge">serial</code> in the disks section allows us to specify a serial number</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -367,46 +373,44 @@ spec:
 16
 17
 18
-</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha1
-kind: VirtualMachine
-metadata:
-  name: myvm
-spec:
-  domain:
-    resources:
-      requests:
-        memory: "64Mi"
-    disks:
-    - name: myimage
-      volumeName: myimage
-      serial: sn-11223344
-      disk: {}
-  volumes:
-    - name: myimage
-      persistentVolumeClaim:
-        claimname: myclaim
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s2">"</span><span class="s">64Mi"</span>
+    <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myimage</span>
+        <span class="na">volumeName</span><span class="pi">:</span> <span class="s">myimage</span>
+        <span class="na">serial</span><span class="pi">:</span> <span class="s">sn-11223344</span>
+        <span class="na">disk</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myimage</span>
+      <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+        <span class="na">claimname</span><span class="pi">:</span> <span class="s">myclaim</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="specifying-the-cpu-model">specifying the CPU model</h2>
 
 <p>Setting the CPU model is possible via <code class="language-html highlighter-rouge">spec.domain.cpu.model</code>. The following VM will have a CPU with the Conroe model:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
 5
 6
 7
-8
-</pre></td><td class="rouge-code"><pre>metadata:
-  name: myvmi
-spec:
-  domain:
-    cpu:
-      # this sets the CPU model
-      model: Conroe
-...
+</pre></td><td class="rouge-code"><pre><span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">myvmi</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">cpu</span><span class="pi">:</span>
+      <span class="c1"># this sets the CPU model</span>
+      <span class="na">model</span><span class="pi">:</span> <span class="s">Conroe</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The available models are listed <a href="https://github.com/libvirt/libvirt/blob/master/src/cpu_map">here</a></p>
@@ -450,7 +454,7 @@ spec:
 
 <p>In slirp mode, virtual machines are connected to the network backend using QEMU user networking mode. In this mode, QEMU allocates internal IP addresses to virtual machines and hides them behind NAT.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -460,23 +464,23 @@ spec:
 8
 9
 10
-</pre></td><td class="rouge-code"><pre>kind: VM
-spec:
-  domain:
-    devices:
-      interfaces:
-        - name: red
-          slirp: {} # connect using SLIRP mode
-  networks:
-  - name: red
-    pod: {}
+</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">VM</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">interfaces</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">red</span>
+          <span class="na">slirp</span><span class="pi">:</span> <span class="pi">{}</span> <span class="c1"># connect using SLIRP mode</span>
+  <span class="na">networks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">red</span>
+      <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="role-aggregation-for-our-roles">Role aggregation for our roles</h2>
 
 <p>Every KubeVirt installation after version v0.5.1 comes a set of default RBAC cluster roles that can be used to grant users access to VirtualMachineInstances.</p>
 
-<p>The kubevirt.io:admin and kubevirt.io:edit ClusterRoles have console and VNC access permissions built into them.</p>
+<p>The <code class="language-html highlighter-rouge">kubevirt.io:admin</code> and <code class="language-html highlighter-rouge">kubevirt.io:edit</code> ClusterRoles have console and VNC access permissions built into them.</p>
 
 <h1 id="conclusion">Conclusion</h1>
 

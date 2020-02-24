@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="lab, cri-o, quickstart, homelab" >
     <meta property="og:title" content="KubeVirt on Kubernetes with CRI-O from scratch | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/KubeVirt_k8s_crio_from_scratch.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: Pedro Ibáñez Requena</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/lab">lab</a>&nbsp;|&nbsp;<a href="/tag/cri-o">cri-o</a>&nbsp;|&nbsp;<a href="/tag/quickstart">quickstart</a>&nbsp;|&nbsp;<a href="/tag/homelab">homelab</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: October 9, 2019  </span>
             </div>
             <div>
@@ -239,11 +244,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
           <p>Building your environment for testing or automation purposes can be difficult when using different technologies. In this guide you’ll find how to set up your system step-by-step to work with the latest versions up to today of Kubernetes, CRI-O and KubeVirt.
 In this series of blogposts the following topics are going to be covered en each post:</p>
+
 <ul>
   <li><a href="/2019/KubeVirt_k8s_crio_from_scratch.html">Requirements: dependencies and containers runtime</a></li>
   <li><a href="/2019/KubeVirt_k8s_crio_from_scratch_installing_kubernetes.html">Kubernetes: Cluster and Network</a></li>
@@ -251,7 +258,9 @@ In this series of blogposts the following topics are going to be covered en each
 </ul>
 
 <h2 id="pre-requisites">Pre-requisites</h2>
+
 <h3 id="versions">Versions</h3>
+
 <p>The following versions are going to be used:</p>
 
 <table>
@@ -292,13 +301,17 @@ In this series of blogposts the following topics are going to be covered en each
 </table>
 
 <h3 id="requirements">Requirements</h3>
+
 <p>It is a requirement to have a Virtual Machine (VM) with enough resources, in my case I am running a 16GB memory and 4vCPUs VM, but should probably be run with less resources. Operating System (OS) running this VM as indicated in the table above has to be CentOS 7.7.1908 and you should take care of its deployment. In my lab I used latest <a href="https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2">Centos 7 cloud image</a> to speed up the provisioning process.</p>
 
 <p>In this guide the system will be named k8s-test.local and the IP address is 192.168.0.10. A second system called laptop would be used to run the playbooks (if you choose to go the easy and automated way). It is also needed to have access to the root account in the VM for installing the required software and configure some kernel parameters. In this example only a Kubernetes master would be used.</p>
 
 <h2 id="instructions">Instructions</h2>
+
 <h3 id="preparing-the-vm">Preparing the VM</h3>
+
 <p>Ensure the VM system is updated to the latest versions of the software and also ensure that the epel repository is installed:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -310,7 +323,9 @@ k8s-test.local# yum update -y
 
 k8s-test.local# yum install vim jq -y
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The following kernel parameters have to be configured:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -324,6 +339,7 @@ k8s-test.local# yum install vim jq -y
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>And also the following kernel modules have to be installed:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -337,11 +353,13 @@ k8s-test.local# echo overlay &gt; /etc/modules-load.d/overlay.conf
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The new sysctl parameters have to be loaded in the system with the following command:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# sysctl -p/etc/sysctl.d/99-kubernetes-cri.conf
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The next step is to disable SELinux:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -349,13 +367,19 @@ k8s-test.local# echo overlay &gt; /etc/modules-load.d/overlay.conf
 
 k8s-test.local# sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>And the installation of Kubernetes and CRI-O can proceed.</p>
 
 <h3 id="installing-kubernetes-and-cri-o">Installing Kubernetes and CRI-O</h3>
+
 <p>To install Kubernetes and CRI-O several ways can be used, in this guide there is the step-by-step guide where the user can do everything by himself or the alternative option, taking the easy road and running the ansible-playbook that will take care of almost everything.</p>
 
 <h4 id="the-ansible-way">The ansible way</h4>
-<p>Note: we are waiting for the <a href="https://github.com/cri-o/cri-o-ansible/pull/25">PR</a> to be merged in the official cri-o-ansible repository, meantime a fork in an alternative repository would be used. Also, note that the following commands are executed from a different place, in this case from a computer called <code class="language-html highlighter-rouge">laptop</code>:</p>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>we are waiting for the <a href="https://github.com/cri-o/cri-o-ansible/pull/25">PR</a> to be merged in the official cri-o-ansible repository, meantime a fork in an alternative repository would be used. Also, note that the following commands are executed from a different place, in this case from a computer called <code class="language-html highlighter-rouge">laptop</code>:</p>
+
+
+</div></div>
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -379,49 +403,58 @@ laptop# ansible-playbook cri-o.yml -i 192.168.0.10,
 <p>Once the playbook ends the system would be ready for getting CRI-O configured.</p>
 
 <h4 id="the-step-by-step-way">The step-by-step way</h4>
+
 <p>If the ansible way was chosen, you may want to skip this section. Otherwise, let’s configure each piece.</p>
 
 <p>The required packages may be installed in the system running the following command:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# yum install btrfs-progs-devel container-selinux device-mapper-devel gcc git glib2-devel glibc-devel glibc-static gpgme-devel json-glib-devel libassuan-devel libgpg-error-devel libseccomp-devel make pkgconfig skopeo-containers tar wget -y
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Install golang and the md2man packages:</p>
-<blockquote>
-  <p>Note: depending on the operating system running in your VM, it may be needed to change the name of the md2man golang package.</p>
-  <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p>depending on the operating system running in your VM, it may be needed to change the name of the md2man golang package.</p>
+
+
+</div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# yum install golang-github-cpuguy83-go-md2man golang -y
-</pre></td></tr></tbody></table></code></pre></div>  </div>
-</blockquote>
+</pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The following directories have to be created:</p>
+
 <ul>
   <li>/usr/local/go</li>
   <li>/etc/systemd/system/kubelet.service.d/</li>
   <li>/var/lib/etcd</li>
-  <li>/etc/cni/net.d
-    <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>k8s-test.local# for d in "/usr/local/go /etc/systemd/system/kubelet.service.d/ /var/lib/etcd /etc/cni/net.d /etc/containers"; do mkdir -p $d; done
-</pre></td></tr></tbody></table></code></pre></div>    </div>
-  </li>
+  <li>/etc/cni/net.d</li>
 </ul>
 
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>k8s-test.local# for d in "/usr/local/go /etc/systemd/system/kubelet.service.d/ /var/lib/etcd /etc/cni/net.d /etc/containers"; do mkdir -p $d; done
+</pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Clone the runc repository:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# git clone https://github.com/opencontainers/runc /root/src/github.com/opencontainers/runc
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Clone the CRI-O repository:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# git clone https://github.com/cri-o/cri-o /root/src/github.com/cri-o/cri-o
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Clone the CNI repository:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# git clone https://github.com/containernetworking/plugins /root/src/github.com/containernetworking/plugins
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>To build each part, a series of commands have to be executed, first building runc:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -439,11 +472,13 @@ k8s-test.local# make install
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>And also runc has to be linked in the correct path:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# ln -sf /usr/local/sbin/runc /usr/bin/runc
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Now building CRI-O (special focus on switching the branch):</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -481,6 +516,7 @@ k8s-test.local# make install.config
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>CRI-O also needs the conmon software as a dependency:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -498,6 +534,7 @@ k8s-test.local# make install
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Now, the ContainerNetworking plugins have to be built and installed:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -515,6 +552,7 @@ k8s-test.local# cp bin/* /opt/cni/bin/
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The cgroup manager has to be changed in the CRI-O configuration from the value of <code class="language-html highlighter-rouge">systemd</code> to <code class="language-html highlighter-rouge">cgroupfs</code>, to get it done, the file <code class="language-html highlighter-rouge">/etc/crio/crio.conf</code> has to be edited and the variable <code class="language-html highlighter-rouge">cgroup_manager</code> has to be replaced from its original value of <code class="language-html highlighter-rouge">systemd</code> to <code class="language-html highlighter-rouge">cgroupfs</code> (it could be already set it up to that value, in that case this step can be skiped):</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -524,6 +562,7 @@ group_manager = "cgroupfs"
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>In the same file, the storage_driver is not configured, the variable <code class="language-html highlighter-rouge">storage_driver</code> has to be uncommented and the value has to be changed from <code class="language-html highlighter-rouge">overlay</code> to <code class="language-html highlighter-rouge">overlay2</code>:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -533,6 +572,7 @@ storage_driver = "overlay2"
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Also related with the storage, the <code class="language-html highlighter-rouge">storage_option</code> has to be configured to have the following value:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>k8s-test.local# vim /etc/crio/crio.conf
@@ -540,6 +580,7 @@ storage_option = [ "overlay2.override_kernel_check=1" ]
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="preparing-cri-o">Preparing CRI-O</h3>
+
 <p>CRI-O is the lightweight container runtime for Kubernetes. As it is pointed in the <a href="https://cri-o.io">CRI-O Website</a>:</p>
 
 <blockquote>
@@ -551,6 +592,7 @@ storage_option = [ "overlay2.override_kernel_check=1" ]
 </blockquote>
 
 <p>The first step is to change the configuration of the <code class="language-html highlighter-rouge">network_dir</code> parameter in the CRI-O configuration file, for doing so, the <code class="language-html highlighter-rouge">network_dir</code> parameter in the <code class="language-html highlighter-rouge">/etc/crio/crio.conf</code> file has to be changed to point to <code class="language-html highlighter-rouge">/etc/crio/net.d</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -560,22 +602,29 @@ storage_option = [ "overlay2.override_kernel_check=1" ]
 # Path to the directory where CNI configuration files are located.
 network_dir = "/etc/crio/net.d/"
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Also that directory has to be created:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local$ mkdir /etc/crio/net.d
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The reason behind that change is because CRI-O and <code class="language-html highlighter-rouge">kubeadm reset</code> don’t play well together, as <code class="language-html highlighter-rouge">kubeadm reset</code> empties /etc/cni/net.d/. Therefore, it is good to change the <code class="language-html highlighter-rouge">crio.network.network_dir</code> in <code class="language-html highlighter-rouge">crio.conf</code> to somewhere kubeadm won’t touch. To get more information the following link [Running CRI-O with kubeadm] in the References section can be checked.</p>
 
 <p>Now Kubernetes has to be configured to be able to talk to CRI-O, to proceed, a new file has to be created in <code class="language-html highlighter-rouge">/etc/default/kubelet</code> with the following content:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=cgroupfs --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Now the systemd has to be reloaded reloaded:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# systemctl daemon-reload
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>CRI-O will use flannel network as it is recommended for multus so the following file has to be downloaded and configured:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -589,7 +638,9 @@ k8s-test.local# wget https://raw.githubusercontent.com/cri-o/cri-o/master/contri
 k8s-test.local# sed -i 's/10.88.0.0/10.244.0.0/g' 10-crio-bridge.conf
 
 </pre></td></tr></tbody></table></code></pre></div></div>
-<p>As the previous code block has shown, the network used is 10.244.0.0, now the crio service can be started and enabled:</p>
+
+<p>As the previous code block has shown, the network used is <code class="language-html highlighter-rouge">10.244.0.0</code>, now the crio service can be started and enabled:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3

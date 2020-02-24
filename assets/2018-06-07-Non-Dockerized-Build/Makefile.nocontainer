@@ -44,4 +44,3 @@ cluster-sync: build
 	./cluster/deploy.sh
 
 .PHONY: bootstrap generate apidocs build test check functest cluster-sync
-

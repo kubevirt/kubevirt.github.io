@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide - Installing Kubernetes">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="cri-o, kubernetes, ansible" >
     <meta property="og:title" content="KubeVirt on Kubernetes with CRI-O from scratch - Installing Kubernetes | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/KubeVirt_k8s_crio_from_scratch_installing_kubernetes.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: Pedro Ibáñez Requena</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/cri-o">cri-o</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">kubernetes</a>&nbsp;|&nbsp;<a href="/tag/ansible">ansible</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: October 16, 2019  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -292,10 +298,10 @@ k8s-test.local# yum <span class="nb">install</span> <span class="nt">-y</span> k
 
 <p>Once the Kubelet is configured and CRI-O also ready, the CRI-O daemon can be started and the setup of the cluster can be done:</p>
 
-<blockquote>
-  <p>Note that kubelet will not start successfully until the Kubernetes cluster is installed.</p>
-</blockquote>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>The kubelet will not start successfully until the Kubernetes cluster is installed.</p>
 
+
+</div></div>
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -382,10 +388,10 @@ kube-system   kube-scheduler-k8s-test            1/1     Running   0          50
 
 <p>Some of the <a href="https://github.com/intel/multus-cni/blob/master/doc/quickstart.md">Multus Prequisites</a> indicate:</p>
 
-<blockquote>
-  <p>After installing Kubernetes, you must install a default network CNI plugin. If you’re using kubeadm, refer to the “Installing a pod network add-on” section in the kubeadm documentation. If it’s your first time, we generally recommend using Flannel for the sake of simplicity.</p>
-</blockquote>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>After installing Kubernetes, you must install a default network CNI plugin. If you’re using kubeadm, refer to the “Installing a pod network add-on” section in the kubeadm documentation. If it’s your first time, we generally recommend using Flannel for the sake of simplicity.</p>
 
+
+</div></div>
 <p>So flannel is going to be installed running the following commands:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -493,7 +499,6 @@ daemonset.apps/kube-multus-ds-ppc64le created
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>In the next post <a href="/2019/KubeVirt_k8s_crio_from_scratch_installing_KubeVirt.html">KubeVirt: requirements and first Virtual Machine</a>, the KubeVirt requirements will be set up together with the binaries and YAML files and also the first virtual Machines will be deployed.</p>
-
 
         </article>
         

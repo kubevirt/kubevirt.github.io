@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide - Installing KubeVirt">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="cri-o, kubevirt installation" >
     <meta property="og:title" content="KubeVirt on Kubernetes with CRI-O from scratch - Installing KubeVirt | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/KubeVirt_k8s_crio_from_scratch_installing_KubeVirt.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: Pedro Ibáñez Requena</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/cri-o">cri-o</a>&nbsp;|&nbsp;<a href="/tag/kubevirt-installation">kubevirt installation</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: October 23, 2019  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -259,6 +265,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>This is the last blogpost of the series of 3, in this case KubeVirt is going to be installed and also would be used to deploy an example Virtual Machine.</p>
 
 <h2 id="installing-kubevirt">Installing KubeVirt</h2>
+
 <p>What is KubeVirt? if you navigate to the <a href="https://kubevirt.io">KubeVirt webpage</a> you can read:</p>
 
 <blockquote>
@@ -270,22 +277,25 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </blockquote>
 
 <p>In this example there is a Kubernetes cluster compose of one master, for it to be schedulable to host the KubeVirt pods, a little modification has to be done:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl taint nodes k8s-test node-role.kubernetes.io/master:NoSchedule-
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The last version of KubeVirt at the moment is <code class="language-html highlighter-rouge">v0.20.8</code>, to check it the following command can be executed:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
-</pre></td><td class="rouge-code"><pre>k8s-test.local# <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq <span class="nt">-r</span> .tag_name<span class="si">)</span>          
+</pre></td><td class="rouge-code"><pre>k8s-test.local# <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq <span class="nt">-r</span> .tag_name<span class="si">)</span>
 
 k8s-test.local# <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
 v0.20.8
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>To install KubeVirt, the operator and the cr are going to be created with the following commands:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -293,11 +303,15 @@ v0.20.8
 
 k8s-test.local# kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>This demo environment already runs within a virtualized environment, and in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The deployment can be checked with the following command:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -319,6 +333,7 @@ virt-operator-6b4dccb44d-m2mvf     1/1     Running   0          16h
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Now that KubeVirt is installed is the right time to download the client tool to interact with th Virtual Machines.</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -341,7 +356,7 @@ virt-operator-6b4dccb44d-m2mvf     1/1     Running   0          16h
 
 k8s-test.local# <span class="nb">chmod</span> +x virtctl
 
-k8s-test.local# ./virtctl 
+k8s-test.local# ./virtctl
 Available Commands:
   console      Connect to a console of a virtual machine instance.
   expose       Expose a virtual machine instance, virtual machine, or virtual machine instance replica <span class="nb">set </span>as a new service.
@@ -358,6 +373,7 @@ Use <span class="s2">"virtctl options"</span> <span class="k">for </span>a list 
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>This step is optional, right now anything related with the Virtual Machines can be done running the <code class="language-html highlighter-rouge">virtctl</code> command. In case ther’s a need to interact with the Virtual Machines without leaving the scope of the <code class="language-html highlighter-rouge">kubectl</code> command, the virt pluging for krew can be installed following the instructions below:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -383,8 +399,10 @@ WARNING: You installed a plugin from the krew-index plugin repository.
    These plugins are not audited <span class="k">for </span>security by the Krew maintainers.
    Run them at your own risk.
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The warning printed by the Krew maintainers can be ignored.
 To have the krew plugin available, the PATH variable has to be modified:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -392,7 +410,9 @@ To have the krew plugin available, the PATH variable has to be modified:</p>
 <span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">KREW_ROOT</span><span class="k">:-</span><span class="nv">$HOME</span><span class="p">/.krew</span><span class="k">}</span><span class="s2">/bin:</span><span class="nv">$PATH</span><span class="s2">"</span>
 k8s-test.local# <span class="nb">source</span> ~/.bashrc
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Now, the virt plugin is going to be installed using the krew plugin manager:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -444,7 +464,9 @@ WARNING: You installed a plugin from the krew-index plugin repository.
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="installing-the-first-virtual-machine-in-kubevirt">Installing the first Virtual Machine in KubeVirt</h2>
+
 <p>For this example, a cirros Virtual Machine is going to be created, in this example, the kind of disk used is a registry disk (not persistent):</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -456,7 +478,9 @@ k8s-test.local# kubectl get vms
 NAME        AGE   RUNNING   VOLUME
 testvm   13s   <span class="nb">false</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>After the Virtual Machine has been created, it has to be started, to do so, the virtcl or the kubectl can be used (dependeing on what method has been choosen in previous steps).</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -470,7 +494,9 @@ k8s-test.local# kubectl get vms
 NAME        AGE     RUNNING   VOLUME
 testvm   7m11s   <span class="nb">true</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Next thing to do is to use the <code class="language-html highlighter-rouge">kubectl</code> command for getting the IP address and the actual status of the virtual machines:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -490,6 +516,7 @@ testvm   63s   Running   10.244.0.15   k8s-test
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (<code class="language-html highlighter-rouge">./virtclt console testvm</code>) or also a direct connection with SSH can be made:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -503,6 +530,7 @@ $ exit
 </span></pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>To stop the Virtual Machine one of the following commands can be executed:</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -516,7 +544,9 @@ VM testvm was scheduled to stop
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="troubleshooting">Troubleshooting</h1>
+
 <p>Each step of this guide has a place where to look for possible issues, in general, the <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/">troubleshooting guide of kubernetes</a> can be checked. The following list tries to ease the possible troubleshooting in case of problems during each step of this guide:</p>
+
 <ul>
   <li>CRI-O: check the status of the CRI-O service <code class="language-html highlighter-rouge">systemctl status crio</code> and also the messages in the journal <code class="language-html highlighter-rouge">journalctl -u crio -lf</code></li>
   <li>Kubernetes: check the status of the Kubelet service <code class="language-html highlighter-rouge">systemctl status kubelet</code> and also the messages in the journal <code class="language-html highlighter-rouge">journalctl -u kubelet -fl</code></li>

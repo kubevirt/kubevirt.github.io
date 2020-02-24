@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Deploying KubeVirt on a single oVirt VM">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="ovirt, openshift" >
     <meta property="og:title" content="Deploying Kubevirt On A Single Ovirt Vm | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/Deploying-KubeVirt-on-a-Single-oVirt-VM.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: awels</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/ovirt">ovirt</a>&nbsp;|&nbsp;<a href="/tag/openshift">openshift</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: May 4, 2018  </span>
             </div>
             <div>
@@ -239,10 +244,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: uncategorized
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <p>In this blog post we are exploring the possibilities of deploying Kube Virt on top of Open Shift which is running inside an oVirt VM. First we must prepare the environment. In my testing I created a VM with 4 cpus, 14G memory and a 100G disk. I then installed Centos 7.4 minimal on it. I also have nested virtualization
+          <p>In this blog post we are exploring the possibilities of deploying KubeVirt on top of OpenShift which is running inside an oVirt VM. First we must prepare the environment. In my testing I created a VM with 4 cpus, 14G memory and a 100G disk. I then installed CentOS 7.4 minimal on it. I also have nested virtualization
 enabled on my hosts, so any VMs I create can run VMs inside them. These instructions are specific to oVirt, however if you are running another virtualization
 platform that can nested virtualization this will also work.</p>
 
@@ -254,22 +260,28 @@ VM.</p>
 <p>First we will need to enable epel and install some needed tools, like git to get at the source, and ansible to do the deploy:</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>epel-release
 <span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>ansible git wget
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p><em>optional</em>
 <em>Install ovirt-guest-agent so you can see information in your oVirt admin view.</em></p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
+4
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>ovirt-guest-agent
 <span class="nv">$ </span>systemctl start ovirt-guest-agent
 <span class="nv">$ </span>systemctl <span class="nb">enable </span>ovirt-guest-agent
+
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p><em>Make a template out of the VM, so if something goes wrong you have a good starting point to try again.</em></p>
 
 <p>Make sure the VM has a fully qualified domain name, using either DNS or editing /etc/hosts.</p>
@@ -278,6 +290,7 @@ VM.</p>
 in this article I opted to simply copy the oc command into /usr/bin, but anywhere in your path will do. Alternatively you can add oc to your PATH.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -289,6 +302,7 @@ in this article I opted to simply copy the oc command into /usr/bin, but anywher
 <p>Next we will install docker and configure it for use with open shift.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>docker
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -300,6 +314,7 @@ to the end of /etc/sysconfig/docker</p>
 <p>Now we can start docker.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>systemctl start docker
@@ -309,16 +324,19 @@ to the end of /etc/sysconfig/docker</p>
 <p>Now we are ready to test if we can bring our cluster to up.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc cluster up
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h2 id="installing-kube-virt-with-ansible">Installing kube virt with ansible</h2>
+
 <p>Now that we have everything configured we can the rest as a regular user. Also note that if you had an existing cluster you can could have skipped the previous section.</p>
 
 <p>Clone the kube-virt ansible repo, and setup the ansible galaxy roles needed to deploy.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -336,6 +354,7 @@ Because we opted to install everything on a single VM the FQDN we enter is the s
 enter the FQDN of each in the inventory file. Lets assume our VMs FQDN is kubevirt.demo, we would changed the inventory file as follows:</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -358,6 +377,7 @@ kubevirt.demo
 configured already:</p>
 
 <p>As <em>root</em>:</p>
+
 <pre><code class="language-base">$ ssh-keygen -t rsa
 </code></pre>
 
@@ -369,6 +389,7 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>Next we need to configure docker storage, one can write a whole book about how to do that, so I will post a <a href="https://docs.okd.io/1.5/install_config/install/host_preparation.html#configuring-docker-storage">link</a> to the installation document and for now go with the defaults which are not recommended for production, but since this is an introduction its fine.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>docker-storage-setup
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -376,6 +397,7 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>Lets double check the cluster is up before we start running the ansible play books.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc cluster up
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -383,6 +405,7 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>Install kubernetes.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>ansible-playbook <span class="nt">-i</span> inventory playbooks/cluster/kubernetes/config.yml
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -390,6 +413,7 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>Disable selinux on all hosts, this hopefully won’t be needed in the future.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>ansible-playbook <span class="nt">-i</span> inventory playbooks/selinux.yml
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -397,6 +421,7 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>log in as admin to give developer user rights.</p>
 
 <p>As <em>root</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc login <span class="nt">-u</span> system:admin
@@ -406,12 +431,15 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>Log in as the developer user.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc login <span class="nt">-u</span> developer
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The password for the developer user is developer. Now finally deploy kubevirt.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>ansible-playbook <span class="nt">-i</span> localhost playbooks/kubevirt.yml <span class="nt">-e</span>@vars/all.yml
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -419,6 +447,7 @@ you need to append the contents of id_rsa.pub on each host.</p>
 <p>Verify that the pods are running, you should be in the kube-system namespace, if not switch with oc project kube-system.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -435,10 +464,11 @@ virt-controller-648945bbcb-nxrj8   0/1       Running   0          10m
 virt-handler-6zh77                 1/1       Running   0          10m
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Now that we have kube virt up and running we are ready to try and start a VM. Lets install virtctl to make it easier to
+<p>Now that we have kube virt up and running we are ready to try to start a VM. Let’s install virtctl to make it easier to
 start and stop VMs. The latest available version while writing this was 0.4.1.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -452,6 +482,7 @@ start and stop VMs. The latest available version while writing this was 0.4.1.</
 <p>Lets grab the demo VM specification from the kubevirt github page.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -459,6 +490,7 @@ start and stop VMs. The latest available version while writing this was 0.4.1.</
 <p>Now we can start the VM.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nv">$ </span>./virtctl start testvm
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -466,6 +498,7 @@ start and stop VMs. The latest available version while writing this was 0.4.1.</
 <p>Now a new pod will be running that is controlling the VM.</p>
 
 <p>As <em>user</em>:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -484,9 +517,10 @@ virt-handler-6zh77                 1/1       Running   0          15m
 virt-launcher-testvm-gv5nt         2/2       Running   0          23s
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Congratulations you now have a VM running in openshift using kubevirt inside an oVirt VM.</p>
+<p>Congratulations you now have a VM running in OpenShift using KubeVirt inside an oVirt VM.</p>
 
-<h2 id="usefule-resources">Usefule resources</h2>
+<h2 id="useful-resources">Useful resources</h2>
+
 <ul>
   <li><a href="https://github.com/kubevirt/kubevirt"><strong>KubeVirt</strong></a></li>
   <li><a href="https://github.com/kubevirt/kubevirt-ansible"><strong>KubeVirt Ansible</strong></a></li>

@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Quick rehash of the network deep-dive">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="networking, multus, ovs-cni, iptables" >
     <meta property="og:title" content="Kubevirt Network Rehash | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/KubeVirt-Network-Rehash.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: jcpowermac</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/networking">networking</a>&nbsp;|&nbsp;<a href="/tag/multus">multus</a>&nbsp;|&nbsp;<a href="/tag/ovs-cni">ovs-cni</a>&nbsp;|&nbsp;<a href="/tag/iptables">iptables</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: October 3, 2018  </span>
             </div>
             <div>
@@ -239,13 +244,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
           <h1 id="introduction">Introduction</h1>
 
-<p>This post is a quick rehash of the previous <a href="/2018/KubeVirt-Network-Deep-Dive.html">post</a> regarding KubeVirt networking.
-It has been updated to reflect the updates that are included with v0.8.0 which includes
+<p>This post is a quick rehash of the previous <a href="/2018/KubeVirt-Network-Deep-Dive.html">post</a> regarding KubeVirt networking.</p>
+
+<p>It has been updated to reflect the updates that are included with v0.8.0 which includes
 optional layer 2 support via Multus and the ovs-cni. I won’t be covering the installation
 of <a href="https://docs.okd.io/">OKD</a>, Kubernetes, KubeVirt, <a href="/2018/attaching-to-multiple-networks.html">Multus or ovs-cni</a> all can be found in other documentation or
 posts.</p>
@@ -259,7 +266,8 @@ These instances are where we will install our simple NodeJS and MongoDB applicat
 
 <p>One of the first objects to create is the <code class="language-html highlighter-rouge">NetworkAttachmentDefinition</code>.
 We are using a fairly simple definition for this post with an ovs bridge <code class="language-html highlighter-rouge">br1</code> and no vlan configured.</p>
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -269,27 +277,27 @@ We are using a fairly simple definition for this post with an ovs bridge <code c
 8
 9
 10
-</pre></td><td class="rouge-code"><pre>apiVersion: "k8s.cni.cncf.io/v1"
-kind: NetworkAttachmentDefinition
-metadata:
-  name: ovs-net-br1
-spec:
-  config: '{
-      "cniVersion": "0.3.1",
-      "type": "ovs",
-      "bridge": "br1"
-    }'
+</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">k8s.cni.cncf.io/v1"</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">ovs-net-br1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">config</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{</span>
+    <span class="s">"cniVersion":</span><span class="nv"> </span><span class="s">"0.3.1",</span>
+    <span class="s">"type":</span><span class="nv"> </span><span class="s">"ovs",</span>
+    <span class="s">"bridge":</span><span class="nv"> </span><span class="s">"br1"</span>
+    <span class="s">}'</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/mongodb.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+2
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/mongodb.yaml
+oc create <span class="nt">-f</span> https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/nodejs.yaml
 </pre></td></tr></tbody></table></code></pre></div></div>
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/nodejs.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>Start the virtual machines instances</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>~/virtctl start nodejs
 ~/virtctl start mongodb
@@ -297,7 +305,7 @@ spec:
 
 <p>Review KubeVirt virtual machine related objects</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -315,21 +323,21 @@ spec:
 16
 17
 18
-</pre></td><td class="rouge-code"><pre>$ oc get net-attach-def
+</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc get net-attach-def
 NAME          AGE
 ovs-net-br1   16d
 
-$ oc get vm
+<span class="nv">$ </span>oc get vm
 NAME      AGE
 mongodb   4d
 nodejs    4d
 
-$ oc get vmi
+<span class="nv">$ </span>oc get vmi
 NAME      AGE
 mongodb   3h
 nodejs    3h
 
-$ oc get pod
+<span class="nv">$ </span>oc get pod
 NAME                          READY     STATUS    RESTARTS   AGE
 virt-launcher-mongodb-bw2t8   2/2       Running   0          3h
 virt-launcher-nodejs-dlgv6    2/2       Running   0          3h
@@ -338,13 +346,15 @@ virt-launcher-nodejs-dlgv6    2/2       Running   0          3h
 <h2 id="service-and-endpoints">Service and Endpoints</h2>
 
 <p>We may still want to use services and routes with a KubeVirt virtual machine instance utilizing
-multiple interfaces.
-The service object below is considered
+multiple interfaces.</p>
+
+<p>The service object below is considered
 <a href="https://kubernetes.io/docs/concepts/services-networking/service/#headless-services">headless</a>
 because the <code class="language-html highlighter-rouge">clusterIP</code> is set to <code class="language-html highlighter-rouge">None</code>. We don’t want load-balancing or single service IP as
 this would force traffic over the cluster network which in this example we are trying to avoid.</p>
 
 <h3 id="mongo">Mongo</h3>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -373,20 +383,20 @@ this would force traffic over the cluster network which in this example we are t
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">metadata</span><span class="pi">:</span>
- <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
 <span class="na">spec</span><span class="pi">:</span>
- <span class="na">clusterIP</span><span class="pi">:</span> <span class="s">None</span>
- <span class="na">ports</span><span class="pi">:</span>
- <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">27017</span>
-   <span class="na">targetPort</span><span class="pi">:</span> <span class="m">27017</span>
-   <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
-   <span class="na">nodePort</span><span class="pi">:</span> <span class="m">0</span>
+  <span class="na">clusterIP</span><span class="pi">:</span> <span class="s">None</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">27017</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">27017</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
+      <span class="na">nodePort</span><span class="pi">:</span> <span class="m">0</span>
 <span class="na">selector</span><span class="pi">:</span> <span class="pi">{}</span>
 <span class="nn">---</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Endpoints</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">metadata</span><span class="pi">:</span>
- <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
 <span class="na">subsets</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">addresses</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">ip</span><span class="pi">:</span> <span class="s">192.168.123.139</span>
@@ -394,6 +404,7 @@ this would force traffic over the cluster network which in this example we are t
       <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">27017</span>
         <span class="na">name</span><span class="pi">:</span> <span class="s">mongo</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p>The above ip address is provided by DHCP via dnsmasq to the virtual machine instance’s <code class="language-html highlighter-rouge">eth1</code> interface.
 All the nodes are virtual instances configured by libvirt.</p>
 
@@ -453,10 +464,10 @@ is accessible from the defined subdomain.</p>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">clusterIP</span><span class="pi">:</span> <span class="s">None</span>
   <span class="na">ports</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
-    <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
-    <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
-    <span class="na">targetPort</span><span class="pi">:</span> <span class="m">8080</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">8080</span>
   <span class="na">sessionAffinity</span><span class="pi">:</span> <span class="s">None</span>
   <span class="na">type</span><span class="pi">:</span> <span class="s">ClusterIP</span>
 <span class="nn">---</span>
@@ -465,12 +476,12 @@ is accessible from the defined subdomain.</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
 <span class="na">subsets</span><span class="pi">:</span>
-<span class="pi">-</span> <span class="na">addresses</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">ip</span><span class="pi">:</span> <span class="s">192.168.123.140</span>
-  <span class="na">ports</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
-    <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
-    <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+  <span class="pi">-</span> <span class="na">addresses</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">ip</span><span class="pi">:</span> <span class="s">192.168.123.140</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">node</span>
+        <span class="na">port</span><span class="pi">:</span> <span class="m">8080</span>
+        <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
 <span class="nn">---</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Route</span>
@@ -485,10 +496,11 @@ is accessible from the defined subdomain.</p>
 <h2 id="testing-our-application">Testing our application</h2>
 
 <p>I am using the same application and method of installation as the previous post so I won’t
-duplicate it here.  Just in case though let’s make sure that the application is available
+duplicate it here. Just in case though let’s make sure that the application is available
 via the <code class="language-html highlighter-rouge">route</code>.</p>
 
 <p><code class="language-html highlighter-rouge">$ curl http://node-vm.apps.192.168.122.101.nip.io</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -499,16 +511,24 @@ via the <code class="language-html highlighter-rouge">route</code>.</p>
 8
 9
 10
-</pre></td><td class="rouge-code"><pre><span class="cp">&lt;!doctype html&gt;</span>
+11
+12
+13
+14
+</pre></td><td class="rouge-code"><pre><span class="cp">&lt;!DOCTYPE html&gt;</span>
 <span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
-<span class="nt">&lt;head&gt;</span>
-  <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
-    <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">"X-UA-Compatible"</span> <span class="na">content=</span><span class="s">"IE=edge,chrome=1"</span><span class="nt">&gt;</span>
-      <span class="nt">&lt;title&gt;</span>Welcome to OpenShift<span class="nt">&lt;/title&gt;</span>
-...outout...
-<span class="nt">&lt;p&gt;</span>Page view count:
-<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"code"</span> <span class="na">id=</span><span class="s">"count-value"</span><span class="nt">&gt;</span>2<span class="nt">&lt;/span&gt;</span>
-...output...
+  <span class="nt">&lt;head&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;meta</span> <span class="na">http-equiv=</span><span class="s">"X-UA-Compatible"</span> <span class="na">content=</span><span class="s">"IE=edge,chrome=1"</span> <span class="nt">/&gt;</span>
+    <span class="nt">&lt;title&gt;</span>Welcome to OpenShift<span class="nt">&lt;/title&gt;</span>
+    ...outout...
+    <span class="nt">&lt;p&gt;</span>
+      Page view count:
+      <span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"code"</span> <span class="na">id=</span><span class="s">"count-value"</span><span class="nt">&gt;</span>2<span class="nt">&lt;/span&gt;</span>
+      ...output...
+    <span class="nt">&lt;/p&gt;</span>
+  <span class="nt">&lt;/head&gt;</span>
+<span class="nt">&lt;/html&gt;</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="networking-in-detail">Networking in Detail</h1>
@@ -542,6 +562,7 @@ MONGO_URL=mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
 <h3 id="endpoints">endpoints</h3>
 
 <p>The endpoints below were manually created for each virtual machine based on the IP Address of <code class="language-html highlighter-rouge">eth1</code>.</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -557,6 +578,7 @@ node      192.168.123.140:8080    7h
 <p>This will allow us access the NodeJS example application using the route url.</p>
 
 <p><code class="language-html highlighter-rouge">$ oc get route</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>NAME      HOST/PORT                             PATH      SERVICES   PORT      TERMINATION   WILDCARD
@@ -570,6 +592,7 @@ node      node-vm.apps.192.168.122.101.nip.io             node       <span class
 <h3 id="interfaces">interfaces</h3>
 
 <p><code class="language-html highlighter-rouge">ip a</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -612,6 +635,7 @@ node      node-vm.apps.192.168.122.101.nip.io             node       <span class
 is one of the veth pair created to connect the virtual machine to the Open vSwitch bridge.</p>
 
 <p><code class="language-html highlighter-rouge">ovs-vsctl show</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -639,9 +663,10 @@ is one of the veth pair created to connect the virtual machine to the Open vSwit
 <h3 id="interfaces-1">interfaces</h3>
 
 <p>There are two bridges <code class="language-html highlighter-rouge">k6t-eth0</code> and <code class="language-html highlighter-rouge">k6t-net0</code>. <code class="language-html highlighter-rouge">eth0</code> and <code class="language-html highlighter-rouge">net1</code> are a veth pair with the alternate side
-available on the host.  <code class="language-html highlighter-rouge">eth0</code> is a member of the <code class="language-html highlighter-rouge">k6t-eth0</code> bridge.  <code class="language-html highlighter-rouge">net1</code> is a member of the <code class="language-html highlighter-rouge">k6t-net0</code> bridge.</p>
+available on the host. <code class="language-html highlighter-rouge">eth0</code> is a member of the <code class="language-html highlighter-rouge">k6t-eth0</code> bridge. <code class="language-html highlighter-rouge">net1</code> is a member of the <code class="language-html highlighter-rouge">k6t-net0</code> bridge.</p>
 
 <p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-76xk7 -- ip a</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -705,6 +730,7 @@ available on the host.  <code class="language-html highlighter-rouge">eth0</code
 <p>Showing the bridge <code class="language-html highlighter-rouge">k6t-eth0</code> and <code class="language-html highlighter-rouge">k6t-net</code> member ports.</p>
 
 <p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- bridge link show</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -723,6 +749,7 @@ on the <code class="language-html highlighter-rouge">k6t-eth0</code> interface t
 a simple DHCP server that provides an offer and typical options to the virtual machine instance.</p>
 
 <p><code class="language-html highlighter-rouge">~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- ss -tuanp</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>Netid State   Recv-Q   Send-Q         Local Address:Port     Peer Address:Port
@@ -786,10 +813,11 @@ from DHCP provided by dnsmasq that was configured by libvirt network on the phys
 <h4 id="configuration-and-dns">Configuration and DNS</h4>
 
 <p>In this example we want to use Kubernetes services so special care must be used when
-configuring the network interfaces.  The default route and dns configuration must be
-maintained by <code class="language-html highlighter-rouge">eth0</code>.  <code class="language-html highlighter-rouge">eth1</code> has both route and dns configuration disabled.</p>
+configuring the network interfaces. The default route and dns configuration must be
+maintained by <code class="language-html highlighter-rouge">eth0</code>. <code class="language-html highlighter-rouge">eth1</code> has both route and dns configuration disabled.</p>
 
 <p><code class="language-html highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -833,6 +861,7 @@ DEFROUTE=no
 <p>Just quickly wanted to cat the <code class="language-html highlighter-rouge">/etc/resolv.conf</code> file to show that DNS is configured so that kube-dns will be properly queried.</p>
 
 <p><code class="language-html highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '') sudo cat /etc/resolv.conf</code></p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>search vm.svc.cluster.local. svc.cluster.local. cluster.local. 168.122.112.nip.io.
@@ -919,7 +948,7 @@ the requests that Nginx is receiving for <code class="language-html highlighter-
 
 <h3 id="haproxy-to-nodejs-vm">HAProxy to NodeJS VM</h3>
 
-<p>The HAProxy pod runs on the master OKD in this scenario.  Using <a href="https://github.com/skydive-project/skydive">skydive</a> we can see a TCP 8080 connection to nodejs eth1 interface exiting eth1 of the master.</p>
+<p>The HAProxy pod runs on the master OKD in this scenario. Using <a href="https://github.com/skydive-project/skydive">skydive</a> we can see a TCP 8080 connection to nodejs eth1 interface exiting eth1 of the master.</p>
 
 <p><code class="language-html highlighter-rouge">$ oc get pod -o wide -n default -l router=router</code></p>
 

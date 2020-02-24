@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-24T15:44:46+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-02-24T17:08:48+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Feb 7 09:40:07 2020 +0100&lt;/p&gt;
 
@@ -13,7 +13,7 @@
   &lt;li&gt;Support for testing SRIOV connectivity in functional tests&lt;/li&gt;
   &lt;li&gt;Update Kubernetes client-go to 1.16.4&lt;/li&gt;
   &lt;li&gt;FOSSA fixes and status&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.26.0</summary></entry><entry><title type="html">KubeVirt v0.25.0</title><link href="https://kubevirt.io//2020/changelog-v0.25.0.html" rel="alternate" type="text/html" title="KubeVirt v0.25.0" /><published>2020-01-13T00:00:00+00:00</published><updated>2020-01-13T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.25.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.25.0.html">&lt;h2 id=&quot;v0250&quot;&gt;v0.25.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.26.0</summary></entry><entry><title type="html">KubeVirt v0.25.0</title><link href="https://kubevirt.io//2020/changelog-v0.25.0.html" rel="alternate" type="text/html" title="KubeVirt v0.25.0" /><published>2020-01-13T00:00:00+00:00</published><updated>2020-01-13T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.25.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.25.0.html">&lt;h2 id=&quot;v0250&quot;&gt;v0.25.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Jan 13 20:37:15 2020 +0100&lt;/p&gt;
 
@@ -22,7 +22,7 @@
   &lt;li&gt;Support emulator thread pinning&lt;/li&gt;
   &lt;li&gt;Support virtctl restart –force&lt;/li&gt;
   &lt;li&gt;Support virtctl migrate to trigger live migrations from the CLI&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.25.0</summary></entry><entry><title type="html">KubeVirt v0.24.0</title><link href="https://kubevirt.io//2019/changelog-v0.24.0.html" rel="alternate" type="text/html" title="KubeVirt v0.24.0" /><published>2019-12-03T00:00:00+00:00</published><updated>2019-12-03T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.24.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.24.0.html">&lt;h2 id=&quot;v0240&quot;&gt;v0.24.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.25.0</summary></entry><entry><title type="html">KubeVirt v0.24.0</title><link href="https://kubevirt.io//2019/changelog-v0.24.0.html" rel="alternate" type="text/html" title="KubeVirt v0.24.0" /><published>2019-12-03T00:00:00+00:00</published><updated>2019-12-03T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.24.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.24.0.html">&lt;h2 id=&quot;v0240&quot;&gt;v0.24.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Tue Dec 3 15:34:34 2019 +0100&lt;/p&gt;
 
@@ -34,7 +34,7 @@
   &lt;li&gt;Update of libvirt to 5.6.0&lt;/li&gt;
   &lt;li&gt;Fix bug related to parallel scraping of Prometheus endpoints&lt;/li&gt;
   &lt;li&gt;Fix to reliably test VNC&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.24.0</summary></entry><entry><title type="html">KubeVirt v0.23.0</title><link href="https://kubevirt.io//2019/changelog-v0.23.0.html" rel="alternate" type="text/html" title="KubeVirt v0.23.0" /><published>2019-11-04T00:00:00+00:00</published><updated>2019-11-04T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.23.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.23.0.html">&lt;h2 id=&quot;v0230&quot;&gt;v0.23.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.24.0</summary></entry><entry><title type="html">KubeVirt v0.23.0</title><link href="https://kubevirt.io//2019/changelog-v0.23.0.html" rel="alternate" type="text/html" title="KubeVirt v0.23.0" /><published>2019-11-04T00:00:00+00:00</published><updated>2019-11-04T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.23.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.23.0.html">&lt;h2 id=&quot;v0230&quot;&gt;v0.23.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Nov 4 16:42:54 2019 +0100&lt;/p&gt;
 
@@ -45,7 +45,7 @@
   &lt;li&gt;Cleaned up and fixed CRD scheme registration&lt;/li&gt;
   &lt;li&gt;Several bugfixes&lt;/li&gt;
   &lt;li&gt;Many CI improvements (e.g. more logs in case of test failures)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.23.0</summary></entry><entry><title type="html">KubeVirt v0.22.0</title><link href="https://kubevirt.io//2019/changelog-v0.22.0.html" rel="alternate" type="text/html" title="KubeVirt v0.22.0" /><published>2019-10-10T00:00:00+00:00</published><updated>2019-10-10T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.22.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.22.0.html">&lt;h2 id=&quot;v0220&quot;&gt;v0.22.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.23.0</summary></entry><entry><title type="html">KubeVirt v0.22.0</title><link href="https://kubevirt.io//2019/changelog-v0.22.0.html" rel="alternate" type="text/html" title="KubeVirt v0.22.0" /><published>2019-10-10T00:00:00+00:00</published><updated>2019-10-10T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.22.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.22.0.html">&lt;h2 id=&quot;v0220&quot;&gt;v0.22.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Thu Oct 10 18:55:08 2019 +0200&lt;/p&gt;
 
@@ -57,7 +57,7 @@
   &lt;li&gt;Many bug fixes and improvements in several areas&lt;/li&gt;
   &lt;li&gt;CI: Introduced a OKD 4 test lane&lt;/li&gt;
   &lt;li&gt;CI: Many improved tests, resulting in less flakyness&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.22.0</summary></entry><entry><title type="html">KubeVirt v0.21.0</title><link href="https://kubevirt.io//2019/changelog-v0.21.0.html" rel="alternate" type="text/html" title="KubeVirt v0.21.0" /><published>2019-09-09T00:00:00+00:00</published><updated>2019-09-09T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.21.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.21.0.html">&lt;h2 id=&quot;v0210&quot;&gt;v0.21.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.22.0</summary></entry><entry><title type="html">KubeVirt v0.21.0</title><link href="https://kubevirt.io//2019/changelog-v0.21.0.html" rel="alternate" type="text/html" title="KubeVirt v0.21.0" /><published>2019-09-09T00:00:00+00:00</published><updated>2019-09-09T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.21.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.21.0.html">&lt;h2 id=&quot;v0210&quot;&gt;v0.21.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Sep 9 09:59:08 2019 +0200&lt;/p&gt;
 
@@ -73,7 +73,7 @@
   &lt;li&gt;Fix CRI-O memory limit&lt;/li&gt;
   &lt;li&gt;Drop spc_t from launcher&lt;/li&gt;
   &lt;li&gt;Add feature gates to security sensitive features&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.21.0</summary></entry><entry><title type="html">KubeVirt v0.20.0</title><link href="https://kubevirt.io//2019/changelog-v0.20.0.html" rel="alternate" type="text/html" title="KubeVirt v0.20.0" /><published>2019-08-09T00:00:00+00:00</published><updated>2019-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.20.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.20.0.html">&lt;h2 id=&quot;v0200&quot;&gt;v0.20.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.21.0</summary></entry><entry><title type="html">KubeVirt v0.20.0</title><link href="https://kubevirt.io//2019/changelog-v0.20.0.html" rel="alternate" type="text/html" title="KubeVirt v0.20.0" /><published>2019-08-09T00:00:00+00:00</published><updated>2019-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.20.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.20.0.html">&lt;h2 id=&quot;v0200&quot;&gt;v0.20.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Aug 9 16:42:41 2019 +0200&lt;/p&gt;
 
@@ -96,7 +96,7 @@
   &lt;li&gt;Added metric to report the VMI count&lt;/li&gt;
   &lt;li&gt;Improved integration with HCO by adding a CSV generator tool and modified&lt;/li&gt;
   &lt;li&gt;CI Improvements:&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.20.0</summary></entry><entry><title type="html">KubeVirt v0.19.0</title><link href="https://kubevirt.io//2019/changelog-v0.19.0.html" rel="alternate" type="text/html" title="KubeVirt v0.19.0" /><published>2019-07-05T00:00:00+00:00</published><updated>2019-07-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.19.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.19.0.html">&lt;h2 id=&quot;v0190&quot;&gt;v0.19.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.20.0</summary></entry><entry><title type="html">KubeVirt v0.19.0</title><link href="https://kubevirt.io//2019/changelog-v0.19.0.html" rel="alternate" type="text/html" title="KubeVirt v0.19.0" /><published>2019-07-05T00:00:00+00:00</published><updated>2019-07-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.19.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.19.0.html">&lt;h2 id=&quot;v0190&quot;&gt;v0.19.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Jul 5 12:52:16 2019 +0200&lt;/p&gt;
 
@@ -118,7 +118,7 @@
   &lt;li&gt;Support for setting a pullPolicy con containerDisks&lt;/li&gt;
   &lt;li&gt;Support for unprivileged VMs when using SR-IOV&lt;/li&gt;
   &lt;li&gt;Introduction of a project security policy&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.19.0</summary></entry><entry><title type="html">KubeVirt v0.18.0</title><link href="https://kubevirt.io//2019/changelog-v0.18.0.html" rel="alternate" type="text/html" title="KubeVirt v0.18.0" /><published>2019-06-05T00:00:00+00:00</published><updated>2019-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.18.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.18.0.html">&lt;h2 id=&quot;v0180&quot;&gt;v0.18.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.19.0</summary></entry><entry><title type="html">KubeVirt v0.18.0</title><link href="https://kubevirt.io//2019/changelog-v0.18.0.html" rel="alternate" type="text/html" title="KubeVirt v0.18.0" /><published>2019-06-05T00:00:00+00:00</published><updated>2019-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.18.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.18.0.html">&lt;h2 id=&quot;v0180&quot;&gt;v0.18.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Wed Jun 5 22:25:09 2019 +0200&lt;/p&gt;
 
@@ -128,7 +128,7 @@
   &lt;li&gt;Countless testcase fixes and additions&lt;/li&gt;
   &lt;li&gt;Several smaller bug fixes&lt;/li&gt;
   &lt;li&gt;Improved upgrade documentation&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.18.0</summary></entry><entry><title type="html">KubeVirt v0.17.0</title><link href="https://kubevirt.io//2019/changelog-v0.17.0.html" rel="alternate" type="text/html" title="KubeVirt v0.17.0" /><published>2019-05-06T00:00:00+00:00</published><updated>2019-05-06T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.17.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.17.0.html">&lt;h2 id=&quot;v0170&quot;&gt;v0.17.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.18.0</summary></entry><entry><title type="html">KubeVirt v0.17.0</title><link href="https://kubevirt.io//2019/changelog-v0.17.0.html" rel="alternate" type="text/html" title="KubeVirt v0.17.0" /><published>2019-05-06T00:00:00+00:00</published><updated>2019-05-06T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.17.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.17.0.html">&lt;h2 id=&quot;v0170&quot;&gt;v0.17.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon May 6 16:18:01 2019 +0200&lt;/p&gt;
 
@@ -143,4 +143,4 @@
   &lt;li&gt;Support for HyperV flags&lt;/li&gt;
   &lt;li&gt;Support for different VM run strategies (i.e manual and rerunOnFailure)&lt;/li&gt;
   &lt;li&gt;Several fixes for live-migration (TLS support, protected pods)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><summary type="html">v0.17.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.17.0</summary></entry></feed>

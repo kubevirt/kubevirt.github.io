@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="In this post we will install and configure vscode for KubeVirt development">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="vscode, development, debug" >
     <meta property="og:title" content="Use Vs Code For Kube Virt Development | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/Use-VS-Code-for-Kube-Virt-Development.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: SchSeba</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/vscode">vscode</a>&nbsp;|&nbsp;<a href="/tag/development">development</a>&nbsp;|&nbsp;<a href="/tag/debug">debug</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: May 22, 2018  </span>
             </div>
             <div>
@@ -239,10 +244,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: uncategorized
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
-          <p>In this post we will install and configure Visual studio code (vscode) for KubeVirt development and debug.</p>
+          <p>In this post we will install and configure Visual Studio Code (vscode) for KubeVirt development and debug.</p>
 
 <p>Visual Studio Code is a source code editor developed by Microsoft for Windows, Linux and macOS.</p>
 
@@ -260,7 +266,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </pre></td><td class="rouge-code"><pre>tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Now lets Add /usr/local/go/bin to the PATH environment variable.</p>
+<p>Now let’s Add /usr/local/go/bin to the PATH environment variable.</p>
 
 <p>You can do this by adding this line to your /etc/profile (for a system-wide installation) or $HOME/.profile:</p>
 
@@ -279,12 +285,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>You may need to restart any open command prompts for the change to take effect.</p>
 
 <h1 id="vscode-installation">VSCODE Installation</h1>
+
 <p>Now we will install Visual Studio Code in our system.</p>
 
 <h2 id="for-linux-machines">For linux machines</h2>
+
 <p>We need to choose our linux distribution.</p>
 
 <h3 id="for-rhelcentosfedora">For RHEL/Centos/Fedora</h3>
+
 <p>The following script will install the key and repository:</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
@@ -310,6 +319,7 @@ sudo yum install code
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h3 id="for-debianubuntu">For Debian/Ubuntu</h3>
+
 <p>We need to download the .deb package from the <a href="https://code.visualstudio.com/Download">vscode download page</a>,
 and from the command line run the package management.</p>
 
@@ -320,10 +330,13 @@ sudo apt-get install -f # Install dependencies
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="for-windows-machines">For Windows machines</h1>
+
 <p>Download the <a href="https://go.microsoft.com/fwlink/?LinkID=534107">Visual Studio Code installer</a>, and then run the installer (VSCodeSetup-version.exe)</p>
 
 <h1 id="go-project-struct">Go Project struct</h1>
-<p>Lets create the following structure for our kubevirt project development environment:</p>
+
+<p>Let’s create the following structure for our kubevirt project development environment:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -337,11 +350,13 @@ sudo apt-get install -f # Install dependencies
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Now navigate to kubevirt.io folder and run:</p>
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>git clone <span class="nt">&lt;kubevirt-fork&gt;</span>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>git clone &lt;kubevirt-fork&gt;
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <h1 id="install-vscode-extensions">Install VSCODE Extensions</h1>
+
 <p>Now we are going to install some extensions for a better development experience with the IDE.</p>
 
 <p>Open vscode and select your go project root folder you created in the last step.</p>
@@ -355,9 +370,11 @@ sudo apt-get install -f # Install dependencies
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/extension-install.png" alt="Extension-Install" /></p>
 
 <h1 id="gopath-and-goroot-configuration">GOPATH and GOROOT configuration</h1>
-<p>Open the vscode configuration file (ctrl+,) file-&gt;preferences-&gt;settings.</p>
+
+<p>Open the vscode configuration file (<code class="language-html highlighter-rouge">ctrl+,</code>) file-&gt;preferences-&gt;settings.</p>
 
 <p>Now on the right file we need to add this configuration:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>"go.gopath": "<span class="nt">&lt;Go-projects-folder&gt;</span>",
@@ -367,11 +384,12 @@ sudo apt-get install -f # Install dependencies
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/settings.png" alt="settings" /></p>
 
 <h1 id="create-debug-configuration">Create debug configuration</h1>
+
 <p>For the last part we are going to configure the debugger file, open it by Debug-&gt;Open Configurations and add to the configuration list the following structure</p>
 
 <p>** Change the <Go-projects-folder> parameter to your golang projects root directory</Go-projects-folder></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -386,40 +404,43 @@ sudo apt-get install -f # Install dependencies
 13
 14
 15
-16
-</pre></td><td class="rouge-code"><pre>{
-            "name": "Kubevirt",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "remotePath": "",
-            "port": 2345,
-            "host": "127.0.0.1",
-            "program": "${fileDirname}",
-            "env": {},
-            "args": ["--kubeconfig", "cluster/k8s-1.9.3/.kubeconfig",
-                     "--port", "1234"],
-            "showLog": true,
-            "cwd": "${workspaceFolder}/src/kubevirt.io/kubevirt",
-            "output": "<span class="nt">&lt;Go-projects-folder&gt;</span>/bin/${fileBasenameNoExtension}"
-}
+</pre></td><td class="rouge-code"><pre><span class="pi">{</span>
+  <span class="s2">"</span><span class="s">name"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Kubevirt"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">type"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">go"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">request"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">launch"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">mode"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">debug"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">remotePath"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">port"</span><span class="pi">:</span> <span class="nv">2345</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">host"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">127.0.0.1"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">program"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">${fileDirname}"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">env"</span><span class="pi">:</span> <span class="pi">{},</span>
+  <span class="s2">"</span><span class="s">args"</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">--kubeconfig"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">cluster/k8s-1.9.3/.kubeconfig"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">--port"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">1234"</span><span class="pi">],</span>
+  <span class="s2">"</span><span class="s">showLog"</span><span class="pi">:</span> <span class="nv">true</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">cwd"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">${workspaceFolder}/src/kubevirt.io/kubevirt"</span><span class="pi">,</span>
+  <span class="s2">"</span><span class="s">output"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">&lt;Go-projects-folder&gt;/bin/${fileBasenameNoExtension}"</span><span class="pi">,</span>
+<span class="pi">}</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-config.png" alt="debug-config" /></p>
 
 <h1 id="debug-process">Debug Process</h1>
+
 <p>For debug we need to open the main package we want to debug.</p>
 
 <p>For example if we want to debug the virt-api component, open the main package:</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>kubevirt.io/cmd/virt-api/virt-api.go
 </pre></td></tr></tbody></table></code></pre></div></div>
+
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-file.png" alt="debug-file" /></p>
 
-<p>Now change to debug view (ctrl+shift+D), check that we are using the kubevirt configuration and hit the play button</p>
+<p>Now change to debug view (<code class="language-html highlighter-rouge">ctrl+shift+D</code>), check that we are using the kubevirt configuration and hit the play button</p>
 
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-view.png" alt="debug-view" /></p>
 
 <h2 id="more-information">More Information</h2>
+
 <p>For more information, keyboard shortcuts and advance vscode usage please refer the following link</p>
 
 <p><a href="https://code.visualstudio.com/docs/editor/codebasics">editor code basics</a></p>

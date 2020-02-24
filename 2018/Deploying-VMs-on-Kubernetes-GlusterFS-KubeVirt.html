@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Deploying Virtual Machines on Kubernetes with GlusterFS+Heketi and KubeVirt">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="glusterfs, heketi, virtual machine, weavenet" >
     <meta property="og:title" content="Deploying Vms On Kubernetes Glusterfs Kubevirt | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2018/Deploying-VMs-on-Kubernetes-GlusterFS-KubeVirt.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: rwsu</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/glusterfs">glusterfs</a>&nbsp;|&nbsp;<a href="/tag/heketi">heketi</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/weavenet">weavenet</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: May 7, 2018  </span>
             </div>
             <div>
@@ -239,6 +244,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: uncategorized
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
@@ -274,7 +280,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <h2 id="known-issues">Known Issues</h2>
 
 <ul>
-  <li>You may need to set SELinux to permissive mode prior to running “kubeadm init” if you see failures attributed to etcd in /var/log/audit.log.</li>
+  <li>You may need to set <code class="language-html highlighter-rouge">SELinux</code> to permissive mode prior to running “kubeadm init” if you see failures attributed to etcd in <code class="language-html highlighter-rouge">/var/log/audit.log</code>.</li>
   <li>Prior to installing GlusterFS, you may need to disable firewalld until this issue is resolved: https://github.com/gluster/gluster-kubernetes/issues/471</li>
   <li>kubevirt-ansible install may fail in storage-glusterfs role: https://github.com/kubevirt/kubevirt-ansible/issues/219</li>
 </ul>
@@ -287,8 +293,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>If you are using only 2 servers as workers, then you will need to allow scheduling of pods on the master node because GlusterFS requires at least three nodes. To schedule pods on the master node, see “Master Isolation” in the kubeadm guide or execute this command:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl taint nodes --all node-role.kubernetes.io/master-
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Move onto the next step when your master and worker nodes are Ready.</p>
@@ -351,7 +357,7 @@ weave-net-s4dp6                                2/2       Running   0          6d
 
 <p>On all nodes:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -362,27 +368,27 @@ weave-net-s4dp6                                2/2       Running   0          6d
 9
 10
 11
-</pre></td><td class="rouge-code"><pre># Open ports for GlusterFS communications
-sudo iptables -I INPUT 1 -p tcp --dport 2222 -j ACCEPT
-sudo iptables -I INPUT 1 -p tcp --dport 24007 -j ACCEPT
-sudo iptables -I INPUT 1 -p tcp --dport 24008 -j ACCEPT
-sudo iptables -I INPUT 1 -p tcp --dport 49152:49251 -j ACCEPT
-# Load kernel modules
-sudo modprobe dm_snapshot
-sudo modprobe dm_thin_pool
-sudo modprobe dm_mirror
-# Install glusterfs-fuse and git packages
-sudo yum install -y glusterfs-fuse git
+</pre></td><td class="rouge-code"><pre><span class="c"># Open ports for GlusterFS communications</span>
+<span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 2222 <span class="nt">-j</span> ACCEPT
+<span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 24007 <span class="nt">-j</span> ACCEPT
+<span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 24008 <span class="nt">-j</span> ACCEPT
+<span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 49152:49251 <span class="nt">-j</span> ACCEPT
+<span class="c"># Load kernel modules</span>
+<span class="nb">sudo </span>modprobe dm_snapshot
+<span class="nb">sudo </span>modprobe dm_thin_pool
+<span class="nb">sudo </span>modprobe dm_mirror
+<span class="c"># Install glusterfs-fuse and git packages</span>
+<span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> glusterfs-fuse git
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>On the master node:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
-</pre></td><td class="rouge-code"><pre># checkout gluster-kubernetes repo
+</pre></td><td class="rouge-code"><pre><span class="c"># checkout gluster-kubernetes repo</span>
 git clone https://github.com/gluster/gluster-kubernetes
-cd gluster-kubernetes/deploy
+<span class="nb">cd </span>gluster-kubernetes/deploy
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Before running the gk-deploy script, we need to first create a topology.json file that maps the nodes present in the GlusterFS cluster and the block devices attached to each node. The block devices should be raw and unformatted. Below is a sample topology.json file for a 3 node cluster all operating in the same zone. The gluster-kubernetes/deploy directory also contains a sample topology.json file.</p>
@@ -507,10 +513,10 @@ cd gluster-kubernetes/deploy
 
 <p>Once you have your topology.json file and saved it in gluster-kubernetes/deploy, we can execute gk-deploy to create the GlusterFS and Heketi pods. You will need to specify an admin-key which will be used in the next step and will be discovered during the KubeVirt installation.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre># from gluster-kubernetes/deploy
-./gk-deploy -g -v -n kube-system --admin-key my-admin-key
+</pre></td><td class="rouge-code"><pre><span class="c"># from gluster-kubernetes/deploy</span>
+./gk-deploy <span class="nt">-g</span> <span class="nt">-v</span> <span class="nt">-n</span> kube-system <span class="nt">--admin-key</span> my-admin-key
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Add the end of the installation, you will see:</p>
@@ -568,15 +574,15 @@ We will use <a href="https://github.com/kubevirt/kubevirt-ansible/">kubevirt-ans
 
 <p>Let’s first clone the kubevirt-ansible repo.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 </pre></td><td class="rouge-code"><pre>git clone https://github.com/kubevirt/kubevirt-ansible
-cd kubevirt-ansible
+<span class="nb">cd </span>kubevirt-ansible
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Edit the <a href="https://github.com/kubevirt/kubevirt-ansible/blob/master/inventory">inventory</a> file in the kubevirt-ansible checkout. Modify the section that starts with “#BEGIN CUSTOM SETTINGS”. As an example using the servers from above:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -607,43 +613,43 @@ cd kubevirt-ansible
 29
 30
 31
-</pre></td><td class="rouge-code"><pre># BEGIN CUSTOM SETTINGS
-[masters]
-# Your master FQDN
-master.somewhere.com
+</pre></td><td class="rouge-code"><pre><span class="c"># BEGIN CUSTOM SETTINGS
+</span>[<span class="n">masters</span>]
+<span class="c"># Your master FQDN
+</span><span class="n">master</span>.<span class="n">somewhere</span>.<span class="n">com</span>
 
-[etcd]
-# Your etcd FQDN
-master.somewhere.com
+[<span class="n">etcd</span>]
+<span class="c"># Your etcd FQDN
+</span><span class="n">master</span>.<span class="n">somewhere</span>.<span class="n">com</span>
 
-[nodes]
-# Your nodes FQDN's
-worker1.somewhere.com
-worker2.somewhere.com
+[<span class="n">nodes</span>]
+<span class="c"># Your nodes FQDN's
+</span><span class="n">worker1</span>.<span class="n">somewhere</span>.<span class="n">com</span>
+<span class="n">worker2</span>.<span class="n">somewhere</span>.<span class="n">com</span>
 
-[nfs]
-# Your nfs server FQDN
-
-[glusterfs]
-# Your glusterfs nodes FQDN
+[<span class="n">nfs</span>]
+<span class="c"># Your nfs server FQDN
+</span>
+[<span class="n">glusterfs</span>]
+<span class="c"># Your glusterfs nodes FQDN
 # Each node should have the "glusterfs_devices" variable, which
 # points to the block device that will be used by gluster.
-master.somewhere.com
-worker1.somewhere.com
-worker1.somewhere.com
+</span><span class="n">master</span>.<span class="n">somewhere</span>.<span class="n">com</span>
+<span class="n">worker1</span>.<span class="n">somewhere</span>.<span class="n">com</span>
+<span class="n">worker1</span>.<span class="n">somewhere</span>.<span class="n">com</span>
 
-#
+<span class="c">#
 # If you run openshift deployment
 # You can add your master as schedulable node with option openshift_schedulable=true
 # Add at least one node with lable to run on it router and docker containers
 # openshift_node_labels="{'region': 'infra','zone': 'default'}"
 # END CUSTOM SETTINGS
-</pre></td></tr></tbody></table></code></pre></div></div>
+</span></pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Now let’s run the kubevirt.yml playbook:</p>
+<p>Now let’s run the <code class="language-html highlighter-rouge">kubevirt.yml</code> playbook:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>ansible-playbook -i inventory playbooks/kubevirt.yml -e cluster=k8s -e storage_role=storage-glusterfs -e namespace=kube-system -e glusterfs_namespace=kube-system -e glusterfs_name= -e heketi_url=http://10.32.0.4:8080 -v
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+</pre></td><td class="rouge-code"><pre>ansible-playbook <span class="nt">-i</span> inventory playbooks/kubevirt.yml <span class="nt">-e</span> <span class="nv">cluster</span><span class="o">=</span>k8s <span class="nt">-e</span> <span class="nv">storage_role</span><span class="o">=</span>storage-glusterfs <span class="nt">-e</span> <span class="nv">namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_name</span><span class="o">=</span> <span class="nt">-e</span> <span class="nv">heketi_url</span><span class="o">=</span>http://10.32.0.4:8080 <span class="nt">-v</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>If successful, we should see 7 additional pods as Running in the kube-system namespace.</p>
@@ -676,19 +682,19 @@ virt-handler-hnlqn                                                1/1       Runn
 
 <p>On master or on a node where kubectl is configured correctly install and start httpd.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre>sudo yum install -y httpd
-sudo systemctl start httpd
+</pre></td><td class="rouge-code"><pre><span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> httpd
+<span class="nb">sudo </span>systemctl start httpd
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Download the cirros cloud image and convert it into raw format.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
-</pre></td><td class="rouge-code"><pre>curl http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img -o /var/www/html/cirros-0.4.0-x86_64-disk.img
-sudo yum install -y qemu-img
+</pre></td><td class="rouge-code"><pre>curl http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img <span class="nt">-o</span> /var/www/html/cirros-0.4.0-x86_64-disk.img
+<span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> qemu-img
 qemu-img convert /var/www/html/cirros-0.4.0-x86_64-disk.img /var/www/html/cirros-0.4.0-x86_64-disk.raw
 </pre></td></tr></tbody></table></code></pre></div></div>
 

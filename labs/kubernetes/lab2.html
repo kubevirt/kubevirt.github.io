@@ -31,7 +31,7 @@
     
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
+    <meta name="keywords" content="laboratory, importer, vm import, containerized data importer, CDI, lab" >
     <meta property="og:title" content="Experiment with CDI | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//labs/kubernetes/lab2" >
@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-24 15:44:46 +0000" >
+    <meta property="og:article:published_time" content="2020-02-24 17:08:48 +0000" >
     <meta name="twitter:title" content="Experiment with CDI | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -408,9 +408,9 @@ NAME      AGE       PHASE     IP            NODENAME
 vm1       109s      Running   172.17.0.16   minikube
 
 $ minikube ssh
-                         _             _            
-            _         _ ( )           ( )           
-  ___ ___  (_)  ___  (_)| |/')  _   _ | |_      __  
+                         _             _
+            _         _ ( )           ( )
+  ___ ___  (_)  ___  (_)| |/')  _   _ | |_      __
 /' _ ` _ `\| |/' _ `\| || , <span class="nt">&lt;</span>  <span class="err">(</span> <span class="err">)</span> <span class="err">(</span> <span class="err">)|</span> <span class="err">'</span><span class="na">_</span><span class="err">`\</span>  <span class="err">/'</span><span class="na">__</span><span class="err">`\</span>
 <span class="err">|</span> <span class="err">(</span> <span class="err">)</span> <span class="err">(</span> <span class="err">)</span> <span class="err">||</span> <span class="err">||</span> <span class="err">(</span> <span class="err">)</span> <span class="err">||</span> <span class="err">||</span> <span class="err">|\`\</span> <span class="err">|</span> <span class="err">(</span><span class="na">_</span><span class="err">)</span> <span class="err">||</span> <span class="err">|</span><span class="na">_</span><span class="err">)</span> <span class="err">)(</span>  <span class="na">___</span><span class="err">/</span>
 <span class="err">(</span><span class="na">_</span><span class="err">)</span> <span class="err">(</span><span class="na">_</span><span class="err">)</span> <span class="err">(</span><span class="na">_</span><span class="err">)(</span><span class="na">_</span><span class="err">)(</span><span class="na">_</span><span class="err">)</span> <span class="err">(</span><span class="na">_</span><span class="err">)(</span><span class="na">_</span><span class="err">)(</span><span class="na">_</span><span class="err">)</span> <span class="err">(</span><span class="na">_</span><span class="err">)`\</span><span class="na">___</span><span class="err">/'(</span><span class="na">_</span><span class="err">,</span><span class="na">__</span><span class="err">/'`\</span><span class="na">____</span><span class="err">)</span>
@@ -420,7 +420,7 @@ $ minikube ssh
 <span class="na">ECDSA</span> <span class="na">key</span> <span class="na">fingerprint</span> <span class="na">is</span> <span class="na">SHA256:QmJUvc8vbM2oXiEonennW7</span><span class="err">+</span><span class="na">lZ8rVRGyhUtcQBVBTnHs</span><span class="err">.</span>
 <span class="na">Are</span> <span class="na">you</span> <span class="na">sure</span> <span class="na">you</span> <span class="na">want</span> <span class="na">to</span> <span class="na">continue</span> <span class="na">connecting</span> <span class="err">(</span><span class="na">yes</span><span class="err">/</span><span class="na">no</span><span class="err">)?</span> <span class="na">yes</span>
 <span class="na">Warning:</span> <span class="na">Permanently</span> <span class="na">added</span> <span class="err">'</span><span class="na">172</span><span class="err">.</span><span class="na">17</span><span class="err">.</span><span class="na">0</span><span class="err">.</span><span class="na">16</span><span class="err">'</span> <span class="err">(</span><span class="na">ECDSA</span><span class="err">)</span> <span class="na">to</span> <span class="na">the</span> <span class="na">list</span> <span class="na">of</span> <span class="na">known</span> <span class="na">hosts</span><span class="err">.</span>
-<span class="na">fedora</span><span class="err">@</span><span class="na">172</span><span class="err">.</span><span class="na">17</span><span class="err">.</span><span class="na">0</span><span class="err">.</span><span class="na">16</span><span class="err">'</span><span class="na">s</span> <span class="na">password:</span> 
+<span class="na">fedora</span><span class="err">@</span><span class="na">172</span><span class="err">.</span><span class="na">17</span><span class="err">.</span><span class="na">0</span><span class="err">.</span><span class="na">16</span><span class="err">'</span><span class="na">s</span> <span class="na">password:</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Finally, on a usual situation you will probably want to give access to your vm1 VM to someone else from outside the Kubernetes cluster nodes. Someone who is actually connecting from his or her laptop. This can be achieved with the virtctl tool already installed in <a href="/quickstart_minikube/">Easy install using minikube</a>. <strong>Note that this is the same case as connecting from our laptop to vm1 VM running on our local Minikube instance</strong></p>
@@ -458,9 +458,9 @@ vm1-ssh   NodePort   10.101.226.150   <span class="nt">&lt;none&gt;</span>      
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
-</pre></td><td class="rouge-code"><pre>$ ssh -i ~/.ssh/id_rsa.pub fedora@192.168.39.74 -p 32495 
+</pre></td><td class="rouge-code"><pre>$ ssh -i ~/.ssh/id_rsa.pub fedora@192.168.39.74 -p 32495
   Last login: Wed Oct  9 13:59:29 2019 from 172.17.0.1
-  [fedora@vm1 ~]$ 
+  [fedora@vm1 ~]$
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>This concludes this section of the lab.</p>

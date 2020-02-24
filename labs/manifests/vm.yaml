@@ -6,7 +6,7 @@ spec:
   running: false
   template:
     metadata:
-      labels: 
+      labels:
         kubevirt.io/size: small
         kubevirt.io/domain: testvm
     spec:
@@ -34,4 +34,4 @@ spec:
             image: kubevirt/cirros-registry-disk-demo
         - name: cloudinitdisk
           cloudInitNoCloud:
-            userDataBase64: SGkuXG4= 
+            userDataBase64: SGkuXG4=

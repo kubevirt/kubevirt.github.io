@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Evicting VM's using Node Drain Functionality">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="node drain, eviction, nmo" >
     <meta property="og:title" content="Node Drain in KubeVirt | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/NodeDrain-KubeVirt.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: DirectedSoul</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/node-drain">node drain</a>&nbsp;|&nbsp;<a href="/tag/eviction">eviction</a>&nbsp;|&nbsp;<a href="/tag/nmo">nmo</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: July 30, 2019  </span>
             </div>
             <div>
@@ -239,24 +244,22 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
           <h2 id="introduction">Introduction</h2>
 
-<p>In a Kubernetes (k8s) cluster, the control plane(scheduler) is responsible for deploying workloads(pods, deployments, replicasets) on the worker nodes depending on the resource availability. What do we do with the workloads if the need arises for maintaining this node? Well, there is good news, <code class="language-html highlighter-rouge">node-drain</code> feature and node maintenance operator(NMO) both come to our rescue in this situation.</p>
+<p>In a Kubernetes (k8s) cluster, the control plane(scheduler) is responsible for deploying workloads(<code class="language-html highlighter-rouge">pods</code>, <code class="language-html highlighter-rouge">deployments</code>, <code class="language-html highlighter-rouge">replicasets</code>) on the worker nodes depending on the resource availability. What do we do with the workloads if the need arises for maintaining this node? Well, there is good news, <code class="language-html highlighter-rouge">node-drain</code> feature and node maintenance operator(NMO) both come to our rescue in this situation.</p>
 
 <p>This post discusses evicting the <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/intro.html">VMI</a>(virtual machine images) and other resources from the node using node drain feature and NMO.</p>
 
-<p><strong>Note:</strong></p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>The environment used for writing this post is based on <a href="https://cloud.redhat.com/openshift/install/aws/installer-provisioned">OpenShift 4</a> with 3 Masters and 3 Worker nodes.</p>
 
+
+</div></div>
 <ul>
-  <li>
-    <p>The environment used for writing this post is based on <a href="https://cloud.redhat.com/openshift/install/aws/installer-provisioned">OpenShift 4</a> with 3 Masters and 3 Worker nodes.</p>
-  </li>
-  <li>
-    <p><a href="/2019/Hyper-Converged-Operator.html">HyperconvergedClusterOperator</a>: The goal of the hyper-converged-cluster-operator (HCO) is to provide a single entry point for multiple operators (kubevirt, cdi, networking, etc) where users can deploy and configure them in a single object. This operator is sometimes referred to as a “meta operator” or an “operator for operators”. Most importantly, this operator doesn’t replace or interfere with OLM which is an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way. Check for <a href="https://coreos.com/blog/introducing-operator-framework">more information about OLM</a>. It only creates operator CRs, which is the user’s prerogative.</p>
-  </li>
+  <li><a href="/2019/Hyper-Converged-Operator.html">HyperconvergedClusterOperator</a>: The goal of the hyper-converged-cluster-operator (HCO) is to provide a single entry point for multiple operators (kubevirt, cdi, networking, etc) where users can deploy and configure them in a single object. This operator is sometimes referred to as a “meta operator” or an “operator for operators”. Most importantly, this operator doesn’t replace or interfere with OLM which is an open source toolkit to manage Kubernetes native applications, called Operators, in an effective, automated, and scalable way. Check for <a href="https://coreos.com/blog/introducing-operator-framework">more information about OLM</a>. It only creates operator CRs, which is the user’s prerogative.</li>
 </ul>
 
 <p>In our cluster (3 master and 3 nodes) we’ll be able to see something similar to:</p>
@@ -359,6 +362,7 @@ ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816
 <p>Here will continue using the gist for demonstration purposes.</p>
 
 <p>Observe the resources that get created after the HCO is installed</p>
+
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -432,48 +436,48 @@ testvm   2m13s   <span class="nb">true</span>
   <li>Create a CRD
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre> oc create <span class="nt">-f</span> deploy/crds/nodemaintenance_crd.yaml
- customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/crds/nodemaintenance_crd.yaml
+customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Create the NS
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre> oc create <span class="nt">-f</span> deploy/namespace.yaml
- namespace/node-maintenance-operator created
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/namespace.yaml
+namespace/node-maintenance-operator created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Create a Service Account:
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre> oc create <span class="nt">-f</span> deploy/service_account.yaml
- serviceaccount/node-maintenance-operator created
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/service_account.yaml
+serviceaccount/node-maintenance-operator created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Create a ROLE
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre> oc create <span class="nt">-f</span> deploy/role.yaml
- clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/role.yaml
+clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Create a ROLE Binding
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre> oc create <span class="nt">-f</span> deploy/role_binding.yaml
- clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/role_binding.yaml
+clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>Then finally make sure to add the image version of the NMO operator in the deploy/operator.yml
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre> image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
+</pre></td><td class="rouge-code"><pre>image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
   <li>and then deploy the NMO Operator as shown
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
-</pre></td><td class="rouge-code"><pre> oc create <span class="nt">-f</span> deploy/operator.yaml
- deployment.apps/node-maintenance-operator created
+</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/operator.yaml
+deployment.apps/node-maintenance-operator created
 </pre></td></tr></tbody></table></code></pre></div>    </div>
   </li>
 </ol>
@@ -532,7 +536,7 @@ NAME     AGE   PHASE     IP            NODENAME
 testvm   92s   Running   10.131.0.17   ip-10-0-173-203.us-east-2.compute.internal
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Also we can see the status:</p>
+<p>Also, we can see the status:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
@@ -614,7 +618,7 @@ testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.intern
 
 <p>When all of this happens, we can view the changes that are taking place with:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -632,25 +636,25 @@ testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.intern
 16
 17
 18
-</pre></td><td class="rouge-code"><pre>oc logs pods/node-maintenance-operator-645f757d5-89d6r <span class="nt">-n</span> node-maintenance-operator
-<span class="nb">.</span>
-<span class="nb">.</span>
-<span class="nb">.</span>
-<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.650298,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Applying Maintenance mode on Node: ip-10-0-173-203.us-east-2.compute.internal with Reason: Test node maintenance"</span>,<span class="s2">"Request.Namespace"</span>:<span class="s2">""</span>,<span class="s2">"Request.Name"</span>:<span class="s2">"nodemaintenance-xyz"</span><span class="o">}</span>
-<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.7509086,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Taints: [{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">node.kubernetes.io/unschedulable</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">effect</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">NoSchedule</span><span class="se">\"</span><span class="s2">},{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">kubevirt.io/drain</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">effect</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">NoSchedule</span><span class="se">\"</span><span class="s2">}] will be added to node ip-10-0-173-203.us-east-2.compute.internal"</span><span class="o">}</span>
-<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.7509348,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Applying kubevirt.io/drain taint add on Node: ip-10-0-173-203.us-east-2.compute.internal"</span><span class="o">}</span>
-<span class="o">{</span><span class="s2">"level"</span>:<span class="s2">"info"</span>,<span class="s2">"ts"</span>:1559681430.7509415,<span class="s2">"logger"</span>:<span class="s2">"controller_nodemaintenance"</span>,<span class="s2">"msg"</span>:<span class="s2">"Patchi{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9903986,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>virt-controller-b94d69456-b9dkw<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.99049,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>community-operators-5cb68db58-4m66j<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9905066,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>alertmanager-main-1<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9905581,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>virt-launcher-testvm-q5t7l<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9905746,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>redhat-operators-6b6f6bd788-zx8nm<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.990588,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>image-registry-586d547bb5-t9lwr<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9906075,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>kube-state-metrics-5bbd4c45d5-sbnbg<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9906383,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>certified-operators-9f9f6fd5c-9ltn8<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9908028,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>virt-api-59d7c4b595-dkpvs<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9906204,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evicting pod <span class="se">\"</span>router-default-6b57bcc884-frd57<span class="se">\"\n</span><span class="s2">"}
-{"</span>level<span class="s2">":"</span>info<span class="s2">","</span>ts<span class="s2">":1559681430.9908257,"</span>logger<span class="s2">":"</span>controller_nodemaintenance<span class="s2">","</span>msg<span class="s2">":"</span>evict
-</pre></td></tr></tbody></table></code></pre></div></div>
+</pre></td><td class="rouge-code"><pre><span class="err">oc</span><span class="w"> </span><span class="err">logs</span><span class="w"> </span><span class="err">pods/node-maintenance-operator</span><span class="mi">-645</span><span class="err">f</span><span class="mi">757</span><span class="err">d</span><span class="mi">5-89</span><span class="err">d</span><span class="mi">6</span><span class="err">r</span><span class="w"> </span><span class="err">-n</span><span class="w"> </span><span class="err">node-maintenance-operator</span><span class="w">
+</span><span class="err">.</span><span class="w">
+</span><span class="err">.</span><span class="w">
+</span><span class="err">.</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.650298</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"Applying Maintenance mode on Node: ip-10-0-173-203.us-east-2.compute.internal with Reason: Test node maintenance"</span><span class="p">,</span><span class="nl">"Request.Namespace"</span><span class="p">:</span><span class="s2">""</span><span class="p">,</span><span class="nl">"Request.Name"</span><span class="p">:</span><span class="s2">"nodemaintenance-xyz"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.7509086</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"Taints: [{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">node.kubernetes.io/unschedulable</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">effect</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">NoSchedule</span><span class="se">\"</span><span class="s2">},{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">kubevirt.io/drain</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">effect</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">NoSchedule</span><span class="se">\"</span><span class="s2">}] will be added to node ip-10-0-173-203.us-east-2.compute.internal"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.7509348</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"Applying kubevirt.io/drain taint add on Node: ip-10-0-173-203.us-east-2.compute.internal"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.7509415</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"Patchi{"</span><span class="err">level</span><span class="s2">":"</span><span class="err">info</span><span class="s2">","</span><span class="err">ts</span><span class="s2">":1559681430.9903986,"</span><span class="err">logger</span><span class="s2">":"</span><span class="err">controller_nodemaintenance</span><span class="s2">","</span><span class="err">msg</span><span class="s2">":"</span><span class="err">evicting</span><span class="w"> </span><span class="err">pod</span><span class="w"> </span><span class="err">\</span><span class="s2">"virt-controller-b94d69456-b9dkw</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.99049</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">community-operators-5cb68db58-4m66j</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9905066</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">alertmanager-main-1</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9905581</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">virt-launcher-testvm-q5t7l</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9905746</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">redhat-operators-6b6f6bd788-zx8nm</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.990588</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">image-registry-586d547bb5-t9lwr</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9906075</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">kube-state-metrics-5bbd4c45d5-sbnbg</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9906383</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">certified-operators-9f9f6fd5c-9ltn8</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9908028</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">virt-api-59d7c4b595-dkpvs</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9906204</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">router-default-6b57bcc884-frd57</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
+</span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9908257</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evict
+</span></pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Clearly we can see that the previous node went into <code class="language-html highlighter-rouge">SchedulingDisabled</code> state and the VMI was evicted and placed into other node in the cluster. This demonstrates the node eviction using NMO.</p>
 

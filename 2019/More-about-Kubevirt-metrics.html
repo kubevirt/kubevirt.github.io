@@ -31,7 +31,7 @@
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="A status update about KubeVirt metrics">
-    <meta name="keywords" content="" >
+    <meta name="keywords" content="metrics, prometheus" >
     <meta property="og:title" content="More About Kubevirt Metrics | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2019/More-about-Kubevirt-metrics.html" >
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", "kubevirtci", "ci-cd", "cicd", "qemu", "virtual machine", "container", "kubevirt", "kubernetes", "microsoft windows kubernetes", "microsoft windows container", ]
+var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -232,6 +232,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="post-info">
             <span class="post-author">Author: fromanirh</span>
             <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/metrics">metrics</a>&nbsp;|&nbsp;<a href="/tag/prometheus">prometheus</a>
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: March 14, 2019  </span>
             </div>
             <div>
@@ -239,13 +244,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 Category: news
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">
           <h1 id="more-about-kubevirt-and-prometheus-metrics">More about KubeVirt and Prometheus metrics</h1>
 
-<p>In this blog post, we update about the KubeVirt metrics, continuing <a href="/2019/An-overview-to-KubeVirt-metrics.html">the series started earlier this year</a>.
-Since the previous post, the <a href="https://github.com/kubevirt/kubevirt/pull/1840">initial groundwork and first set of metrics</a> was merged, and it is expected
+<p>In this blog post, we update about the KubeVirt metrics, continuing <a href="/2019/An-overview-to-KubeVirt-metrics.html">the series started earlier this year</a>.</p>
+
+<p>Since the previous post, the <a href="https://github.com/kubevirt/kubevirt/pull/1840">initial groundwork and first set of metrics</a> was merged, and it is expected
 to be available with KubeVirt v0.15.0 and onwards.</p>
 
 <p>Make sure you followed <a href="/2019/An-overview-to-KubeVirt-metrics.html">the steps described in the previous post</a> to set up properly the monitoring stack
@@ -255,7 +262,7 @@ in your KubeVirt-powered cluster.</p>
 
 <p>Let’s look at the initial set of metrics exposed by KubeVirt 0.15.0:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
 4
@@ -266,18 +273,18 @@ in your KubeVirt-powered cluster.</p>
 9
 10
 11
-</pre></td><td class="rouge-code"><pre>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0-alpha.0.74+d7aaf3b5df4a60-dirty"}
-kubevirt_vm_memory_resident_bytes{domain="$VM_NAME"}
-kubevirt_vm_network_traffic_bytes_total{domain="$VM_NAME",interface="$IFACE_NAME0",type="rx"}
-kubevirt_vm_network_traffic_bytes_total{domain="$VM_NAME",interface="$IFACE_NAME0",type="tx"}
-kubevirt_vm_storage_iops_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="read"}
-kubevirt_vm_storage_iops_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="write"}
-kubevirt_vm_storage_times_ms_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="read"}
-kubevirt_vm_storage_times_ms_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="write"}
-kubevirt_vm_storage_traffic_bytes_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="read"}
-kubevirt_vm_storage_traffic_bytes_total{domain="$VM_NAME",drive="$DRIVE_NAME",type="write"}
-kubevirt_vm_vcpu_seconds{domain="$VM_NAME",id="0",state="1"}
-</pre></td></tr></tbody></table></code></pre></div></div>
+</pre></td><td class="rouge-code"><pre><span class="err">kubevirt_info</span><span class="p">{</span><span class="err">goversion=</span><span class="s2">"go1.11.4"</span><span class="p">,</span><span class="err">kubeversion=</span><span class="s2">"v0.15.0-alpha.0.74+d7aaf3b5df4a60-dirty"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_memory_resident_bytes</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_network_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">interface=</span><span class="s2">"$IFACE_NAME0"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"rx"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_network_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">interface=</span><span class="s2">"$IFACE_NAME0"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"tx"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_storage_iops_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"read"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_storage_iops_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"write"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_storage_times_ms_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"read"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_storage_times_ms_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"write"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_storage_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"read"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_storage_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"write"</span><span class="p">}</span><span class="w">
+</span><span class="err">kubevirt_vm_vcpu_seconds</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">id=</span><span class="s2">"0"</span><span class="p">,</span><span class="err">state=</span><span class="s2">"1"</span><span class="p">}</span><span class="w">
+</span></pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The metrics expose <a href="https://www.robustperception.io/exposing-the-software-version-to-prometheus">versioning information according to the recommendations</a> using the <code class="language-html highlighter-rouge">kubevirt_info</code> metric; the other metrics should be self-explanatory.
 As we can expect, labels like <code class="language-html highlighter-rouge">domain</code>, <code class="language-html highlighter-rouge">drive</code> and <code class="language-html highlighter-rouge">interface</code> depend on the specifics of the VM. <code class="language-html highlighter-rouge">type</code>, however, is not and represents the subtype of the metric.</p>
@@ -332,16 +339,16 @@ As we can expect, labels like <code class="language-html highlighter-rouge">doma
       <span class="na">domain</span><span class="pi">:</span>
         <span class="na">devices</span><span class="pi">:</span>
           <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+              <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
         <span class="na">machine</span><span class="pi">:</span>
           <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
         <span class="na">resources</span><span class="pi">:</span>
           <span class="na">requests</span><span class="pi">:</span>
             <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
       <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-        <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
       <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
 <span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -405,69 +412,33 @@ Not much data in this case, but beware of potentially large result sets.</p>
 26
 27
 28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
 </pre></td><td class="rouge-code"><pre><span class="p">{</span><span class="w">
-   </span><span class="nl">"data"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"resultType"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"matrix"</span><span class="p">,</span><span class="w">
-      </span><span class="nl">"result"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-         </span><span class="p">{</span><span class="w">
-            </span><span class="nl">"values"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-               </span><span class="p">[</span><span class="w">
-                  </span><span class="mf">1552514400.001</span><span class="p">,</span><span class="w">
-                  </span><span class="s2">"44036096"</span><span class="w">
-               </span><span class="p">],</span><span class="w">
-               </span><span class="p">[</span><span class="w">
-                  </span><span class="mf">1552521600.001</span><span class="p">,</span><span class="w">
-                  </span><span class="s2">"42348544"</span><span class="w">
-               </span><span class="p">],</span><span class="w">
-               </span><span class="p">[</span><span class="w">
-                  </span><span class="mf">1552528800.001</span><span class="p">,</span><span class="w">
-                  </span><span class="s2">"44040192"</span><span class="w">
-               </span><span class="p">],</span><span class="w">
-               </span><span class="p">[</span><span class="w">
-                  </span><span class="mf">1552536000.001</span><span class="p">,</span><span class="w">
-                  </span><span class="s2">"42291200"</span><span class="w">
-               </span><span class="p">],</span><span class="w">
-               </span><span class="p">[</span><span class="w">
-                  </span><span class="mf">1552543200.001</span><span class="p">,</span><span class="w">
-                  </span><span class="s2">"42450944"</span><span class="w">
-               </span><span class="p">],</span><span class="w">
-               </span><span class="p">[</span><span class="w">
-                  </span><span class="mf">1552550400.001</span><span class="p">,</span><span class="w">
-                  </span><span class="s2">"43315200"</span><span class="w">
-               </span><span class="p">]</span><span class="w">
-            </span><span class="p">],</span><span class="w">
-            </span><span class="nl">"metric"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-               </span><span class="nl">"__name__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt_vm_memory_resident_bytes"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"endpoint"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"domain"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"default_vm-test-01"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"instance"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.29:8443"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"service"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
-         </span><span class="p">}</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-   </span><span class="p">},</span><span class="w">
-   </span><span class="nl">"status"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"resultType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"matrix"</span><span class="p">,</span><span class="w">
+    </span><span class="nl">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"values"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="p">[</span><span class="mf">1552514400.001</span><span class="p">,</span><span class="w"> </span><span class="s2">"44036096"</span><span class="p">],</span><span class="w">
+          </span><span class="p">[</span><span class="mf">1552521600.001</span><span class="p">,</span><span class="w"> </span><span class="s2">"42348544"</span><span class="p">],</span><span class="w">
+          </span><span class="p">[</span><span class="mf">1552528800.001</span><span class="p">,</span><span class="w"> </span><span class="s2">"44040192"</span><span class="p">],</span><span class="w">
+          </span><span class="p">[</span><span class="mf">1552536000.001</span><span class="p">,</span><span class="w"> </span><span class="s2">"42291200"</span><span class="p">],</span><span class="w">
+          </span><span class="p">[</span><span class="mf">1552543200.001</span><span class="p">,</span><span class="w"> </span><span class="s2">"42450944"</span><span class="p">],</span><span class="w">
+          </span><span class="p">[</span><span class="mf">1552550400.001</span><span class="p">,</span><span class="w"> </span><span class="s2">"43315200"</span><span class="p">]</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="nl">"metric"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"__name__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt_vm_memory_resident_bytes"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"job"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"pod"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"domain"</span><span class="p">:</span><span class="w"> </span><span class="s2">"default_vm-test-01"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"instance"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.29:8443"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"service"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></pre></td></tr></tbody></table></code></pre></div></div>
 
@@ -480,7 +451,7 @@ and there are many options to actually set up the monitoring stack. Here we pres
 
 <p>An underused feature of the Prometheus server is the <em>target configuration</em>. The Prometehus server exposes data about the targets it is
 looking for, so we can easily asses if the Prometheus server knows that it must scrape the <code class="language-html highlighter-rouge">kubevirt</code> endpoints for metrics.
-We can see this both in the  Prometheus UI:</p>
+We can see this both in the Prometheus UI:</p>
 
 <p><img src="../assets/2019-03-14-More-about-KubeVirt-metrics/promui_targets_1.png" alt="promui_targets_1" /></p>
 
@@ -491,6 +462,7 @@ We can see this both in the  Prometheus UI:</p>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>(output trimmed for brevity):</p>
+
 <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -587,103 +559,104 @@ We can see this both in the  Prometheus UI:</p>
 94
 95
 </pre></td><td class="rouge-code"><pre><span class="p">{</span><span class="w">
-   </span><span class="nl">"data"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-      </span><span class="nl">"activeTargets"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-         </span><span class="p">{</span><span class="w">
-            </span><span class="nl">"lastError"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-            </span><span class="nl">"lastScrape"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-03-14T13:38:52.886262669Z"</span><span class="p">,</span><span class="w">
-            </span><span class="nl">"scrapeUrl"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"https://10.244.0.72:8443/metrics"</span><span class="p">,</span><span class="w">
-            </span><span class="nl">"labels"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-               </span><span class="nl">"service"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"instance"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72:8443"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"endpoint"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="w">
-            </span><span class="p">},</span><span class="w">
-            </span><span class="nl">"discoveredLabels"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_phase"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Running"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoints_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_pod_template_generation"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_label_app_kubernetes_io_managed_by"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-operator"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__address__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72:8443"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_port_number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"8443"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_controller_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"DaemonSet"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_controller_revision_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"7bc9c7665b"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__scheme__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"https"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_tolerations"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"[{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">CriticalAddonsOnly</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">operator</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Exists</span><span class="se">\"</span><span class="s2">}]"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_critical_pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_prometheus_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__metrics_path__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"/metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_controller_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_node_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"c7-allinone-2.kube.lan"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_label_prometheus_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_uid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"7d65f67a-45c8-11e9-8567-5254000be9ec"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt/kubevirt/0"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_host_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.48.7"</span><span class="w">
-            </span><span class="p">},</span><span class="w">
-            </span><span class="nl">"health"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"up"</span><span class="w">
-         </span><span class="p">}</span><span class="w">
-      </span><span class="p">],</span><span class="w">
-      </span><span class="nl">"droppedTargets"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-         </span><span class="p">{</span><span class="w">
-            </span><span class="nl">"discoveredLabels"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c-dnvnm"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_phase"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Running"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoints_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_label_app_kubernetes_io_managed_by"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-operator"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c-dnvnm"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__address__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.59:8443"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_port_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_controller_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"ReplicaSet"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_port_number"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"8443"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_namespace"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_tolerations"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"[{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">CriticalAddonsOnly</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">operator</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Exists</span><span class="se">\"</span><span class="s2">}]"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__scheme__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"https"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_prometheus_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_critical_pod"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_container_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__metrics_path__"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"/metrics"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_address_target_kind"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_port_protocol"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_controller_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_label_pod_template_hash"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"649859444c"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_node_name"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"c7-allinone-2.kube.lan"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_host_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.48.7"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"job"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt/kubevirt/0"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_service_label_kubevirt_io"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_endpoint_ready"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_ip"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.59"</span><span class="p">,</span><span class="w">
-               </span><span class="nl">"__meta_kubernetes_pod_uid"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"7d5c3299-45c8-11e9-8567-5254000be9ec"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
-         </span><span class="p">}</span><span class="w">
-      </span><span class="p">]</span><span class="w">
-   </span><span class="p">},</span><span class="w">
-   </span><span class="nl">"status"</span><span class="w"> </span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
+  </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="nl">"activeTargets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"lastError"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"lastScrape"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2019-03-14T13:38:52.886262669Z"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"scrapeUrl"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://10.244.0.72:8443/metrics"</span><span class="p">,</span><span class="w">
+        </span><span class="nl">"labels"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"service"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"instance"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72:8443"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"job"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"pod"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"endpoint"</span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"discoveredLabels"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_phase"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Running"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoints_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_address_target_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-prometheus-metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_pod_template_generation"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_port_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_label_app_kubernetes_io_managed_by"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-operator"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler-6ng6j"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__address__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72:8443"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_port_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8443"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_controller_kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DaemonSet"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_controller_revision_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7bc9c7665b"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_port_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_ready"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__scheme__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_tolerations"</span><span class="p">:</span><span class="w"> </span><span class="s2">"[{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">CriticalAddonsOnly</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">operator</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Exists</span><span class="se">\"</span><span class="s2">}]"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_port_protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_critical_pod"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_prometheus_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__metrics_path__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_controller_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-handler"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"c7-allinone-2.kube.lan"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_address_target_kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_port_protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_label_prometheus_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7d65f67a-45c8-11e9-8567-5254000be9ec"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"job"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt/kubevirt/0"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_label_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.72"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_ready"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_host_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.48.7"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="nl">"health"</span><span class="p">:</span><span class="w"> </span><span class="s2">"up"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="nl">"droppedTargets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="nl">"discoveredLabels"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_address_target_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c-dnvnm"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_phase"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Running"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoints_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_label_app_kubernetes_io_managed_by"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt-operator"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c-dnvnm"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__address__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.59:8443"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_port_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_port_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_ready"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_controller_kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ReplicaSet"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_port_number"</span><span class="p">:</span><span class="w"> </span><span class="s2">"8443"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_namespace"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_tolerations"</span><span class="p">:</span><span class="w"> </span><span class="s2">"[{</span><span class="se">\"</span><span class="s2">key</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">CriticalAddonsOnly</span><span class="se">\"</span><span class="s2">,</span><span class="se">\"</span><span class="s2">operator</span><span class="se">\"</span><span class="s2">:</span><span class="se">\"</span><span class="s2">Exists</span><span class="se">\"</span><span class="s2">}]"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__scheme__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_prometheus_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_annotation_scheduler_alpha_kubernetes_io_critical_pod"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_container_port_protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__metrics_path__"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/metrics"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_address_target_kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Pod"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_port_protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TCP"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_controller_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api-649859444c"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_label_pod_template_hash"</span><span class="p">:</span><span class="w"> </span><span class="s2">"649859444c"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_node_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"c7-allinone-2.kube.lan"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_host_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"192.168.48.7"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"job"</span><span class="p">:</span><span class="w"> </span><span class="s2">"kubevirt/kubevirt/0"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_service_label_kubevirt_io"</span><span class="p">:</span><span class="w"> </span><span class="s2">"virt-api"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_endpoint_ready"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_ip"</span><span class="p">:</span><span class="w"> </span><span class="s2">"10.244.0.59"</span><span class="p">,</span><span class="w">
+          </span><span class="nl">"__meta_kubernetes_pod_uid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7d5c3299-45c8-11e9-8567-5254000be9ec"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>The Prometheus target state gives us a very useful information that shapes the next steps during the troubleshooting:</p>
+
 <ul>
   <li>does the Prometheus server know it should scrape our target? If no, we should check the Prometheus configuration, which is, in our case, driven by the Prometheus operator. Otherwise:</li>
   <li>can the Prometheus server access the endpoint? If no, we need to check the network connectivity/DNS configuration, or the endpoint itself</li>
@@ -812,7 +785,7 @@ for more details.</p>
   <span class="na">uid</span><span class="pi">:</span> <span class="s">44a0783f-45c8-11e9-8567-5254000be9ec</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">finalizers</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">kubernetes</span>
+    <span class="pi">-</span> <span class="s">kubernetes</span>
 <span class="na">status</span><span class="pi">:</span>
   <span class="na">phase</span><span class="pi">:</span> <span class="s">Active</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -824,17 +797,20 @@ for more details.</p>
 <p>As in KubeVirt 0.15.0, <code class="language-html highlighter-rouge">virt-handler</code> is the component which exposes the VM metrics through its Prometheus endpoint. Let’s check it reports the data correctly.</p>
 
 <p>First, let’s get the virt-handler IP address. We look out the instance we want to check with</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Then we query the address:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt <span class="nv">$VIRT_HANDLER_POD</span> | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Prometheus tooling adds lots of metrics about internal state.
 In this case we care only about kubevirt-related metrics, so we filter out everything else with something like</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 </pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
 </pre></td></tr></tbody></table></code></pre></div></div>
@@ -846,6 +822,7 @@ In this case we care only about kubevirt-related metrics, so we filter out every
 </pre></td></tr></tbody></table></code></pre></div></div>
 
 <p>Let’s see how a healthy output looks like:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
 2
 3
@@ -858,15 +835,18 @@ kubevirt_vm_network_traffic_bytes_total<span class="o">{</span><span class="nv">
 kubevirt_vm_vcpu_seconds<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,id<span class="o">=</span><span class="s2">"0"</span>,state<span class="o">=</span><span class="s2">"1"</span><span class="o">}</span> 5173
 </pre></td></tr></tbody></table></code></pre></div></div>
 
-<p>Please remember that some metrics can be correctly omitted for some VMs.
-In general, we should always see metrics about version (pseudo metric), memory, network, and CPU.
-But there are known cases on which not having storage metrics is expected and correct: for example this case, since we are using a diskless VM.</p>
+<p>Please remember that some metrics can be correctly omitted for some VMs.</p>
+
+<p>In general, we should always see metrics about version (pseudo metric), memory, network, and CPU.</p>
+
+<p>But there are known cases on which not having storage metrics is expected and correct: for example this case, since we are using a diskless VM.</p>
 
 <h2 id="coming-next">Coming next</h2>
 
 <p>The <em>KubeVirt team</em> is still working to enhance and refine the metrics support. There are two main active topics. First, discussion is ongoing about adding more metrics,
-depending on the <a href="https://github.com/kubevirt/kubevirt/issues/2023">needs of the community</a> or the <a href="https://github.com/kubevirt/kubevirt/pull/2077">needs of the ecosystem</a>.
-Furthermore, there is <a href="https://github.com/kubevirt/kubevirt/issues/2011">work in</a> <a href="https://github.com/kubevirt/kubevirt/issues/2012">progress</a> to increase the robustness
+depending on the <a href="https://github.com/kubevirt/kubevirt/issues/2023">needs of the community</a> or the <a href="https://github.com/kubevirt/kubevirt/pull/2077">needs of the ecosystem</a>.</p>
+
+<p>Furthermore, there is <a href="https://github.com/kubevirt/kubevirt/issues/2011">work in</a> <a href="https://github.com/kubevirt/kubevirt/issues/2012">progress</a> to increase the robustness
 and the reliability of the monitoring. We also have <a href="https://github.com/kubevirt/kubevirt/issues/2108">plans</a> to improve the integration with kubernetes.
 Stay tuned for more updates!</p>
 

@@ -97,7 +97,8 @@ code {
   font-size: 1rem;
   border: 1px solid #b1b1b1;
   border-radius: 3px;
-  background-color: #f5f5f5; }
+  background-color: #f5f5f5;
+  padding: 1px .5rem; }
 
 .highlight {
   background-color: #f5f5f5 !important; }
@@ -774,6 +775,25 @@ table {
     .premonition.error .header {
       color: #d9534f; }
 
+.tagcloud .tagcloud-tag {
+  display: inline;
+  white-space: nowrap;
+  padding: 0.6em; }
+.tagcloud .tagcloud-tag-xs a {
+  font-size: 0em;
+  color: #72767b; }
+.tagcloud .tagcloud-tag-s a {
+  color: #72767b; }
+.tagcloud .tagcloud-tag-m a {
+  font-size: 1.1em;
+  color: #1da1f2; }
+.tagcloud .tagcloud-tag-l a {
+  font-size: 1.3em;
+  color: #07a692; }
+.tagcloud .tagcloud-tag-xl a {
+  font-size: 1.6em;
+  color: #005c61; }
+
 * {
   box-sizing: border-box; }
 
@@ -832,7 +852,6 @@ pre {
   background: var(--mk--BackgroundColor--350);
   padding: var(--mk--spacer--xs);
   margin: var(--mk--spacer--sm) 0;
-  display: inline-block;
   min-width: 100%; }
 
 pre .hll {
@@ -1140,14 +1159,35 @@ pre .il {
   display: flex;
   flex-direction: row-reverse; }
 
+/* modification for button copy */
 .btn-copy {
-  color: #FFF;
-  background-color: #00797f;
-  border: 0;
-  padding: 5px 10px;
-  cursor: pointer; }
+  color: #272822;
+  background-color: #FFF;
+  border-color: #272822;
+  border: 2px solid;
+  border-radius: 3px 3px 0px 0px;
+  /* right-align */
+  display: block;
+  margin-left: auto;
+  margin-right: 0;
+  margin-bottom: -2px;
+  padding: 3px 8px;
+  font-size: 0.8em; }
 
 .btn-copy:hover {
-  background-color: rgba(235, 58, 58, 0.774); }
+  cursor: pointer;
+  background-color: #F2F2F2; }
 
-/* modification for button copy */
+.btn-copy:focus {
+  /* Avoid an ugly focus outline on click in Chrome,
+     but darken the button for accessibility.
+     See https://stackoverflow.com/a/25298082/1481479 */
+  background-color: #E6E6E6;
+  outline: 0; }
+
+.btn-copy:active {
+  background-color: #D9D9D9; }
+
+.highlight pre {
+  /* Avoid pushing up the copy buttons. */
+  margin: 0; }
