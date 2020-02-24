@@ -131,7 +131,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["docker", "kubernetes", "podman", "cri-o", "openshift", "okd", "istio", "federation", "kubevirt", "release notes", "container", "libvirt", "qemu", "kvm", {% for tag in site.tags %}"{{ tag[0] }}", {% endfor %}]
+var mykeywords = [{% for tag in site.tags %}"{{ tag[0] }}", {% endfor %}]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 

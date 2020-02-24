@@ -8,6 +8,20 @@ comments: true
 title: KubeVirt basic operations video
 pub-date: November 28
 pub-year: 2019
+tags:
+  [
+    admin,
+    operations,
+    create vm,
+    start vm,
+    connect to console,
+    connect to ssh,
+    stop vm,
+    remove vm,
+    virtual machine,
+    operator manual,
+    basic operations,
+  ]
 ---
 
 In this video, we are showing how KubeVirt can be used from a beginner point of view.
@@ -24,6 +38,7 @@ Also, the `virtctl` command is already installed and available in the PATH.
 ## Operations
 
 The following operations are shown in the video:
+
 - Creating a Virtual Machine from a YAML and a cloud image
 - Starting the Virtual Machine
 - Connecting through the console and SSH to the Virtual Machine

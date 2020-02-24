@@ -7,13 +7,14 @@ pub-date: Dec 13
 pub-year: 2018
 category: news
 comments: true
+tags: [gcp, autodeployer]
 ---
 
-# How to easily test specific versions of kubevirt on gcp
+# How to easily test specific versions of KubeVirt on GCP
 
-At kubevirt, we created cloud images on gcp and aws to ease evaluation of the project. It works fine, has a dedicated CI and is updated when new releases come out, but i wanted to go a little bit further and see if i could easily spawn a vm which would default to latest versions of the components, or that would allow me to test a given PR without focusing on deployment details
+At KubeVirt, we created cloud images on gcp and aws to ease evaluation of the project. It works fine, has a dedicated CI and is updated when new releases come out, but i wanted to go a little bit further and see if i could easily spawn a vm which would default to latest versions of the components, or that would allow me to test a given PR without focusing on deployment details
 
-## So What did i come up with
+## So What did I come up with
 
 the image is called `autolatest` and can be found on [Google Storage](https://console.cloud.google.com/storage/browser/kubevirt-button)
 
@@ -21,8 +22,8 @@ I assume that you have a Google account with an active payment method
 or a free trial. You also need to make sure that you have a default keypair
 installed.
 
-From console.cloud.google.com, go to "Compute Engine", "Images" and then click
-on "Create Image" or click this [link](https://console.cloud.google.com/compute/imagesAdd?){:target="_blank"}.
+From `console.cloud.google.com`, go to "Compute Engine", "Images" and then click
+on "Create Image" or click this [link](https://console.cloud.google.com/compute/imagesAdd?){:target="\_blank"}.
 
 ![screenshot0042](/assets/images/autodeployer/image.png)
 
@@ -46,7 +47,7 @@ It's recommended to select:
 - the 2 CPU / 7.5GB instance
 - a zone that supports the Haswell CPU Platform or newer (for nested virtualization to work), `us-central1-b` for instance
 
-Under "boot disk", select the image that you created above.
+Under `boot disk`, select the image that you created above.
 
 If you want to use specific versions for any of the following components, create the corresponding metadata entry in Management/Metadata
 
@@ -57,17 +58,16 @@ If you want to use specific versions for any of the following components, create
 
 ![screenshot0042](/assets/images/autodeployer/metadata.png)
 
-
-Now hit "Create" to start the instance.
+Now hit `Create` to start the instance.
 
 Once vm is up, you should be able to connect and see through the presented banner which components got deployed
-
 
 ## What happened under the hood
 
 When the vm boots, it executes a boot script which does the following:
 
 - Gather metadata for the following variables
+
   - k8s_version
   - flannel_version
   - kubevirt_version

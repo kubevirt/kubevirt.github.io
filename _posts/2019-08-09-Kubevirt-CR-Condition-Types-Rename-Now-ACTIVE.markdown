@@ -7,6 +7,7 @@ navbar_active: Blogs
 pub-date: Aug 9
 pub-year: 2019
 category: news
+tags: [Condition types]
 ---
 
 Hi,

@@ -8,6 +8,7 @@ pub-date: 8 Jul
 pub-year: 2019
 category: news
 comments: true
+tags: [website, community, roadmap]
 ---
 
 # Detour ahead!

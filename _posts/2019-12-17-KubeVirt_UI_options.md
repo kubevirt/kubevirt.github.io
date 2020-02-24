@@ -6,6 +6,18 @@ navbar_active: Blogs
 category: news
 comments: true
 title: KubeVirt user interface options
+tags:
+  [
+    octant,
+    okd,
+    openshift console,
+    cockpit,
+    noVNC,
+    user interface,
+    web interface,
+    virtVNC,
+    OKD console,
+  ]
 pub-date: December
 pub-year: 2019
 ---
@@ -21,7 +33,6 @@ The different UI options available for KubeVirt that we have been checking, at t
 - [Openshift console](https://github.com/openshift/console) running on vanilla Kubernetes
 - [Cockpit](https://cockpit-project.org/)
 - [noVNC](https://novnc.com/info.html)
-
 
 ## Octant
 
@@ -53,16 +64,15 @@ We installed it and found out that:
 
 With further work and investigation, it could be an option to develop a specific plugin to enable remote console or VNC access to KubeVirt workloads.
 
-
 ## OKD: The Origin Community Distribution of Kubernetes
 
 <img src="/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png" alt="OKD logo">
 
 As defined in the [official webpage](https://www.okd.io/):
+
 > OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.
 
 > OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.
-
 
 A few weeks ago Kubernetes distribution [OKD4](https://github.com/openshift/okd) was released as preview. OKD is the official upstream version of Red Hat's Openshift. Since Openshift includes KubeVirt (Red Hat calls it [CNV](https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html)) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.
 
@@ -86,7 +96,6 @@ One of the drawbacks is that the current [KubeVirt HCO operator](https://operato
 
 If for any reason there is a need to deploy the latest version, it can be done by running the following script which applies directly the HCO operator: [unreleased bundles using the hco without marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace). Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.
 
-
 ## OpenShift console (bridge)
 
 There is actually a [KubeVirt Web User Interface](https://github.com/kubevirt/web-ui), however the standalone project was deprecated in favor of OpenShift Console where it is included as a plugin.
@@ -109,9 +118,7 @@ Then, as briefly explained in their [repository](https://github.com/openshift/co
 
 <video autoplay loop muted playsinline src="/assets/2019-12-19-KubeVirt_UI_options/bridge-k8s.mp4" type="video/mp4" width="1280" height="720"></video>
 
-
 Note that the OpenShift console documentation briefly points out how to integrate the OpenShift console with a native Kubernetes deployment. It is uncertain if it can be installed in any other Kubernetes cluster.
-
 
 ## Cockpit
 
@@ -127,37 +134,31 @@ When testing cockpit in a CentOS 7 server with a Kubernetes cluster and KubeVirt
 
   - **Overview**: filtering by project, it shows Pods, volumes, Nodes, services and resources used.
 
+![Cluster overview](/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_cluster_overview_800.png "cockpit cluster overview")
 
-  ![Cluster overview](/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_cluster_overview_800.png "cockpit cluster overview")
+- **Nodes**: nodes and the resources used are being shown here.
+- **Containers**: a full list of containers and some metadata about them is displayed in this option.
+- **Topology**: A graph with the pods, services and nodes is shown in this option.
 
-  - **Nodes**: nodes and the resources used are being shown here.
-  - **Containers**: a full list of containers and some metadata about them is displayed in this option.
-  - **Topology**: A graph with the pods, services and nodes is shown in this option.
+![Cluster topology](/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_topology_800.png "cockpit cluster topology")
 
-
-
-  ![Cluster topology](/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_topology_800.png "cockpit cluster topology")
-
-
-  - **Details**: allows to filter by project and type of resource and shows some metadata in the results.
-  - **Volumes**: allows to filter by project and shows the volumes with the type and the status.
+- **Details**: allows to filter by project and type of resource and shows some metadata in the results.
+- **Volumes**: allows to filter by project and shows the volumes with the type and the status.
 
 In CentOS 7 there are also the following packages:
 
-- `cockpit-machines.x86_64` : Cockpit user interface for virtual machines. If "virt-install" is installed, you can also create new virtual machines. 
-It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.
+- `cockpit-machines.x86_64` : Cockpit user interface for virtual machines. If "virt-install" is installed, you can also create new virtual machines.
+  It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.
 - `cockpit-machines-ovirt.noarch` : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.
 
 At the moment none of the cockpit complements has support for KubeVirt Virtual Machine.
 
 KubeVirt support for cockpit was [removed from fedora 29](https://bugzilla.redhat.com/show_bug.cgi?id=1629608)
 
-
 ## noVNC
 
 noVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas.
 It just allows you to connect through VNC to the virtual Machine already deployed in KubeVirt.
-
 
 No VM management or even a dashboard is enabled with this option, it's a pure DIY code that can embed the VNC access to the VM into HTML in any application or webpage.
 There is a [noVNC blogpost]({% post_url 2019-11-11-Access-Virtual-Machines-graphic-console-using-noVNC %}) detailing how to install noVNC.
@@ -165,18 +166,18 @@ There is a [noVNC blogpost]({% post_url 2019-11-11-Access-Virtual-Machines-graph
 In this animation you can see the feature of connecting to the Virtual Machine with noVNC:
 ![noVNC](/assets/2019-12-19-KubeVirt_UI_options/virtvnc.gif "noVNC")
 
-
 ## Summary
 
 From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a poweful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.
 
-OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster. 
+OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.
 
-On the other hand, noVNC provides a lightweight interface to simply connect to the console of your virtual machine. 
+On the other hand, noVNC provides a lightweight interface to simply connect to the console of your virtual machine.
 
 Octant, although it does not have any specific integration with KubeVirt, looks like a promising Kubernetes user interface that could be extended to manage our KubeVirt instances in the future.
 
-**Note: We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list.**
+> note "Note"
+> We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list
 
 ## References:
 

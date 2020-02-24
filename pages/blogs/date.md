@@ -21,14 +21,14 @@ order: 10
 {% assign endYear   = 1 %}
 
 {% for post in site.posts %}
-  {%comment%} +++++
-    "| plus: 0" casts postYear to fixnum, because "post.date | date: "%Y"" is a string
-    and comparing "2013" with 2012 (string / number) throws an error
-  +++++ {%endcomment%}
-  {% assign postYear = post.date | date: "%Y" | plus: 0 %}
+{%comment%} +++++
+"| plus: 0" casts postYear to fixnum, because "post.date | date: "%Y"" is a string
+and comparing "2013" with 2012 (string / number) throws an error
++++++ {%endcomment%}
+{% assign postYear = post.date | date: "%Y" | plus: 0 %}
 
-  {% if postYear > endYear %}{% assign endYear = postYear %}{% endif %}
-  {% if postYear < startYear %}{% assign startYear = postYear %}{% endif %}
+{% if postYear > endYear %}{% assign endYear = postYear %}{% endif %}
+{% if postYear < startYear %}{% assign startYear = postYear %}{% endif %}
 {% endfor %}
 
 {%comment%} +++++++++++++++ build the table +++++++++++++++ {%endcomment%}
@@ -36,10 +36,10 @@ order: 10
 {% assign tableContent = "<tr><th></th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th></tr>" %}
 
 {%comment%} +++++
-  currentPostIndex is used to loop over post in an efficient way
-  Knowing that posts a sorted by date, we don't need to loop over
-  all posts each time we want to inspect them.
-  Instead we only loop through posts we don't already inspect.
+currentPostIndex is used to loop over post in an efficient way
+Knowing that posts a sorted by date, we don't need to loop over
+all posts each time we want to inspect them.
+Instead we only loop through posts we don't already inspect.
 +++++ {%endcomment%}
 {% assign currentPostIndex = 0 %}
 
@@ -49,13 +49,13 @@ order: 10
 {%comment%} +++++ Looping trough years in REVERSE order +++++ {%endcomment%}
 {% for year in (startYear...endYear) reversed %}
 
-  {% assign yearRow = "<tr><th>" | append: year | append: "</th>" %}
+{% assign yearRow = "<tr><th>" | append: year | append: "</th>" %}
 
-  {%comment%} +++++ Trick to create an empty array +++++ {%endcomment%}
-  {% assign yearCellsArray = "" | split: "/" %}
+{%comment%} +++++ Trick to create an empty array +++++ {%endcomment%}
+{% assign yearCellsArray = "" | split: "/" %}
 
-  {%comment%} +++++ Looping over month reversed +++++ {%endcomment%}
-  {% for month in (1...12) reversed %}
+{%comment%} +++++ Looping over month reversed +++++ {%endcomment%}
+{% for month in (1...12) reversed %}
 
     {% assign postsThisYearMonth = 0 %}
     {% assign monthCell = "<td>" %}
@@ -88,11 +88,11 @@ order: 10
     {% assign monthCell = monthCell | append: cellContent | append: "</td>" %}
     {% assign yearCellsArray = yearCellsArray | unshift: monthCell %}
 
-  {% endfor %}
+{% endfor %}
 
-  {% assign yearCells = yearCellsArray | join: "" %}
-  {% assign yearRow = yearRow | append: yearCells | append: "</tr>" %}
-  {% assign tableContent = tableContent | append: yearRow %}
+{% assign yearCells = yearCellsArray | join: "" %}
+{% assign yearRow = yearRow | append: yearCells | append: "</tr>" %}
+{% assign tableContent = tableContent | append: yearRow %}
 
 {% endfor %}
 
@@ -109,6 +109,7 @@ order: 10
 {% assign lastPostIndex = site.posts.size | minus: 1 %}
 
 {% for year in (startYear...endYear) reversed %}
+
   <h2>{{year}}</h2>
   {% assign currentYear = year %}
   {% for month in (1...12) reversed %}
@@ -151,10 +152,11 @@ order: 10
       </ul>
     {% endif %}
 
-  {% endfor %}
+{% endfor %}
 
 {% endfor %}
 
     </div>
+
   </div>
 </div>

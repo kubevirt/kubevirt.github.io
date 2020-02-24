@@ -7,6 +7,7 @@ pub-date: June 20
 pub-year: 2018
 category: news
 comments: true
+tags: [kvm, qemu, device plugins]
 ---
 
 As of Kubernetes 1.10, the Device Plugins API is now in beta! KubeVirt is now
@@ -32,7 +33,7 @@ In KubeVirt virt-handler takes on the role of the device plugin server. When it
 starts up on each node, it registers with the Kubernetes Device Plugin API and
 advertises KVM and TUN devices.
 
-```
+```yaml
 apiVersion: v1
 kind: Node
 metadata:
@@ -67,7 +68,7 @@ all nodes in the cluster.
 
 Here's an excerpt of what the pod spec looks like in this case.
 
-```
+```yaml
 apiVersion: v1
 kind: Pod
 metadata:

@@ -7,11 +7,13 @@ pub-date: Oct 11
 pub-year: 2018
 category: news
 comments: true
+tags: [networking, multus, ovs-cni, iptables]
 ---
 
 # Introduction
 
 This post is a quick rehash of the previous [post]({% post_url 2018-04-25-KubeVirt-Network-Deep-Dive %}) regarding KubeVirt networking.
+
 It has been updated to reflect the updates that are included with v0.8.0 which includes
 optional layer 2 support via Multus and the ovs-cni. I won't be covering the installation
 of [OKD](https://docs.okd.io/), Kubernetes, KubeVirt, [Multus or ovs-cni]({% post_url 2018-09-12-attaching-to-multiple-networks %}) all can be found in other documentation or
@@ -24,39 +26,37 @@ These instances are where we will install our simple NodeJS and MongoDB applicat
 
 ## Create Objects and Start the Virtual Machines
 
-
 One of the first objects to create is the `NetworkAttachmentDefinition`.
 We are using a fairly simple definition for this post with an ovs bridge `br1` and no vlan configured.
-```
+
+```yaml
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
   name: ovs-net-br1
 spec:
   config: '{
-      "cniVersion": "0.3.1",
-      "type": "ovs",
-      "bridge": "br1"
+    "cniVersion": "0.3.1",
+    "type": "ovs",
+    "bridge": "br1"
     }'
 ```
 
-
-```
+```sh
 oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/mongodb.yaml
-```
-```
 oc create -f https://gist.githubusercontent.com/jcpowermac/633de0066ee7990afc09fbd35ae776fe/raw/ac259386e1499b7f9c51316e4d5dcab152b60ce7/nodejs.yaml
 ```
+
 Start the virtual machines instances
 
-```
+```sh
 ~/virtctl start nodejs
 ~/virtctl start mongodb
 ```
 
 Review KubeVirt virtual machine related objects
 
-```
+```sh
 $ oc get net-attach-def
 NAME          AGE
 ovs-net-br1   16d
@@ -81,31 +81,33 @@ virt-launcher-nodejs-dlgv6    2/2       Running   0          3h
 
 We may still want to use services and routes with a KubeVirt virtual machine instance utilizing
 multiple interfaces.
+
 The service object below is considered
 [headless](https://kubernetes.io/docs/concepts/services-networking/service/#headless-services)
 because the `clusterIP` is set to `None`. We don't want load-balancing or single service IP as
 this would force traffic over the cluster network which in this example we are trying to avoid.
 
 ### Mongo
+
 ```yaml
 ---
 kind: Service
 apiVersion: v1
 metadata:
- name: mongo
+  name: mongo
 spec:
- clusterIP: None
- ports:
- - port: 27017
-   targetPort: 27017
-   name: mongo
-   nodePort: 0
+  clusterIP: None
+  ports:
+    - port: 27017
+      targetPort: 27017
+      name: mongo
+      nodePort: 0
 selector: {}
 ---
 kind: Endpoints
 apiVersion: v1
 metadata:
- name: mongo
+  name: mongo
 subsets:
   - addresses:
       - ip: 192.168.123.139
@@ -113,9 +115,9 @@ subsets:
       - port: 27017
         name: mongo
 ```
+
 The above ip address is provided by DHCP via dnsmasq to the virtual machine instance's `eth1` interface.
 All the nodes are virtual instances configured by libvirt.
-
 
 After creating the service and endpoints objects lets confirm that DNS is resolving correctly.
 
@@ -138,10 +140,10 @@ metadata:
 spec:
   clusterIP: None
   ports:
-  - name: node
-    port: 8080
-    protocol: TCP
-    targetPort: 8080
+    - name: node
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
   sessionAffinity: None
   type: ClusterIP
 ---
@@ -150,12 +152,12 @@ kind: Endpoints
 metadata:
   name: node
 subsets:
-- addresses:
-  - ip: 192.168.123.140
-  ports:
-  - name: node
-    port: 8080
-    protocol: TCP
+  - addresses:
+      - ip: 192.168.123.140
+    ports:
+      - name: node
+        port: 8080
+        protocol: TCP
 ---
 apiVersion: v1
 kind: Route
@@ -167,25 +169,29 @@ spec:
     name: node
 ```
 
-
 ## Testing our application
 
 I am using the same application and method of installation as the previous post so I won't
-duplicate it here.  Just in case though let's make sure that the application is available
+duplicate it here. Just in case though let's make sure that the application is available
 via the `route`.
 
 `$ curl http://node-vm.apps.192.168.122.101.nip.io`
+
 ```html
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-      <title>Welcome to OpenShift</title>
-...outout...
-<p>Page view count:
-<span class="code" id="count-value">2</span>
-...output...
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    <title>Welcome to OpenShift</title>
+    ...outout...
+    <p>
+      Page view count:
+      <span class="code" id="count-value">2</span>
+      ...output...
+    </p>
+  </head>
+</html>
 ```
 
 # Networking in Detail
@@ -213,6 +219,7 @@ MONGO_URL=mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
 ### endpoints
 
 The endpoints below were manually created for each virtual machine based on the IP Address of `eth1`.
+
 ```
 $ oc get endpoints
 NAME      ENDPOINTS               AGE
@@ -225,6 +232,7 @@ node      192.168.123.140:8080    7h
 This will allow us access the NodeJS example application using the route url.
 
 `$ oc get route`
+
 ```
 NAME      HOST/PORT                             PATH      SERVICES   PORT      TERMINATION   WILDCARD
 node      node-vm.apps.192.168.122.101.nip.io             node       <all>                   None
@@ -237,6 +245,7 @@ In addition to the existing interface `eth0` and bridge `br0`, `eth1` is the upl
 ### interfaces
 
 `ip a`
+
 ```
 ...output...
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state UP group default qlen 1000
@@ -263,6 +272,7 @@ The command and output below shows the Open vSwitch bridge and interfaces. The `
 is one of the veth pair created to connect the virtual machine to the Open vSwitch bridge.
 
 `ovs-vsctl show`
+
 ```
 77147900-3d26-46c6-ac0b-755da3aa4b97
     Bridge "br1"
@@ -281,9 +291,10 @@ is one of the veth pair created to connect the virtual machine to the Open vSwit
 ### interfaces
 
 There are two bridges `k6t-eth0` and `k6t-net0`. `eth0` and `net1` are a veth pair with the alternate side
-available on the host.  `eth0` is a member of the `k6t-eth0` bridge.  `net1` is a member of the `k6t-net0` bridge.
+available on the host. `eth0` is a member of the `k6t-eth0` bridge. `net1` is a member of the `k6t-net0` bridge.
 
 `~ oc exec -n vm -c compute virt-launcher-nodejs-76xk7 -- ip a`
+
 ```
 ...output
 3: eth0@if41: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 qdisc noqueue master k6t-eth0 state UP group default
@@ -319,6 +330,7 @@ available on the host.  `eth0` is a member of the `k6t-eth0` bridge.  `net1` is 
 Showing the bridge `k6t-eth0` and `k6t-net` member ports.
 
 `~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- bridge link show`
+
 ```
 3: eth0 state UP @if41: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1450 master k6t-eth0 state forwarding priority 32 cost 2
 5: net1 state UP @if42: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 master k6t-net1 state forwarding priority 32 cost 2
@@ -334,6 +346,7 @@ on the `k6t-eth0` interface to serve DHCP to the virtual machine. As described i
 a simple DHCP server that provides an offer and typical options to the virtual machine instance.
 
 `~ oc exec -n vm -c compute virt-launcher-nodejs-dlgv6 -- ss -tuanp`
+
 ```
 Netid State   Recv-Q   Send-Q         Local Address:Port     Peer Address:Port
 udp   UNCONN  0        0           0.0.0.0%k6t-eth0:67            0.0.0.0:*      users:(("virt-launcher",pid=7,fd=15))
@@ -360,7 +373,6 @@ Fortunately the vm interfaces are fairly typical. Two interfaces: one that has b
 pod ip address and the other the `ovs-cni` layer 2 interface. The `eth1` interface receives a IP address
 from DHCP provided by dnsmasq that was configured by libvirt network on the physical host.
 
-
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ip a`
 
 ```
@@ -382,10 +394,11 @@ from DHCP provided by dnsmasq that was configured by libvirt network on the phys
 #### Configuration and DNS
 
 In this example we want to use Kubernetes services so special care must be used when
-configuring the network interfaces.  The default route and dns configuration must be
-maintained by `eth0`.  `eth1` has both route and dns configuration disabled.
+configuring the network interfaces. The default route and dns configuration must be
+maintained by `eth0`. `eth1` has both route and dns configuration disabled.
 
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0`
+
 ```
 BOOTPROTO=dhcp
 DEVICE=eth0
@@ -414,6 +427,7 @@ DEFROUTE=no
 Just quickly wanted to cat the `/etc/resolv.conf` file to show that DNS is configured so that kube-dns will be properly queried.
 
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '{{.status.podIP}}') sudo cat /etc/resolv.conf`
+
 ```
 search vm.svc.cluster.local. svc.cluster.local. cluster.local. 168.122.112.nip.io.
 nameserver 192.168.122.112
@@ -439,7 +453,6 @@ arrows annotate the flow of packets between the host and virtual machine network
 
 To confirm connectivity we are going to do a few things. First look for an established
 connection to MongoDB and finally check the NodeJS logs looking for confirmation of database connection.
-
 
 #### TCP connection
 
@@ -491,7 +504,7 @@ the requests that Nginx is receiving for `nodejs.ingress.virtomation.com`.
 
 ### HAProxy to NodeJS VM
 
-The HAProxy pod runs on the master OKD in this scenario.  Using [skydive](https://github.com/skydive-project/skydive) we can see a TCP 8080 connection to nodejs eth1 interface exiting eth1 of the master.
+The HAProxy pod runs on the master OKD in this scenario. Using [skydive](https://github.com/skydive-project/skydive) we can see a TCP 8080 connection to nodejs eth1 interface exiting eth1 of the master.
 
 `$ oc get pod -o wide -n default -l router=router`
 

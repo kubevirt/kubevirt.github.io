@@ -4,6 +4,7 @@ title: Experiment with CDI
 permalink: /labs/kubernetes/lab2
 lab: kubernetes
 order: 1
+tags: [laboratory, importer, vm import, containerized data importer, CDI, lab]
 ---
 
 # Experiment with the Containerized Data Importer (CDI)
@@ -12,9 +13,9 @@ You can experiment this lab online at [![Katacoda](/assets/images/katacoda-logo.
 
 [CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt.
 
-At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named *disk.img* with the desired content into the associated PVC.
+At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named _disk.img_ with the desired content into the associated PVC.
 
-**NOTE**: This 'lab' targets deployment on *one node* as it uses `hostpath` storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.
+**NOTE**: This 'lab' targets deployment on _one node_ as it uses `hostpath` storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.
 
 #### Install the CDI
 
@@ -42,7 +43,7 @@ As an example, we will import a Fedora30 Cloud Image as a PVC and launch a Virtu
 {% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
 ```
 
-This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the *cdi.kubevirt.io/storage.import.endpoint* annotation.
+This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the _cdi.kubevirt.io/storage.import.endpoint_ annotation.
 
 ```
 {% include scriptlets/lab2/07_view_pod_logs.sh -%}
@@ -52,7 +53,7 @@ Notice that the importer downloaded the publicly available Fedora Cloud qcow ima
 
 If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} PVC, and then recreate the {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} PVC.
 
-Let's create a Virtual Machine making use of it. Review the file *vm1_pvc.yml*.
+Let's create a Virtual Machine making use of it. Review the file _vm1_pvc.yml_.
 
 ```bash
 {% include scriptlets/lab2/08_get_vm_manifest.sh -%}

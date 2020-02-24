@@ -7,6 +7,7 @@ navbar_active: Blogs
 pub-date: Aug 1
 pub-year: 2019
 category: news
+tags: [condition types]
 ---
 
 ## The announcement
@@ -15,7 +16,7 @@ Hi KubeVirt Community!
 
 As per the message from Marc Sluiter on our [mailing list](https://groups.google.com/d/msg/kubevirt-dev/LhTm77nWxzM/Qr3c-hDWCQAJ):
 
-~~~
+```
 Hello everybody,
 
 today we merged a PR [0], which renamed the condition types on the KubeVirt custom resources.
@@ -33,7 +34,7 @@ These changes take effect immediately if you are deploying KubeVirt from the mas
 [2] https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md
 
 Best regards,
-~~~
+```
 
 We're renaming some of the prior 'conditions' reported by the Custom Resources.
 
@@ -41,8 +42,6 @@ We're renaming some of the prior 'conditions' reported by the Custom Resources.
 
 > warning "CR Rename"
 > We're making KubeVirt more compatible with the standard for Operators, when doing so, some of the `conditions` are changing, so check your scripts using checks for conditions to use the new ones.
->
-
 
 |  **Prior**   |    **Actual**     | **Note**          |
 | :----------: | :---------------: | :---------------- |

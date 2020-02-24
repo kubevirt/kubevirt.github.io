@@ -6,6 +6,7 @@ navbar_active: Blogs
 pub-date: May 16
 pub-year: 2018
 category: uncategorized
+tags: [ovn, kubetron, network, neutron]
 comments: true
 ---
 
@@ -19,12 +20,12 @@ You can find source code in [Kubetron GitHub repository](https://github.com/phor
 
 ## Contents
 
-* Desired Model and Usage
-* Proof of Concept
-* Demo
-* Try it Yourself
-* Looking for Help
-* Disclaimer
+- Desired Model and Usage
+- Proof of Concept
+- Demo
+- Try it Yourself
+- Looking for Help
+- Disclaimer
 
 ## Desired Model and Usage
 
@@ -60,11 +61,11 @@ kind: pod
 metadata:
   name: network-consumer
   annotations:
-    kubernetes.v1.cni.cncf.io/networks: red  # requested networks
+    kubernetes.v1.cni.cncf.io/networks: red # requested networks
 spec:
   containers:
-  - name: busybox
-    image: busybox
+    - name: busybox
+      image: busybox
 ```
 
 ### Access the Network from the pod
@@ -94,9 +95,9 @@ red-bcxoeffrsw
 
 As for now, current implementation does not completely implement the desired model yet:
 
-* Only Neutron mode is implemented, Kubetron can not be used with OVN alone
-* Network object handling is not implemented, Kubetron obtains networks directly from Neutron
-* Interface names are not exposed as environment variables
+- Only Neutron mode is implemented, Kubetron can not be used with OVN alone
+- Network object handling is not implemented, Kubetron obtains networks directly from Neutron
+- Interface names are not exposed as environment variables
 
 It might be unstable and there are some missing parts. However, basic scenario works, at least in development environment.
 

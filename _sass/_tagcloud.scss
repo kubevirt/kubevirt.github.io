@@ -1,0 +1,32 @@
+.tagcloud {
+    .tagcloud-tag {
+        display: inline;
+        white-space: nowrap;
+        padding: 0.6em;
+    }
+
+    .tagcloud-tag-xs a {
+        font-size: 0em;
+        color: $kv-color--black-400;
+    }
+
+    .tagcloud-tag-s a {
+        // default font size
+        color: $kv-color--black-400;
+    }
+
+    .tagcloud-tag-m a {
+        font-size: 1.1em;
+        color: $kv-color--blue-500;
+    }
+
+    .tagcloud-tag-l a {
+        font-size: 1.3em;
+        color: $kv-color--green-400;
+    }
+
+    .tagcloud-tag-xl a {
+        font-size: 1.6em;
+        color: $kv-color--green-700;
+    }
+}

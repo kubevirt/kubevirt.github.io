@@ -7,6 +7,7 @@ pub-date: Nov 20
 pub-year: 2018
 category: news
 comments: true
+tags: [ignition, coreos, rhcos]
 ---
 
 ## Introduction
@@ -21,14 +22,13 @@ Ignition is a new provisioning utility designed specifically for CoreOS/RhCOS. A
 Recently, we added support for it in KubeVirt so ignition data can now be embedded in a vm specification, through a dedicated annotation.
 Ignition support is still needed in the guest operating system.
 
-
 ## Enabling Ignition Support
 
-Ignition Support has be enabled through a *[feature gate*. This is achieved by creating (or editing ) the _kubevirt-config_ ConfigMap in the kubevirt namespace.
+Ignition Support has to be enabled through a _feature gate_. This is achieved by creating (or editing ) the _kubevirt-config_ ConfigMap in the kubevirt namespace.
 
 A minimal config map would look like this:
 
-```
+```yaml
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -42,7 +42,7 @@ data:
 
 Make sure to delete kubevirt related pods afterward for the configuration to be taken into account:
 
-```
+```sh
 kubectl delete pod --all -n kubevirt
 ```
 
@@ -52,9 +52,9 @@ We assume that you already have a Kubernetes or Openshift cluster running with K
 
 ### Step 1
 
-Create The following VM spec in the file *myvm1.yml*:
+Create The following VM spec in the file _myvm1.yml_:
 
-```
+```yaml
 apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachine
 metadata:
@@ -92,28 +92,28 @@ spec:
               disk:
                 bus: virtio
           interfaces:
-          - name: default
-            bridge: {}
+            - name: default
+              bridge: {}
         resources:
           requests:
             memory: 64M
       networks:
-      - name: default
-        pod: {}
+        - name: default
+          pod: {}
       volumes:
         - name: containerdisk
           containerDisk:
             image: kubevirt/fedora-cloud-container-disk-demo
 ```
 
-Note we simply inject the ignition data as a string in *vm/spec/domain/spec/metadata/annotations*, using *kubevirt.io/ignitiondata* as an annotation
-
+> note "Note"
+> We simply inject the ignition data as a string in _vm/spec/domain/spec/metadata/annotations_, using _kubevirt.io/ignitiondata_ as an annotation
 
 ### Step 2
 
 Create the VM:
 
-```
+```sh
 $ kubectl apply -f myvm1.yml
 virtualmachine "myvm1" created
 ```
@@ -126,4 +126,4 @@ We currently leverage [Pass-through of arbitrary qemu commands](https://libvirt.
 
 ## Summary
 
-Ignition Support brings the ability to run coreos/rhcos distros on KubeVirt and to customize them at boot time.
+Ignition Support brings the ability to run CoreOS/RHCOS distros on KubeVirt and to customize them at boot time.

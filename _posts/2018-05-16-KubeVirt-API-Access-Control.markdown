@@ -6,6 +6,7 @@ navbar_active: Blogs
 pub-date: May 16
 pub-year: 2018
 category: uncategorized
+tags: [api, rbac, roles]
 comments: true
 ---
 
@@ -16,7 +17,7 @@ already provides to its core api objects.
 
 ## KubeVirt RBAC Role Basics
 
-Typically when people think of Kubernetes RBAC system, they're thinking about
+Typically, when people think of Kubernetes RBAC system, they're thinking about
 granting users access to create/delete kubernetes objects (like Pods,
 deployments, etc), however those same RBAC mechanisms work naturally with
 KubeVirt objects as well.
@@ -48,8 +49,8 @@ spec:
       image: kubevirt/cirros-registry-disk-demo:devel
 ```
 
-In the spec above, we see the KubeVirt VirtualMachine object has an *apiVersion*
-field and a *kind* field just like a Pod spec does. The **kubevirt.io** portion
+In the spec above, we see the KubeVirt VirtualMachine object has an _apiVersion_
+field and a _kind_ field just like a Pod spec does. The **kubevirt.io** portion
 of the apiVersion field represents KubeVirt apiGroup the resource is a part of.
 The **kind** field reflects the resource type.
 

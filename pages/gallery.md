@@ -4,6 +4,7 @@ title: Gallery
 permalink: /gallery/
 navbar_active: Gallery
 order: 10
+tags: [picture gallery, photos]
 ---
 
 <div class="container">
@@ -40,5 +41,6 @@ order: 10
       {% endfor %}
       </ul>
     </div>
+
   </div>
 </div>

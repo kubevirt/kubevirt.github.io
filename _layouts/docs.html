@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+  {% include head.html %}
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+      {% include header.html %}
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container-fluid">
+        <div class="row">
+          <h1 class="page-title offset-lg-1">{{ page.navbar_active }}</h1>
+        </div>
+        <div class="row">
+          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+            <div class="search-bar">
+              <i class="fas fa-search docs-search"></i>
+              <input type="text" id="search-input" class="docs-search--input" placeholder="Type to search">
+              <ul id="results-container" class="docs-search--container"></ul>
+            </div>
+            {% include sidebar-docs.html %}
+          </div>
+          <div class="col-sm-12 col-md-8 col-lg-8 docs">
+            {{ content }}
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="footer" role="footer">
+      {% include footer.html %}
+    </footer>
+  </body>
+</html>

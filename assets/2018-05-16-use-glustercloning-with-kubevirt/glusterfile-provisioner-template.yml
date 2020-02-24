@@ -42,4 +42,3 @@ objects:
           env:
           - name: PROVISIONER_NAME
             value: gluster.org/glusterfile
-

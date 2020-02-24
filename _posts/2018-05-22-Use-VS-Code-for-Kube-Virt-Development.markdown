@@ -6,10 +6,11 @@ navbar_active: Blogs
 pub-date: May 22
 pub-year: 2018
 category: uncategorized
+tags: [vscode, development, debug]
 comments: true
 ---
 
-In this post we will install and configure Visual studio code (vscode) for KubeVirt development and debug.
+In this post we will install and configure Visual Studio Code (vscode) for KubeVirt development and debug.
 
 Visual Studio Code is a source code editor developed by Microsoft for Windows, Linux and macOS.
 
@@ -27,9 +28,9 @@ After downloading the binaries extract them with the following command:
 tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
 ```
 
-Now lets Add /usr/local/go/bin to the PATH environment variable.
+Now let's Add /usr/local/go/bin to the PATH environment variable.
 
-You can do this by adding this line to your /etc/profile (for a system-wide installation) or $HOME/.profile:
+You can do this by adding this line to your /etc/profile (for a system-wide installation) or \$HOME/.profile:
 
 ```
 export PATH=$PATH:/usr/local/go/bin
@@ -46,12 +47,15 @@ The installer should put the C:\Go\bin directory in your PATH environment variab
 You may need to restart any open command prompts for the change to take effect.
 
 # VSCODE Installation
+
 Now we will install Visual Studio Code in our system.
 
 ## For linux machines
+
 We need to choose our linux distribution.
 
 ### For RHEL/Centos/Fedora
+
 The following script will install the key and repository:
 
 ```
@@ -74,6 +78,7 @@ sudo yum install code
 ```
 
 ### For Debian/Ubuntu
+
 We need to download the .deb package from the [vscode download page](https://code.visualstudio.com/Download),
 and from the command line run the package management.
 
@@ -83,10 +88,13 @@ sudo apt-get install -f # Install dependencies
 ```
 
 # For Windows machines
+
 Download the [Visual Studio Code installer](https://go.microsoft.com/fwlink/?LinkID=534107), and then run the installer (VSCodeSetup-version.exe)
 
 # Go Project struct
-Lets create the following structure for our kubevirt project development environment:
+
+Let's create the following structure for our kubevirt project development environment:
+
 ```
 ├── <Go-projects-folder> # Your Golang projects root folder
 │   ├── bin
@@ -96,13 +104,13 @@ Lets create the following structure for our kubevirt project development environ
 ```
 
 Now navigate to kubevirt.io folder and run:
-```
+
+```sh
 git clone <kubevirt-fork>
 ```
 
-
-
 # Install VSCODE Extensions
+
 Now we are going to install some extensions for a better development experience with the IDE.
 
 Open vscode and select your go project root folder you created in the last step.
@@ -113,14 +121,14 @@ Now open the command palette (Ctrl+Shift+P) view->Command Palette and type "Go: 
 
 (optional) We can install docker extension for syntax highlighting, commands, etc..
 
-
 ![Extension-Install](../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/extension-install.png)
 
-
 # GOPATH and GOROOT configuration
-Open the vscode configuration file (ctrl+,) file->preferences->settings.
+
+Open the vscode configuration file (`ctrl+,`) file->preferences->settings.
 
 Now on the right file we need to add this configuration:
+
 ```
 "go.gopath": "<Go-projects-folder>",
 "go.goroot": "/usr/local/go",
@@ -129,46 +137,49 @@ Now on the right file we need to add this configuration:
 ![settings](../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/settings.png)
 
 # Create debug configuration
+
 For the last part we are going to configure the debugger file, open it by Debug->Open Configurations and add to the configuration list the following structure
 
-** Change the <Go-projects-folder> parameter to your golang projects root directory
+\*\* Change the <Go-projects-folder> parameter to your golang projects root directory
 
-```
+```yaml
 {
-            "name": "Kubevirt",
-            "type": "go",
-            "request": "launch",
-            "mode": "debug",
-            "remotePath": "",
-            "port": 2345,
-            "host": "127.0.0.1",
-            "program": "${fileDirname}",
-            "env": {},
-            "args": ["--kubeconfig", "cluster/k8s-1.9.3/.kubeconfig",
-                     "--port", "1234"],
-            "showLog": true,
-            "cwd": "${workspaceFolder}/src/kubevirt.io/kubevirt",
-            "output": "<Go-projects-folder>/bin/${fileBasenameNoExtension}"
+  "name": "Kubevirt",
+  "type": "go",
+  "request": "launch",
+  "mode": "debug",
+  "remotePath": "",
+  "port": 2345,
+  "host": "127.0.0.1",
+  "program": "${fileDirname}",
+  "env": {},
+  "args": ["--kubeconfig", "cluster/k8s-1.9.3/.kubeconfig", "--port", "1234"],
+  "showLog": true,
+  "cwd": "${workspaceFolder}/src/kubevirt.io/kubevirt",
+  "output": "<Go-projects-folder>/bin/${fileBasenameNoExtension}",
 }
 ```
+
 ![debug-config](../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-config.png)
 
 # Debug Process
+
 For debug we need to open the main package we want to debug.
 
 For example if we want to debug the virt-api component, open the main package:
+
 ```
 kubevirt.io/cmd/virt-api/virt-api.go
 ```
+
 ![debug-file](../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-file.png)
 
-
-Now change to debug view (ctrl+shift+D), check that we are using the kubevirt configuration and hit the play button
+Now change to debug view (`ctrl+shift+D`), check that we are using the kubevirt configuration and hit the play button
 
 ![debug-view](../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-view.png)
 
-
 ## More Information
+
 For more information, keyboard shortcuts and advance vscode usage please refer the following link
 
 [editor code basics](https://code.visualstudio.com/docs/editor/codebasics)

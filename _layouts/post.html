@@ -12,6 +12,11 @@ navbar_active: blogs
           <div class="post-info">
             <span class="post-author">Author: {{ page.author }}</span>
             <div>
+              <span class="post-category-name">
+                Tags: {% for tag in page.tags %}<a href="{{ site.tag_page_dir }}{{ tag | slugify: 'pretty' }}">{{ tag }}</a>{% if tag != page.tags.last %}&nbsp;|&nbsp;{% endif %}{% endfor %}
+              </span>
+            </div>
+            <div>
               <span class="post-meta">Publication Date: {{ page.date | date: "%B %-d, %Y" }}  {% if page.meta %} | {{ page.meta }}{% endif %}</span>
             </div>
             <div>
@@ -19,6 +24,7 @@ navbar_active: blogs
                 Category: {{ page.category }}
               </span>
             </div>
+
           </div>
         </header>
         <article class="post-content">

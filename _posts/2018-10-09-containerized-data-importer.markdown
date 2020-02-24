@@ -7,9 +7,11 @@ pub-date: October 09
 pub-year: 2018
 category: news
 comments: true
+tags: [import, clone, upload, virtual machine, disk image, cdi]
 ---
 
 # Introduction
+
 Containerized Data Importer (CDI) is a utility to import, upload and clone Virtual Machine images for use with [KubeVirt](https://github.com/kubevirt/kubevirt). At a high level, a persistent volume claim (PVC), which defines VM-suitable storage via a storage class, is created.
 
 A custom controller watches for specific annotation on the persistent volume claim, and when discovered, starts an import, upload or clone process. The status of the each process is reflected in an additional annotation on the associated claim, and when the process completes KubeVirt can create the VM based on the new image.
@@ -25,8 +27,8 @@ This approach supports two main use-cases:
 
 For an in depth look at the system and workflow, see the [Design](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design) documentation.
 
-
 # Data Format
+
 The Containerized Data Importer is capable of performing certain functions that streamline its use with KubeVirt. It automatically decompresses gzip and xz files, and un-tar's tar archives. Also, qcow2 images are converted into the raw format which is required by KubeVirt, resulting in the final file being a simple .img file.
 
 Supported file formats are:
@@ -41,21 +43,26 @@ Supported file formats are:
 Note: CDI also supports combinations of these formats such as gzipped tar archives, gzipped raw images, etc.
 
 # Deploying CDI
+
 ## Assumptions
+
 - A running Kubernetes cluster that is capable of binding PVCs to dynamically or statically provisioned PVs.
 - A storage class and provisioner (only for dynamically provisioned PVs).
 - An HTTP file server hosting VM images
 - An optional "golden" namespace acting as the image repository. The default namespace is fine for tire kicking.
 
 ## Deploy CDI from a release
+
 Deploying the CDI controller is straight forward. In this document the default namespace is used, but in a production setup a [protected namespace](https://github.com/kubevirt/containerized-data-importer#protecting-the-golden-image-namespace) that is inaccessible to regular users should be used instead.
 
-1) Ensure that the cdi-sa service account has proper authority to run privileged containers, typically in a kube environment this is true by default. If you are running an openshift variation of kubernetes you may need to enable privileged containers in the security context:
+1. Ensure that the cdi-sa service account has proper authority to run privileged containers, typically in a kube environment this is true by default. If you are running an openshift variation of kubernetes you may need to enable privileged containers in the security context:
+
 ```bash
 $ oc adm policy add-scc-to-user privileged -z cdi-sa
 ```
 
-2) Deploy the controller from the release manifest:
+2. Deploy the controller from the release manifest:
+
 ```bash
 $ VERSION=<cdi version>
 ```
@@ -65,15 +72,16 @@ $ kubectl create -f https://github.com/kubevirt/containerized-data-importer/rele
 ```
 
 ## Deploy CDI using a template
+
 By default when using manifests/generated/cdi-controller.yaml CDI will deploy into the kube-system namespace using default settings. You can customize the deployment by using the generated manifests/generated/cdi-controller.yaml.j2 jinja2 template. This allows you to alter the install namespace, docker image repo, docker image tags, etc. To deploy using the template follow these steps:
 
-1) Install j2cli:
+1. Install j2cli:
 
 ```bash
 $ pip install j2cli
 ```
 
-2) Install CDI:
+2. Install CDI:
 
 ```bash
 $ cdi_namespace=default \
@@ -87,23 +95,30 @@ $ cdi_namespace=default \
 Check the template file and make sure to supply values for all variables.
 
 Notes:
+
 - The default verbosity level is set to 1 in the controller deployment file, which is minimal logging. If greater details are desired increase the -v number to 2 or 3.
 - The importer pod uses the same logging verbosity as the controller. If a different level of logging is required after the controller has been started, the deployment can be edited and applied by using kubectl apply -f <CDI-MANIFEST>. This will not alter the running controller's logging level but will affect importer pods created after the change. To change the running controller's log level requires it to be restarted after the deployment has been edited.
 
 # Download CDI
+
 There are few ways to download CDI through command line:
 
 - git clone command:
+
 ```bash
 $ git clone https://github.com/kubevirt/containerized-data-importer.git $GOPATH/src/kubevirt.io/containerized-data-importer
 ```
+
 - download only the yamls:
+
 ```bash
 $ mkdir cdi-manifests && cd cdi-manifests
 $ wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/kubevirt-centric-readme/manifests/example/golden-pvc.yaml
 $ wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/kubevirt-centric-readme/manifests/example/endpoint-secret.yaml
 ```
+
 - go get command:
+
 ```bash
 $ go get kubevirt.io/containerized-data-importer
 ```
@@ -122,17 +137,19 @@ metadata:
   labels:
     app: containerized-data-importer
   annotations:
-    cdi.kubevirt.io/storage.import.endpoint: "https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"  # Required. Format: (http||s3)://www.myUrl.com/path/of/data
+    cdi.kubevirt.io/storage.import.endpoint: "https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img" # Required. Format: (http||s3)://www.myUrl.com/path/of/data
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
   # Optional: Set the storage class or omit to accept the default
   # storageClassName: local
 ```
+
 Edit the PVC above -
+
 - cdi.kubevirt.io/storage.import.endpoint: The full URL to the VM image in the format of: http://www.myUrl.com/path/of/data or s3://bucketName/fileName.
 - storageClassName: The default StorageClass will be used if not set. Otherwise, set to a desired StorageClass.
 
@@ -140,31 +157,31 @@ Note: It is possible to use authentication when importing the image from the end
 
 ## Deploy the manifest yaml files
 
-1) Create the persistent volume claim to trigger the import process:
+1. Create the persistent volume claim to trigger the import process:
 
 ```bash
 $ kubectl -n <NAMESPACE> create -f golden-pvc.yaml
 ```
 
-2) (Optional) Monitor the cdi-controller:
+2. (Optional) Monitor the cdi-controller:
 
 ```bash
 $ kubectl -n <CDI-NAMESPACE> logs cdi-deployment-<RANDOM>
 ```
 
-3) (Optional )Monitor the importer pod:
+3. (Optional )Monitor the importer pod:
 
 ```bash
 $ kubectl -n <NAMESPACE> logs importer-<PVC-NAME> # pvc name is shown in controller log
 ```
 
-4) Verify the import is completed by checking the following annotation value:
+4. Verify the import is completed by checking the following annotation value:
 
 ```bash
 $ kubectl -n <NAMESPACE> get pvc golden-pvc.yaml -o yaml
 ```
-annotation to verify - cdi.kubevirt.io/storage.pod.phase: Succeeded
 
+annotation to verify - cdi.kubevirt.io/storage.pod.phase: Succeeded
 
 # Start cloning disk image
 
@@ -194,7 +211,7 @@ kind: StorageClass
 
 ## Create a PVC yaml file named target-pvc.yaml
 
-```
+```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
@@ -206,31 +223,32 @@ metadata:
     k8s.io/CloneRequest: "source-ns/golden-pvc"
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 10Gi
 ```
 
 Edit the PVC above -
+
 - k8s.io/CloneRequest: The name of the PVC we copy the image from (including its namespace). For example: "source-ns/golden-pvc".
 - add the name of the storage class which defines volumeBindingMode per above. Note, this is not required in Kubernetes 1.10 and later.
 
 ## Deploy the manifest yaml files
 
-1) (Optional) Create the namespace where the target PVC will be deployed:
+1. (Optional) Create the namespace where the target PVC will be deployed:
 
 ```bash
 $ kubectl create ns <TARGET-NAMESPACE>
 ```
 
-2) Deploy the target PVC:
+2. Deploy the target PVC:
 
 ```bash
 $ kubectl -n <TARGET-NAMESPACE> create -f target-pvc.yaml
 ```
 
-3) (Optional) Monitor the cloning pods:
+3. (Optional) Monitor the cloning pods:
 
 ```bash
 $ kubectl -n <SOURCE-NAMESPACE> logs <clone-source-pod-name>
@@ -240,7 +258,7 @@ $ kubectl -n <SOURCE-NAMESPACE> logs <clone-source-pod-name>
 $ kubectl -n <TARGET-NAMESPACE> logs <clone-target-pod-name>
 ```
 
-4) Check the target PVC for 'k8s.io/CloneOf' annotation:
+4. Check the target PVC for 'k8s.io/CloneOf' annotation:
 
 ```bash
 $ kubectl -n <TARGET-NAMESPACE> get pvc <target-pvc-name> -o yaml
@@ -263,7 +281,7 @@ metadata:
     cdi.kubevirt.io/storage.upload.target: ""
 spec:
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -283,19 +301,19 @@ spec:
 
 ## Upload an image
 
-1) deploy the upload-pvc
+1. deploy the upload-pvc
 
 ```bash
 $ kubectl apply -f upload-pvc.yaml
 ```
 
-2) Request for upload token
+2. Request for upload token
 
 ```bash
 $ TOKEN=$(kubectl apply -f upload-token.yaml -o="jsonpath={.status.token}")
 ```
 
-3) Upload the image
+3. Upload the image
 
 ```bash
 $ curl -v --insecure -H "Authorization: Bearer $TOKEN" --data-binary @tests/images/cirros-qcow2.img https://$(minikube ip):31001/v1alpha1/upload
@@ -323,7 +341,8 @@ spec:
     <STORAGE-CLASS-NAME>.storageclass.storage.k8s.io/requests.storage: "0"
 ```
 
-NOTE: .storageclass.storage.k8s.io/persistentvolumeclaims: "0" would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.
+> note "Note"
+> `.storageclass.storage.k8s.io/persistentvolumeclaims: "0"` would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.
 
 - Open Up StorageClass Usage for Namespace:
 
@@ -337,4 +356,5 @@ spec:
     <STORAGE-CLASS-NAME>.storageclass.storage.k8s.io/requests.storage: "500Gi"
 ```
 
-NOTE: .storageclass.storage.k8s.io/persistentvolumeclaims: "4" could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.
+> note "Note"
+> `.storageclass.storage.k8s.io/persistentvolumeclaims: "4"` could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.

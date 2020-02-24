@@ -30,7 +30,7 @@ test:
       name: Verify the test VM
       filename: "03_verify_testvm.sh"
       stdout: ""
-      
+
     - step: 4
       name: Start the test VM
       filename: "04_start_testvm.sh"
@@ -71,6 +71,6 @@ test:
       name: Delete the test VM
       filename: "08_delete_testvm.sh"
       test: "! kubectl get vms testvm"
-      
+
   cleanup:
     - rm vm.yaml

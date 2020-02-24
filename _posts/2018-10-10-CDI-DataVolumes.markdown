@@ -7,6 +7,7 @@ pub-date: Oct 11
 pub-year: 2018
 category: news
 comments: true
+tags: [cdi, datavolumes]
 ---
 
 # CDI DataVolumes
@@ -25,25 +26,23 @@ In this blog post, I'd like to focus on the second method, embedding the informa
 
 ### Environment description
 
-* **OpenShift**
+- **OpenShift**
 
-   For testing DataVolumes, I've spawned a new OpenShift cluster, using dynamic provisioning for storage running OpenShift Cloud Storage (GlusterFS), so the Persistent Volumes (PVs for short) are created on-demand. Other than that, it's a regular OpenShift cluster, running with a single master (also used for infrastructure components) and two compute nodes.
+  For testing DataVolumes, I've spawned a new OpenShift cluster, using dynamic provisioning for storage running OpenShift Cloud Storage (GlusterFS), so the Persistent Volumes (PVs for short) are created on-demand. Other than that, it's a regular OpenShift cluster, running with a single master (also used for infrastructure components) and two compute nodes.
 
-* **CDI**
+- **CDI**
 
-   We also need CDI, of course, CDI can be deployed either together with KubeVirt or independently, the instructions can be found in the project's [GitHub repo](https://github.com/kubevirt/containerized-data-importer).
+  We also need CDI, of course, CDI can be deployed either together with KubeVirt or independently, the instructions can be found in the project's [GitHub repo](https://github.com/kubevirt/containerized-data-importer).
 
-* **KubeVirt**
+- **KubeVirt**
 
   Last but not least, we'll need KubeVirt to run the VMs that will make use of the DataVolumes.
-
 
 ### Enabling DataVolumes feature
 
 As of this writing, DataVolumes have to be enabled through a [feature gate](https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/), for KubeVirt, this is achieved by creating the _kubevirt-config_ ConfigMap on the namespace where KubeVirt has been deployed, by default _kube-system_.
 
 Let's create the ConfigMap with the following definition:
-
 
 ```yaml
 ---
@@ -76,7 +75,6 @@ level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 componen
 
 > **NOTE**: It's worth noting the values in the ConfigMap are not dynamic, in the sense that _virt-controller_ and _virt-api_ will need to be _restarted_, scaling their deployments down and back up again, just remember to scale it up to the same number of replicas they previously had.
 
-
 ## Creating a VirtualMachine embedding a DataVolume
 
 Now that the cluster is ready to use the feature, let's have a look at our VirtualMachine definition, which includes a DataVolume.
@@ -95,7 +93,7 @@ spec:
       spec:
         pvc:
           accessModes:
-          - ReadWriteOnce
+            - ReadWriteOnce
           resources:
             requests:
               storage: 10Gi
@@ -113,43 +111,43 @@ spec:
           cores: 1
         devices:
           disks:
-          - volumeName: test-datavolume
-            name: disk0
-            disk:
-              bus: virtio
-          - name: cloudinitdisk
-            volumeName: cloudinitvolume
-            cdrom:
-              bus: virtio
+            - volumeName: test-datavolume
+              name: disk0
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              volumeName: cloudinitvolume
+              cdrom:
+                bus: virtio
         resources:
           requests:
             memory: 8Gi
       volumes:
-      - dataVolume:
-          name: centos7-dv
-        name: test-datavolume
-      - cloudInitNoCloud:
-          userData: |
-            #cloud-config
-            hostname: testvm1
-            users:
-              - name: kubevirt
-                gecos: KubeVirt Project
-                sudo: ALL=(ALL) NOPASSWD:ALL
-                passwd: $6$JXbc3063IJir.e5h$ypMlYScNMlUtvQ8Il1ldZi/mat7wXTiRioGx6TQmJjTVMandKqr.jJfe99.QckyfH/JJ.OdvLb5/OrCa8ftLr.
-                shell: /bin/bash
-                home: /home/kubevirt
-                lock_passwd: false
-        name: cloudinitvolume
+        - dataVolume:
+            name: centos7-dv
+          name: test-datavolume
+        - cloudInitNoCloud:
+            userData: |
+              #cloud-config
+              hostname: testvm1
+              users:
+                - name: kubevirt
+                  gecos: KubeVirt Project
+                  sudo: ALL=(ALL) NOPASSWD:ALL
+                  passwd: $6$JXbc3063IJir.e5h$ypMlYScNMlUtvQ8Il1ldZi/mat7wXTiRioGx6TQmJjTVMandKqr.jJfe99.QckyfH/JJ.OdvLb5/OrCa8ftLr.
+                  shell: /bin/bash
+                  home: /home/kubevirt
+                  lock_passwd: false
+          name: cloudinitvolume
 ```
 
 The new addition to a regular VirtualMachine definition is the _dataVolumeTemplates_ block, which will trigger the import of the CentOS-7 cloud image defined on the _url_ field, storing it on a PV, the resulting DataVolume will be named _centos7-dv_, being referenced on the _volumes_ section, it will serve as the boot disk (disk0) for our VirtualMachine.
 
 Going ahead and applying the above manifest to our cluster results in the following set of events:
 
-* The DataVolume is created, triggering the creation of a PVC and therefore, using the dynamic provisioning configured on the cluster, a PV is provisioned to satisfy the needs of the PVC.
-* An importer pod is started, this pod is the one actually downloading the image defined in the _url_ field and storing it on the provisioned PV.
-* Once the image has been downloaded and stored, the DataVolume status changes to _Succeeded_, from that point the virt launcher controller will go ahead and schedule the VirtualMachine.
+- The DataVolume is created, triggering the creation of a PVC and therefore, using the dynamic provisioning configured on the cluster, a PV is provisioned to satisfy the needs of the PVC.
+- An importer pod is started, this pod is the one actually downloading the image defined in the _url_ field and storing it on the provisioned PV.
+- Once the image has been downloaded and stored, the DataVolume status changes to _Succeeded_, from that point the virt launcher controller will go ahead and schedule the VirtualMachine.
 
 Taking a look to the resources created after applying the VirtualMachine manifest, we can see the following:
 

@@ -6,6 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: Managing KubeVirt with Openshift Web Console
+tags: [openshift web console, web interface, okd]
 pub-date: January 24
 pub-year: 2020
 ---
@@ -17,7 +18,6 @@ There are two options to run the OKD web console to manage a Kubernetes cluster:
 - [Executing the web console as a binary](#binary-installation). This installation method is the only one described in the [OKD web console repository](https://github.com/openshift/console#build-everything). Personally, looks like more targetted at developers who want to quickly iterate over the development process while hacking in the web console. This development approach is described in the [native Kubernetes](https://github.com/openshift/console#native-kubernetes) section of the OpenShift console code repository.
 
 - [Executing the web console as another pod](#containerized-installation). The idea is leveraging the containerized version available as origin-console in the [OpenShift container image repository](https://quay.io/repository/openshift/origin-console?tag=latest&tab=tags) and execute it inside a Kubernetes cluster as a regular application, e.g. as a pod.
-
 
 ## What is the OKD web console
 
@@ -34,18 +34,17 @@ When the web console is accessed from a browser, it first loads all required sta
 
 The web console uses WebSockets to maintain a persistent connection with the API server and receive updated information as soon as it is available. Note as well that JavaScript must be enabled to use the web console. For the best experience, use a web browser that supports WebSockets. OKD web console's developers inform that Google Chrome/Chromium version 76 or greater is used in their integration tests.
 
-Unlike what is explained in the [official repository](https://github.com/openshift/console#native-kubernetes), OKD actually executes the OKD web console in a pod. Therefore, even not officially mentioned, information how to run the OKD web console as a pod in a *native Kubernetes* cluster will be described later.
-
+Unlike what is explained in the [official repository](https://github.com/openshift/console#native-kubernetes), OKD actually executes the OKD web console in a pod. Therefore, even not officially mentioned, information how to run the OKD web console as a pod in a _native Kubernetes_ cluster will be described later.
 
 ## Binary installation
 
-*This method is suggested to be a development installation since it is mainly used by the OKD web console developers to test new features.*
+_This method is suggested to be a development installation since it is mainly used by the OKD web console developers to test new features._
 
 In this section the OKD web console will be compiled from the source code and executed as a binary artifact in a **CentOS 8** server which does not belong to any Kubernetes cluster. The following diagram shows the relationship between all the components: user, OKD web console and Kubernetes cluster.
 
 <img src="/assets/2020-01-24-OKD-web-console-install/OKD-console-kubevirt.png" alt="Lab diagram">
 
-Note that it is possible to run the OKD web console in a Kubernetes master, in a regular node or, as shown, in a server outside the cluster. In the latter case, the external server must have access to the master API. *Notice also that it can be configured with different security and network settings or even different hardware resources*.
+Note that it is possible to run the OKD web console in a Kubernetes master, in a regular node or, as shown, in a server outside the cluster. In the latter case, the external server must have access to the master API. _Notice also that it can be configured with different security and network settings or even different hardware resources_.
 
 The first step when using the binary installation is cloning the [repository](https://github.com/openshift/console).
 
@@ -109,7 +108,6 @@ Installed:
   jq.x86_64 0:1.5-1.el7
 ```
 
-
 ### Compiling OKD web console
 
 Once all dependencies are met, access the cloned directory and export the correct variables that will be used during the building process. Then, execute `build.sh` script which actually calls the build-frontend and build-backend scripts.
@@ -126,7 +124,7 @@ $ ./build.sh
 Done in 215.91s.
 ```
 
-The result of the process is a binary file called **bridge** inside the bin folder. Prior to run the *"bridge"*, it has to be verified that the port where the OKD web console is expecting connections is not blocked.
+The result of the process is a binary file called **bridge** inside the bin folder. Prior to run the _"bridge"_, it has to be verified that the port where the OKD web console is expecting connections is not blocked.
 
 ```sh
 $ iptables -A INPUT -p tcp --dport 9000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
@@ -146,13 +144,9 @@ At this point, the connection to the OKD web console from your network should be
 
 Probably, the following issue will be faced when connecting to the web user interface: `"services is forbidden: User "system:serviceaccount:kube-system:default" cannot list resource "services" in API group "" in the namespace default"`. The problem is that the **default service account** does not have enough privileges to show all the cluster objects.
 
-<br>
-
 <img src="/assets/2020-01-24-OKD-web-console-install/okd-serviceaccount-error.png" alt="OKD sa error" width="1110" height="720">
 
-<br>
-
- There are two options to fix the issue: one is granting cluster-admin permissions to the default service account. That, it is not recommended since default service account is, at its very name indicates, the default service account for all pods if not explicitly configured. This means granting cluster-admin permissions to some applications running in kube-system namespace and even future ones when no service account is configured.
+There are two options to fix the issue: one is granting cluster-admin permissions to the default service account. That, it is not recommended since default service account is, at its very name indicates, the default service account for all pods if not explicitly configured. This means granting cluster-admin permissions to some applications running in kube-system namespace and even future ones when no service account is configured.
 
 The other option is create a new service account called **console**, grant cluster-admin permissions to it and configure the web console to run with this new service account:
 
@@ -170,11 +164,9 @@ secretname=$(kubectl get serviceaccount **console** --namespace=kube-system -o j
 
 Now, variables configured in the `environment.sh` file have to be exported again and the connection to the console must be reloaded.
 
-
 ```sh
 $ source ./contrib/environment.sh
 ```
-<br>
 
 ## Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)
 
@@ -286,21 +278,22 @@ virt-handler-k6npr                                    1/1     Running   0       
 virt-operator-84f5588df6-2k49b                        1/1     Running   0          24m   10.244.1.14       blog-worker-00.kubevirt.local   <none>           <none>
 virt-operator-84f5588df6-zzrsb                        1/1     Running   1          24m   10.244.0.4        blog-master-00.kubevirt.local   <none>           <none>
 ```
-<br>
-**Note** that only once HCO is completely deployed, `VirtualMachines` can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.
+
+> note "Note"
+> Only once HCO is completely deployed, `VirtualMachines` can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.
 
 It is worth noting that there is an ongoing effort to adapt the OpenShift web console's user interface in native Kubernetes additionally to OKD or OpenShift as they are expected. [As an example](https://github.com/openshift/console/pull/3848), a few days ago, the non applicable Virtual Machine Templates option from the Workload menu was removed and the VM Wizard was made fully functional when native Kubernetes is detected.
-<br>
 
 <iframe width="1110" height="650" src="https://www.youtube.com/embed/XQw4GkGHs44" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
 
-<br>
 ## Containerized installation
 
 The OKD web console actually runs as a pod in OKD along with its deployment, services and all objects needed to run properly. The idea is to take advantage of the containerized OKD web console available and execute it in one of the nodes of a native Kubernetes cluster.
 
-*Note that unlike the binary installation the pod must run in a node inside our Kubernetes cluster*. On the other side, running the OKD web console as a native Kubernetes application will benefit from all the Kubernetes advantages: rolling deployments, easy upgrades, high availability, scalability, auto-restart in case of failure, liveness and readiness probes... An example of how easy it is to update the OKD web console to a newer version will be presented as well.
+> note ""
+> Note that unlike the binary installation the pod must run in a node inside our Kubernetes cluster
 
+Running the OKD web console as a native Kubernetes application will benefit from all the Kubernetes advantages: rolling deployments, easy upgrades, high availability, scalability, auto-restart in case of failure, liveness and readiness probes... An example of how easy it is to update the OKD web console to a newer version will be presented as well.
 
 ### Deploying OKD web console
 
@@ -343,24 +336,24 @@ spec:
         app: console
     spec:
       containers:
-      - name: console-app
-        image: quay.io/openshift/origin-console:4.2
-        env:
-        - name: BRIDGE_USER_AUTH
-          value: disabled         # no authentication required
-        - name: BRIDGE_K8S_MODE
-          value: off-cluster
-        - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
-          value: https://kubernetes.default  #master api
-        - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
-          value: "true"           # no tls enabled
-        - name: BRIDGE_K8S_AUTH
-          value: bearer-token
-        - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: console-token-ppfc2 # console serviceaccount token
-              key: token
+        - name: console-app
+          image: quay.io/openshift/origin-console:4.2
+          env:
+            - name: BRIDGE_USER_AUTH
+              value: disabled # no authentication required
+            - name: BRIDGE_K8S_MODE
+              value: off-cluster
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
+              value: https://kubernetes.default #master api
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
+              value: "true" # no tls enabled
+            - name: BRIDGE_K8S_AUTH
+              value: bearer-token
+            - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: console-token-ppfc2 # console serviceaccount token
+                  key: token
 
 ---
 kind: Service
@@ -371,19 +364,19 @@ metadata:
 spec:
   selector:
     app: console
-  type: NodePort    # nodePort configuration
+  type: NodePort # nodePort configuration
   ports:
-  - name: http
-    port: 9000
-    targetPort: 9000
-    nodePort: 30036
-    protocol: TCP
+    - name: http
+      port: 9000
+      targetPort: 9000
+      nodePort: 30036
+      protocol: TCP
 
 ---
+
 ```
 
 Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.
-
 
 ```sh
 $ kubectl create -f okd-web-console-install.yaml
@@ -401,28 +394,20 @@ kube-dns             ClusterIP   10.96.0.10     <none>        53/UDP,53/TCP,9153
 ```
 
 Once running, a connection to the `nodeport` defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.
-<br>
-
 
 <img src="/assets/2020-01-24-OKD-web-console-install/okd-pod-4.2.resized.png" alt="OKD 4.2">
 
-<br>
 It can be verified that it is possible to see and manage `VirtualMachines` running inside of the native Kubernetes cluster.
-<br>
 
 <img src="/assets/2020-01-24-OKD-web-console-install/okd-console-vm.resized.png" alt="OKD vmr">
-
-<br>
 
 ### Upgrade OKD web console
 
 The upgrade process is really straightforward. All available image versions of the OpenShift console can be consulted in the [official OpenShift container image repository](https://quay.io/repository/openshift/origin-console?tab=tags). Then, the deployment object must be modified accordingly to run the desired version of the OKD web console.
 
-<br>
 <img src="/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr">
-<br>
 
-In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. *Note that this is not linked with the latest tag, actually `latest` tag is the same as version `4.4`*. Upgrading process only involves updating the image value to the desired container image: `quay.io/openshift/origin-console:4.5` and save.
+In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. _Note that this is not linked with the latest tag, actually `latest` tag is the same as version `4.4`_. Upgrading process only involves updating the image value to the desired container image: `quay.io/openshift/origin-console:4.5` and save.
 
 ```yaml
 apiVersion: apps/v1
@@ -443,26 +428,26 @@ spec:
         app: console
     spec:
       containers:
-      - name: console-app
-        image: quay.io/openshift/origin-console:4.5 #new image version
-        env:
-        - name: BRIDGE_USER_AUTH
-          value: disabled
-        - name: BRIDGE_K8S_MODE
-          value: off-cluster
-        - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
-          value: https://kubernetes.default
-        - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
-          value: "true"
-        - name: BRIDGE_K8S_AUTH
-          value: bearer-token
-        - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: console-token-ppfc2
-              key: token
-
+        - name: console-app
+          image: quay.io/openshift/origin-console:4.5 #new image version
+          env:
+            - name: BRIDGE_USER_AUTH
+              value: disabled
+            - name: BRIDGE_K8S_MODE
+              value: off-cluster
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT
+              value: https://kubernetes.default
+            - name: BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS
+              value: "true"
+            - name: BRIDGE_K8S_AUTH
+              value: bearer-token
+            - name: BRIDGE_K8S_AUTH_BEARER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: console-token-ppfc2
+                  key: token
 ```
+
 Once the deployment has been saved, a new pod with the configured version of the OKD web console is created and eventually will replace the old one.
 
 ```sh
@@ -471,24 +456,20 @@ NAME                                                    READY   STATUS          
 console-deployment-5588f98644-bw7jr                     0/1     ContainerCreating   0          5s
 console-deployment-59d8956db5-td462                     1/1     Running             0          16h
 ```
-<br>
+
 <img src="/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5">
-<br>
 
 In the video below, the procedure explained in this section is shown.
-<br>
 
 <iframe width="1110" height="650" src="https://www.youtube.com/embed/xoL0UFI657I" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<br>
 
 ## Summary
 
-In this post *two ways to install the OKD web console to manage a KubeVirt deployment in a native Kubernetes cluster have been explored*. Running the OKD web console will allow you to create, manage and delete virtual machines running in a native cluster from a friendly user interface. Also you will be able to delegate to the developers or other users the creation and maintenance of their virtual machines without having a deep knowledge of Kubernetes.
+In this post _two ways to install the OKD web console to manage a KubeVirt deployment in a native Kubernetes cluster have been explored_. Running the OKD web console will allow you to create, manage and delete virtual machines running in a native cluster from a friendly user interface. Also you will be able to delegate to the developers or other users the creation and maintenance of their virtual machines without having a deep knowledge of Kubernetes.
 
 Personally, I would like to see more user interfaces to manage and configure KubeVirt deployments and their virtual machines. In a previous post, [KubeVirt user interface options](https://kubevirt.io/2019/KubeVirt_UI_options.html), some options were explored, however only OKD web console was found to be deeply integrated with KubeVirt.
 
 Ping us or feel free to comment this post in case there are some other existing options that we did not notice.
-
 
 ## References
 

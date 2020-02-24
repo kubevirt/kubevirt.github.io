@@ -8,6 +8,7 @@ comments: true
 title: Persistent storage of your Virtual Machines in KubeVirt with Rook
 pub-date: October
 pub-year: 2019
+tags: [rook, ceph, ntp, chronyd]
 ---
 
 ![Rook](/assets/2019-10-30-KubeVirt_storage_rook_ceph/rook-stacked-color_250.png "Rook")
@@ -15,7 +16,7 @@ pub-year: 2019
 
 ## Introduction
 
-Quoting [Wikipedia](https://en.wikipedia.org/wiki/Persistence_(computer_science)):
+Quoting [Wikipedia](<https://en.wikipedia.org/wiki/Persistence_(computer_science)>):
 
 > In computer science, persistence refers to the characteristic of state that outlives the process
 > that created it. This is achieved in practice by storing the state as data in computer data storage.
@@ -67,7 +68,10 @@ cdi.cdi.kubevirt.io/cdi created
 
 ```
 
-The nodes of the cluster have to be time synchronized (note that this should have been done for you by `chronyd` but it can't harm to do it again):
+> warning "The nodes of the cluster have to be time synchronized"
+> This should have been done for you by `chronyd`
+
+It can't harm to do it again:
 
 ```sh
 [root@kv-master-00 ~]# for i in $(echo 6 106 206 222); do ssh -oStrictHostKeyChecking=no \
@@ -83,7 +87,8 @@ Warning: Permanently added '192.168.122.222' (ECDSA) to the list of known hosts.
 200 OK
 ```
 
-> NOTE: This step could also be done with ansible (one line or rhel-system-roles.noarch).
+> note ""
+> This step could also be done with ansible (one line or rhel-system-roles.noarch).
 
 ## Installing Rook in Kubernetes to handle the Ceph cluster
 
@@ -220,7 +225,8 @@ sh-4.2# ceph status
     pgs:
 ```
 
-> NOTE: In this example, the health value is `HEALTH_WARN` because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a `HEALTH_OK`.
+> note "Note"
+> In this example, the health value is `HEALTH_WARN` because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a `HEALTH_OK`.
 
 Next, some other resources need to be created. First, the block pool that defines the name (and specification) of the RBD pool that will be used for creating persistent volumes, in this case, is called `replicapool`:
 
@@ -292,30 +298,30 @@ Now is time to create the Kubernetes storage class that would be used to create 
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:
-   name: rook-ceph-block
+  name: rook-ceph-block
 # Change "rook-ceph" provisioner prefix to match the operator namespace if needed
 provisioner: rook-ceph.rbd.csi.ceph.com
 parameters:
-    # clusterID is the namespace where the rook cluster is running
-    clusterID: rook-ceph
-    # Ceph pool into which the RBD image shall be created
-    pool: replicapool
+  # clusterID is the namespace where the rook cluster is running
+  clusterID: rook-ceph
+  # Ceph pool into which the RBD image shall be created
+  pool: replicapool
 
-    # RBD image format. Defaults to "2".
-    imageFormat: "2"
+  # RBD image format. Defaults to "2".
+  imageFormat: "2"
 
-    # RBD image features. Available for imageFormat: "2". CSI RBD currently supports only `layering` feature.
-    imageFeatures: layering
+  # RBD image features. Available for imageFormat: "2". CSI RBD currently supports only `layering` feature.
+  imageFeatures: layering
 
-    # The secrets contain Ceph admin credentials.
-    csi.storage.k8s.io/provisioner-secret-name: rook-ceph-csi
-    csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
-    csi.storage.k8s.io/node-stage-secret-name: rook-ceph-csi
-    csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
+  # The secrets contain Ceph admin credentials.
+  csi.storage.k8s.io/provisioner-secret-name: rook-ceph-csi
+  csi.storage.k8s.io/provisioner-secret-namespace: rook-ceph
+  csi.storage.k8s.io/node-stage-secret-name: rook-ceph-csi
+  csi.storage.k8s.io/node-stage-secret-namespace: rook-ceph
 
-    # Specify the filesystem type of the volume. If not specified, csi-provisioner
-    # will set default as `ext4`.
-    csi.storage.k8s.io/fstype: xfs
+  # Specify the filesystem type of the volume. If not specified, csi-provisioner
+  # will set default as `ext4`.
+  csi.storage.k8s.io/fstype: xfs
 
 # Delete the rbd volume when a PVC is deleted
 reclaimPolicy: Delete
@@ -330,7 +336,8 @@ NAME              PROVISIONER                  AGE
 rook-ceph-block   rook-ceph.rbd.csi.ceph.com   61s
 ```
 
-> NOTE: Special attention to the pool name, it has to be the same as configured in the CephBlockPool.
+> note ""
+> Special attention to the pool name, it has to be the same as configured in the CephBlockPool.
 
 Now, simply wait for the Ceph OSD's to finish provisioning and we'll be done with our Ceph deployment:
 
@@ -343,7 +350,8 @@ rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0    
 
 ```
 
->NOTE: This process may take a few minutes as it has to zap the disks, deploy a BlueStore configuration on them, and start the OSD service pods across our nodes.
+> note ""
+> This process may take a few minutes as it has to zap the disks, deploy a BlueStore configuration on them, and start the OSD service pods across our nodes.
 
 The cluster deployment can be validated now:
 
@@ -477,6 +485,7 @@ For validating the storage provisioning through the new Ceph cluster managed by 
 ```sh
 [root@kv-master-00 ~]# vim pvc.yml
 ```
+
 ```yaml
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -485,7 +494,7 @@ metadata:
 spec:
   storageClassName: rook-ceph-block
   accessModes:
-  - ReadWriteOnce
+    - ReadWriteOnce
   resources:
     requests:
       storage: 1Gi
@@ -496,7 +505,8 @@ spec:
 persistentvolumeclaim/pv-claim created
 ```
 
-> NOTE: Ensure that the `storageClassName` contains the name of the storage class you have created, in this case, `rook-ceph-block`
+> note ""
+> Ensure that the `storageClassName` contains the name of the storage class you have created, in this case, `rook-ceph-block`
 
 For checking that it has been bound, list the PVC's and look for the ones in the `rook-ceph-block` storageclass:
 
@@ -506,7 +516,8 @@ NAME       STATUS   VOLUME                                     CAPACITY   ACCESS
 pv-claim   Bound    pvc-62a9738a-e027-4a68-9ecf-16278711ff64   1Gi        RWO            rook-ceph-block   63s
 ```
 
->NOTE: If the volume is still in a 'Pending' state, likely, that one of the pods haven't come up correctly or one of the steps above has been missed. To check it, the command 'kubectl get pods -n rook-ceph' can be executed for viewing the running/failed pods.
+> note ""
+> If the volume is still in a 'Pending' state, likely, that one of the pods haven't come up correctly or one of the steps above has been missed. To check it, the command 'kubectl get pods -n rook-ceph' can be executed for viewing the running/failed pods.
 
 Before proceeding let's clean up the temporary PVC:
 
@@ -531,43 +542,47 @@ Once the Ceph cluster is up and running, the first Virtual Machine can be create
 The modified YAML could be run already like this but a user won't be able to log in as we don't know the password used in that image. `cloud-init` can be used to change the password of the default user of that image `centos` and grant us access, two parts have to be added:
 
 - Add a second disk after the `datavolumevolume` (already existing), in this example is called `cloudint`:
+
 ```sh
 [root@kv-master-00 ~]# vim vm-dv.yaml
 ```
+
 ```yaml
-...
-  template:
-    metadata:
-      labels:
-        kubevirt.io/vm: vm-datavolume
-    spec:
-      domain:
-        devices:
-          disks:
+---
+template:
+  metadata:
+    labels:
+      kubevirt.io/vm: vm-datavolume
+  spec:
+    domain:
+      devices:
+        disks:
           - disk:
               bus: virtio
             name: datavolumevolume
           - disk:
               bus: virtio
             name: cloudinit
-...
 ```
+
 - Afterwards, add the volume at the end of the file, after the volume already defined as `datavolumevolume`, in this example it's also called `cloudinit`:
+
 ```sh
 [root@kv-master-00 ~]# vim vm-dv.yaml
 ```
+
 ```yaml
-...
-      volumes:
-      - dataVolume:
-          name: centos-dv
-        name: datavolumevolume
-      - cloudInitNoCloud:
-          userData: |
-            #cloud-config
-            password: changeme
-            chpasswd: { expire: False }
-        name: cloudinit
+---
+volumes:
+  - dataVolume:
+      name: centos-dv
+    name: datavolumevolume
+  - cloudInitNoCloud:
+      userData: |
+        #cloud-config
+        password: changeme
+        chpasswd: { expire: False }
+    name: cloudinit
 ```
 
 The password value (`changeme` in this example), can be set to your preferred one.
@@ -701,9 +716,9 @@ sh-4.2# ceph status                                                             
 
 ## References
 
-* [Kubernetes getting started](https://kubernetes.io/docs/setup/)
-* [KubeVirt Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
-* [Ceph: free-software storage platform](https://ceph.io)
-* [Ceph hardware recommendations](https://docs.ceph.com/docs/jewel/start/hardware-recommendations/)
-* [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
-* [KubeVirt Userguide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
+- [Kubernetes getting started](https://kubernetes.io/docs/setup/)
+- [KubeVirt Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
+- [Ceph: free-software storage platform](https://ceph.io)
+- [Ceph hardware recommendations](https://docs.ceph.com/docs/jewel/start/hardware-recommendations/)
+- [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
+- [KubeVirt Userguide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)

@@ -4,12 +4,14 @@ title: Easy installation on Cloud Providers
 tags: [gcp, aws]
 permalink: pages/cloud
 lab: kubernetes
+tags: [gcp, aws, alicloud, azure, amazon, google, quickstart, tutorial]
 order: 1
 ---
 
 # Easy install using Cloud Providers
 
 ## Introduction
+
 > info ""
 > KubeVirt has been tested on GCP and AWS providers, this approach is intended for demonstration purposes similar to the environments for [Kind]({% link pages/quickstart_kind.md %}) and [Minikube]({% link pages/quickstart_minikube.md %}) and of course the [Katacoda scenarios](https://katacoda.com/kubevirt).
 
@@ -25,7 +27,6 @@ Check Kubernetes.io guide for each cloud provider to match your use case:
 > error ""
 > Usage of Cloud Providers like GCP or AWS (or others) might have additional costs or require trial account and setup prior to be able to run those instructions, like for example, creating a default keypair or others.
 
-
 | Provider | Link                                                                             |
 | -------- | -------------------------------------------------------------------------------- |
 | AliCloud | <https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/> |
@@ -34,11 +35,8 @@ Check Kubernetes.io guide for each cloud provider to match your use case:
 | GCP      | <https://kubernetes.io/docs/setup/production-environment/turnkey/gce/>           |
 | Others   | <https://kubernetes.io/docs/setup/production-environment/turnkey/>               |
 
-
-
 > info ""
 > Create a disk of 30Gb at least.
-
 
 After following the instructions provided by <Kubernetes.io>, `kubectl` can be used to manage the cluster.
 

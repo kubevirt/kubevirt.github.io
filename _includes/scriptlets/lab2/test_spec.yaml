@@ -53,7 +53,7 @@ test:
         match: "3"
         rate: 15
         tries: 20
-      stdout: |        
+      stdout: |
         customresourcedefinition.apiextensions.k8s.io/datavolumes.cdi.kubevirt.io created
         clusterrolebinding.rbac.authorization.k8s.io/cdi-sa created
         clusterrole.rbac.authorization.k8s.io/cdi created
@@ -83,7 +83,7 @@ test:
 #      test: false
 #      stdout: |
 #        persistentvolumeclaim/fedora created
-      
+
   cleanup:
     - kubectl delete -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
     - kubectl delete -f cdi-controller.yaml
