@@ -262,17 +262,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>After downloading the binaries extract them with the following command:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
+</code></pre></div></div>
 
 <p>Now let’s Add /usr/local/go/bin to the PATH environment variable.</p>
 
 <p>You can do this by adding this line to your /etc/profile (for a system-wide installation) or $HOME/.profile:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>export PATH=$PATH:/usr/local/go/bin
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export PATH=$PATH:/usr/local/go/bin
+</code></pre></div></div>
 
 <h2 id="golang-windows-installation">Golang Windows Installation</h2>
 
@@ -296,38 +294,30 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>The following script will install the key and repository:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" &gt; /etc/yum.repos.d/vscode.repo'
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Then update the package cache and install the package using dnf (Fedora 22 and above):</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>dnf check-update
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dnf check-update
 sudo dnf install code
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Or on older versions using yum:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>yum check-update
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum check-update
 sudo yum install code
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="for-debianubuntu">For Debian/Ubuntu</h3>
 
 <p>We need to download the .deb package from the <a href="https://code.visualstudio.com/Download">vscode download page</a>,
 and from the command line run the package management.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>sudo dpkg -i <span class="nt">&lt;file&gt;</span>.deb
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dpkg -i <span class="nt">&lt;file&gt;</span>.deb
 sudo apt-get install -f # Install dependencies
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h1 id="for-windows-machines">For Windows machines</h1>
 
@@ -337,23 +327,17 @@ sudo apt-get install -f # Install dependencies
 
 <p>Let’s create the following structure for our kubevirt project development environment:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>├── <span class="nt">&lt;Go-projects-folder&gt;</span> # Your Golang projects root folder
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── <span class="nt">&lt;Go-projects-folder&gt;</span> # Your Golang projects root folder
 │   ├── bin
 │   ├── pkg
 │   ├── src
 │   │   ├── kubevirt.io
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now navigate to kubevirt.io folder and run:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>git clone &lt;kubevirt-fork&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone &lt;kubevirt-fork&gt;
+</code></pre></div></div>
 
 <h1 id="install-vscode-extensions">Install VSCODE Extensions</h1>
 
@@ -375,11 +359,9 @@ sudo apt-get install -f # Install dependencies
 
 <p>Now on the right file we need to add this configuration:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>"go.gopath": "<span class="nt">&lt;Go-projects-folder&gt;</span>",
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"go.gopath": "<span class="nt">&lt;Go-projects-folder&gt;</span>",
 "go.goroot": "/usr/local/go",
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/settings.png" alt="settings" /></p>
 
@@ -389,22 +371,7 @@ sudo apt-get install -f # Install dependencies
 
 <p>** Change the <Go-projects-folder> parameter to your golang projects root directory</Go-projects-folder></p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="pi">{</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">{</span>
   <span class="s2">"</span><span class="s">name"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Kubevirt"</span><span class="pi">,</span>
   <span class="s2">"</span><span class="s">type"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">go"</span><span class="pi">,</span>
   <span class="s2">"</span><span class="s">request"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">launch"</span><span class="pi">,</span>
@@ -419,7 +386,7 @@ sudo apt-get install -f # Install dependencies
   <span class="s2">"</span><span class="s">cwd"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">${workspaceFolder}/src/kubevirt.io/kubevirt"</span><span class="pi">,</span>
   <span class="s2">"</span><span class="s">output"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">&lt;Go-projects-folder&gt;/bin/${fileBasenameNoExtension}"</span><span class="pi">,</span>
 <span class="pi">}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-config.png" alt="debug-config" /></p>
 
@@ -429,9 +396,8 @@ sudo apt-get install -f # Install dependencies
 
 <p>For example if we want to debug the virt-api component, open the main package:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubevirt.io/cmd/virt-api/virt-api.go
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt.io/cmd/virt-api/virt-api.go
+</code></pre></div></div>
 
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-file.png" alt="debug-file" /></p>
 

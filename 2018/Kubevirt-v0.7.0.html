@@ -260,27 +260,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>To use hugepages as backing memory, we need to indicate a desired amount of memory (<code class="language-html highlighter-rouge">resources.requests.memory</code>) and size of hugepages to use (<code class="language-html highlighter-rouge">memory.hugepages.pageSize</code>)</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
@@ -300,7 +280,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myimage</span>
       <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
         <span class="na">claimname</span><span class="pi">:</span> <span class="s">myclaim</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Note that</p>
 
@@ -314,19 +294,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>the following syntax within interfaces section allows us to set both a mac address and network model</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">VM</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kind</span><span class="pi">:</span> <span class="s">VM</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">domain</span><span class="pi">:</span>
     <span class="na">devices</span><span class="pi">:</span>
@@ -338,7 +306,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <span class="na">networks</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">red</span>
       <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>alternative network models can be</p>
 
@@ -355,25 +323,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>The new keyword <code class="language-html highlighter-rouge">serial</code> in the disks section allows us to specify a serial number</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
@@ -391,27 +341,20 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">myimage</span>
       <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
         <span class="na">claimname</span><span class="pi">:</span> <span class="s">myclaim</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="specifying-the-cpu-model">specifying the CPU model</h2>
 
 <p>Setting the CPU model is possible via <code class="language-html highlighter-rouge">spec.domain.cpu.model</code>. The following VM will have a CPU with the Conroe model:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">metadata</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">myvmi</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">domain</span><span class="pi">:</span>
     <span class="na">cpu</span><span class="pi">:</span>
       <span class="c1"># this sets the CPU model</span>
       <span class="na">model</span><span class="pi">:</span> <span class="s">Conroe</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The available models are listed <a href="https://github.com/libvirt/libvirt/blob/master/src/cpu_map">here</a></p>
 
@@ -430,41 +373,28 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>to expose a cluster ip service</li>
 </ul>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
+</code></pre></div></div>
 
 <ul>
   <li>to expose a node port service</li>
 </ul>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
+</code></pre></div></div>
 
 <ul>
   <li>to expose a load balancer service</li>
 </ul>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
+</code></pre></div></div>
 
 <h2 id="kubernetes-compatible-networking-approach-slirp">Kubernetes compatible networking approach (SLIRP)</h2>
 
 <p>In slirp mode, virtual machines are connected to the network backend using QEMU user networking mode. In this mode, QEMU allocates internal IP addresses to virtual machines and hides them behind NAT.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">VM</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kind</span><span class="pi">:</span> <span class="s">VM</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">domain</span><span class="pi">:</span>
     <span class="na">devices</span><span class="pi">:</span>
@@ -474,7 +404,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <span class="na">networks</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">red</span>
       <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="role-aggregation-for-our-roles">Role aggregation for our roles</h2>
 

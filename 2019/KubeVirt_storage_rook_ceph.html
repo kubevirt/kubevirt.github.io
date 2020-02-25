@@ -320,22 +320,7 @@ native programming-language data structures to the storage device data structure
 
 <p>In the case your cluster doesn’t have CDI, the following commands will cover CDI operator and the CR setup:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\+\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\+\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
 
 <span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-operator.yaml
 namespace/cdi created
@@ -350,7 +335,7 @@ containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/c
 <span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-cr.yaml
 cdi.cdi.kubevirt.io/cdi created
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">The nodes of the cluster have to be time synchronized</p><p>This should have been done for you by <code class="language-html highlighter-rouge">chronyd</code></p>
 
@@ -358,18 +343,7 @@ cdi.cdi.kubevirt.io/cdi created
 </div></div>
 <p>It can’t harm to do it again:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# <span class="k">for </span>i <span class="k">in</span> <span class="si">$(</span><span class="nb">echo </span>6 106 206 222<span class="si">)</span><span class="p">;</span> <span class="k">do </span>ssh <span class="nt">-oStrictHostKeyChecking</span><span class="o">=</span>no <span class="se">\</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="k">for </span>i <span class="k">in</span> <span class="si">$(</span><span class="nb">echo </span>6 106 206 222<span class="si">)</span><span class="p">;</span> <span class="k">do </span>ssh <span class="nt">-oStrictHostKeyChecking</span><span class="o">=</span>no <span class="se">\</span>
     root@192.168.122.<span class="nv">$i</span> <span class="nb">sudo </span>chronyc <span class="nt">-a</span> makestep<span class="p">;</span> <span class="k">done
 
 </span>Warning: Permanently added <span class="s1">'192.168.122.6'</span> <span class="o">(</span>ECDSA<span class="o">)</span> to the list of known hosts.
@@ -380,7 +354,7 @@ Warning: Permanently added <span class="s1">'192.168.122.206'</span> <span class
 200 OK
 Warning: Permanently added <span class="s1">'192.168.122.222'</span> <span class="o">(</span>ECDSA<span class="o">)</span> to the list of known hosts.
 200 OK
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>This step could also be done with ansible (one line or rhel-system-roles.noarch).</p>
 
@@ -390,61 +364,35 @@ Warning: Permanently added <span class="s1">'192.168.122.222'</span> <span class
 
 <p>Next, the latest upstream release of Rook has to be cloned:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# git clone https://github.com/rook/rook
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# git clone https://github.com/rook/rook
 Cloning into <span class="s1">'rook'</span>...
 remote: Enumerating objects: 1, <span class="k">done</span><span class="nb">.</span>
 remote: Counting objects: 100% <span class="o">(</span>1/1<span class="o">)</span>, <span class="k">done</span><span class="nb">.</span>
 remote: Total 37745 <span class="o">(</span>delta 0<span class="o">)</span>, reused 0 <span class="o">(</span>delta 0<span class="o">)</span>, pack-reused 37744
 Receiving objects: 100% <span class="o">(</span>37745/37745<span class="o">)</span>, 13.02 MiB | 1.54 MiB/s, <span class="k">done</span><span class="nb">.</span>
 Resolving deltas: 100% <span class="o">(</span>25309/25309<span class="o">)</span>, <span class="k">done</span><span class="nb">.</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now, change the actual directory to the location of the Kubernetes examples where the respective resource definitions can be found:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">cd </span>rook/cluster/examples/kubernetes/ceph
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">cd </span>rook/cluster/examples/kubernetes/ceph
+</code></pre></div></div>
 
 <p>The Rook common resources that make up Rook have to be created:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> common.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> common.yaml
 <span class="o">(</span>output removed<span class="o">)</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Next, create the Kubernetes Rook operator:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> operator.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> operator.yaml
 deployment.apps/rook-ceph-operator created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>To check the progress of the operator pod and the discovery pods starting up, the commands below can be executed. The discovery pods are responsible for investigating the available resources (e.g. disks that can make up OSD’s) across all available Nodes:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# watch kubectl get pods <span class="nt">-n</span> rook-ceph
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# watch kubectl get pods <span class="nt">-n</span> rook-ceph
 NAME                                 READY   STATUS             RESTARTS   AGE
 rook-ceph-operator-fdfbcc5c5-qs7x8   1/1     Running            1          3m14s
 rook-discover-7v65m                  1/1     Running            2          2m19s
@@ -458,54 +406,25 @@ pod/rook-discover-7v65m                  1/1     Running   2          3m26s
 pod/rook-discover-cjfdz                  1/1     Running   0          3m26s
 pod/rook-discover-f8k4s                  1/1     Running   0          3m26s
 pod/rook-discover-x22hh                  1/1     Running   0          3m26s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>After, the Ceph cluster configuration inside of the Rook operator has to be prepared:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> cluster.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> cluster.yaml
 cephcluster.ceph.rook.io/rook-ceph created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>One of the key elements of the default cluster configuration is to configure the Ceph cluster to use all nodes and use all devices, i.e. run Rook/Ceph on every system and consume any free disks that it finds; this makes configuring Rook a lot more simple:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">grep </span>useAll cluster.yml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">grep </span>useAll cluster.yml
     useAllNodes: <span class="nb">true
     </span>useAllDevices: <span class="nb">true</span>
     <span class="c"># Individual nodes and their config can be specified as well, but 'useAllNodes' above must be set to false. Then, only the named</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The progress can be checked now, check the pods in the <code class="language-html highlighter-rouge">rook-ceph</code> namespace:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# watch kubectl <span class="nt">-n</span> rook-ceph get pods
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# watch kubectl <span class="nt">-n</span> rook-ceph get pods
 NAME                                            READY   STATUS              RESTARTS   AGE
 csi-cephfsplugin-2kqbd                          3/3     Running             0          36s
 csi-cephfsplugin-hjnf9                          3/3     Running             0          36s
@@ -528,46 +447,23 @@ rook-discover-cjfdz                             1/1     Running             0   
 rook-discover-f8k4s                             1/1     Running             0          8m35s
 rook-discover-x22hh                             1/1     Running             0          8m35s
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Wait until the Ceph monitor pods are created. Next, the toolbox pod has to be created; this is useful to verify the status/health of the cluster, getting/setting authentication, and querying the Ceph cluster using standard Ceph tools:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> toolbox.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> toolbox.yaml
 deployment.apps/rook-ceph-tools created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>To check how well this is progressing:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph get pods | <span class="nb">grep </span>tool
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph get pods | <span class="nb">grep </span>tool
 rook-ceph-tools-856c5bc6b4-s47qm                       1/1     Running   0          31s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Before proceeding with the pool and the storage class the Ceph cluster status can be checked already:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# <span class="nv">toolbox</span><span class="o">=</span><span class="si">$(</span>kubectl <span class="nt">-n</span> rook-ceph get pods <span class="nt">-o</span> custom-columns<span class="o">=</span>NAME:.metadata.name <span class="nt">--no-headers</span> | <span class="nb">grep </span>tools<span class="si">)</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="nv">toolbox</span><span class="o">=</span><span class="si">$(</span>kubectl <span class="nt">-n</span> rook-ceph get pods <span class="nt">-o</span> custom-columns<span class="o">=</span>NAME:.metadata.name <span class="nt">--no-headers</span> | <span class="nb">grep </span>tools<span class="si">)</span>
 
 <span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
 sh-4.2# ceph status
@@ -586,7 +482,7 @@ sh-4.2# ceph status
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In this example, the health value is <code class="language-html highlighter-rouge">HEALTH_WARN</code> because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a <code class="language-html highlighter-rouge">HEALTH_OK</code>.</p>
 
@@ -598,31 +494,10 @@ sh-4.2# ceph status
 
 <p>The <code class="language-html highlighter-rouge">cephblockpool.yml</code> is based in the <code class="language-html highlighter-rouge">pool.yml</code>, you can check that file in the same directory to learn about the details of each parameter:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">cat </span>pool.yml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">cat </span>pool.yml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-</pre></td><td class="rouge-code"><pre><span class="c1">#################################################################################################################</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">#################################################################################################################</span>
 <span class="c1"># Create a Ceph pool with settings for replication in production environments. A minimum of 3 OSDs on</span>
 <span class="c1"># different hosts are required in this example.</span>
 <span class="c1">#  kubectl create -f pool.yaml</span>
@@ -642,24 +517,14 @@ sh-4.2# ceph status
   <span class="c1"># A key/value list of annotations</span>
   <span class="na">annotations</span><span class="pi">:</span>
   <span class="c1">#  key: value</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The following file has to be created to define the CephBlockPool:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# vim cephblockpool.yml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim cephblockpool.yml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">ceph.rook.io/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">ceph.rook.io/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">CephBlockPool</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">replicapool</span>
@@ -668,59 +533,22 @@ sh-4.2# ceph status
   <span class="na">failureDomain</span><span class="pi">:</span> <span class="s">host</span>
   <span class="na">replicated</span><span class="pi">:</span>
     <span class="na">size</span><span class="pi">:</span> <span class="m">2</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> cephblockpool.yml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> cephblockpool.yml
 cephblockpool.ceph.rook.io/replicapool created
 
 <span class="o">[</span>root@kv-master-00 ~]# kubectl get cephblockpool <span class="nt">-n</span> rook-ceph
 NAME          AGE
 replicapool   19s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now is time to create the Kubernetes storage class that would be used to create the volumes later:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# vim storageclass.yml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim storageclass.yml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">storage.k8s.io/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">storage.k8s.io/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">StorageClass</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">rook-ceph-block</span>
@@ -750,21 +578,15 @@ replicapool   19s
 
 <span class="c1"># Delete the rbd volume when a PVC is deleted</span>
 <span class="na">reclaimPolicy</span><span class="pi">:</span> <span class="s">Delete</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> storageclass.yml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> storageclass.yml
 storageclass.storage.k8s.io/rook-ceph-block created
 
 <span class="o">[</span>root@kv-master-00 ~]# kubectl get storageclass
 NAME              PROVISIONER                  AGE
 rook-ceph-block   rook-ceph.rbd.csi.ceph.com   61s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>Special attention to the pool name, it has to be the same as configured in the CephBlockPool.</p>
 
@@ -772,19 +594,13 @@ rook-ceph-block   rook-ceph.rbd.csi.ceph.com   61s
 </div></div>
 <p>Now, simply wait for the Ceph OSD’s to finish provisioning and we’ll be done with our Ceph deployment:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# watch  <span class="s2">"kubectl -n rook-ceph get pods | grep rook-ceph-osd-prepare"</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# watch  <span class="s2">"kubectl -n rook-ceph get pods | grep rook-ceph-osd-prepare"</span>
 rook-ceph-osd-prepare-kv-master-00.kubevirt-io-4npmf   0/1     Completed   0          20m
 rook-ceph-osd-prepare-kv-master-01.kubevirt-io-69smd   0/1     Completed   0          20m
 rook-ceph-osd-prepare-kv-master-02.kubevirt-io-zm7c2   0/1     Completed   0          20m
 rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0          20m
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>This process may take a few minutes as it has to zap the disks, deploy a BlueStore configuration on them, and start the OSD service pods across our nodes.</p>
 
@@ -792,24 +608,7 @@ rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0    
 </div></div>
 <p>The cluster deployment can be validated now:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
 sh-4.2# ceph <span class="nt">-s</span>
   cluster:
     <span class="nb">id</span>:     5a0bbe74-ce42-4f49-813d-7c434af65aad
@@ -826,35 +625,11 @@ sh-4.2# ceph <span class="nt">-s</span>
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:     8 active+clean
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Oh Wait! the health value is again <code class="language-html highlighter-rouge">HEALTH_WARN</code>, no problem! it is because there are too few PGs per OSD, in this case 4, for a minimum value of 30. Let’s fix it changing that value to 256:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
 sh-4.2# ceph osd pool <span class="nb">set </span>replicapool pg_num 256
 <span class="nb">set </span>pool 1 pg_num to 256
 
@@ -878,26 +653,11 @@ sh-4.2# ceph <span class="nt">-s</span>
              31  unknown
              1   peering
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>In a moment, Ceph will end peering and the status of the pgs would be <code class="language-html highlighter-rouge">active+clean</code>:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre>sh-4.2# ceph <span class="nt">-s</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh-4.2# ceph <span class="nt">-s</span>
   cluster:
     <span class="nb">id</span>:     5a0bbe74-ce42-4f49-813d-7c434af65aad
     health: HEALTH_OK
@@ -912,33 +672,11 @@ sh-4.2# ceph <span class="nt">-s</span>
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:     256 active+clean
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Some additional checks on the Ceph cluster can be performed:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-</pre></td><td class="rouge-code"><pre>sh-4.2# ceph osd tree
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh-4.2# ceph osd tree
 ID CLASS WEIGHT  TYPE NAME                         STATUS REWEIGHT PRI-AFF
 <span class="nt">-1</span>       0.07434 root default
 <span class="nt">-9</span>       0.01859     host kv-master-00-kubevirt-io
@@ -960,39 +698,22 @@ sh-4.2# ceph osd status
 | 3  | kv-master-00.kubevirt-io | 1026M | 17.9G |    0   |     0   |    0   |     0   | exists,up |
 +----+--------------------------+-------+-------+--------+---------+--------+---------+-----------+
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>That should match the available block devices in the nodes, let’s check it in the <code class="language-html highlighter-rouge">kv-master-00</code> node:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# lsblk
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# lsblk
 NAME                                                                                                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
 sr0                                                                                                   11:0    1  512K  0 rom
 vda                                                                                                  253:0    0   50G  0 disk
 └─vda1                                                                                               253:1    0   50G  0 part /
 vdb                                                                                                  253:16   0   20G  0 disk
 └─ceph--09112f92--11cd--4284--b763--447065cc169c-osd--data--0102789c--852c--4696--96ce--54c2ad3a848b 252:0    0   19G  0 lvm
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>To validate that the pods are running on the correct nodes, check the <code class="language-html highlighter-rouge">NODE</code> column below:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl get pods <span class="nt">-n</span> rook-ceph <span class="nt">-o</span> wide | egrep <span class="s1">'(NAME|osd)'</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl get pods <span class="nt">-n</span> rook-ceph <span class="nt">-o</span> wide | egrep <span class="s1">'(NAME|osd)'</span>
 NAME                                                   READY   STATUS      RESTARTS   AGE   IP                NODE                       NOMINATED NODE   READINESS GATES
 rook-ceph-osd-0-8689c68c78-rgdbj                       1/1     Running     0          31m   10.244.2.9        kv-master-02.kubevirt-io   &lt;none&gt;           &lt;none&gt;
 rook-ceph-osd-1-574cb85d9d-vs2jc                       1/1     Running     0          31m   10.244.3.18       kv-worker-00.kubevirt-io   &lt;none&gt;           &lt;none&gt;
@@ -1002,28 +723,16 @@ rook-ceph-osd-prepare-kv-master-00.kubevirt-io-4npmf   0/1     Completed   0    
 rook-ceph-osd-prepare-kv-master-01.kubevirt-io-69smd   0/1     Completed   0          31m   10.244.1.9        kv-master-01.kubevirt-io   &lt;none&gt;           &lt;none&gt;
 rook-ceph-osd-prepare-kv-master-02.kubevirt-io-zm7c2   0/1     Completed   0          31m   10.244.2.8        kv-master-02.kubevirt-io   &lt;none&gt;           &lt;none&gt;
 rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0          31m   10.244.3.17       kv-worker-00.kubevirt-io   &lt;none&gt;           &lt;none&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>All good!</p>
 
 <p>For validating the storage provisioning through the new Ceph cluster managed by the Rook operator, a persistent volume claim (PVC) can be created:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# vim pvc.yml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim pvc.yml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">pv-claim</span>
@@ -1034,13 +743,11 @@ rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0    
   <span class="na">resources</span><span class="pi">:</span>
     <span class="na">requests</span><span class="pi">:</span>
       <span class="na">storage</span><span class="pi">:</span> <span class="s">1Gi</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ceph]# kubectl create <span class="nt">-f</span> pvc.yml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ceph]# kubectl create <span class="nt">-f</span> pvc.yml
 persistentvolumeclaim/pv-claim created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>Ensure that the <code class="language-html highlighter-rouge">storageClassName</code> contains the name of the storage class you have created, in this case, <code class="language-html highlighter-rouge">rook-ceph-block</code></p>
 
@@ -1048,13 +755,10 @@ persistentvolumeclaim/pv-claim created
 </div></div>
 <p>For checking that it has been bound, list the PVC’s and look for the ones in the <code class="language-html highlighter-rouge">rook-ceph-block</code> storageclass:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl get pvc
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl get pvc
 NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 pv-claim   Bound    pvc-62a9738a-e027-4a68-9ecf-16278711ff64   1Gi        RWO            rook-ceph-block   63s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>If the volume is still in a ‘Pending’ state, likely, that one of the pods haven’t come up correctly or one of the steps above has been missed. To check it, the command ‘kubectl get pods -n rook-ceph’ can be executed for viewing the running/failed pods.</p>
 
@@ -1062,29 +766,21 @@ pv-claim   Bound    pvc-62a9738a-e027-4a68-9ecf-16278711ff64   1Gi        RWO   
 </div></div>
 <p>Before proceeding let’s clean up the temporary PVC:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl delete pvc pv-claim
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl delete pvc pv-claim
 persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="creating-a-virtual-machine-in-kubevirt-backed-by-ceph">Creating a Virtual Machine in KubeVirt backed by Ceph</h2>
 
 <p>Once the Ceph cluster is up and running, the first Virtual Machine can be created, to do so, a YML example file is being downloaded and modified:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/master/manifests/example/vm-dv.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/master/manifests/example/vm-dv.yaml
 <span class="o">[</span>root@kv-master-00 ~]# <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/hdd/rook-ceph-block/'</span> vm-dv.yaml
 <span class="o">[</span>root@kv-master-00 ~]# <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/fedora/centos/'</span> vm-dv.yaml
 <span class="o">[</span>root@kv-master-00 ~]# <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s@https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img@http://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2@'</span> vm-dv.yaml
 <span class="o">[</span>root@kv-master-00 ~]# <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/storage: 100M/storage: 9G/'</span> vm-dv.yaml
 <span class="o">[</span>root@kv-master-00 ~]# <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/memory: 64M/memory: 1G/'</span> vm-dv.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The modified YAML could be run already like this but a user won’t be able to log in as we don’t know the password used in that image. <code class="language-html highlighter-rouge">cloud-init</code> can be used to change the password of the default user of that image <code class="language-html highlighter-rouge">centos</code> and grant us access, two parts have to be added:</p>
 
@@ -1092,26 +788,10 @@ persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
   <li>Add a second disk after the <code class="language-html highlighter-rouge">datavolumevolume</code> (already existing), in this example is called <code class="language-html highlighter-rouge">cloudint</code>:</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# vim vm-dv.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim vm-dv.yaml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="nn">---</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
 <span class="na">template</span><span class="pi">:</span>
   <span class="na">metadata</span><span class="pi">:</span>
     <span class="na">labels</span><span class="pi">:</span>
@@ -1126,28 +806,16 @@ persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
           <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
               <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
             <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinit</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <ul>
   <li>Afterwards, add the volume at the end of the file, after the volume already defined as <code class="language-html highlighter-rouge">datavolumevolume</code>, in this example it’s also called <code class="language-html highlighter-rouge">cloudinit</code>:</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# vim vm-dv.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim vm-dv.yaml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="nn">---</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
 <span class="na">volumes</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">centos-dv</span>
@@ -1158,49 +826,30 @@ persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
         <span class="s">password: changeme</span>
         <span class="s">chpasswd: { expire: False }</span>
     <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinit</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The password value (<code class="language-html highlighter-rouge">changeme</code> in this example), can be set to your preferred one.</p>
 
 <p>Once the YAML file is prepared the Virtual Machine can be created and started:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> vm-dv.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl create <span class="nt">-f</span> vm-dv.yaml
 virtualmachine.kubevirt.io/vm-centos-datavolume created
 
 <span class="o">[</span>root@kv-master-00 ~]# kubectl get vm
 NAME                   AGE   RUNNING   VOLUME
 vm-centos-datavolume              62m   <span class="nb">false</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Let’s wait a little bit until the importer pod finishes, meanwhile you can check it with:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl get pods
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl get pods
 NAME                       READY   STATUS              RESTARTS   AGE
 importer-centos-dv-8v6l5   0/1     ContainerCreating   0          12s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once that pods ends, the Virtual Machine can be started (in this case the virt parameter can be used because of the <a href="https://kubevirt.io/user-guide/docs/latest/administration/intro.html#client-side-virtctl-deployment">krew plugin system</a>:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 tmp]# kubectl virt start vm-centos-datavolume
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 tmp]# kubectl virt start vm-centos-datavolume
 VM vm-centos-datavolume was scheduled to start
 
 <span class="o">[</span>root@kv-master-00 ~]# kubectl get vmi
@@ -1210,21 +859,11 @@ vm-centos-datavolume   2m4s   Running   10.244.3.20   kv-worker-00.kubevirt-io
 <span class="o">[</span>root@kv-master-00 ~]# kubectl get pvc
 NAME        STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
 centos-dv   Bound    pvc-5604eb4a-21dd-4dca-8bb7-fbacb0791402   9Gi        RWO            rook-ceph-block   7m34s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Awesome! the Virtual Machine is running in a pod through KubeVirt and it’s backed up with Ceph under the management of Rook. Now it’s the time for grabbing a coffee to allow cloud-init to do its job. A little while later let’s connect to that VM console:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl virt console vm-centos-datavolume
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl virt console vm-centos-datavolume
 Successfully connected to vm-centos-datavolume console. The escape sequence is ^]
 
 CentOS Linux 7 <span class="o">(</span>Core<span class="o">)</span>
@@ -1234,7 +873,7 @@ Kernel 3.10.0-957.27.2.el7.x86_64 on an x86_64
 vm-centos-datavolume login: centos
 Password:
 <span class="o">[</span>centos@vm-centos-datavolume ~]<span class="err">$</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And there it is! our Kubernetes cluster provided with virtualization capabilities thanks to KubeVirt and backed up with a strong Ceph cluster under the management of Rook.</p>
 
@@ -1249,71 +888,7 @@ Password:
   <li>Remove the mon pods to apply the new configuration</li>
 </ul>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
 sh-4.2# ceph status
   cluster:
     <span class="nb">id</span>:     5a0bbe74-ce42-4f49-813d-7c434af65aad
@@ -1377,7 +952,7 @@ sh-4.2# ceph status                                                             
     objects: 0 objects, 0 B
     usage:   4.0 GiB used, 72 GiB / 76 GiB avail
     pgs:
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="references">References</h2>
 

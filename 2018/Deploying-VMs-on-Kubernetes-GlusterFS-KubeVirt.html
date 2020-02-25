@@ -293,40 +293,21 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>If you are using only 2 servers as workers, then you will need to allow scheduling of pods on the master node because GlusterFS requires at least three nodes. To schedule pods on the master node, see “Master Isolation” in the kubeadm guide or execute this command:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
+</code></pre></div></div>
 
 <p>Move onto the next step when your master and worker nodes are Ready.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>[root@master ~]# kubectl get nodes
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get nodes
 NAME                     STATUS    ROLES     AGE       VERSION
 master.somewhere.com     Ready     master    6d        v1.10.1
 worker1.somewhere.com    Ready     <span class="nt">&lt;none&gt;</span>    6d        v1.10.1
 worker2.somewhere.com    Ready     <span class="nt">&lt;none&gt;</span>    6d        v1.10.1
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And all of the pods in the kube-system namespace are Running.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-</pre></td><td class="rouge-code"><pre>[root@master ~]# kubectl get pods -n kube-system
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods -n kube-system
 NAME                                           READY     STATUS    RESTARTS   AGE
 etcd-master.somewhere.com                      1/1       Running   0          6d
 kube-apiserver-master.somewhere.com            1/1       Running   0          6d
@@ -339,7 +320,7 @@ kube-scheduler-master.somewhere.com            1/1       Running   0          6d
 weave-net-ldlh7                                2/2       Running   0          6d
 weave-net-pmhlx                                2/2       Running   1          6d
 weave-net-s4dp6                                2/2       Running   0          6d
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="installing-glusterfs-and-heketi-using-gluster-kubernetes">Installing GlusterFS and Heketi using gluster-kubernetes</h3>
 
@@ -349,26 +330,14 @@ weave-net-s4dp6                                2/2       Running   0          6d
 
 <p>There is a detailed <a href="https://github.com/gluster/gluster-kubernetes/blob/master/docs/setup-guide.md">setup guide for gk-deploy</a>. Note each node must have a raw block device that is reserved for use by heketi and they must not contain any data or be pre-formatted. You can reset your block device to a useable state by running:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>wipefs -a <span class="nt">&lt;path</span> <span class="na">to</span> <span class="na">device</span><span class="nt">&gt;</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wipefs -a <span class="nt">&lt;path</span> <span class="na">to</span> <span class="na">device</span><span class="nt">&gt;</span>
+</code></pre></div></div>
 
 <p>To aid you, below are the commands you will need to run if you are following the setup guide.</p>
 
 <p>On all nodes:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="c"># Open ports for GlusterFS communications</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Open ports for GlusterFS communications</span>
 <span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 2222 <span class="nt">-j</span> ACCEPT
 <span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 24007 <span class="nt">-j</span> ACCEPT
 <span class="nb">sudo </span>iptables <span class="nt">-I</span> INPUT 1 <span class="nt">-p</span> tcp <span class="nt">--dport</span> 24008 <span class="nt">-j</span> ACCEPT
@@ -379,78 +348,18 @@ weave-net-s4dp6                                2/2       Running   0          6d
 <span class="nb">sudo </span>modprobe dm_mirror
 <span class="c"># Install glusterfs-fuse and git packages</span>
 <span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> glusterfs-fuse git
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>On the master node:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="c"># checkout gluster-kubernetes repo</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># checkout gluster-kubernetes repo</span>
 git clone https://github.com/gluster/gluster-kubernetes
 <span class="nb">cd </span>gluster-kubernetes/deploy
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Before running the gk-deploy script, we need to first create a topology.json file that maps the nodes present in the GlusterFS cluster and the block devices attached to each node. The block devices should be raw and unformatted. Below is a sample topology.json file for a 3 node cluster all operating in the same zone. The gluster-kubernetes/deploy directory also contains a sample topology.json file.</p>
 
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-</pre></td><td class="rouge-code"><pre><span class="err">#</span><span class="w"> </span><span class="err">topology.json</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">#</span><span class="w"> </span><span class="err">topology.json</span><span class="w">
 </span><span class="p">{</span><span class="w">
   </span><span class="nl">"clusters"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
@@ -507,32 +416,19 @@ git clone https://github.com/gluster/gluster-kubernetes
     </span><span class="p">}</span><span class="w">
   </span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>Under “hostnames”, the node’s hostname is listed under “manage” and its IP address is listed under “storage”. Multiple block devices can be listed under “devices”. If you are using VMs, the second block device attached to the VM will usually be /dev/vdb. For multi-path, the device path will usually be /dev/mapper/mpatha. If you are using a second disk drive, the device path will usually be /dev/sdb.</p>
 
 <p>Once you have your topology.json file and saved it in gluster-kubernetes/deploy, we can execute gk-deploy to create the GlusterFS and Heketi pods. You will need to specify an admin-key which will be used in the next step and will be discovered during the KubeVirt installation.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="c"># from gluster-kubernetes/deploy</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># from gluster-kubernetes/deploy</span>
 ./gk-deploy <span class="nt">-g</span> <span class="nt">-v</span> <span class="nt">-n</span> kube-system <span class="nt">--admin-key</span> my-admin-key
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Add the end of the installation, you will see:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre>heketi is now running and accessible via http://10.32.0.4:8080 . To run
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>heketi is now running and accessible via http://10.32.0.4:8080 . To run
 administrative commands you can install 'heketi-cli' and use it as follows:
 
   # heketi-cli -s http://10.32.0.4:8080 --user admin --secret '<span class="nt">&lt;ADMIN</span><span class="na">_KEY</span><span class="nt">&gt;</span>' cluster list
@@ -543,21 +439,13 @@ use it from within the heketi pod:
   # /usr/bin/kubectl -n kube-system exec -i heketi-b96c7c978-dcwlw -- heketi-cli -s http://localhost:8080 --user admin --secret '<span class="nt">&lt;ADMIN</span><span class="na">_KEY</span><span class="nt">&gt;</span>' cluster list
 
 For dynamic provisioning, create a StorageClass similar to this:\
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Take note of the URL for Heketi which will be used next step.</p>
 
 <p>If successful, 4 additional pods will be shown as Running in the kube-system namespace.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre>[root@master deploy]# kubectl get pods -n kube-system
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master deploy]# kubectl get pods -n kube-system
 NAME                                                              READY     STATUS    RESTARTS   AGE
 ...snip...
 glusterfs-h4nwf                                                   1/1       Running   0          6d
@@ -565,7 +453,7 @@ glusterfs-kfvjk                                                   1/1       Runn
 glusterfs-tjm2f                                                   1/1       Running   0          6d
 heketi-b96c7c978-dcwlw                                            1/1       Running   0          6d
 ...snip...
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="installing-kubevirt-and-setting-up-storage">Installing KubeVirt and setting up storage</h3>
 
@@ -574,46 +462,13 @@ We will use <a href="https://github.com/kubevirt/kubevirt-ansible/">kubevirt-ans
 
 <p>Let’s first clone the kubevirt-ansible repo.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>git clone https://github.com/kubevirt/kubevirt-ansible
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/kubevirt/kubevirt-ansible
 <span class="nb">cd </span>kubevirt-ansible
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Edit the <a href="https://github.com/kubevirt/kubevirt-ansible/blob/master/inventory">inventory</a> file in the kubevirt-ansible checkout. Modify the section that starts with “#BEGIN CUSTOM SETTINGS”. As an example using the servers from above:</p>
 
-<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-</pre></td><td class="rouge-code"><pre><span class="c"># BEGIN CUSTOM SETTINGS
+<div class="language-conf highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># BEGIN CUSTOM SETTINGS
 </span>[<span class="n">masters</span>]
 <span class="c"># Your master FQDN
 </span><span class="n">master</span>.<span class="n">somewhere</span>.<span class="n">com</span>
@@ -644,26 +499,16 @@ We will use <a href="https://github.com/kubevirt/kubevirt-ansible/">kubevirt-ans
 # Add at least one node with lable to run on it router and docker containers
 # openshift_node_labels="{'region': 'infra','zone': 'default'}"
 # END CUSTOM SETTINGS
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>Now let’s run the <code class="language-html highlighter-rouge">kubevirt.yml</code> playbook:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>ansible-playbook <span class="nt">-i</span> inventory playbooks/kubevirt.yml <span class="nt">-e</span> <span class="nv">cluster</span><span class="o">=</span>k8s <span class="nt">-e</span> <span class="nv">storage_role</span><span class="o">=</span>storage-glusterfs <span class="nt">-e</span> <span class="nv">namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_name</span><span class="o">=</span> <span class="nt">-e</span> <span class="nv">heketi_url</span><span class="o">=</span>http://10.32.0.4:8080 <span class="nt">-v</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ansible-playbook <span class="nt">-i</span> inventory playbooks/kubevirt.yml <span class="nt">-e</span> <span class="nv">cluster</span><span class="o">=</span>k8s <span class="nt">-e</span> <span class="nv">storage_role</span><span class="o">=</span>storage-glusterfs <span class="nt">-e</span> <span class="nv">namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_name</span><span class="o">=</span> <span class="nt">-e</span> <span class="nv">heketi_url</span><span class="o">=</span>http://10.32.0.4:8080 <span class="nt">-v</span>
+</code></pre></div></div>
 
 <p>If successful, we should see 7 additional pods as Running in the kube-system namespace.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre>[root@master kubevirt-ansible]# kubectl get pods -n kube-system
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master kubevirt-ansible]# kubectl get pods -n kube-system
 NAME                                                              READY     STATUS    RESTARTS   AGE
 virt-api-785fd6b4c7-rdknl                                         1/1       Running   0          6d
 virt-api-785fd6b4c7-rfbqv                                         1/1       Running   0          6d
@@ -672,7 +517,7 @@ virt-controller-844469fd89-vtjct                                  0/1       Runn
 virt-handler-78wsb                                                1/1       Running   0          6d
 virt-handler-csqbl                                                1/1       Running   0          6d
 virt-handler-hnlqn                                                1/1       Running   0          6d
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="deploying-virtual-machines">Deploying Virtual Machines</h2>
 
@@ -682,39 +527,20 @@ virt-handler-hnlqn                                                1/1       Runn
 
 <p>On master or on a node where kubectl is configured correctly install and start httpd.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> httpd
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> httpd
 <span class="nb">sudo </span>systemctl start httpd
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Download the cirros cloud image and convert it into raw format.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>curl http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img <span class="nt">-o</span> /var/www/html/cirros-0.4.0-x86_64-disk.img
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img <span class="nt">-o</span> /var/www/html/cirros-0.4.0-x86_64-disk.img
 <span class="nb">sudo </span>yum <span class="nb">install</span> <span class="nt">-y</span> qemu-img
 qemu-img convert /var/www/html/cirros-0.4.0-x86_64-disk.img /var/www/html/cirros-0.4.0-x86_64-disk.raw
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Create the PVC to store the cirros image.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-</pre></td><td class="rouge-code"><pre><span class="s">cat &lt;&lt;EOF | kubectl create -f -</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl create -f -</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -728,47 +554,19 @@ qemu-img convert /var/www/html/cirros-0.4.0-x86_64-disk.img /var/www/html/cirros
    <span class="na">requests</span><span class="pi">:</span>
      <span class="na">storage</span><span class="pi">:</span> <span class="s">5Gi</span>
 <span class="s">EOF</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Check the PVC was created and has “Bound” status.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>[root@master ~]# kubectl get pvc
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pvc
 NAME                 STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 gluster-pvc-cirros   Bound     pvc-843bd508-4dbf-11e8-9e4e-149ecfc53021   5Gi        RWO            kubevirt       2m
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Create a Pod to curl the cirros image into the PVC.
 Note: You will need to substitute <hostname> with actual hostname or IP address.</hostname></p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-</pre></td><td class="rouge-code"><pre><span class="s">cat &lt;&lt;EOF | kubectl create -f -</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl create -f -</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -793,63 +591,19 @@ Note: You will need to substitute <hostname> with actual hostname or IP address.
     <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
       <span class="na">claimName</span><span class="pi">:</span> <span class="s">gluster-pvc-cirros</span>
 <span class="s">EOF</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Check and wait for the image-importer-cirros Pod to complete.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>[root@master ~]# kubectl get pods
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods
 NAME                         READY     STATUS      RESTARTS   AGE
 image-importer-cirros        0/1       Completed   0          28s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Create a Virtual Machine definition for your VM and source it into Kubernetes.
 Note the PVC containing the cirros image must be listed as the first disk under spec.domain.devices.disks.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-</pre></td><td class="rouge-code"><pre><span class="s">cat &lt;&lt;EOF | kubectl create -f -</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl create -f -</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -890,37 +644,28 @@ Note the PVC containing the cirros image must be listed as the first disk under 
         <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
           <span class="na">claimName</span><span class="pi">:</span> <span class="s">gluster-pvc-cirros</span>
 <span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Finally start the VM.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>export VERSION=v0.4.1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export VERSION=v0.4.1
 curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/$VERSION/virtctl-$VERSION-linux-amd64
 chmod +x virtctl
 ./virtctl start cirros
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Wait for the VM pod to be in “Running” status.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>[root@master ~]# kubectl get pods
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods
 NAME                         READY     STATUS      RESTARTS   AGE
 image-importer-cirros        0/1       Completed   0          28s
 virt-launcher-cirros-krvv2   0/1       Running     0          13s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once it is running, we can then connect to its console.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>./virtctl console cirros
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console cirros
+</code></pre></div></div>
 
 <p>Press enter if a login prompt doesn’t appear.</p>
 

@@ -265,26 +265,7 @@ the objects that come predefined in the Kubernetes core.</p>
 
 <p>For example, look here’s an example of a VirtualMachine spec.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-</pre></td><td class="rouge-code"><pre>apiVersion: kubevirt.io/v1alpha1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachine
 metadata:
   name: vm-ephemeral
@@ -303,7 +284,7 @@ spec:
   - name: registryvolume
     registryDisk:
       image: kubevirt/cirros-registry-disk-demo:devel
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>In the spec above, we see the KubeVirt VirtualMachine object has an <em>apiVersion</em>
 field and a <em>kind</em> field just like a Pod spec does. The <strong>kubevirt.io</strong> portion
@@ -313,26 +294,7 @@ The <strong>kind</strong> field reflects the resource type.</p>
 <p>Using that information, we can create an RBAC role that gives a user permission
 to create, delete, and view all VirtualMachine objects.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-</pre></td><td class="rouge-code"><pre>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-access
@@ -351,34 +313,14 @@ rules:
       - patch
       - list
       - watch
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>This same logic can be applied when creating RBAC roles for other KubeVirt
 objects as well. If we wanted to extend this RBAC role to grant similar
 permissions for VirtualMachinePreset objects, we’d just have to add a second
 resource kubevirt.io resource list. The result would look like this.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-</pre></td><td class="rouge-code"><pre>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-access
@@ -398,7 +340,7 @@ rules:
       - patch
       - list
       - watch
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="kubevirt-subresource-rbac-roles">KubeVirt Subresource RBAC Roles</h2>
 
@@ -411,21 +353,7 @@ though.</p>
 its own api group called <strong>subresources.kubevirt.io</strong>. Below is an example of
 how to create a role that grants access to the VNC and console streams APIs.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-</pre></td><td class="rouge-code"><pre>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-vnc-access
@@ -439,7 +367,7 @@ rules:
       - virtualmachines/vnc
     verbs:
       - get
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="limiting-rbac-to-a-single-namespace">Limiting RBAC To a Single Namespace.</h2>
 
@@ -457,23 +385,7 @@ defined in the ClusterRole within the namespace RoleBinding exists in.</p>
 type. Below is an example that only grants VNC access to the VirtualMachine
 named ‘bobs-vm’</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-</pre></td><td class="rouge-code"><pre>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-vnc-access
@@ -489,7 +401,7 @@ rules:
       - bobs-vm
     verbs:
       - get
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="default-kubevirt-rbac-roles">Default KubeVirt RBAC Roles</h2>
 

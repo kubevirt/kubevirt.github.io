@@ -288,15 +288,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Let’s create the ConfigMap with the following definition:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre><span class="nn">---</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">data</span><span class="pi">:</span>
   <span class="na">feature-gates</span><span class="pi">:</span> <span class="s">DataVolumes</span>
@@ -304,25 +296,22 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc create <span class="nt">-f</span> kubevirt-config-cm.yml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create <span class="nt">-f</span> kubevirt-config-cm.yml
+</code></pre></div></div>
 
 <p>Alternatively, the following one-liner can also be used to achieve the same result:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc create configmap kubevirt-config <span class="nt">--from-literal</span> feature-gates<span class="o">=</span>DataVolumes <span class="nt">-n</span> kube-system
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create configmap kubevirt-config <span class="nt">--from-literal</span> feature-gates<span class="o">=</span>DataVolumes <span class="nt">-n</span> kube-system
+</code></pre></div></div>
 
 <p>If the ConfigMap was already present on the system, just use <code class="language-html highlighter-rouge">oc edit</code> to add the DataVolumes feature gate under the <em>data</em> field like the YAML above.</p>
 
 <p>If everything went as expected, we should see the following log lines on the <em>virt-controller</em> pods:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 component=virt-controller msg="DataVolume integration enabled"
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 component=virt-controller msg="DataVolume integration enabled"
+</code></pre></div></div>
 
 <blockquote>
   <p><strong>NOTE</strong>: It’s worth noting the values in the ConfigMap are not dynamic, in the sense that <em>virt-controller</em> and <em>virt-api</em> will need to be <em>restarted</em>, scaling their deployments down and back up again, just remember to scale it up to the same number of replicas they previously had.</p>
@@ -332,66 +321,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Now that the cluster is ready to use the feature, let’s have a look at our VirtualMachine definition, which includes a DataVolume.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">labels</span><span class="pi">:</span>
@@ -450,7 +380,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                   <span class="s">home: /home/kubevirt</span>
                   <span class="s">lock_passwd: false</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The new addition to a regular VirtualMachine definition is the <em>dataVolumeTemplates</em> block, which will trigger the import of the CentOS-7 cloud image defined on the <em>url</em> field, storing it on a PV, the resulting DataVolume will be named <em>centos7-dv</em>, being referenced on the <em>volumes</em> section, it will serve as the boot disk (disk0) for our VirtualMachine.</p>
 
@@ -464,34 +394,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Taking a look to the resources created after applying the VirtualMachine manifest, we can see the following:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc get pods
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc get pods
 NAME                          READY     STATUS      RESTARTS   AGE
 importer-centos7-dv-t9zx2     0/1       Completed   0          11m
 virt-launcher-testvm1-cpt8n   1/1       Running     0          8m
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Let’s look at the importer pod logs to understand what it did:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc logs importer-centos7-dv-t9zx2
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc logs importer-centos7-dv-t9zx2
 I1009 12:37:45.384032       1 importer.go:32] Starting importer
 I1009 12:37:45.393461       1 importer.go:37] begin import process
 I1009 12:37:45.393519       1 dataStream.go:235] copying <span class="s2">"https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"</span> to <span class="s2">"/data/disk.img"</span>...
@@ -506,48 +417,11 @@ I1009 12:37:45.841650       1 dataStream.go:138] NewDataStream: endpoint "https:
 I1009 12:37:45.841698       1 dataStream.go:566] Validating qcow2 file
 I1009 12:37:46.848736       1 dataStream.go:572] Doing streaming qcow2 to raw conversion
 I1009 12:40:07.546308       1 importer.go:43] import <span class="nb">complete</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>So, following the events we see, it fetched the image from the defined <em>url</em>, validated its format and converted it to <em>raw</em> for being used by <em>qemu</em>.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc describe dv centos7-dv
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc describe dv centos7-dv
 Name:         centos7-dv
 Namespace:    test-dv
 Labels:       kubevirt.io/created-by<span class="o">=</span>1916da5f-cbc0-11e8-b467-c81f666533c3
@@ -584,32 +458,11 @@ Events:
   <span class="nt">----</span>    <span class="nt">------</span>  <span class="nt">----</span>                <span class="nt">----</span>                   <span class="nt">-------</span>
   Normal  Synced  29s <span class="o">(</span>x13 over 14m<span class="o">)</span>  datavolume-controller  DataVolume synced successfully
   Normal  Synced  18s                 datavolume-controller  DataVolume synced successfully
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The DataVolume description matches what was defined under <em>dataVolumeTemplates</em>. Now, as we know it uses a PV/PVC underneath, let’s have a look:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc describe pvc centos7-dv
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc describe pvc centos7-dv
 Name:          centos7-dv
 Namespace:     test-dv
 StorageClass:  glusterfs-storage
@@ -630,33 +483,28 @@ Events:
   Type    Reason                 Age   From                         Message
   <span class="nt">----</span>    <span class="nt">------</span>                 <span class="nt">----</span>  <span class="nt">----</span>                         <span class="nt">-------</span>
   Normal  ProvisioningSucceeded  18m   persistentvolume-controller  Successfully provisioned volume pvc-191d27c6-cbc0-11e8-b467-c81f666533c3 using kubernetes.io/glusterfs
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>It’s important to pay attention to the annotations, these are monitored/set by CDI. CDI triggers an import when it detects the <em>cdi.kubevirt.io/storage.import.endpoint</em>, assigns a pod as the import task owner and updates the pod phase annotation.</p>
 
 <p>At this point, everything is in place, the DataVolume has its underlying components, the image has been imported so now the VirtualMachine can start the VirtualMachineInstance based on its definition and using the CentOS7 image as boot disk, as users we can connect to its console as usual, for instance running the following command:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>virtctl console testvm1
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl console testvm1
+</code></pre></div></div>
 
 <h2 id="cleaning-it-up">Cleaning it up</h2>
 
 <p>Once we’re happy with the results, it’s time to clean up all these tests. The task is easy:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc delete vm testvm1
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc delete vm testvm1
+</code></pre></div></div>
 
 <p>Once the VM (and its associated VMI) are gone, all the underlying storage resources are removed, there is no trace of the PVC, PV or DataVolume.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc get dv centos7-dv
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc get dv centos7-dv
 <span class="nv">$ </span>oc get pvc centos7-dv
 <span class="nv">$ </span>oc get pv pvc-191d27c6-cbc0-11e8-b467-c81f666533c3
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>All three commands returned <em>No resources found</em>.</p>
 

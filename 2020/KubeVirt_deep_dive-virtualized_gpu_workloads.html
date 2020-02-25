@@ -295,17 +295,7 @@ With KubeVirt all this is simplified with just one stack to manage containers an
 
 <p>An example of a VM Instance in YAML could be so simple as the following example:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="s">$ cat &lt;&lt;EOF | kubectl create -f -</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">$ cat &lt;&lt;EOF | kubectl create -f -</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
 <span class="nn">...</span>
@@ -315,7 +305,7 @@ With KubeVirt all this is simplified with just one stack to manage containers an
     <span class="na">cores</span><span class="pi">:</span> <span class="m">2</span>
    <span class="na">devices</span><span class="pi">:</span>
     <span class="na">disk</span><span class="pi">:</span> <span class="s">fedora29</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="architecture">Architecture</h2>
 

@@ -292,95 +292,36 @@ Cross compilation is not covered here (e.g. building <code class="language-html 
 
 <p>Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> git
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> git
 <span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> libvirt-devel
 <span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> golang
 <span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> docker
 <span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> qemu-img
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><em>Similarly to the containerized case</em>, docker is still needed (e.g. all the cluster stuff is done via docker), and therefore, any docker related preparations are needed as well. This would include running docker on startup and making sure that docker commands does not need root privileges. On Fedora27 this would mean:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="nb">sudo </span>groupadd docker
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>groupadd docker
 <span class="nb">sudo </span>usermod <span class="nt">-aG</span> docker <span class="nv">$USER</span>
 <span class="nb">sudo </span>systemctl <span class="nb">enable </span>docker
 <span class="nb">sudo </span>systemctl start docker
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now, getting the actual code could be done either via <code class="language-html highlighter-rouge">go get</code> (don’t forget to set the <code class="language-html highlighter-rouge">GOPATH</code> environment variable):</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>go get <span class="nt">-d</span> kubevirt.io/kubevirt/...
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get <span class="nt">-d</span> kubevirt.io/kubevirt/...
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Or <code class="language-html highlighter-rouge">git clone</code>:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/
 git clone https://github.com/kubevirt/kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="makefilenocontainer"><a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">Makefile.nocontainer</a></h3>
 
-<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-</pre></td><td class="rouge-code"><pre><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
+<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
 
 <span class="nl">bootstrap</span><span class="o">:</span>
     <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">github.com/onsi/ginkgo/ginkgo</span>
@@ -426,15 +367,14 @@ git clone https://github.com/kubevirt/kubevirt
     <span class="err">./cluster/deploy.sh</span>
 
 <span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">bootstrap generate apidocs build test check functest cluster-sync</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="targets">Targets</h3>
 
 <p>To execute any of the targets use:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>make <span class="nt">-f</span> Makefile.nocontainer &lt;target&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make <span class="nt">-f</span> Makefile.nocontainer &lt;target&gt;
+</code></pre></div></div>
 
 <p>File has the following targets:</p>
 

@@ -303,21 +303,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>Ensure that the cdi-sa service account has proper authority to run privileged containers, typically in a kube environment this is true by default. If you are running an openshift variation of kubernetes you may need to enable privileged containers in the security context:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>oc adm policy add-scc-to-user privileged <span class="nt">-z</span> cdi-sa
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc adm policy add-scc-to-user privileged <span class="nt">-z</span> cdi-sa
+</code></pre></div></div>
 
 <ol>
   <li>Deploy the controller from the release manifest:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ VERSION</span><span class="o">=</span>&lt;cdi version&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ VERSION</span><span class="o">=</span>&lt;cdi version&gt;
+</code></pre></div></div>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-controller.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-controller.yaml
+</code></pre></div></div>
 
 <h2 id="deploy-cdi-using-a-template">Deploy CDI using a template</h2>
 
@@ -327,27 +324,20 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>Install j2cli:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>pip <span class="nb">install </span>j2cli
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>pip <span class="nb">install </span>j2cli
+</code></pre></div></div>
 
 <ol>
   <li>Install CDI:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="nv">$ cdi_namespace</span><span class="o">=</span>default <span class="se">\</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ cdi_namespace</span><span class="o">=</span>default <span class="se">\</span>
   <span class="nv">docker_prefix</span><span class="o">=</span>kubevirt <span class="se">\</span>
   <span class="nv">docker_tag</span><span class="o">=</span>v1.2.0 <span class="se">\</span>
   <span class="nv">pull_policy</span><span class="o">=</span>IfNotPresent <span class="se">\</span>
   <span class="nv">verbosity</span><span class="o">=</span>1 <span class="se">\</span>
   j2 manifests/generated/cdi-controller.yaml.j2 | kubectl create <span class="nt">-f</span> -
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Check the template file and make sure to supply values for all variables.</p>
 
@@ -366,29 +356,24 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>git clone command:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>git clone https://github.com/kubevirt/containerized-data-importer.git <span class="nv">$GOPATH</span>/src/kubevirt.io/containerized-data-importer
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/kubevirt/containerized-data-importer.git <span class="nv">$GOPATH</span>/src/kubevirt.io/containerized-data-importer
+</code></pre></div></div>
 
 <ul>
   <li>download only the yamls:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">mkdir </span>cdi-manifests <span class="o">&amp;&amp;</span> <span class="nb">cd </span>cdi-manifests
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">mkdir </span>cdi-manifests <span class="o">&amp;&amp;</span> <span class="nb">cd </span>cdi-manifests
 <span class="nv">$ </span>wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/kubevirt-centric-readme/manifests/example/golden-pvc.yaml
 <span class="nv">$ </span>wget https://raw.githubusercontent.com/kubevirt/containerized-data-importer/kubevirt-centric-readme/manifests/example/endpoint-secret.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <ul>
   <li>go get command:</li>
 </ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>go get kubevirt.io/containerized-data-importer
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>go get kubevirt.io/containerized-data-importer
+</code></pre></div></div>
 
 <h1 id="start-importing-images">Start Importing Images</h1>
 
@@ -396,23 +381,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="create-a-pvc-yaml-file-named-golden-pvcyaml">Create a PVC yaml file named golden-pvc.yaml</h2>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">golden-pvc"</span>
@@ -428,7 +397,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <span class="na">storage</span><span class="pi">:</span> <span class="s">10Gi</span>
   <span class="c1"># Optional: Set the storage class or omit to accept the default</span>
   <span class="c1"># storageClassName: local</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Edit the PVC above -</p>
 
@@ -445,33 +414,29 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>Create the persistent volume claim to trigger the import process:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; create <span class="nt">-f</span> golden-pvc.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; create <span class="nt">-f</span> golden-pvc.yaml
+</code></pre></div></div>
 
 <ol>
   <li>(Optional) Monitor the cdi-controller:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;CDI-NAMESPACE&gt; logs cdi-deployment-&lt;RANDOM&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;CDI-NAMESPACE&gt; logs cdi-deployment-&lt;RANDOM&gt;
+</code></pre></div></div>
 
 <ol>
   <li>(Optional )Monitor the importer pod:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; logs importer-&lt;PVC-NAME&gt; <span class="c"># pvc name is shown in controller log</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; logs importer-&lt;PVC-NAME&gt; <span class="c"># pvc name is shown in controller log</span>
+</code></pre></div></div>
 
 <ol>
   <li>Verify the import is completed by checking the following annotation value:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; get pvc golden-pvc.yaml <span class="nt">-o</span> yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;NAMESPACE&gt; get pvc golden-pvc.yaml <span class="nt">-o</span> yaml
+</code></pre></div></div>
 
 <p>annotation to verify - cdi.kubevirt.io/storage.pod.phase: Succeeded</p>
 
@@ -485,45 +450,23 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>When using local storage and Kubernetes 1.9 and older, export KUBE_FEATURE_GATES before bringing up the cluster:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBE_FEATURE_GATES</span><span class="o">=</span><span class="s2">"PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBE_FEATURE_GATES</span><span class="o">=</span><span class="s2">"PersistentLocalVolumes=true,VolumeScheduling=true,MountPropagation=true"</span>
+</code></pre></div></div>
 
 <p>These features default to true in Kubernetes 1.10 and later and thus do not need to be set.
 Regardless of the Kubernetes version, a storage class with volumeBindingMode set to “WaitForFirstConsumer” needs to be created. Eg:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="na">kind</span><span class="pi">:</span> <span class="s">StorageClass</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kind</span><span class="pi">:</span> <span class="s">StorageClass</span>
    <span class="s">apiVersion</span><span class="pi">:</span> <span class="s">storage.k8s.io/v1</span>
    <span class="s">metadata</span><span class="pi">:</span>
      <span class="na">name</span><span class="pi">:</span> <span class="s">&lt;local-storage-name&gt;</span>
    <span class="na">provisioner</span><span class="pi">:</span> <span class="s">kubernetes.io/no-provisioner</span>
    <span class="na">volumeBindingMode</span><span class="pi">:</span> <span class="s">WaitForFirstConsumer</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="create-a-pvc-yaml-file-named-target-pvcyaml">Create a PVC yaml file named target-pvc.yaml</h2>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">target-pvc"</span>
@@ -538,7 +481,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <span class="na">resources</span><span class="pi">:</span>
     <span class="na">requests</span><span class="pi">:</span>
       <span class="na">storage</span><span class="pi">:</span> <span class="s">10Gi</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Edit the PVC above -</p>
 
@@ -553,37 +496,32 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <li>(Optional) Create the namespace where the target PVC will be deployed:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl create ns &lt;TARGET-NAMESPACE&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create ns &lt;TARGET-NAMESPACE&gt;
+</code></pre></div></div>
 
 <ol>
   <li>Deploy the target PVC:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; create <span class="nt">-f</span> target-pvc.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; create <span class="nt">-f</span> target-pvc.yaml
+</code></pre></div></div>
 
 <ol>
   <li>(Optional) Monitor the cloning pods:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;SOURCE-NAMESPACE&gt; logs &lt;clone-source-pod-name&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;SOURCE-NAMESPACE&gt; logs &lt;clone-source-pod-name&gt;
+</code></pre></div></div>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; logs &lt;clone-target-pod-name&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; logs &lt;clone-target-pod-name&gt;
+</code></pre></div></div>
 
 <ol>
   <li>Check the target PVC for ‘k8s.io/CloneOf’ annotation:</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; get pvc &lt;target-pvc-name&gt; <span class="nt">-o</span> yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> &lt;TARGET-NAMESPACE&gt; get pvc &lt;target-pvc-name&gt; <span class="nt">-o</span> yaml
+</code></pre></div></div>
 
 <h1 id="start-uploading-disk-image">Start uploading disk image</h1>
 
@@ -591,21 +529,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
 
 <h2 id="create-a-pvc-yaml-file-named-upload-pvcyaml">Create a PVC yaml file named upload-pvc.yaml</h2>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">upload-pvc</span>
@@ -619,25 +543,18 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <span class="na">resources</span><span class="pi">:</span>
     <span class="na">requests</span><span class="pi">:</span>
       <span class="na">storage</span><span class="pi">:</span> <span class="s">1Gi</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="create-the-upload-tokenyaml-file">Create the upload-token.yaml file</h2>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">upload.cdi.kubevirt.io/v1alpha1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">upload.cdi.kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">UploadTokenRequest</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">upload-pvc</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">pvcName</span><span class="pi">:</span> <span class="s">upload-pvc</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="upload-an-image">Upload an image</h2>
 
@@ -645,25 +562,22 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <li>deploy the upload-pvc</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> upload-pvc.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> upload-pvc.yaml
+</code></pre></div></div>
 
 <ol>
   <li>Request for upload token</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ TOKEN</span><span class="o">=</span><span class="si">$(</span>kubectl apply <span class="nt">-f</span> upload-token.yaml <span class="nt">-o</span><span class="o">=</span><span class="s2">"jsonpath={.status.token}"</span><span class="si">)</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ TOKEN</span><span class="o">=</span><span class="si">$(</span>kubectl apply <span class="nt">-f</span> upload-token.yaml <span class="nt">-o</span><span class="o">=</span><span class="s2">"jsonpath={.status.token}"</span><span class="si">)</span>
+</code></pre></div></div>
 
 <ol>
   <li>Upload the image</li>
 </ol>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="nt">--insecure</span> <span class="nt">-H</span> <span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span> <span class="nt">--data-binary</span> @tests/images/cirros-qcow2.img https://<span class="si">$(</span>minikube ip<span class="si">)</span>:31001/v1alpha1/upload
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl <span class="nt">-v</span> <span class="nt">--insecure</span> <span class="nt">-H</span> <span class="s2">"Authorization: Bearer </span><span class="nv">$TOKEN</span><span class="s2">"</span> <span class="nt">--data-binary</span> @tests/images/cirros-qcow2.img https://<span class="si">$(</span>minikube ip<span class="si">)</span>:31001/v1alpha1/upload
+</code></pre></div></div>
 
 <h1 id="security-configurations">Security Configurations</h1>
 
@@ -679,21 +593,14 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <li>Lock Down StorageClass Usage for Namespace:</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">ResourceQuota</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">protect-mynamespace</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">hard</span><span class="pi">:</span>
     <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-html highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "0"</code> would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
 
@@ -703,21 +610,14 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <li>Open Up StorageClass Usage for Namespace:</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">ResourceQuota</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">protect-mynamespace</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">hard</span><span class="pi">:</span>
     <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">500Gi"</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-html highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "4"</code> could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>
 

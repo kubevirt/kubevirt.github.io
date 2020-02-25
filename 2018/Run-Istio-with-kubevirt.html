@@ -328,11 +328,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Run the bash script</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>cd kubevirt-istio-poc
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-istio-poc
 ./deploy-istio-poc.sh
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h1 id="demo-application">Demo application</h1>
 
@@ -346,56 +344,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Lets start with the bash script:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-</pre></td><td class="rouge-code"><pre><span class="c">#!/bin/bash</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
 
 <span class="nb">set</span> <span class="nt">-x</span>
 
@@ -444,7 +393,7 @@ kubectl label namespace default istio-injection<span class="o">=</span>enabled
 kubectl apply <span class="nt">-f</span> bookinfo.yaml
 
 kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The follow script create a kubernetes cluster using the kubeadm command, deploy calico as a network CNI and taint the master node (have only one node in the cluster).</p>
 
@@ -454,75 +403,7 @@ kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
 
 <p>Lets take a closer look in the virtual machine part inside the bookinfo.yaml file</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-</pre></td><td class="rouge-code"><pre><span class="c1">##################################################################################################</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">##################################################################################################</span>
 <span class="c1"># Details service</span>
 <span class="c1">##################################################################################################</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
@@ -590,7 +471,7 @@ kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
 <span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
 <span class="nn">---</span>
 <span class="s">..........</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="details">Details:</h3>
 
@@ -598,47 +479,29 @@ kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
   <li>Create a network of type pod</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="na">networks</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">networks</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testSlirp</span>
     <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <ul>
   <li>Create an interface of type slirp and connect it to the pod network by matching the pod network name</li>
   <li>Add our application port</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="na">interfaces</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">interfaces</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testSlirp</span>
     <span class="na">slirp</span><span class="pi">:</span> <span class="pi">{}</span>
     <span class="na">ports</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
         <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <ul>
   <li>Use the cloud init script to download install and run the details application</li>
 </ul>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre><span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
     <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
       <span class="s">#!/bin/bash</span>
       <span class="s">echo "fedora" |passwd fedora --stdin</span>
@@ -647,47 +510,36 @@ kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
       <span class="s">cd istio/samples/bookinfo/src/details/</span>
       <span class="s">ruby details.rb 9080 &amp;</span>
     <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h1 id="poc-check">POC Check</h1>
 
 <p>After running the bash script the environment should look like this</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre>NAME                              READY     STATUS    RESTARTS   AGE
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                              READY     STATUS    RESTARTS   AGE
 productpage-v1-7bbdd59459-w6nwq   2/2       Running   0          1h
 ratings-v1-76dc7f6b9-6n6s9        2/2       Running   0          1h
 reviews-v1-64545d97b4-tvgl2       2/2       Running   0          1h
 reviews-v2-8cb9489c6-wjp9x        2/2       Running   0          1h
 reviews-v3-6bc884b456-hr5bm       2/2       Running   0          1h
 virt-launcher-vmi-details-94pb6   3/3       Running   0          1h
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Let’s find the istio ingress service port</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre># kubectl get service -n istio-system  | grep istio-ingressgateway
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code># kubectl get service -n istio-system  | grep istio-ingressgateway
 istio-ingressgateway       LoadBalancer   10.97.163.91     <span class="nt">&lt;pending&gt;</span>     80:31380/TCP,443:31390/TCP,31400:31400/TCP                            3h
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Then browse the following url</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>http://<span class="nt">&lt;k8s-node-ip-address&gt;</span>:<span class="nt">&lt;istio-ingress-service-port-exposed-by-k8s&gt;</span>/productpage
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://<span class="nt">&lt;k8s-node-ip-address&gt;</span>:<span class="nt">&lt;istio-ingress-service-port-exposed-by-k8s&gt;</span>/productpage
+</code></pre></div></div>
 
 <p>Example:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>http://10.0.0.1:31380/productpage
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.0.0.1:31380/productpage
+</code></pre></div></div>
 
 <h1 id="conclusions">Conclusions</h1>
 

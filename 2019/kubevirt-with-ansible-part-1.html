@@ -271,50 +271,27 @@ To get actually runnable versions of each example, take a look at <a href="https
 
 <p>Let’s start with creating the most basic VM by utilizing the <em>kubevirt_vm</em> module, like so:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_vm</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_vm</span><span class="pi">:</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm1</span>
   <span class="na">state</span><span class="pi">:</span> <span class="s">running</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And now run it:</p>
 
-<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 01_vm1_running.yaml
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 01_vm1_running.yaml
 <span class="go">(…)
 TASK [Create first vm?] *******************************************************************************************
 </span><span class="gp">fatal: [localhost]: FAILED! =&gt;</span><span class="w"> </span><span class="o">{</span><span class="s2">"changed"</span>: <span class="nb">false</span>, <span class="s2">"msg"</span>: <span class="s2">"It's impossible to create an empty VM or change state of a non-existent VM."</span><span class="o">}</span>
 <span class="go">
 PLAY RECAP ********************************************************************************************************
 localhost                  : ok=1    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>Oops, too basic. Let’s try again, but this time with a small set of parameters specifying cpu, memory and a boot disk.
 The latter will be a demo image provided by the KubeVirt project.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_vm</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_vm</span><span class="pi">:</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm1</span>
   <span class="na">cpu_cores</span><span class="pi">:</span> <span class="m">1</span>
@@ -326,25 +303,18 @@ The latter will be a demo image provided by the KubeVirt project.</p>
           <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/cirros-container-disk-demo:latest</span>
       <span class="na">disk</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And run it:</p>
 
-<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 02_vm1.yaml
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 02_vm1.yaml
 <span class="go">(…)
 TASK [Create first vm, for real this time] ************************************************************************
 changed: [localhost]
 
 PLAY RECAP ********************************************************************************************************
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>It worked! One thing to note is that by default <em>kubevirt_vm</em> will not start a newly–created VM. Running <code class="language-html highlighter-rouge">kubectl get vms -n default</code> will confirm as much.</p>
 
@@ -352,21 +322,14 @@ localhost                  : ok=2    changed=1    unreachable=0    failed=0    s
 boot by running the first playbook one more time, since this time the task will be interpreted as attempting to change the <em>state</em> of
 an existing VM to <em>running</em>, which is what we want.</p>
 
-<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 01_vm1_running.yaml
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 01_vm1_running.yaml
 <span class="go">(…)
 TASK [Create first vm] ********************************************************************************************
 changed: [localhost]
 
 PLAY RECAP ********************************************************************************************************
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>While the first two runs likely finished almost immediately, this time around <code class="language-html highlighter-rouge">ansible-playbook</code> is waiting for the VM to boot, so
 don’t be alarmed if that takes a bit of time.</p>
@@ -377,21 +340,14 @@ can be used to log onto the new VM and to take a look around. Run <code class="l
 <p>It’s useful to note at this point something about how Ansible and Kubernetes operate. This is best illustrated with an example. Let’s run
 the first playbook one more time:</p>
 
-<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 01_vm1_running.yaml
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 01_vm1_running.yaml
 <span class="go">(…)
 TASK [Create first vm?] *******************************************************************************************
 ok: [localhost]
 
 PLAY RECAP ********************************************************************************************************
 localhost                  : ok=2    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>The output is almost the same as on the previous run, with the one difference being that this time no changes were reported (<code class="language-html highlighter-rouge">changed=0</code>).</p>
 
@@ -406,33 +362,22 @@ currently is in (the VM is already running) then nothing will change, no matter 
 </div></div>
 <p>Let’s finish with cleaning up after ourselves by removing <em>vm1</em>. First the relevant YAML:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_vm</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_vm</span><span class="pi">:</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm1</span>
   <span class="na">state</span><span class="pi">:</span> <span class="s">absent</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And run it:</p>
 
-<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 03_vm1_absent.yaml
+<div class="language-console highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="gp">[mmazur@klapek blog1]$</span><span class="w"> </span>ansible-playbook 03_vm1_absent.yaml
 <span class="go">(…)
 TASK [Delete the vm] **********************************************************************************************
 changed: [localhost]
 
 PLAY RECAP ********************************************************************************************************
 localhost                  : ok=2    changed=1    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>Now the VM is gone, which running <code class="language-html highlighter-rouge">kubectl get vms -n default</code> will confirm.
 Just like before, if you run the playbook a few more times, the <em>play recap</em> will keep reporting <code class="language-html highlighter-rouge">changed=0</code>.</p>

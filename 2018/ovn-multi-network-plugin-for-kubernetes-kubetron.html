@@ -280,15 +280,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Once the networks are configured, there are two options how to expose available networks to a user. First one is providing some form of access to OVN or Neutron API, this one is completely out of Kubernetes’ and Kubetron’s
 scope. Second option is to enable Network object support (as described in Kubernetes Network CRD De-Facto standard). With this option, administrator must create a Network object per each OVN network is allowed to be used by a user. This object allows administrator to expose only limited subset of networks or to limit access per Namespace. This process could be automated, e.g. via a service that monitors available logical switches and exposes them as Networks.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre><span class="c"># List networks (Logical Switches) directly from OVN Northbound database</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># List networks (Logical Switches) directly from OVN Northbound database</span>
 ovn-nbctl ls-list
 
 <span class="c"># List networks available on Neutron</span>
@@ -296,23 +288,13 @@ neutron net-list
 
 <span class="c"># List networks as Network objects created in Kubernetes</span>
 kubectl get networks
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="attach-pod-to-a-network">Attach pod to a Network</h3>
 
 <p>Once user selects a desired network based on options described in previous section, he or she can request them for a pod using an annotation. This annotation is compatible with earlier mentioned Kubernetes Network CRD De-Facto Standard.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">pod</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">network-consumer</span>
@@ -322,22 +304,13 @@ kubectl get networks
   <span class="na">containers</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">busybox</span>
       <span class="na">image</span><span class="pi">:</span> <span class="s">busybox</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="access-the-network-from-the-pod">Access the Network from the pod</h3>
 
 <p>Once the pod is created, a user can list its interfaces and their assigned IP addresses:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl <span class="nb">exec</span> <span class="nt">-it</span> network-consumer <span class="nt">--</span> ip address
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nb">exec</span> <span class="nt">-it</span> network-consumer <span class="nt">--</span> ip address
 ...
 10: red-bcxoeffrsw: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1442 qdisc noqueue state UNKNOWN qlen 1000
     <span class="nb">link</span>/ether 4e:71:3b:ee:a5:f4 brd ff:ff:ff:ff:ff:ff
@@ -346,15 +319,13 @@ kubectl get networks
     inet6 fe80::4c71:3bff:feee:a5f4/64 scope <span class="nb">link
        </span>valid_lft forever preferred_lft forever
 ...
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>In order to make it easier to obtain the network’s interface name inside pod’s containers, environment variables with network-interface mapping are created:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$NETWORK_INTERFACE_RED</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="nv">$NETWORK_INTERFACE_RED</span>
 red-bcxoeffrsw
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="proof-of-concept">Proof of Concept</h2>
 

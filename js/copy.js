@@ -1,4 +1,8 @@
-let codes = document.querySelectorAll('.highlight > pre > code > table > tbody > tr > td:nth-of-type(2)');
+// When using line numbers
+// let codes = document.querySelectorAll('.highlight > pre > code > table > tbody > tr > td:nth-of-type(2)');
+
+// When not using line numbers
+let codes = document.querySelectorAll('.highlight > pre > code');
 
 let countID = 0;
 codes.forEach((code) => {
@@ -15,11 +19,15 @@ codes.forEach((code) => {
   div.appendChild(btn);
   code.after(div);
 
-  var codeblock = code.parentNode
-  var container = codeblock.parentNode
-  var row = container.parentNode;
-  var table = row.parentNode;
-  var pre = table.parentNode;
+  // when using line numbers
+  // var codeblock = code.parentNode
+  // var container = codeblock.parentNode
+  // var row = container.parentNode;
+  // var table = row.parentNode;
+  // var pre = table.parentNode;
+
+  // when not using line numbers
+  var pre = code.parentNode
 
   if (pre.parentNode.classList.contains('highlight')) {
     var highlight = pre.parentNode;

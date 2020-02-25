@@ -266,15 +266,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>In order to use the provider we need to install Vagrant first. The steps how to do it are available <a href="https://www.vagrantup.com/intro/getting-started/install.html">here</a>. Once command line tool is available in our system, we can install the plugin by running:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>$ vagrant plugin install vagrant-kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant plugin install vagrant-kubevirt
+</code></pre></div></div>
 
 <p>Now, we can obtain predefined box and start it using:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>$ vagrant up --provider=kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant up --provider=kubevirt
+</code></pre></div></div>
 
 <h1 id="virtual-machine-definition">Virtual machine definition</h1>
 
@@ -288,21 +286,14 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
   <li>define connection details as part of box definition</li>
 </ul>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">provider</span> <span class="ss">:kubevirt</span> <span class="k">do</span> <span class="o">|</span><span class="n">kubevirt</span><span class="o">|</span>
     <span class="n">kubevirt</span><span class="p">.</span><span class="nf">hostname</span> <span class="o">=</span> <span class="s1">'&lt;kubevirt host&gt;'</span>
     <span class="n">kubevirt</span><span class="p">.</span><span class="nf">port</span> <span class="o">=</span> <span class="s1">'&lt;kubevirt port&gt;'</span>
     <span class="n">kubevirt</span><span class="p">.</span><span class="nf">token</span> <span class="o">=</span> <span class="s1">'&lt;token&gt;'</span>
   <span class="k">end</span>
 <span class="k">end</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Values used in above sample box:</p>
 
@@ -329,34 +320,7 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
 
 <p>Below, you can find sample Vagrantfile exposing all the supported features:</p>
 
-<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-</pre></td><td class="rouge-code"><pre><span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+<div class="language-ruby highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="no">Vagrant</span><span class="p">.</span><span class="nf">configure</span><span class="p">(</span><span class="s2">"2"</span><span class="p">)</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
   <span class="c1"># name of the box</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">vm</span><span class="p">.</span><span class="nf">box</span> <span class="o">=</span> <span class="s1">'kubevirt'</span>
   <span class="c1"># vm boot timeout</span>
@@ -383,45 +347,39 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
   <span class="n">config</span><span class="p">.</span><span class="nf">ssh</span><span class="p">.</span><span class="nf">username</span> <span class="o">=</span> <span class="s1">'vagrant'</span>
   <span class="n">config</span><span class="p">.</span><span class="nf">ssh</span><span class="p">.</span><span class="nf">password</span> <span class="o">=</span> <span class="s1">'vagrant'</span>
 <span class="k">end</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h1 id="usage">Usage</h1>
 
 <p>Now, once we defined a virtual machine we can see how to use the provider to manage it.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>vagrant up
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant up
+</code></pre></div></div>
 
 <p>The above command starts a virtual machines and performs any additonal operations defined in the Vagrantfile like provisioning, folder synchronization setup. For more information check <a href="https://www.vagrantup.com/docs/cli/up.html">here</a></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>vagrant halt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant halt
+</code></pre></div></div>
 
 <p>The above command stops a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/halt.html">here</a></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>vagrant status
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant status
+</code></pre></div></div>
 
 <p>The above command provides status of a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/status.html">here</a></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>vagrant destroy
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant destroy
+</code></pre></div></div>
 
 <p>The above command stops a virtual machine and destroys all the resources used. For more information check <a href="https://www.vagrantup.com/docs/cli/destroy.html">here</a></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>vagrant provision
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant provision
+</code></pre></div></div>
 
 <p>The above command runs configured provisioners for specific virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/provision.html">here</a></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>vagrant ssh
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant ssh
+</code></pre></div></div>
 
 <p>The above command ssh to running virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/ssh.html">here</a></p>
 

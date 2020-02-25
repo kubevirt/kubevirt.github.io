@@ -296,19 +296,13 @@ many more ways of using the modules than can reasonably fit here.</p>
 <p>The main functionality of the <code class="language-html highlighter-rouge">kubevirt_pvc</code> module is to manage Persistent Volume Claims. The following snippet
 should seem familiar to anyone who dealt with PVCs before:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_pvc</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_pvc</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">pvc1</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
   <span class="na">size</span><span class="pi">:</span> <span class="s">100Mi</span>
   <span class="na">access_modes</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Running it inside a playbook will result in a new PVC named <em>pvc1</em> with the access mode <em>ReadWriteOnce</em> and at least
 100Mi of storage assigned.</p>
@@ -317,13 +311,10 @@ should seem familiar to anyone who dealt with PVCs before:</p>
 upon creation. But before we get to the examples, the Containerized Data Importer needs to be properly deployed,
 which is as simple as running the following commands:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="nb">export </span><span class="nv">CDI_VER</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">CDI_VER</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
 kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VER</span>/cdi-operator.yaml
 kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VER</span>/cdi-cr.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once <code class="language-html highlighter-rouge">kubectl get pods -n cdi</code> confirms all pods are ready, CDI is good to go.</p>
 
@@ -338,17 +329,7 @@ kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containeriz
 
 <p>Here’s a simple example:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="na">kubevirt_pvc</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_pvc</span><span class="pi">:</span>
 <span class="na">name</span><span class="pi">:</span> <span class="s">pvc2</span>
 <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
 <span class="na">size</span><span class="pi">:</span> <span class="s">100Mi</span>
@@ -358,7 +339,7 @@ kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containeriz
 <span class="na">cdi_source</span><span class="pi">:</span>
   <span class="na">http</span><span class="pi">:</span>
     <span class="na">url</span><span class="pi">:</span> <span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <blockquote>
   <p>info
@@ -367,24 +348,7 @@ Please notice the <code class="language-html highlighter-rouge">wait: yes</code>
 
 <p>Let’s see this in action:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook pvc_cdi.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook pvc_cdi.yaml
 <span class="o">(</span>…<span class="o">)</span>
 
 TASK <span class="o">[</span>Create pvc and fetch data] <span class="k">**********************************************************************************</span>
@@ -401,7 +365,7 @@ pvc2      Bound     local-pv-6b6380e2   37Gi       RWO            <span class="n
     cdi.kubevirt.io/storage.import.importPodName: importer-pvc2-gvn5c
     cdi.kubevirt.io/storage.import.source: http
     cdi.kubevirt.io/storage.pod.phase: Succeeded
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Everything worked as expected.</p>
 
@@ -421,58 +385,33 @@ be used.</p>
 
 <p>First, enable the plugin in <code class="language-html highlighter-rouge">ansible.cfg</code>:</p>
 
-<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>[<span class="n">inventory</span>]
+<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">inventory</span>]
 <span class="n">enable_plugins</span> = <span class="n">kubevirt</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Then configure the plugin using a file named <code class="language-html highlighter-rouge">kubevirt.yml</code> or <code class="language-html highlighter-rouge">kubevirt.yaml</code>:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="na">plugin</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">plugin</span><span class="pi">:</span> <span class="s">kubevirt</span>
 <span class="na">connections</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="s">default</span>
     <span class="na">network_name</span><span class="pi">:</span> <span class="s">default</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And now let’s see if it worked and there’s a VM running in the default namespace (as represented by the
 <code class="language-html highlighter-rouge">namespace_default</code> inventory group):</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
  <span class="o">[</span>WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not
 match <span class="s1">'all'</span>
 
   hosts <span class="o">(</span>0<span class="o">)</span>:
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Right, we don’t have any VMs running. Let’s go back to <a href="/2019/kubevirt-with-ansible-part-1.html">part 1</a>, create <code class="language-html highlighter-rouge">vm1</code>, make sure it’s runing
 and then try again:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook  ../part1/02_vm1.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook  ../part1/02_vm1.yaml
 <span class="o">(</span>…<span class="o">)</span>
 PLAY RECAP <span class="k">********************************************************************************************************</span>
 localhost                  : <span class="nv">ok</span><span class="o">=</span>2    <span class="nv">changed</span><span class="o">=</span>1    <span class="nv">unreachable</span><span class="o">=</span>0    <span class="nv">failed</span><span class="o">=</span>0    <span class="nv">skipped</span><span class="o">=</span>0    <span class="nv">rescued</span><span class="o">=</span>0    <span class="nv">ignored</span><span class="o">=</span>0
@@ -485,7 +424,7 @@ localhost                  : <span class="nv">ok</span><span class="o">=</span>2
 <span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
   hosts <span class="o">(</span>1<span class="o">)</span>:
     default-vm1-2c680040-9e75-11e9-8839-525500d15501
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Works!</p>
 

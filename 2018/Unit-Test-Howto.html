@@ -314,15 +314,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Be verbose and use specific matchers. For example, to check that an array has N elements, you can use:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>Expect(len(arr)).To(Equal(N))
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(len(arr)).To(Equal(N))
+</code></pre></div></div>
 
 <p>But a better way would be:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>Expect(arr).To(HaveLen(N))
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(arr).To(HaveLen(N))
+</code></pre></div></div>
 
 <h2 id="function-override">Function Override</h2>
 

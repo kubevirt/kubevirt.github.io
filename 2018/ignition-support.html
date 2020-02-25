@@ -268,16 +268,7 @@ Ignition support is still needed in the guest operating system.</p>
 
 <p>A minimal config map would look like this:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
@@ -286,13 +277,12 @@ Ignition support is still needed in the guest operating system.</p>
     <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
 <span class="na">data</span><span class="pi">:</span>
   <span class="na">feature-gates</span><span class="pi">:</span> <span class="s">ExperimentalIgnitionSupport</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Make sure to delete kubevirt related pods afterward for the configuration to be taken into account:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl delete pod <span class="nt">--all</span> <span class="nt">-n</span> kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete pod <span class="nt">--all</span> <span class="nt">-n</span> kubevirt
+</code></pre></div></div>
 
 <h2 id="workthrough">WorkThrough</h2>
 
@@ -302,56 +292,7 @@ Ignition support is still needed in the guest operating system.</p>
 
 <p>Create The following VM spec in the file <em>myvm1.yml</em>:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">myvm1</span>
@@ -400,7 +341,7 @@ Ignition support is still needed in the guest operating system.</p>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
           <span class="na">containerDisk</span><span class="pi">:</span>
             <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/fedora-cloud-container-disk-demo</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>We simply inject the ignition data as a string in <em>vm/spec/domain/spec/metadata/annotations</em>, using <em>kubevirt.io/ignitiondata</em> as an annotation</p>
 
@@ -410,11 +351,9 @@ Ignition support is still needed in the guest operating system.</p>
 
 <p>Create the VM:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> myvm1.yml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> myvm1.yml
 virtualmachine <span class="s2">"myvm1"</span> created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>At this point, when VM boots, ignition data will be injected.</p>
 

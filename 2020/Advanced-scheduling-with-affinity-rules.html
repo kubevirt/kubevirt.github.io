@@ -329,19 +329,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </div></div>
 <p>Below you can find a cluster labeling where topology is based in one region and several zones spread across geographically. Additionally, special <strong>high performing nodes</strong> composed by nodes with a high number of resources available including memory, cpu, storage and network are marked as well.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl label node kni-worker topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl label node kni-worker topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu</span>
 node/kni-worker labeled
 <span class="c"># kubectl label node kni-worker2 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu performance=high</span>
 node/kni-worker2 labeled
@@ -353,21 +341,11 @@ node/kni-worker4 labeled
 node/kni-worker5 labeled
 <span class="c"># kubectl label node kni-worker6 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=sab performance=high</span>
 node/kni-worker6 labeled
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>At this point, Kubernetes cluster nodes are labelled as expected:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl get nodes --show-labels</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl get nodes --show-labels</span>
 
 NAME                STATUS   ROLES    AGE   VERSION   LABELS
 kni-control-plane   Ready    master   18m   v1.17.0   beta.kubernetes.io/arch<span class="o">=</span>amd64,beta.kubernetes.io/os<span class="o">=</span>linux,kubernetes.io/arch<span class="o">=</span>amd64,kubernetes.io/hostname<span class="o">=</span>kni-control-plane,kubernetes.io/os<span class="o">=</span>linux,node-role.kubernetes.io/master<span class="o">=</span>
@@ -377,7 +355,7 @@ kni-worker3         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
 kni-worker4         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/arch<span class="o">=</span>amd64,beta.kubernetes.io/os<span class="o">=</span>linux,kubernetes.io/arch<span class="o">=</span>amd64,kubernetes.io/hostname<span class="o">=</span>kni-worker4,kubernetes.io/os<span class="o">=</span>linux,performance<span class="o">=</span>high,topology.kubernetes.io/region<span class="o">=</span>iberia,topology.kubernetes.io/zone<span class="o">=</span>bcn
 kni-worker5         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/arch<span class="o">=</span>amd64,beta.kubernetes.io/os<span class="o">=</span>linux,kubernetes.io/arch<span class="o">=</span>amd64,kubernetes.io/hostname<span class="o">=</span>kni-worker5,kubernetes.io/os<span class="o">=</span>linux,topology.kubernetes.io/region<span class="o">=</span>iberia,topology.kubernetes.io/zone<span class="o">=</span>sab
 kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/arch<span class="o">=</span>amd64,beta.kubernetes.io/os<span class="o">=</span>linux,kubernetes.io/arch<span class="o">=</span>amd64,kubernetes.io/hostname<span class="o">=</span>kni-worker6,kubernetes.io/os<span class="o">=</span>linux,performance<span class="o">=</span>high,topology.kubernetes.io/region<span class="o">=</span>iberia,topology.kubernetes.io/zone<span class="o">=</span>sab
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Finally, the cluster is ready to run and deploy our specific <em>customapp</em>.</p>
 
@@ -397,44 +375,7 @@ kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
 </div></div>
 <p>There are two options to accomplish our requirement, use <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector">nodeSelector</a> or configure <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity">nodeAffinity</a> rules. In our first approach, <code class="language-html highlighter-rouge">nodeSelector</code> instead of <code class="language-html highlighter-rouge">nodeAffinity</code> rule is used. <code class="language-html highlighter-rouge">nodeSelector</code> matches the nodes where the <code class="language-html highlighter-rouge">performance</code> key is equal to <code class="language-html highlighter-rouge">high</code> and makes the <code class="language-html highlighter-rouge">VirtualMachineInstance</code> to run on top of the matching nodes. The following code snippet shows the configuration:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstanceReplicaSet</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">mssql2016</span>
@@ -471,36 +412,17 @@ kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
       <span class="na">networks</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
         <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Next, the <code class="language-html highlighter-rouge">VirtualMachineInstanceReplicaSet</code> configuration partially shown previously is applied successfully.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl create -f vmr-windows-mssql.yaml</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl create -f vmr-windows-mssql.yaml</span>
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Then, it is expected that the 3 <code class="language-html highlighter-rouge">VirtualMachineInstances</code> will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the <em>even</em> nodes.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl get pods -o wide</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl get pods -o wide</span>
 NAME                                 READY   STATUS              RESTARTS   AGE   IP       NODE          NOMINATED NODE   READINESS GATES
 virt-launcher-mssql2016p948r-257pn   0/2     ContainerCreating   0          16s   &lt;none&gt;   kni-worker4   &lt;none&gt;           &lt;none&gt;
 virt-launcher-mssql2016rd4lk-6zz9d   0/2     ContainerCreating   0          16s   &lt;none&gt;   kni-worker2   &lt;none&gt;           &lt;none&gt;
@@ -517,7 +439,7 @@ NAME             AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql2016p948r   3m25s   Running   10.244.1.4   kni-worker4   False
 mssql2016rd4lk   3m25s   Running   10.244.2.4   kni-worker2   False
 mssql2016z2qnw   3m25s   Running   10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Warning</p><p><code class="language-html highlighter-rouge">nodeSelector</code> provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.</p>
 
@@ -525,31 +447,21 @@ mssql2016z2qnw   3m25s   Running   10.244.5.4   kni-worker6   False
 </div></div>
 <p>Let’s test what happens if the node running the database must be rebooted due to an upgrade or any other valid reason. First, a <a href="/2019/NodeDrain-KubeVirt.html">node drain</a> must be executed in order to evacuate all pods running and mark the node as unschedulable.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl drain kni-worker2 --delete-local-data --ignore-daemonsets=true --force</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl drain kni-worker2 --delete-local-data --ignore-daemonsets=true --force</span>
 node/kni-worker2 already cordoned
 evicting pod <span class="s2">"virt-launcher-mssql2016rd4lk-6zz9d"</span>
 pod/virt-launcher-mssql2016rd4lk-6zz9d evicted
 node/kni-worker2 evicted
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The result is an unwanted scenario, where two databases are being executed in the same high performing server. <em>This leads us to more advanced scheduling features like affinity and anti-affinity.</em></p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl get vmi -o wide</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl get vmi -o wide</span>
 NAME             AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql201696sz9   7m16s   Running   10.244.5.5   kni-worker6   False
 mssql2016p948r   19m     Running   10.244.1.4   kni-worker4   False
 mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity">affinity/anti-affinity rules</a> solve much more complex scenarios compared to <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector">nodeSelector</a>. Some of the key enhancements are:</p>
 
@@ -578,49 +490,12 @@ mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
 
 <p>Here is the <code class="language-html highlighter-rouge">VirtualMachineInstanceReplicaSet</code> object replaced.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016</span>
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 <p>Now, it contains both affinity rules:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstanceReplicaSet</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">mssql2016replicaset</span>
@@ -655,7 +530,7 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
             <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
       <span class="na">domain</span><span class="pi">:</span>
 <span class="nn">...</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the <code class="language-html highlighter-rouge">VirtualMachineInstances</code> (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).</p>
 
@@ -663,37 +538,22 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 
 
 </div></div>
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl uncordon kni-worker2</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl uncordon kni-worker2</span>
 node/kni-worker2 uncordoned
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Below shows the current status, where two databases are running in the <code class="language-html highlighter-rouge">kni-worker6</code> node. By applying the previous affinity rules this should not happen again:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl get vmi -o wide</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl get vmi -o wide</span>
 NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql201696sz9   12m   Running   10.244.5.5   kni-worker6   False
 mssql2016p948r   24m   Running   10.244.1.4   kni-worker4   False
 mssql2016z2qnw   24m   Running   10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Next, we delete one of the VMIs running in <code class="language-html highlighter-rouge">kni-worker6</code> and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl delete vmi mssql201696sz9</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl delete vmi mssql201696sz9</span>
 virtualmachineinstance.kubevirt.io <span class="s2">"mssql201696sz9"</span> deleted
 
 <span class="c"># kubectl get vmi -o wide</span>
@@ -701,7 +561,7 @@ NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql2016p948r   40m   Running   10.244.1.4   kni-worker4   False
 mssql2016tpj6n   22s   Running   10.244.2.5   kni-worker2   False
 mssql2016z2qnw   40m   Running   10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>During the deployment of the clustered database <code class="language-html highlighter-rouge">nodeAffinity</code> and <code class="language-html highlighter-rouge">nodeSelector</code> rules were compared, however, there are a couple of things to take into consideration when creating node affinity rules, it is worth taking a look at <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity">node affinity in Kubernetes documentation</a>.</p>
 
@@ -717,17 +577,12 @@ mssql2016z2qnw   40m   Running   10.244.5.4   kni-worker6   False
 
 <p>Start by creating a ConfigMap that contains a VCL template and a Secret object that contains the secret for the Varnish administration port. Then apply the <a href="https://github.com/mittwald/kube-httpcache#deploy-varnish">Varnish deployment config</a>.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@eko1 varnish]# kubectl create <span class="nt">-f</span> configmap.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@eko1 varnish]# kubectl create <span class="nt">-f</span> configmap.yaml
 configmap/vcl-template created
 
 <span class="o">[</span>root@eko1 varnish]# kubectl create secret generic varnish-secret <span class="nt">--from-literal</span><span class="o">=</span><span class="nv">secret</span><span class="o">=</span><span class="si">$(</span><span class="nb">head</span> <span class="nt">-c32</span> /dev/urandom  | <span class="nb">base64</span><span class="si">)</span>
 secret/varnish-secret created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>In our specific mandate, 3 replicas of our web cache application are needed. Each one must be running in a different zone or datacenter. Preferably, if possible, expected to run in a Kubernetes node different from the database since as administrators we would like the database to take advantage of all the possible resources of the high-performing server. Taken into account this prerequisite, the following advanced rules are applied:</p>
 
@@ -736,44 +591,7 @@ secret/varnish-secret created
   <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="language-html highlighter-rouge">app</code> equals to <code class="language-html highlighter-rouge">cache</code> must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey <code class="language-html highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in <em>scu, bcn and sab</em> respectively.</li>
 </ol>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">varnish-cache</span>
@@ -810,7 +628,7 @@ secret/varnish-secret created
       <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cache</span>
         <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/spaces/kube-httpcache:stable</span>
         <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>In this set of affinity rules, a new scheduling policy has been introduced: <code class="language-html highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code>. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.</p>
 
@@ -820,23 +638,13 @@ secret/varnish-secret created
 </div></div>
 <p>Here, the modified deployment is applied:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@eko1 varnish]# kubectl create <span class="nt">-f</span> deployment.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@eko1 varnish]# kubectl create <span class="nt">-f</span> deployment.yaml
 deployment.apps/varnish-cache created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The Pod is scheduled as expected since there is a node available in each zone without the <code class="language-html highlighter-rouge">performance=high</code> label.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl get pods -o wide</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl get pods -o wide</span>
 NAME                                 READY   STATUS    RESTARTS   AGE   IP           NODE          NOMINATED NODE   READINESS GATES
 varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          91s   10.244.4.5   kni-worker5   &lt;none&gt;           &lt;none&gt;
 varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          91s   10.244.3.5   kni-worker3   &lt;none&gt;           &lt;none&gt;
@@ -844,7 +652,7 @@ varnish-cache-54489f9fc9-dflzs       1/1     Running   0          91s   10.244.6
 virt-launcher-mssql2016p948r-257pn   2/2     Running   0          70m   10.244.1.4   kni-worker4   &lt;none&gt;           &lt;none&gt;
 virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          31m   10.244.2.5   kni-worker2   &lt;none&gt;           &lt;none&gt;
 virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5.4   kni-worker6   &lt;none&gt;           &lt;none&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>At this point, database and http-cache components of our customapp are up and running. Only the appliance created by an external provider needs to be deployed to complete the stack.</p>
 
@@ -859,42 +667,7 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
   <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="language-html highlighter-rouge">kubevirt.io/domain</code> equals to <code class="language-html highlighter-rouge">blackbox</code> must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey <code class="language-html highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one appliance instance can run in each zone, e.g. one appliance in <em>scu, bcn and sab</em> respectively.</li>
 </ol>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstanceReplicaSet</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">blackbox</span>
@@ -929,31 +702,11 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
                 <span class="pi">-</span> <span class="s">blackbox</span>
             <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
       <span class="na">domain</span><span class="pi">:</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Here, the modified deployment is applied. As expected the VMI is scheduled as expected in the same Kubernetes nodes as Varnish Cache and each one in a different datacenter or zone.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl get pods,vmi <span class="nt">-o</span> wide
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods,vmi <span class="nt">-o</span> wide
 
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
 pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          172m    10.244.4.5   kni-worker5   &lt;none&gt;           &lt;none&gt;
@@ -973,7 +726,7 @@ virtualmachineinstance.kubevirt.io/blackboxzf9kt    2m31s   Running   10.244.3.6
 virtualmachineinstance.kubevirt.io/mssql2016p948r   4h1m    Running   10.244.1.4   kni-worker4   False
 virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h22m   Running   10.244.2.5   kni-worker2   False
 virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h1m    Running   10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>At this point, our stack has been successfully deployed and configured accordingly to the requirements agreed. However, it is important before going into production to verify the proper behaviour in case of node failures. That’s what is going to be shown in the next section.</p>
 
@@ -987,25 +740,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h1m    Running   10.244.5.4
 
 <p>As it is depicted, once the <code class="language-html highlighter-rouge">kni-worker</code> is marked as unschedulable and drained, the Varnish Cache pod and the black box appliance VM are automatically moved to the high-performance node in the same zone.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-</pre></td><td class="rouge-code"><pre>NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
 pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h8m    10.244.4.5   kni-worker5   &lt;none&gt;           &lt;none&gt;
 pod/varnish-cache-54489f9fc9-9s5sr	 1/1     Running   0          2m32s   10.244.2.7   kni-worker2   &lt;none&gt;           &lt;none&gt;
 pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h8m    10.244.3.5   kni-worker3   &lt;none&gt;           &lt;none&gt;
@@ -1023,7 +758,7 @@ virtualmachineinstance.kubevirt.io/blackboxzf9kt    18m     Running	 10.244.3.6 
 virtualmachineinstance.kubevirt.io/mssql2016p948r   4h17m   Running	 10.244.1.4   kni-worker4   False
 virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h37m   Running	 10.244.2.5   kni-worker2   False
 virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h17m   Running	 10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Remember that this is happening because:</p>
 
@@ -1037,20 +772,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h17m   Running	 10.244.5.4 
 
 
 </div></div>
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl uncordon kni-worker</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl uncordon kni-worker</span>
 node/kni-worker uncordoned
 
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
@@ -1063,7 +785,7 @@ pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          21m     10
 pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h20m   10.244.1.4   kni-worker4   &lt;none&gt;           &lt;none&gt;
 pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h40m   10.244.2.5   kni-worker2   &lt;none&gt;           &lt;none&gt;
 pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h20m   10.244.5.4   kni-worker6   &lt;none&gt;           &lt;none&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>In order to return to the most desirable state, the pod and VM from kni-worker2 must be deleted.</p>
 
@@ -1071,39 +793,16 @@ pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h20m   10
 
 
 </div></div>
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="c"># kubectl delete  pod/varnish-cache-54489f9fc9-9s5sr</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># kubectl delete  pod/varnish-cache-54489f9fc9-9s5sr</span>
 pod <span class="s2">"varnish-cache-54489f9fc9-9s5sr"</span> deleted
 
 <span class="c"># kubectl delete virtualmachineinstance.kubevirt.io/blackboxxh5tg</span>
 virtualmachineinstance.kubevirt.io <span class="s2">"blackboxxh5tg"</span> deleted
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once done, the scheduling process is run again for both applications and the applications are placed in the most desirable node taking into account affinity rules configured.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-</pre></td><td class="rouge-code"><pre>NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
 pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h13m   10.244.4.5   kni-worker5   &lt;none&gt;           &lt;none&gt;
 pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h13m   10.244.3.5   kni-worker3   &lt;none&gt;           &lt;none&gt;
 pod/varnish-cache-54489f9fc9-fldhc	 1/1     Running   0          2m7s    10.244.6.7   kni-worker    &lt;none&gt;           &lt;none&gt;
@@ -1121,7 +820,7 @@ virtualmachineinstance.kubevirt.io/blackboxzf9kt    23m     Running   10.244.3.6
 virtualmachineinstance.kubevirt.io/mssql2016p948r   4h23m   Running   10.244.1.4   kni-worker4   False
 virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h43m   Running   10.244.2.5   kni-worker2   False
 virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4   kni-worker6   False
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server <em>in the same zone</em>. Although this is not ideal, our <code class="language-html highlighter-rouge">customapp</code> will be still available while the node recovery is ongoing.</p>
 
@@ -1143,44 +842,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
   <li><strong>podAntiAffinity rule</strong>. This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node (<code class="language-html highlighter-rouge">kubernetes.io/hostname</code>). It is used the key <code class="language-html highlighter-rouge">kubevirt.io</code> to match the application <code class="language-html highlighter-rouge">virt-api</code> or <code class="language-html highlighter-rouge">virt-controller</code>. See that it is a soft requirement, which means that the kube-scheduler will try to match the rule, however, if it is not possible it can place both replicas in the same node.</li>
 </ol>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-</pre></td><td class="rouge-code"><pre>        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
         <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
         <span class="na">metadata</span><span class="pi">:</span>
           <span class="na">labels</span><span class="pi">:</span>
@@ -1217,44 +879,9 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
                     <span class="na">weight</span><span class="pi">:</span> <span class="m">1</span>
               <span class="na">containers</span><span class="pi">:</span>
               <span class="s">...</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-</pre></td><td class="rouge-code"><pre>        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
         <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
         <span class="na">metadata</span><span class="pi">:</span>
           <span class="na">labels</span><span class="pi">:</span>
@@ -1289,7 +916,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
                           <span class="pi">-</span> <span class="s">virt-controller</span>
                       <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">kubernetes.io/hostname</span>
                     <span class="na">weight</span><span class="pi">:</span> <span class="m">1</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are <code class="language-html highlighter-rouge">nodeAffinity</code> rules in order to place each replica in each Kubernetes node of the cluster.</p>
 
@@ -1299,56 +926,13 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
 
 
 </div></div>
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="o">[</span>root@eko1 varnish]# kubectl get daemonset <span class="nt">-n</span> kubevirt
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@eko1 varnish]# kubectl get daemonset <span class="nt">-n</span> kubevirt
 NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                 AGE
 kubevirt      virt-handler   6         6         6       6            6           &lt;none&gt;                        25h
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 <p>See the partial snippet of a <code class="language-html highlighter-rouge">virt-handler</code> Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a <code class="language-html highlighter-rouge">nodeAffinity</code> rule that requires the Pod to run in a specific hostname matched by the key <code class="language-html highlighter-rouge">metadata.name</code> and value the name of the node (<code class="language-html highlighter-rouge">kni-worker2</code>). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">annotations</span><span class="pi">:</span>
@@ -1388,7 +972,7 @@ kubevirt      virt-handler   6         6         6       6            6         
             <span class="na">values</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">kni-worker2</span>
 <span class="nn">...</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="summary">Summary</h2>
 

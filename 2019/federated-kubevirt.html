@@ -265,72 +265,46 @@ clusters.</p>
 
 <p>We create KubeVirt namespace on first cluster:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create ns kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create ns kubevirt
+</code></pre></div></div>
 
 <p>We then create <a href="/assets/2019-02-22-federated-kubevirt/federated_namespace.yaml">a placement</a> for this namespace to get replicated to the second cluster.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create -f federated_namespace.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f federated_namespace.yaml
+</code></pre></div></div>
 
 <p>NOTE: This yaml file was generated for version 0.14.0. but feel free to edit in order to use a more recent version of the operator</p>
 
 <p>We create the federated objects required as per kubevirt deployment:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>kubefed2 enable ClusterRoleBinding
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubefed2 enable ClusterRoleBinding
 kubefed2 enable CustomResourceDefinition
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And <a href="/assets/2019-02-22-federated-kubevirt/federated_kubevirt-operator.yaml">federated kubevirt</a> itself, with placements so that it gets deployed at both sites.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create -f federated_kubevirt-operator.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f federated_kubevirt-operator.yaml
+</code></pre></div></div>
 
 <p>This gets KubeVirt operator deployed at both sites, which creates the Custom Resource definition <em>KubeVirt</em>. We then deploy kubevirt by federating this CRD and creates <a href="/assets/2019-02-22-federated-kubevirt/federated_kubevirt-cr.yaml">an instance of it</a>.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>kubefed2 enable kubevirts
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubefed2 enable kubevirts
 kubectl create -f federated_kubevirt-cr.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>To help starting/stopping vms and connecting to consoles, we install virtctl (which is aware of contexts):</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>VERSION="v0.14.0"
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>VERSION="v0.14.0"
 wget https://github.com/kubevirt/kubevirt/releases/download/$VERSION/virtctl-$VERSION-linux-amd64
 mv virtctl-$VERSION-linux-amd64 /usr/bin/virtctl
 chmod +x /usr/bin/virtctl
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="kubevirt-deployment-verification">KubeVirt Deployment Verification</h2>
 
 <p>Verify that all KubeVirt pods are running in the clusters:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="k">for </span>c <span class="k">in </span>cluster1 cluster2<span class="p">;</span> <span class="k">do </span>kubectl get pods <span class="nt">-n</span> kubevirt <span class="nt">--context</span> <span class="k">${</span><span class="nv">c</span><span class="k">}</span> <span class="p">;</span> <span class="k">done
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="k">for </span>c <span class="k">in </span>cluster1 cluster2<span class="p">;</span> <span class="k">do </span>kubectl get pods <span class="nt">-n</span> kubevirt <span class="nt">--context</span> <span class="k">${</span><span class="nv">c</span><span class="k">}</span> <span class="p">;</span> <span class="k">done
 </span>NAME                               READY     STATUS    RESTARTS   AGE
 virt-api-578cff4f56-2dsml          1/1       Running   0          3m
 virt-api-578cff4f56-8mk27          1/1       Running   0          3m
@@ -345,61 +319,48 @@ virt-controller-7d8c4fbc4c-tt9tz   1/1       Running   0          3m
 virt-controller-7d8c4fbc4c-zf6hh   1/1       Running   0          3m
 virt-handler-bldss                 1/1       Running   0          3m
 virt-operator-67c86544f7-zz5jc     1/1       Running   0          5m
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now that KubeVirt is up and created its own custom resource types, we federate them:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>kubefed2 enable virtualmachines
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubefed2 enable virtualmachines
 kubefed2 enable virtualmachineinstances
 kubefed2 enable virtualmachineinstancepresets
 kubefed2 enable virtualmachineinstancereplicasets
 kubefed2 enable virtualmachineinstancemigrations
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>For demo purposes, we also federate persistent volume claims:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubefed2 enable persistentvolumeclaim
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubefed2 enable persistentvolumeclaim
+</code></pre></div></div>
 
 <h2 id="demo-workflow">Demo Workflow</h2>
 
 <p>We create a <a href="/assets/2019-02-22-federated-kubevirt/federated_pvc.yaml">federated persistent volume claim</a>, pointing to an existing pv created at both sites, against the same nfs server:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create -f federated_pvc.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f federated_pvc.yaml
+</code></pre></div></div>
 
 <p>We then create a <a href="/assets/2019-02-22-federated-kubevirt/federated_vm.yaml">federated virtualmachine</a>, with a placement so that it’s only created at cluster1</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create -f federated_vm.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f federated_vm.yaml
+</code></pre></div></div>
 
 <p>We can check how its underlying pod only got created at one site:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span><span class="k">for </span>c <span class="k">in </span>cluster1 cluster2<span class="p">;</span> <span class="k">do </span>kubectl get pods <span class="nt">--context</span> <span class="k">${</span><span class="nv">c</span><span class="k">}</span> <span class="p">;</span> <span class="k">done
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="k">for </span>c <span class="k">in </span>cluster1 cluster2<span class="p">;</span> <span class="k">do </span>kubectl get pods <span class="nt">--context</span> <span class="k">${</span><span class="nv">c</span><span class="k">}</span> <span class="p">;</span> <span class="k">done
 </span>NAME                          READY     STATUS    RESTARTS   AGE
 virt-launcher-testvm2-9dq48   2/2       Running   0          6m
 No resources found.
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once the vm is up, we connect to it and format its secondary disk, put some data there</p>
 
 <p>Playing with placement resource, we have it stopping at cluster1 and launch at cluster2.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl patch federatedvirtualmachineplacements  testvm2 --type=merge -p '{"spec":{"clusterNames": ["cluster2"]}}'
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch federatedvirtualmachineplacements  testvm2 --type=merge -p '{"spec":{"clusterNames": ["cluster2"]}}'
+</code></pre></div></div>
 
 <p>We can then connect there and see how the data is still available!!!</p>
 

@@ -262,18 +262,7 @@ in your KubeVirt-powered cluster.</p>
 
 <p>Let’s look at the initial set of metrics exposed by KubeVirt 0.15.0:</p>
 
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="err">kubevirt_info</span><span class="p">{</span><span class="err">goversion=</span><span class="s2">"go1.11.4"</span><span class="p">,</span><span class="err">kubeversion=</span><span class="s2">"v0.15.0-alpha.0.74+d7aaf3b5df4a60-dirty"</span><span class="p">}</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">kubevirt_info</span><span class="p">{</span><span class="err">goversion=</span><span class="s2">"go1.11.4"</span><span class="p">,</span><span class="err">kubeversion=</span><span class="s2">"v0.15.0-alpha.0.74+d7aaf3b5df4a60-dirty"</span><span class="p">}</span><span class="w">
 </span><span class="err">kubevirt_vm_memory_resident_bytes</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">}</span><span class="w">
 </span><span class="err">kubevirt_vm_network_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">interface=</span><span class="s2">"$IFACE_NAME0"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"rx"</span><span class="p">}</span><span class="w">
 </span><span class="err">kubevirt_vm_network_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">interface=</span><span class="s2">"$IFACE_NAME0"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"tx"</span><span class="p">}</span><span class="w">
@@ -284,44 +273,14 @@ in your KubeVirt-powered cluster.</p>
 </span><span class="err">kubevirt_vm_storage_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"read"</span><span class="p">}</span><span class="w">
 </span><span class="err">kubevirt_vm_storage_traffic_bytes_total</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">drive=</span><span class="s2">"$DRIVE_NAME"</span><span class="p">,</span><span class="err">type=</span><span class="s2">"write"</span><span class="p">}</span><span class="w">
 </span><span class="err">kubevirt_vm_vcpu_seconds</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">id=</span><span class="s2">"0"</span><span class="p">,</span><span class="err">state=</span><span class="s2">"1"</span><span class="p">}</span><span class="w">
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>The metrics expose <a href="https://www.robustperception.io/exposing-the-software-version-to-prometheus">versioning information according to the recommendations</a> using the <code class="language-html highlighter-rouge">kubevirt_info</code> metric; the other metrics should be self-explanatory.
 As we can expect, labels like <code class="language-html highlighter-rouge">domain</code>, <code class="language-html highlighter-rouge">drive</code> and <code class="language-html highlighter-rouge">interface</code> depend on the specifics of the VM. <code class="language-html highlighter-rouge">type</code>, however, is not and represents the subtype of the metric.</p>
 
 <p>Let’s now see a real life example, from this idle, diskless VM:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
@@ -351,21 +310,16 @@ As we can expect, labels like <code class="language-html highlighter-rouge">doma
           <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
       <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
 <span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Querying the endpoint (see below) yields something like</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0"} 1
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0"} 1
 kubevirt_vm_memory_resident_bytes{domain="default_vm-test-01"} 4.25984e+07
 kubevirt_vm_network_traffic_bytes_total{domain="default_vm-test-01",interface="vnet0",type="rx"} 90
 kubevirt_vm_network_traffic_bytes_total{domain="default_vm-test-01",interface="vnet0",type="tx"} 0
 kubevirt_vm_vcpu_seconds{domain="default_vm-test-01",id="0",state="1"} 613
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Example of how the <code class="language-html highlighter-rouge">kubevirt_vm_memory_resident_bytes</code> metric looks like in the Prometheus UI</p>
 
@@ -378,41 +332,12 @@ For example, let’s get the same data about the memory consumption we have seen
 The following query yields all the data for the year 2019, aggregated every two hours.
 Not much data in this case, but beware of potentially large result sets.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>curl <span class="nt">-g</span> <span class="s1">'http://$CLUSTER_IP:9090/api/v1/query_range?query=kubevirt_vm_memory_resident_bytes&amp;start=2019-01-01T00:00:00.001Z&amp;end=2019-12-31T23:59:59.999Z&amp;step=7200s'</span> | json_pp
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-g</span> <span class="s1">'http://$CLUSTER_IP:9090/api/v1/query_range?query=kubevirt_vm_memory_resident_bytes&amp;start=2019-01-01T00:00:00.001Z&amp;end=2019-12-31T23:59:59.999Z&amp;step=7200s'</span> | json_pp
+</code></pre></div></div>
 
 <p>Which yields something like</p>
 
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-</pre></td><td class="rouge-code"><pre><span class="p">{</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
   </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nl">"resultType"</span><span class="p">:</span><span class="w"> </span><span class="s2">"matrix"</span><span class="p">,</span><span class="w">
     </span><span class="nl">"result"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
@@ -440,7 +365,7 @@ Not much data in this case, but beware of potentially large result sets.</p>
   </span><span class="p">},</span><span class="w">
   </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <h2 id="troubleshooting-tips">Troubleshooting tips</h2>
 
@@ -457,108 +382,12 @@ We can see this both in the Prometheus UI:</p>
 
 <p>Or programmatically, with the Prometheus REST API:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>curl <span class="nt">-g</span> <span class="s1">'http://192.168.48.7:9090/api/v1/targets'</span> | json_pp
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-g</span> <span class="s1">'http://192.168.48.7:9090/api/v1/targets'</span> | json_pp
+</code></pre></div></div>
 
 <p>(output trimmed for brevity):</p>
 
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-41
-42
-43
-44
-45
-46
-47
-48
-49
-50
-51
-52
-53
-54
-55
-56
-57
-58
-59
-60
-61
-62
-63
-64
-65
-66
-67
-68
-69
-70
-71
-72
-73
-74
-75
-76
-77
-78
-79
-80
-81
-82
-83
-84
-85
-86
-87
-88
-89
-90
-91
-92
-93
-94
-95
-</pre></td><td class="rouge-code"><pre><span class="p">{</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">{</span><span class="w">
   </span><span class="nl">"data"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
     </span><span class="nl">"activeTargets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
       </span><span class="p">{</span><span class="w">
@@ -653,7 +482,7 @@ We can see this both in the Prometheus UI:</p>
   </span><span class="p">},</span><span class="w">
   </span><span class="nl">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"success"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>The Prometheus target state gives us a very useful information that shapes the next steps during the troubleshooting:</p>
 
@@ -672,19 +501,7 @@ We describe two of the most common pitfalls.</p>
 
 <p>KubeVirt services run in the <code class="language-html highlighter-rouge">kubevirt</code> namespace. Make sure to <a href="https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#integrating-with-the-prometheus-operator">create the servicemonitor</a> in the same namespace:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-</pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                               READY   STATUS    RESTARTS   AGE
 virt-api-649859444c-dnvnm          1/1     Running   2          19h
 virt-api-649859444c-j9d94          1/1     Running   2          19h
@@ -696,19 +513,15 @@ virt-operator-6c5db798d4-wr9wl     1/1     Running   6          19h
 kubectl get servicemonitor <span class="nt">-n</span> kubevirt
 NAME       AGE
 kubevirt   16h
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Actually, the servicemonitor should be created in the same namespace on which the <code class="language-html highlighter-rouge">kubevirt-prometheus-metrics</code> service is defined:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>kubectl get svc <span class="nt">-n</span> kubevirt
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get svc <span class="nt">-n</span> kubevirt
 NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>   AGE
 kubevirt-prometheus-metrics   ClusterIP   10.109.85.101    &lt;none&gt;        443/TCP   19h
 virt-api                      ClusterIP   10.109.162.102   &lt;none&gt;        443/TCP   19h
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>See <a href="https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#custom-service-discovery">the KubeVirt documentation</a> for all the details.</p>
 
@@ -718,22 +531,7 @@ virt-api                      ClusterIP   10.109.162.102   &lt;none&gt;        4
 is not recommended anyway.
 So, make sure that the <code class="language-html highlighter-rouge">prometheus</code> configuration we use looks in all the relevant namespaces, using something like</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">monitoring.coreos.com/v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">monitoring.coreos.com/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Prometheus</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">prometheus</span>
@@ -748,7 +546,7 @@ So, make sure that the <code class="language-html highlighter-rouge">prometheus<
   <span class="na">resources</span><span class="pi">:</span>
     <span class="na">requests</span><span class="pi">:</span>
       <span class="na">memory</span><span class="pi">:</span> <span class="s">400Mi</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Please note the usage of the <code class="language-html highlighter-rouge">serviceMonitorNamespaceSelector</code>.
 See <a href="https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md">here</a> and <a href="https://github.com/coreos/prometheus-operator/issues/1331">here</a>
@@ -756,23 +554,7 @@ for more details.</p>
 
 <p>Namespaces must have the right label, <code class="language-html highlighter-rouge">prometheus.kubevirt.io</code>, to be searched for servicemonitors. The <code class="language-html highlighter-rouge">kubevirt</code> namespace is, of course, set correctly by default</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Namespace</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2019-03-13T19:43:25Z"</span>
@@ -788,7 +570,7 @@ for more details.</p>
     <span class="pi">-</span> <span class="s">kubernetes</span>
 <span class="na">status</span><span class="pi">:</span>
   <span class="na">phase</span><span class="pi">:</span> <span class="s">Active</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>But please make sure that any other namespace you may want to monitor has the correct <code class="language-html highlighter-rouge">label</code>.</p>
 
@@ -798,42 +580,33 @@ for more details.</p>
 
 <p>First, let’s get the virt-handler IP address. We look out the instance we want to check with</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+</code></pre></div></div>
 
 <p>Then we query the address:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt <span class="nv">$VIRT_HANDLER_POD</span> | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt <span class="nv">$VIRT_HANDLER_POD</span> | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span>
+</code></pre></div></div>
 
 <p>Prometheus tooling adds lots of metrics about internal state.
 In this case we care only about kubevirt-related metrics, so we filter out everything else with something like</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
+</code></pre></div></div>
 
 <p>Putting all together:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>curl <span class="nt">-s</span> <span class="nt">-k</span> <span class="nt">-L</span> https://<span class="si">$(</span>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt virt-handler-6ng6j | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span><span class="si">)</span>:8443/metrics | <span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-s</span> <span class="nt">-k</span> <span class="nt">-L</span> https://<span class="si">$(</span>kubectl get pod <span class="nt">-o</span> json <span class="nt">-n</span> KubeVirt virt-handler-6ng6j | jq <span class="nt">-r</span> <span class="s1">'.status.podIP'</span><span class="si">)</span>:8443/metrics | <span class="nb">grep</span> <span class="nt">-E</span> <span class="s1">'^kubevirt_'</span>
+</code></pre></div></div>
 
 <p>Let’s see how a healthy output looks like:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>kubevirt_info<span class="o">{</span><span class="nv">goversion</span><span class="o">=</span><span class="s2">"go1.11.4"</span>,kubeversion<span class="o">=</span><span class="s2">"v0.15.0"</span><span class="o">}</span> 1
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info<span class="o">{</span><span class="nv">goversion</span><span class="o">=</span><span class="s2">"go1.11.4"</span>,kubeversion<span class="o">=</span><span class="s2">"v0.15.0"</span><span class="o">}</span> 1
 kubevirt_vm_memory_resident_bytes<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span><span class="o">}</span> 4.1168896e+07
 kubevirt_vm_network_traffic_bytes_total<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,interface<span class="o">=</span><span class="s2">"vnet0"</span>,type<span class="o">=</span><span class="s2">"rx"</span><span class="o">}</span> 90
 kubevirt_vm_network_traffic_bytes_total<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,interface<span class="o">=</span><span class="s2">"vnet0"</span>,type<span class="o">=</span><span class="s2">"tx"</span><span class="o">}</span> 0
 kubevirt_vm_vcpu_seconds<span class="o">{</span><span class="nv">domain</span><span class="o">=</span><span class="s2">"default_vm-test-01"</span>,id<span class="o">=</span><span class="s2">"0"</span>,state<span class="o">=</span><span class="s2">"1"</span><span class="o">}</span> 5173
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Please remember that some metrics can be correctly omitted for some VMs.</p>
 

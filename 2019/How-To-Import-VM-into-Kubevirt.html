@@ -321,30 +321,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>We can use <code class="language-html highlighter-rouge">virtctl</code> command for uploading the image as shown below:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-</pre></td><td class="rouge-code"><pre>virtctl image-upload <span class="nt">--help</span>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl image-upload <span class="nt">--help</span>
 Upload a VM image to a PersistentVolumeClaim.
 
 Usage:
@@ -367,43 +344,18 @@ Flags:
       --wait-secs uint           Seconds to wait for upload pod to start. (default 60)
 
 Use "virtctl options" for a list of global command-line options (applies to all commands).
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <h3 id="creation-of-virtualmachineinstance-from-a-pvc">Creation of VirtualMachineInstance from a PVC</h3>
 
 <p>Here, <code class="language-html highlighter-rouge">virtctl image-upload</code> works by creating a PVC of the requested size, sending an <code class="language-html highlighter-rouge">UploadTokenRequest</code> to the <code class="language-html highlighter-rouge">cdi-apiserver</code>, and uploading the file to the <code class="language-html highlighter-rouge">cdi-uploadproxy</code>.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>virtctl image-upload <span class="nt">--pvc-name</span><span class="o">=</span>cirros-vm-disk <span class="nt">--pvc-size</span><span class="o">=</span>500Mi <span class="nt">--image-path</span><span class="o">=</span>/home/shegde/images/cirros-0.4.0-x86_64-disk.img <span class="nt">--uploadproxy-url</span><span class="o">=</span>&lt;url to upload proxy service&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl image-upload <span class="nt">--pvc-name</span><span class="o">=</span>cirros-vm-disk <span class="nt">--pvc-size</span><span class="o">=</span>500Mi <span class="nt">--image-path</span><span class="o">=</span>/home/shegde/images/cirros-0.4.0-x86_64-disk.img <span class="nt">--uploadproxy-url</span><span class="o">=</span>&lt;url to upload proxy service&gt;
+</code></pre></div></div>
 
 <p>The data inside are ephemeral meaning is lost when the VM restarts, in order to prevent that, and provide a persistent data storage, we use PVC (<code class="language-html highlighter-rouge">persistentVolumeClaim</code>) which allows connecting a PersistentVolumeClaim to a VM disk.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
 apiVersion: kubevirt.io/v1alpha3
 kind: VirtualMachineInstance
 metadata:
@@ -427,7 +379,7 @@ spec:
       claimName: cirros-vm-disk
 status: {}
 </span><span class="no">EOF
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>A <code class="language-html highlighter-rouge">PersistentVolume</code> can be in <code class="language-html highlighter-rouge">filesystem</code> or <code class="language-html highlighter-rouge">block</code> mode:</p>
 
@@ -444,24 +396,7 @@ status: {}
 
 <p>A simple example which attaches a PersistentVolumeClaim as a disk may look like this:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="na">metadata</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">testvmi-pvc</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
@@ -478,7 +413,7 @@ status: {}
     <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">mypvcdisk</span>
       <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
         <span class="na">claimName</span><span class="pi">:</span> <span class="s">mypvc</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="creation-with-a-datavolume">Creation with a DataVolume</h3>
 
@@ -488,46 +423,7 @@ status: {}
 
 <p>DataVolumes can be defined in the VM spec directly by adding the DataVolumes to the dataVolumeTemplates list. Below is an example.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">labels</span><span class="pi">:</span>
@@ -566,7 +462,7 @@ status: {}
         <span class="na">source</span><span class="pi">:</span> <span class="c1">#This is the source where the iso file resides</span>
           <span class="na">http</span><span class="pi">:</span>
             <span class="na">url</span><span class="pi">:</span> <span class="s">http://cdi-http-import-server.kubevirt/images/alpine.iso</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>From the above manifest the two main sections that needs an attention are <strong><code class="language-html highlighter-rouge">source</code></strong> and <strong><code class="language-html highlighter-rouge">pvc</code></strong>.</p>
 
@@ -590,18 +486,7 @@ status: {}
 
 <p>Below is an example of how to enable DataVolume support using the kubevirt-config config map.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -612,7 +497,7 @@ metadata:
 data:
   feature-gates: "DataVolumes"
 </span><span class="no">EOF
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>This config map assumes KubeVirt will be installed in the KubeVirt namespace. Change the namespace to suit your installation.</p>
 

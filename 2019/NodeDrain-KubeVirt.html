@@ -264,21 +264,14 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>In our cluster (3 master and 3 nodes) we’ll be able to see something similar to:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="nv">$oc</span> get nodes
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$oc</span> get nodes
 ip-10-0-132-147.us-east-2.compute.internal   Ready  worker   14m   v1.13.4+27816e1b1
 ip-10-0-142-95.us-east-2.compute.internal    Ready  master   15m   v1.13.4+27816e1b1
 ip-10-0-144-125.us-east-2.compute.internal   Ready  worker   14m   v1.13.4+27816e1b1
 ip-10-0-150-125.us-east-2.compute.internal   Ready  master   14m   v1.13.4+27816e1b1
 ip-10-0-161-166.us-east-2.compute.internal   Ready  master   15m   v1.13.4+27816e1b1
 ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816e1b1
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>To test the node eviction, there are two methods.</p>
 
@@ -286,15 +279,13 @@ ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816
 
 <p>Before sending a node into maintenance state it is very much necessary to evict the resources on it, VMI’s, pods, deployments etc. One of the easiest option for us is to stick to the oc adm drain command. For this, select the node from the cluster from which you want the VMIs to be evicted</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>oc get nodes
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc get nodes
+</code></pre></div></div>
 
 <p>Here <code class="language-html highlighter-rouge">ip-10-0-173-203.us-east-2.compute.internal</code>, then issue the following command.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>oc adm drain &lt;node-name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span> <span class="nt">--pod-selector</span><span class="o">=</span>kubevirt.io<span class="o">=</span>virt-launcher
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc adm drain &lt;node-name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span> <span class="nt">--pod-selector</span><span class="o">=</span>kubevirt.io<span class="o">=</span>virt-launcher
+</code></pre></div></div>
 
 <ul>
   <li>
@@ -312,25 +303,21 @@ ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816
 
 <p>If you want to evict all pods from the node just use:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>oc adm drain &lt;node name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc adm drain &lt;node name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span>
+</code></pre></div></div>
 
 <h3 id="how-to-evacuate-vmis-via-live-migration-from-a-node">How to evacuate VMIs via Live Migration from a Node</h3>
 
 <p>If the <code class="language-html highlighter-rouge">LiveMigration</code> feature gate is enabled, it is possible to specify an evictionStrategy on VMIs which will react with live-migrations on specific taints on nodes. The following snippet on a VMI ensures that the VMI is migrated if the <code class="language-html highlighter-rouge">kubevirt.io/drain:NoSchedule</code> taint is added to a node:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="na">spec</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
   <span class="na">evictionStrategy</span><span class="pi">:</span> <span class="s">LiveMigrate</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once the VMI is created, taint the node with</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl taint nodes foo kubevirt.io/drain<span class="o">=</span>draining:NoSchedule
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl taint nodes foo kubevirt.io/drain<span class="o">=</span>draining:NoSchedule
+</code></pre></div></div>
 
 <p>This command will then trigger a migration.</p>
 
@@ -344,9 +331,8 @@ ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816
 
 <p>If target node should become schedulable again, the following command must be run:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>oc adm uncordon &lt;node name&gt;
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc adm uncordon &lt;node name&gt;
+</code></pre></div></div>
 
 <h2 id="method-2-use-node-maintenance-operator-nmo">Method 2: Use Node Maintenance Operator (NMO)</h2>
 
@@ -363,28 +349,7 @@ ip-10-0-173-203.us-east-2.compute.internal   Ready  worker   15m   v1.13.4+27816
 
 <p>Observe the resources that get created after the HCO is installed</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-</pre></td><td class="rouge-code"><pre>$oc get pods -n kubevirt-hyperconverged
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$oc get pods -n kubevirt-hyperconverged
 NAME                                               READY   STATUS    RESTARTS   AGE
 cdi-apiserver-769fcc7bdf-xgpt8                     1/1     Running   0          12m
 cdi-deployment-8b64c5585-gq46b                     1/1     Running   0          12m
@@ -405,19 +370,16 @@ virt-handler-mcl7r                                 1/1     Running   1          
 virt-operator-87d7c98b-fvvzt                       1/1     Running   0          13m
 virt-operator-87d7c98b-xzc42                       1/1     Running   0          13m
 virt-template-validator-76cbbd6f68-5fbzx           1/1     Running   0          12m
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>As seen from above HCO deploys the <code class="language-html highlighter-rouge">node-maintenance-operator</code>.</p>
 
 <p>Next, let’s install a kubevirt CR to start using VM workloads on worker nodes. Please feel free to follow the steps <a href="/quickstart_minikube/#deploy-kubevirt">here</a> and deploy a VMI as explained. Please feel free to check the video that explains the <a href="https://www.youtube.com/watch?v=LLNjyeB-3fI">same</a></p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="nv">$oc</span> get vms
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$oc</span> get vms
 NAME     AGE     RUNNING   VOLUME
 testvm   2m13s   <span class="nb">true</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Deploy a node-maintenance-operator CR: As seen from above NMO is deployed from HCO, the purpose of this operator is to watch the node maintenance CustomResource(CR) called <code class="language-html highlighter-rouge">NodeMaintenance</code> which mainly contains the node that needs a maintenance and the reason for it. The below actions are performed</p>
 
@@ -434,76 +396,51 @@ testvm   2m13s   <span class="nb">true</span>
 
 <ol>
   <li>Create a CRD
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/crds/nodemaintenance_crd.yaml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create <span class="nt">-f</span> deploy/crds/nodemaintenance_crd.yaml
 customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+</code></pre></div>    </div>
   </li>
   <li>Create the NS
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/namespace.yaml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create <span class="nt">-f</span> deploy/namespace.yaml
 namespace/node-maintenance-operator created
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+</code></pre></div>    </div>
   </li>
   <li>Create a Service Account:
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/service_account.yaml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create <span class="nt">-f</span> deploy/service_account.yaml
 serviceaccount/node-maintenance-operator created
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+</code></pre></div>    </div>
   </li>
   <li>Create a ROLE
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/role.yaml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create <span class="nt">-f</span> deploy/role.yaml
 clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+</code></pre></div>    </div>
   </li>
   <li>Create a ROLE Binding
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/role_binding.yaml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create <span class="nt">-f</span> deploy/role_binding.yaml
 clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+</code></pre></div>    </div>
   </li>
   <li>Then finally make sure to add the image version of the NMO operator in the deploy/operator.yml
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>image: quay.io/kubevirt/node-maintenance-operator:v0.3.0
+</code></pre></div>    </div>
   </li>
   <li>and then deploy the NMO Operator as shown
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc create <span class="nt">-f</span> deploy/operator.yaml
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create <span class="nt">-f</span> deploy/operator.yaml
 deployment.apps/node-maintenance-operator created
-</pre></td></tr></tbody></table></code></pre></div>    </div>
+</code></pre></div>    </div>
   </li>
 </ol>
 
 <p>Finally, We can verify the deployment for the NMO Operator as below</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>oc get deployment <span class="nt">-n</span> node-maintenance-operator
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc get deployment <span class="nt">-n</span> node-maintenance-operator
 NAME                        READY   UP-TO-DATE   AVAILABLE   AGE
 node-maintenance-operator   1/1     1            1           4m23s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now that the NMO operator is created, we can create the NMO CR which puts the node into maintenance mode (this CR has the info about the node-&gt;from which the pods needs to be evicted and the reason for the maintenance)</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre><span class="s">cat deploy/crds/nodemaintenance_cr.yaml</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat deploy/crds/nodemaintenance_cr.yaml</span>
 
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">NodeMaintenance</span>
@@ -512,44 +449,28 @@ node-maintenance-operator   1/1     1            1           4m23s
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">nodeName</span><span class="pi">:</span> <span class="s">&lt;Node-Name&gt;</span>
   <span class="na">reason</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Test</span><span class="nv"> </span><span class="s">node</span><span class="nv"> </span><span class="s">maintenance"</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>For testing purpose, we can deploy a sample VM instance as shown:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+</code></pre></div></div>
 
 <p>Now start the VM <code class="language-html highlighter-rouge">testvm</code></p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>./virtctl start testvm
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl start testvm
+</code></pre></div></div>
 
 <p>We can see that it’s up and running</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>kubectl get vmis
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmis
 NAME     AGE   PHASE     IP            NODENAME
 testvm   92s   Running   10.131.0.17   ip-10-0-173-203.us-east-2.compute.internal
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Also, we can see the status:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-</pre></td><td class="rouge-code"><pre><span class="s">kubectl get vmis -o yaml testvm</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">kubectl get vmis -o yaml testvm</span>
 <span class="s">.</span>
 <span class="s">.</span>
 <span class="s">.</span>
@@ -560,22 +481,13 @@ testvm   92s   Running   10.131.0.17   ip-10-0-173-203.us-east-2.compute.interna
   <span class="na">migrationMethod</span><span class="pi">:</span> <span class="s">BlockMigration</span>
   <span class="na">nodeName</span><span class="pi">:</span> <span class="s">ip-10-0-173-203.us-east-2.compute.internal</span>    <span class="c1">#NoteDown the nodeName</span>
   <span class="na">phase</span><span class="pi">:</span> <span class="s">Running</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Note down the node name and edit the <code class="language-html highlighter-rouge">nodemaintenance_cr.yaml</code> file and then issue the CR manifest which sends the node into maintenance.</p>
 
 <p>Now to evict the pods from the node <code class="language-html highlighter-rouge">ip-10-0-173-203.us-east-2.compute.internal</code>, edit the <code class="language-html highlighter-rouge">node-maintenance_cr.yaml</code> as shown:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre><span class="s">cat deploy/crds/nodemaintenance_cr.yaml</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat deploy/crds/nodemaintenance_cr.yaml</span>
 
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">NodeMaintenance</span>
@@ -584,59 +496,31 @@ testvm   92s   Running   10.131.0.17   ip-10-0-173-203.us-east-2.compute.interna
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">nodeName</span><span class="pi">:</span> <span class="s">ip-10-0-173-203.us-east-2.compute.internal</span>
   <span class="na">reason</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Test</span><span class="nv"> </span><span class="s">node</span><span class="nv"> </span><span class="s">maintenance"</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>As soon as you apply the above CR, the current VM gets deployed in the other node,</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>oc apply <span class="nt">-f</span> deploy/crds/nodemaintenance_cr.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc apply <span class="nt">-f</span> deploy/crds/nodemaintenance_cr.yaml
 nodemaintenance.kubevirt.io/nodemaintenance-xyz created
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Which immediately evicts the VMI</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre>kubectl get vmis
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmis
 NAME     AGE   PHASE        IP    NODENAME
 testvm   33s   Scheduling
 
 kubectl get vmis
 NAME     AGE    PHASE     IP            NODENAME
 testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.internal
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>ip-10-0-173-203.us-east-2.compute.internal   Ready,SchedulingDisabled   worker
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip-10-0-173-203.us-east-2.compute.internal   Ready,SchedulingDisabled   worker
+</code></pre></div></div>
 
 <p>When all of this happens, we can view the changes that are taking place with:</p>
 
-<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-</pre></td><td class="rouge-code"><pre><span class="err">oc</span><span class="w"> </span><span class="err">logs</span><span class="w"> </span><span class="err">pods/node-maintenance-operator</span><span class="mi">-645</span><span class="err">f</span><span class="mi">757</span><span class="err">d</span><span class="mi">5-89</span><span class="err">d</span><span class="mi">6</span><span class="err">r</span><span class="w"> </span><span class="err">-n</span><span class="w"> </span><span class="err">node-maintenance-operator</span><span class="w">
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">oc</span><span class="w"> </span><span class="err">logs</span><span class="w"> </span><span class="err">pods/node-maintenance-operator</span><span class="mi">-645</span><span class="err">f</span><span class="mi">757</span><span class="err">d</span><span class="mi">5-89</span><span class="err">d</span><span class="mi">6</span><span class="err">r</span><span class="w"> </span><span class="err">-n</span><span class="w"> </span><span class="err">node-maintenance-operator</span><span class="w">
 </span><span class="err">.</span><span class="w">
 </span><span class="err">.</span><span class="w">
 </span><span class="err">.</span><span class="w">
@@ -654,7 +538,7 @@ testvm   104s   Running   10.128.2.20   ip-10-0-132-147.us-east-2.compute.intern
 </span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9908028</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">virt-api-59d7c4b595-dkpvs</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
 </span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9906204</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evicting pod </span><span class="se">\"</span><span class="s2">router-default-6b57bcc884-frd57</span><span class="se">\"\n</span><span class="s2">"</span><span class="p">}</span><span class="w">
 </span><span class="p">{</span><span class="nl">"level"</span><span class="p">:</span><span class="s2">"info"</span><span class="p">,</span><span class="nl">"ts"</span><span class="p">:</span><span class="mf">1559681430.9908257</span><span class="p">,</span><span class="nl">"logger"</span><span class="p">:</span><span class="s2">"controller_nodemaintenance"</span><span class="p">,</span><span class="nl">"msg"</span><span class="p">:</span><span class="s2">"evict
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>Clearly we can see that the previous node went into <code class="language-html highlighter-rouge">SchedulingDisabled</code> state and the VMI was evicted and placed into other node in the cluster. This demonstrates the node eviction using NMO.</p>
 

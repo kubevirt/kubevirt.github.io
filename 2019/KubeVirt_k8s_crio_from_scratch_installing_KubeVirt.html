@@ -278,50 +278,32 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>In this example there is a Kubernetes cluster compose of one master, for it to be schedulable to host the KubeVirt pods, a little modification has to be done:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl taint nodes k8s-test node-role.kubernetes.io/master:NoSchedule-
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl taint nodes k8s-test node-role.kubernetes.io/master:NoSchedule-
+</code></pre></div></div>
 
 <p>The last version of KubeVirt at the moment is <code class="language-html highlighter-rouge">v0.20.8</code>, to check it the following command can be executed:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>k8s-test.local# <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq <span class="nt">-r</span> .tag_name<span class="si">)</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq <span class="nt">-r</span> .tag_name<span class="si">)</span>
 
 k8s-test.local# <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
 v0.20.8
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>To install KubeVirt, the operator and the cr are going to be created with the following commands:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 
 k8s-test.local# kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>This demo environment already runs within a virtualized environment, and in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
 
 <p>The deployment can be checked with the following command:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl get pods <span class="nt">-n</span> kubevirt
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                               READY   STATUS    RESTARTS   AGE
 virt-api-5546d58cc8-5sm4v          1/1     Running   0          16h
 virt-api-5546d58cc8-pxkgt          1/1     Running   0          16h
@@ -330,29 +312,11 @@ virt-controller-5c749d77bf-wwkxm   1/1     Running   0          16h
 virt-handler-cx7q7                 1/1     Running   0          16h
 virt-operator-6b4dccb44d-bqxld     1/1     Running   0          16h
 virt-operator-6b4dccb44d-m2mvf     1/1     Running   0          16h
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now that KubeVirt is installed is the right time to download the client tool to interact with th Virtual Machines.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-</pre></td><td class="rouge-code"><pre>k8s-test.local# wget <span class="nt">-O</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# wget <span class="nt">-O</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
 
 k8s-test.local# <span class="nb">chmod</span> +x virtctl
 
@@ -370,23 +334,11 @@ Available Commands:
 
 Use <span class="s2">"virtctl &lt;command&gt; --help"</span> <span class="k">for </span>more information about a given command.
 Use <span class="s2">"virtctl options"</span> <span class="k">for </span>a list of global command-line options <span class="o">(</span>applies to all commands<span class="o">)</span><span class="nb">.</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>This step is optional, right now anything related with the Virtual Machines can be done running the <code class="language-html highlighter-rouge">virtctl</code> command. In case ther’s a need to interact with the Virtual Machines without leaving the scope of the <code class="language-html highlighter-rouge">kubectl</code> command, the virt pluging for krew can be installed following the instructions below:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-</pre></td><td class="rouge-code"><pre>k8s-test.local# <span class="o">(</span>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# <span class="o">(</span>
   <span class="nb">set</span> <span class="nt">-x</span><span class="p">;</span> <span class="nb">cd</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">mktemp</span> <span class="nt">-d</span><span class="si">)</span><span class="s2">"</span> <span class="o">&amp;&amp;</span>
   curl <span class="nt">-fsSLO</span> <span class="s2">"https://github.com/kubernetes-sigs/krew/releases/download/v0.3.1/krew.{tar.gz,yaml}"</span> <span class="o">&amp;&amp;</span>
   <span class="nb">tar </span>zxvf krew.tar.gz <span class="o">&amp;&amp;</span>
@@ -398,46 +350,19 @@ Installed plugin: krew
 WARNING: You installed a plugin from the krew-index plugin repository.
    These plugins are not audited <span class="k">for </span>security by the Krew maintainers.
    Run them at your own risk.
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The warning printed by the Krew maintainers can be ignored.
 To have the krew plugin available, the PATH variable has to be modified:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>k8s-test.local# vim ~/.bashrc
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim ~/.bashrc
 <span class="nb">export </span><span class="nv">PATH</span><span class="o">=</span><span class="s2">"</span><span class="k">${</span><span class="nv">KREW_ROOT</span><span class="k">:-</span><span class="nv">$HOME</span><span class="p">/.krew</span><span class="k">}</span><span class="s2">/bin:</span><span class="nv">$PATH</span><span class="s2">"</span>
 k8s-test.local# <span class="nb">source</span> ~/.bashrc
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now, the virt plugin is going to be installed using the krew plugin manager:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl krew <span class="nb">install </span>virt
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl krew <span class="nb">install </span>virt
 Updated the <span class="nb">local </span>copy of plugin index.
 Installing plugin: virt
 CAVEATS:
@@ -461,51 +386,32 @@ Installed plugin: virt
 WARNING: You installed a plugin from the krew-index plugin repository.
    These plugins are not audited <span class="k">for </span>security by the Krew maintainers.
    Run them at your own risk.
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="installing-the-first-virtual-machine-in-kubevirt">Installing the first Virtual Machine in KubeVirt</h2>
 
 <p>For this example, a cirros Virtual Machine is going to be created, in this example, the kind of disk used is a registry disk (not persistent):</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
 
 k8s-test.local# kubectl get vms
 NAME        AGE   RUNNING   VOLUME
 testvm   13s   <span class="nb">false</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>After the Virtual Machine has been created, it has to be started, to do so, the virtcl or the kubectl can be used (dependeing on what method has been choosen in previous steps).</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre>k8s-test.local# ./virtctl start testvm
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ./virtctl start testvm
 VM vm-cirros was scheduled to start
 
 k8s-test.local# kubectl get vms
 NAME        AGE     RUNNING   VOLUME
 testvm   7m11s   <span class="nb">true</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Next thing to do is to use the <code class="language-html highlighter-rouge">kubectl</code> command for getting the IP address and the actual status of the virtual machines:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre>k8s-test.local# kubectl get vmis
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl get vmis
 kubectl get vmis
 NAME        AGE    PHASE        IP    NODENAME
 testvm    14s   Scheduling
@@ -513,35 +419,25 @@ testvm    14s   Scheduling
 k8s-test.local# kubectl get vmis
 NAME     AGE   PHASE     IP            NODENAME
 testvm   63s   Running   10.244.0.15   k8s-test
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (<code class="language-html highlighter-rouge">./virtclt console testvm</code>) or also a direct connection with SSH can be made:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>k8s-test.local# ssh cirros@10.244.0.15
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ssh cirros@10.244.0.15
 cirros@10.244.0.15<span class="s1">'s password: gocubsgo
 $ uname -a
 Linux testvm 4.4.0-28-generic #47-Ubuntu SMP Fri Jun 24 10:09:13 UTC 2016 x86_64 GNU/Linux
 $ exit
-</span></pre></td></tr></tbody></table></code></pre></div></div>
+</span></code></pre></div></div>
 
 <p>To stop the Virtual Machine one of the following commands can be executed:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>k8s-test.local# ./virtctl stop testvm
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ./virtctl stop testvm
 VM testvm was scheduled to stop
 
 k8s-test.local# kubectl virt stop testvm
 VM testvm was scheduled to stop
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h1 id="troubleshooting">Troubleshooting</h1>
 

@@ -271,47 +271,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Once those are in place, Kubernetes will consider the requested memory for scheduling while libvirt will define the domain with the amount of memory defined in <code class="language-html highlighter-rouge">domain.memory.guest</code>. For example, let’s define a VMI which requests <em>24534983Ki</em> but wants to use <em>25761732Ki</em>
 instead.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">testvm1</span>
@@ -351,53 +311,13 @@ instead.</p>
             <span class="s">home: /home/kubevirt</span>
             <span class="s">lock_passwd: false</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>As explained already, the QEMU process spawn by libvirt, will get <em>25761732Ki</em> of RAM, minus some amount for the graphics and firmwares, the guest OS will see its total memory close to that amount, while Kubernetes would think the pod requests <em>24534983Ki</em>, making more room to schedule more pods if needed.</p>
 
 <p>Now let’s imagine we want to undercommit, here’s the same YAML definition but setting less memory than requested:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-28
-29
-30
-31
-32
-33
-34
-35
-36
-37
-38
-39
-40
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">testvm1</span>
@@ -437,7 +357,7 @@ instead.</p>
               <span class="s">home: /home/kubevirt</span>
               <span class="s">lock_passwd: false</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h2 id="why-this-is-needed">Why this is needed</h2>
 

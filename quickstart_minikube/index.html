@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-02-25 11:23:00 +0000" >
+    <meta property="og:article:published_time" content="2020-02-25 11:48:42 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -310,9 +310,8 @@ driver.</p>
 <p>Before starting with Minikube, let’s verify whether nested virtualization is enabled on the
 host where Minikube is being installed on:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> /sys/module/kvm_intel/parameters/nested
+</code></pre></div></div>
 
 <p>If you get an <strong>N</strong>, follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="\_blank">here</a> for enabling it.</p>
 
@@ -328,62 +327,46 @@ of RAM (by default it uses 2GiB), it’ll allow you to experiment further this g
 interfering what any configuration you might had already, let’s start by
 increasing the default memory to 4GiB:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>minikube config <span class="nt">-p</span> kubevirt <span class="nb">set </span>memory 4096
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube config <span class="nt">-p</span> kubevirt <span class="nb">set </span>memory 4096
+</code></pre></div></div>
 
 <p>Now, set the VM driver to KVM2:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>minikube config <span class="nt">-p</span> kubevirt <span class="nb">set </span>vm-driver kvm2
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube config <span class="nt">-p</span> kubevirt <span class="nb">set </span>vm-driver kvm2
+</code></pre></div></div>
 
 <p>We’re ready to start the Minikube VM:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>minikube start <span class="nt">-p</span> kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube start <span class="nt">-p</span> kubevirt
+</code></pre></div></div>
 
 <h3 id="deploy-kubevirt-operator">Deploy KubeVirt Operator</h3>
 
 <p>Having the Minikube VM is up and running, let’s set the <em>version</em> environment
 variable that will be used on few commands:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="c"># On other OS you might need to define it like</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On other OS you might need to define it like</span>
 <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="s2">"v0.18.0"</span>
 
 <span class="c"># On Linux you can obtain it using 'curl' via:</span>
 <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> - | <span class="nb">sort</span> <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
 
 <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Now, using the <code class="language-html highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
+</code></pre></div></div>
 
 <p>Check it’s running:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                             READY     STATUS              RESTARTS   AGE
 virt-operator-6c5db798d4-9qg56   0/1       ContainerCreating   0          12s
 ...
 virt-operator-6c5db798d4-9qg56   1/1       Running   0         28s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>We’ll need to execute the command above few times (or add <em>-w</em> for <em>watching</em>
 the pods), until the operator is <em>Running</em> and <em>Ready</em> (1/1), then it’s time
@@ -394,36 +377,25 @@ to head to the next section.</p>
 <p>To check if your VM’s CPU supports virtualization extensions execute the
 following command:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>minikube ssh <span class="nt">-p</span> kubevirt <span class="s2">"egrep 'svm|vmx' /proc/cpuinfo"</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube ssh <span class="nt">-p</span> kubevirt <span class="s2">"egrep 'svm|vmx' /proc/cpuinfo"</span>
+</code></pre></div></div>
 
 <p>If the command doesn’t generate any output, create the following <em>ConfigMap</em>
 so that KubeVirt uses emulation mode, otherwise skip to the next section:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
 
 <h3 id="deploy-kubevirt">Deploy KubeVirt</h3>
 
 <p>KubeVirt is then deployed by creating a dedicated custom resource:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
+</code></pre></div></div>
 
 <p>Check the deployment:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre>kubectl get pods <span class="nt">-n</span> kubevirt
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                               READY     STATUS    RESTARTS   AGE
 virt-api-649859444c-fmrb7          1/1       Running   0          2m12s
 virt-api-649859444c-qrtb6          1/1       Running   0          2m12s
@@ -431,7 +403,7 @@ virt-controller-7f49b8f77c-kpfxw   1/1       Running   0          2m12s
 virt-controller-7f49b8f77c-m2h7d   1/1       Running   0          2m12s
 virt-handler-t4fgb                 1/1       Running   0          2m12s
 virt-operator-6c5db798d4-9qg56     1/1       Running   0          6m41s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Once we applied the <em>Custom Resource</em> the operator took care of deploying the
 actual KubeVirt pods (<em>virt-api</em>, <em>virt-controller</em> and <em>virt-handler</em>). Again
@@ -443,45 +415,37 @@ we’ll need to execute the command until everything is <em>up&amp;running</em>
 <p>An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
 The tool is called <em>virtctl</em> and can be retrieved from the release page of KubeVirt:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
     https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
 <span class="nb">chmod</span> +x virtctl
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>If <a href="https://krew.dev/"><code class="language-html highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="language-html highlighter-rouge">virtctl</code> can be installed via <code class="language-html highlighter-rouge">krew</code>:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
+</code></pre></div></div>
 
 <p>Then <code class="language-html highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
+</code></pre></div></div>
 
 <p>Every occurrence throughout this guide of</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>./virtctl &lt;<span class="nb">command</span><span class="o">&gt;</span>...
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl &lt;<span class="nb">command</span><span class="o">&gt;</span>...
+</code></pre></div></div>
 
 <p>should then be read as</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre><span class="nv">$ </span>kubectl virt &lt;<span class="nb">command</span><span class="o">&gt;</span>...
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt &lt;<span class="nb">command</span><span class="o">&gt;</span>...
+</code></pre></div></div>
 
 <h3 id="clean-up-after-lab-cleanups">Clean Up (after lab cleanups):</h3>
 
 <p>Delete the KubeVirt from minikube:</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>minikube delete <span class="nt">-p</span> kubevirt
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube delete <span class="nt">-p</span> kubevirt
+</code></pre></div></div>
 
 <h2 id="step-2-kubevirt-labs">Step 2: KubeVirt labs</h2>
 

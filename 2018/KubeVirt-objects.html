@@ -293,34 +293,15 @@ later we will discuss OfflineVirtualMachines which will address this.</p>
 
 <p>First let’s use <code class="language-html highlighter-rouge">kubectl</code> to retrieve a list of <code class="language-html highlighter-rouge">VirtualMachine</code> objects.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>$ kubectl get vms -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vms -n nodejs-ex
 NAME      AGE
 mongodb   5d
 nodejs    5d
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>We can also use <code class="language-html highlighter-rouge">kubectl describe</code></p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-</pre></td><td class="rouge-code"><pre>$ kubectl describe vms -n test
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl describe vms -n test
 Name:         testvm
 Namespace:    test
 Labels:       guest=testvm
@@ -335,31 +316,19 @@ Events:
   Normal  Created             59m (x2 over 59m)  virt-handler, kn2.virtomation.com  VM defined.
   Normal  Started             59m                virt-handler, kn2.virtomation.com  VM started.
 
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And just in case if you want to return the yaml definition of a <code class="language-html highlighter-rouge">VirtualMachine</code> object here is an example.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>$ kubectl -o yaml get vms mongodb -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl -o yaml get vms mongodb -n nodejs-ex
 apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachine
 ...output...
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The first object we will annotate is <code class="language-html highlighter-rouge">VirtualMachine</code>. The important sections <code class="language-html highlighter-rouge">.spec</code> for <code class="language-html highlighter-rouge">VirtualMachineSpec</code> and <code class="language-html highlighter-rouge">.spec.domain</code> for <code class="language-html highlighter-rouge">DomainSpec</code> will be annotated only in this section then referred to in the other object sections.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">annotations</span><span class="pi">:</span> <span class="pi">{}</span>
@@ -367,7 +336,7 @@ kind: VirtualMachine
   <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">string</span>
 <span class="na">spec</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="node-placement">Node Placement</h3>
 
@@ -375,24 +344,7 @@ kind: VirtualMachine
 
 <p><a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_nodeaffinity">Node affinity</a> is also possible with KubeVirt. To <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/assigning-vms-to-nodes?id=affinity-and-anti-affinity">constrain a virtual machine</a> to run on a node define a matching expressions using node labels.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="na">affinity</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">affinity</span><span class="pi">:</span>
   <span class="na">nodeAffinity</span><span class="pi">:</span>
     <span class="na">preferredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
       <span class="pi">-</span> <span class="na">preference</span><span class="pi">:</span>
@@ -409,52 +361,28 @@ kind: VirtualMachine
               <span class="na">operator</span><span class="pi">:</span> <span class="s">string</span>
               <span class="na">values</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>A virtual machine can also more easily be constrained by using <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/assigning-vms-to-nodes?id=nodeselector">nodeSelector</a> which is defined by node’s label and value. Here is an example</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="na">nodeSelector</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">nodeSelector</span><span class="pi">:</span>
   <span class="s">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">kn1.virtomation.com</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="clocks-and-timers">Clocks and Timers</h3>
 
 <p>Configures the <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=clock">virtualize hardware</a> clock provided by <a href="https://qemu.weilnetz.de/doc/qemu-doc.html#Debug_002fExpert-options">QEMU</a>.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="na">domain</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">domain</span><span class="pi">:</span>
   <span class="na">clock</span><span class="pi">:</span>
     <span class="na">timezone</span><span class="pi">:</span> <span class="s">string</span>
     <span class="na">utc</span><span class="pi">:</span>
       <span class="na">offsetSeconds</span><span class="pi">:</span> <span class="m">0</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>The <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=timers">timer</a> defines the <a href="https://libvirt.org/formatdomain.html#elementsTime">type and policy attribute</a> that determines what action is take when QEMU misses a deadline for injecting a tick to the guest.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="na">domain</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">domain</span><span class="pi">:</span>
   <span class="na">clock</span><span class="pi">:</span>
     <span class="na">timer</span><span class="pi">:</span>
       <span class="na">hpet</span><span class="pi">:</span>
@@ -471,41 +399,32 @@ kind: VirtualMachine
         <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
         <span class="na">track</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="cpu-and-memory">CPU and Memory</h3>
 
 <p>The number of <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=cpu">CPU cores</a> a virtual machine will be assigned. <a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_cpu">.spec.domain.cpu.cores</a> will not be used for scheduling use <a href="http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_resourcerequirements">.spec.domain.resources.requests.cpu</a> instead.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="na">cpu</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">cpu</span><span class="pi">:</span>
   <span class="na">cores</span><span class="pi">:</span> <span class="m">1</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>There are two supported <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=resources-requests-and-limits">resource limits and requests</a>: <code class="language-html highlighter-rouge">cpu</code> and <code class="language-html highlighter-rouge">memory</code>. A <code class="language-html highlighter-rouge">.spec.domain.resources.requests.memory</code> should be defined to determine the allocation of memory provided to the virtual machine. These values will be used to in scheduling decisions.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="na">resources</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">resources</span><span class="pi">:</span>
   <span class="na">limits</span><span class="pi">:</span> <span class="pi">{}</span>
   <span class="na">requests</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="watchdog-devices">Watchdog Devices</h3>
 
 <p><a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog">.spec.domain.watchdog</a> automatically triggers an action via <a href="https://libvirt.org/formatdomain.html#elementsWatchdog">Libvirt</a> and <a href="https://qemu.weilnetz.de/doc/qemu-doc.html#Debug_002fExpert-options">QEMU</a> when the virtual machine operating system hangs or crashes.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre><span class="na">watchdog</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">watchdog</span><span class="pi">:</span>
   <span class="na">i6300esb</span><span class="pi">:</span>
     <span class="na">action</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="features">Features</h3>
 
@@ -518,34 +437,7 @@ both acpi and
 should be enabled.
 The <a href="http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_featurehyperv">hyperv</a> features should be enabled only for Windows-based virtual machines. For additional information regarding features please visit the <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=features">virtual hardware configuration</a> in the kubevirt user guide.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-18
-19
-20
-21
-22
-23
-24
-25
-26
-27
-</pre></td><td class="rouge-code"><pre><span class="na">features</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">features</span><span class="pi">:</span>
   <span class="na">acpi</span><span class="pi">:</span>
     <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
   <span class="na">apic</span><span class="pi">:</span>
@@ -572,29 +464,19 @@ The <a href="http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_fe
       <span class="na">vendorid</span><span class="pi">:</span> <span class="s">string</span>
     <span class="na">vpindex</span><span class="pi">:</span>
       <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="qemu-machine-type">QEMU Machine Type</h3>
 
 <p><a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=machine-type">.spec.domain.machine.type</a> is the emulated machine architecture provided by <a href="https://qemu.weilnetz.de/doc/qemu-doc.html#Standard-options">QEMU</a>.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="na">machine</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">machine</span><span class="pi">:</span>
   <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Here is an example how to retrieve the supported QEMU machine types.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre>    <span class="nv">$ </span>qemu-system-x86_64 <span class="nt">--machine</span> <span class="nb">help
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="nv">$ </span>qemu-system-x86_64 <span class="nt">--machine</span> <span class="nb">help
     </span>Supported machines are:
     ...output...
     pc                   Standard PC <span class="o">(</span>i440FX + PIIX, 1996<span class="o">)</span> <span class="o">(</span><span class="nb">alias </span>of pc-i440fx-2.10<span class="o">)</span>
@@ -602,30 +484,13 @@ The <a href="http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_fe
     ...output...
     q35                  Standard PC <span class="o">(</span>Q35 + ICH9, 2009<span class="o">)</span> <span class="o">(</span><span class="nb">alias </span>of pc-q35-2.10<span class="o">)</span>
     pc-q35-2.10          Standard PC <span class="o">(</span>Q35 + ICH9, 2009<span class="o">)</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="disks-and-volumes">Disks and Volumes</h3>
 
 <p><a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk">.spec.domain.devices.disks</a> configures a <a href="https://qemu.weilnetz.de/doc/qemu-doc.html#Block-device-options">QEMU</a> type of <a href="https://libvirt.org/formatdomain.html#elementsDisks">disk</a> to the virtual machine and assigns a specific <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes">volume and its type to that disk</a> via the <code class="language-html highlighter-rouge">volumeName</code>.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-9
-10
-11
-12
-13
-14
-15
-16
-17
-</pre></td><td class="rouge-code"><pre><span class="na">devices</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">devices</span><span class="pi">:</span>
   <span class="na">disks</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
@@ -642,7 +507,7 @@ The <a href="http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_fe
         <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">volumeName</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_cloudinitnocloudsource">cloudInitNoCloud</a>
 injects scripts and configuration into a virtual machine operating system.
@@ -651,75 +516,48 @@ cloud-init coniguration: <code class="language-html highlighter-rouge">secretRef
 
 <p>See the user-guide for examples of how to use <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/startup-scripts?id=cloud-init-examples">.spec.volumes.cloudInitNoCloud</a>.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre><span class="na">volumes</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">volumes</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
       <span class="na">secretRef</span><span class="pi">:</span>
         <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">userData</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">userDataBase64</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>An <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=emptydisk">emptyDisk volume</a> creates an extra qcow2 disk that is created with the virtual machine. It will be removed if the <code class="language-html highlighter-rouge">VirtualMachine</code> object is deleted.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre><span class="na">emptyDisk</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">emptyDisk</span><span class="pi">:</span>
   <span class="na">capacity</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=ephemeral">Ephemeral volume</a> creates a temporary local copy on write image storage that will be discarded when the <code class="language-html highlighter-rouge">VirtualMachine</code> is removed.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre><span class="na">ephemeral</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">ephemeral</span><span class="pi">:</span>
   <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
     <span class="na">claimName</span><span class="pi">:</span> <span class="s">string</span>
     <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
 <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=persistentvolumeclaim">persistentVolumeClaim volume</a> persists after the <code class="language-html highlighter-rouge">VirtualMachine</code> is deleted.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">persistentVolumeClaim</span><span class="pi">:</span>
   <span class="na">claimName</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p><a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk">registryDisk volume</a> type uses a virtual machine disk that is stored in a container image registry.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="na">registryDisk</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">registryDisk</span><span class="pi">:</span>
   <span class="na">image</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">imagePullSecret</span><span class="pi">:</span> <span class="s">string</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="virtual-machine-status">Virtual Machine Status</h3>
 
 <p>Once the <code class="language-html highlighter-rouge">VirtualMachine</code> object has been created the <a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_virtualmachinestatus">VirtualMachineStatus</a> will be available. <a href="http://www.kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_virtualmachinestatus">VirtualMachineStatus</a> can be used in automation tools such as Ansible to confirm running state, determine where a <code class="language-html highlighter-rouge">VirtualMachine</code> is running via <code class="language-html highlighter-rouge">nodeName</code> or the <code class="language-html highlighter-rouge">ipAddress</code> of the virtual machine operating system.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre>kubectl -o yaml get vm mongodb -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl -o yaml get vm mongodb -n nodejs-ex
 
 # ...output...
 status:
@@ -727,15 +565,13 @@ status:
   - ipAddress: 10.244.2.7
   nodeName: kn2.virtomation.com
   phase: Running
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Example using <code class="language-html highlighter-rouge">--template</code> to retrieve the <code class="language-html highlighter-rouge">.status.phase</code> of the <code class="language-html highlighter-rouge">VirtualMachine</code>.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>kubectl get vm mongodb --template {{.status.phase}} -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vm mongodb --template {{.status.phase}} -n nodejs-ex
 Running
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="examples">Examples</h3>
 
@@ -753,41 +589,24 @@ most use-cases.</p>
 
 <p>Just like <code class="language-html highlighter-rouge">VirtualMachine</code> we can retrieve the <code class="language-html highlighter-rouge">OfflineVirtualMachine</code> objects.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>$ kubectl get ovms -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ovms -n nodejs-ex
 NAME      AGE
 mongodb   5d
 nodejs    5d
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>And display the object in yaml.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-</pre></td><td class="rouge-code"><pre>$ kubectl -o yaml get ovms mongodb -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl -o yaml get ovms mongodb -n nodejs-ex
 apiVersion: kubevirt.io/v1alpha1
 kind: OfflineVirtualMachine
 metadata:
 ...output...
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>We continue by annotating <code class="language-html highlighter-rouge">OfflineVirtualMachine</code> object.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-8
-</pre></td><td class="rouge-code"><pre><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">OfflineVirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">annotations</span><span class="pi">:</span> <span class="pi">{}</span>
@@ -795,63 +614,50 @@ metadata:
   <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">string</span>
 <span class="na">spec</span><span class="pi">:</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="what-is-running-in-offlinevirtualmachine">What is Running in OfflineVirtualMachine?</h3>
 
 <p><a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_offlinevirtualmachinespec">.spec.running</a> controls whether the associated VirtualMachine object is created. In other words this changes the <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/life-cycle?id=stopping-a-virtual-machine">power status</a> of the virtual machine.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>  running: true
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  running: true
+</code></pre></div></div>
 
 <p>This will create a <code class="language-html highlighter-rouge">VirtualMachine</code> object which will instantiate and power on a virtual machine.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true }}' -n nodejs-ex
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true }}' -n nodejs-ex
+</code></pre></div></div>
 
 <p>This will delete the <code class="language-html highlighter-rouge">VirtualMachine</code> object which will power off the virtual machine.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":false }}' -n nodejs-ex
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":false }}' -n nodejs-ex
+</code></pre></div></div>
 
 <p>And if you would rather not have to remember the <code class="language-html highlighter-rouge">kubectl patch</code> command above
 the KubeVirt team has provided a cli tool <code class="language-html highlighter-rouge">virtctl</code> that can start and stop
 a guest.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>./virtctl start mongodb <span class="nt">-n</span> nodejs-ex
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl start mongodb <span class="nt">-n</span> nodejs-ex
 ./virtctl stop mongodb <span class="nt">-n</span> nodejs-ex
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="offline-virtual-machine-status">Offline Virtual Machine Status</h3>
 
 <p>Once the <code class="language-html highlighter-rouge">OfflineVirtualMachine</code> object has been created the <a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_offlinevirtualmachinestatus">OfflineVirtualMachineStatus</a> will be available. Like <code class="language-html highlighter-rouge">VirtualMachineStatus</code> <code class="language-html highlighter-rouge">OfflineVirtualMachineStatus</code> can be used for automation tools such as Ansible.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-</pre></td><td class="rouge-code"><pre>kubectl -o yaml get ovms mongodb -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl -o yaml get ovms mongodb -n nodejs-ex
 
 # ...output...
 status:
   created: true
   ready: true
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Example using <code class="language-html highlighter-rouge">--template</code> to retrieve the <code class="language-html highlighter-rouge">.status.conditions[0].type</code> of <code class="language-html highlighter-rouge">OfflineVirtualMachine</code>.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>kubectl get ovm mongodb --template "{{.status.ready}}" -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get ovm mongodb --template "{{.status.ready}}" -n nodejs-ex
 true
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="examples-1">Examples</h3>
 
@@ -865,59 +671,43 @@ true
 
 <p>Just like the other top-level objects we can retrieve <code class="language-html highlighter-rouge">VirtualMachineReplicaSet</code>.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>$ kubectl get vmrs -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vmrs -n nodejs-ex
 NAME      AGE
 replica   1m
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>With the <code class="language-html highlighter-rouge">replicas</code> parameter set to <code class="language-html highlighter-rouge">2</code> the command below displays the two <code class="language-html highlighter-rouge">VirtualMachine</code> objects that were created.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>$ kubectl get vms -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vms -n nodejs-ex
 NAME           AGE
 replicanmgjl   7m
 replicarjhdz   7m
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="pause-rollout">Pause rollout</h3>
 
 <p>The <a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_vmreplicasetspec">.spec.paused</a> parameter if true pauses the deployment of the <code class="language-html highlighter-rouge">VirtualMachineReplicaSet</code>.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>  paused: true
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  paused: true
+</code></pre></div></div>
 
 <h3 id="replica-quantity">Replica quantity</h3>
 
 <p>The <a href="http://www.kubevirt.io/user-guide/#/workloads/controllers/virtual-machine-replica-set?id=how-to-use-a-virtualmachinereplicaset">.spec.replicas</a> number of <code class="language-html highlighter-rouge">VirtualMachine</code> objects that should be created.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-</pre></td><td class="rouge-code"><pre>  replicas: 0
-</pre></td></tr></tbody></table></code></pre></div></div>
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  replicas: 0
+</code></pre></div></div>
 
 <p>The <a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_labelselector">selector</a> must be defined and match labels defined in the template. It is used by the controller to keep track of managed virtual machines.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">selector</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">selector</span><span class="pi">:</span>
   <span class="na">matchExpressions</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">operator</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">values</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">string</span>
   <span class="na">matchLabels</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="virtual-machine-template-spec"><a href="http://www.kubevirt.io/user-guide/#/workloads/controllers/virtual-machine-replica-set?id=how-to-use-a-virtualmachinereplicaset">Virtual Machine Template Spec</a></h3>
 
@@ -925,45 +715,31 @@ replicarjhdz   7m
 
 <p>In the <code class="language-html highlighter-rouge">VirtualMachine</code> section the <code class="language-html highlighter-rouge">.spec</code> <code class="language-html highlighter-rouge">VirtualMachineSpec</code> describes the available parameters for that object.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">template</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">template</span><span class="pi">:</span>
   <span class="na">metadata</span><span class="pi">:</span>
     <span class="na">annotations</span><span class="pi">:</span> <span class="pi">{}</span>
     <span class="na">labels</span><span class="pi">:</span> <span class="pi">{}</span>
     <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
     <span class="na">namespace</span><span class="pi">:</span> <span class="s">string</span>
   <span class="na">spec</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="replica-status">Replica Status</h3>
 
 <p>Like the other objects we already have discussed <a href="http://www.kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_vmreplicasetstatus">VMReplicaSetStatus</a> is an important object to use for automation.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre><span class="na">status</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">status</span><span class="pi">:</span>
   <span class="na">readyReplicas</span><span class="pi">:</span> <span class="m">0</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">0</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <p>Example using <code class="language-html highlighter-rouge">--template</code> to retrieve the <code class="language-html highlighter-rouge">.status.readyReplicas</code> and <code class="language-html highlighter-rouge">.status.replicas</code> of <code class="language-html highlighter-rouge">VirtualMachineReplicaSet</code>.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-</pre></td><td class="rouge-code"><pre>$ kubectl get vmrs replica --template "{{.status.readyReplicas}}" -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vmrs replica --template "{{.status.readyReplicas}}" -n nodejs-ex
 2
 $ kubectl get vmrs replica --template "{{.status.replicas}}" -n nodejs-ex
 2
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="examples-2">Examples</h3>
 
@@ -977,43 +753,31 @@ $ kubectl get vmrs replica --template "{{.status.replicas}}" -n nodejs-ex
 
 <p>To configure a <code class="language-html highlighter-rouge">DomainSpec</code> for multiple <code class="language-html highlighter-rouge">VirtualMachine</code> objects the <code class="language-html highlighter-rouge">selector</code> defines which <code class="language-html highlighter-rouge">VirtualMachine</code> the <code class="language-html highlighter-rouge">VirtualMachinePreset</code> should be applied to.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-</pre></td><td class="rouge-code"><pre>$ kubectl get vmpreset -n nodejs-ex
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vmpreset -n nodejs-ex
 NAME       AGE
 m1.small   17s
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="domain-spec">Domain Spec</h3>
 
 <p>See the <code class="language-html highlighter-rouge">VirtualMachine</code> section above for annotated details of the <code class="language-html highlighter-rouge">DomainSpec</code> object.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-</pre></td><td class="rouge-code"><pre>spec:
+<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spec:
   domain: {}
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="preset-selector">Preset Selector</h3>
 
 <p>The <a href="http://www.kubevirt.io/user-guide/#/workloads/virtual-machines/presets?id=virtalmachine-selector">selector</a> is optional but if not defined will be applied to all <code class="language-html highlighter-rouge">VirtualMachine</code> objects; which is probably not the intended purpose so I recommend always including a selector.</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><table class="rouge-table"><tbody><tr><td class="rouge-gutter gl"><pre class="lineno">1
-2
-3
-4
-5
-6
-7
-</pre></td><td class="rouge-code"><pre><span class="na">selector</span><span class="pi">:</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">selector</span><span class="pi">:</span>
   <span class="na">matchExpressions</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">operator</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">values</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="s">string</span>
   <span class="na">matchLabels</span><span class="pi">:</span> <span class="pi">{}</span>
-</pre></td></tr></tbody></table></code></pre></div></div>
+</code></pre></div></div>
 
 <h3 id="examples-3">Examples</h3>
 
