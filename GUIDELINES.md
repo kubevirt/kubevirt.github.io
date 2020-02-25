@@ -85,6 +85,38 @@ All Blog posts are located in the [\_posts](/_posts/) directory, each entry is a
   - Title is a very important piece of your blog post, a catchy title will likely have more readers, write a bad title and no matter how good the content is, you'll likely get less readers
   - After the title, write a brief introduction of what you're going to be writing about, which will help the reader to get a grasp on the topic
   - Closing section, the same way we can add a brief introduction of what the blog post is about, it's very important to add a closing section with thoughts, upcoming work on the topic discussed, encourage readers to test something and share their findings, joining the community, ...
+  - For big images, you can use photoswipe to show a miniature that is zoomable, to do so, insert code like this:
+
+    ```html
+    <div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+      <figure
+        itemprop="associatedMedia"
+        itemscope
+        itemtype="http://schema.org/ImageObject"
+      >
+        <a
+          href="/assets/images/kubevirt-skydive-vm-to-vm.png"
+          itemprop="contentUrl"
+          data-size="2496x2269"
+        >
+          <img
+            src="/assets/images/kubevirt-skydive-vm-to-vm.png"
+            width="249"
+            height="226"
+            itemprop="thumbnail"
+            alt="VM to VM"
+          />
+        </a>
+        <figcaption itemprop="caption description">VM to VM</figcaption>
+      </figure>
+    </div>
+    ```
+
+    It's very important to define the original image size in `data-size` to match the current image size and adjust the `<img>` fields `width` and `height` to the miniature you want to use.
+
+    If there's more than one image, that you want to be shown together, leave the `<div>` and add another `<figure>` entry within it.
+
+    Do not change the name of the div class. You can use the `figcaption` inner text to show as title for the image.
 
 ### Pages
 
