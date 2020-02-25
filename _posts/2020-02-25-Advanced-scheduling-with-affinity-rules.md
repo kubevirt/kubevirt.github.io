@@ -7,7 +7,7 @@ category: news
 tags: [ "kubevirt", "kubernetes", "virtual machine", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys" ]
 comments: true
 title: Advanced scheduling using affinity and anti-affinity rules
-pub-date: February 20
+pub-date: February 25
 pub-year: 2020
 ---
 
@@ -71,7 +71,7 @@ There are some important labels when creating advanced scheduling workflows with
 
 Previous labels are just prepopulated Kubernetes labels that the system uses to denote such a topology domain. In our case, the cluster is running in *Iberia* **region** across three different **zones**: *scu, bcn and sab*. Therefore, it must be labelled accordingly since advanced scheduling rules are going to be applied:
 
-![cluster labelling](/assets/2020-02-20-Advanced-scheduling-with-affinity-rules/kubevirt-blog-affinity.resized.png)
+![cluster labelling](/assets/2020-02-25-Advanced-scheduling-with-affinity-rules/kubevirt-blog-affinity.resized.png)
 
 > info "Information"
 > Pod anti-affinity requires nodes to be consistently labelled, i.e. every node in the cluster must have an appropriate label matching **topologyKey**. If some or all nodes are missing the specified topologyKey label, it can lead to unintended behavior.
@@ -80,24 +80,24 @@ Below you can find a cluster labeling where topology is based in one region and 
 
 
 ```sh
-# kubectl label node kni-worker topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu
+$ kubectl label node kni-worker topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu
 node/kni-worker labeled
-# kubectl label node kni-worker2 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu performance=high
+$ kubectl label node kni-worker2 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu performance=high
 node/kni-worker2 labeled
-# kubectl label node kni-worker3 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=bcn
+$ kubectl label node kni-worker3 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=bcn
 node/kni-worker3 labeled
-# kubectl label node kni-worker4 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=bcn performance=high
+$ kubectl label node kni-worker4 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=bcn performance=high
 node/kni-worker4 labeled
-# kubectl label node kni-worker5 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=sab
+$ kubectl label node kni-worker5 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=sab
 node/kni-worker5 labeled
-# kubectl label node kni-worker6 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=sab performance=high
+$ kubectl label node kni-worker6 topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=sab performance=high
 node/kni-worker6 labeled
 ```
 
 At this point, Kubernetes cluster nodes are labelled as expected:
 
 ```sh
-# kubectl get nodes --show-labels
+$ kubectl get nodes --show-labels
 
 NAME                STATUS   ROLES    AGE   VERSION   LABELS
 kni-control-plane   Ready    master   18m   v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=kni-control-plane,kubernetes.io/os=linux,node-role.kubernetes.io/master=
@@ -168,14 +168,14 @@ spec:
 Next, the `VirtualMachineInstanceReplicaSet` configuration partially shown previously is applied successfully.
 
 ```sh
-# kubectl create -f vmr-windows-mssql.yaml
+$ kubectl create -f vmr-windows-mssql.yaml
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 created
 ```
 
 Then, it is expected that the 3 `VirtualMachineInstances` will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the *even* nodes.
 
 ```sh
-# kubectl get pods -o wide
+$ kubectl get pods -o wide
 NAME                                 READY   STATUS              RESTARTS   AGE   IP       NODE          NOMINATED NODE   READINESS GATES
 virt-launcher-mssql2016p948r-257pn   0/2     ContainerCreating   0          16s   <none>   kni-worker4   <none>           <none>
 virt-launcher-mssql2016rd4lk-6zz9d   0/2     ContainerCreating   0          16s   <none>   kni-worker2   <none>           <none>
@@ -187,7 +187,7 @@ mssql2016p948r   34s   Scheduling
 mssql2016rd4lk   34s   Scheduling
 mssql2016z2qnw   34s   Scheduling
 
-# kubectl get vmi -o wide
+$ kubectl get vmi -o wide
 NAME             AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql2016p948r   3m25s   Running   10.244.1.4   kni-worker4   False
 mssql2016rd4lk   3m25s   Running   10.244.2.4   kni-worker2   False
@@ -200,7 +200,7 @@ mssql2016z2qnw   3m25s   Running   10.244.5.4   kni-worker6   False
 Let's test what happens if the node running the database must be rebooted due to an upgrade or any other valid reason. First, a [node drain]({% post_url 2019-07-30-NodeDrain-KubeVirt %}) must be executed in order to evacuate all pods running and mark the node as unschedulable.
 
 ```sh
-# kubectl drain kni-worker2 --delete-local-data --ignore-daemonsets=true --force
+$ kubectl drain kni-worker2 --delete-local-data --ignore-daemonsets=true --force
 node/kni-worker2 already cordoned
 evicting pod "virt-launcher-mssql2016rd4lk-6zz9d"
 pod/virt-launcher-mssql2016rd4lk-6zz9d evicted
@@ -210,7 +210,7 @@ node/kni-worker2 evicted
 The result is an unwanted scenario, where two databases are being executed in the same high performing server. *This leads us to more advanced scheduling features like affinity and anti-affinity.*
 
 ```sh
-# kubectl get vmi -o wide
+$ kubectl get vmi -o wide
 NAME             AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql201696sz9   7m16s   Running   10.244.5.5   kni-worker6   False
 mssql2016p948r   19m     Running   10.244.1.4   kni-worker4   False
@@ -239,7 +239,7 @@ In principle, the `topologyKey` can be any legal label-key. However, for perform
 Here is the `VirtualMachineInstanceReplicaSet` object replaced.
 
 ```sh
-# kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
+$ kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 ```
 Now, it contains both affinity rules:
@@ -288,14 +288,14 @@ Notice that the VM or POD placement is executed only during the scheduling proce
 > Remember to mark the kni-worker2 as schedulable again.
 
 ```sh
-# kubectl uncordon kni-worker2
+$ kubectl uncordon kni-worker2
 node/kni-worker2 uncordoned
 ```
 
 Below shows the current status, where two databases are running in the `kni-worker6` node. By applying the previous affinity rules this should not happen again:
 
 ```sh
-# kubectl get vmi -o wide
+$ kubectl get vmi -o wide
 NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql201696sz9   12m   Running   10.244.5.5   kni-worker6   False
 mssql2016p948r   24m   Running   10.244.1.4   kni-worker4   False
@@ -305,10 +305,10 @@ mssql2016z2qnw   24m   Running   10.244.5.4   kni-worker6   False
 Next, we delete one of the VMIs running in `kni-worker6` and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:
 
 ```sh
-# kubectl delete vmi mssql201696sz9
+$ kubectl delete vmi mssql201696sz9
 virtualmachineinstance.kubevirt.io "mssql201696sz9" deleted
 
-# kubectl get vmi -o wide
+$ kubectl get vmi -o wide
 NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
 mssql2016p948r   40m   Running   10.244.1.4   kni-worker4   False
 mssql2016tpj6n   22s   Running   10.244.2.5   kni-worker2   False
@@ -330,10 +330,10 @@ Start by creating a ConfigMap that contains a VCL template and a Secret object t
 
 
 ```sh
-[root@eko1 varnish]# kubectl create -f configmap.yaml
+$ kubectl create -f configmap.yaml
 configmap/vcl-template created
 
-[root@eko1 varnish]# kubectl create secret generic varnish-secret --from-literal=secret=$(head -c32 /dev/urandom  | base64)
+$ kubectl create secret generic varnish-secret --from-literal=secret=$(head -c32 /dev/urandom  | base64)
 secret/varnish-secret created
 ```
 
@@ -397,7 +397,7 @@ deployment.apps/varnish-cache created
 The Pod is scheduled as expected since there is a node available in each zone without the `performance=high` label.
 
 ```sh
-# kubectl get pods -o wide
+$ kubectl get pods -o wide
 NAME                                 READY   STATUS    RESTARTS   AGE   IP           NODE          NOMINATED NODE   READINESS GATES
 varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          91s   10.244.4.5   kni-worker5   <none>           <none>
 varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          91s   10.244.3.5   kni-worker3   <none>           <none>
@@ -524,7 +524,7 @@ Remember that this is happening because:
 > Note that uncordoning the node will not make the blackbox appliance and the Varnish Cache pod to come back to the previous node.
 
 ```sh
-# kubectl uncordon kni-worker
+$ kubectl uncordon kni-worker
 node/kni-worker uncordoned
 
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
@@ -545,10 +545,10 @@ In order to return to the most desirable state, the pod and VM from kni-worker2 
 > Both applications must be deleted since the `requiredDuringSchedulingIgnoredDuringExecution` policy is only applied during scheduling time.
 
 ```sh
-# kubectl delete  pod/varnish-cache-54489f9fc9-9s5sr
+$ kubectl delete  pod/varnish-cache-54489f9fc9-9s5sr
 pod "varnish-cache-54489f9fc9-9s5sr" deleted
 
-# kubectl delete virtualmachineinstance.kubevirt.io/blackboxxh5tg
+$ kubectl delete virtualmachineinstance.kubevirt.io/blackboxxh5tg
 virtualmachineinstance.kubevirt.io "blackboxxh5tg" deleted
 ```
 
