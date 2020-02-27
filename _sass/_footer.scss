@@ -8,7 +8,8 @@
       &-github,
       &-mail,
       &-calendar,
-      &-slack {
+      &-slack,
+      &-youtube {
         color: $kv-color--black-400;
         @media (max-width: 576px) {
           font-size: 2rem;
@@ -33,6 +34,7 @@
         }
       }
       &-calendar {
+        margin-right: 1rem;
         &:hover {
           color: $kv-color--green-400;
         }
@@ -42,6 +44,13 @@
 
         &:hover {
           color: $kv-color--green-450;
+        }
+      }
+      &-youtube {
+        margin-right: 1rem;
+
+        &:hover {
+          color: #cc0000;
         }
       }
     }
