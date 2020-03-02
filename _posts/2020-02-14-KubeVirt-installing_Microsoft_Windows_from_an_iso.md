@@ -35,7 +35,7 @@ In this blogpost, we are going to explain how to prepare that VM with the ISO fi
 To proceed with the Installation steps the different elements involved are listed:
 
 > note "NOTE"
-> No need for executing any command until the Installation section.
+> No need for executing any command until the [Installation](#installation) section.
 
 1. An empty KubeVirt Virtual Machine
    ```yaml
