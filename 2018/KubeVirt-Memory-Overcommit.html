@@ -263,12 +263,12 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>It’s not too complex to get this working, all that is needed is to have, at least, KubeVirt version <em>0.8.0</em> installed, which includes the aforementioned feature, and use the following settings on the VMI definition:</p>
 
 <ul>
-  <li><code class="language-html highlighter-rouge">domain.memory.guest</code>: Defines the amount memory assigned to the VMI process (by libvirt).</li>
-  <li><code class="language-html highlighter-rouge">domain.resources.requests.memory</code>: Defines the memory requested to Kubernetes by the pod that will run the VMI.</li>
-  <li><code class="language-html highlighter-rouge">domain.resources.overcommitGuestOverhead</code>: Boolean switch to enable the feature.</li>
+  <li><code class="highlighter-rouge">domain.memory.guest</code>: Defines the amount memory assigned to the VMI process (by libvirt).</li>
+  <li><code class="highlighter-rouge">domain.resources.requests.memory</code>: Defines the memory requested to Kubernetes by the pod that will run the VMI.</li>
+  <li><code class="highlighter-rouge">domain.resources.overcommitGuestOverhead</code>: Boolean switch to enable the feature.</li>
 </ul>
 
-<p>Once those are in place, Kubernetes will consider the requested memory for scheduling while libvirt will define the domain with the amount of memory defined in <code class="language-html highlighter-rouge">domain.memory.guest</code>. For example, let’s define a VMI which requests <em>24534983Ki</em> but wants to use <em>25761732Ki</em>
+<p>Once those are in place, Kubernetes will consider the requested memory for scheduling while libvirt will define the domain with the amount of memory defined in <code class="highlighter-rouge">domain.memory.guest</code>. For example, let’s define a VMI which requests <em>24534983Ki</em> but wants to use <em>25761732Ki</em>
 instead.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
@@ -365,7 +365,7 @@ instead.</p>
 
 <p>Let’s put it as an example, say a node has 100GiB of RAM, with 2GiB of reserved memory plus 1GiB requested by monitoring and storage pods, that leaves the user 97GiB of allocatable memory to schedule pods, so each VMI that needs to be started on a node needs to request an amount that would fit, if the user wants to run 10 VMIs on each node with 10GiB of RAM Kubernetes wouldn’t allow that cause the sum of their requests would be more than what’s allocatable in the node.</p>
 
-<p>Using the memory overcommitment feature the user can tell Kubernetes that each VMI requests 9.7GiB and set <code class="language-html highlighter-rouge">domain.memory.guest</code> to 10GiB.</p>
+<p>Using the memory overcommitment feature the user can tell Kubernetes that each VMI requests 9.7GiB and set <code class="highlighter-rouge">domain.memory.guest</code> to 10GiB.</p>
 
 <p>The other way around, undercommitting the node, also works, for instance, to make sure that no matter how many VMIs will be under memory pressure the node will still be in good shape. Using the same node sizing, 100GiB, we could define 10 VMIs to request 9.7GiB, while giving them exactly 9.0GiB, that’d leave around 7GiB for the node processes while Kubernetes wouldn’t try to schedule any more pods on it cause all the requests already sum up to 100% of the allocatable memory.</p>
 

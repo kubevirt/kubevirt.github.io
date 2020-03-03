@@ -727,7 +727,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
 
 <p>When the mynatproxy container starts it runs an entry point script for iptables configuration.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. iptables -t nat -I PREROUTING 1 -p tcp -s 10.0.1.2 -m comment --comment "nat-proxy redirect" -j REDIRECT --to-ports 8080
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. iptables -t nat -I PREROUTING 1 -p tcp -s 10.0.1.2 -m comment --comment "nat-proxy redirect" -j REDIRECT --to-ports 8080
 2. iptables -t nat -I OUTPUT 1 -p tcp -s 10.0.1.2 -j ACCEPT
 3. iptables -t nat -I POSTROUTING 1 -s 10.0.1.2 -p udp -m comment --comment "nat udp connections" -j MASQUERADE
 </code></pre></div></div>
@@ -831,7 +831,7 @@ For the egress traffic I used a program writen in golang, and for the ingress tr
 
 <p>The Haproxy help us with the ingress traffic with the follow configuration</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
   mode tcp
 frontend main
   bind *:9080
@@ -1091,7 +1091,7 @@ backend guest
 
 <p>When the tproxy container starts it runs an entry point script for iptables configuration but this time the proxy redirect came in the mangle table and not in the nat table that because TPROXY module avilable only in the mangle table.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TPROXY
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TPROXY
 This target is only valid in the mangle table, in the
 PREROUTING chain and user-defined chains which are only
 called from this chain.  It redirects the packet to a local
@@ -1169,7 +1169,7 @@ Preparing a socket to receive connections with TProxy is really no different tha
 
 <p>About IP_TRANSPARENT</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IP_TRANSPARENT (since Linux 2.6.24)
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IP_TRANSPARENT (since Linux 2.6.24)
 Setting this boolean option enables transparent proxying on
 this socket.  This socket option allows the calling applica‐
 tion to bind to a nonlocal IP address and operate both as a
@@ -1206,7 +1206,7 @@ Same goes for making connections to a remote host pretending to be the client, t
 
 <p>The Haproxy helps us with the ingress traffic with the follow configuration</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
   mode tcp
 frontend main
   bind *:9080

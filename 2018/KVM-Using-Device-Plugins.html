@@ -297,8 +297,8 @@ based on the number of pods that node is limited to.</p>
 
 <h3 id="consuming-devices">Consuming Devices</h3>
 
-<p>Now any pod that requests a <code class="language-html highlighter-rouge">devices.kubevirt.io/kvm</code> or
-<code class="language-html highlighter-rouge">devices.kubevirt.io/tun</code> device can only be scheduled on nodes which provide
+<p>Now any pod that requests a <code class="highlighter-rouge">devices.kubevirt.io/kvm</code> or
+<code class="highlighter-rouge">devices.kubevirt.io/tun</code> device can only be scheduled on nodes which provide
 them. On clusters where KubeVirt is deployed this conveniently happens to be
 all nodes in the cluster that have these physical devices, which normally means
 all nodes in the cluster.</p>
@@ -334,7 +334,7 @@ all nodes in the cluster.</p>
 </code></pre></div></div>
 
 <p>Of special note is the securityContext stanza. The only special privilege
-required is the <code class="language-html highlighter-rouge">NET_ADMIN</code> capability! This is needed by libvirt to set up the
+required is the <code class="highlighter-rouge">NET_ADMIN</code> capability! This is needed by libvirt to set up the
 domain’s networking stack.</p>
 
         </article>

@@ -289,10 +289,10 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>The Bookinfo application is broken into four separate microservices:</p>
 
 <ul>
-  <li><code class="language-html highlighter-rouge">productpage</code>. The productpage microservice calls the details and reviews microservices to populate the page.</li>
-  <li><code class="language-html highlighter-rouge">details</code>. The details microservice contains book information.</li>
-  <li><code class="language-html highlighter-rouge">reviews</code>. The reviews microservice contains book reviews. It also calls the ratings microservice.</li>
-  <li><code class="language-html highlighter-rouge">ratings</code>. The ratings microservice contains book ranking information that accompanies a book review.</li>
+  <li><code class="highlighter-rouge">productpage</code>. The productpage microservice calls the details and reviews microservices to populate the page.</li>
+  <li><code class="highlighter-rouge">details</code>. The details microservice contains book information.</li>
+  <li><code class="highlighter-rouge">reviews</code>. The reviews microservice contains book reviews. It also calls the ratings microservice.</li>
+  <li><code class="highlighter-rouge">ratings</code>. The ratings microservice contains book ranking information that accompanies a book review.</li>
 </ul>
 
 <p><img src="../assets/2019-06-21-Run-Istio-with-kubevirt/Bookinfo.png" alt="Bookinfo-application" /></p>
@@ -328,7 +328,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Run the bash script</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-istio-poc
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-istio-poc
 ./deploy-istio-poc.sh
 </code></pre></div></div>
 
@@ -516,7 +516,7 @@ kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
 
 <p>After running the bash script the environment should look like this</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                              READY     STATUS    RESTARTS   AGE
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                              READY     STATUS    RESTARTS   AGE
 productpage-v1-7bbdd59459-w6nwq   2/2       Running   0          1h
 ratings-v1-76dc7f6b9-6n6s9        2/2       Running   0          1h
 reviews-v1-64545d97b4-tvgl2       2/2       Running   0          1h
@@ -527,18 +527,18 @@ virt-launcher-vmi-details-94pb6   3/3       Running   0          1h
 
 <p>Let’s find the istio ingress service port</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code># kubectl get service -n istio-system  | grep istio-ingressgateway
-istio-ingressgateway       LoadBalancer   10.97.163.91     <span class="nt">&lt;pending&gt;</span>     80:31380/TCP,443:31390/TCP,31400:31400/TCP                            3h
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># kubectl get service -n istio-system  | grep istio-ingressgateway
+istio-ingressgateway       LoadBalancer   10.97.163.91     &lt;pending&gt;     80:31380/TCP,443:31390/TCP,31400:31400/TCP                            3h
 </code></pre></div></div>
 
 <p>Then browse the following url</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://<span class="nt">&lt;k8s-node-ip-address&gt;</span>:<span class="nt">&lt;istio-ingress-service-port-exposed-by-k8s&gt;</span>/productpage
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://&lt;k8s-node-ip-address&gt;:&lt;istio-ingress-service-port-exposed-by-k8s&gt;/productpage
 </code></pre></div></div>
 
 <p>Example:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.0.0.1:31380/productpage
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.0.0.1:31380/productpage
 </code></pre></div></div>
 
 <h1 id="conclusions">Conclusions</h1>

@@ -258,7 +258,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="hugepages-support">hugepages support</h2>
 
-<p>To use hugepages as backing memory, we need to indicate a desired amount of memory (<code class="language-html highlighter-rouge">resources.requests.memory</code>) and size of hugepages to use (<code class="language-html highlighter-rouge">memory.hugepages.pageSize</code>)</p>
+<p>To use hugepages as backing memory, we need to indicate a desired amount of memory (<code class="highlighter-rouge">resources.requests.memory</code>) and size of hugepages to use (<code class="highlighter-rouge">memory.hugepages.pageSize</code>)</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
@@ -321,7 +321,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="setting-a-disks-serial-number">setting a disks serial number</h2>
 
-<p>The new keyword <code class="language-html highlighter-rouge">serial</code> in the disks section allows us to specify a serial number</p>
+<p>The new keyword <code class="highlighter-rouge">serial</code> in the disks section allows us to specify a serial number</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
@@ -345,7 +345,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="specifying-the-cpu-model">specifying the CPU model</h2>
 
-<p>Setting the CPU model is possible via <code class="language-html highlighter-rouge">spec.domain.cpu.model</code>. The following VM will have a CPU with the Conroe model:</p>
+<p>Setting the CPU model is possible via <code class="highlighter-rouge">spec.domain.cpu.model</code>. The following VM will have a CPU with the Conroe model:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">myvmi</span>
@@ -373,21 +373,21 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>to expose a cluster ip service</li>
 </ul>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name vmiservice --port 27017 --target-port 22
 </code></pre></div></div>
 
 <ul>
   <li>to expose a node port service</li>
 </ul>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name nodeport --type NodePort --port 27017 --target-port 22 --node-port 30000
 </code></pre></div></div>
 
 <ul>
   <li>to expose a load balancer service</li>
 </ul>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl expose virtualmachineinstance vmi-ephemeral --name lbsvc --type LoadBalancer --port 27017 --target-port 3389
 </code></pre></div></div>
 
 <h2 id="kubernetes-compatible-networking-approach-slirp">Kubernetes compatible networking approach (SLIRP)</h2>
@@ -410,7 +410,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Every KubeVirt installation after version v0.5.1 comes a set of default RBAC cluster roles that can be used to grant users access to VirtualMachineInstances.</p>
 
-<p>The <code class="language-html highlighter-rouge">kubevirt.io:admin</code> and <code class="language-html highlighter-rouge">kubevirt.io:edit</code> ClusterRoles have console and VNC access permissions built into them.</p>
+<p>The <code class="highlighter-rouge">kubevirt.io:admin</code> and <code class="highlighter-rouge">kubevirt.io:edit</code> ClusterRoles have console and VNC access permissions built into them.</p>
 
 <h1 id="conclusion">Conclusion</h1>
 

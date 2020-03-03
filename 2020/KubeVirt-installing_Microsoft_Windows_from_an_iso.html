@@ -297,7 +297,7 @@ but what if you want to follow the traditional way of installing a VM using an e
 </code></pre></div>    </div>
   </li>
   <li>
-    <p>A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the <code class="language-html highlighter-rouge">virtctl</code> command when uploading the file</p>
+    <p>A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the <code class="highlighter-rouge">virtctl</code> command when uploading the file</p>
 
     <p>First thing here is to download the ISO file of the Microsoft Windows, for that the <a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2">Microsoft Evaluation Center</a> offers
 the ISO files to download for evaluation purposes:</p>
@@ -309,15 +309,15 @@ the following picture:</p>
 
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png" alt="win2k12_download_iso_64.png" title="KubeVirt Microsoft Windows iso download" /></p>
 
-    <p>Once the ISO file is downloaded it has to be uploaded with <code class="language-html highlighter-rouge">virtctl</code>, the parameters used in this example are the following:</p>
+    <p>Once the ISO file is downloaded it has to be uploaded with <code class="highlighter-rouge">virtctl</code>, the parameters used in this example are the following:</p>
 
     <ul>
-      <li><code class="language-html highlighter-rouge">image-upload</code>: Upload a VM image to a PersistentVolumeClaim</li>
-      <li><code class="language-html highlighter-rouge">--image-path</code>: The path of the ISO file</li>
-      <li><code class="language-html highlighter-rouge">--pvc-name</code>: The name of the PVC to store the ISO file, in this example is <code class="language-html highlighter-rouge">iso-win2k12</code></li>
-      <li><code class="language-html highlighter-rouge">--access-mode</code>: the access mode for the PVC, in the example <code class="language-html highlighter-rouge">ReadOnlyMany</code> has been used.</li>
-      <li><code class="language-html highlighter-rouge">--pvc-size</code>: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough</li>
-      <li><code class="language-html highlighter-rouge">--uploadproxy-url</code>: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is <code class="language-html highlighter-rouge">10.96.164.35</code> and the PORT is <code class="language-html highlighter-rouge">443</code></li>
+      <li><code class="highlighter-rouge">image-upload</code>: Upload a VM image to a PersistentVolumeClaim</li>
+      <li><code class="highlighter-rouge">--image-path</code>: The path of the ISO file</li>
+      <li><code class="highlighter-rouge">--pvc-name</code>: The name of the PVC to store the ISO file, in this example is <code class="highlighter-rouge">iso-win2k12</code></li>
+      <li><code class="highlighter-rouge">--access-mode</code>: the access mode for the PVC, in the example <code class="highlighter-rouge">ReadOnlyMany</code> has been used.</li>
+      <li><code class="highlighter-rouge">--pvc-size</code>: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough</li>
+      <li><code class="highlighter-rouge">--uploadproxy-url</code>: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is <code class="highlighter-rouge">10.96.164.35</code> and the PORT is <code class="highlighter-rouge">443</code></li>
     </ul>
 
     <div class="premonition info">
@@ -334,10 +334,10 @@ To upload data to the cluster, the cdi-uploadproxy service must be accessible fr
  cdi-api           ClusterIP   10.96.117.29   &lt;none&gt;        443/TCP   6d18h
  cdi-uploadproxy   ClusterIP   10.96.164.35   &lt;none&gt;        443/TCP   6d18h
 </code></pre></div>    </div>
-    <p>In this example the ISO file was copied to the Kubernetes node, to allow the <code class="language-html highlighter-rouge">virtctl</code> to find it and to simplify the operation.</p>
+    <p>In this example the ISO file was copied to the Kubernetes node, to allow the <code class="highlighter-rouge">virtctl</code> to find it and to simplify the operation.</p>
     <ul>
-      <li><code class="language-html highlighter-rouge">--insecure</code>: Allow insecure server connections when using HTTPS</li>
-      <li><code class="language-html highlighter-rouge">--wait-secs</code>: The time in seconds to wait for upload pod to start. (default 60)</li>
+      <li><code class="highlighter-rouge">--insecure</code>: Allow insecure server connections when using HTTPS</li>
+      <li><code class="highlighter-rouge">--wait-secs</code>: The time in seconds to wait for upload pod to start. (default 60)</li>
     </ul>
 
     <p>The final command with the parameters and the values would look like:</p>
@@ -352,7 +352,7 @@ To upload data to the cluster, the cdi-uploadproxy service must be accessible fr
 </code></pre></div>    </div>
   </li>
   <li>
-    <p>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="language-html highlighter-rouge">winhd</code> and the space requested is 15Gi:</p>
+    <p>A PVC for the hard drive where the Operating System is going to be installed, in this example it is called <code class="highlighter-rouge">winhd</code> and the space requested is 15Gi:</p>
 
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
@@ -374,7 +374,7 @@ The container image has to be pulled to have it available in the local registry.
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
 </code></pre></div>    </div>
 
-    <p>And also it has to be referenced in the VM YAML, in this example the name for the <code class="language-html highlighter-rouge">containerDisk</code> is <code class="language-html highlighter-rouge">virtiocontainerdisk</code>.</p>
+    <p>And also it has to be referenced in the VM YAML, in this example the name for the <code class="highlighter-rouge">containerDisk</code> is <code class="highlighter-rouge">virtiocontainerdisk</code>.</p>
 
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
     <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
@@ -444,7 +444,7 @@ The container image has to be pulled to have it available in the local registry.
   </li>
 </ol>
 
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Special attention to the <code class="language-html highlighter-rouge">bootOrder: 1</code> parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.</p>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Special attention to the <code class="highlighter-rouge">bootOrder: 1</code> parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.</p>
 
 
 </div></div>
@@ -476,7 +476,7 @@ Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-
 </code></pre></div>    </div>
   </li>
   <li>
-    <p>Pulling the <code class="language-html highlighter-rouge">virtio</code> container image to the locally:</p>
+    <p>Pulling the <code class="highlighter-rouge">virtio</code> container image to the locally:</p>
 
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
 Using default tag: latest
@@ -506,14 +506,14 @@ win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
 </code></pre></div>    </div>
   </li>
   <li>
-    <p>Once the status of the VMI is <code class="language-html highlighter-rouge">RUNNING</code> it’s time to connect using VNC:</p>
+    <p>Once the status of the VMI is <code class="highlighter-rouge">RUNNING</code> it’s time to connect using VNC:</p>
 
     <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl vnc win2k12-iso
 </code></pre></div>    </div>
 
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png" alt="windows2k12_install.png" title="KubeVirt Microsoft Windows installation" /></p>
 
-    <p>Here is important to comment that to be able to connect through VNC using <code class="language-html highlighter-rouge">virtctl</code> it’s necessary to reach the Kubernetes API.
+    <p>Here is important to comment that to be able to connect through VNC using <code class="highlighter-rouge">virtctl</code> it’s necessary to reach the Kubernetes API.
 The following video shows how to go through the Microsoft Windows installation process:</p>
 
     <figure class="video_container">
@@ -524,7 +524,7 @@ The following video shows how to go through the Microsoft Windows installation p
   </li>
 </ol>
 
-<p>Once the Virtual Machine is created, the PVC with the ISO and the <code class="language-html highlighter-rouge">virtio</code> drivers can be unattached from the Virtual Machine.</p>
+<p>Once the Virtual Machine is created, the PVC with the ISO and the <code class="highlighter-rouge">virtio</code> drivers can be unattached from the Virtual Machine.</p>
 
 <h2 id="references">References</h2>
 

@@ -255,7 +255,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <pre><code class="language-url">APISERVER:/apis/subresources.kubevirt.io/v1alpha3/namespaces/NAMESPACE/virtualmachineinstances/VM/vnc
 </code></pre>
 
-<p>but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provide a component using <code class="language-html highlighter-rouge">kubectl proxy</code> to provide a authorized vnc acess, we name this Component <a href="https://github.com/wavezhang/virtVNC"><code class="language-html highlighter-rouge">virtVNC</code></a>.</p>
+<p>but we can not access the VNC api directly since authorization is needed. In order to solve the problem, we provide a component using <code class="highlighter-rouge">kubectl proxy</code> to provide a authorized vnc acess, we name this Component <a href="https://github.com/wavezhang/virtVNC"><code class="highlighter-rouge">virtVNC</code></a>.</p>
 
 <p>In this post we are going to show how to do this in detail.</p>
 
@@ -281,7 +281,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <span class="nb">cp </span>noVNC/<span class="k">*</span>.html virtvnc/static/
 </code></pre></div></div>
 
-<p>Create a file <code class="language-html highlighter-rouge">index.html</code> to <code class="language-html highlighter-rouge">virtvnc/static/</code> with the following content. The page will display VMs and corresponding VNC links.</p>
+<p>Create a file <code class="highlighter-rouge">index.html</code> to <code class="highlighter-rouge">virtvnc/static/</code> with the following content. The page will display VMs and corresponding VNC links.</p>
 
 <div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">&lt;html&gt;</span>
   <span class="nt">&lt;meta</span> <span class="na">charset=</span><span class="s">"utf-8"</span><span class="nt">&gt;</span>
@@ -351,16 +351,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <span class="nt">&lt;/html&gt;</span>
 </code></pre></div></div>
 
-<p>Create dockerfile with following content to add static html files and set up <code class="language-html highlighter-rouge">kubectl proxy</code> command line args.</p>
+<p>Create dockerfile with following content to add static html files and set up <code class="highlighter-rouge">kubectl proxy</code> command line args.</p>
 
 <pre><code class="language-Dockerfile">FROM quay.io/bitnami/kubectl:1.15
 ADD static /static
 CMD ["proxy", "--www=/static", "--accept-hosts=^.*$", "--address=[::]", "--api-prefix=/k8s/", "--www-prefix="]
 </code></pre>
 
-<p>Finally use <code class="language-html highlighter-rouge">docker build</code> to build docker image.</p>
+<p>Finally use <code class="highlighter-rouge">docker build</code> to build docker image.</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd virtvnc
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd virtvnc
 docker build -t quay.io/samblade/virtvnc:v0.1 .
 </code></pre></div></div>
 
@@ -421,7 +421,7 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
 
 <h3 id="deploy-to-kubernetes">Deploy to kubernetes</h3>
 
-<p>Create following yaml, and then apply to kubernetes to setup <code class="language-html highlighter-rouge">virtvnc</code> deployment.</p>
+<p>Create following yaml, and then apply to kubernetes to setup <code class="highlighter-rouge">virtvnc</code> deployment.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
@@ -461,7 +461,7 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
             <span class="na">timeoutSeconds</span><span class="pi">:</span> <span class="m">5</span>
 </code></pre></div></div>
 
-<p>Expose a <code class="language-html highlighter-rouge">NodePort</code> service, then we can access the web page from node network.</p>
+<p>Expose a <code class="highlighter-rouge">NodePort</code> service, then we can access the web page from node network.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
@@ -493,19 +493,19 @@ docker build -t quay.io/samblade/virtvnc:v0.1 .
 
 <h2 id="access-vnc">Access VNC</h2>
 
-<p>First get node port of <code class="language-html highlighter-rouge">virtvnc</code> service.</p>
+<p>First get node port of <code class="highlighter-rouge">virtvnc</code> service.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get svc <span class="nt">-n</span> kubevirt virtvnc
 </code></pre></div></div>
 
 <p>Then visit the following url in browser:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://NODEIP:NODEPORT/
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://NODEIP:NODEPORT/
 </code></pre></div></div>
 
-<p>If you want manage virtual machines in other namespace, you can specify namespace using query param <code class="language-html highlighter-rouge">namespace</code> like following:</p>
+<p>If you want manage virtual machines in other namespace, you can specify namespace using query param <code class="highlighter-rouge">namespace</code> like following:</p>
 
-<div class="language-html highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://NODEIP:NODEPORT/?namespace=test
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://NODEIP:NODEPORT/?namespace=test
 </code></pre></div></div>
 
 <p><img src="/assets/2019-11-11-Access-Virtual-Machines-graphic-console-using-noVNC/virtvnc.gif" alt="VirtVNC" title="VirtVNC" /></p>

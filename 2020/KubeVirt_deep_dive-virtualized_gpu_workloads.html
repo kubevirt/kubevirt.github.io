@@ -368,7 +368,7 @@ the following diagram shows the different layers involved in the GPU pass-throug
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png" alt="kubevirt_gpu_passthrough" title="KubeVirt GPU passthrough" /></p>
 
 <p>Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUS in that node), the Virtual Machine specification
-containing the <code class="language-html highlighter-rouge">deviceName</code> that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as
+containing the <code class="highlighter-rouge">deviceName</code> that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as
 any other else in Kubernetes.</p>
 
 <p><img src="/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_yaml.png" alt="kubevirt_gpu_pass_yaml" title="KubeVirt GPU passthrough yaml" /></p>

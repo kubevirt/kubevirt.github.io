@@ -270,16 +270,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li><a href="https://github.com/kubevirt/cloud-image-builder">Cloud Image Builder</a></li>
 </ul>
 
-<p>Those repos contain useful information for new users, like the <code class="language-html highlighter-rouge">try-it</code> scenarios, the Laboratories, <a href="https://katacoda.com/kubevirt">Katacoda scenarios</a>, Community supporting files (like logos, proposals, etc).</p>
+<p>Those repos contain useful information for new users, like the <code class="highlighter-rouge">try-it</code> scenarios, the Laboratories, <a href="https://katacoda.com/kubevirt">Katacoda scenarios</a>, Community supporting files (like logos, proposals, etc).</p>
 
 <h2 id="the-jobs">The jobs</h2>
 
 <p>For each repo we’ve some types of jobs:</p>
 
 <ul>
-  <li><code class="language-html highlighter-rouge">periodical</code>: Run automatically to validate that the repo, without further changes is still working (for example, detecting broken URL’s).</li>
-  <li><code class="language-html highlighter-rouge">presubmit</code>: Validates that the incoming PR will not break the environment.</li>
-  <li><code class="language-html highlighter-rouge">post-submit</code>: After merging the PR, the repo is still working.</li>
+  <li><code class="highlighter-rouge">periodical</code>: Run automatically to validate that the repo, without further changes is still working (for example, detecting broken URL’s).</li>
+  <li><code class="highlighter-rouge">presubmit</code>: Validates that the incoming PR will not break the environment.</li>
+  <li><code class="highlighter-rouge">post-submit</code>: After merging the PR, the repo is still working.</li>
 </ul>
 
 <p>Jobs are defined in the <a href="https://github.com/kubevirt/project-infra/">project-infra</a> repository, for example:</p>
@@ -293,21 +293,21 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h3 id="kubevirt-tutorial">KubeVirt-tutorial</h3>
 
-<p>The jobs, when executed as part of the Prow workflow, run the commands defined in the repo itself, for example for <code class="language-html highlighter-rouge">kubevirt-tutorial</code> check the following folder:</p>
+<p>The jobs, when executed as part of the Prow workflow, run the commands defined in the repo itself, for example for <code class="highlighter-rouge">kubevirt-tutorial</code> check the following folder:</p>
 
 <ul>
   <li><a href="https://github.com/kubevirt/kubevirt-tutorial/tree/master/hack">https://github.com/kubevirt/kubevirt-tutorial/tree/master/hack</a></li>
 </ul>
 
-<p>That folder contains three scripts: <code class="language-html highlighter-rouge">build</code>, <code class="language-html highlighter-rouge">test_lab</code> and <code class="language-html highlighter-rouge">tests</code>, which do setup the environment for running the validations, that is:</p>
+<p>That folder contains three scripts: <code class="highlighter-rouge">build</code>, <code class="highlighter-rouge">test_lab</code> and <code class="highlighter-rouge">tests</code>, which do setup the environment for running the validations, that is:</p>
 
 <ul>
   <li>install required software on top of the used images.</li>
-  <li>prepare the scripts to be executed via <a href="https://github.com/bashup/mdsh">mdsh</a> which extracts markdown from lab files to be executed against the cluster setup by Prow (using <code class="language-html highlighter-rouge">dind</code>).</li>
+  <li>prepare the scripts to be executed via <a href="https://github.com/bashup/mdsh">mdsh</a> which extracts markdown from lab files to be executed against the cluster setup by Prow (using <code class="highlighter-rouge">dind</code>).</li>
   <li>Run each script and report status</li>
 </ul>
 
-<p>Once the execution has finished, if the final status is <code class="language-html highlighter-rouge">ok</code>, the status is reported back to the GitHub PR so that it can be reviewed by mantainers of the repo.</p>
+<p>Once the execution has finished, if the final status is <code class="highlighter-rouge">ok</code>, the status is reported back to the GitHub PR so that it can be reviewed by mantainers of the repo.</p>
 
 <h2 id="job-status">Job status</h2>
 
@@ -330,7 +330,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="wrap-up">Wrap-up</h2>
 
-<p>If you find that a test should be performed to further validate the integrity and information provided, feel free to raise issues or even a PR against the <code class="language-html highlighter-rouge">project-infra</code> repository so that we can get it improved!</p>
+<p>If you find that a test should be performed to further validate the integrity and information provided, feel free to raise issues or even a PR against the <code class="highlighter-rouge">project-infra</code> repository so that we can get it improved!</p>
 
         </article>
         
