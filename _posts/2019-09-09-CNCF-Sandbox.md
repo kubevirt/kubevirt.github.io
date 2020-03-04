@@ -15,6 +15,6 @@ Some time ago, with the PR <https://github.com/cncf/toc/pull/265>, KubeVirt was 
 
 On 9th September 2019, the project has finally accomplished the required steps to get in (including two sponsors) to get listed as part of it at <https://www.cncf.io/sandbox-projects/>
 
-The document with the proposal can be read at the final repo at <https://github.com/cncf/toc/blob/master/proposals/kubevirt.adoc> for more information.
+The document with the proposal can be read at the final repo at <https://github.com/cncf/toc/blob/master/proposals/sandbox/kubevirt.adoc> for more information.
 
 It's interesting to see the messages of support at the PR that show interesting use cases by our users, so keep an eye on them!
