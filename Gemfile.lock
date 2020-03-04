@@ -99,7 +99,7 @@ DEPENDENCIES
   jekyll-redirect-from
   jekyll-sitemap
   jekyll-tagging
-  premonition (~> 2.0.0)
+  premonition (~> 2.0.1)
   rake
 
 BUNDLED WITH
