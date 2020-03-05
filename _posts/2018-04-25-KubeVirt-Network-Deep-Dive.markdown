@@ -336,7 +336,14 @@ This application uses MongoDB to store the views of the website. Listing the `co
 
 Now that we shown that kubernetes, kubevirt, ingress-nginx and flannel work together how is it accomplished? First let’s go over what is going on in kubevirt specifically.
 
-![KubeVirt networking](/assets/images/diagram.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/diagram.png" itemprop="contentUrl" data-size="1040x840">
+            <img src="/assets/images/diagram.png" width="100%" itemprop="thumbnail" alt="KubeVirt networking" />
+        </a>
+        <figcaption itemprop="caption description">KubeVirt networking</figcaption>
+    </figure>
+</div>
 
 ## virt-launcher - [virtwrap](https://github.com/kubevirt/kubevirt/tree/master/pkg/virt-launcher/virtwrap)
 
@@ -583,7 +590,7 @@ The virtual machines are on differnet hosts. This was done purposely to show tha
 <div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="/assets/images/kubevirt-skydive-vm-to-vm.png" itemprop="contentUrl" data-size="2496x2269">
-            <img src="/assets/images/kubevirt-skydive-vm-to-vm.png" width="249" height="226" itemprop="thumbnail" alt="VM to VM" />
+            <img src="/assets/images/kubevirt-skydive-vm-to-vm.png" width="100%" itemprop="thumbnail" alt="VM to VM" />
         </a>
         <figcaption itemprop="caption description">VM to VM</figcaption>
     </figure>
@@ -628,7 +635,7 @@ The topology image below shows the packet flow when using a ingress kubernetes o
 <div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
         <a href="/assets/images/skydive-ingress-path.png" itemprop="contentUrl" data-size="1461x960">
-            <img src="/assets/images/skydive-ingress-path.png" width="300" height="196" itemprop="thumbnail" alt="Ingress to VM" />
+            <img src="/assets/images/skydive-ingress-path.png" width="100%" itemprop="thumbnail" alt="Ingress to VM" />
         </a>
         <figcaption itemprop="caption description">Ingress to VM</figcaption>
     </figure>
@@ -663,7 +670,14 @@ In the section where we installed the application we already tested for connecti
 
 ingress-nginx provides an optional setting to enable traffic status - which we already enabled. The screenshot below shows the requests that Nginx is receiving for `nodejs.ingress.virtomation.com`.
 
-![nginx-vts](/assets/images/nginx-vts.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/nginx-vts.png" itemprop="contentUrl" data-size="1254x843">
+            <img src="/assets/images/nginx-vts.png" width="100%" itemprop="thumbnail" alt="nginx-vts" />
+        </a>
+        <figcaption itemprop="caption description">nginx-vts</figcaption>
+    </figure>
+</div>
 
 #### Service NodePort to Nginx Pod
 
@@ -711,7 +725,14 @@ In (1) we can see flows to and from `10.244.1.4` and `10.244.1.8`. `.8` is the n
     ingress-nginx   nginx-ingress-controller-85c8787886-vf5tp     1/1       Running   0          1d        10.244.1.4      kn1.virtomation.com
     ...output...
 
-![ingress-vm](/assets/images/skydive-ingress-vm.png)
+<div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
+    <figure itemprop="associatedMedia" itemscope itemtype="http://schema.org/ImageObject">
+        <a href="/assets/images/skydive-ingress-vm.png" itemprop="contentUrl" data-size="1039x1201">
+            <img src="/assets/images/skydive-ingress-vm.png" width="100%" itemprop="thumbnail" alt="ingress-vm" />
+        </a>
+        <figcaption itemprop="caption description">ingress-vm</figcaption>
+    </figure>
+</div>
 
 # Final Thoughts
 
