@@ -19,6 +19,7 @@ func (VirtualMachineInstanceList) SwaggerDoc() map[string]string {
 func (VirtualMachineInstanceSpec) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":                              "VirtualMachineInstanceSpec is a description of a VirtualMachineInstance.",
+		"priorityClassName":             "If specified, indicates the pod's priority.\nIf not specified, the pod priority will be default or zero if there is no\ndefault.\n+optional",
 		"domain":                        "Specification of the desired behavior of the VirtualMachineInstance on the host.",
 		"nodeSelector":                  "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/\n+optional",
 		"affinity":                      "If affinity is specifies, obey all the affinity rules",
@@ -227,6 +228,7 @@ func (VirtualMachineStatus) SwaggerDoc() map[string]string {
 func (VirtualMachineStateChangeRequest) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"action": "Indicates the type of action that is requested. e.g. Start or Stop",
+		"data":   "Provides additional data in order to perform the Action",
 		"uid":    "Indicates the UUID of an existing Virtual Machine Instance that this change request applies to -- if applicable",
 	}
 }
@@ -325,5 +327,11 @@ func (VirtualMachineInstanceFileSystemInfo) SwaggerDoc() map[string]string {
 func (VirtualMachineInstanceFileSystem) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"": "VirtualMachineInstanceFileSystem represents guest os disk",
+	}
+}
+
+func (RenameOptions) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"": "Options for a rename operation",
 	}
 }

@@ -81,6 +81,12 @@ type EvictionStrategy string
 // ---
 // +k8s:openapi-gen=true
 type VirtualMachineInstanceSpec struct {
+	// If specified, indicates the pod's priority.
+	// If not specified, the pod priority will be default or zero if there is no
+	// default.
+	// +optional
+	PriorityClassName string `json:"priorityClassName,omitempty"`
+
 	// Specification of the desired behavior of the VirtualMachineInstance on the host.
 	Domain DomainSpec `json:"domain"`
 	// NodeSelector is a selector which must be true for the vmi to fit on a node.
@@ -463,6 +469,8 @@ const (
 	// This annotation is used to inject ignition data
 	// Used on VirtualMachineInstance.
 	IgnitionAnnotation string = "kubevirt.io/ignitiondata"
+
+	VirtualMachineLabel = AppLabel + "/vm"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {
@@ -881,8 +889,9 @@ type StateChangeRequestAction string
 
 // These are the currently defined state change requests
 const (
-	StartRequest StateChangeRequestAction = "Start"
-	StopRequest  StateChangeRequestAction = "Stop"
+	StartRequest  StateChangeRequestAction = "Start"
+	StopRequest   StateChangeRequestAction = "Stop"
+	RenameRequest                          = "Rename"
 )
 
 // VirtualMachineStatus represents the status returned by the
@@ -904,6 +913,8 @@ type VirtualMachineStatus struct {
 type VirtualMachineStateChangeRequest struct {
 	// Indicates the type of action that is requested. e.g. Start or Stop
 	Action StateChangeRequestAction `json:"action"`
+	// Provides additional data in order to perform the Action
+	Data map[string]string `json:"data,omitempty" optional:"true"`
 	// Indicates the UUID of an existing Virtual Machine Instance that this change request applies to -- if applicable
 	UID *types.UID `json:"uid,omitempty" optional:"true" protobuf:"bytes,5,opt,name=uid,casttype=k8s.io/kubernetes/pkg/types.UID"`
 }
@@ -933,6 +944,9 @@ const (
 	// VirtualMachinePaused is added in a virtual machine when its vmi
 	// signals with its own condition that it is paused.
 	VirtualMachinePaused VirtualMachineConditionType = "Paused"
+
+	// This condition indicates that the VM was renamed
+	RenameConditionType VirtualMachineConditionType = "Rename Operation"
 )
 
 // ---
@@ -1191,4 +1205,11 @@ type VirtualMachineInstanceFileSystem struct {
 	FileSystemType string `json:"fileSystemType"`
 	UsedBytes      int    `json:"usedBytes"`
 	TotalBytes     int    `json:"totalBytes"`
+}
+
+// Options for a rename operation
+type RenameOptions struct {
+	metav1.TypeMeta `json:",inline"`
+	NewName         string  `json:"newName"`
+	OldName         *string `json:"oldName,omitempty"`
 }
