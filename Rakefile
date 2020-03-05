@@ -15,7 +15,7 @@ namespace :links do
             :assume_extension   => true,
             :only_4xx           => true,
             :log_level          => :info,
-            :internal_domains   => ["https://instructor.labs.sysdeseng.com"],
+            :internal_domains   => ["https://instructor.labs.sysdeseng.com", "https://www.youtube.com"],
             :external_only      => true,
             :url_swap           => {'https://kubevirt.io/' => '',},
         }
