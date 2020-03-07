@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-06T07:16:42+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-07T07:16:42+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.27.0</title><link href="https://kubevirt.io//2020/changelog-v0.27.0.html" rel="alternate" type="text/html" title="KubeVirt v0.27.0" /><published>2020-03-06T00:00:00+00:00</published><updated>2020-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.27.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.27.0.html">&lt;h2 id=&quot;v0270&quot;&gt;v0.27.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Mar 6 22:40:34 2020 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Support for more guest agent informations in the API&lt;/li&gt;
+  &lt;li&gt;Support setting priorityClasses on VMs&lt;/li&gt;
+  &lt;li&gt;Support for additional control plane alerts via prometheus&lt;/li&gt;
+  &lt;li&gt;Support for io and emulator thread pinning&lt;/li&gt;
+  &lt;li&gt;Support setting a custom SELinux type for the launcher&lt;/li&gt;
+  &lt;li&gt;Support to perform network configurations from handler instead of launcher&lt;/li&gt;
+  &lt;li&gt;Support to opt-out of auto attaching the serial console&lt;/li&gt;
+  &lt;li&gt;Support for different uninstallStaretgies for data protection&lt;/li&gt;
+  &lt;li&gt;Fix to let qemu run in the qemu group&lt;/li&gt;
+  &lt;li&gt;Fix guest agen connectivity check after i.e. live migrations&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.27.0</summary></entry><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
 
 &lt;p&gt;It is important to notice that from the Kubernetes scheduler stand point, which will be explained later, it only manages Pod and node scheduling. Since the VM is wrapped up in a Pod, the same scheduling rules are completely valid to KubeVirt VMs.&lt;/p&gt;
 
@@ -2066,37 +2081,4 @@ There is a &lt;a href=&quot;/2019/Access-Virtual-Machines-graphic-console-using-
   &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/origin-web-console&quot;&gt;OKD Console&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/wavezhang/virtVNC/&quot;&gt;virtVNC, noVNC for Kubevirt&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande, Pedro Ibáñez Requena</name></author><category term="news" /><category term="octant" /><category term="okd" /><category term="openshift console" /><category term="cockpit" /><category term="noVNC" /><category term="user interface" /><category term="web interface" /><category term="virtVNC" /><category term="OKD console" /><summary type="html">The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. Wikipedia:User Interface</summary></entry><entry><title type="html">KubeVirt Laboratory 2, experimenting with CDI</title><link href="https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 2, experimenting with CDI" /><published>2019-12-10T00:00:00+00:00</published><updated>2019-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;KubeVirt Laboratory 2: Experiment with CDI&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
-
-&lt;p&gt;In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt installation notes&lt;/a&gt; or try it yourself in the &lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt&lt;/a&gt; Katacoda scenario.
-Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/ZHqcHbCxzYM&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
-
-&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Configure the storage for the Virtual Machine&lt;/li&gt;
-  &lt;li&gt;Install the CDI Operator and the CR for the importer&lt;/li&gt;
-  &lt;li&gt;Create and customize the Fedora Virtual Machine from the cloud image&lt;/li&gt;
-  &lt;li&gt;Connect to the console of the Virtual Machine&lt;/li&gt;
-  &lt;li&gt;Connect to the Virtual Machine using SSH&lt;/li&gt;
-  &lt;li&gt;Redirect a host port to the Virtual Machine to enable external SSH connectivity&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;Kubevirt Laboratory 2: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="CDI" /><category term="containerized data importer" /><category term="vm import" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 2: Experiment with CDI</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande, Pedro Ibáñez Requena</name></author><category term="news" /><category term="octant" /><category term="okd" /><category term="openshift console" /><category term="cockpit" /><category term="noVNC" /><category term="user interface" /><category term="web interface" /><category term="virtVNC" /><category term="OKD console" /><summary type="html">The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. Wikipedia:User Interface</summary></entry></feed>

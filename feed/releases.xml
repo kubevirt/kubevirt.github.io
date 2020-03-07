@@ -1,4 +1,19 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-06T07:16:42+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-07T07:16:42+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.27.0</title><link href="https://kubevirt.io//2020/changelog-v0.27.0.html" rel="alternate" type="text/html" title="KubeVirt v0.27.0" /><published>2020-03-06T00:00:00+00:00</published><updated>2020-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.27.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.27.0.html">&lt;h2 id=&quot;v0270&quot;&gt;v0.27.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Mar 6 22:40:34 2020 +0100&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Support for more guest agent informations in the API&lt;/li&gt;
+  &lt;li&gt;Support setting priorityClasses on VMs&lt;/li&gt;
+  &lt;li&gt;Support for additional control plane alerts via prometheus&lt;/li&gt;
+  &lt;li&gt;Support for io and emulator thread pinning&lt;/li&gt;
+  &lt;li&gt;Support setting a custom SELinux type for the launcher&lt;/li&gt;
+  &lt;li&gt;Support to perform network configurations from handler instead of launcher&lt;/li&gt;
+  &lt;li&gt;Support to opt-out of auto attaching the serial console&lt;/li&gt;
+  &lt;li&gt;Support for different uninstallStaretgies for data protection&lt;/li&gt;
+  &lt;li&gt;Fix to let qemu run in the qemu group&lt;/li&gt;
+  &lt;li&gt;Fix guest agen connectivity check after i.e. live migrations&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.27.0</summary></entry><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Feb 7 09:40:07 2020 +0100&lt;/p&gt;
 
@@ -128,19 +143,4 @@
   &lt;li&gt;Countless testcase fixes and additions&lt;/li&gt;
   &lt;li&gt;Several smaller bug fixes&lt;/li&gt;
   &lt;li&gt;Improved upgrade documentation&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.18.0</summary></entry><entry><title type="html">KubeVirt v0.17.0</title><link href="https://kubevirt.io//2019/changelog-v0.17.0.html" rel="alternate" type="text/html" title="KubeVirt v0.17.0" /><published>2019-05-06T00:00:00+00:00</published><updated>2019-05-06T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.17.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.17.0.html">&lt;h2 id=&quot;v0170&quot;&gt;v0.17.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Mon May 6 16:18:01 2019 +0200&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Several testcase additions&lt;/li&gt;
-  &lt;li&gt;Improved virt-controller node distribution&lt;/li&gt;
-  &lt;li&gt;Improved support between version migrations&lt;/li&gt;
-  &lt;li&gt;Support for a configurable MachineType default&lt;/li&gt;
-  &lt;li&gt;Support for live-migration of a VM on node taints&lt;/li&gt;
-  &lt;li&gt;Support for VM swap metrics&lt;/li&gt;
-  &lt;li&gt;Support for versioned virt-launcher / virt-handler communication&lt;/li&gt;
-  &lt;li&gt;Support for HyperV flags&lt;/li&gt;
-  &lt;li&gt;Support for different VM run strategies (i.e manual and rerunOnFailure)&lt;/li&gt;
-  &lt;li&gt;Several fixes for live-migration (TLS support, protected pods)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.17.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.18.0</summary></entry></feed>
