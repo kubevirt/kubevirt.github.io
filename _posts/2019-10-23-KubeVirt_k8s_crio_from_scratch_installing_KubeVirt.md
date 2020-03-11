@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: KubeVirt on Kubernetes with CRI-O from scratch - Installing KubeVirt
-pub-date: Oct 23
+pub-date: October 23
 pub-year: 2019
 tags: [cri-o, kubevirt installation]
 ---
@@ -99,7 +99,7 @@ Use "virtctl <command> --help" for more information about a given command.
 Use "virtctl options" for a list of global command-line options (applies to all commands).
 ```
 
-This step is optional, right now anything related with the Virtual Machines can be done running the `virtctl` command. In case ther's a need to interact with the Virtual Machines without leaving the scope of the `kubectl` command, the virt pluging for krew can be installed following the instructions below:
+This step is optional, right now anything related with the Virtual Machines can be done running the `virtctl` command. In case there's a need to interact with the Virtual Machines without leaving the scope of the `kubectl` command, the virt plugin for Krew can be installed following the instructions below:
 
 ```sh
 k8s-test.local# (
@@ -166,7 +166,7 @@ NAME        AGE   RUNNING   VOLUME
 testvm   13s   false
 ```
 
-After the Virtual Machine has been created, it has to be started, to do so, the virtcl or the kubectl can be used (dependeing on what method has been choosen in previous steps).
+After the Virtual Machine has been created, it has to be started, to do so, the virtctl or the kubectl can be used (depending on what method has been chosen in previous steps).
 
 ```sh
 k8s-test.local# ./virtctl start testvm
@@ -190,7 +190,7 @@ NAME     AGE   PHASE     IP            NODENAME
 testvm   63s   Running   10.244.0.15   k8s-test
 ```
 
-So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (`./virtclt console testvm`) or also a direct connection with SSH can be made:
+So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (`./virtctl console testvm`) or also a direct connection with SSH can be made:
 
 ```sh
 k8s-test.local# ssh cirros@10.244.0.15
@@ -232,5 +232,5 @@ Each step of this guide has a place where to look for possible issues, in genera
 - [Kubernetes pod-network configuration](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network)
 - [Kubectl cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 - [Multus](https://github.com/intel/multus-cni)
-- [KubeVirt Userguide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
+- [KubeVirt User Guide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
 - [KubeVirt Katacoda scenarios](https://www.katacoda.com/kubevirt)

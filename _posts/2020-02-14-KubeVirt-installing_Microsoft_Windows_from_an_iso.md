@@ -10,9 +10,9 @@ tags:
     kubevirt,
     kubernetes,
     "virtual machine",
-    "microsoft windows kubernetes",
-    "microsoft windows container",
-    windows,
+    "Microsoft Windows kubernetes",
+    "Microsoft Windows container",
+    Windows,
   ]
 title: "KubeVirt: installing Microsoft Windows from an ISO"
 pub-date: February, 14
@@ -20,7 +20,7 @@ pub-year: 2020
 ---
 
 Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt,
-but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?
+but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?
 
 In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.
 
@@ -63,9 +63,9 @@ To proceed with the Installation steps the different elements involved are liste
          volumes:
        ...
    ```
-2. A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the `virtctl` command when uploading the file
+2. A PVC with the Microsoft Windows ISO file attached as CD-ROM to the VM, would be automatically created with the `virtctl` command when uploading the file
 
-   First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
+   First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.Microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
    the ISO files to download for evaluation purposes:
 
    ![win2k12_download_iso.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png "KubeVirt Microsoft Windows iso download")
@@ -81,8 +81,8 @@ To proceed with the Installation steps the different elements involved are liste
    - `--image-path`: The path of the ISO file
    - `--pvc-name`: The name of the PVC to store the ISO file, in this example is `iso-win2k12`
    - `--access-mode`: the access mode for the PVC, in the example `ReadOnlyMany` has been used.
-   - `--pvc-size`: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough
-   - `--uploadproxy-url`: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is `10.96.164.35` and the PORT is `443`
+   - `--pvc-size`: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC OS 5G should be enough
+   - `--uploadproxy-url`: The URL of the cdi-upload proxy service, in the following example, the CLUSTER-IP is `10.96.164.35` and the PORT is `443`
 
    > info "Information"
    > To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service.
@@ -126,7 +126,7 @@ To proceed with the Installation steps the different elements involved are liste
    storageClassName: hostpath
    ```
 
-4. A [container with the virtio drivers](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers) attached as a CDROM to the VM.
+4. A [container with the virtio drivers](https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers) attached as a CD-ROM to the VM.
    The container image has to be pulled to have it available in the local registry.
 
    ```sh
@@ -145,7 +145,7 @@ To proceed with the Installation steps the different elements involved are liste
      name: virtiocontainerdisk
    ```
 
-   If the pre-requisites are fullfilled, the final YAML ([win2k12.yml](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml)), will look like:
+   If the pre-requisites are fulfilled, the final YAML ([win2k12.yml](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml)), will look like:
 
    ```yaml
    apiVersion: v1

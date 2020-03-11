@@ -4,7 +4,7 @@ author: Pablo Iranzo Gómez
 description: How Jenkins is leveraged for automation at KubeVirt Cloud Image Builder and Lab Validation
 title: Jenkins Jobs for KubeVirt lab validation
 navbar_active: Blogs
-pub-date: Oct 31
+pub-date: October 31
 pub-year: 2019
 category: news
 tags:
@@ -20,7 +20,7 @@ tags:
 
 ## Introduction
 
-[Jenkins](https://jenkins.io/) is an opensource automation server that allows to define jobs, triggers, etc to validate that certain conditions are met.
+[Jenkins](https://jenkins.io/) is an open-source automation server that allows to define jobs, triggers, etc to validate that certain conditions are met.
 
 Jobs can run either after a trigger has been received (for example from a repo merge or PR), periodically to validate that a previous 'validated' job is still 'valid' or even manually to force refresh of information.
 

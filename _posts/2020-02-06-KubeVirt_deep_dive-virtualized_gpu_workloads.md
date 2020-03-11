@@ -9,11 +9,11 @@ comments: true
 title: "NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat & Vishesh Tanksale, NVIDIA"
 pub-date: February, 06
 pub-year: 2019
-tags: [kubecon, gpu, nvidia, gpu workloads, pass-through, passthru, kvm, qemu]
+tags: [KubeCon, GPU, NVIDIA, GPU workloads, pass-through, passthrough, KVM, QEMU]
 ---
 
 In this [video](https://www.youtube.com/watch?v=Qejlyny0G58), David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes.
-Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some
+Using NVIDIA's GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some
 performance metrics comparing KubeVirt to standalone KVM.
 
 ## KubeVirt Intro
@@ -72,7 +72,7 @@ The truth here is that a KubeVirt VM is a KVM+qemu process running inside a pod.
 ![kubevirt_virtual_machine](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_virtual_machine.png "KubeVirt VM = KVM+qemu")
 
 The VM Launch flow is shown in the following diagram. Since the user posts a VM manifest to the cluster until the Kubelet spins up the VM pod.
-And finaly the virt-handler instructs the virt-launcher how to launch the qemu.
+And finally the virt-handler instructs the virt-launcher how to launch the qemu.
 
 ![kubevirt_vm_launch_flow](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_vm_launch_flow.png "KubeVirt VM launch flow")
 
@@ -107,14 +107,14 @@ still need to run VMs and have native GPU functionalities, that is why NVIDIA de
 ![gpus_on_kubevirt](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png "GPU/vGPU on KubeVirt")
 
 To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in [GitHub](https://github.com/NVIDIA/kubevirt-gpu-device-plugin)
-It's opensource and anybody can take a look to it and download it.
+It's open-source and anybody can take a look to it and download it.
 
 Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs,
 the following diagram shows the different layers involved in the GPU pass-through architecture:
 
 ![kubevirt_gpu_passthrough](/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png "KubeVirt GPU passthrough")
 
-Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUS in that node), the Virtual Machine specification
+Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUs in that node), the Virtual Machine specification
 containing the `deviceName` that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as
 any other else in Kubernetes.
 
@@ -124,7 +124,7 @@ The main Device Plugin Functions are:
 
 - GPU and vGPU device Discovery
   - GPUs with VFIO-PCI driver on the host are identified
-  - vGPUs configured using Nvidia vGPU manager are identified
+  - vGPUs configured using NVIDIA vGPU manager are identified
 - GPU and vGPU device Advertising
   - Discovered devices are advertised to kubelet as allocatable resources
 - GPU and vGPU device Allocation
@@ -149,11 +149,11 @@ taking a look to the following video.
 
 ## Speakers
 
-[David Vossel](https://github.com/davidvossel) David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift’s Container Native Virtualization (CNV)
+[David Vossel](https://github.com/davidvossel) David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift's Container Native Virtualization (CNV)
 and is a core contributor to the open source KubeVirt project.
 
 [Vishesh Tanksale](https://www.linkedin.com/in/vishesh-tanksale) is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster.
-He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sanbox Project.
+He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sandbox Project.
 
 ## References
 

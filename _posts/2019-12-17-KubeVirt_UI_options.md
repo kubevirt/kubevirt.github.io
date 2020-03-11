@@ -30,7 +30,7 @@ The different UI options available for KubeVirt that we have been checking, at t
 
 - [Octant](https://github.com/vmware-tanzu/octant)
 - [OKD: The Origin Community Distribution of Kubernetes](https://github.com/openshift/okd)
-- [Openshift console](https://github.com/openshift/console) running on vanilla Kubernetes
+- [OpenShift console](https://github.com/openshift/console) running on vanilla Kubernetes
 - [Cockpit](https://cockpit-project.org/)
 - [noVNC](https://novnc.com/info.html)
 
@@ -74,9 +74,9 @@ As defined in the [official webpage](https://www.okd.io/):
 
 > OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.
 
-A few weeks ago Kubernetes distribution [OKD4](https://github.com/openshift/okd) was released as preview. OKD is the official upstream version of Red Hat's Openshift. Since Openshift includes KubeVirt (Red Hat calls it [CNV](https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html)) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.
+A few weeks ago Kubernetes distribution [OKD4](https://github.com/openshift/okd) was released as preview. OKD is the official upstream version of Red Hat's OpenShift. Since OpenShift includes KubeVirt (Red Hat calls it [CNV](https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html)) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.
 
-Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with Openshift. We have noticed that from the UI a user can:
+Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with OpenShift. We have noticed that from the UI a user can:
 
 - Install the KubeVirt operator from the operator marketplace.
 - Create Virtual Machines by importing YAML files or following a wizard. The wizard prevents you from moving to the next screen until you provide values in the required fields.
@@ -102,7 +102,7 @@ There is actually a [KubeVirt Web User Interface](https://github.com/kubevirt/we
 
 As we reviewed previously the [OpenShift web console](https://github.com/openshift/console) is just another piece inside OKD. It is an independent part and, as it is stated in their official GitHub repository, it can run on top of native Kubernetes. OpenShift Console a.k.a bridge is defined as:
 
-> a friendly kubectl in the form of a single page webapp. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:
+> a friendly kubectl in the form of a single page web application. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:
 
 - Proxying the Kubernetes API under /api/kubernetes
 - Providing additional non-Kubernetes APIs for interacting with the cluster
@@ -111,7 +111,7 @@ As we reviewed previously the [OpenShift web console](https://github.com/openshi
 
 Then, as briefly explained in their [repository](https://github.com/openshift/console#native-kubernetes), our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar to the ones found in the OKD installation except:
 
-- KubeVirt installation is done using the [Hyperconverged Cluster Operator (HCO) without OL or Marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace) instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically
+- KubeVirt installation is done using the [Hyperconverged Cluster Operator (HCO) without OLM or Marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace) instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically
 - Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.
 - Connection to the VM via serial or VNC console is flaky.
 - VM templates can only be created from YAML. The wizard dialog is based on OpenShift templates.
@@ -168,7 +168,7 @@ In this animation you can see the feature of connecting to the Virtual Machine w
 
 ## Summary
 
-From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a poweful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.
+From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a powerful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.
 
 OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.
 

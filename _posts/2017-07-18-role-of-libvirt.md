@@ -11,8 +11,6 @@ pub-year: 2017
 tags: [libvirt]
 ---
 
-# The role of libvirt
-
 [Libvirt](https://libvirt.org) project.
 
 ## Can I perform a 1:1 translation of my libvirt domain xml to a VM Spec?
@@ -28,7 +26,7 @@ does not permit to address host resources.
 ## Does a VM Spec support all features of libvirt?
 
 No, libvirt has a wide range of features, reaching beyond pure virtualization
-fatures, into host, network, and storage management. The API was driven by the
+features, into host, network, and storage management. The API was driven by the
 requirements of running virtualization on a host.
 
 A VM Spec however is a VM definition on the _cluster level_, this by itself

@@ -3,7 +3,7 @@ layout: post
 author: slintes
 description: New Volume Types - ConfigMap, Secret and ServiceAccount
 navbar_active: Blogs
-pub-date: Nov 16
+pub-date: November 16
 pub-year: 2018
 category: news
 comments: true
@@ -29,7 +29,7 @@ With the third new volume type `serviceAccount` you can get this information int
 
 ## Example
 
-We assume that you already have a Kubernetes or Openshift cluster running with KubeVirt installed.
+We assume that you already have a Kubernetes or OpenShift cluster running with KubeVirt installed.
 
 ### Step 1
 

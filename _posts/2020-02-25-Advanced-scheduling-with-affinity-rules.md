@@ -4,7 +4,17 @@ author: Alberto Losada Grande
 description: KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to  virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.
 navbar_active: Blogs
 category: news
-tags: [ "kubevirt", "kubernetes", "virtual machine", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys" ]
+tags:
+  [
+    "kubevirt",
+    "kubernetes",
+    "virtual machine",
+    "VM",
+    "Advanced VM scheduling",
+    "affinity",
+    "scheduling",
+    "topologyKeys",
+  ]
 comments: true
 title: Advanced scheduling using affinity and anti-affinity rules
 pub-date: February 25
@@ -18,7 +28,6 @@ It is important to notice that from the Kubernetes scheduler stand point, which 
 > warning "Warning"
 > As informed in the [official Kubernetes documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#inter-pod-affinity-and-anti-affinity): inter-pod affinity and anti-affinity require substantial amount of processing which can slow-down scheduling in large clusters significantly. This can be specially notorious in clusters larger than several hundred nodes.
 
-
 ## Introduction
 
 In a Kubernetes cluster, [kube-scheduler](https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/) is the default scheduler and runs as part of the control plane. Kube-scheduler is in charge of selecting an optimal node for every newly created or unscheduled pod to run on. However, every container within a pod and the pods themselves, have different requirements for resources. Therefore, existing nodes need to be filtered according to the specific requirements.
@@ -28,13 +37,12 @@ In a Kubernetes cluster, [kube-scheduler](https://kubernetes.io/docs/reference/c
 
 When we talk about scheduling, we refer basically to making sure that Pods are matched to Nodes so that a Kubelet can run them. Actually, kube-scheduler selects a node for the pod in a 2-step operation:
 
-* **Filtering.** The filtering step finds the set of candidate Nodes where it’s possible to schedule the Pod. The result is a list of Nodes, usually more than one.
-* **Scoring.** In the scoring step, the scheduler ranks the remaining nodes to choose the most suitable Pod placement. This is accomplished based on a score obtained from a list of scoring rules that are applied by the scheduler.
+- **Filtering.** The filtering step finds the set of candidate Nodes where it’s possible to schedule the Pod. The result is a list of Nodes, usually more than one.
+- **Scoring.** In the scoring step, the scheduler ranks the remaining nodes to choose the most suitable Pod placement. This is accomplished based on a score obtained from a list of scoring rules that are applied by the scheduler.
 
 The obtained list of candidate nodes is evaluated using multiple priority criteria, which add up to a weighted score. Nodes with higher values are better candidates to run the pod. Among the criteria are affinity and anti-affinity rules; nodes with higher affinity for the pod have a higher score, and nodes with higher anti-affinity have a lower score. Finally, kube-scheduler assigns the Pod to the Node with the highest score. If there is more than one node with equal scores, kube-scheduler selects one of these randomly.
 
 In this blog post we are going to focus on examples of affinity and anti-affinity rules applied to solve real use cases. A common use for affinity rules is to schedule related pods to be close to each other for performance reasons. A common use case for anti-affinity rules is to schedule related pods not too close to each other for high availability reasons.
-
 
 ## Goal: Run my customapp
 
@@ -46,30 +54,30 @@ In this example, our mission is to run a customapp that is composed of 3 tiers:
 
 Instructions were delivered to deploy the application in our production Kubernetes cluster taking advantage of the existing KubeVirt integration and making sure the application is resilient to any problems that can occur. The current status of the cluster is the following:
 
-- A stretched Kubernetes cluster is already up and running. 
+- A stretched Kubernetes cluster is already up and running.
 - [KubeVirt](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) is already installed.
 - There is enough free CPU, Memory and disk space in the cluster to deploy customapp stack.
 
 > info "information"
-> The Kubernetes stretched cluster is running in 3 different geographical locations to provide high availability. Also, all locations are close and well-connected to provide low latency between the nodes. 
+> The Kubernetes stretched cluster is running in 3 different geographical locations to provide high availability. Also, all locations are close and well-connected to provide low latency between the nodes.
 
 Topology used is common for large data centers, such as cloud providers, which is based in organizing hosts into regions and zones:
 
-* A **region** is a set of hosts in a close geographic area, which guarantees high-speed connectivity between them.
-* A **zone**, also called an availability zone, is a set of hosts that might fail together because they share common critical infrastructure components, such as a network, storage, or power.
+- A **region** is a set of hosts in a close geographic area, which guarantees high-speed connectivity between them.
+- A **zone**, also called an availability zone, is a set of hosts that might fail together because they share common critical infrastructure components, such as a network, storage, or power.
 
 There are some important labels when creating advanced scheduling workflows with affinity and anti-affinity rules. As explained previously, they are very close linked to common topologies used in datacenters. Labels such as:
 
-* *topology.kubernetes.io/zone*
-* *topology.kubernetes.io/region*
-* *kubernetes.io/hostname*
-* *kubernetes.io/arch*
-* *kubernetes.io/os*
+- _topology.kubernetes.io/zone_
+- _topology.kubernetes.io/region_
+- _kubernetes.io/hostname_
+- _kubernetes.io/arch_
+- _kubernetes.io/os_
 
 > warning "Warning"
-> As it is detailed in the [labels and annotations official documentation](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/), starting in v1.17, label *failure-domain.beta.kubernetes.io/region* and *failure-domain.beta.kubernetes.io/zone* are deprecated in favour of **topology.kubernetes.io/region** and **topology kubernetes.io/zone respectively**.
+> As it is detailed in the [labels and annotations official documentation](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/), starting in v1.17, label _failure-domain.beta.kubernetes.io/region_ and _failure-domain.beta.kubernetes.io/zone_ are deprecated in favour of **topology.kubernetes.io/region** and **topology kubernetes.io/zone respectively**.
 
-Previous labels are just prepopulated Kubernetes labels that the system uses to denote such a topology domain. In our case, the cluster is running in *Iberia* **region** across three different **zones**: *scu, bcn and sab*. Therefore, it must be labelled accordingly since advanced scheduling rules are going to be applied:
+Previous labels are just prepopulated Kubernetes labels that the system uses to denote such a topology domain. In our case, the cluster is running in _Iberia_ **region** across three different **zones**: _scu, bcn and sab_. Therefore, it must be labelled accordingly since advanced scheduling rules are going to be applied:
 
 ![cluster labelling](/assets/2020-02-25-Advanced-scheduling-with-affinity-rules/kubevirt-blog-affinity.resized.png)
 
@@ -77,7 +85,6 @@ Previous labels are just prepopulated Kubernetes labels that the system uses to 
 > Pod anti-affinity requires nodes to be consistently labelled, i.e. every node in the cluster must have an appropriate label matching **topologyKey**. If some or all nodes are missing the specified topologyKey label, it can lead to unintended behavior.
 
 Below you can find a cluster labeling where topology is based in one region and several zones spread across geographically. Additionally, special **high performing nodes** composed by nodes with a high number of resources available including memory, cpu, storage and network are marked as well.
-
 
 ```sh
 $ kubectl label node kni-worker topology.kubernetes.io/region=iberia topology.kubernetes.io/zone=scu
@@ -109,16 +116,16 @@ kni-worker5         Ready    <none>   17m   v1.17.0   beta.kubernetes.io/arch=am
 kni-worker6         Ready    <none>   17m   v1.17.0   beta.kubernetes.io/arch=amd64,beta.kubernetes.io/os=linux,kubernetes.io/arch=amd64,kubernetes.io/hostname=kni-worker6,kubernetes.io/os=linux,performance=high,topology.kubernetes.io/region=iberia,topology.kubernetes.io/zone=sab
 ```
 
-Finally, the cluster is ready to run and deploy our specific *customapp*.
+Finally, the cluster is ready to run and deploy our specific _customapp_.
 
 ### The clustered database
 
 A MS Windows 2016 Server virtual machine is already containerized and ready to be deployed. As we have to deploy 3 replicas of the operating system a `VirtualMachineInstanceReplicaSet` has been created. Once the replicas are up and running, database administrators will be able to reach the VMs running in our Kubernetes cluster through Remote Desktop Protocol (RDP). Eventually, MS SQL2016 database is installed and configured as a clustered database to provide high availability to our customapp.
 
 > info "Information"
->Check [KubeVirt: installing Microsoft Windows from an ISO]({% post_url 2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso %}) if you need further information on how to deploy a MS Windows VM on KubeVirt.
+> Check [KubeVirt: installing Microsoft Windows from an ISO]({% post_url 2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso %}) if you need further information on how to deploy a MS Windows VM on KubeVirt.
 
-Regarding the scheduling, a Kubernetes node of each zone has been labelled as high-performance, e.g. it has more memory, storage, CPU and higher performing disk and network than the other node that shares the same zone. This specific Kubernetes node was provisioned to run the database VM due to the hardware requirements to run database applications. Therefore, a scheduling rule is needed to be sure that all MSSQL2016 instances run *only* in these high-performance servers.
+Regarding the scheduling, a Kubernetes node of each zone has been labelled as high-performance, e.g. it has more memory, storage, CPU and higher performing disk and network than the other node that shares the same zone. This specific Kubernetes node was provisioned to run the database VM due to the hardware requirements to run database applications. Therefore, a scheduling rule is needed to be sure that all MSSQL2016 instances run _only_ in these high-performance servers.
 
 > note "Note"
 > These nodes were labelled as **performance=high**.
@@ -141,28 +148,28 @@ spec:
       labels:
         kubevirt.io/domain: mssql2016
     spec:
-      nodeSelector:     #nodeSelector matches nodes where performance key has high as value.
+      nodeSelector: #nodeSelector matches nodes where performance key has high as value.
         performance: high
       domain:
         devices:
           disks:
-          - disk:
-              bus: virtio
-            name: containerdisk
-          - disk:
-              bus: virtio
-            name: cloudinitdisk
+            - disk:
+                bus: virtio
+              name: containerdisk
+            - disk:
+                bus: virtio
+              name: cloudinitdisk
           interfaces:
-          - bridge: {}
-            name: default
+            - bridge: {}
+              name: default
         machine:
           type: ""
         resources:
           requests:
             memory: 16Gi
       networks:
-      - name: default
-        pod: {}
+        - name: default
+          pod: {}
 ```
 
 Next, the `VirtualMachineInstanceReplicaSet` configuration partially shown previously is applied successfully.
@@ -172,7 +179,7 @@ $ kubectl create -f vmr-windows-mssql.yaml
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 created
 ```
 
-Then, it is expected that the 3 `VirtualMachineInstances` will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the *even* nodes.
+Then, it is expected that the 3 `VirtualMachineInstances` will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the _even_ nodes.
 
 ```sh
 $ kubectl get pods -o wide
@@ -207,7 +214,7 @@ pod/virt-launcher-mssql2016rd4lk-6zz9d evicted
 node/kni-worker2 evicted
 ```
 
-The result is an unwanted scenario, where two databases are being executed in the same high performing server. *This leads us to more advanced scheduling features like affinity and anti-affinity.*
+The result is an unwanted scenario, where two databases are being executed in the same high performing server. _This leads us to more advanced scheduling features like affinity and anti-affinity._
 
 ```sh
 $ kubectl get vmi -o wide
@@ -219,22 +226,22 @@ mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
 
 The [affinity/anti-affinity rules](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) solve much more complex scenarios compared to [nodeSelector](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector). Some of the key enhancements are:
 
-* The language is more expressive (not just "AND or exact match").
-* You can indicate that the rule is "soft"/"preference" rather than a hard requirement, so if the scheduler can’t satisfy it, the pod will still be scheduled.
-* You can constrain against labels on other pods running on the node (or other topological domain), rather than against labels on the node itself, which allows rules about which pods can and cannot be co-located.
+- The language is more expressive (not just "AND or exact match").
+- You can indicate that the rule is "soft"/"preference" rather than a hard requirement, so if the scheduler can’t satisfy it, the pod will still be scheduled.
+- You can constrain against labels on other pods running on the node (or other topological domain), rather than against labels on the node itself, which allows rules about which pods can and cannot be co-located.
 
-Before going into more detail, it should be noticed that there are currently two types of **affinity** that applies to both *Node and Pod affinity*. They are called `requiredDuringSchedulingIgnoredDuringExecution` and `preferredDuringSchedulingIgnoredDuringExecution`. You can think of them as *hard* and *soft* respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.
+Before going into more detail, it should be noticed that there are currently two types of **affinity** that applies to both _Node and Pod affinity_. They are called `requiredDuringSchedulingIgnoredDuringExecution` and `preferredDuringSchedulingIgnoredDuringExecution`. You can think of them as _hard_ and _soft_ respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.
 
 Said that, it is time to edit the `VirtualMachineInstanceReplicaSet` YAML file. Actually, `nodeSelector` must be removed and two different affinity rules created instead.
 
-1. **nodeAffinity rule**. This rule ensures that during scheduling time the application (MS SQL2016) must be placed *only* on nodes where the key performance contains the value high. Note the word only, there is no room for other nodes.
-2. **podAntiAffinity rule**. This rule ensures that two applications with the key `kubevirt.io/domain` equals to `mssql2016` must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey `topology.kubernetes.io/zone`. This means that only one database instance can run in each zone, e.g. one database in *scu, bcn and sab* respectively.
+1. **nodeAffinity rule**. This rule ensures that during scheduling time the application (MS SQL2016) must be placed _only_ on nodes where the key performance contains the value high. Note the word only, there is no room for other nodes.
+2. **podAntiAffinity rule**. This rule ensures that two applications with the key `kubevirt.io/domain` equals to `mssql2016` must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey `topology.kubernetes.io/zone`. This means that only one database instance can run in each zone, e.g. one database in _scu, bcn and sab_ respectively.
 
 In principle, the `topologyKey` can be any legal label-key. However, for performance and security reasons, there are some constraints on `topologyKey` that need to be taken into consideration:
 
-* For affinity and for `requiredDuringSchedulingIgnoredDuringExecution` pod anti-affinity, empty `topologyKey` is not allowed.
-* For `preferredDuringSchedulingIgnoredDuringExecution` pod anti-affinity, empty `topologyKey` is interpreted as "all topologies" ("all topologies" here is now limited to the combination of `kubernetes.io/hostname`, `topology.kubernetes.io/zone` and `topology.kubernetes.io/region`).
-* For `requiredDuringSchedulingIgnoredDuringExecution` pod anti-affinity, the admission controller `LimitPodHardAntiAffinityTopology` was introduced to limit `topologyKey` to `kubernetes.io/hostname`. Verify if it is enabled or disabled.
+- For affinity and for `requiredDuringSchedulingIgnoredDuringExecution` pod anti-affinity, empty `topologyKey` is not allowed.
+- For `preferredDuringSchedulingIgnoredDuringExecution` pod anti-affinity, empty `topologyKey` is interpreted as "all topologies" ("all topologies" here is now limited to the combination of `kubernetes.io/hostname`, `topology.kubernetes.io/zone` and `topology.kubernetes.io/region`).
+- For `requiredDuringSchedulingIgnoredDuringExecution` pod anti-affinity, the admission controller `LimitPodHardAntiAffinityTopology` was introduced to limit `topologyKey` to `kubernetes.io/hostname`. Verify if it is enabled or disabled.
 
 Here is the `VirtualMachineInstanceReplicaSet` object replaced.
 
@@ -242,6 +249,7 @@ Here is the `VirtualMachineInstanceReplicaSet` object replaced.
 $ kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 ```
+
 Now, it contains both affinity rules:
 
 ```yaml
@@ -261,25 +269,24 @@ spec:
         kubevirt.io/domain: mssql2016
     spec:
       affinity:
-        nodeAffinity:    #This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high
+        nodeAffinity: #This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high
           requiredDuringSchedulingIgnoredDuringExecution:
             nodeSelectorTerms:
-            - matchExpressions:
-              - key: performance
-                operator: In
-                values:
-                - high
-        podAntiAffinity:  #This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone
+              - matchExpressions:
+                  - key: performance
+                    operator: In
+                    values:
+                      - high
+        podAntiAffinity: #This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: kubevirt.io/domain
-                operator: In
-                values:
-                - mssql2016
-            topologyKey: topology.kubernetes.io/zone
+            - labelSelector:
+                matchExpressions:
+                  - key: kubevirt.io/domain
+                    operator: In
+                    values:
+                      - mssql2016
+              topologyKey: topology.kubernetes.io/zone
       domain:
-...
 ```
 
 Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the `VirtualMachineInstances` (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).
@@ -328,7 +335,6 @@ A detailed explanation on how to run a [Varnish Cache](https://varnish-cache.org
 
 Start by creating a ConfigMap that contains a VCL template and a Secret object that contains the secret for the Varnish administration port. Then apply the [Varnish deployment config](https://github.com/mittwald/kube-httpcache#deploy-varnish).
 
-
 ```sh
 $ kubectl create -f configmap.yaml
 configmap/vcl-template created
@@ -339,8 +345,8 @@ secret/varnish-secret created
 
 In our specific mandate, 3 replicas of our web cache application are needed. Each one must be running in a different zone or datacenter. Preferably, if possible, expected to run in a Kubernetes node different from the database since as administrators we would like the database to take advantage of all the possible resources of the high-performing server. Taken into account this prerequisite, the following advanced rules are applied:
 
-1. **nodeAffinity rule**. This rule ensures that during scheduling time the application should be placed *if possible* on nodes where the key performance does not contain the value high. Note the word *if possible*. This means, it will try to run on a not performing server, however, if there none available it will be co-located with the database.
-2. **podAntiAffinity rule**. This rule ensures that two applications with the key `app` equals to `cache` must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey `topology.kubernetes.io/zone`. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in *scu, bcn and sab* respectively.
+1. **nodeAffinity rule**. This rule ensures that during scheduling time the application should be placed _if possible_ on nodes where the key performance does not contain the value high. Note the word _if possible_. This means, it will try to run on a not performing server, however, if there none available it will be co-located with the database.
+2. **podAntiAffinity rule**. This rule ensures that two applications with the key `app` equals to `cache` must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey `topology.kubernetes.io/zone`. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in _scu, bcn and sab_ respectively.
 
 ```yaml
 apiVersion: apps/v1
@@ -358,28 +364,28 @@ spec:
         app: cache
     spec:
       affinity:
-        nodeAffinity:   #This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high
+        nodeAffinity: #This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 10
-            preference:
-              matchExpressions:
-              - key: performance
-                operator: NotIn
-                values:
-                - high
+            - weight: 10
+              preference:
+                matchExpressions:
+                  - key: performance
+                    operator: NotIn
+                    values:
+                      - high
         podAntiAffinity: #This rule ensures that the application cannot run in the same zone (app=cache).
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - cache
-            topologyKey: topology.kubernetes.io/zone
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - cache
+              topologyKey: topology.kubernetes.io/zone
       containers:
-      - name: cache
-        image: quay.io/spaces/kube-httpcache:stable
-        imagePullPolicy: Always
+        - name: cache
+          image: quay.io/spaces/kube-httpcache:stable
+          imagePullPolicy: Always
 ```
 
 > info "Information"
@@ -415,8 +421,8 @@ A third-party provider delivered a black box (appliance) in the form of a virtua
 
 Following up with our objective, this web application must take advantage of the web cache application running as a Pod. So we require the appliance to be co-located in the same server that Varnish Cache in order to accelerate the delivery of the content provided by the appliance. Also, it is required to run every replica of the appliance in different zones or data centers. Taken into account these prerequisites, the following advanced rules are configured:
 
-1. **podAffinity rule**. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key `app' equals to `cache` is running. That is is to say where the Varnish Cache is running. Note that this is mandatory, it will only run colocated with the web cache Pod.
-2. **podAntiAffinity rule**. This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey `topology.kubernetes.io/zone`. This means that only one appliance instance can run in each zone, e.g. one appliance in *scu, bcn and sab* respectively.
+1. **podAffinity rule**. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key `app' equals to`cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.
+2. **podAntiAffinity rule**. This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey `topology.kubernetes.io/zone`. This means that only one appliance instance can run in each zone, e.g. one appliance in _scu, bcn and sab_ respectively.
 
 ```yaml
 apiVersion: kubevirt.io/v1alpha3
@@ -437,22 +443,22 @@ spec:
       affinity:
         podAffinity: #This rule ensures that during scheduling time the application must be placed on nodes where Varnish Cache is running
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: app
-                operator: In
-                values:
-                - cache
-            topologyKey: topology.kubernetes.io/hostname
-        podAntiAffinity:   #This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone
+            - labelSelector:
+                matchExpressions:
+                  - key: app
+                    operator: In
+                    values:
+                      - cache
+              topologyKey: topology.kubernetes.io/hostname
+        podAntiAffinity: #This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone
           requiredDuringSchedulingIgnoredDuringExecution:
-          - labelSelector:
-              matchExpressions:
-              - key: "kubevirt.io/domain"
-                operator: In
-                values:
-                - blackbox
-            topologyKey: topology.kubernetes.io/zone
+            - labelSelector:
+                matchExpressions:
+                  - key: "kubevirt.io/domain"
+                    operator: In
+                    values:
+                      - blackbox
+              topologyKey: topology.kubernetes.io/zone
       domain:
 ```
 
@@ -516,9 +522,9 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h17m   Running	 10.244.5.4 
 
 Remember that this is happening because:
 
-* There is a **mandatory** policy that only one replica of each application can run at the same time in the same zone.
-* There is a **soft policy** (preferred) that both applications should run on a non high-performance node. However, since there are any of these nodes available it has been scheduled in the high-performance server along with the database.
-* Both applications must run in the same node
+- There is a **mandatory** policy that only one replica of each application can run at the same time in the same zone.
+- There is a **soft policy** (preferred) that both applications should run on a non high-performance node. However, since there are any of these nodes available it has been scheduled in the high-performance server along with the database.
+- Both applications must run in the same node
 
 > info "Information"
 > Note that uncordoning the node will not make the blackbox appliance and the Varnish Cache pod to come back to the previous node.
@@ -575,7 +581,7 @@ virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h43m   Running   10.244.2.5
 virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4   kni-worker6   False
 ```
 
-This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server *in the same zone*. Although this is not ideal, our `customapp` will be still available while the node recovery is ongoing.
+This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server _in the same zone_. Although this is not ideal, our `customapp` will be still available while the node recovery is ongoing.
 
 ### Draining a high-performance node
 
@@ -634,41 +640,41 @@ For instance, below it is partly shown a snippet of the deployment object for vi
 ```
 
 ```yaml
-        apiVersion: apps/v1
-        kind: Deployment
-        metadata:
-          labels:
-            kubevirt.io: virt-controller
-          name: virt-controller
-          namespace: kubevirt
-        spec:
-          replicas: 2
-          selector:
-            matchLabels:
-              kubevirt.io: virt-controller
-          strategy: {}
-          template:
-            metadata:
-              annotations:
-                scheduler.alpha.kubernetes.io/critical-pod: ""
-                scheduler.alpha.kubernetes.io/tolerations: '[{"key":"CriticalAddonsOnly","operator":"Exists"}]'
-              labels:
-                kubevirt.io: virt-controller
-                prometheus.kubevirt.io: ""
-              name: virt-controller
-            spec:
-              affinity:
-                podAntiAffinity: #This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node
-                  preferredDuringSchedulingIgnoredDuringExecution:
-                  - podAffinityTerm:
-                      labelSelector:
-                        matchExpressions:
-                        - key: kubevirt.io
-                          operator: In
-                          values:
-                          - virt-controller
-                      topologyKey: kubernetes.io/hostname
-                    weight: 1
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    kubevirt.io: virt-controller
+  name: virt-controller
+  namespace: kubevirt
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      kubevirt.io: virt-controller
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        scheduler.alpha.kubernetes.io/critical-pod: ""
+        scheduler.alpha.kubernetes.io/tolerations: '[{"key":"CriticalAddonsOnly","operator":"Exists"}]'
+      labels:
+        kubevirt.io: virt-controller
+        prometheus.kubevirt.io: ""
+      name: virt-controller
+    spec:
+      affinity:
+        podAntiAffinity: #This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchExpressions:
+                    - key: kubevirt.io
+                      operator: In
+                      values:
+                        - virt-controller
+                topologyKey: kubernetes.io/hostname
+              weight: 1
 ```
 
 > info "Information"
@@ -682,6 +688,7 @@ For instance, below it is partly shown a snippet of the deployment object for vi
 NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                 AGE
 kubevirt      virt-handler   6         6         6       6            6           <none>                        25h
 ```
+
 See the partial snippet of a `virt-handler` Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a `nodeAffinity` rule that requires the Pod to run in a specific hostname matched by the key `metadata.name` and value the name of the node (`kni-worker2`). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.
 
 ```yaml
@@ -705,12 +712,12 @@ metadata:
   name: virt-handler-ctzcg
   namespace: kubevirt
   ownerReferences:
-  - apiVersion: apps/v1
-    blockOwnerDeletion: true
-    controller: true
-    kind: DaemonSet
-    name: virt-handler
-    uid: 6e7faece-a7aa-4ed0-959e-4332b2be4ec3
+    - apiVersion: apps/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DaemonSet
+      name: virt-handler
+      uid: 6e7faece-a7aa-4ed0-959e-4332b2be4ec3
   resourceVersion: "28301"
   selfLink: /api/v1/namespaces/kubevirt/pods/virt-handler-ctzcg
   uid: 95d68dad-ad06-489f-b3d3-92413bcae1da
@@ -719,12 +726,11 @@ spec:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-        - matchFields:
-          - key: metadata.name
-            operator: In
-            values:
-            - kni-worker2
-...
+          - matchFields:
+              - key: metadata.name
+                operator: In
+                values:
+                  - kni-worker2
 ```
 
 ## Summary
@@ -733,8 +739,8 @@ In this blog post, a real use case has been detailed on how advanced scheduling 
 
 ## References
 
-* [Kubernetes labels and annotations official documentation](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/)]
-* [Kubevirt node drain blog post](https://kubevirt.io/2019/NodeDrain-KubeVirt.html)
-* [Kubernetes node affinity documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity).
-* [Kubernetes design proposal for Inter-pod topological affinity and anti-affinity](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/podaffinity.md)
-* [KubeVirt add affinity to virt pods pull request discussion](https://github.com/kubevirt/kubevirt/pull/2089)
+- [Kubernetes labels and annotations official documentation](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/)]
+- [Kubevirt node drain blog post](https://kubevirt.io/2019/NodeDrain-KubeVirt.html)
+- [Kubernetes node affinity documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity).
+- [Kubernetes design proposal for Inter-pod topological affinity and anti-affinity](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/podaffinity.md)
+- [KubeVirt add affinity to virt pods pull request discussion](https://github.com/kubevirt/kubevirt/pull/2089)

@@ -28,7 +28,7 @@ I assume you already have a running instance of openshift and kubevirt along wit
 For reference, I used the following components and versions:
 
 - 3 baremetal servers with Rhel 7.4 as base OS
-- Openshift and Cns 3.9
+- OpenShift and CNS 3.9
 - KubeVirt latest
 
 ## Installing Gluster provisioner
@@ -183,4 +183,4 @@ oc process -f template.yml -p Name=myvm | oc process -f - -n default
 
 ## Conclusion
 
-Cloning features in the storage backend allow us to simply use a given set of pvcs as base os for the deployment of our vms. This feature is growing in gluster, worth giving it a try!
+Cloning features in the storage backend allow us to simply use a given set of pvcs as base OS for the deployment of our vms. This feature is growing in gluster, worth giving it a try!

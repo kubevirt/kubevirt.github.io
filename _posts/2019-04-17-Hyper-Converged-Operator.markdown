@@ -25,15 +25,15 @@ In this blog post, I'd like to focus on the first method(i.e by deploying a HCO 
 
 ### Environment description
 
-We can use HCO both on `minikube` and also on `Openshift 4`. We will be using Openshift 4 for HCO in this post.
+We can use HCO both on `minikube` and also on `OpenShift 4`. We will be using OpenShift 4 for HCO in this post.
 
 **Note**: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link [Install_HCO_minikube]({% link pages/quickstart_minikube.md  %}) install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).
 
-## Deploying HCO on Openshift 4 Cluster.
+## Deploying HCO on OpenShift 4 Cluster.
 
-[Openshift](https://www.openshift.com/learn/what-is-openshift/)
+[OpenShift](https://www.openshift.com/learn/what-is-openshift/)
 
-Installation steps for Openshift 4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/)
+Installation steps for OpenShift 4 including video tutorial can be found [here](https://blog.openshift.com/installing-openshift-4-from-start-to-finish/)
 
 Upon successful installation of OpenShift, we will have a cluster consisting of 3 masters and 3 workers which can be used for HCO integration
 
@@ -218,7 +218,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 ```
 
 > note "Note"
-> In Openshift we can use both `kubectl` and `oc` interchangeably to interact with the cluster objects once HCO is up and running.
+> In OpenShift we can use both `kubectl` and `oc` interchangeably to interact with the cluster objects once HCO is up and running.
 
 ## You can also read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
 
@@ -289,7 +289,7 @@ EOF
 
 Please wait until the `hco-catalogsource` pod comes up
 
-Next is to create a subscription, we can create a subscription from the Openshift4 web interface as shown below:
+Next is to create a subscription, we can create a subscription from the OpenShift4 web interface as shown below:
 
 ![Subscription](../assets/2019-04-17-HyperConvergedOperator/subscription.png)
 
@@ -340,7 +340,7 @@ We can see how OLM operator manages the HCO pods from the `openshift-operator-li
 
 ![HCO-Managed-Operators](../assets/2019-04-17-HyperConvergedOperator/HCO-Managed-Operators.png)
 
-The above method demonstrates the integration of HCO operator in Openshift4.
+The above method demonstrates the integration of HCO operator in OpenShift4.
 
 So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart]({% link pages/quickstart_minikube.md  %}#install-virtctl):
 

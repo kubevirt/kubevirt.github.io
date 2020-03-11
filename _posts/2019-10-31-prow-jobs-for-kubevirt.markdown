@@ -4,7 +4,7 @@ author: Pablo Iranzo Gómez
 description: How prow is used to keep website and tutorials 'up'
 title: Prow jobs for KubeVirt website and Tutorial repo
 navbar_active: Blogs
-pub-date: Oct 31
+pub-date: October 31
 pub-year: 2019
 category: news
 tags:

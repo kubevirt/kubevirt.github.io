@@ -3,7 +3,7 @@ layout: post
 author: jcpowermac
 description: Quick rehash of the network deep-dive
 navbar_active: Blogs
-pub-date: Oct 11
+pub-date: October 11
 pub-year: 2018
 category: news
 comments: true
@@ -478,9 +478,9 @@ Here we are reviewing the logs of node to confirm we have a database connection 
 
 ```
 ...output...
-Oct 01 18:28:09 nodejs.localdomain systemd[1]: Started OpenShift NodeJS Example.
-Oct 01 18:28:10 nodejs.localdomain node[12893]: Server running on http://0.0.0.0:8080
-Oct 01 18:28:10 nodejs.localdomain node[12893]: Connected to MongoDB at: mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
+October 01 18:28:09 nodejs.localdomain systemd[1]: Started OpenShift NodeJS Example.
+October 01 18:28:10 nodejs.localdomain node[12893]: Server running on http://0.0.0.0:8080
+October 01 18:28:10 nodejs.localdomain node[12893]: Connected to MongoDB at: mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
 ...output...
 ```
 

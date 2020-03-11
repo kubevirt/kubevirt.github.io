@@ -1,6 +1,6 @@
 ---
 layout: labs
-title: Easy install using Alicloud
+title: Easy install using AliCloud
 permalink: pages/alicloud
 lab: kubernetes
 order: 1

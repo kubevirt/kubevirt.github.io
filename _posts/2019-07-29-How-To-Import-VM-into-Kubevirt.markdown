@@ -205,7 +205,7 @@ spec:
           resources:
             requests:
               storage: 2Gi
-        source: #This is the source where the iso file resides
+        source: #This is the source where the ISO file resides
           http:
             url: http://cdi-http-import-server.kubevirt/images/alpine.iso
 ```
