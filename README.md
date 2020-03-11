@@ -8,7 +8,7 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 
 ## Test your changes in a local container
 
-### Run a jekyll container
+### Run a Jekyll container
 
 - On a SELinux enabled OS:
 

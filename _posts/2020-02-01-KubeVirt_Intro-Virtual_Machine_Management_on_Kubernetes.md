@@ -8,7 +8,7 @@ comments: true
 title: NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi
 pub-date: February, 01
 pub-year: 2019
-tags: [video, virtual machine management, kubecon, numa, cpu pinning, qemu, kvm]
+tags: [video, virtual machine management, KubeCon, NUMA, CPU pinning, QEMU, KVM]
 ---
 
 In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an
@@ -63,7 +63,7 @@ A walk through the KubeVirt components is also shown:
 
 In the Video, a short demo of the project in action is shown. Eventually, Chandra shows how to install KubeVirt and bring up a virtual machine in a short time!
 
-Finally, you will hear about future plans for developing KubeVirt’s capabilities that are emerging from the community. Some hints:
+Finally, you will hear about future plans for developing KubeVirt capabilities that are emerging from the community. Some hints:
 
 - Better support for deterministic workloads:
   - CPU Pinning○NUMA Topology Alignment

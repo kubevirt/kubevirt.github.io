@@ -5,8 +5,8 @@ description: This article focuses on running the OKD web console in a native Kub
 navbar_active: Blogs
 category: news
 comments: true
-title: Managing KubeVirt with Openshift Web Console
-tags: [openshift web console, web interface, okd]
+title: Managing KubeVirt with OpenShift Web Console
+tags: [OpenShift web console, web interface, OKD]
 pub-date: January 24
 pub-year: 2020
 ---
@@ -21,7 +21,7 @@ There are two options to run the OKD web console to manage a Kubernetes cluster:
 
 ## What is the OKD web console
 
-> The [OKD web console](https://github.com/openshift/console) is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly `kubectl` in the form of a single page webapp. It integrates with other services like monitoring, chargeback and the [Operator Lifecycle Manager or OLM](https://github.com/operator-framework/operator-lifecycle-manager). Some things that go on behind the scenes include:
+> The [OKD web console](https://github.com/openshift/console) is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly `kubectl` in the form of a single page web application. It integrates with other services like monitoring, chargeback and the [Operator Lifecycle Manager or OLM](https://github.com/operator-framework/operator-lifecycle-manager). Some things that go on behind the scenes include:
 
 - Proxying the Kubernetes API under /api/kubernetes
 - Providing additional non-Kubernetes APIs for interacting with the cluster
@@ -475,7 +475,7 @@ Ping us or feel free to comment this post in case there are some other existing 
 
 - [KubeVirt user interface options]({% post_url 2019-12-17-KubeVirt_UI_options %})
 - [Managing KubeVirt with OpenShift web console running as a container application on Youtube](https://www.youtube.com/watch?v=xoL0UFI657I)
-- [ManagManaging KubeVirt with OpenShift web console running as a compiled binary on Youtube](https://www.youtube.com/watch?v=XQw4GkGHs44&t=37s)
+- [Managing KubeVirt with OpenShift web console running as a compiled binary on Youtube](https://www.youtube.com/watch?v=XQw4GkGHs44&t=37s)
 - [Kubevirt Laboratory 1 blogpost: Use Kubevirt]({% post_url 2019-12-04-KubeVirt_lab1_use_kubevirt %})
 - [KubeVirt basic operations video on Youtube](https://www.youtube.com/watch?v=KC03G60shIc)
 - [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html)

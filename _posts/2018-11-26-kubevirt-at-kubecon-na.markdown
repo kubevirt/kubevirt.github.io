@@ -3,7 +3,7 @@ layout: post
 author: xsgordon
 description: KubeVirt at KubeCon North America 2019
 navbar_active: Blogs
-pub-date: Nov 26
+pub-date: November 26
 pub-year: 2018
 category: news
 comments: true

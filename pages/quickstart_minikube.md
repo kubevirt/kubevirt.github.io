@@ -24,7 +24,7 @@ Kubernetes, we'll be using
 Our recommendation is to always run the latest (\*) version of
 [Minikube](https://github.com/kubernetes/minikube/){:target="\_blank"}
 available for your platform of choice, following their
-[installation intructions](https://kubernetes.io/docs/tasks/tools/install-minikube/){:target="\_blank"}. For instance, to write this guide, the **Linux** version has been used, together
+[installation instructions](https://kubernetes.io/docs/tasks/tools/install-minikube/){:target="\_blank"}. For instance, to write this guide, the **Linux** version has been used, together
 with the [**KVM2**](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver){:target="\_blank"}
 driver.
 

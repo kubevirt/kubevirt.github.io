@@ -508,7 +508,7 @@ persistentvolumeclaim/pv-claim created
 > note ""
 > Ensure that the `storageClassName` contains the name of the storage class you have created, in this case, `rook-ceph-block`
 
-For checking that it has been bound, list the PVC's and look for the ones in the `rook-ceph-block` storageclass:
+For checking that it has been bound, list the PVCs and look for the ones in the `rook-ceph-block` storageclass:
 
 ```sh
 [root@kv-master-00 ~]# kubectl get pvc
@@ -721,4 +721,4 @@ sh-4.2# ceph status                                                             
 - [Ceph: free-software storage platform](https://ceph.io)
 - [Ceph hardware recommendations](https://docs.ceph.com/docs/jewel/start/hardware-recommendations/)
 - [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
-- [KubeVirt Userguide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
+- [KubeVirt User Guide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)

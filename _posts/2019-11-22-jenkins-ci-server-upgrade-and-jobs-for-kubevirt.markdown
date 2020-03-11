@@ -4,7 +4,7 @@ author: Pablo Iranzo Gómez
 description: Jenkins CI server upgrade and jobs for KubeVirt labs and image creation refresh
 title: Jenkins Infra upgrade
 navbar_active: Blogs
-pub-date: Nov 22
+pub-date: November 22
 pub-year: 2019
 tags: [jenkins, community, infrastructure, contra-lib]
 category: news

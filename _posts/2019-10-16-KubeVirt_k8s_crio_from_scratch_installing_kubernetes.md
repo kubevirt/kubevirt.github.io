@@ -6,7 +6,7 @@ navbar_active: Blogs
 category: news
 comments: true
 title: KubeVirt on Kubernetes with CRI-O from scratch - Installing Kubernetes
-pub-date: Oct 16
+pub-date: October 16
 pub-year: 2019
 tags: [cri-o, kubernetes, ansible]
 ---
@@ -109,7 +109,7 @@ The [Kubernetes pod-network documentation](https://kubernetes.io/docs/setup/prod
 
 In this example Virtual Machines will be deployed with KubeVirt and also they will have multiple network interfaces attached to the VMs, in this example [Multus](https://github.com/intel/multus-cni) is going to be used.
 
-Some of the [Multus Prequisites](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md) indicate:
+Some of the [Multus Prerequisites](https://github.com/intel/multus-cni/blob/master/doc/quickstart.md) indicate:
 
 > note ""
 > After installing Kubernetes, you must install a default network CNI plugin. If you're using kubeadm, refer to the "Installing a pod network add-on" section in the kubeadm documentation. If it's your first time, we generally recommend using Flannel for the sake of simplicity.

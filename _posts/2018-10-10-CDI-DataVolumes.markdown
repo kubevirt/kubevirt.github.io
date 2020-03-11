@@ -3,7 +3,7 @@ layout: post
 author: tripledes
 description: CDI DataVolumes
 navbar_active: Blogs
-pub-date: Oct 11
+pub-date: October 11
 pub-year: 2018
 category: news
 comments: true

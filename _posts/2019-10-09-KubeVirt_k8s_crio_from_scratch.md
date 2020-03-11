@@ -223,7 +223,7 @@ k8s-test.local# mkdir -p /opt/cni/bin
 k8s-test.local# cp bin/* /opt/cni/bin/
 ```
 
-The cgroup manager has to be changed in the CRI-O configuration from the value of `systemd` to `cgroupfs`, to get it done, the file `/etc/crio/crio.conf` has to be edited and the variable `cgroup_manager` has to be replaced from its original value of `systemd` to `cgroupfs` (it could be already set it up to that value, in that case this step can be skiped):
+The cgroup manager has to be changed in the CRI-O configuration from the value of `systemd` to `cgroupfs`, to get it done, the file `/etc/crio/crio.conf` has to be edited and the variable `cgroup_manager` has to be replaced from its original value of `systemd` to `cgroupfs` (it could be already set it up to that value, in that case this step can be skipped):
 
 ```
 k8s-test.local# vim /etc/crio/crio.conf
@@ -277,7 +277,7 @@ Now Kubernetes has to be configured to be able to talk to CRI-O, to proceed, a n
 KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=cgroupfs --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
 ```
 
-Now the systemd has to be reloaded reloaded:
+Now the systemd has to be reloaded:
 
 ```
 k8s-test.local# systemctl daemon-reload

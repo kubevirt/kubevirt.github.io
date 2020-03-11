@@ -6,6 +6,17 @@ This document describes a set of guidelines for generating contents for [KubeVir
 
 Please use the following as general guidelines on any kind of contents generated for this site:
 
+### Technical setup
+
+- Install `pre-commit` in your system and from the repositry folder run `pre-commit install` so that git hook is in place.
+  - It will avoid commits to `source` and `master` branch
+  - It will spell check articles before commit can be performed
+  - Adjust some formatting in markdown like tables, spaces before and after headings, etc (via prettifier)
+  - If you're using `npm` you can also add pre-commit as dependency for development so that it incorporates the `pre-commit` hook and it also spellchecks before you submit to CI and risk to get a failure in build. To do so, use: `npm install --save-dev pre-commit`
+- For each spellcheck failure or duplicate word, adjust `.yaspellerrc`, try to sort the wordfile and check for duplicates reported by yaspeller on run.
+
+### Content
+
 - Follow [Kramdown Quick Reference](https://kramdown.gettalong.org/quickref.html) for syntax reference
 - Split the contents in sections using the different levels of headers that Markdown offers
   - Keep in mind that once rendered, the title you set in the Front Matter data will use `H1`, so start your sections from `H2`

@@ -84,7 +84,7 @@ As _root_:
 $ oc cluster up
 ```
 
-## Installing kube virt with ansible
+## Installing KubeVirt with Ansible
 
 Now that we have everything configured we can the rest as a regular user. Also note that if you had an existing cluster you can could have skipped the previous section.
 
@@ -202,7 +202,7 @@ virt-controller-648945bbcb-nxrj8   0/1       Running   0          10m
 virt-handler-6zh77                 1/1       Running   0          10m
 ```
 
-Now that we have kube virt up and running we are ready to try to start a VM. Let's install virtctl to make it easier to
+Now that we have KubeVirt up and running we are ready to try to start a VM. Let's install virtctl to make it easier to
 start and stop VMs. The latest available version while writing this was 0.4.1.
 
 As _user_:

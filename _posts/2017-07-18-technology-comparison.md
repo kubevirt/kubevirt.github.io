@@ -8,7 +8,7 @@ comments: true
 title: "Comparing KubeVirt to other technologies"
 pub-date: July, 18
 pub-year: 2017
-tags: [kubevirt, clearcontainers, virtlet, cri, openstack, ovirt]
+tags: [KubeVirt, ClearContainers, virtlet, CRI, OpenStack, ovirt]
 ---
 
 ## Is KubeVirt a replacement for \$MYVMMGMTSYSTEM?
@@ -38,13 +38,13 @@ highly interested in providing an API to configure a virtual machine.
 ## Is KubeVirt like virtlet?
 
 Somewhat. [virtlet](https://github.com/Mirantis/virtlet) is a CRI
-implemetation to run virtual machines instead of containers.
+implementation to run virtual machines instead of containers.
 
 The key differences to KubeVirt are:
 
 - **It's a CRI.** This implies that the VM runtime is on the host, and that the
   kubelet is configured to use it.
-  KubeVirt on the other hand can be deplyed as a native Kubernetes add-on.
+  KubeVirt on the other hand can be deployed as a native Kubernetes add-on.
 - **Pod API.** The virtlet is using a Pod API to specify the VM. Certain
   fields like i.e. volumes are mapped to the corresponding VM functionality.
   This is problematic, there are many details to VMs which can not be mapped

@@ -13,7 +13,7 @@ tags: [website, community, roadmap]
 
 # Detour ahead!
 
-Working with websites and with this Kube Virt website for a while has given the idea of things that should improve it.
+Working with websites and with this KubeVirt website for a while has given the idea of things that should improve it.
 
 As this is a community-driven effort, what could better do rather than ask YOU for feedback?
 
@@ -23,4 +23,4 @@ Additionally, as that file is part of the repository, it can be PR'd, commented 
 
 Please, let us know what do you think about what is proposed, or propose new ideas to be added (or create [new issues](https://github.com/kubevirt/kubevirt.github.io/issues/new) to have them added)
 
-Thanks for being part of Kube Virt community!
+Thanks for being part of KubeVirt community!

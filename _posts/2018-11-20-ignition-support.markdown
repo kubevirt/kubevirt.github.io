@@ -3,7 +3,7 @@ layout: post
 author: karmab
 description: Ignition Support
 navbar_active: Blogs
-pub-date: Nov 20
+pub-date: November 20
 pub-year: 2018
 category: news
 comments: true
@@ -12,7 +12,7 @@ tags: [ignition, coreos, rhcos]
 
 ## Introduction
 
-Ignition is a new provisioning utility designed specifically for CoreOS/RhCOS. At the the most basic level, it is a tool for manipulating a node during early boot. This includes:
+Ignition is a new provisioning utility designed specifically for CoreOS/RhCOS. At the most basic level, it is a tool for manipulating a node during early boot. This includes:
 
 - Partitioning disks.
 - Formatting partitions.
@@ -48,7 +48,7 @@ kubectl delete pod --all -n kubevirt
 
 ## WorkThrough
 
-We assume that you already have a Kubernetes or Openshift cluster running with KubeVirt installed.
+We assume that you already have a Kubernetes or OpenShift cluster running with KubeVirt installed.
 
 ### Step 1
 
