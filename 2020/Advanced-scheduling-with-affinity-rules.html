@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -256,7 +256,6 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 
 </div></div>
-
 <h2 id="introduction">Introduction</h2>
 
 <p>In a Kubernetes cluster, <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/">kube-scheduler</a> is the default scheduler and runs as part of the control plane. Kube-scheduler is in charge of selecting an optimal node for every newly created or unscheduled pod to run on. However, every container within a pod and the pods themselves, have different requirements for resources. Therefore, existing nodes need to be filtered according to the specific requirements.</p>
@@ -390,28 +389,28 @@ kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
       <span class="na">labels</span><span class="pi">:</span>
         <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">mssql2016</span>
     <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">nodeSelector</span><span class="pi">:</span>     <span class="c1">#nodeSelector matches nodes where performance key has high as value.</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span> <span class="c1">#nodeSelector matches nodes where performance key has high as value.</span>
         <span class="na">performance</span><span class="pi">:</span> <span class="s">high</span>
       <span class="na">domain</span><span class="pi">:</span>
         <span class="na">devices</span><span class="pi">:</span>
           <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
           <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+            <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
         <span class="na">machine</span><span class="pi">:</span>
           <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
         <span class="na">resources</span><span class="pi">:</span>
           <span class="na">requests</span><span class="pi">:</span>
             <span class="na">memory</span><span class="pi">:</span> <span class="s">16Gi</span>
       <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-        <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
 </code></pre></div></div>
 
 <p>Next, the <code class="highlighter-rouge">VirtualMachineInstanceReplicaSet</code> configuration partially shown previously is applied successfully.</p>
@@ -493,6 +492,7 @@ mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 </code></pre></div></div>
+
 <p>Now, it contains both affinity rules:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
@@ -511,25 +511,24 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
         <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">mssql2016</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">affinity</span><span class="pi">:</span>
-        <span class="na">nodeAffinity</span><span class="pi">:</span>    <span class="c1">#This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high</span>
+        <span class="na">nodeAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high</span>
           <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
             <span class="na">nodeSelectorTerms</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">matchExpressions</span><span class="pi">:</span>
-              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">performance</span>
-                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-                <span class="na">values</span><span class="pi">:</span>
-                <span class="pi">-</span> <span class="s">high</span>
-        <span class="na">podAntiAffinity</span><span class="pi">:</span>  <span class="c1">#This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone</span>
+              <span class="pi">-</span> <span class="na">matchExpressions</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">performance</span>
+                    <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                    <span class="na">values</span><span class="pi">:</span>
+                      <span class="pi">-</span> <span class="s">high</span>
+        <span class="na">podAntiAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone</span>
           <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
-              <span class="na">matchExpressions</span><span class="pi">:</span>
-              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">kubevirt.io/domain</span>
-                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-                <span class="na">values</span><span class="pi">:</span>
-                <span class="pi">-</span> <span class="s">mssql2016</span>
-            <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
+            <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
+                <span class="na">matchExpressions</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">kubevirt.io/domain</span>
+                    <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                    <span class="na">values</span><span class="pi">:</span>
+                      <span class="pi">-</span> <span class="s">mssql2016</span>
+              <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
       <span class="na">domain</span><span class="pi">:</span>
-<span class="nn">...</span>
 </code></pre></div></div>
 
 <p>Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the <code class="highlighter-rouge">VirtualMachineInstances</code> (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).</p>
@@ -606,28 +605,28 @@ secret/varnish-secret created
         <span class="na">app</span><span class="pi">:</span> <span class="s">cache</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">affinity</span><span class="pi">:</span>
-        <span class="na">nodeAffinity</span><span class="pi">:</span>   <span class="c1">#This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high</span>
+        <span class="na">nodeAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high</span>
           <span class="na">preferredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">weight</span><span class="pi">:</span> <span class="m">10</span>
-            <span class="na">preference</span><span class="pi">:</span>
-              <span class="na">matchExpressions</span><span class="pi">:</span>
-              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">performance</span>
-                <span class="na">operator</span><span class="pi">:</span> <span class="s">NotIn</span>
-                <span class="na">values</span><span class="pi">:</span>
-                <span class="pi">-</span> <span class="s">high</span>
+            <span class="pi">-</span> <span class="na">weight</span><span class="pi">:</span> <span class="m">10</span>
+              <span class="na">preference</span><span class="pi">:</span>
+                <span class="na">matchExpressions</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">performance</span>
+                    <span class="na">operator</span><span class="pi">:</span> <span class="s">NotIn</span>
+                    <span class="na">values</span><span class="pi">:</span>
+                      <span class="pi">-</span> <span class="s">high</span>
         <span class="na">podAntiAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that the application cannot run in the same zone (app=cache).</span>
           <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
-              <span class="na">matchExpressions</span><span class="pi">:</span>
-              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">app</span>
-                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-                <span class="na">values</span><span class="pi">:</span>
-                <span class="pi">-</span> <span class="s">cache</span>
-            <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
+            <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
+                <span class="na">matchExpressions</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">app</span>
+                    <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                    <span class="na">values</span><span class="pi">:</span>
+                      <span class="pi">-</span> <span class="s">cache</span>
+              <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
       <span class="na">containers</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cache</span>
-        <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/spaces/kube-httpcache:stable</span>
-        <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cache</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/spaces/kube-httpcache:stable</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
 </code></pre></div></div>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>In this set of affinity rules, a new scheduling policy has been introduced: <code class="highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code>. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.</p>
@@ -663,7 +662,7 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
 <p>Following up with our objective, this web application must take advantage of the web cache application running as a Pod. So we require the appliance to be co-located in the same server that Varnish Cache in order to accelerate the delivery of the content provided by the appliance. Also, it is required to run every replica of the appliance in different zones or data centers. Taken into account these prerequisites, the following advanced rules are configured:</p>
 
 <ol>
-  <li><strong>podAffinity rule</strong>. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key <code class="highlighter-rouge">app' equals to </code>cache` is running. That is is to say where the Varnish Cache is running. Note that this is mandatory, it will only run colocated with the web cache Pod.</li>
+  <li><strong>podAffinity rule</strong>. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key <code class="highlighter-rouge">app' equals to</code>cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.</li>
   <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="highlighter-rouge">kubevirt.io/domain</code> equals to <code class="highlighter-rouge">blackbox</code> must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey <code class="highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one appliance instance can run in each zone, e.g. one appliance in <em>scu, bcn and sab</em> respectively.</li>
 </ol>
 
@@ -685,22 +684,22 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
       <span class="na">affinity</span><span class="pi">:</span>
         <span class="na">podAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that during scheduling time the application must be placed on nodes where Varnish Cache is running</span>
           <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
-              <span class="na">matchExpressions</span><span class="pi">:</span>
-              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">app</span>
-                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-                <span class="na">values</span><span class="pi">:</span>
-                <span class="pi">-</span> <span class="s">cache</span>
-            <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/hostname</span>
-        <span class="na">podAntiAffinity</span><span class="pi">:</span>   <span class="c1">#This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone</span>
+            <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
+                <span class="na">matchExpressions</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">app</span>
+                    <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                    <span class="na">values</span><span class="pi">:</span>
+                      <span class="pi">-</span> <span class="s">cache</span>
+              <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/hostname</span>
+        <span class="na">podAntiAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone</span>
           <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
-              <span class="na">matchExpressions</span><span class="pi">:</span>
-              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s2">"</span><span class="s">kubevirt.io/domain"</span>
-                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-                <span class="na">values</span><span class="pi">:</span>
-                <span class="pi">-</span> <span class="s">blackbox</span>
-            <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
+            <span class="pi">-</span> <span class="na">labelSelector</span><span class="pi">:</span>
+                <span class="na">matchExpressions</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s2">"</span><span class="s">kubevirt.io/domain"</span>
+                    <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                    <span class="na">values</span><span class="pi">:</span>
+                      <span class="pi">-</span> <span class="s">blackbox</span>
+              <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">topology.kubernetes.io/zone</span>
       <span class="na">domain</span><span class="pi">:</span>
 </code></pre></div></div>
 
@@ -881,41 +880,41 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
               <span class="s">...</span>
 </code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
-        <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
-        <span class="na">metadata</span><span class="pi">:</span>
-          <span class="na">labels</span><span class="pi">:</span>
-            <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s">virt-controller</span>
-          <span class="na">name</span><span class="pi">:</span> <span class="s">virt-controller</span>
-          <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
-        <span class="na">spec</span><span class="pi">:</span>
-          <span class="na">replicas</span><span class="pi">:</span> <span class="m">2</span>
-          <span class="na">selector</span><span class="pi">:</span>
-            <span class="na">matchLabels</span><span class="pi">:</span>
-              <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s">virt-controller</span>
-          <span class="na">strategy</span><span class="pi">:</span> <span class="pi">{}</span>
-          <span class="na">template</span><span class="pi">:</span>
-            <span class="na">metadata</span><span class="pi">:</span>
-              <span class="na">annotations</span><span class="pi">:</span>
-                <span class="s">scheduler.alpha.kubernetes.io/critical-pod</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
-                <span class="s">scheduler.alpha.kubernetes.io/tolerations</span><span class="pi">:</span> <span class="s1">'</span><span class="s">[{"key":"CriticalAddonsOnly","operator":"Exists"}]'</span>
-              <span class="na">labels</span><span class="pi">:</span>
-                <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s">virt-controller</span>
-                <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">virt-controller</span>
-            <span class="na">spec</span><span class="pi">:</span>
-              <span class="na">affinity</span><span class="pi">:</span>
-                <span class="na">podAntiAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node</span>
-                  <span class="na">preferredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
-                  <span class="pi">-</span> <span class="na">podAffinityTerm</span><span class="pi">:</span>
-                      <span class="na">labelSelector</span><span class="pi">:</span>
-                        <span class="na">matchExpressions</span><span class="pi">:</span>
-                        <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">kubevirt.io</span>
-                          <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-                          <span class="na">values</span><span class="pi">:</span>
-                          <span class="pi">-</span> <span class="s">virt-controller</span>
-                      <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">kubernetes.io/hostname</span>
-                    <span class="na">weight</span><span class="pi">:</span> <span class="m">1</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s">virt-controller</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">virt-controller</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">2</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s">virt-controller</span>
+  <span class="na">strategy</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">annotations</span><span class="pi">:</span>
+        <span class="s">scheduler.alpha.kubernetes.io/critical-pod</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="s">scheduler.alpha.kubernetes.io/tolerations</span><span class="pi">:</span> <span class="s1">'</span><span class="s">[{"key":"CriticalAddonsOnly","operator":"Exists"}]'</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s">virt-controller</span>
+        <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">virt-controller</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">affinity</span><span class="pi">:</span>
+        <span class="na">podAntiAffinity</span><span class="pi">:</span> <span class="c1">#This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node</span>
+          <span class="na">preferredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">podAffinityTerm</span><span class="pi">:</span>
+                <span class="na">labelSelector</span><span class="pi">:</span>
+                  <span class="na">matchExpressions</span><span class="pi">:</span>
+                    <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">kubevirt.io</span>
+                      <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                      <span class="na">values</span><span class="pi">:</span>
+                        <span class="pi">-</span> <span class="s">virt-controller</span>
+                <span class="na">topologyKey</span><span class="pi">:</span> <span class="s">kubernetes.io/hostname</span>
+              <span class="na">weight</span><span class="pi">:</span> <span class="m">1</span>
 </code></pre></div></div>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are <code class="highlighter-rouge">nodeAffinity</code> rules in order to place each replica in each Kubernetes node of the cluster.</p>
@@ -930,6 +929,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
 NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                 AGE
 kubevirt      virt-handler   6         6         6       6            6           &lt;none&gt;                        25h
 </code></pre></div></div>
+
 <p>See the partial snippet of a <code class="highlighter-rouge">virt-handler</code> Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a <code class="highlighter-rouge">nodeAffinity</code> rule that requires the Pod to run in a specific hostname matched by the key <code class="highlighter-rouge">metadata.name</code> and value the name of the node (<code class="highlighter-rouge">kni-worker2</code>). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
@@ -952,12 +952,12 @@ kubevirt      virt-handler   6         6         6       6            6         
   <span class="na">name</span><span class="pi">:</span> <span class="s">virt-handler-ctzcg</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
   <span class="na">ownerReferences</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
-    <span class="na">blockOwnerDeletion</span><span class="pi">:</span> <span class="no">true</span>
-    <span class="na">controller</span><span class="pi">:</span> <span class="no">true</span>
-    <span class="na">kind</span><span class="pi">:</span> <span class="s">DaemonSet</span>
-    <span class="na">name</span><span class="pi">:</span> <span class="s">virt-handler</span>
-    <span class="na">uid</span><span class="pi">:</span> <span class="s">6e7faece-a7aa-4ed0-959e-4332b2be4ec3</span>
+    <span class="pi">-</span> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+      <span class="na">blockOwnerDeletion</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">controller</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">kind</span><span class="pi">:</span> <span class="s">DaemonSet</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">virt-handler</span>
+      <span class="na">uid</span><span class="pi">:</span> <span class="s">6e7faece-a7aa-4ed0-959e-4332b2be4ec3</span>
   <span class="na">resourceVersion</span><span class="pi">:</span> <span class="s2">"</span><span class="s">28301"</span>
   <span class="na">selfLink</span><span class="pi">:</span> <span class="s">/api/v1/namespaces/kubevirt/pods/virt-handler-ctzcg</span>
   <span class="na">uid</span><span class="pi">:</span> <span class="s">95d68dad-ad06-489f-b3d3-92413bcae1da</span>
@@ -966,12 +966,11 @@ kubevirt      virt-handler   6         6         6       6            6         
     <span class="na">nodeAffinity</span><span class="pi">:</span>
       <span class="na">requiredDuringSchedulingIgnoredDuringExecution</span><span class="pi">:</span>
         <span class="na">nodeSelectorTerms</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">matchFields</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">metadata.name</span>
-            <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
-            <span class="na">values</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="s">kni-worker2</span>
-<span class="nn">...</span>
+          <span class="pi">-</span> <span class="na">matchFields</span><span class="pi">:</span>
+              <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">metadata.name</span>
+                <span class="na">operator</span><span class="pi">:</span> <span class="s">In</span>
+                <span class="na">values</span><span class="pi">:</span>
+                  <span class="pi">-</span> <span class="s">kni-worker2</span>
 </code></pre></div></div>
 
 <h2 id="summary">Summary</h2>

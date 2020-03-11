@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-11T07:21:49+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.27.0</title><link href="https://kubevirt.io//2020/changelog-v0.27.0.html" rel="alternate" type="text/html" title="KubeVirt v0.27.0" /><published>2020-03-06T00:00:00+00:00</published><updated>2020-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.27.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.27.0.html">&lt;h2 id=&quot;v0270&quot;&gt;v0.27.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-11T09:34:17+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.27.0</title><link href="https://kubevirt.io//2020/changelog-v0.27.0.html" rel="alternate" type="text/html" title="KubeVirt v0.27.0" /><published>2020-03-06T00:00:00+00:00</published><updated>2020-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.27.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.27.0.html">&lt;h2 id=&quot;v0270&quot;&gt;v0.27.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Mar 6 22:40:34 2020 +0100&lt;/p&gt;
 
@@ -21,7 +21,6 @@
 
 
 &lt;/div&gt;&lt;/div&gt;
-
 &lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;In a Kubernetes cluster, &lt;a href=&quot;https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/&quot;&gt;kube-scheduler&lt;/a&gt; is the default scheduler and runs as part of the control plane. Kube-scheduler is in charge of selecting an optimal node for every newly created or unscheduled pod to run on. However, every container within a pod and the pods themselves, have different requirements for resources. Therefore, existing nodes need to be filtered according to the specific requirements.&lt;/p&gt;
@@ -155,28 +154,28 @@ kni-worker6         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kuberne
       &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;     &lt;span class=&quot;c1&quot;&gt;#nodeSelector matches nodes where performance key has high as value.&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#nodeSelector matches nodes where performance key has high as value.&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;performance&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;containerdisk&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;containerdisk&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;interfaces&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;bridge&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;bridge&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
             &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;16Gi&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Next, the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; configuration partially shown previously is applied successfully.&lt;/p&gt;
@@ -258,6 +257,7 @@ mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;Now, it contains both affinity rules:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
@@ -276,25 +276,24 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
         &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;    &lt;span class=&quot;c1&quot;&gt;#This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
             &lt;span class=&quot;na&quot;&gt;nodeSelectorTerms&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;performance&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;  &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone&lt;/span&gt;
+              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;performance&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).&lt;/p&gt;
@@ -371,28 +370,28 @@ secret/varnish-secret created
         &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;#This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;preference&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;performance&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NotIn&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;preference&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;performance&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NotIn&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that the application cannot run in the same zone (app=cache).&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;app&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;app&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;containers&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;quay.io/spaces/kube-httpcache:stable&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;imagePullPolicy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Always&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;quay.io/spaces/kube-httpcache:stable&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;imagePullPolicy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Always&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In this set of affinity rules, a new scheduling policy has been introduced: &lt;code class=&quot;highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
@@ -428,7 +427,7 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
 &lt;p&gt;Following up with our objective, this web application must take advantage of the web cache application running as a Pod. So we require the appliance to be co-located in the same server that Varnish Cache in order to accelerate the delivery of the content provided by the appliance. Also, it is required to run every replica of the appliance in different zones or data centers. Taken into account these prerequisites, the following advanced rules are configured:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;podAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key &lt;code class=&quot;highlighter-rouge&quot;&gt;app' equals to &lt;/code&gt;cache` is running. That is is to say where the Varnish Cache is running. Note that this is mandatory, it will only run colocated with the web cache Pod.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;podAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key &lt;code class=&quot;highlighter-rouge&quot;&gt;app' equals to&lt;/code&gt;cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.&lt;/li&gt;
   &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;highlighter-rouge&quot;&gt;blackbox&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one appliance instance can run in each zone, e.g. one appliance in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
 &lt;/ol&gt;
 
@@ -450,22 +449,22 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
       &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;podAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that during scheduling time the application must be placed on nodes where Varnish Cache is running&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;app&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/hostname&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;   &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;app&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/hostname&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&quot;&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&quot;&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -646,41 +645,41 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
               &lt;span class=&quot;s&quot;&gt;...&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;strategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/critical-pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/tolerations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;[{&quot;key&quot;:&quot;CriticalAddonsOnly&quot;,&quot;operator&quot;:&quot;Exists&quot;}]'&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node&lt;/span&gt;
-                  &lt;span class=&quot;na&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;podAffinityTerm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                        &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;
-                          &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                          &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;strategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/critical-pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/tolerations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;[{&quot;key&quot;:&quot;CriticalAddonsOnly&quot;,&quot;operator&quot;:&quot;Exists&quot;}]'&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;podAffinityTerm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;
+                      &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                      &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rules in order to place each replica in each Kubernetes node of the cluster.&lt;/p&gt;
@@ -695,6 +694,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
 NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                 AGE
 kubevirt      virt-handler   6         6         6       6            6           &amp;lt;none&amp;gt;                        25h
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;See the partial snippet of a &lt;code class=&quot;highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule that requires the Pod to run in a specific hostname matched by the key &lt;code class=&quot;highlighter-rouge&quot;&gt;metadata.name&lt;/code&gt; and value the name of the node (&lt;code class=&quot;highlighter-rouge&quot;&gt;kni-worker2&lt;/code&gt;). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
@@ -717,12 +717,12 @@ kubevirt      virt-handler   6         6         6       6            6         
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler-ctzcg&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;ownerReferences&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;blockOwnerDeletion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;controller&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DaemonSet&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;uid&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;6e7faece-a7aa-4ed0-959e-4332b2be4ec3&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;blockOwnerDeletion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;controller&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DaemonSet&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;uid&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;6e7faece-a7aa-4ed0-959e-4332b2be4ec3&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;resourceVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;28301&quot;&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;selfLink&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/api/v1/namespaces/kubevirt/pods/virt-handler-ctzcg&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;uid&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;95d68dad-ad06-489f-b3d3-92413bcae1da&lt;/span&gt;
@@ -731,12 +731,11 @@ kubevirt      virt-handler   6         6         6       6            6         
     &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;nodeSelectorTerms&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;matchFields&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metadata.name&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kni-worker2&lt;/span&gt;
-&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;matchFields&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metadata.name&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kni-worker2&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
@@ -752,7 +751,7 @@ kubevirt      virt-handler   6         6         6       6            6         
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/podaffinity.md&quot;&gt;Kubernetes design proposal for Inter-pod topological affinity and anti-affinity&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/2089&quot;&gt;KubeVirt add affinity to virt pods pull request discussion&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Advanced VM scheduling" /><category term="affinity" /><category term="scheduling" /><category term="topologyKeys" /><summary type="html">This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</summary></entry><entry><title type="html">KubeVirt: installing Microsoft Windows from an ISO</title><link href="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows from an ISO" /><published>2020-02-14T00:00:00+00:00</published><updated>2020-02-14T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">&lt;p&gt;Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt,
-but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?&lt;/p&gt;
+but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?&lt;/p&gt;
 
 &lt;p&gt;In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.&lt;/p&gt;
 
@@ -800,9 +799,9 @@ but what if you want to follow the traditional way of installing a VM using an e
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;A PVC with the Microsoft Windows ISO file attached as CDROM to the VM, would be automatically created with the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command when uploading the file&lt;/p&gt;
+    &lt;p&gt;A PVC with the Microsoft Windows ISO file attached as CD-ROM to the VM, would be automatically created with the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command when uploading the file&lt;/p&gt;
 
-    &lt;p&gt;First thing here is to download the ISO file of the Microsoft Windows, for that the &lt;a href=&quot;https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2&quot;&gt;Microsoft Evaluation Center&lt;/a&gt; offers
+    &lt;p&gt;First thing here is to download the ISO file of the Microsoft Windows, for that the &lt;a href=&quot;https://www.Microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2&quot;&gt;Microsoft Evaluation Center&lt;/a&gt; offers
 the ISO files to download for evaluation purposes:&lt;/p&gt;
 
     &lt;p&gt;&lt;img src=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png&quot; alt=&quot;win2k12_download_iso.png&quot; title=&quot;KubeVirt Microsoft Windows iso download&quot; /&gt;&lt;/p&gt;
@@ -819,8 +818,8 @@ the following picture:&lt;/p&gt;
       &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--image-path&lt;/code&gt;: The path of the ISO file&lt;/li&gt;
       &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--pvc-name&lt;/code&gt;: The name of the PVC to store the ISO file, in this example is &lt;code class=&quot;highlighter-rouge&quot;&gt;iso-win2k12&lt;/code&gt;&lt;/li&gt;
       &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--access-mode&lt;/code&gt;: the access mode for the PVC, in the example &lt;code class=&quot;highlighter-rouge&quot;&gt;ReadOnlyMany&lt;/code&gt; has been used.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--pvc-size&lt;/code&gt;: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC os 5G should be enough&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--uploadproxy-url&lt;/code&gt;: The URL of the cdi-upload proxy service, in the following example the CLUSTER-IP is &lt;code class=&quot;highlighter-rouge&quot;&gt;10.96.164.35&lt;/code&gt; and the PORT is &lt;code class=&quot;highlighter-rouge&quot;&gt;443&lt;/code&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--pvc-size&lt;/code&gt;: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC OS 5G should be enough&lt;/li&gt;
+      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--uploadproxy-url&lt;/code&gt;: The URL of the cdi-upload proxy service, in the following example, the CLUSTER-IP is &lt;code class=&quot;highlighter-rouge&quot;&gt;10.96.164.35&lt;/code&gt; and the PORT is &lt;code class=&quot;highlighter-rouge&quot;&gt;443&lt;/code&gt;&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
@@ -871,7 +870,7 @@ $ virtctl image-upload \
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;A &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers&quot;&gt;container with the virtio drivers&lt;/a&gt; attached as a CDROM to the VM.
+    &lt;p&gt;A &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers&quot;&gt;container with the virtio drivers&lt;/a&gt; attached as a CD-ROM to the VM.
 The container image has to be pulled to have it available in the local registry.&lt;/p&gt;
 
     &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker pull kubevirt/virtio-container-disk
@@ -888,7 +887,7 @@ The container image has to be pulled to have it available in the local registry.
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
 
-    &lt;p&gt;If the pre-requisites are fullfilled, the final YAML (&lt;a href=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml&quot;&gt;win2k12.yml&lt;/a&gt;), will look like:&lt;/p&gt;
+    &lt;p&gt;If the pre-requisites are fulfilled, the final YAML (&lt;a href=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml&quot;&gt;win2k12.yml&lt;/a&gt;), will look like:&lt;/p&gt;
 
     &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolumeClaim&lt;/span&gt;
@@ -1036,7 +1035,7 @@ The following video shows how to go through the Microsoft Windows installation p
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md&quot;&gt;Creating a registry image with a VM disk&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md&quot;&gt;CDI Upload User Guide&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers&quot;&gt;KubeVirt user-guide: How to obtain virtio drivers?&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="microsoft windows kubernetes" /><category term="microsoft windows container" /><category term="windows" /><summary type="html">Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CDROM?</summary></entry><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html">Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?</summary></entry><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Feb 7 09:40:07 2020 +0100&lt;/p&gt;
 
@@ -1117,7 +1116,7 @@ With KubeVirt all this is simplified with just one stack to manage containers an
 &lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_virtual_machine.png&quot; alt=&quot;kubevirt_virtual_machine&quot; title=&quot;KubeVirt VM = KVM+qemu&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;The VM Launch flow is shown in the following diagram. Since the user posts a VM manifest to the cluster until the Kubelet spins up the VM pod.
-And finaly the virt-handler instructs the virt-launcher how to launch the qemu.&lt;/p&gt;
+And finally the virt-handler instructs the virt-launcher how to launch the qemu.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_vm_launch_flow.png&quot; alt=&quot;kubevirt_vm_launch_flow&quot; title=&quot;KubeVirt VM launch flow&quot; /&gt;&lt;/p&gt;
 
@@ -1163,14 +1162,14 @@ still need to run VMs and have native GPU functionalities, that is why NVIDIA de
 &lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png&quot; alt=&quot;gpus_on_kubevirt&quot; title=&quot;GPU/vGPU on KubeVirt&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in &lt;a href=&quot;https://github.com/NVIDIA/kubevirt-gpu-device-plugin&quot;&gt;GitHub&lt;/a&gt;
-It’s opensource and anybody can take a look to it and download it.&lt;/p&gt;
+It’s open-source and anybody can take a look to it and download it.&lt;/p&gt;
 
 &lt;p&gt;Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs,
 the following diagram shows the different layers involved in the GPU pass-through architecture:&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png&quot; alt=&quot;kubevirt_gpu_passthrough&quot; title=&quot;KubeVirt GPU passthrough&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUS in that node), the Virtual Machine specification
+&lt;p&gt;Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUs in that node), the Virtual Machine specification
 containing the &lt;code class=&quot;highlighter-rouge&quot;&gt;deviceName&lt;/code&gt; that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as
 any other else in Kubernetes.&lt;/p&gt;
 
@@ -1182,7 +1181,7 @@ any other else in Kubernetes.&lt;/p&gt;
   &lt;li&gt;GPU and vGPU device Discovery
     &lt;ul&gt;
       &lt;li&gt;GPUs with VFIO-PCI driver on the host are identified&lt;/li&gt;
-      &lt;li&gt;vGPUs configured using Nvidia vGPU manager are identified&lt;/li&gt;
+      &lt;li&gt;vGPUs configured using NVIDIA vGPU manager are identified&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
   &lt;li&gt;GPU and vGPU device Advertising
@@ -1223,7 +1222,7 @@ taking a look to the following video.&lt;/p&gt;
 and is a core contributor to the open source KubeVirt project.&lt;/p&gt;
 
 &lt;p&gt;&lt;a href=&quot;https://www.linkedin.com/in/vishesh-tanksale&quot;&gt;Vishesh Tanksale&lt;/a&gt; is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster.
-He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sanbox Project.&lt;/p&gt;
+He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sandbox Project.&lt;/p&gt;
 
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
@@ -1231,7 +1230,7 @@ He is specifically interested in GPU workloads on VMs. He is an active contribut
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;YouTube video: KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/31/KubeCon%202019%20-%20Virtualized%20GPU%20Workloads%20on%20KubeVirt.pdf&quot;&gt;Presentation: Virtualized GPU workloads on KubeVirt&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VnjX&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubecon" /><category term="gpu" /><category term="nvidia" /><category term="gpu workloads" /><category term="pass-through" /><category term="passthru" /><category term="kvm" /><category term="qemu" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="KubeCon" /><category term="GPU" /><category term="NVIDIA" /><category term="GPU workloads" /><category term="pass-through" /><category term="passthrough" /><category term="KVM" /><category term="QEMU" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an
 orchestration engine for not just application containers but virtual machine workloads as well. This provides a
 unified development platform where developers can build, modify, and deploy applications made up of both application
 containers as well as the virtual machines (VM) in a common, shared environment.&lt;/p&gt;
@@ -1313,7 +1312,7 @@ containers as well as the virtual machines (VM) in a common, shared environment.
 
 &lt;p&gt;In the Video, a short demo of the project in action is shown. Eventually, Chandra shows how to install KubeVirt and bring up a virtual machine in a short time!&lt;/p&gt;
 
-&lt;p&gt;Finally, you will hear about future plans for developing KubeVirt’s capabilities that are emerging from the community. Some hints:&lt;/p&gt;
+&lt;p&gt;Finally, you will hear about future plans for developing KubeVirt capabilities that are emerging from the community. Some hints:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Better support for deterministic workloads:
@@ -1364,7 +1363,7 @@ is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.&lt;
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=_z5Pjyl0Dq4&quot;&gt;YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp;amp; Chandrakanth Jakkidi&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/70/Introduction_to_KubeVirt-KUBECONNA19.pdf&quot;&gt;Presentation: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp;amp; Chandrakanth Jakkidi&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VyBC&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="video" /><category term="virtual machine management" /><category term="kubecon" /><category term="numa" /><category term="cpu pinning" /><category term="qemu" /><category term="kvm" /><summary type="html">In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an orchestration engine for not just application containers but virtual machine workloads as well. This provides a unified development platform where developers can build, modify, and deploy applications made up of both application containers as well as the virtual machines (VM) in a common, shared environment.</summary></entry><entry><title type="html">Managing KubeVirt with Openshift Web Console</title><link href="https://kubevirt.io//2020/OKD-web-console-install.html" rel="alternate" type="text/html" title="Managing KubeVirt with Openshift Web Console" /><published>2020-01-24T00:00:00+00:00</published><updated>2020-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2020/OKD-web-console-install</id><content type="html" xml:base="https://kubevirt.io//2020/OKD-web-console-install.html">&lt;p&gt;In the previous post, &lt;a href=&quot;/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt; were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.&lt;/p&gt;
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="video" /><category term="virtual machine management" /><category term="KubeCon" /><category term="NUMA" /><category term="CPU pinning" /><category term="QEMU" /><category term="KVM" /><summary type="html">In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an orchestration engine for not just application containers but virtual machine workloads as well. This provides a unified development platform where developers can build, modify, and deploy applications made up of both application containers as well as the virtual machines (VM) in a common, shared environment.</summary></entry><entry><title type="html">Managing KubeVirt with OpenShift Web Console</title><link href="https://kubevirt.io//2020/OKD-web-console-install.html" rel="alternate" type="text/html" title="Managing KubeVirt with OpenShift Web Console" /><published>2020-01-24T00:00:00+00:00</published><updated>2020-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2020/OKD-web-console-install</id><content type="html" xml:base="https://kubevirt.io//2020/OKD-web-console-install.html">&lt;p&gt;In the previous post, &lt;a href=&quot;/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt; were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.&lt;/p&gt;
 
 &lt;p&gt;There are two options to run the OKD web console to manage a Kubernetes cluster:&lt;/p&gt;
 
@@ -1380,7 +1379,7 @@ is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.&lt;
 &lt;h2 id=&quot;what-is-the-okd-web-console&quot;&gt;What is the OKD web console&lt;/h2&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;The &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OKD web console&lt;/a&gt; is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl&lt;/code&gt; in the form of a single page webapp. It integrates with other services like monitoring, chargeback and the &lt;a href=&quot;https://github.com/operator-framework/operator-lifecycle-manager&quot;&gt;Operator Lifecycle Manager or OLM&lt;/a&gt;. Some things that go on behind the scenes include:&lt;/p&gt;
+  &lt;p&gt;The &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OKD web console&lt;/a&gt; is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl&lt;/code&gt; in the form of a single page web application. It integrates with other services like monitoring, chargeback and the &lt;a href=&quot;https://github.com/operator-framework/operator-lifecycle-manager&quot;&gt;Operator Lifecycle Manager or OLM&lt;/a&gt;. Some things that go on behind the scenes include:&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
@@ -1832,12 +1831,12 @@ console-deployment-59d8956db5-td462                     1/1     Running         
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_UI_options.html&quot;&gt;KubeVirt user interface options&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=xoL0UFI657I&quot;&gt;Managing KubeVirt with OpenShift web console running as a container application on Youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=XQw4GkGHs44&amp;amp;t=37s&quot;&gt;ManagManaging KubeVirt with OpenShift web console running as a compiled binary on Youtube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=XQw4GkGHs44&amp;amp;t=37s&quot;&gt;Managing KubeVirt with OpenShift web console running as a compiled binary on Youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on Youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="openshift web console" /><category term="web interface" /><category term="okd" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry><entry><title type="html">KubeVirt Laboratory 3, upgrades</title><link href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 3, upgrades" /><published>2020-01-21T00:00:00+00:00</published><updated>2020-01-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_lab3_upgrade</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;KubeVirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/p&gt;
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="OpenShift web console" /><category term="web interface" /><category term="OKD" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry><entry><title type="html">KubeVirt Laboratory 3, upgrades</title><link href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 3, upgrades" /><published>2020-01-21T00:00:00+00:00</published><updated>2020-01-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_lab3_upgrade</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;KubeVirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
 
@@ -1890,7 +1889,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/vmware-tanzu/octant&quot;&gt;Octant&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD: The Origin Community Distribution of Kubernetes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/console&quot;&gt;Openshift console&lt;/a&gt; running on vanilla Kubernetes&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OpenShift console&lt;/a&gt; running on vanilla Kubernetes&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://novnc.com/info.html&quot;&gt;noVNC&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
@@ -1945,9 +1944,9 @@ console-deployment-59d8956db5-td462                     1/1     Running         
   &lt;p&gt;OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;A few weeks ago Kubernetes distribution &lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD4&lt;/a&gt; was released as preview. OKD is the official upstream version of Red Hat’s Openshift. Since Openshift includes KubeVirt (Red Hat calls it &lt;a href=&quot;https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html&quot;&gt;CNV&lt;/a&gt;) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.&lt;/p&gt;
+&lt;p&gt;A few weeks ago Kubernetes distribution &lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD4&lt;/a&gt; was released as preview. OKD is the official upstream version of Red Hat’s OpenShift. Since OpenShift includes KubeVirt (Red Hat calls it &lt;a href=&quot;https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html&quot;&gt;CNV&lt;/a&gt;) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.&lt;/p&gt;
 
-&lt;p&gt;Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with Openshift. We have noticed that from the UI a user can:&lt;/p&gt;
+&lt;p&gt;Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with OpenShift. We have noticed that from the UI a user can:&lt;/p&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Install the KubeVirt operator from the operator marketplace.&lt;/li&gt;
@@ -1976,7 +1975,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
 &lt;p&gt;As we reviewed previously the &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OpenShift web console&lt;/a&gt; is just another piece inside OKD. It is an independent part and, as it is stated in their official GitHub repository, it can run on top of native Kubernetes. OpenShift Console a.k.a bridge is defined as:&lt;/p&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;a friendly kubectl in the form of a single page webapp. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:&lt;/p&gt;
+  &lt;p&gt;a friendly kubectl in the form of a single page web application. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:&lt;/p&gt;
 &lt;/blockquote&gt;
 
 &lt;ul&gt;
@@ -1989,7 +1988,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
 &lt;p&gt;Then, as briefly explained in their &lt;a href=&quot;https://github.com/openshift/console#native-kubernetes&quot;&gt;repository&lt;/a&gt;, our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar to the ones found in the OKD installation except:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;KubeVirt installation is done using the &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;Hyperconverged Cluster Operator (HCO) without OL or Marketplace&lt;/a&gt; instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically&lt;/li&gt;
+  &lt;li&gt;KubeVirt installation is done using the &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;Hyperconverged Cluster Operator (HCO) without OLM or Marketplace&lt;/a&gt; instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically&lt;/li&gt;
   &lt;li&gt;Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.&lt;/li&gt;
   &lt;li&gt;Connection to the VM via serial or VNC console is flaky.&lt;/li&gt;
   &lt;li&gt;VM templates can only be created from YAML. The wizard dialog is based on OpenShift templates.&lt;/li&gt;
@@ -2061,7 +2060,7 @@ There is a &lt;a href=&quot;/2019/Access-Virtual-Machines-graphic-console-using-
 
 &lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
 
-&lt;p&gt;From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a poweful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.&lt;/p&gt;
+&lt;p&gt;From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a powerful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.&lt;/p&gt;
 
 &lt;p&gt;OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.&lt;/p&gt;
 

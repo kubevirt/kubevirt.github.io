@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -264,15 +264,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h3 id="environment-description">Environment description</h3>
 
-<p>We can use HCO both on <code class="highlighter-rouge">minikube</code> and also on <code class="highlighter-rouge">Openshift 4</code>. We will be using Openshift 4 for HCO in this post.</p>
+<p>We can use HCO both on <code class="highlighter-rouge">minikube</code> and also on <code class="highlighter-rouge">OpenShift 4</code>. We will be using OpenShift 4 for HCO in this post.</p>
 
 <p><strong>Note</strong>: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link <a href="/quickstart_minikube/">Install_HCO_minikube</a> install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).</p>
 
-<h2 id="deploying-hco-on-openshift-4-cluster">Deploying HCO on Openshift 4 Cluster.</h2>
+<h2 id="deploying-hco-on-openshift-4-cluster">Deploying HCO on OpenShift 4 Cluster.</h2>
 
-<p><a href="https://www.openshift.com/learn/what-is-openshift/">Openshift</a></p>
+<p><a href="https://www.openshift.com/learn/what-is-openshift/">OpenShift</a></p>
 
-<p>Installation steps for Openshift 4 including video tutorial can be found <a href="https://blog.openshift.com/installing-openshift-4-from-start-to-finish/">here</a></p>
+<p>Installation steps for OpenShift 4 including video tutorial can be found <a href="https://blog.openshift.com/installing-openshift-4-from-start-to-finish/">here</a></p>
 
 <p>Upon successful installation of OpenShift, we will have a cluster consisting of 3 masters and 3 workers which can be used for HCO integration</p>
 
@@ -442,7 +442,7 @@ virtualmachineinstances.kubevirt.io                              2019-05-07T20:2
 virtualmachines.kubevirt.io                                      2019-05-07T20:23:02Z
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In Openshift we can use both <code class="highlighter-rouge">kubectl</code> and <code class="highlighter-rouge">oc</code> interchangeably to interact with the cluster objects once HCO is up and running.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In OpenShift we can use both <code class="highlighter-rouge">kubectl</code> and <code class="highlighter-rouge">oc</code> interchangeably to interact with the cluster objects once HCO is up and running.</p>
 
 
 </div></div>
@@ -513,7 +513,7 @@ docker push docker.io/<span class="nv">$HCO_DOCKER_ORG</span>/hco-registry:examp
 
 <p>Please wait until the <code class="highlighter-rouge">hco-catalogsource</code> pod comes up</p>
 
-<p>Next is to create a subscription, we can create a subscription from the Openshift4 web interface as shown below:</p>
+<p>Next is to create a subscription, we can create a subscription from the OpenShift4 web interface as shown below:</p>
 
 <p><img src="../assets/2019-04-17-HyperConvergedOperator/subscription.png" alt="Subscription" /></p>
 
@@ -563,7 +563,7 @@ virt-operator-87d7c98b-p6mbd                       1/1     Running   0          
 
 <p><img src="../assets/2019-04-17-HyperConvergedOperator/HCO-Managed-Operators.png" alt="HCO-Managed-Operators" /></p>
 
-<p>The above method demonstrates the integration of HCO operator in Openshift4.</p>
+<p>The above method demonstrates the integration of HCO operator in OpenShift4.</p>
 
 <p>So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here <a href="/quickstart_minikube/#install-virtctl">minikube_quickstart</a>:</p>
 

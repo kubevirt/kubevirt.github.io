@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -336,7 +336,7 @@ Use <span class="s2">"virtctl &lt;command&gt; --help"</span> <span class="k">for
 Use <span class="s2">"virtctl options"</span> <span class="k">for </span>a list of global command-line options <span class="o">(</span>applies to all commands<span class="o">)</span><span class="nb">.</span>
 </code></pre></div></div>
 
-<p>This step is optional, right now anything related with the Virtual Machines can be done running the <code class="highlighter-rouge">virtctl</code> command. In case ther’s a need to interact with the Virtual Machines without leaving the scope of the <code class="highlighter-rouge">kubectl</code> command, the virt pluging for krew can be installed following the instructions below:</p>
+<p>This step is optional, right now anything related with the Virtual Machines can be done running the <code class="highlighter-rouge">virtctl</code> command. In case there’s a need to interact with the Virtual Machines without leaving the scope of the <code class="highlighter-rouge">kubectl</code> command, the virt plugin for Krew can be installed following the instructions below:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# <span class="o">(</span>
   <span class="nb">set</span> <span class="nt">-x</span><span class="p">;</span> <span class="nb">cd</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">mktemp</span> <span class="nt">-d</span><span class="si">)</span><span class="s2">"</span> <span class="o">&amp;&amp;</span>
@@ -399,7 +399,7 @@ NAME        AGE   RUNNING   VOLUME
 testvm   13s   <span class="nb">false</span>
 </code></pre></div></div>
 
-<p>After the Virtual Machine has been created, it has to be started, to do so, the virtcl or the kubectl can be used (dependeing on what method has been choosen in previous steps).</p>
+<p>After the Virtual Machine has been created, it has to be started, to do so, the virtctl or the kubectl can be used (depending on what method has been chosen in previous steps).</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ./virtctl start testvm
 VM vm-cirros was scheduled to start
@@ -421,7 +421,7 @@ NAME     AGE   PHASE     IP            NODENAME
 testvm   63s   Running   10.244.0.15   k8s-test
 </code></pre></div></div>
 
-<p>So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (<code class="highlighter-rouge">./virtclt console testvm</code>) or also a direct connection with SSH can be made:</p>
+<p>So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (<code class="highlighter-rouge">./virtctl console testvm</code>) or also a direct connection with SSH can be made:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ssh cirros@10.244.0.15
 cirros@10.244.0.15<span class="s1">'s password: gocubsgo
@@ -470,7 +470,7 @@ VM testvm was scheduled to stop
   <li><a href="https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network">Kubernetes pod-network configuration</a></li>
   <li><a href="https://kubernetes.io/docs/reference/kubectl/cheatsheet/">Kubectl cheatsheet</a></li>
   <li><a href="https://github.com/intel/multus-cni">Multus</a></li>
-  <li><a href="https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment">KubeVirt Userguide</a></li>
+  <li><a href="https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment">KubeVirt User Guide</a></li>
   <li><a href="https://www.katacoda.com/kubevirt">KubeVirt Katacoda scenarios</a></li>
 </ul>
 

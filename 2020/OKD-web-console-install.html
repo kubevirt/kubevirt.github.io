@@ -25,14 +25,14 @@
     <link rel="canonical" href="https://kubevirt.io//2020/OKD-web-console-install.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Managing KubeVirt with Openshift Web Console | KubeVirt.io</title>
+    <title>Managing KubeVirt with OpenShift Web Console | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
     <meta name="author" content="Alberto Losada Grande" >
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
     <meta name="description" content="This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface">
-    <meta name="keywords" content="openshift web console, web interface, okd" >
-    <meta property="og:title" content="Managing KubeVirt with Openshift Web Console | KubeVirt.io">
+    <meta name="keywords" content="OpenShift web console, web interface, OKD" >
+    <meta property="og:title" content="Managing KubeVirt with OpenShift Web Console | KubeVirt.io">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://kubevirt.io//2020/OKD-web-console-install.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
@@ -40,7 +40,7 @@
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="Alberto Losada Grande" >
     <meta property="og:article:published_time" content="2020-01-24 00:00:00 +0000" >
-    <meta name="twitter:title" content="Managing KubeVirt with Openshift Web Console | KubeVirt.io">
+    <meta name="twitter:title" content="Managing KubeVirt with OpenShift Web Console | KubeVirt.io">
     <meta name="twitter:description" content="This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
@@ -213,7 +213,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "kubevirt", "clearcontainers", "virtlet", "cri", "openstack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "cloudnativecon", "america", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "openshift web console", "video", "virtual machine management", "numa", "cpu pinning", "gpu", "nvidia", "gpu workloads", "pass-through", "passthru", "microsoft windows kubernetes", "microsoft windows container", "windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -228,12 +228,12 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <div class="post">
         <header class="post-header">
           <h1></h1>
-          <h1 class="post-title">Managing KubeVirt with Openshift Web Console</h1>
+          <h1 class="post-title">Managing KubeVirt with OpenShift Web Console</h1>
           <div class="post-info">
             <span class="post-author">Author: Alberto Losada Grande</span>
             <div>
               <span class="post-category-name">
-                Tags: <a href="/tag/openshift-web-console">openshift web console</a>&nbsp;|&nbsp;<a href="/tag/web-interface">web interface</a>&nbsp;|&nbsp;<a href="/tag/okd">okd</a>
+                Tags: <a href="/tag/openshift-web-console">OpenShift web console</a>&nbsp;|&nbsp;<a href="/tag/web-interface">web interface</a>&nbsp;|&nbsp;<a href="/tag/okd">OKD</a>
               </span>
             </div>
             <div>
@@ -264,7 +264,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <h2 id="what-is-the-okd-web-console">What is the OKD web console</h2>
 
 <blockquote>
-  <p>The <a href="https://github.com/openshift/console">OKD web console</a> is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly <code class="highlighter-rouge">kubectl</code> in the form of a single page webapp. It integrates with other services like monitoring, chargeback and the <a href="https://github.com/operator-framework/operator-lifecycle-manager">Operator Lifecycle Manager or OLM</a>. Some things that go on behind the scenes include:</p>
+  <p>The <a href="https://github.com/openshift/console">OKD web console</a> is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly <code class="highlighter-rouge">kubectl</code> in the form of a single page web application. It integrates with other services like monitoring, chargeback and the <a href="https://github.com/operator-framework/operator-lifecycle-manager">Operator Lifecycle Manager or OLM</a>. Some things that go on behind the scenes include:</p>
 </blockquote>
 
 <ul>
@@ -716,7 +716,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
 <ul>
   <li><a href="/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a></li>
   <li><a href="https://www.youtube.com/watch?v=xoL0UFI657I">Managing KubeVirt with OpenShift web console running as a container application on Youtube</a></li>
-  <li><a href="https://www.youtube.com/watch?v=XQw4GkGHs44&amp;t=37s">ManagManaging KubeVirt with OpenShift web console running as a compiled binary on Youtube</a></li>
+  <li><a href="https://www.youtube.com/watch?v=XQw4GkGHs44&amp;t=37s">Managing KubeVirt with OpenShift web console running as a compiled binary on Youtube</a></li>
   <li><a href="/2019/KubeVirt_lab1_use_kubevirt.html">Kubevirt Laboratory 1 blogpost: Use Kubevirt</a></li>
   <li><a href="https://www.youtube.com/watch?v=KC03G60shIc">KubeVirt basic operations video on Youtube</a></li>
   <li><a href="https://kubevirt.io/user-guide/docs/latest/administration/intro.html">Kubevirt installation notes</a></li>
@@ -727,7 +727,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
         
         
 
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Managing KubeVirt with Openshift Web Console&url=https://www.kubevirt.io/2020/OKD-web-console-install.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Managing KubeVirt with OpenShift Web Console&url=https://www.kubevirt.io/2020/OKD-web-console-install.html&screen_name=kubevirt" aria-label="Share this on Twitter">
   <i class="fab fa-twitter mr-1"></i> Tweet
 </a>
 <hr/>
