@@ -39,3 +39,17 @@ repos:
   - id: requirements-txt-fixer
   - id: sort-simple-yaml
   - id: trailing-whitespace
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v1.2.3
+  hooks:
+  - id: flake8
+- repo: https://github.com/pecigonzalo/pre-commit-shfmt.git
+  rev: master
+  hooks:
+  - id: shell-fmt
+    args:
+    - --indent=4
+- repo: https://github.com/asottile/blacken-docs
+  rev:  master
+  hooks:
+  - id: blacken-docs
