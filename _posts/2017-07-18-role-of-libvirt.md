@@ -1,6 +1,6 @@
 ---
 layout: post
-author: Fabian Deustch
+author: Fabian Deutsch
 description: "In this blogpost, we discuss on libvirt role in KubeVirt"
 navbar_active: Blogs
 category: news

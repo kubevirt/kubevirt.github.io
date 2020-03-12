@@ -1,6 +1,6 @@
 ---
 layout: post
-author: Fabian Deustch
+author: Fabian Deutsch
 description: "In this blogpost, we discuss on the technology provided by KubeVirt and how it stands against other technologies available"
 navbar_active: Blogs
 category: news
