@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-03-13 09:36:20 +0000" >
+    <meta property="og:article:published_time" content="2020-03-13 10:28:40 +0000" >
     <meta name="twitter:title" content="KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -1075,14 +1075,14 @@ var documents = [{
     "id": 111,
     "url": "/2017/technology-comparison.html",
     "title": "Comparing KubeVirt to other technologies",
-    "author" : "Fabian Deustch",
+    "author" : "Fabian Deutsch",
     "tags" : "KubeVirt, ClearContainers, virtlet, CRI, OpenStack, ovirt",
     "body": "Is KubeVirt a replacement for $MYVMMGMTSYSTEM?: Maybe. The primary goal of KubeVirt is to allow running virtual machines ontop of Kubernetes. It’s focused on the virtualization bits. General virtualization management systems like i. e. OpenStack or oVirt usuallyconsist of some additional services which take care of i. e. network management,host provisioning, data warehousing, just to name a few. These services are outof scope of KubeVirt. That being said, KubeVirt is intended to be part of a virtualization managementsystem. It can be seen as an VM cluster runtime, and additional componentsprovide additional functionality to provide a nice coherent user-experience. Is KubeVirt like ClearContainers?: No. ClearContainersare about using VMs to isolate pods or containers on the container runtimelevel. KubeVirt on the other hand is about allowing to manage virtual machines on acluster level. But beyond that it’s also how virtual machines are exposed. ClearContainers hide the fact that a virtual machine is used, but KubeVirt ishighly interested in providing an API to configure a virtual machine. Is KubeVirt like virtlet?: Somewhat. virtlet is a CRIimplementation to run virtual machines instead of containers. The key differences to KubeVirt are:  It’s a CRI. This implies that the VM runtime is on the host, and that thekubelet is configured to use it. KubeVirt on the other hand can be deployed as a native Kubernetes add-on.  Pod API. The virtlet is using a Pod API to specify the VM. Certainfields like i. e. volumes are mapped to the corresponding VM functionality. This is problematic, there are many details to VMs which can not be mappedto a Pod counterpart. Eventually annotations can be used to cover thoseproperties. KubeVirt on the other hand exposes a VM specific API, which tries to coverall properties of a VM. Why Kubernetes and not bringing containers to OpenStack or oVirt ?: We think that Container workloads are the future. Therefore we want to add VMsupport on top of a container management system instead of building containersupport into a VM management system. "
     }, {
     "id": 112,
     "url": "/2017/role-of-libvirt.html",
     "title": "The Role of LibVirt",
-    "author" : "Fabian Deustch",
+    "author" : "Fabian Deutsch",
     "tags" : "libvirt",
     "body": "Libvirt project. Can I perform a 1:1 translation of my libvirt domain xml to a VM Spec?: Probably not, libvirt is intended to be run on a host and the domain XML isbased on this assumption, this implies that the domain xml allows you to accesshost local resources i. e. local paths, host devices, and host deviceconfigurations. A VM Spec on the other hand is designed to work with cluster resources. And itdoes not permit to address host resources. Does a VM Spec support all features of libvirt?: No, libvirt has a wide range of features, reaching beyond pure virtualizationfeatures, into host, network, and storage management. The API was driven by therequirements of running virtualization on a host. A VM Spec however is a VM definition on the cluster level, this by itselfmeans that the specification has different requirements, i. e. it also needs toinclude scheduling information and KubeVirt specifically builds on Kubernetes, which allows it to reuse thesubsystems for consuming network and storage, which on the other hand meansthat the corresponding libvirt features will not be exposed. "
     }, {
