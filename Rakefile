@@ -18,6 +18,7 @@ namespace :links do
             :internal_domains   => ["https://instructor.labs.sysdeseng.com", "https://www.youtube.com"],
             :external_only      => true,
             :url_swap           => {'https://kubevirt.io/' => '',},
+            :http_status_ignore => [429],
         }
 
         parser = OptionParser.new

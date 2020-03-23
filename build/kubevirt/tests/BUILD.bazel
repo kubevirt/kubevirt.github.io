@@ -106,6 +106,7 @@ go_test(
     deps = [
         "//pkg/certificates/triple:go_default_library",
         "//pkg/certificates/triple/cert:go_default_library",
+        "//pkg/cloud-init:go_default_library",
         "//pkg/config:go_default_library",
         "//pkg/controller:go_default_library",
         "//pkg/handler-launcher-com/cmd/v1:go_default_library",
@@ -115,6 +116,7 @@ go_test(
         "//pkg/host-disk:go_default_library",
         "//pkg/testutils:go_default_library",
         "//pkg/util:go_default_library",
+        "//pkg/util/cluster:go_default_library",
         "//pkg/util/hardware:go_default_library",
         "//pkg/util/migrations:go_default_library",
         "//pkg/util/net/dns:go_default_library",

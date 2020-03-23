@@ -71,6 +71,9 @@ distclean: clean
 	hack/dockerized "rm -rf vendor/ && rm -f go.sum && GO111MODULE=on go clean -modcache"
 	rm -rf vendor/
 
+deps-update-patch:
+	SYNC_VENDOR=true hack/dockerized " ./hack/dep-update.sh -u=patch && ./hack/dep-prune.sh && ./hack/bazel-generate.sh"
+
 deps-update:
 	SYNC_VENDOR=true hack/dockerized " ./hack/dep-update.sh && ./hack/dep-prune.sh && ./hack/bazel-generate.sh"
 
@@ -120,7 +123,9 @@ build-prom-spec-dumper:
 	hack/dockerized "go build -o rule-spec-dumper ./hack/prom-rule-ci/rule-spec-dumper.go"
 
 prom-rules-verify: build-prom-spec-dumper
-	./hack/prom-rule-ci/verify-rules.sh ${current-dir}/rule-spec-dumper
+	./hack/prom-rule-ci/verify-rules.sh \
+		"${current-dir}/rule-spec-dumper" \
+		"${current-dir}/hack/prom-rule-ci/prom-rules-tests.yaml"
 
 olm-push:
 	hack/dockerized "DOCKER_TAG=${DOCKER_TAG} CSV_VERSION=${CSV_VERSION} QUAY_USERNAME=${QUAY_USERNAME} \

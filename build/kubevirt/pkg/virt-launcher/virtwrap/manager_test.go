@@ -25,6 +25,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"runtime"
 	"strings"
 	"time"
 
@@ -83,12 +84,13 @@ var _ = Describe("Manager", func() {
 	expectIsolationDetectionForVMI := func(vmi *v1.VirtualMachineInstance) *api.DomainSpec {
 		domain := &api.Domain{}
 		c := &api.ConverterContext{
+			Architecture:   runtime.GOARCH,
 			VirtualMachine: vmi,
 			UseEmulation:   true,
 			SMBios:         &cmdv1.SMBios{},
 		}
 		Expect(api.Convert_v1_VirtualMachine_To_api_Domain(vmi, domain, c)).To(Succeed())
-		api.SetObjectDefaults_Domain(domain)
+		api.NewDefaulter(runtime.GOARCH).SetObjectDefaults_Domain(domain)
 
 		return &domain.Spec
 	}
@@ -108,7 +110,7 @@ var _ = Describe("Manager", func() {
 			mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
 			mockDomain.EXPECT().Create().Return(nil)
-			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
+			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).MaxTimes(2).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0, nil)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 			Expect(err).To(BeNil())
@@ -130,7 +132,7 @@ var _ = Describe("Manager", func() {
 			mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
 			mockDomain.EXPECT().Create().Return(nil)
-			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
+			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).MaxTimes(2).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0, nil)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 			Expect(err).To(BeNil())
@@ -151,7 +153,7 @@ var _ = Describe("Manager", func() {
 			mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
 			mockDomain.EXPECT().Create().Return(nil)
-			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
+			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).MaxTimes(2).Return(string(xml), nil)
 			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0, nil)
 			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 			Expect(err).To(BeNil())
@@ -184,7 +186,7 @@ var _ = Describe("Manager", func() {
 				mockDomain.EXPECT().GetState().Return(state, 1, nil)
 				mockConn.EXPECT().DomainDefineXML(string(xml)).Return(mockDomain, nil)
 				mockDomain.EXPECT().Create().Return(nil)
-				mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).Return(string(xml), nil)
+				mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).MaxTimes(2).Return(string(xml), nil)
 				manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0, nil)
 				newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{VirtualMachineSMBios: &cmdv1.SMBios{}})
 				Expect(err).To(BeNil())
