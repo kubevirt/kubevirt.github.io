@@ -87,29 +87,30 @@ To proceed with the Installation steps the different elements involved are liste
    > info "Information"
    > To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service.
 
-    ```sh
-    $ kubectl get services -n cdi
-    NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
-    cdi-api           ClusterIP   10.96.117.29   <none>        443/TCP   6d18h
-    cdi-uploadproxy   ClusterIP   10.96.164.35   <none>        443/TCP   6d18h
-    ```
+   ```sh
+   $ kubectl get services -n cdi
+   NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
+   cdi-api           ClusterIP   10.96.117.29   <none>        443/TCP   6d18h
+   cdi-uploadproxy   ClusterIP   10.96.164.35   <none>        443/TCP   6d18h
+   ```
 
-    In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` to find it and to simplify the operation.
-    - `--insecure`: Allow insecure server connections when using HTTPS
-    - `--wait-secs`: The time in seconds to wait for upload pod to start. (default 60)
+   In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` to find it and to simplify the operation.
 
-    The final command with the parameters and the values would look like:
+   - `--insecure`: Allow insecure server connections when using HTTPS
+   - `--wait-secs`: The time in seconds to wait for upload pod to start. (default 60)
 
-    ```sh
-    $ virtctl image-upload \
-    --image-path=/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO \
-    --pvc-name=iso-win2k12 \
-    --access-mode=ReadOnlyMany \
-    --pvc-size=5G \
-    --uploadproxy-url=https://10.96.164.35:443 \
-    --insecure \
-    --wait-secs=240
-    ```
+   The final command with the parameters and the values would look like:
+
+   ```sh
+   $ virtctl image-upload \
+   --image-path=/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO \
+   --pvc-name=iso-win2k12 \
+   --access-mode=ReadOnlyMany \
+   --pvc-size=5G \
+   --uploadproxy-url=https://10.96.164.35:443 \
+   --insecure \
+   --wait-secs=240
+   ```
 
 3. A PVC for the hard drive where the Operating System is going to be installed, in this example it is called `winhd` and the space requested is 15Gi:
 
