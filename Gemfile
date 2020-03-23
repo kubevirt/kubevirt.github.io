@@ -3,6 +3,7 @@ Encoding.default_internal = Encoding::UTF_8
 
 source "https://rubygems.org"
 
+gem "bundler"
 gem "jekyll"
 gem "rake"
 gem "jekyll-paginate"
@@ -13,3 +14,4 @@ gem "jekyll-feed"
 gem "jekyll-sitemap"
 gem "premonition", "~> 2.0.1"
 gem "jekyll-tagging"
+gem "jekyll-toc"

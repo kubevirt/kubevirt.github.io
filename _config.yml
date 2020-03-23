@@ -29,7 +29,7 @@ collections:
     output: true
     permalink: /:collection/:path
 
-plugins: [jekyll-paginate, jekyll-asciidoc, jekyll-redirect-from, jekyll-feed, jekyll-sitemap, premonition, jekyll/tagging]
+plugins: [jekyll-paginate, jekyll-asciidoc, jekyll-redirect-from, jekyll-feed, jekyll-sitemap, premonition, jekyll/tagging, jekyll-toc]
 paginate: 5
 paginate_path: "/blogs/page:num"
 
@@ -65,3 +65,12 @@ kramdown:
     block:
       line_numbers: false
       start_line: 1
+
+toc:
+  min_level: 2
+  max_level: 6
+  no_toc_section_class: no_toc_section
+  list_class: section-nav
+  sublist_class: ''
+  item_class: toc-entry
+  item_prefix: toc-

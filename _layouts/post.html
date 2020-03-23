@@ -28,7 +28,7 @@ navbar_active: blogs
           </div>
         </header>
         <article class="post-content">
-          {{ content }}
+          {{ content | toc }}
         </article>
         {% if page.galleria %}
           <div class="galleria">
