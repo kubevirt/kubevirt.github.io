@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-23T13:34:14+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-03-23T14:56:17+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
 
 &lt;p&gt;It is important to notice that from the Kubernetes scheduler stand point, which will be explained later, it only manages Pod and node scheduling. Since the VM is wrapped up in a Pod, the same scheduling rules are completely valid to KubeVirt VMs.&lt;/p&gt;
 
@@ -813,29 +813,29 @@ the following picture:&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;```sh
-$ kubectl get services -n cdi
-NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT(S)   AGE
-cdi-api           ClusterIP   10.96.117.29   &amp;lt;none&amp;gt;        443/TCP   6d18h
-cdi-uploadproxy   ClusterIP   10.96.164.35   &amp;lt;none&amp;gt;        443/TCP   6d18h
-```
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get services &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi
+   NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   AGE
+   cdi-api           ClusterIP   10.96.117.29   &amp;lt;none&amp;gt;        443/TCP   6d18h
+   cdi-uploadproxy   ClusterIP   10.96.164.35   &amp;lt;none&amp;gt;        443/TCP   6d18h
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-In this example the ISO file was copied to the Kubernetes node, to allow the `virtctl` to find it and to simplify the operation.
-- `--insecure`: Allow insecure server connections when using HTTPS
-- `--wait-secs`: The time in seconds to wait for upload pod to start. (default 60)
+&lt;p&gt;In this example the ISO file was copied to the Kubernetes node, to allow the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; to find it and to simplify the operation.&lt;/p&gt;
 
-The final command with the parameters and the values would look like:
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--insecure&lt;/code&gt;: Allow insecure server connections when using HTTPS&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--wait-secs&lt;/code&gt;: The time in seconds to wait for upload pod to start. (default 60)&lt;/li&gt;
+&lt;/ul&gt;
 
-```sh
-$ virtctl image-upload \
---image-path=/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO \
---pvc-name=iso-win2k12 \
---access-mode=ReadOnlyMany \
---pvc-size=5G \
---uploadproxy-url=https://10.96.164.35:443 \
---insecure \
---wait-secs=240
-```
+&lt;p&gt;The final command with the parameters and the values would look like:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl image-upload &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iso-win2k12 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--access-mode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ReadOnlyMany &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--pvc-size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5G &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://10.96.164.35:443 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--wait-secs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;240
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;ol&gt;
