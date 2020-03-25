@@ -561,7 +561,7 @@ func (t *templateService) RenderLaunchManifest(vmi *v1.VirtualMachineInstance) (
 	gracePeriodKillAfter := gracePeriodSeconds + int64(15)
 
 	// Get memory overhead
-	memoryOverhead := getMemoryOverhead(vmi.Spec.Domain)
+	memoryOverhead := getMemoryOverhead(vmi)
 
 	// Consider CPU and memory requests and limits for pod scheduling
 	resources := k8sv1.ResourceRequirements{}
@@ -583,8 +583,18 @@ func (t *templateService) RenderLaunchManifest(vmi *v1.VirtualMachineInstance) (
 	// Consider hugepages resource for pod scheduling
 	if vmi.Spec.Domain.Memory != nil && vmi.Spec.Domain.Memory.Hugepages != nil {
 		hugepageType := k8sv1.ResourceName(k8sv1.ResourceHugePagesPrefix + vmi.Spec.Domain.Memory.Hugepages.PageSize)
-		resources.Requests[hugepageType] = resources.Requests[k8sv1.ResourceMemory]
-		resources.Limits[hugepageType] = resources.Requests[k8sv1.ResourceMemory]
+		hugepagesMemReq := vmi.Spec.Domain.Resources.Requests.Memory()
+
+		// If requested, use the guest memory to allocate hugepages
+		if vmi.Spec.Domain.Memory != nil && vmi.Spec.Domain.Memory.Guest != nil {
+			requests := vmi.Spec.Domain.Resources.Requests.Memory().Value()
+			guest := vmi.Spec.Domain.Memory.Guest.Value()
+			if requests > guest {
+				hugepagesMemReq = vmi.Spec.Domain.Memory.Guest
+			}
+		}
+		resources.Requests[hugepageType] = *hugepagesMemReq
+		resources.Limits[hugepageType] = *hugepagesMemReq
 
 		// Configure hugepages mount on a pod
 		volumeMounts = append(volumeMounts, k8sv1.VolumeMount{
@@ -600,10 +610,29 @@ func (t *templateService) RenderLaunchManifest(vmi *v1.VirtualMachineInstance) (
 			},
 		})
 
+		reqMemDiff := resource.NewScaledQuantity(0, resource.Kilo)
+		limMemDiff := resource.NewScaledQuantity(0, resource.Kilo)
+		// In case the guest memory and the requested memeory are diffrent, add the difference
+		// to the to the overhead
+		if vmi.Spec.Domain.Memory != nil && vmi.Spec.Domain.Memory.Guest != nil {
+			requests := vmi.Spec.Domain.Resources.Requests.Memory().Value()
+			limits := vmi.Spec.Domain.Resources.Limits.Memory().Value()
+			guest := vmi.Spec.Domain.Memory.Guest.Value()
+			if requests > guest {
+				reqMemDiff.Add(*vmi.Spec.Domain.Resources.Requests.Memory())
+				reqMemDiff.Sub(*vmi.Spec.Domain.Memory.Guest)
+			}
+			if limits > guest {
+				limMemDiff.Add(*vmi.Spec.Domain.Resources.Limits.Memory())
+				limMemDiff.Sub(*vmi.Spec.Domain.Memory.Guest)
+			}
+		}
 		// Set requested memory equals to overhead memory
-		resources.Requests[k8sv1.ResourceMemory] = *memoryOverhead
+		reqMemDiff.Add(*memoryOverhead)
+		resources.Requests[k8sv1.ResourceMemory] = *reqMemDiff
 		if _, ok := resources.Limits[k8sv1.ResourceMemory]; ok {
-			resources.Limits[k8sv1.ResourceMemory] = *memoryOverhead
+			limMemDiff.Add(*memoryOverhead)
+			resources.Limits[k8sv1.ResourceMemory] = *limMemDiff
 		}
 	} else {
 		// Add overhead memory
@@ -1066,7 +1095,8 @@ func appendUniqueImagePullSecret(secrets []k8sv1.LocalObjectReference, newsecret
 //
 // Note: This is the best estimation we were able to come up with
 //       and is still not 100% accurate
-func getMemoryOverhead(domain v1.DomainSpec) *resource.Quantity {
+func getMemoryOverhead(vmi *v1.VirtualMachineInstance) *resource.Quantity {
+	domain := vmi.Spec.Domain
 	vmiMemoryReq := domain.Resources.Requests.Memory()
 
 	overhead := resource.NewScaledQuantity(0, resource.Kilo)
@@ -1096,6 +1126,13 @@ func getMemoryOverhead(domain v1.DomainSpec) *resource.Quantity {
 	// Add video RAM overhead
 	if domain.Devices.AutoattachGraphicsDevice == nil || *domain.Devices.AutoattachGraphicsDevice == true {
 		overhead.Add(resource.MustParse("16Mi"))
+	}
+
+	// Additional overhead of 1G for VFIO devices. VFIO requires all guest RAM to be locked
+	// in addition to MMIO memory space to allow DMA. 1G is often the size of reserved MMIO space on x86 systems.
+	// Additial information can be found here: https://www.redhat.com/archives/libvir-list/2015-November/msg00329.html
+	if util.IsSRIOVVmi(vmi) || util.IsGPUVMI(vmi) {
+		overhead.Add(resource.MustParse("1G"))
 	}
 
 	return overhead
