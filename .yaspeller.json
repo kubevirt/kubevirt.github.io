@@ -110,6 +110,7 @@
     "galleria",
     "gcp",
     "GCP",
+    "GiB",
     "GitHub's",
     "github",
     "GitHub",
@@ -135,6 +136,7 @@
     "hyperconverged",
     "Hyperconverged",
     "hypervisor",
+    "hypervisors",
     "Ibáñez",
     "Intoto",
     "io",
@@ -194,6 +196,8 @@
     "meetups",
     "meta",
     "metal3",
+    "MiB",
+    "migratable",
     "minikube",
     "Minikube",
     "Moby",
@@ -273,6 +277,7 @@
     "RSS",
     "runc",
     "runStrategy",
+    "RWX",
     "scalability",
     "SCC",
     "schedulable",
@@ -351,6 +356,8 @@
     "yml",
     "YML",
     "youtube",
-    "Youtube"
+    "Youtube",
+    "backends",
+    "reenabling"
   ]
 }
