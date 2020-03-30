@@ -36,13 +36,13 @@ toc: false
 
 ## Introduction
 
-In this blog post we'll be explaining on KubeVirt's ability for performing Live Migration.
+This blog post will be explaining on KubeVirt's ability for performing Live Migration.
 
 > Live Migration is a process during which a running Virtual Machine Instance moves to another compute node while the guest workload continues to run and remain accessible.
 
 The concept of Live Migration is already well-known among virtualization platforms and enables administrators to keep workloads from users running while the servers can be moved to maintenance for any specific reason that you might think of like:
 
-- hardware maintenance (physical, firmware upgrades, etc)
+- Hardware maintenance (physical, firmware upgrades, etc)
 - Power management, by moving workloads to a lower number of hypervisors during off-peak hours
 - etc
 
@@ -66,7 +66,9 @@ data:
   feature-gates: "LiveMigration"
 ```
 
-Also, current `kubevirt-config` can be edited to append "`LiveMigration`" to existing configuration:
+<br>
+
+Also, current `kubevirt-config` can be edited to append "`LiveMigration`" to an existing configuration:
 
 ```sh
 kubectl edit configmap kubevirt-config -n kubevirt
@@ -76,6 +78,8 @@ kubectl edit configmap kubevirt-config -n kubevirt
 data:
   feature-gates: "DataVolumes,LiveMigration"
 ```
+
+<br>
 
 ## Configuring Live Migration
 
@@ -99,7 +103,7 @@ data:
   progressTimeout: 150
 ```
 
-Parameters are explained in below table (check the documentation for more details):
+Parameters are explained in the below table (check the documentation for more details):
 
 | Parameter                           | Default value | Description                                                                   |
 | :---------------------------------- | :-----------: | :---------------------------------------------------------------------------- |
@@ -116,7 +120,7 @@ Parameters are explained in below table (check the documentation for more detail
 > 1. Virtual Machines using PVC must have a `RWX` access mode to be Live-Migrated
 > 1. Additionally, pod network binding of bridge interface is not allowed
 
-Live migration is initiated by posting a object `VirtualMachineInstanceMigration` to the cluster, indicating the VM name to migrate, like in the following example:
+Live migration is initiated by posting an object `VirtualMachineInstanceMigration` to the cluster, indicating the VM name to migrate, like in the following example:
 
 ```yaml
 apiVersion: kubevirt.io/v1alpha3
@@ -131,7 +135,7 @@ This will trigger the process for the VM.
 
 > note "NOTE"
 >
-> When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the `VMI.status.conditions`. Currently most of the calculation is based on the `Access Mode` for the VMI volumes but can be based on multiple parameters. For example:
+> When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the `VMI.status.conditions`. Currently, most of the calculation is based on the `Access Mode` for the VMI volumes but can be based on multiple parameters. For example:
 >
 > ```yaml
 > Status:
@@ -156,7 +160,7 @@ If the VM is Live-Migratable, the request will come-trough and the status will s
 
 If we want to abort the Live Migration, 'Kubernetes-Style', we'll just delete the object we created for triggering it.
 
-In this case the VM status for migration will report some additional information:
+In this case, the VM status for migration will report some additional information:
 
 ```yaml
 Migration State:
@@ -181,7 +185,7 @@ Migration State:
   Target Pod: virt-launcher-testvmimcbjgw6zrzcmp8wpddvztvzm7x2k6cjbdgktwv8tkq
 ```
 
-Note that there are some additional fields that indicate that `Abort Requested` has happened and in above example that it has `Succeded`, in this case, the original fields for migration will report as `Completed` (because there's no running migration) and `Failed` set to true.
+Note that there are some additional fields that indicate that `Abort Requested` happened and in the above example that it has `Succeded`, in this case, the original fields for migration will report as `Completed` (because there's no running migration) and `Failed` set to true.
 
 ## What can go wrong?
 
@@ -197,7 +201,7 @@ Some values can be adjusted (check the [table](#configuring-live-migration) for 
 
 Sometimes, a node requires to be put on maintenance and it includes workloads on it, either containers or, in KubeVirt's case, VM's.
 
-It is possible to use **selectors** to, for example, move all the virtual machines to another node via `kubectl drain <nodename>`, for example, evicting all KubeVirt VM's from a node can be done via:
+It is possible to use **selectors**, for example, move all the virtual machines to another node via `kubectl drain <nodename>`, for example, evicting all KubeVirt VM's from a node can be done via:
 
 ```sh
 kubectl drain <node name> --delete-local-data --ignore-daemonsets=true --force --pod-selector=kubevirt.io=virt-launcher
@@ -231,7 +235,7 @@ If we omit the `--pod-selector`, we'll force eviction of all Pods and VM's from 
 As a briefing on the above data:
 
 - `LiveMigrate` needs to be enabled on KubeVirt as a feature gate.
-- `LiveMigrate` will add status to the VMI object indicating if it's candidate or not and if so, which mode to use (Block or Live)
+- `LiveMigrate` will add status to the VMI object indicating if it's a candidate or not and if so, which mode to use (Block or Live)
   - Based on the storage backend and other conditions, it will enable `LiveMigration` or just `BlockMigration`.
 
 ## References
