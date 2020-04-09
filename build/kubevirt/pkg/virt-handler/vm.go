@@ -76,7 +76,8 @@ func NewController(
 	watchdogTimeoutSeconds int,
 	maxDevices int,
 	clusterConfig *virtconfig.ClusterConfig,
-	tlsConfig *tls.Config,
+	serverTLSConfig *tls.Config,
+	clientTLSConfig *tls.Config,
 	podIsolationDetector isolation.PodIsolationDetector,
 ) *VirtualMachineController {
 
@@ -95,7 +96,7 @@ func NewController(
 		gracefulShutdownInformer: gracefulShutdownInformer,
 		heartBeatInterval:        1 * time.Minute,
 		watchdogTimeoutSeconds:   watchdogTimeoutSeconds,
-		migrationProxy:           migrationproxy.NewMigrationProxyManager(virtShareDir, tlsConfig),
+		migrationProxy:           migrationproxy.NewMigrationProxyManager(virtShareDir, serverTLSConfig, clientTLSConfig),
 		podIsolationDetector:     podIsolationDetector,
 		containerDiskMounter:     &container_disk.Mounter{PodIsolationDetector: podIsolationDetector},
 		clusterConfig:            clusterConfig,
@@ -928,6 +929,9 @@ func (d *VirtualMachineController) defaultExecute(key string,
 	if domainExists && vmiExists && vmi.IsFinal() {
 		log.Log.Object(vmi).V(3).Info("Removing domain and ephemeral data for finalized vmi.")
 		shouldDelete = true
+	} else if !domainExists && vmiExists && vmi.IsFinal() {
+		log.Log.Object(vmi).V(3).Info("Cleaning up local data for finalized vmi.")
+		shouldCleanUp = true
 	}
 
 	// Determine if an active (or about to be active) VirtualMachineInstance should be updated.
