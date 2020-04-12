@@ -32,6 +32,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
+	"github.com/pborman/uuid"
 	k8sv1 "k8s.io/api/core/v1"
 	v13 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -730,7 +731,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 					return ""
 				}, 120*time.Second, 1*time.Second).Should(ContainSubstring("failed to find pod"))
 
-				waitForVMIScheduling(virtClient, newVMI)
+				waitForNewVMI(virtClient, newVMI)
 
 				By("Comparing the new CreationTimeStamp with the old one")
 				newVMI, err = virtClient.VirtualMachineInstance(newVM.Namespace).Get(newVM.Name, &v12.GetOptions{})
@@ -1474,12 +1475,13 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 		})
 
 		Context("as ordinary OCP user trough test service account", func() {
+			var testUser string
+			var token string
+
 			BeforeEach(func() {
 				tests.SkipIfNoCmd("oc")
+				testUser = "testuser-" + uuid.NewRandom().String()
 			})
-
-			const testUser = "testuser"
-			var token string
 
 			Context("should succeed with right rights", func() {
 				BeforeEach(func() {
@@ -1693,17 +1695,17 @@ func waitForVMIStart(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineIn
 	}, 120*time.Second, 1*time.Second).Should(Equal(v1.Running), "New VMI was not created")
 }
 
-func waitForVMIScheduling(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance) {
-	Eventually(func() v1.VirtualMachineInstancePhase {
+func waitForNewVMI(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance) {
+	Eventually(func() bool {
 		newVMI, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.GetName(), &v12.GetOptions{})
 		if err != nil {
 			if !errors.IsNotFound(err) {
 				Expect(err).ToNot(HaveOccurred())
 			}
-			return v1.Unknown
+			return false
 		}
-		return newVMI.Status.Phase
-	}, 120*time.Second, 1*time.Second).Should(Equal(v1.Scheduling), "New VMI was not created")
+		return (newVMI.Status.Phase == v1.Scheduling) || (newVMI.Status.Phase == v1.Running)
+	}, 120*time.Second, 1*time.Second).Should(BeTrue(), "New VMI was not created")
 }
 
 func waitForResourceDeletion(k8sClient string, resourceType string, resourceName string) {
