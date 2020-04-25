@@ -103,6 +103,22 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 		if len(nodes.Items) < 2 {
 			Skip("Migration tests require at least 2 nodes")
 		}
+
+		// Taints defined by k8s are special and can't be applied manually.
+		// Temporarily configure KubeVirt to use something else for the duration of these tests.
+		if tests.IsUsingBuiltinNodeDrainKey() {
+			var data map[string]string
+
+			cfgMap, err := tests.GetKubeVirtConfigMap()
+			Expect(err).ToNot(HaveOccurred())
+			if val, ok := cfgMap.Data[virtconfig.MigrationsConfigKey]; ok {
+				json.Unmarshal([]byte(val), &data)
+			}
+			data["nodeDrainTaintKey"] = "kubevirt.io/drain"
+			migrationData, err := json.Marshal(data)
+
+			tests.UpdateClusterConfigValueAndWait(virtconfig.MigrationsConfigKey, string(migrationData))
+		}
 	})
 
 	AfterEach(func() {
@@ -1224,7 +1240,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
 			},
 				table.Entry("[test_id:2226]with ContainerDisk", newVirtualMachineInstanceWithFedoraContainerDisk),
-				table.PEntry("[test_id:2731] [flaky] with OCS Disk", newVirtualMachineInstanceWithFedoraOCSDisk),
+				table.Entry("[test_id:2731] with OCS Disk", newVirtualMachineInstanceWithFedoraOCSDisk),
 			)
 			It("[test_id:3241]should be able to cancel a migration right after posting it", func() {
 				tests.SkipMigrationTestIfRunnigOnKindInfra()
@@ -1670,7 +1686,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 					tests.WaitForSuccessfulVMIStartWithTimeout(vmi, 180)
 				}
 
-				By("selecting a  node as the target")
+				By("selecting a node as the target")
 				targetNode := tests.GetAllSchedulableNodes(virtClient).Items[1]
 				tests.AddLabelToNode(targetNode.Name, "tests.kubevirt.io", "target")
 
