@@ -1,4 +1,142 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-04-28T13:25:41+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.28.0</title><link href="https://kubevirt.io//2020/changelog-v0.28.0.html" rel="alternate" type="text/html" title="KubeVirt v0.28.0" /><published>2020-04-09T00:00:00+00:00</published><updated>2020-04-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.28.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.28.0.html">&lt;h2 id=&quot;v0280&quot;&gt;v0.28.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-04-29T13:23:56+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Security Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Security Fundamentals" /><published>2020-04-29T00:00:00+00:00</published><updated>2020-04-29T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Security-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html">&lt;h2 id=&quot;security-guidelines&quot;&gt;Security Guidelines&lt;/h2&gt;
+
+&lt;p&gt;In KubeVirt, our approach to security can be summed up by adhering to the following guidelines.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;Maintain the &lt;strong&gt;principle of least privilege&lt;/strong&gt; for all our components, meaning each component only has access to exactly the minimum privileges required to operate.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;&lt;strong&gt;Establish boundaries between trusted vs untrusted components.&lt;/strong&gt; In our case, an untrusted component is typically anything that executes user third party logic.&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Inter-component network communication &lt;strong&gt;must be secured by TLS with mutual peer authentication.&lt;/strong&gt;&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Let’s take a look at what each of these guidelines mean for us practically when it comes to KubeVirt’s design.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-principle-of-least-privilege&quot;&gt;The Principle of Least Privilege&lt;/h2&gt;
+
+&lt;p&gt;By limiting each component to only the exact privileges it needs to operate, we reduce the blast radius that occurs if a component is compromised.&lt;/p&gt;
+
+&lt;p&gt;Here’s a simple and rather obvious example. If a component needs access to a secret in a specific namespace, then we give that component read-only access to that single secret and not access to read all secrets. If that component is compromised, we’ve then limited the blast radius for what can be exploited.&lt;/p&gt;
+
+&lt;p&gt;For KubeVirt, the principle of least privilege can be broken into two categories.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Cluster Level Access:&lt;/strong&gt; The resources and APIs a component is permitted to access on the cluster.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Host Level Access:&lt;/strong&gt; The local resources a component is permitted to access on the host it is running on.&lt;/p&gt;
+
+&lt;h3 id=&quot;cluster-level-access&quot;&gt;Cluster Level Access&lt;/h3&gt;
+
+&lt;p&gt;For cluster level access the primary tools we have to grant and restrict access to cluster resources are cluster Namespaces and RBAC (Role Based Access Control). Each KubeVirt component only has access to the exact RBAC permissions within the limited set of Namespaces it requires to operate.&lt;/p&gt;
+
+&lt;p&gt;For example, let’s take a look at the KubeVirt control plane and runtime components highlighted in orange below.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-04-29-KubeVirt-Security-Fundamentals/component-view.png&quot; alt=&quot;Components View&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-controller&lt;/strong&gt; is the component responsible for spinning up pods across the entire cluster for virtual machines to live in. As a result, this component needs access to RBAC permissions to manage pods. However, another part of virt-controller’s operation involves needing access to a single secret that contains its TLS certificate information. We aren’t going to give virt-controller access to manage secrets as well as pods simply because it needs access to read a single secret. In fact we aren’t even going to give virt-controller direct API access to any secrets at all. Instead we use the ability to pass a cluster secret as a pod volume into the virt-controller’s pod in order to provide read-only access.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-api&lt;/strong&gt; is the component that validates our api and provides virtual machine console and VNC access. This component doesn’t need access to create Pods like virt-controller does. Instead it mostly only requires read and modify access to existing KubeVirt API objects. As a result, if virt-api is compromised the blast radius is mostly limited to KubeVirt objects.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-handler&lt;/strong&gt; is a privileged daemonset that resides at the host level on every node that is capable of spinning up KubeVirt virtual machines. This component needs cluster access to the KubeVirt VirtualMachineInstance objects in order to manage the startup flow of virtual machines. However it doesn’t need cluster access to the pod objects the virtual machines live in. Similar to virt-api, what little cluster access this component has is mostly read-only and limited to the KubeVirt API.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-launcher&lt;/strong&gt; is a non-privileged component that resides in every virtual machine’s pod. This component is responsible for starting and monitoring the qemu-kvm process. Since this process lives within an “untrusted” environment that is executing third party logic, we’ve designed this component to require no cluster API access. As a result, this pod only receives the default service account for the namespace the pod resides in. If virt-launcher is compromised, cluster API access should not be impacted.&lt;/p&gt;
+
+&lt;h3 id=&quot;host-level-access&quot;&gt;Host Level Access&lt;/h3&gt;
+
+&lt;p&gt;For host level access, the primary tools we have at our disposal for limiting access primarily reside within the Pod specification’s &lt;strong&gt;securityContext&lt;/strong&gt; section. It’s here that we can define settings like what local user a container runs with, whether a container has access to host namespaces, and SELinux related options. Other tools for host level access involve exposing &lt;strong&gt;hostPath volumes&lt;/strong&gt; for shared host directory access and &lt;strong&gt;DevicePlugins&lt;/strong&gt; to pass host devices into the pod environment.&lt;/p&gt;
+
+&lt;p&gt;Let’s take a look at a few examples of how host access is managed for our components.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-controller&lt;/strong&gt; and &lt;strong&gt;virt-api&lt;/strong&gt; are cluster level components only, and have no need for access to host resources. These components run as non-privileged and non-root within their own isolated namespaces. No special host level access is granted to these components. For OpenShift clusters, the &lt;strong&gt;SCC&lt;/strong&gt; (Security Context Constraint) feature even provides the ability to restrict virt-controller’s permissions in a way that prevents it from creating pods with host access.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-launcher&lt;/strong&gt; is a host level component that is non-privileged and untrusted. However this component still needs access to host level devices (like /dev/kvm, gpus, and network devices) in order to start the virtual machine. Through the use of the Kubernetes &lt;strong&gt;Device Plugin&lt;/strong&gt; feature, we can expose host devices into a pod’s environment in a controlled way that doesn’t compromise namespace isolation or require hostPath volumes.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virt-handler&lt;/strong&gt; is a host level component that is both privileged and trusted. This component’s responsibilities involve reaching into the virt-launcher’s pod to perform actions we don’t want the untrusted virt-launcher component to have permissions to perform itself. The primary method we have to restrict virt-handler’s access to the host is through SELinux. Since virt-handler requires maintaining some limited persistent state, hostPath volumes are also utilized to allow virt-handler to store persistent information on the host that can persist through virt-handler updates.&lt;/p&gt;
+
+&lt;h2 id=&quot;trusted-vs-untrusted-components&quot;&gt;Trusted vs Untrusted Components&lt;/h2&gt;
+
+&lt;p&gt;For KubeVirt, the separation between trusted and untrusted components comes when users can execute their own third party logic within a component’s environment. We can clearly illustrate this concept using the boundary between our two host level components, virt-launcher and virt-handler.&lt;/p&gt;
+
+&lt;h3 id=&quot;establishing-boundaries&quot;&gt;Establishing Boundaries&lt;/h3&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-04-29-KubeVirt-Security-Fundamentals/trusted-v-untrusted-boundary.png&quot; alt=&quot;Trusted vs Untrusted Boundary&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;The virt-launcher pod is an untrusted environment.&lt;/strong&gt; The third party code executed within this environment is the user’s kvm virtual machine. KubeVirt has no control over what is executing within this virtual machine guest, so if there is a security vulnerability that allows breaking out of the kvm hypervisor, we want to make sure the environment that’s broken into is as limited as possible. This is why the virt-launcher’s pod has such restricted cluster and host access.&lt;/p&gt;
+
+&lt;p&gt;The &lt;strong&gt;virt-handler pod, on the other hand, is a trusted environment&lt;/strong&gt; that does not involve executing any third party code. During the virtual machine startup flow, there are privileged tasks that need to take place on the host in order to prepare the virtual machine for starting. This ranges from performing the Device Plugin logic that injects a host device into a pod’s environment, to setting up network bridges and interfaces within a pod’s environment. To accomplish this, we use the trusted virt-handler component to reach into the untrusted virt-launcher environment to perform privileged tasks.&lt;/p&gt;
+
+&lt;p&gt;The boundary established here is that we trust virt-handler with the ability to influence and provide information about all virtual machines running on a host, and limit virt-launcher to only influence and provide information about itself.&lt;/p&gt;
+
+&lt;h3 id=&quot;securing-boundaries&quot;&gt;Securing Boundaries&lt;/h3&gt;
+
+&lt;p&gt;Any communication channel that gives an untrusted environment the ability to present information to a trusted environment must be heavily scrutinized to prevent the possibility of privilege escalation. For example, the boundary between virt-handler and virt-launcher is meant to work like a one way mirror. The trusted virt-handler component can reach directly into the untrusted virt-launcher environments, but each virt-launcher can’t reach outside of its own isolated environment. Host namespace isolation provides a reasonable guarantee that virt-launcher can’t reach outside of its own environment directly, however we still have to be mindful about indirection communication.&lt;/p&gt;
+
+&lt;p&gt;Virt-handler observes information presented to it by each virt-launcher pod. If a virt-launcher environment is able to present fake information about another virtual machine, then the untrusted virt-launcher environment could indirectly influence the execution of another workload.&lt;/p&gt;
+
+&lt;p&gt;To counter this, when designing communication channels between trusted and untrusted components, we have to be careful to only allow communication from untrusted sources to influence itself and furthermore only influence itself in a way that can’t result in escalated privileges.&lt;/p&gt;
+
+&lt;h2 id=&quot;mutual-tls-authentication&quot;&gt;Mutual TLS Authentication&lt;/h2&gt;
+
+&lt;p&gt;There is a built in trust that components have for interacting with one another. For example, virt-api is allowed to establish virtual machine Console/VNC streams with virt-handler, and live migration is performed by streaming information between two virt-handler instances.&lt;/p&gt;
+
+&lt;p&gt;However for these types of interactions to work, we have to have a strong guarantee that the endpoints we’re talking to are in fact who they present themselves to be. Otherwise we could live migrate a virtual machine to an untrusted location, or provide VNC access to a virtual machine to an unauthorized endpoint.&lt;/p&gt;
+
+&lt;p&gt;In KubeVirt we solve this issue of inter-component communication trust in the same way Kubernetes solves it. Each component receives a unique TLS certificate signed by a cluster Certificate Authority which is used to guarantee the component is who they say they are. The certificate and CA information is injected into each component using a secret passed in as a Pod volume. Whenever a component acts as a client establishing a new connection with another component, it uses its unique certificate to prove its identify. Likewise, the server accepting the clients connection also presents its certificate to the client. This mutual peer certificate authentication allows both the client and server to establish trust.&lt;/p&gt;
+
+&lt;p&gt;So, when virt-api attempts to establish a VNC console stream with a virt-handler component, virt-handler is configured to only allow that stream to be opened by an endpoint providing a valid virt-api certificate, and virt-api will only talk to a server that presents the expected virt-handler certificate.&lt;/p&gt;
+
+&lt;h2 id=&quot;ca-and-certificate-rotation&quot;&gt;CA and Certificate Rotation&lt;/h2&gt;
+
+&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry><entry><title type="html">KubeVirt Architecture Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Architecture Fundamentals" /><published>2020-04-28T00:00:00+00:00</published><updated>2020-04-28T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals.html">&lt;h2 id=&quot;placing-our-bets&quot;&gt;Placing our Bets&lt;/h2&gt;
+
+&lt;p&gt;Back in 2017 the KubeVirt architecture team got together and placed their bets on a set of core design principles that became the foundation of what KubeVirt is today. At the time, our decisions broke convention. We chose to take some calculated risks with the understanding that those risks had a real chance of not playing out in our favor.&lt;/p&gt;
+
+&lt;p&gt;Luckily, time has proven our bets were well placed. Since those early discussions back in 2017, KubeVirt has grown from a theoretical prototype into a project deployed in production environments with a thriving open source community. While KubeVirt has grown in maturity and sophistication throughout the past few years, the initial set of guidelines established in those early discussions still govern the project’s architecture today.&lt;/p&gt;
+
+&lt;p&gt;Those guidelines can be summarized nearly entirely by the following two key decisions.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virtual machines run in Pods using the existing container runtimes.&lt;/strong&gt; This decision came at a time when other Kubernetes virtualization efforts were creating their own virtualization specific CRI runtimes. We took a bet on our ability to successfully launch virtual machines using existing and future container runtimes within an unadulterated Pod environment.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Virtual machines are managed using a custom “Kubernetes like” declarative API.&lt;/strong&gt; When this decision was made, imperative APIs were the defacto standard for how other platforms managed virtual machines. However, we knew in order to succeed in our mission to deliver a truly cloud-native API managed using existing Kubernetes tooling (like kubectl), we had to adhere fully to the declarative workflow. We took a bet that the lackluster Kubernetes Third Party Resource support (now known as CRDs) would eventually provide the ability to create custom declarative APIs as first class citizens in the cluster.&lt;/p&gt;
+
+&lt;p&gt;Let’s dive into these two points a bit and take a look at how these two key decisions permeated throughout our entire design.&lt;/p&gt;
+
+&lt;h2 id=&quot;virtual-machines-as-pods&quot;&gt;Virtual Machines as Pods&lt;/h2&gt;
+
+&lt;p&gt;We often pitch KubeVirt by saying something like “KubeVirt allows you to run virtual machines side by side with your container workloads”. However, the reality is &lt;strong&gt;we’re delivering virtual machines as container workloads.&lt;/strong&gt; So as far as Kubernetes is concerned, there are no virtual machines, just pods and containers. Fundamentally, KubeVirt virtual machines just look like any other containerized application to the rest of the cluster. It’s our KubeVirt API and control plane that make these containerized virtual machines behave like you’d expect from using other virtual machine management platforms.&lt;/p&gt;
+
+&lt;p&gt;The payoff from running virtual machines within a Kubernetes Pod has been huge for us. There’s an entire ecosystem that continues to grow around how to provide pods with access to networks, storage, host devices, cpu, memory, and more. This means every time a problem or feature is added to pods, it’s yet another tool we can use for virtual machines.&lt;/p&gt;
+
+&lt;p&gt;Here are a few examples of how pod features meet the needs of virtual machines as well.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Storage:&lt;/strong&gt; Virtual machines need persistent disks. Users should be able to stop a VM, start a VM, and have the data persist. There’s a Kubernetes storage abstraction called a PVC (persistent volume claim) that allows persistent storage to be attached to a pod. This means by placing the virtual machine in a pod, we can use the existing PVC mechanisms of delivering persistent storage to deliver our virtual machine disks.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Network:&lt;/strong&gt; Virtual machines need access to cluster networking. Pods are provided network interfaces that tie directly into the pod network via CNI. We can give a virtual machine running in a pod access to the pod network using the default CNI allocated network interfaces already present in the pod’s environment.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;CPU/Memory:&lt;/strong&gt; Users need the ability to assign cpu and memory resources to Virtual machines. We can assign cpu and memory to pods using the resource requests/limits on the pod spec. This means through the use of pod resource requests/limits we are able to assign resources directly to virtual machines as well.&lt;/p&gt;
+
+&lt;p&gt;This list goes on and on. As problems are solved for pods, KubeVirt leverages the solution and translates it to the virtual machine equivalent.&lt;/p&gt;
+
+&lt;h2 id=&quot;the-declarative-kubevirt-virtualization-api&quot;&gt;The Declarative KubeVirt Virtualization API&lt;/h2&gt;
+
+&lt;p&gt;While a KubeVirt virtual machine runs within a pod, that doesn’t change the fact that people working with virtual machines have a different set of expectations for how virtual machines should work compared to how pods are managed.&lt;/p&gt;
+
+&lt;p&gt;Here’s the conflict.&lt;/p&gt;
+
+&lt;p&gt;Pods are &lt;strong&gt;mortal workloads&lt;/strong&gt;. A pod is declared by posting it’s manifest to the cluster, the pod runs once to completion, and that’s it. It’s done.&lt;/p&gt;
+
+&lt;p&gt;Virtual machines are &lt;strong&gt;immortal workloads&lt;/strong&gt;. A virtual machine doesn’t just run once to completion. Virtual machines have state. They can be started, stopped, and restarted any number of times. Virtual machines have concepts like live migration as well. Furthermore if the node a virtual machine is running on dies, the expectation is for that exact same virtual machine to resurrect on another node maintaining its state.&lt;/p&gt;
+
+&lt;p&gt;So, pods run once and virtual machines live forever. How do we reconcile the two? Our solution came from taking a play directly out of the Kubernetes playbook.&lt;/p&gt;
+
+&lt;p&gt;The Kubernetes core apis have this concept of layering objects on top of one another through the use of &lt;strong&gt;workload controllers&lt;/strong&gt;. For example, the Kubernetes ReplicaSet is a workload controller layered on top of pods. The ReplicaSet controller manages ensuring that there are always ‘x’ number of pod replicas running within the cluster. If a ReplicaSet object declares that 5 pod replicas should be running, but a node dies bringing that total to 4, then the ReplicaSet workload controller manages spinning up a 5th pod in order to meet the declared replica count. The workload controller is always reconciling on the ReplicaSet objects desired state.&lt;/p&gt;
+
+&lt;p&gt;Using this established Kubernetes pattern of layering objects on top of one another, we came up with our own virtualization specific API and corresponding workload controller called a &lt;strong&gt;“VirtualMachine”&lt;/strong&gt; (big surprise there on the name, right?). Users declare a VirtualMachine object just like they would a pod by posting the VirtualMachine object’s manifest to the cluster. The big difference here that deviates from how pods are managed is that we allow VirtualMachine objects to be declared to exist in different states. For example, you can declare you want to “start” a virtual machine by setting “running: true” on the VirtualMachine object’s spec. Likewise you can declare you want to “stop” a virtual machine by setting “running: false” on the VirtualMachine object’s spec. Behind the scenes, setting the “running” field to true or false results in the workload controller creating or deleting a pod for the virtual machine to live in.&lt;/p&gt;
+
+&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry><entry><title type="html">KubeVirt v0.28.0</title><link href="https://kubevirt.io//2020/changelog-v0.28.0.html" rel="alternate" type="text/html" title="KubeVirt v0.28.0" /><published>2020-04-09T00:00:00+00:00</published><updated>2020-04-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.28.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.28.0.html">&lt;h2 id=&quot;v0280&quot;&gt;v0.28.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Thu Apr 9 23:01:29 2020 +0200&lt;/p&gt;
 
@@ -1858,46 +1996,4 @@ console-deployment-59d8956db5-td462                     1/1     Running         
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on Youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="OpenShift web console" /><category term="web interface" /><category term="OKD" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry><entry><title type="html">KubeVirt Laboratory 3, upgrades</title><link href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 3, upgrades" /><published>2020-01-21T00:00:00+00:00</published><updated>2020-01-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_lab3_upgrade</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;KubeVirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
-
-&lt;p&gt;In the video, there is a Kubernetes cluster already running. Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/OAPzOvqp0is&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
-
-&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Install a specific version of the KubeVirt Operator and Custom Resource&lt;/li&gt;
-  &lt;li&gt;Create a cirros Virtual Machine running in KubeVirt&lt;/li&gt;
-  &lt;li&gt;Connect to the Virtual Machine using SSH&lt;/li&gt;
-  &lt;li&gt;Upgrade to a specific version of KubeVirt while the Virtual Machine is running&lt;/li&gt;
-  &lt;li&gt;Check the new KubeVirt version&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;Kubevirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab2_experiment_with_cdi.html&quot;&gt;Kubevirt Laboratory 2 blogpost: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;Kubevirt Laboratory 2: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="kubevirt upgrade" /><category term="upgrading" /><category term="lifecycle" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 3: Upgrades</summary></entry><entry><title type="html">KubeVirt v0.25.0</title><link href="https://kubevirt.io//2020/changelog-v0.25.0.html" rel="alternate" type="text/html" title="KubeVirt v0.25.0" /><published>2020-01-13T00:00:00+00:00</published><updated>2020-01-13T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.25.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.25.0.html">&lt;h2 id=&quot;v0250&quot;&gt;v0.25.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Mon Jan 13 20:37:15 2020 +0100&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;CI: Support for Kubernetes 1.17&lt;/li&gt;
-  &lt;li&gt;Support emulator thread pinning&lt;/li&gt;
-  &lt;li&gt;Support virtctl restart –force&lt;/li&gt;
-  &lt;li&gt;Support virtctl migrate to trigger live migrations from the CLI&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.25.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="OpenShift web console" /><category term="web interface" /><category term="OKD" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry></feed>
