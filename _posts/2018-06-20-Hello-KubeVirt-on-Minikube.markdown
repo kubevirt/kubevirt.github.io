@@ -36,7 +36,7 @@ Y
 
 ## Install KVM2 driver for Minikube
 
-Minikube requires a special driver to manage Docker Machine VMs running in KVM. KVM2 is the latest iteration of the driver. Read more about it [here](https://github.com/kubernetes/minikube/blob/master/docs/drivers.md#kvm2-driver)
+Minikube requires a special driver to manage Docker Machine VMs running in KVM. KVM2 is the latest iteration of the driver. Read more about it [here](https://minikube.sigs.k8s.io/docs/drivers/kvm2/)
 
 ```bash
 # install driver to /usr/local/bin
