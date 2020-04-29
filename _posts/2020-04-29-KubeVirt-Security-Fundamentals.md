@@ -30,7 +30,7 @@ In KubeVirt, our approach to security can be summed up by adhering to the follow
 
 3. Inter-component network communication **must be secured by TLS with mutual peer authentication.**
 
-Let’s take a look at what each of these guidelines mean for us practically when it comes to KubeVirt’s design.
+Let’s take a look at what each of these guidelines mean for us practically when it comes to KubeVirt's design.
 
 ## The Principle of Least Privilege
 
