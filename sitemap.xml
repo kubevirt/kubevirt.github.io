@@ -469,6 +469,10 @@
 <lastmod>2020-04-29T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html</loc>
+<lastmod>2020-04-30T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1091,6 +1095,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/security.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/operation.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>

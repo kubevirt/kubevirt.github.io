@@ -22,26 +22,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">
+    <link rel="canonical" href="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>KubeVirt Laboratory 3, upgrades | KubeVirt.io</title>
+    <title>KubeVirt Operation Fundamentals | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="Pedro Ibáñez Requena" >
+    <meta name="author" content="David Vossel" >
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="In this video, we are showing the step by step of the KubeVirt Laboratory 3 how to upgrade KubeVirt">
-    <meta name="keywords" content="lab, kubevirt upgrade, upgrading, lifecycle" >
-    <meta property="og:title" content="KubeVirt Laboratory 3, upgrades | KubeVirt.io">
+    <meta name="description" content="This blog post outlines fundamentals around the KubeVirt's approach to installs and updates.">
+    <meta name="keywords" content="kubevirt, kubernetes, virtual machine, VM, design, architecture, operation" >
+    <meta property="og:title" content="KubeVirt Operation Fundamentals | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" >
+    <meta property="og:url" content="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="In this video, we are showing the step by step of the KubeVirt Laboratory 3 how to upgrade KubeVirt" >
+    <meta property="og:description" content="This blog post outlines fundamentals around the KubeVirt's approach to installs and updates." >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="Pedro Ibáñez Requena" >
-    <meta property="og:article:published_time" content="2020-01-21 00:00:00 +0000" >
-    <meta name="twitter:title" content="KubeVirt Laboratory 3, upgrades | KubeVirt.io">
-    <meta name="twitter:description" content="In this video, we are showing the step by step of the KubeVirt Laboratory 3 how to upgrade KubeVirt">
+    <meta property="og:article:author" content="David Vossel" >
+    <meta property="og:article:published_time" content="2020-04-30 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt Operation Fundamentals | KubeVirt.io">
+    <meta name="twitter:description" content="This blog post outlines fundamentals around the KubeVirt's approach to installs and updates.">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     
@@ -228,16 +228,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <div class="post">
         <header class="post-header">
           <h1></h1>
-          <h1 class="post-title">KubeVirt Laboratory 3, upgrades</h1>
+          <h1 class="post-title">KubeVirt Operation Fundamentals</h1>
           <div class="post-info">
-            <span class="post-author">Author: Pedro Ibáñez Requena</span>
+            <span class="post-author">Author: David Vossel</span>
             <div>
               <span class="post-category-name">
-                Tags: <a href="/tag/lab">lab</a>&nbsp;|&nbsp;<a href="/tag/kubevirt-upgrade">kubevirt upgrade</a>&nbsp;|&nbsp;<a href="/tag/upgrading">upgrading</a>&nbsp;|&nbsp;<a href="/tag/lifecycle">lifecycle</a>
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>&nbsp;|&nbsp;<a href="/tag/design">design</a>&nbsp;|&nbsp;<a href="/tag/architecture">architecture</a>&nbsp;|&nbsp;<a href="/tag/operation">operation</a>
               </span>
             </div>
             <div>
-              <span class="post-meta">Publication Date: January 21, 2020  </span>
+              <span class="post-meta">Publication Date: April 30, 2020  </span>
             </div>
             <div>
               <span class="post-category-name">
@@ -248,46 +248,64 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <p>In this video, we are showing the step by step of the <a href="/labs/kubernetes/lab3">KubeVirt Laboratory 3: Upgrades</a></p>
+          <h2 id="simplicity-above-all-else">Simplicity Above All Else</h2>
 
-<h2 id="pre-requisites">Pre-requisites</h2>
+<p>In the late 1970s and early 1980s there were two video recording tape formats competing for market domination. The Betamax format was the technically superior option. Yet despite having better audio, video, and build quality, Betamax still eventually lost to the technically inferior VHS format. VHS won because it was “close enough” in terms of quality and drastically reduced the cost to the consumer.</p>
 
-<p>In the video, there is a Kubernetes cluster already running. Also, the <code class="highlighter-rouge">virtctl</code> command is already installed and available in the PATH.</p>
+<p>I’ve seen this same pattern play out in the open source world as well. It doesn’t matter how technically superior one project might be over another if no one can operate the thing. The “cost” here is operational complexity. The project people can actually get up and running in 5 minutes as a proof of concept is usually going to win over another project they struggle to stand up for several hours or days.</p>
 
-<h2 id="video">Video</h2>
+<p>With KubeVirt, our aim is Betamax for quality and VHS for operational complexity costs. When we have to choose between the two, the option that involves less operational complexity wins 9 out of 10 times.</p>
 
-<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/OAPzOvqp0is" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+<p>Essentially, above all else, KubeVirt must be simple to use.</p>
 
-<h2 id="operations">Operations</h2>
+<h2 id="installation-made-easy">Installation Made Easy</h2>
 
-<p>The following operations are shown in the video:</p>
+<p>From my experience, the first (and perhaps the largest) hurdle a user faces when approaching a new project is installation. When the KubeVirt architecture team placed their bet’s on what technical direction to take the project early on, picking a design that was easy to install was a critical component of the decision making process.</p>
 
-<ul>
-  <li>Install a specific version of the KubeVirt Operator and Custom Resource</li>
-  <li>Create a cirros Virtual Machine running in KubeVirt</li>
-  <li>Connect to the Virtual Machine using SSH</li>
-  <li>Upgrade to a specific version of KubeVirt while the Virtual Machine is running</li>
-  <li>Check the new KubeVirt version</li>
-</ul>
+<p>As a result, our goal from day one has always been to make installing KubeVirt as simple as posting manifests to the cluster with standard Kubernetes client tooling (like kubectl). No per node package installations, no host level configurations. All KubeVirt components have to be delivered as containers and managed with Kubernetes.</p>
 
-<h2 id="references">References</h2>
+<p>We’ve maintained this simplicity today. Installing KubeVirt v0.27.0 is as simple as…</p>
 
-<ul>
-  <li><a href="/labs/kubernetes/lab3">Kubevirt Laboratory 3: Upgrades</a></li>
-  <li><a href="/2019/KubeVirt_lab2_experiment_with_cdi.html">Kubevirt Laboratory 2 blogpost: Experimenting with CDI</a></li>
-  <li><a href="/labs/kubernetes/lab2">Kubevirt Laboratory 2: Experimenting with CDI</a></li>
-  <li><a href="/2019/KubeVirt_lab1_use_kubevirt.html">Kubevirt Laboratory 1 blogpost: Use Kubevirt</a></li>
-  <li><a href="/labs/kubernetes/lab1">Kubevirt Laboratory 1: Use KubeVirt</a></li>
-  <li><a href="https://www.youtube.com/watch?v=KC03G60shIc">KubeVirt basic operations video on youtube</a></li>
-  <li><a href="https://kubevirt.io/user-guide/docs/latest/administration/intro.html">Kubevirt installation notes</a></li>
-  <li><a href="https://www.katacoda.com/kubevirt/scenarios/kubevirt-101">First steps with KubeVirt - Katacoda scenario</a></li>
-</ul>
+<p><strong>Step 1:</strong> posting the KubeVirt operator manifest</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-operator.yaml
+</code></pre></div></div>
+
+<p><strong>Step 2:</strong> posting the KubeVirt install object, which you can use to define exactly what version you want to install using the KubeVirt operator. In our example here, this custom resource defaults to the release that matches the installed operator.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-cr.yaml
+</code></pre></div></div>
+
+<p><strong>Step 3:</strong> and then optionally waiting for the KubeVirt install object’s “Available” condition, which indicates installation has succeeded.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
+</code></pre></div></div>
+
+<p>Maintaining this simplicity played a critical role in our design process early on. At one point we had to make a decision whether to use the existing Kubernetes container runtimes or create our own special virtualization runtime to run in parallel to the cluster’s container runtime. We certainly had more control with our own runtime, but there was no practical way of delivering our own CRI implementation that would be easy to install on existing Kubernetes clusters. The installation would require invasive per node modifications and fall outside of the scope of what we could deliver using Kubernetes manifests alone, so we dropped the idea. Lucky for us, reusing the existing container runtime was both the simplest approach operationally and eventually proved to be the superior approach technically for our use case.</p>
+
+<h2 id="zero-downtime-updates">Zero Downtime Updates</h2>
+
+<p>While installation is likely the first hurdle for evaluating a project, how to perform updates quickly becomes the next hurdle before placing a project into production. This is why we created the KubeVirt <strong>virt-operator.</strong></p>
+
+<p>If you go back and look at the installation steps in the previous section, you’ll notice the first step is to post the virt-operator manifest and the second step is posting a custom resource object. What we’re doing here is bringing up the virt-operator somewhere in the cluster, and then posting a custom resource object representing the KubeVirt install. That second step is telling virt-operator to install KubeVirt. The third step is simply watching our install object to determine when virt-operator has reported the install is complete.</p>
+
+<p>Using our default installation instructions, zero downtime updates are as simple as posting a new virt-operator deployment.</p>
+
+<p><strong>Step 1.</strong> Update virt-operator from our original install of v0.27.0 to v0.28.0 by applying a new virt-operator manifest.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.28.0/kubevirt-operator.yaml
+</code></pre></div></div>
+
+<p><strong>Step 2:</strong> Watch the install object to see when the installation completes. Eventually it will report v0.28.0 as the observed version which indicates the update has completed.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get kv <span class="nt">-o</span> yaml <span class="nt">-n</span> kubevirt | <span class="nb">grep </span>observedKubeVirtVersion
+</code></pre></div></div>
+
+<p>Behind the scenes, virt-operator is coordinating the roll out of all the new KubeVirt components in a way that ensures existing virtual machine workloads are not disrupted.</p>
+
+<p>The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.</p>
+
 
         </article>
         
         
 
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt Laboratory 3, upgrades&url=https://www.kubevirt.io/2020/KubeVirt_lab3_upgrade.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt Operation Fundamentals&url=https://www.kubevirt.io/2020/KubeVirt-Operation-Fundamentals.html&screen_name=kubevirt" aria-label="Share this on Twitter">
   <i class="fab fa-twitter mr-1"></i> Tweet
 </a>
 <hr/>

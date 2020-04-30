@@ -1,4 +1,54 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-04-29T13:26:23+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Security Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Security Fundamentals" /><published>2020-04-29T00:00:00+00:00</published><updated>2020-04-29T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Security-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html">&lt;h2 id=&quot;security-guidelines&quot;&gt;Security Guidelines&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-04-30T13:27:06+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Operation Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Operation Fundamentals" /><published>2020-04-30T00:00:00+00:00</published><updated>2020-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html">&lt;h2 id=&quot;simplicity-above-all-else&quot;&gt;Simplicity Above All Else&lt;/h2&gt;
+
+&lt;p&gt;In the late 1970s and early 1980s there were two video recording tape formats competing for market domination. The Betamax format was the technically superior option. Yet despite having better audio, video, and build quality, Betamax still eventually lost to the technically inferior VHS format. VHS won because it was “close enough” in terms of quality and drastically reduced the cost to the consumer.&lt;/p&gt;
+
+&lt;p&gt;I’ve seen this same pattern play out in the open source world as well. It doesn’t matter how technically superior one project might be over another if no one can operate the thing. The “cost” here is operational complexity. The project people can actually get up and running in 5 minutes as a proof of concept is usually going to win over another project they struggle to stand up for several hours or days.&lt;/p&gt;
+
+&lt;p&gt;With KubeVirt, our aim is Betamax for quality and VHS for operational complexity costs. When we have to choose between the two, the option that involves less operational complexity wins 9 out of 10 times.&lt;/p&gt;
+
+&lt;p&gt;Essentially, above all else, KubeVirt must be simple to use.&lt;/p&gt;
+
+&lt;h2 id=&quot;installation-made-easy&quot;&gt;Installation Made Easy&lt;/h2&gt;
+
+&lt;p&gt;From my experience, the first (and perhaps the largest) hurdle a user faces when approaching a new project is installation. When the KubeVirt architecture team placed their bet’s on what technical direction to take the project early on, picking a design that was easy to install was a critical component of the decision making process.&lt;/p&gt;
+
+&lt;p&gt;As a result, our goal from day one has always been to make installing KubeVirt as simple as posting manifests to the cluster with standard Kubernetes client tooling (like kubectl). No per node package installations, no host level configurations. All KubeVirt components have to be delivered as containers and managed with Kubernetes.&lt;/p&gt;
+
+&lt;p&gt;We’ve maintained this simplicity today. Installing KubeVirt v0.27.0 is as simple as…&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Step 1:&lt;/strong&gt; posting the KubeVirt operator manifest&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-operator.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Step 2:&lt;/strong&gt; posting the KubeVirt install object, which you can use to define exactly what version you want to install using the KubeVirt operator. In our example here, this custom resource defaults to the release that matches the installed operator.&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-cr.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Step 3:&lt;/strong&gt; and then optionally waiting for the KubeVirt install object’s “Available” condition, which indicates installation has succeeded.&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;kv kubevirt &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Maintaining this simplicity played a critical role in our design process early on. At one point we had to make a decision whether to use the existing Kubernetes container runtimes or create our own special virtualization runtime to run in parallel to the cluster’s container runtime. We certainly had more control with our own runtime, but there was no practical way of delivering our own CRI implementation that would be easy to install on existing Kubernetes clusters. The installation would require invasive per node modifications and fall outside of the scope of what we could deliver using Kubernetes manifests alone, so we dropped the idea. Lucky for us, reusing the existing container runtime was both the simplest approach operationally and eventually proved to be the superior approach technically for our use case.&lt;/p&gt;
+
+&lt;h2 id=&quot;zero-downtime-updates&quot;&gt;Zero Downtime Updates&lt;/h2&gt;
+
+&lt;p&gt;While installation is likely the first hurdle for evaluating a project, how to perform updates quickly becomes the next hurdle before placing a project into production. This is why we created the KubeVirt &lt;strong&gt;virt-operator.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If you go back and look at the installation steps in the previous section, you’ll notice the first step is to post the virt-operator manifest and the second step is posting a custom resource object. What we’re doing here is bringing up the virt-operator somewhere in the cluster, and then posting a custom resource object representing the KubeVirt install. That second step is telling virt-operator to install KubeVirt. The third step is simply watching our install object to determine when virt-operator has reported the install is complete.&lt;/p&gt;
+
+&lt;p&gt;Using our default installation instructions, zero downtime updates are as simple as posting a new virt-operator deployment.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Step 1.&lt;/strong&gt; Update virt-operator from our original install of v0.27.0 to v0.28.0 by applying a new virt-operator manifest.&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/v0.28.0/kubevirt-operator.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Step 2:&lt;/strong&gt; Watch the install object to see when the installation completes. Eventually it will report v0.28.0 as the observed version which indicates the update has completed.&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get kv &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;observedKubeVirtVersion
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Behind the scenes, virt-operator is coordinating the roll out of all the new KubeVirt components in a way that ensures existing virtual machine workloads are not disrupted.&lt;/p&gt;
+
+&lt;p&gt;The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="operation" /><summary type="html">Simplicity Above All Else</summary></entry><entry><title type="html">KubeVirt Security Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Security Fundamentals" /><published>2020-04-29T00:00:00+00:00</published><updated>2020-04-29T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Security-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html">&lt;h2 id=&quot;security-guidelines&quot;&gt;Security Guidelines&lt;/h2&gt;
 
 &lt;p&gt;In KubeVirt, our approach to security can be summed up by adhering to the following guidelines.&lt;/p&gt;
 
@@ -2180,37 +2230,4 @@ There is a &lt;a href=&quot;/2019/Access-Virtual-Machines-graphic-console-using-
   &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/origin-web-console&quot;&gt;OKD Console&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/wavezhang/virtVNC/&quot;&gt;virtVNC, noVNC for Kubevirt&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande, Pedro Ibáñez Requena</name></author><category term="news" /><category term="octant" /><category term="okd" /><category term="openshift console" /><category term="cockpit" /><category term="noVNC" /><category term="user interface" /><category term="web interface" /><category term="virtVNC" /><category term="OKD console" /><summary type="html">The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. Wikipedia:User Interface</summary></entry><entry><title type="html">KubeVirt Laboratory 2, experimenting with CDI</title><link href="https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 2, experimenting with CDI" /><published>2019-12-10T00:00:00+00:00</published><updated>2019-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_lab2_experiment_with_cdi.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;KubeVirt Laboratory 2: Experiment with CDI&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
-
-&lt;p&gt;In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt installation notes&lt;/a&gt; or try it yourself in the &lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt&lt;/a&gt; Katacoda scenario.
-Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/ZHqcHbCxzYM&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
-
-&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Configure the storage for the Virtual Machine&lt;/li&gt;
-  &lt;li&gt;Install the CDI Operator and the CR for the importer&lt;/li&gt;
-  &lt;li&gt;Create and customize the Fedora Virtual Machine from the cloud image&lt;/li&gt;
-  &lt;li&gt;Connect to the console of the Virtual Machine&lt;/li&gt;
-  &lt;li&gt;Connect to the Virtual Machine using SSH&lt;/li&gt;
-  &lt;li&gt;Redirect a host port to the Virtual Machine to enable external SSH connectivity&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;Kubevirt Laboratory 2: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="CDI" /><category term="containerized data importer" /><category term="vm import" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 2: Experiment with CDI</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande, Pedro Ibáñez Requena</name></author><category term="news" /><category term="octant" /><category term="okd" /><category term="openshift console" /><category term="cockpit" /><category term="noVNC" /><category term="user interface" /><category term="web interface" /><category term="virtVNC" /><category term="OKD console" /><summary type="html">The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. Wikipedia:User Interface</summary></entry></feed>
