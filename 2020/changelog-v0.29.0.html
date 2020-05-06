@@ -22,26 +22,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//gallery/">
+    <link rel="canonical" href="https://kubevirt.io//2020/changelog-v0.29.0.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Gallery | KubeVirt.io</title>
+    <title>KubeVirt v0.29.0 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="picture gallery, photos" >
-    <meta property="og:title" content="Gallery | KubeVirt.io">
+    <meta name="description" content="This article provides information about KubeVirt release v0.29.0 changes">
+    <meta name="keywords" content="release notes, changelog" >
+    <meta property="og:title" content="KubeVirt v0.29.0 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//gallery/" >
+    <meta property="og:url" content="https://kubevirt.io//2020/changelog-v0.29.0.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This article provides information about KubeVirt release v0.29.0 changes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-05-06 13:30:41 +0000" >
-    <meta name="twitter:title" content="Gallery | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2020-05-06 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v0.29.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v0.29.0 changes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     
@@ -71,7 +71,7 @@
       
 
       
-        <li  class="nav-item" >
+        <li  class="nav-item active" >
           <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
         </li>
       
@@ -79,7 +79,7 @@
           <a class="nav-link text-uppercase" href="/videos/">Videos</a>
         </li>
       
-        <li  class="nav-item active" >
+        <li  class="nav-item" >
           <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
         </li>
       
@@ -222,50 +222,136 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container post">
-  <h1 class="page-title">Gallery</h1>
-  <article class="post-content">
-    <div class="container">
+      <div class="container">
   <div class="row">
-    <div class="col-sm-12 col-md-9 blogs">
-      <ul class="posts">
-      
-        
-          <li>
-            <h2 class="posts-title">
-                <a href="/galleries/2020-02-03-Fosdem2020-communty-presence">
-                  FOSDEM 2020 in pictures
-                  <div id="/galleries/2020-02-03-Fosdem2020-communty-presence"></div>
-                </a>
-            </h2>
-            <div class="posts-date">February 2, 2020</div>
-                
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v0.29.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/changelog">changelog</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: May 6, 2020  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
 
-                    <script src="//code.jquery.com/jquery.min.js"></script>
-                    <script>
-                        $.getJSON('/assets/galleria/fosdem2020.json', function(data) {
-                            var up = document.getElementById('/galleries/2020-02-03-Fosdem2020-communty-presence');
-                            up.innerHTML = '<img src="' + data[0]['image'] + '"widht="100" height="100" align="right" />';
-                        });
-                    </script>
-              
-              This article shows KubeVirt presence at FOSDEM 2020
-              
-              <div class="readmore">
-    <a href="/galleries/2020-02-03-Fosdem2020-communty-presence" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="v0290">v0.29.0</h2>
 
-          </li>
+<p>Released on: Wed May 6 15:01:57 2020 +0200</p>
+
+<ul>
+  <li>Tests: Many many test fixes</li>
+  <li>Tests: Many more test fixes</li>
+  <li>CI: Add lane with SELinux enabled</li>
+  <li>CI: Drop PPC64 support for now</li>
+  <li>Drop Genie support</li>
+  <li>Drop the use of hostPaths in the virt-launcher for improved security</li>
+  <li>Support priority classes for important componenets</li>
+  <li>Support IPv6 over masquerade binding</li>
+  <li>Support certificate rotations based on shared secrets</li>
+  <li>Support for VM ready condition</li>
+  <li>Support for advanced node labelling (supported CPU Families and machine types)</li>
+</ul>
+
+        </article>
         
-      
-      </ul>
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v0.29.0&url=https://www.kubevirt.io/2020/changelog-v0.29.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
     </div>
-
   </div>
 </div>
-
-  </article>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
 </div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 
