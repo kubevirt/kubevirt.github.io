@@ -135,7 +135,7 @@ In this blog post, we will explore the current state of integration between Kube
 
   The _rest_client_requests_total_, represents the number of HTTP requests, partitioned by status code, method, and host.
 
-- Now, following again [KubeVirt's docs](https://kubevirt.io/user-guide/#/installation/monitoring),we need to deploy two resources:
+- Now, following again [KubeVirt's docs](https://kubevirt.io/user-guide/#/installation/monitoring), we need to deploy two resources:
 
   1. A [Prometheus resource](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#prometheus). Just copy the YAML snippet from _KubeVirt's docs_ and apply it as follows:
 
