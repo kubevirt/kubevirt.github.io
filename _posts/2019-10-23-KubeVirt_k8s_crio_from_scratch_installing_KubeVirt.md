@@ -144,7 +144,7 @@ CAVEATS:
  |
  |  See
  |
- |    https://kubevirt.io/user-guide/docs/latest/using-virtual-machines/graphical-and-console-access.html
+ |    https://kubevirt.io/user-guide/#/usage/graphical-and-console-access?id=graphical-and-serial-console-access
  |
  |  for a usage example
 /
@@ -232,5 +232,5 @@ Each step of this guide has a place where to look for possible issues, in genera
 - [Kubernetes pod-network configuration](https://kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/#pod-network)
 - [Kubectl cheatsheet](https://kubernetes.io/docs/reference/kubectl/cheatsheet/)
 - [Multus](https://github.com/intel/multus-cni)
-- [KubeVirt User Guide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
+- [KubeVirt User Guide](https://kubevirt.io/user-guide/#/)
 - [KubeVirt Katacoda scenarios](https://www.katacoda.com/kubevirt)

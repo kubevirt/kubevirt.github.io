@@ -478,5 +478,5 @@ Ping us or feel free to comment this post in case there are some other existing 
 - [Managing KubeVirt with OpenShift web console running as a compiled binary on Youtube](https://www.youtube.com/watch?v=XQw4GkGHs44&t=37s)
 - [Kubevirt Laboratory 1 blogpost: Use Kubevirt]({% post_url 2019-12-04-KubeVirt_lab1_use_kubevirt %})
 - [KubeVirt basic operations video on Youtube](https://www.youtube.com/watch?v=KC03G60shIc)
-- [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html)
+- [Kubevirt installation notes](https://kubevirt.io/user-guide/#/installation/installation)
 - [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)

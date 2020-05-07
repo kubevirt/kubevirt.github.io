@@ -55,7 +55,7 @@ In this example, our mission is to run a customapp that is composed of 3 tiers:
 Instructions were delivered to deploy the application in our production Kubernetes cluster taking advantage of the existing KubeVirt integration and making sure the application is resilient to any problems that can occur. The current status of the cluster is the following:
 
 - A stretched Kubernetes cluster is already up and running.
-- [KubeVirt](https://kubevirt.io/user-guide/docs/latest/administration/intro.html) is already installed.
+- [KubeVirt](https://kubevirt.io/user-guide/#/) is already installed.
 - There is enough free CPU, Memory and disk space in the cluster to deploy customapp stack.
 
 > info "information"
