@@ -39,5 +39,5 @@ The following operations are shown in the video:
 - [Kubevirt Laboratory 1 blogpost: Use Kubevirt]({% post_url 2019-12-04-KubeVirt_lab1_use_kubevirt %})
 - [Kubevirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})
 - [KubeVirt basic operations video on youtube](https://www.youtube.com/watch?v=KC03G60shIc)
-- [Kubevirt installation notes](https://kubevirt.io/user-guide/docs/latest/administration/intro.html)
+- [Kubevirt installation notes](https://kubevirt.io/user-guide/#/installation/installation)
 - [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)
