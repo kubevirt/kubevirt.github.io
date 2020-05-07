@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-07T13:31:29+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Operation Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Operation Fundamentals" /><published>2020-04-30T00:00:00+00:00</published><updated>2020-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html">&lt;h2 id=&quot;simplicity-above-all-else&quot;&gt;Simplicity Above All Else&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.6">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-07T13:45:48+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Operation Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Operation Fundamentals" /><published>2020-04-30T00:00:00+00:00</published><updated>2020-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html">&lt;h2 id=&quot;simplicity-above-all-else&quot;&gt;Simplicity Above All Else&lt;/h2&gt;
 
 &lt;p&gt;In the late 1970s and early 1980s there were two video recording tape formats competing for market domination. The Betamax format was the technically superior option. Yet despite having better audio, video, and build quality, Betamax still eventually lost to the technically inferior VHS format. VHS won because it was “close enough” in terms of quality and drastically reduced the cost to the consumer.&lt;/p&gt;
 
@@ -227,7 +227,7 @@
 
 &lt;ul&gt;
   &lt;li&gt;A stretched Kubernetes cluster is already up and running.&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt&lt;/a&gt; is already installed.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/&quot;&gt;KubeVirt&lt;/a&gt; is already installed.&lt;/li&gt;
   &lt;li&gt;There is enough free CPU, Memory and disk space in the cluster to deploy customapp stack.&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -932,7 +932,7 @@ but what if you want to follow the traditional way of installing a VM using an e
 
 &lt;ul&gt;
   &lt;li&gt;A Kubernetes cluster is already up and running&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/README.md&quot;&gt;CDI&lt;/a&gt; are already installed&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/README.md&quot;&gt;CDI&lt;/a&gt; are already installed&lt;/li&gt;
   &lt;li&gt;There is enough free CPU, Memory and disk space in the cluster to deploy a Microsoft Windows VM, in this example, the version 2012 R2 VM is going to be used&lt;/li&gt;
 &lt;/ul&gt;
 
@@ -1044,7 +1044,7 @@ the following picture:&lt;/p&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
   &lt;/li&gt;
   &lt;li&gt;
-    &lt;p&gt;A &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers&quot;&gt;container with the virtio drivers&lt;/a&gt; attached as a CD-ROM to the VM.
+    &lt;p&gt;A &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers&quot;&gt;container with the virtio drivers&lt;/a&gt; attached as a CD-ROM to the VM.
 The container image has to be pulled to have it available in the local registry.&lt;/p&gt;
 
     &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker pull kubevirt/virtio-container-disk
@@ -1205,10 +1205,10 @@ The following video shows how to go through the Microsoft Windows installation p
 &lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html&quot;&gt;KubeVirt user-guide: Virtio Windows Driver disk usage&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win&quot;&gt;KubeVirt user-guide: Virtio Windows Driver disk usage&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md&quot;&gt;Creating a registry image with a VM disk&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md&quot;&gt;CDI Upload User Guide&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/virtio-win.html#how-to-obtain-virtio-drivers&quot;&gt;KubeVirt user-guide: How to obtain virtio drivers?&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers&quot;&gt;KubeVirt user-guide: How to obtain virtio drivers?&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html">Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA</title><link href="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA" /><published>2020-02-06T00:00:00+00:00</published><updated>2020-02-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">&lt;p&gt;In this &lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;video&lt;/a&gt;, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes.
 Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some
 performance metrics comparing KubeVirt to standalone KVM.&lt;/p&gt;
@@ -1993,7 +1993,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=XQw4GkGHs44&amp;amp;t=37s&quot;&gt;Managing KubeVirt with OpenShift web console running as a compiled binary on Youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on Youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="OpenShift web console" /><category term="web interface" /><category term="OKD" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry><entry><title type="html">KubeVirt Laboratory 3, upgrades</title><link href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 3, upgrades" /><published>2020-01-21T00:00:00+00:00</published><updated>2020-01-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_lab3_upgrade</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;KubeVirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/p&gt;
 
@@ -2026,7 +2026,7 @@ console-deployment-59d8956db5-td462                     1/1     Running         
   &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/administration/intro.html&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="kubevirt upgrade" /><category term="upgrading" /><category term="lifecycle" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 3: Upgrades</summary></entry><entry><title type="html">KubeVirt user interface options</title><link href="https://kubevirt.io//2019/KubeVirt_UI_options.html" rel="alternate" type="text/html" title="KubeVirt user interface options" /><published>2019-12-17T00:00:00+00:00</published><updated>2019-12-17T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_UI_options</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_UI_options.html">&lt;blockquote&gt;
   &lt;p&gt;The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. &lt;a href=&quot;https://en.wikipedia.org/wiki/User_interface&quot;&gt;Wikipedia:User Interface&lt;/a&gt;&lt;/p&gt;

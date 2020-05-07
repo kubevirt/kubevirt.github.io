@@ -348,7 +348,7 @@ statefulset.apps/prometheus-k8s      2         2         3d
 <h2 id="lets-deploy-kubevirt-and-dig-on-the-metrics-components">Let’s deploy KubeVirt and dig on the metrics components</h2>
 
 <ul>
-  <li>Deploy KubeVirt using the <a href="https://kubevirt.io/user-guide/docs/latest/administration/intro.html">official documentation</a>. For this blog post the version <em>0.11.0</em> has been used.</li>
+  <li>Deploy KubeVirt using the <a href="https://kubevirt.io/user-guide/#/README">official documentation</a>.For this blog post the version <em>0.11.0</em> has been used.</li>
   <li>Metrics:
     <ul>
       <li>If you’ve installed KubeVirt before, there’s a service that might be unfamiliar to you, <em>service/kubevirt-prometheus-metrics</em>, this service uses a selector set to match the label <em>prometheus.kubevirt.io: ““</em> which is included on all the main KubeVirt components, like the <em>virt-api</em>, <em>virt-controllers</em> and <em>virt-handler</em>.</li>
@@ -391,7 +391,7 @@ rest_client_requests_total{code="&lt;error&gt;",host="10.96.0.1:443",method="GET
     <p>The <em>rest_client_requests_total</em>, represents the number of HTTP requests, partitioned by status code, method, and host.</p>
   </li>
   <li>
-    <p>Now, following again <a href="https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html">KubeVirt’s docs</a>, we need to deploy two resources:</p>
+    <p>Now, following again <a href="https://kubevirt.io/user-guide/#/installation/monitoring">KubeVirt’s docs</a>, we need to deploy two resources:</p>
 
     <ol>
       <li>
