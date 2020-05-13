@@ -1,4 +1,417 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-13T13:34:55+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Operation Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Operation Fundamentals" /><published>2020-04-30T00:00:00+00:00</published><updated>2020-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html">&lt;h2 id=&quot;simplicity-above-all-else&quot;&gt;Simplicity Above All Else&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-13T13:58:15+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt VM Image Usage Patterns</title><link href="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html" rel="alternate" type="text/html" title="KubeVirt VM Image Usage Patterns" /><published>2020-05-12T00:00:00+00:00</published><updated>2020-05-12T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html">&lt;h1 id=&quot;building-a-vm-image-repository&quot;&gt;Building a VM Image Repository&lt;/h1&gt;
+
+&lt;p&gt;You know what I hear a lot from new KubeVirt users?&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“How do I manage VM images with KubeVirt? There’s a million options and I have no idea where to start.”&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;And I agree. It’s not obvious. There are a million ways to use and manipulate VM images with KubeVirt. That’s by design. KubeVirt is meant to be as flexible as possible, but in the process I think we dropped the ball on creating some well defined workflows people can use as a starting point.&lt;/p&gt;
+
+&lt;p&gt;So, that’s what I’m going to attempt to do. I’ll show you how to make your images accessible in the cluster. I’ll show you how to make a custom VM image repository for use within the cluster. And I’ll show you how to use this at scale using the same patterns you may have used in AWS or GCP.&lt;/p&gt;
+
+&lt;p&gt;The pattern we’ll use here is…&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Import a base VM image into the cluster as an PVC&lt;/li&gt;
+  &lt;li&gt;Use KubeVirt to create a new immutable custom image with application assets&lt;/li&gt;
+  &lt;li&gt;Scale out as many VMIs as we’d like using the pre-provisioned immutable custom image.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;&lt;strong&gt;Remember, this isn’t “the definitive” way of managing VM images in KubeVirt. This is just an example workflow to help people get started.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;importing-a-base-image&quot;&gt;Importing a Base Image&lt;/h2&gt;
+
+&lt;p&gt;Let’s start with importing a base image into a PVC.&lt;/p&gt;
+
+&lt;p&gt;For our purposes in this workflow, the base image is meant to be immutable. No VM will use this image directly, instead VMs spawn with their own unique copy of this base image. Think of this just like you would containers. A container image is immutable, and a running container instance is using a copy of an image instead of the image itself.&lt;/p&gt;
+
+&lt;h3 id=&quot;step-0-install-kubevirt-with-cdi&quot;&gt;Step 0. Install KubeVirt with CDI&lt;/h3&gt;
+
+&lt;p&gt;I’m not covering this. Use our documentation linked to below. Understand that CDI (containerized data importer) is the tool we’ll be using to help populate and manage PVCs.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Installing KubeVirt&lt;/a&gt;
+&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/image-upload?id=install-cdi&quot;&gt;Installing CDI&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;step-1-create-a-namespace-for-our-immutable-vm-images&quot;&gt;Step 1. Create a namespace for our immutable VM images.&lt;/h3&gt;
+
+&lt;p&gt;We’ll give users the ability to clone VM images living on PVCs from this namespace to their own namespace, but not directly create VMIs within this namespace.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create namespace vm-images
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;step-2-import-your-image-to-a-pvc-in-the-image-namespace&quot;&gt;Step 2. Import your image to a PVC in the image namespace&lt;/h3&gt;
+
+&lt;p&gt;Below are a few options for importing. For each example, I’m using the Fedora Cloud qcow2 image that can be downloaded &lt;a href=&quot;https://download.fedoraproject.org/pub/fedora/linux/releases/31/Cloud/x86_64/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;If you try these examples yourself, you’ll need to download the &lt;strong&gt;Fedora-Cloud-Base-31-1.9.x86_64.qcow2&lt;/strong&gt; image file in your working directory.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Example: Import a local VM from your desktop environment using virtctl&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If you don’t have ingress setup for the cdi-uploadproxy service endpoint (which you don’t if you’re reading this) we can set up a local port forward using kubectl. That gives a route into the cluster to upload the image. Leave the command below executing to open the port.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl port-forward &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi service/cdi-uploadproxy 18443:443
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In a separate terminal upload the image over the port forward connection using the virtctl tool. Note that the size of the PVC must be the size of what the qcow image will expand to when converted to a raw image. In this case I chose 5 gigabytes as the PVC size.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl image-upload dv fedora-cloud-base-31 &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt; vm-images  &lt;span class=&quot;nt&quot;&gt;--size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5Gi &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt; Fedora-Cloud-Base-31-1.9.x86_64.qcow2  &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://127.0.0.1:18443 &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once that completes, you’ll have a PVC in the vm-images namespace that contains the Fedora Cloud image.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pvc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
+NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Example: Import using a container registry&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;If the image’s footprint is small like our Fedora Cloud Base qcow image, then it probably makes sense to use a container image registry to import our image from a container image to a PVC.&lt;/p&gt;
+
+&lt;p&gt;In the example below, I start by building a container image with the Fedora Cloud Base qcow VM image in it, and push that container image to my container registry.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;END&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; Dockerfile
+FROM scratch
+ADD Fedora-Cloud-Base-31-1.9.x86_64.qcow2 /disk/
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;END
+&lt;/span&gt;docker build &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; quay.io/dvossel/fedora:cloud-base-31 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+docker push quay.io/dvossel/fedora:cloud-base-31
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next a CDI DataVolume is used to import the VM image into a new PVC from the container image you just uploaded to your container registry. Posting the DataVolume manifest below will result in a new 5 gigabyte PVC being created and the VM image being placed on that PVC in a way KubeVirt can consume it.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;END&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; fedora-cloud-base-31-datavolume.yaml
+apiVersion: cdi.kubevirt.io/v1alpha1
+kind: DataVolume
+metadata:
+  name: fedora-cloud-base-31
+  namespace: vm-images
+spec:
+  source:
+    registry:
+      url: &quot;docker://quay.io/dvossel/fedora:cloud-base-31&quot;
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;END
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; fedora-cloud-base-31-datavolume.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can observe the CDI complete the import by watching the DataVolume object.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl describe datavolume fedora-cloud-base-31 &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
+&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Status:
+  Phase:     Succeeded
+  Progress:  100.0%
+Events:
+  Type    Reason            Age                   From                   Message
+  &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;    &lt;span class=&quot;nt&quot;&gt;------&lt;/span&gt;            &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;                  &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;                   &lt;span class=&quot;nt&quot;&gt;-------&lt;/span&gt;
+  Normal  ImportScheduled   2m49s                 datavolume-controller  Import into fedora-cloud-base-31 scheduled
+  Normal  ImportInProgress  2m46s                 datavolume-controller  Import into fedora-cloud-base-31 &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;progress
+  Normal  Synced            40s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x11 over 2m51s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  datavolume-controller  DataVolume synced successfully
+  Normal  ImportSucceeded   40s                   datavolume-controller  Successfully imported into PVC fedora-cloud-base-31
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once the import is complete, you’ll see the image available as a PVC in your vm-images namespace. The PVC will have the same name given to the DataVolume.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pvc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
+NAME                   STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;Example: Import an image from an http or s3 endpoint&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;While I’m not going to provide a detailed example here, another option for importing VM images into a PVC is to host the image on an http server (or as an s3 object) and then use a DataVolume to import the VM image into the PVC from a URL.&lt;/p&gt;
+
+&lt;p&gt;Replace the url in this example with one hosting the qcow2 image. More information about this import method can be found &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md#https3registry-source&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kind: DataVolume
+metadata:
+  name: fedora-cloud-base-31
+  namespace: vm-images
+spec:
+  &lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt;:
+    http:
+      url: http://your-web-server-here/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;provisioning-new-custom-vm-image&quot;&gt;Provisioning New Custom VM Image&lt;/h2&gt;
+
+&lt;p&gt;The base image itself isn’t that useful to us. Typically what we really want is an immutable VM image preloaded with all our application related assets. This way when the VM boots up, it already has everything it needs pre-provisioned. The pattern we’ll use here is to provision the VM image once, and then use clones of the pre-provisioned VM image as many times as we’d like.&lt;/p&gt;
+
+&lt;p&gt;For this example, I want a new immutable VM image preloaded with an nginx webserver. We can actually describe this entire process of creating this new VM image using the single VM manifest below. Note that I’m starting the VM inside the vm-images namespace. This is because I want the resulting VM image’s cloned PVC to remain in our vm-images repository namespace.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;kubevirt.io/vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-provisioner&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-provisioner&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;runStrategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;RerunOnFailure&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;kubevirt.io/vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-provisioner&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;datavolumedisk1&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1Gi&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;terminationGracePeriodSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;dataVolume&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;datavolumedisk1&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;cloudInitNoCloud&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;userData&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;#!/bin/sh&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;yum install -y nginx&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;systemctl enable nginx&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;# removing instances ensures cloud init will execute again after reboot&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;rm -rf /var/lib/cloud/instances&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;shutdown now&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;dataVolumeTemplates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5Gi&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-cloud-base-31&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;There are a few key takeaways from this manifest worth discussing.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Usage of &lt;strong&gt;runStrategy: “RerunOnFailure”&lt;/strong&gt;. This tells KubeVirt to treat the VM’s execution similar to a Kubernetes Job. We want the VM to continue retrying until the VM guest shuts itself down gracefully.&lt;/li&gt;
+  &lt;li&gt;Usage of the &lt;strong&gt;cloudInitNoCloud volume&lt;/strong&gt;. This volume allows us to inject a script into the VM’s startup procedure. In our case, we want this script to install nginx, configure nginx to launch on startup, and then immediately shutdown the guest gracefully once that is complete.&lt;/li&gt;
+  &lt;li&gt;Usage of the &lt;strong&gt;dataVolumeTemplates section&lt;/strong&gt;. This allows us to define a new PVC which is a clone of our fedora-cloud-base-31 base image. The resulting VM image attached to our VM will be a new image pre-populated with nginx.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;After posting the VM manifest to the cluster, wait for the corresponding VMI to reach the Succeeded phase.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
+NAME                AGE     PHASE       IP            NODENAME
+nginx-provisioner   2m26s   Succeeded   10.244.0.22   node01
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This tells us the VM successfully executed the cloud-init script which installed nginx and shut down the guest gracefully. A VMI that never shuts down or repeatedly fails means something is wrong with the provisioning.&lt;/p&gt;
+
+&lt;p&gt;All that’s left now is to delete the VM and leave the resulting PVC behind as our immutable artifact. We do this by deleting the VM using the –cascade=false option. This tells Kubernetes to delete the VM, but leave behind anything owned by the VM. In this case we’ll be leaving behind the PVC that has nginx provisioned on it.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl delete vm nginx-provisioner &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images &lt;span class=&quot;nt&quot;&gt;--cascade&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After deleting the VM, you can see the nginx provisioned PVC in your vm-images namespace.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pvc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
+NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;understanding-the-vm-image-repository&quot;&gt;Understanding the VM Image Repository&lt;/h2&gt;
+&lt;p&gt;At this point we have a namespace, vm-images, that contains PVCs with our VM images on them. Those PVCs represent VM images in the same way AWS’s AMIs represent VM images and this &lt;strong&gt;vm-images namespace is our VM image repository.&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Using CDI’s i&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one&quot;&gt;cross namespace cloning feature&lt;/a&gt;, VM’s can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository”. Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/RBAC.md#pvc-cloning&quot;&gt;here&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Below is an example of the RBAC necessary to enable cross namespace cloning from the vm-images namespace to the default namespace using the default service account.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRole&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdi-cloner&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;rules&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiGroups&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;cdi.kubevirt.io&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;datavolumes/source&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;verbs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;create&quot;&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;]&lt;/span&gt;
+&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;RoleBinding&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default-cdi-cloner&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;subjects&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ServiceAccount&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;roleRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterRole&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdi-cloner&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;apiGroup&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rbac.authorization.k8s.io&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;horizontally-scaling-vms-using-custom-image&quot;&gt;Horizontally Scaling VMs Using Custom Image&lt;/h1&gt;
+
+&lt;p&gt;Now that we have our immutable custom VM image, we can create as many VMs as we want using that custom image.&lt;/p&gt;
+
+&lt;h2 id=&quot;example-scale-out-vmi-instances-using-the-custom-vm-image&quot;&gt;Example: Scale out VMI instances using the custom VM image.&lt;/h2&gt;
+
+&lt;p&gt;Clone the custom VM image from the vm-images namespace into the namespace the VMI instances will be running in as a &lt;strong&gt;ReadOnlyMany&lt;/strong&gt; PVC. This will allow concurrent access to a single PVC.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdi.kubevirt.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DataVolume&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-rom&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadOnlyMany&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5Gi&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral&quot;&gt;ephemeral volume&lt;/a&gt; on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.&lt;/p&gt;
+
+&lt;p&gt;Here’s an example manifest of a VirtualMachineInstanceReplicaSet starting 5 instances of our nginx server in separate VMIs.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;kubevirt.io/vmReplicaSet&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;5&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;kubevirt.io/vmReplicaSet&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-image&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1Gi&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;terminationGracePeriodSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;ephemeral&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-image&lt;/span&gt;
+          &lt;span class=&quot;s&quot;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;claimName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx-rom&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;cloudInitNoCloud&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;userData&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;# add any custom logic you want to occur on startup here.&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;echo “cloud-init script execution&quot;&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;example-launching-a-single-pet-vm-from-custom-image&quot;&gt;Example: Launching a Single “Pet” VM from Custom Image&lt;/h2&gt;
+
+&lt;p&gt;In the manifest below, we’re starting a new VM with a PVC cloned from our pre-provisioned VM image that contains the nginx server. When the VM boots up, a new PVC will be created in the VM’s namespace that is a clone of the PVC referenced in our vm-images namespace.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;kubevirt.io/vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;running&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;kubevirt.io/vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;datavolumedisk1&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1Gi&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;terminationGracePeriodSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;dataVolume&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;datavolumedisk1&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;cloudInitNoCloud&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;userData&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;# add any custom logic you want to occur on startup here.&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;echo “cloud-init script execution&quot;&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;dataVolumeTemplates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nginx&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5Gi&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h1 id=&quot;other-custom-creation-image-tools&quot;&gt;Other Custom Creation Image Tools&lt;/h1&gt;
+
+&lt;p&gt;In my example I imported a VM base image into the cluster and used KubeVirt to provision a custom image with a technique that used cloud-init. This may or may not make sense for your use case. It’s possible you need to pre-provision the VM image before importing into the cluster at all.&lt;/p&gt;
+
+&lt;p&gt;If that’s the case, I suggest looking into two tools.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://packer.io/docs/builders/qemu.html&quot;&gt;Packer.io using the qemu builder&lt;/a&gt;. This allows you to automate building custom images on your local machine using configuration files that describe all the build steps. I like this tool because it closely matches the Kubernetes “declarative” approach.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;http://libguestfs.org/virt-customize.1.html&quot;&gt;Virt-customize&lt;/a&gt; is a cli tool that allows you to customize local VM images by injecting/modifying files on disk and installing packages.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://linux.die.net/man/1/virt-install&quot;&gt;Virt-install&lt;/a&gt; is a cli tool that allows you to automate a VM install as if you were installing it from a cdrom. You’ll want to look into using a kickstart file to fully automate the process.&lt;/p&gt;
+
+&lt;p&gt;The resulting VM image artifact created from any of these tools can then be imported into the cluster in the same way we imported the base image earlier in this document.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="images" /><category term="storage" /><summary type="html">Building a VM Image Repository</summary></entry><entry><title type="html">KubeVirt Operation Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Operation Fundamentals" /><published>2020-04-30T00:00:00+00:00</published><updated>2020-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Operation-Fundamentals.html">&lt;h2 id=&quot;simplicity-above-all-else&quot;&gt;Simplicity Above All Else&lt;/h2&gt;
 
 &lt;p&gt;In the late 1970s and early 1980s there were two video recording tape formats competing for market domination. The Betamax format was the technically superior option. Yet despite having better audio, video, and build quality, Betamax still eventually lost to the technically inferior VHS format. VHS won because it was “close enough” in terms of quality and drastically reduced the cost to the consumer.&lt;/p&gt;
 
@@ -2028,206 +2441,4 @@ console-deployment-59d8956db5-td462                     1/1     Running         
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="kubevirt upgrade" /><category term="upgrading" /><category term="lifecycle" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 3: Upgrades</summary></entry><entry><title type="html">KubeVirt user interface options</title><link href="https://kubevirt.io//2019/KubeVirt_UI_options.html" rel="alternate" type="text/html" title="KubeVirt user interface options" /><published>2019-12-17T00:00:00+00:00</published><updated>2019-12-17T00:00:00+00:00</updated><id>https://kubevirt.io//2019/KubeVirt_UI_options</id><content type="html" xml:base="https://kubevirt.io//2019/KubeVirt_UI_options.html">&lt;blockquote&gt;
-  &lt;p&gt;The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. &lt;a href=&quot;https://en.wikipedia.org/wiki/User_interface&quot;&gt;Wikipedia:User Interface&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;In this blogpost we show the results of a research about the different options existing in the market to enable KubeVirt with a user interface to manage, access and control the life cycle of the Virtual Machines inside Kubernetes with KubeVirt.&lt;/p&gt;
-
-&lt;p&gt;The different UI options available for KubeVirt that we have been checking, at the moment of writing this article, are the following:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/vmware-tanzu/octant&quot;&gt;Octant&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD: The Origin Community Distribution of Kubernetes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OpenShift console&lt;/a&gt; running on vanilla Kubernetes&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://novnc.com/info.html&quot;&gt;noVNC&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;octant&quot;&gt;Octant&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/octant-logo.png&quot; alt=&quot;Octant logo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;As the &lt;a href=&quot;https://octant.dev/&quot;&gt;Octant webpage&lt;/a&gt; claims:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Octant is an open-source developer-centric web interface for Kubernetes that lets you inspect a Kubernetes cluster and its applications. Octant is a tool for developers to understand how applications run on a Kubernetes cluster. It aims to be part of the developer’s toolkit for gaining insight and approaching complexity found in Kubernetes. Octant offers a combination of introspective tooling, cluster navigation, and object management along with a plugin system to further extend its capabilities.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;Some of the key features of this tool can be checked in their &lt;a href=&quot;https://octant.dev/docs/master/&quot;&gt;latest release notes&lt;/a&gt;:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Resource Viewer&lt;/strong&gt;: Graphically visualize relationships between objects in a Kubernetes cluster. The status of individual objects is represented by colour to show workload performance.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Summary View&lt;/strong&gt;: Consolidated status and configuration information in a single page aggregated from output typically found using multiple kubectl commands.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Port Forward&lt;/strong&gt;: Forward a local port to a running pod with a single button for debugging applications and even port forward multiple pods across namespaces.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Log Stream&lt;/strong&gt;: View log streams of pod and container activity for troubleshooting or monitoring without holding multiple terminals open.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Label Filter&lt;/strong&gt;: Organize workloads with label filtering for inspecting clusters with a high volume of objects in a namespace.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Cluster Navigation&lt;/strong&gt;: Easily change between namespaces or contexts across different clusters. Multiple kubeconfig files are also supported.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Plugin System&lt;/strong&gt;: Highly extensible plugin system for users to provide additional functionality through gRPC. Plugin authors can add components on top of existing views.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;We installed it and found out that:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Octant provides a very basic dashboard for Kubernetes and it is pretty straightforward to install. It can be installed in your laptop or in a remote server.&lt;/li&gt;
-  &lt;li&gt;Regular Kubernetes objects can be seen from the UI. Pod logs can be checked as well. However, mostly everything is in view mode, even the YAML description of the objects. Therefore, as a developer or cluster operator you cannot edit YAML files directly from the UI&lt;/li&gt;
-  &lt;li&gt;Custom resources (CRs) and custom resource definitions (CRDs) are automatically detected and shown in the UI. This means that KubeVirt CRs can be viewed from the dashboard. However, VirtualMachines and VirtualMachineInstances cannot be modified from Octant, they can only be deleted.&lt;/li&gt;
-  &lt;li&gt;There is an option to extend the functionality adding &lt;a href=&quot;https://octant.dev/docs/master/plugins/reference/&quot;&gt;plugins&lt;/a&gt; to the dashboard.&lt;/li&gt;
-  &lt;li&gt;No specific options to manage KubeVirt workloads have been found.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;video autoplay=&quot;&quot; loop=&quot;&quot; muted=&quot;&quot; playsinline=&quot;&quot; src=&quot;/assets/2019-12-19-KubeVirt_UI_options/octant.mp4&quot; type=&quot;video/mp4&quot; width=&quot;1280&quot; height=&quot;720&quot;&gt;&lt;/video&gt;
-
-&lt;p&gt;With further work and investigation, it could be an option to develop a specific plugin to enable remote console or VNC access to KubeVirt workloads.&lt;/p&gt;
-
-&lt;h2 id=&quot;okd-the-origin-community-distribution-of-kubernetes&quot;&gt;OKD: The Origin Community Distribution of Kubernetes&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png&quot; alt=&quot;OKD logo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;As defined in the &lt;a href=&quot;https://www.okd.io/&quot;&gt;official webpage&lt;/a&gt;:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;A few weeks ago Kubernetes distribution &lt;a href=&quot;https://github.com/openshift/okd&quot;&gt;OKD4&lt;/a&gt; was released as preview. OKD is the official upstream version of Red Hat’s OpenShift. Since OpenShift includes KubeVirt (Red Hat calls it &lt;a href=&quot;https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html&quot;&gt;CNV&lt;/a&gt;) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.&lt;/p&gt;
-
-&lt;p&gt;Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with OpenShift. We have noticed that from the UI a user can:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Install the KubeVirt operator from the operator marketplace.&lt;/li&gt;
-  &lt;li&gt;Create Virtual Machines by importing YAML files or following a wizard. The wizard prevents you from moving to the next screen until you provide values in the required fields.&lt;/li&gt;
-  &lt;li&gt;Modify the status of the Virtual Machine: stop, start, migrate, clone, edit label, edit annotations, edit CD-ROMs and delete&lt;/li&gt;
-  &lt;li&gt;Edit network interfaces. It is possible to add multiple network interfaces to the VM.&lt;/li&gt;
-  &lt;li&gt;Add disks to the VM&lt;/li&gt;
-  &lt;li&gt;Connect to the VM via serial or VNC console.&lt;/li&gt;
-  &lt;li&gt;Edit the YAML object files online.&lt;/li&gt;
-  &lt;li&gt;Create VM templates. The web console features an interactive wizard that guides you through the Basic Settings, Networking, and Storage screens to simplify the process of creating virtual machine templates.&lt;/li&gt;
-  &lt;li&gt;Check VM events in real time.&lt;/li&gt;
-  &lt;li&gt;Gather metrics and utilization of the VM.&lt;/li&gt;
-  &lt;li&gt;Pretty much everything you can do with KubeVirt from the command line.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;video autoplay=&quot;&quot; loop=&quot;&quot; muted=&quot;&quot; playsinline=&quot;&quot; src=&quot;/assets/2019-12-19-KubeVirt_UI_options/okd.mp4&quot; type=&quot;video/mp4&quot; width=&quot;1280&quot; height=&quot;720&quot;&gt;&lt;/video&gt;
-
-&lt;p&gt;One of the drawbacks is that the current &lt;a href=&quot;https://operatorhub.io/operator/kubevirt&quot;&gt;KubeVirt HCO operator&lt;/a&gt; contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest &lt;a href=&quot;https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo&quot;&gt;Fedora cloud container disk image&lt;/a&gt; and instead we were forced to use the one tagged as v0.18.1 which matches the version of KubeVirt deployed.&lt;/p&gt;
-
-&lt;p&gt;If for any reason there is a need to deploy the latest version, it can be done by running the following script which applies directly the HCO operator: &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;unreleased bundles using the hco without marketplace&lt;/a&gt;. Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.&lt;/p&gt;
-
-&lt;h2 id=&quot;openshift-console-bridge&quot;&gt;OpenShift console (bridge)&lt;/h2&gt;
-
-&lt;p&gt;There is actually a &lt;a href=&quot;https://github.com/kubevirt/web-ui&quot;&gt;KubeVirt Web User Interface&lt;/a&gt;, however the standalone project was deprecated in favor of OpenShift Console where it is included as a plugin.&lt;/p&gt;
-
-&lt;p&gt;As we reviewed previously the &lt;a href=&quot;https://github.com/openshift/console&quot;&gt;OpenShift web console&lt;/a&gt; is just another piece inside OKD. It is an independent part and, as it is stated in their official GitHub repository, it can run on top of native Kubernetes. OpenShift Console a.k.a bridge is defined as:&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;a friendly kubectl in the form of a single page web application. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Proxying the Kubernetes API under /api/kubernetes&lt;/li&gt;
-  &lt;li&gt;Providing additional non-Kubernetes APIs for interacting with the cluster&lt;/li&gt;
-  &lt;li&gt;Serving all frontend static assets&lt;/li&gt;
-  &lt;li&gt;User Authentication&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Then, as briefly explained in their &lt;a href=&quot;https://github.com/openshift/console#native-kubernetes&quot;&gt;repository&lt;/a&gt;, our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar to the ones found in the OKD installation except:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;KubeVirt installation is done using the &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace&quot;&gt;Hyperconverged Cluster Operator (HCO) without OLM or Marketplace&lt;/a&gt; instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically&lt;/li&gt;
-  &lt;li&gt;Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.&lt;/li&gt;
-  &lt;li&gt;Connection to the VM via serial or VNC console is flaky.&lt;/li&gt;
-  &lt;li&gt;VM templates can only be created from YAML. The wizard dialog is based on OpenShift templates.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;video autoplay=&quot;&quot; loop=&quot;&quot; muted=&quot;&quot; playsinline=&quot;&quot; src=&quot;/assets/2019-12-19-KubeVirt_UI_options/bridge-k8s.mp4&quot; type=&quot;video/mp4&quot; width=&quot;1280&quot; height=&quot;720&quot;&gt;&lt;/video&gt;
-
-&lt;p&gt;Note that the OpenShift console documentation briefly points out how to integrate the OpenShift console with a native Kubernetes deployment. It is uncertain if it can be installed in any other Kubernetes cluster.&lt;/p&gt;
-
-&lt;h2 id=&quot;cockpit&quot;&gt;Cockpit&lt;/h2&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit-logo.png&quot; alt=&quot;Cockpit logo&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;When testing cockpit in a CentOS 7 server with a Kubernetes cluster and KubeVirt we have realised that some of the containers/k8s features have to be enabled installing extra cockpit packages:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;To see the containers and images the package &lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-docker&lt;/code&gt; has to be installed, then a new option called containers appears in the menu.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit_containers_800.png&quot; alt=&quot;Containers&quot; title=&quot;cockpit containers&quot; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;To see the k8s cluster the package &lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-kubernetes&lt;/code&gt; has to be installed and a new tab appears in the left menu. The new options allow you to:&lt;/p&gt;
-
-    &lt;ul&gt;
-      &lt;li&gt;&lt;strong&gt;Overview&lt;/strong&gt;: filtering by project, it shows Pods, volumes, Nodes, services and resources used.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_cluster_overview_800.png&quot; alt=&quot;Cluster overview&quot; title=&quot;cockpit cluster overview&quot; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Nodes&lt;/strong&gt;: nodes and the resources used are being shown here.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Containers&lt;/strong&gt;: a full list of containers and some metadata about them is displayed in this option.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Topology&lt;/strong&gt;: A graph with the pods, services and nodes is shown in this option.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_topology_800.png&quot; alt=&quot;Cluster topology&quot; title=&quot;cockpit cluster topology&quot; /&gt;&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Details&lt;/strong&gt;: allows to filter by project and type of resource and shows some metadata in the results.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Volumes&lt;/strong&gt;: allows to filter by project and shows the volumes with the type and the status.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;In CentOS 7 there are also the following packages:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-machines.x86_64&lt;/code&gt; : Cockpit user interface for virtual machines. If “virt-install” is installed, you can also create new virtual machines.
-It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;cockpit-machines-ovirt.noarch&lt;/code&gt; : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;At the moment none of the cockpit complements has support for KubeVirt Virtual Machine.&lt;/p&gt;
-
-&lt;p&gt;KubeVirt support for cockpit was &lt;a href=&quot;https://bugzilla.redhat.com/show_bug.cgi?id=1629608&quot;&gt;removed from fedora 29&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;novnc&quot;&gt;noVNC&lt;/h2&gt;
-
-&lt;p&gt;noVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas.
-It just allows you to connect through VNC to the virtual Machine already deployed in KubeVirt.&lt;/p&gt;
-
-&lt;p&gt;No VM management or even a dashboard is enabled with this option, it’s a pure DIY code that can embed the VNC access to the VM into HTML in any application or webpage.
-There is a &lt;a href=&quot;/2019/Access-Virtual-Machines-graphic-console-using-noVNC.html&quot;&gt;noVNC blogpost&lt;/a&gt; detailing how to install noVNC.&lt;/p&gt;
-
-&lt;p&gt;In this animation you can see the feature of connecting to the Virtual Machine with noVNC:
-&lt;img src=&quot;/assets/2019-12-19-KubeVirt_UI_options/virtvnc.gif&quot; alt=&quot;noVNC&quot; title=&quot;noVNC&quot; /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
-
-&lt;p&gt;From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a powerful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.&lt;/p&gt;
-
-&lt;p&gt;OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.&lt;/p&gt;
-
-&lt;p&gt;On the other hand, noVNC provides a lightweight interface to simply connect to the console of your virtual machine.&lt;/p&gt;
-
-&lt;p&gt;Octant, although it does not have any specific integration with KubeVirt, looks like a promising Kubernetes user interface that could be extended to manage our KubeVirt instances in the future.&lt;/p&gt;
-
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;h2 id=&quot;references&quot;&gt;References:&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://octant.dev&quot;&gt;Octant&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.okd.io/&quot;&gt;OKD&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/openshift/origin-web-console&quot;&gt;OKD Console&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://cockpit-project.org/&quot;&gt;Cockpit&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/wavezhang/virtVNC/&quot;&gt;virtVNC, noVNC for Kubevirt&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande, Pedro Ibáñez Requena</name></author><category term="news" /><category term="octant" /><category term="okd" /><category term="openshift console" /><category term="cockpit" /><category term="noVNC" /><category term="user interface" /><category term="web interface" /><category term="virtVNC" /><category term="OKD console" /><summary type="html">The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. Wikipedia:User Interface</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="kubevirt upgrade" /><category term="upgrading" /><category term="lifecycle" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 3: Upgrades</summary></entry></feed>

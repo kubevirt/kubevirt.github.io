@@ -1,0 +1,828 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>KubeVirt VM Image Usage Patterns | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="David Vossel" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This blog post outlines methods for building and using virtual machine images with KubeVirt">
+    <meta name="keywords" content="kubevirt, kubernetes, virtual machine, VM, images, storage" >
+    <meta property="og:title" content="KubeVirt VM Image Usage Patterns | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This blog post outlines methods for building and using virtual machine images with KubeVirt" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="David Vossel" >
+    <meta property="og:article:published_time" content="2020-05-12 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt VM Image Usage Patterns | KubeVirt.io">
+    <meta name="twitter:description" content="This blog post outlines methods for building and using virtual machine images with KubeVirt">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "minikube", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "design", "architecture", "security", "operation", "images", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt VM Image Usage Patterns</h1>
+          <div class="post-info">
+            <span class="post-author">Author: David Vossel</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>&nbsp;|&nbsp;<a href="/tag/images">images</a>&nbsp;|&nbsp;<a href="/tag/storage">storage</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: May 12, 2020  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h1 id="building-a-vm-image-repository">Building a VM Image Repository</h1>
+
+<p>You know what I hear a lot from new KubeVirt users?</p>
+
+<blockquote>
+  <p>“How do I manage VM images with KubeVirt? There’s a million options and I have no idea where to start.”</p>
+</blockquote>
+
+<p>And I agree. It’s not obvious. There are a million ways to use and manipulate VM images with KubeVirt. That’s by design. KubeVirt is meant to be as flexible as possible, but in the process I think we dropped the ball on creating some well defined workflows people can use as a starting point.</p>
+
+<p>So, that’s what I’m going to attempt to do. I’ll show you how to make your images accessible in the cluster. I’ll show you how to make a custom VM image repository for use within the cluster. And I’ll show you how to use this at scale using the same patterns you may have used in AWS or GCP.</p>
+
+<p>The pattern we’ll use here is…</p>
+<ol>
+  <li>Import a base VM image into the cluster as an PVC</li>
+  <li>Use KubeVirt to create a new immutable custom image with application assets</li>
+  <li>Scale out as many VMIs as we’d like using the pre-provisioned immutable custom image.</li>
+</ol>
+
+<p><strong>Remember, this isn’t “the definitive” way of managing VM images in KubeVirt. This is just an example workflow to help people get started.</strong></p>
+
+<h2 id="importing-a-base-image">Importing a Base Image</h2>
+
+<p>Let’s start with importing a base image into a PVC.</p>
+
+<p>For our purposes in this workflow, the base image is meant to be immutable. No VM will use this image directly, instead VMs spawn with their own unique copy of this base image. Think of this just like you would containers. A container image is immutable, and a running container instance is using a copy of an image instead of the image itself.</p>
+
+<h3 id="step-0-install-kubevirt-with-cdi">Step 0. Install KubeVirt with CDI</h3>
+
+<p>I’m not covering this. Use our documentation linked to below. Understand that CDI (containerized data importer) is the tool we’ll be using to help populate and manage PVCs.</p>
+
+<p><a href="https://kubevirt.io/user-guide/#/installation/installation">Installing KubeVirt</a>
+<a href="https://kubevirt.io/user-guide/#/installation/image-upload?id=install-cdi">Installing CDI</a></p>
+
+<h3 id="step-1-create-a-namespace-for-our-immutable-vm-images">Step 1. Create a namespace for our immutable VM images.</h3>
+
+<p>We’ll give users the ability to clone VM images living on PVCs from this namespace to their own namespace, but not directly create VMIs within this namespace.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create namespace vm-images
+</code></pre></div></div>
+
+<h3 id="step-2-import-your-image-to-a-pvc-in-the-image-namespace">Step 2. Import your image to a PVC in the image namespace</h3>
+
+<p>Below are a few options for importing. For each example, I’m using the Fedora Cloud qcow2 image that can be downloaded <a href="https://download.fedoraproject.org/pub/fedora/linux/releases/31/Cloud/x86_64/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2">here</a></p>
+
+<p>If you try these examples yourself, you’ll need to download the <strong>Fedora-Cloud-Base-31-1.9.x86_64.qcow2</strong> image file in your working directory.</p>
+
+<p><strong>Example: Import a local VM from your desktop environment using virtctl</strong></p>
+
+<p>If you don’t have ingress setup for the cdi-uploadproxy service endpoint (which you don’t if you’re reading this) we can set up a local port forward using kubectl. That gives a route into the cluster to upload the image. Leave the command below executing to open the port.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl port-forward <span class="nt">-n</span> cdi service/cdi-uploadproxy 18443:443
+</code></pre></div></div>
+
+<p>In a separate terminal upload the image over the port forward connection using the virtctl tool. Note that the size of the PVC must be the size of what the qcow image will expand to when converted to a raw image. In this case I chose 5 gigabytes as the PVC size.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl image-upload dv fedora-cloud-base-31 <span class="nt">--namespace</span> vm-images  <span class="nt">--size</span><span class="o">=</span>5Gi <span class="nt">--image-path</span> Fedora-Cloud-Base-31-1.9.x86_64.qcow2  <span class="nt">--uploadproxy-url</span><span class="o">=</span>https://127.0.0.1:18443 <span class="nt">--insecure</span>
+</code></pre></div></div>
+
+<p>Once that completes, you’ll have a PVC in the vm-images namespace that contains the Fedora Cloud image.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc <span class="nt">-n</span> vm-images
+NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            <span class="nb">local          </span>60s
+</code></pre></div></div>
+
+<p><strong>Example: Import using a container registry</strong></p>
+
+<p>If the image’s footprint is small like our Fedora Cloud Base qcow image, then it probably makes sense to use a container image registry to import our image from a container image to a PVC.</p>
+
+<p>In the example below, I start by building a container image with the Fedora Cloud Base qcow VM image in it, and push that container image to my container registry.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span> <span class="no">END</span><span class="sh"> &gt; Dockerfile
+FROM scratch
+ADD Fedora-Cloud-Base-31-1.9.x86_64.qcow2 /disk/
+</span><span class="no">END
+</span>docker build <span class="nt">-t</span> quay.io/dvossel/fedora:cloud-base-31 <span class="nb">.</span>
+docker push quay.io/dvossel/fedora:cloud-base-31
+</code></pre></div></div>
+
+<p>Next a CDI DataVolume is used to import the VM image into a new PVC from the container image you just uploaded to your container registry. Posting the DataVolume manifest below will result in a new 5 gigabyte PVC being created and the VM image being placed on that PVC in a way KubeVirt can consume it.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span> <span class="no">END</span><span class="sh"> &gt; fedora-cloud-base-31-datavolume.yaml
+apiVersion: cdi.kubevirt.io/v1alpha1
+kind: DataVolume
+metadata:
+  name: fedora-cloud-base-31
+  namespace: vm-images
+spec:
+  source:
+    registry:
+      url: "docker://quay.io/dvossel/fedora:cloud-base-31"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+</span><span class="no">END
+</span>kubectl create <span class="nt">-f</span> fedora-cloud-base-31-datavolume.yaml
+</code></pre></div></div>
+
+<p>You can observe the CDI complete the import by watching the DataVolume object.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl describe datavolume fedora-cloud-base-31 <span class="nt">-n</span> vm-images
+<span class="nb">.</span>
+<span class="nb">.</span>
+<span class="nb">.</span>
+Status:
+  Phase:     Succeeded
+  Progress:  100.0%
+Events:
+  Type    Reason            Age                   From                   Message
+  <span class="nt">----</span>    <span class="nt">------</span>            <span class="nt">----</span>                  <span class="nt">----</span>                   <span class="nt">-------</span>
+  Normal  ImportScheduled   2m49s                 datavolume-controller  Import into fedora-cloud-base-31 scheduled
+  Normal  ImportInProgress  2m46s                 datavolume-controller  Import into fedora-cloud-base-31 <span class="k">in </span>progress
+  Normal  Synced            40s <span class="o">(</span>x11 over 2m51s<span class="o">)</span>  datavolume-controller  DataVolume synced successfully
+  Normal  ImportSucceeded   40s                   datavolume-controller  Successfully imported into PVC fedora-cloud-base-31
+</code></pre></div></div>
+
+<p>Once the import is complete, you’ll see the image available as a PVC in your vm-images namespace. The PVC will have the same name given to the DataVolume.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc <span class="nt">-n</span> vm-images
+NAME                   STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            <span class="nb">local          </span>60s
+</code></pre></div></div>
+
+<p><strong>Example: Import an image from an http or s3 endpoint</strong></p>
+
+<p>While I’m not going to provide a detailed example here, another option for importing VM images into a PVC is to host the image on an http server (or as an s3 object) and then use a DataVolume to import the VM image into the PVC from a URL.</p>
+
+<p>Replace the url in this example with one hosting the qcow2 image. More information about this import method can be found <a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md#https3registry-source">here</a>.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kind: DataVolume
+metadata:
+  name: fedora-cloud-base-31
+  namespace: vm-images
+spec:
+  <span class="nb">source</span>:
+    http:
+      url: http://your-web-server-here/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 5Gi
+</code></pre></div></div>
+
+<h2 id="provisioning-new-custom-vm-image">Provisioning New Custom VM Image</h2>
+
+<p>The base image itself isn’t that useful to us. Typically what we really want is an immutable VM image preloaded with all our application related assets. This way when the VM boots up, it already has everything it needs pre-provisioned. The pattern we’ll use here is to provision the VM image once, and then use clones of the pre-provisioned VM image as many times as we’d like.</p>
+
+<p>For this example, I want a new immutable VM image preloaded with an nginx webserver. We can actually describe this entire process of creating this new VM image using the single VM manifest below. Note that I’m starting the VM inside the vm-images namespace. This is because I want the resulting VM image’s cloned PVC to remain in our vm-images repository namespace.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">nginx-provisioner</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">nginx-provisioner</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">vm-images</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s2">"</span><span class="s">RerunOnFailure"</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">nginx-provisioner</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-31-nginx</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+            <span class="s">#!/bin/sh</span>
+            <span class="s">yum install -y nginx</span>
+            <span class="s">systemctl enable nginx</span>
+            <span class="s"># removing instances ensures cloud init will execute again after reboot</span>
+            <span class="s">rm -rf /var/lib/cloud/instances</span>
+            <span class="s">shutdown now</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-31-nginx</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">pvc</span><span class="pi">:</span>
+        <span class="na">accessModes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">storage</span><span class="pi">:</span> <span class="s">5Gi</span>
+      <span class="na">source</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">namespace</span><span class="pi">:</span> <span class="s">vm-images</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-cloud-base-31</span>
+</code></pre></div></div>
+
+<p>There are a few key takeaways from this manifest worth discussing.</p>
+
+<ol>
+  <li>Usage of <strong>runStrategy: “RerunOnFailure”</strong>. This tells KubeVirt to treat the VM’s execution similar to a Kubernetes Job. We want the VM to continue retrying until the VM guest shuts itself down gracefully.</li>
+  <li>Usage of the <strong>cloudInitNoCloud volume</strong>. This volume allows us to inject a script into the VM’s startup procedure. In our case, we want this script to install nginx, configure nginx to launch on startup, and then immediately shutdown the guest gracefully once that is complete.</li>
+  <li>Usage of the <strong>dataVolumeTemplates section</strong>. This allows us to define a new PVC which is a clone of our fedora-cloud-base-31 base image. The resulting VM image attached to our VM will be a new image pre-populated with nginx.</li>
+</ol>
+
+<p>After posting the VM manifest to the cluster, wait for the corresponding VMI to reach the Succeeded phase.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmi <span class="nt">-n</span> vm-images
+NAME                AGE     PHASE       IP            NODENAME
+nginx-provisioner   2m26s   Succeeded   10.244.0.22   node01
+</code></pre></div></div>
+
+<p>This tells us the VM successfully executed the cloud-init script which installed nginx and shut down the guest gracefully. A VMI that never shuts down or repeatedly fails means something is wrong with the provisioning.</p>
+
+<p>All that’s left now is to delete the VM and leave the resulting PVC behind as our immutable artifact. We do this by deleting the VM using the –cascade=false option. This tells Kubernetes to delete the VM, but leave behind anything owned by the VM. In this case we’ll be leaving behind the PVC that has nginx provisioned on it.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete vm nginx-provisioner <span class="nt">-n</span> vm-images <span class="nt">--cascade</span><span class="o">=</span><span class="nb">false</span>
+</code></pre></div></div>
+
+<p>After deleting the VM, you can see the nginx provisioned PVC in your vm-images namespace.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc <span class="nt">-n</span> vm-images
+NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
+fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            <span class="nb">local          </span>60s
+fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            <span class="nb">local          </span>60s
+</code></pre></div></div>
+
+<h2 id="understanding-the-vm-image-repository">Understanding the VM Image Repository</h2>
+<p>At this point we have a namespace, vm-images, that contains PVCs with our VM images on them. Those PVCs represent VM images in the same way AWS’s AMIs represent VM images and this <strong>vm-images namespace is our VM image repository.</strong></p>
+
+<p>Using CDI’s i<a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one">cross namespace cloning feature</a>, VM’s can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository”. Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined <a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/RBAC.md#pvc-cloning">here</a>.</p>
+
+<p>Below is an example of the RBAC necessary to enable cross namespace cloning from the vm-images namespace to the default namespace using the default service account.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">cdi-cloner</span>
+<span class="na">rules</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">apiGroups</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">cdi.kubevirt.io"</span><span class="pi">]</span>
+  <span class="na">resources</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">datavolumes/source"</span><span class="pi">]</span>
+  <span class="na">verbs</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">create"</span><span class="pi">]</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">RoleBinding</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">default-cdi-cloner</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">vm-images</span>
+<span class="na">subjects</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">kind</span><span class="pi">:</span> <span class="s">ServiceAccount</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+<span class="na">roleRef</span><span class="pi">:</span>
+  <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">cdi-cloner</span>
+  <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io</span>
+</code></pre></div></div>
+
+<h1 id="horizontally-scaling-vms-using-custom-image">Horizontally Scaling VMs Using Custom Image</h1>
+
+<p>Now that we have our immutable custom VM image, we can create as many VMs as we want using that custom image.</p>
+
+<h2 id="example-scale-out-vmi-instances-using-the-custom-vm-image">Example: Scale out VMI instances using the custom VM image.</h2>
+
+<p>Clone the custom VM image from the vm-images namespace into the namespace the VMI instances will be running in as a <strong>ReadOnlyMany</strong> PVC. This will allow concurrent access to a single PVC.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">cdi.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">DataVolume</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">nginx-rom</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">source</span><span class="pi">:</span>
+    <span class="na">pvc</span><span class="pi">:</span>
+      <span class="na">namespace</span><span class="pi">:</span> <span class="s">vm-images</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-31-nginx</span>
+  <span class="na">pvc</span><span class="pi">:</span>
+    <span class="na">accessModes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">ReadOnlyMany</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">storage</span><span class="pi">:</span> <span class="s">5Gi</span>
+</code></pre></div></div>
+
+<p>Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) <a href="https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral">ephemeral volume</a> on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.</p>
+
+<p>Here’s an example manifest of a VirtualMachineInstanceReplicaSet starting 5 instances of our nginx server in separate VMIs.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstanceReplicaSet</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vmReplicaSet</span><span class="pi">:</span> <span class="s">nginx</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">nginx</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">5</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vmReplicaSet</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">nginx-image</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">ephemeral</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">nginx-image</span>
+          <span class="s">persistentVolumeClaim</span><span class="pi">:</span>
+            <span class="na">claimName</span><span class="pi">:</span> <span class="s">nginx-rom</span>
+      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+            <span class="s"># add any custom logic you want to occur on startup here.</span>
+            <span class="s">echo “cloud-init script execution"</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+</code></pre></div></div>
+
+<h2 id="example-launching-a-single-pet-vm-from-custom-image">Example: Launching a Single “Pet” VM from Custom Image</h2>
+
+<p>In the manifest below, we’re starting a new VM with a PVC cloned from our pre-provisioned VM image that contains the nginx server. When the VM boots up, a new PVC will be created in the VM’s namespace that is a clone of the PVC referenced in our vm-images namespace.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">nginx</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">nginx</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">nginx</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+            <span class="s"># add any custom logic you want to occur on startup here.</span>
+            <span class="s">echo “cloud-init script execution"</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">pvc</span><span class="pi">:</span>
+        <span class="na">accessModes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">storage</span><span class="pi">:</span> <span class="s">5Gi</span>
+      <span class="na">source</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">namespace</span><span class="pi">:</span> <span class="s">vm-images</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-31-nginx</span>
+</code></pre></div></div>
+
+<h1 id="other-custom-creation-image-tools">Other Custom Creation Image Tools</h1>
+
+<p>In my example I imported a VM base image into the cluster and used KubeVirt to provision a custom image with a technique that used cloud-init. This may or may not make sense for your use case. It’s possible you need to pre-provision the VM image before importing into the cluster at all.</p>
+
+<p>If that’s the case, I suggest looking into two tools.</p>
+
+<p><a href="https://packer.io/docs/builders/qemu.html">Packer.io using the qemu builder</a>. This allows you to automate building custom images on your local machine using configuration files that describe all the build steps. I like this tool because it closely matches the Kubernetes “declarative” approach.</p>
+
+<p><a href="http://libguestfs.org/virt-customize.1.html">Virt-customize</a> is a cli tool that allows you to customize local VM images by injecting/modifying files on disk and installing packages.</p>
+
+<p><a href="https://linux.die.net/man/1/virt-install">Virt-install</a> is a cli tool that allows you to automate a VM install as if you were installing it from a cdrom. You’ll want to look into using a kickstart file to fully automate the process.</p>
+
+<p>The resulting VM image artifact created from any of these tools can then be imported into the cluster in the same way we imported the base image earlier in this document.</p>
+
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt VM Image Usage Patterns&url=https://www.kubevirt.io/2020/KubeVirt-VM-Image-Usage-Patterns.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-center">
+    <div class="col-sm-12 col-md-5">
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" aria-label="Talk to us in Slack" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" aria-label="View our repo on GitHub" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" aria-label="Send us an email" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT"
+            aria-label="See our calendar"
+            class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos"
+            aria-label="See our YouTube channel"
+            class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+      Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
+      site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>. This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+    </div>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>
