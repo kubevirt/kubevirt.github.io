@@ -36,23 +36,23 @@ toc: false
 
 ## Introduction
 
-This blog post will be explaining on KubeVirt's ability for performing Live Migration.
+This blog post will be explaining on KubeVirt's ability to perform live migration of virtual machines.
 
 > Live Migration is a process during which a running Virtual Machine Instance moves to another compute node while the guest workload continues to run and remain accessible.
 
-The concept of Live Migration is already well-known among virtualization platforms and enables administrators to keep workloads from users running while the servers can be moved to maintenance for any specific reason that you might think of like:
+The concept of live migration is already well-known among virtualization platforms and enables administrators to keep user workloads running while the servers can be moved to maintenance for any reason that you might think of like:
 
 - Hardware maintenance (physical, firmware upgrades, etc)
 - Power management, by moving workloads to a lower number of hypervisors during off-peak hours
 - etc
 
-KubeVirt, as a virtualization layer for Kubernetes also includes this support when enabled.
+KubeVirt also includes support for virtual machine migration within Kubernetes when enabled.
 
 Keep reading to learn how!
 
 ## Enabling Live Migration
 
-To enable Live Migration we need to enable the `feature-gates` for it by adding `LiveMigration` to the key:
+To enable live migration we need to enable the `feature-gate` for it by adding `LiveMigration` to the key:
 
 ```yaml
 apiVersion: v1
@@ -68,7 +68,7 @@ data:
 
 <br>
 
-Also, current `kubevirt-config` can be edited to append "`LiveMigration`" to an existing configuration:
+A current `kubevirt-config` can be edited to append "`LiveMigration`" to an existing configuration:
 
 ```sh
 kubectl edit configmap kubevirt-config -n kubevirt
@@ -145,7 +145,7 @@ This will trigger the process for the VM.
 >   Migration Method: BlockMigration
 > ```
 
-If the VM is Live-Migratable, the request will come-trough and the status will start to be reported at `VMI.status`, indicating when it finishes if it has `Completed` or `Failed`.
+If the VM is Live-Migratable, the request will submit successfully. The status change will be reported under `VMI.status`. Once live migration is complete, a status of `Completed` or `Failed` will be indicated.
 
 > info "Watch out!"
 >
@@ -154,7 +154,7 @@ If the VM is Live-Migratable, the request will come-trough and the status will s
 > - `BlockMigration` : meaning that the disk data is being copied from source to destination
 > - `LiveMigration`: meaning that only the memory is copied from source to destination
 >
-> Related with this, on a more complex level, storage backends like [Rook](https://rook.io/) that provide PVCs which have `RWX` access mode, allow VMs to live-migrate only memory contents instead of having to do Block Migration.
+> VMs with block devices located on shared storage backends like the ones provided by [Rook](https://rook.io/) that provide PVCs with ReadWriteMany access have the option to live-migrate only memory contents instead of having to also migrate the block devices.
 
 ### Cancelling a Live Migration
 
