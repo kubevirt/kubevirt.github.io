@@ -1,2 +1,0 @@
-I"²<p>Only once HCO is completely deployed, <code class="highlighter-rouge">VirtualMachines</code> can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.</p>
-:ET

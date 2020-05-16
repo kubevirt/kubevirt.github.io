@@ -1,2 +1,0 @@
-I"<p>If the volume is still in a ‘Pending’ state, likely, that one of the pods haven’t come up correctly or one of the steps above has been missed. To check it, the command ‘kubectl get pods -n rook-ceph’ can be executed for viewing the running/failed pods.</p>
-:ET

@@ -1,2 +1,0 @@
-I"Ñ<p>Special attention to the <code class="highlighter-rouge">bootOrder: 1</code> parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.</p>
-:ET

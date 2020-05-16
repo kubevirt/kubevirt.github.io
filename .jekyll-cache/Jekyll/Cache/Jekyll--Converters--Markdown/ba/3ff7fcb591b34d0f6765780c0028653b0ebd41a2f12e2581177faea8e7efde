@@ -1,2 +1,0 @@
-I"Ô<p>To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service.</p>
-:ET

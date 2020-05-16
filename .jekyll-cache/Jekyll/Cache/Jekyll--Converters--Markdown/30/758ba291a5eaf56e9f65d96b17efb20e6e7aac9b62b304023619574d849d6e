@@ -1,2 +1,0 @@
-I"Û<p><code class="highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "0"</code> would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
-:ET

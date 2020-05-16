@@ -1,2 +1,0 @@
-I"æ<p><code class="highlighter-rouge">nodeSelector</code> provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.</p>
-:ET

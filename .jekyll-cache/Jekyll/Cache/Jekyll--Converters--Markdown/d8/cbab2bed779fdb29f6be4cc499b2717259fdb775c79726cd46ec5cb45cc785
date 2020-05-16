@@ -1,2 +1,0 @@
-I"ó<p>It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are <code class="highlighter-rouge">nodeAffinity</code> rules in order to place each replica in each Kubernetes node of the cluster.</p>
-:ET

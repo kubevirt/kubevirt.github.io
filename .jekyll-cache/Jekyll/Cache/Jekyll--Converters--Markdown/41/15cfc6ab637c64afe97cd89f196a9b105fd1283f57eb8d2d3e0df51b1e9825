@@ -1,2 +1,0 @@
-I"[<p>KubeVirt has been tested on GCP and AWS providers, this approach is intended for demonstration purposes similar to the environments for <a href="{% link pages/quickstart_kind.md %}">Kind</a> and <a href="{% link pages/quickstart_minikube.md %}">Minikube</a> and of course the <a href="https://katacoda.com/kubevirt">Katacoda scenarios</a>.</p>
-:ET

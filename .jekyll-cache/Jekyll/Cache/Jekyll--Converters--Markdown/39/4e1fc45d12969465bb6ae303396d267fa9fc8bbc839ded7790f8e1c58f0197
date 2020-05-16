@@ -1,2 +1,0 @@
-I"É<p>Even without Multus, this exact configuration could have been put under <code class="highlighter-rouge">/etc/cni/net.d</code>, and provide the same network to the pod, using the bride CNI. But, in such a case, this would have been the <strong>only</strong> network interface to the pod, since Kubernetes just takes the first configuration file from that directory (sorted by alphabetical order) and use it to provide a single interface for all pods.</p>
-:ET

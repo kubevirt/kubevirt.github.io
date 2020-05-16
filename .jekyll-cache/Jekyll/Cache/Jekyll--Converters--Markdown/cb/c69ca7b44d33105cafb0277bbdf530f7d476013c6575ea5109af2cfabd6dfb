@@ -1,2 +1,0 @@
-I"Ð<p>Gluster seems like a good fit for storage in kubernetes and in particular in kubevirt. Still, as for other storage backends, we will likely need to use a golden set of images and deploy vms from them.</p>
-:ET

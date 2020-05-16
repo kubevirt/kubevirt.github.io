@@ -1,5 +1,0 @@
-I"_<p>Hi,
-As previously announced in /2019/KubeVirt-CR-Condition-Types-Rename.html, Condition Types have been renamed from <del>Ready</del> to <strong>Available</strong> and from <del>Updating</del> to <strong>Progressing</strong>, check the linked article for more details.</p>
-
-<p>Check Release notes on kubevirt.io for v0.20.0 to see the changes.</p>
-:ET

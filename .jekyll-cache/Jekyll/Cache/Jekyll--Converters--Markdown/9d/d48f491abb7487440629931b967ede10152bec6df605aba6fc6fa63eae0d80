@@ -1,2 +1,0 @@
-I"i<p>In this example, the health value is <code class="highlighter-rouge">HEALTH_WARN</code> because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a <code class="highlighter-rouge">HEALTH_OK</code>.</p>
-:ET

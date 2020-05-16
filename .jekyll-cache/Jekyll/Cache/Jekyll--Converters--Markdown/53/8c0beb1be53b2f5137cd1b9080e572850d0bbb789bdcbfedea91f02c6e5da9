@@ -1,2 +1,0 @@
-I"ê<p>As informed in the <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#inter-pod-affinity-and-anti-affinity">official Kubernetes documentation</a>: inter-pod affinity and anti-affinity require substantial amount of processing which can slow-down scheduling in large clusters significantly. This can be specially notorious in clusters larger than several hundred nodes.</p>
-:ET

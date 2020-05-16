@@ -1,2 +1,0 @@
-I"¥<p>We simply inject the ignition data as a string in <em>vm/spec/domain/spec/metadata/annotations</em>, using <em>kubevirt.io/ignitiondata</em> as an annotation</p>
-:ET

@@ -1,2 +1,0 @@
-I"Ã<p>If you remove or change the label of the node where the Pod is scheduled, the Pod will not be removed. In other words, the affinity selection works only at the time of scheduling the Pod.</p>
-:ET

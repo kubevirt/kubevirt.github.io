@@ -1,2 +1,0 @@
-I"¿<p>To test virtual machine to virtual machine network connectivity I purposely set the host where which instance would run by using a <code class="highlighter-rouge">nodeSelector</code>.</p>
-:ET

@@ -1,5 +1,0 @@
-I"°<p>In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an
-orchestration engine for not just application containers but virtual machine workloads as well. This provides a
-unified development platform where developers can build, modify, and deploy applications made up of both application
-containers as well as the virtual machines (VM) in a common, shared environment.</p>
-:ET
