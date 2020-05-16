@@ -1,0 +1,3 @@
+I"í<p>Until we publish (and consume) the HCO and component operators through <a href="https://operatorhub.io/">operatorhub.io</a>, this is a means to demonstrate the HCO workflow without OLM
+Once we publish operators through Marketplace at <a href="https://operatorhub.io">OperatorHub.io</a>, it will be available <a href="https://github.com/operator-framework/operator-lifecycle-manager/blob/954a669200e57c6ce3105ddca17793186b3a3a43/Documentation/install/install.md#installing-olm">here</a></p>
+:ET

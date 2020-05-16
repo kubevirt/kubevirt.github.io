@@ -1,0 +1,2 @@
+I"ò<p>Weâ€™re making KubeVirt more compatible with the standard for Operators, when doing so, some of the <code class="highlighter-rouge">conditions</code> are changing, so check your scripts using checks for conditions to use the new ones.</p>
+:ET

@@ -1,0 +1,2 @@
+I"#<p>After installing Kubernetes, you must install a default network CNI plugin. If you’re using kubeadm, refer to the “Installing a pod network add-on” section in the kubeadm documentation. If it’s your first time, we generally recommend using Flannel for the sake of simplicity.</p>
+:ET

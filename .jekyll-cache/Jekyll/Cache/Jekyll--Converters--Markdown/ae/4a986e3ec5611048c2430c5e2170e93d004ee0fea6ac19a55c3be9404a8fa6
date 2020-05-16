@@ -1,0 +1,181 @@
+I"|<div class="container">
+  <div class="row">
+    <h1 class="page-title">Blogs</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      
+        
+          
+          <ul class="blogs-navigation">
+            <h3>Categories</h3>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/news.html" class="blogs-navigation--item_link">
+                  News
+                </a>
+                
+              </li>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/updates.html" class="blogs-navigation--item_link">
+                  Weekly Updates
+                </a>
+                
+              </li>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/releases.html" class="blogs-navigation--item_link">
+                  Releases
+                </a>
+                
+              </li>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/uncategorized.html" class="blogs-navigation--item_link">
+                  Uncategorized
+                </a>
+                
+              </li>
+            
+          </ul>
+          
+        
+          
+          <ul class="blogs-navigation">
+            <h3>Additional filters</h3>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/date.html" class="blogs-navigation--item_link">
+                  Grouped by Date
+                </a>
+                
+              </li>
+            
+          </ul>
+          
+        
+      
+    </div>
+    <div class="col-sm-12 col-md-9">
+      <ul class="posts">
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-VM-Image-Usage-Patterns.html">KubeVirt VM Image Usage Patterns</a></h2>
+            <div class="posts-date">May 12, 2020</div>
+            This blog post outlines methods for building and using virtual machine images with KubeVirt
+            
+            <div class="readmore">
+    <a href="/2020/KubeVirt-VM-Image-Usage-Patterns.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-Operation-Fundamentals.html">KubeVirt Operation Fundamentals</a></h2>
+            <div class="posts-date">April 30, 2020</div>
+            This blog post outlines fundamentals around the KubeVirt's approach to installs and updates.
+            
+            <div class="readmore">
+    <a href="/2020/KubeVirt-Operation-Fundamentals.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-Security-Fundamentals.html">KubeVirt Security Fundamentals</a></h2>
+            <div class="posts-date">April 29, 2020</div>
+            This blog post outlines fundamentals around the KubeVirt's approach to security.
+            
+            <div class="readmore">
+    <a href="/2020/KubeVirt-Security-Fundamentals.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-Architecture-Fundamentals.html">KubeVirt Architecture Fundamentals</a></h2>
+            <div class="posts-date">April 28, 2020</div>
+            This blog post outlines the core set of design decisions that shaped KubeVirt into what it is today.
+            
+            <div class="readmore">
+    <a href="/2020/KubeVirt-Architecture-Fundamentals.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/Advanced-scheduling-with-affinity-rules.html">Advanced scheduling using affinity and anti-affinity rules</a></h2>
+            <div class="posts-date">February 25, 2020</div>
+            KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to  virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.
+            
+            <div class="readmore">
+    <a href="/2020/Advanced-scheduling-with-affinity-rules.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      </ul>
+    </div>
+    
+<div class="pagination align-items-center">
+  
+    <span class="btn btn-outline-light mr-2">
+      <i class="fas fa-angle-left"></i> New
+    </span>
+  
+
+  
+      
+        <strong class="font-weight-bold">1</strong>
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+      
+  
+  <strong>of 19</strong>
+
+  
+    <a href="/blogs/page2" class="btn btn-outline-secondary btn-light ml-2">
+      Old <i class="fas fa-angle-right"></i>
+    </a>
+  
+
+</div>
+
+  </div>
+</div>
+:ET

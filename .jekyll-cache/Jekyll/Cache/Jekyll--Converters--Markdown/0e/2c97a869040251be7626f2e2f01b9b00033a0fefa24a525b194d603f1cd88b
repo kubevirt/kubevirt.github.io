@@ -1,0 +1,146 @@
+I"�,<p>In this post we will set up an alternative to the existing containerized build system used in KubeVirt.</p>
+
+<p>A <a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">new makefile</a> will be presented here, which you can for experimenting (if you are brave enough…)</p>
+
+<h1 id="why">Why?</h1>
+
+<p>Current build system for KubeVirt is done inside docker. This ensures a robust and consistent build environment:</p>
+
+<ul>
+  <li>No need to install system dependencies</li>
+  <li>Controlled versions of these dependencies</li>
+  <li>Agnostic of local golang environment</li>
+</ul>
+
+<p>So, in general, <strong>you should just use the dockerized build system</strong>.</p>
+
+<p>Still, there are some drawbacks there:</p>
+
+<ul>
+  <li>Tool integration:
+    <ul>
+      <li>Since your tools are not running in the dockerized environment, they may give different outcome than the ones running in the dockerized environment</li>
+      <li>Invoking any of the dockerized scripts (under <code class="highlighter-rouge">hack</code> directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)</li>
+    </ul>
+  </li>
+  <li>Build time: the dockerized build has some small overheads, and some improvements are still needed to make sure that caching work properly and build is optimized</li>
+  <li>And last, but not least, <em>sometimes it is just hard to resist the tinkering…</em></li>
+</ul>
+
+<h2 id="how">How?</h2>
+
+<p>Currently, the Makefile includes targets that address different things: building, dependencies, cluster management, testing etc. - here I tried to modify the minimum which is required for non-containerized build. Anything not related to it, should just be done using the existing Makefile.</p>
+
+<blockquote>
+  <p>note “Note
+Cross compilation is not covered here (e.g. building <code class="highlighter-rouge">virtctl</code> for mac and windows)</p>
+</blockquote>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>Best place to look for that is in the docker file definition for the build environment: <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/builder/Dockerfile">hack/docker-builder/Dockerfile</a></p>
+
+<p>Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> git
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> libvirt-devel
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> golang
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> docker
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> qemu-img
+</code></pre></div></div>
+
+<p><em>Similarly to the containerized case</em>, docker is still needed (e.g. all the cluster stuff is done via docker), and therefore, any docker related preparations are needed as well. This would include running docker on startup and making sure that docker commands does not need root privileges. On Fedora27 this would mean:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>groupadd docker
+<span class="nb">sudo </span>usermod <span class="nt">-aG</span> docker <span class="nv">$USER</span>
+<span class="nb">sudo </span>systemctl <span class="nb">enable </span>docker
+<span class="nb">sudo </span>systemctl start docker
+</code></pre></div></div>
+
+<p>Now, getting the actual code could be done either via <code class="highlighter-rouge">go get</code> (don’t forget to set the <code class="highlighter-rouge">GOPATH</code> environment variable):</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get <span class="nt">-d</span> kubevirt.io/kubevirt/...
+
+</code></pre></div></div>
+
+<p>Or <code class="highlighter-rouge">git clone</code>:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/
+git clone https://github.com/kubevirt/kubevirt
+</code></pre></div></div>
+
+<h3 id="makefilenocontainer"><a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">Makefile.nocontainer</a></h3>
+
+<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
+
+<span class="nl">bootstrap</span><span class="o">:</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">github.com/onsi/ginkgo/ginkgo</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">mvdan.cc/sh/cmd/shfmt</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/deepcopy-gen</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/defaulter-gen</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/openapi-gen</span>
+    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/deepcopy-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
+    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/defaulter-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
+    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/openapi-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
+
+<span class="nl">generate</span><span class="o">:</span>
+    <span class="err">./hack/generate.sh</span>
+
+<span class="nl">apidocs</span><span class="o">:</span> <span class="nf">generate</span>
+    <span class="err">./hack/gen-swagger-doc/gen-swagger-docs.sh</span> <span class="err">v1</span> <span class="err">html</span>
+
+<span class="nl">build</span><span class="o">:</span> <span class="nf">check</span>
+    <span class="err">go</span> <span class="err">install</span> <span class="err">-v</span> <span class="err">./cmd/...</span> <span class="err">./pkg/...</span>
+    <span class="err">./hack/copy-cmd.sh</span>
+
+<span class="nl">test</span><span class="o">:</span> <span class="nf">build</span>
+    <span class="err">go</span> <span class="err">test</span> <span class="err">-v</span> <span class="err">-cover</span> <span class="err">./pkg/...</span>
+
+<span class="nl">check</span><span class="o">:</span>
+    <span class="err">./hack/check.sh</span>
+
+<span class="nv">OUT_DIR</span><span class="o">=</span>./_out
+<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="nv">${OUT_DIR}</span>/tests
+
+<span class="nl">functest</span><span class="o">:</span> <span class="nf">build</span>
+    <span class="err">go</span> <span class="err">build</span> <span class="err">-v</span> <span class="err">./tests/...</span>
+    <span class="err">ginkgo</span> <span class="err">build</span> <span class="err">./tests</span>
+    <span class="err">mkdir</span> <span class="err">-p</span> <span class="err">${TESTS_OUT_DIR}/</span>
+    <span class="err">mv</span> <span class="err">./tests/tests.test</span> <span class="err">${TESTS_OUT_DIR}/</span>
+    <span class="err">./hack/functests.sh</span>
+
+<span class="nl">cluster-sync</span><span class="o">:</span> <span class="nf">build</span>
+    <span class="err">./hack/build-copy-artifacts.sh</span>
+    <span class="err">./hack/build-manifests.sh</span>
+    <span class="err">./hack/build-docker.sh</span> <span class="err">build</span>
+    <span class="err">./cluster/clean.sh</span>
+    <span class="err">./cluster/deploy.sh</span>
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">bootstrap generate apidocs build test check functest cluster-sync</span>
+</code></pre></div></div>
+
+<h3 id="targets">Targets</h3>
+
+<p>To execute any of the targets use:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make <span class="nt">-f</span> Makefile.nocontainer &lt;target&gt;
+</code></pre></div></div>
+
+<p>File has the following targets:</p>
+
+<ul>
+  <li><strong>bootstrap</strong>: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
+    <ul>
+      <li>Note that the k8s code generators use specific version</li>
+      <li>Note that these are not code dependencies, as they are handled by using a <code class="highlighter-rouge">vendor</code> directory, as well as the distclean, deps-install and deps-update targets in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
+    </ul>
+  </li>
+  <li><strong>generate</strong>: Calling <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh">hack/generate.sh</a> script similarly to the <a href="https://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a>. It builds all generators (under the <code class="highlighter-rouge">tools</code> directory) and use them to generate: test mocks, KubeVirt resources and test yamls</li>
+  <li><strong>apidocs</strong>: this is similar to apidocs target in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
+  <li><strong>build</strong>: this is building all product binaries, and then using a script (<a href="../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh">copy-cmd.sh</a>, should be placed under: <code class="highlighter-rouge">hack</code>) to copy the binaries from their standard location into the <code class="highlighter-rouge">_out</code> directory, where the cluster management scripts expect them</li>
+  <li><strong>test</strong>: building and running unit tests
+check: using similar code to the one used in the standard makefile: formatting files, fixing package imports and calling go vet</li>
+  <li><strong>functest</strong>: building and running integration tests. After tests are built , they are moved to the <code class="highlighter-rouge">_out</code> directory so that the standard script for running integration tests would find them</li>
+  <li><strong>cluster-sync</strong>: this is the only “cluster management” target that had to be modified from the standard makefile</li>
+</ul>
+:ET

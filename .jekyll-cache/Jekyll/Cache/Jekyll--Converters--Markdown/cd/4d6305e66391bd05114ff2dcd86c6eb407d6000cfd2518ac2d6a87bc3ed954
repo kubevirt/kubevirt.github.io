@@ -1,0 +1,51 @@
+I"�<h2 id="the-announcement">The announcement</h2>
+
+<p>Hi KubeVirt Community!</p>
+
+<p>As per the message from Marc Sluiter on our <a href="https://groups.google.com/d/msg/kubevirt-dev/LhTm77nWxzM/Qr3c-hDWCQAJ">mailing list</a>:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hello everybody,
+
+today we merged a PR [0], which renamed the condition types on the KubeVirt custom resources.
+This was done for alignment of conditions of all components in the KubeVirt ecosystem, which are deployed by the Hyperconverged Cluster Operator (HCO)[1], in order to make it easier for HCO to determine the deployment status of these components. The conditions are explained in detail in [2].
+
+For KubeVirt this means that especially the "Ready" condition was renamed to "Available". This might affect you in case you used the "Ready" condition for waiting for a successful deployment of KubeVirt. If so, you need to update the corresponding command to something like `kubectl -n kubevirt wait kv kubevirt --for condition=Available`.
+The second renamed condition is "Updating". This one is named "Progressing" now.
+As explained in [2], there also is a new condition named "Degraded".
+The "Created" and "Synchronized" conditions are unchanged.
+
+These changes take effect immediately if you are deploying KubeVirt from the master branch, or starting with the upcoming v0.20.0 release.
+
+[0] https://github.com/kubevirt/kubevirt/pull/2548
+[1] https://github.com/kubevirt/hyperconverged-cluster-operator
+[2] https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md
+
+Best regards,
+</code></pre></div></div>
+
+<p>We’re renaming some of the prior ‘conditions’ reported by the Custom Resources.</p>
+
+<h2 id="what-does-it-mean-to-us">What does it mean to us</h2>
+
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">CR Rename</p><p>We’re making KubeVirt more compatible with the standard for Operators, when doing so, some of the <code class="highlighter-rouge">conditions</code> are changing, so check your scripts using checks for conditions to use the new ones.</p>
+
+
+</div></div>
+<p>|  <strong>Prior</strong>   |    <strong>Actual</strong>     | <strong>Note</strong>          |
+| :———-: | :—————: | :—————- |
+|  <del>Ready</del>   |  <strong><code class="highlighter-rouge">Available</code></strong>  | <strong>Updated</strong>       |
+| <del>Updating</del> | <strong><code class="highlighter-rouge">Progressing</code></strong> | <strong>Updated</strong>       |
+|      -       |    <code class="highlighter-rouge">Degraded</code>     | <strong>New condition</strong> |
+|   Created    |     <code class="highlighter-rouge">Created</code>     | <strong>Unchanged</strong>     |
+| Synchronized |  <code class="highlighter-rouge">Synchronized</code>   | <strong>Unchanged</strong>     |</p>
+
+<h2 id="references">References</h2>
+
+<p>Check for more information on the following URL’s</p>
+
+<ul>
+  <li><a href="https://github.com/kubevirt/kubevirt/pull/2548">https://github.com/kubevirt/kubevirt/pull/2548</a></li>
+  <li><a href="https://github.com/kubevirt/hyperconverged-cluster-operator">https://github.com/kubevirt/hyperconverged-cluster-operator</a></li>
+  <li><a href="https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md">https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md</a></li>
+</ul>
+:ET

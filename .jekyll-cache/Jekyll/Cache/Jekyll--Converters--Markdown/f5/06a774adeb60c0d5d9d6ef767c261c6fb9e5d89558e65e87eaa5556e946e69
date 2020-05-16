@@ -1,0 +1,274 @@
+I"F<div class="container">
+  <div class="row">
+    <h1 class="page-title">Blogs</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      
+  <ul class="blogs-navigation">
+    <h3>Categories</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/news.html" class="blogs-navigation--item_link">
+          News
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/updates.html" class="blogs-navigation--item_link">
+          Weekly Updates
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/releases.html" class="blogs-navigation--item_link active">
+          Releases
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/uncategorized.html" class="blogs-navigation--item_link">
+          Uncategorized
+        </a>
+      </li>
+    
+  </ul>
+
+  <ul class="blogs-navigation">
+    <h3>Additional filters</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/date.html" class="blogs-navigation--item_link">
+          Grouped by Date
+        </a>
+      </li>
+    
+  </ul>
+
+
+    </div>
+    <div class="col-sm-12 col-md-9 blogs">
+      <ul class="posts">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/Kube-Virt-v020.html">Kube Virt v0.2.0</a></h2>
+            <div class="posts-date">January 05, 2018</div>
+              This release follows v0.1.0 and consists of 131 changes, contributed by 6 people, leading to 148 files changed, 9096 insertions(+), 5871 deletions(-).
+              
+              <div class="readmore">
+    <a href="/2018/Kube-Virt-v020.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/Kube-Virt-v010.html">Kube Virt v0.1.0</a></h2>
+            <div class="posts-date">December 08, 2017</div>
+              This release follows v0.0.4 and consists of 115 changes, contributed by 11 people, leading to 121 files changed, 5278 insertions(+), 1916 deletions(-).
+              
+              <div class="readmore">
+    <a href="/2017/Kube-Virt-v010.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/Kube-Virt-v004.html">Kube Virt v0.0.4</a></h2>
+            <div class="posts-date">November 07, 2017</div>
+              This release follows v0.0.3 and consists of 133 changes, contributed by 14 people, leading to 109 files changed, 7093 insertions(+), 2437 deletions(-).
+              
+              <div class="readmore">
+    <a href="/2017/Kube-Virt-v004.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+      </ul>
+    </div>
+  </div>
+</div>
+:ET

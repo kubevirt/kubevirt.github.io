@@ -1,0 +1,297 @@
+I"WE<p>On this blog post, we are going to deploy virtual machines with the KubeVirt project and insert them into the Istio service mesh.</p>
+
+<p>Some information about the technologies we are going to use in this blog post.</p>
+
+<h2 id="kubernetes">Kubernetes</h2>
+
+<p>Production-Grade Container Orchestration.</p>
+
+<p>Kubernetes is an open-source system for automating deployment, scaling, and management of containerized applications.</p>
+
+<h3 id="kubeadm">Kubeadm</h3>
+
+<p>kubeadm helps you bootstrap a minimum viable Kubernetes cluster that conforms to best practices.</p>
+
+<h2 id="calico">Calico</h2>
+
+<p>Calico provides secure network connectivity for containers and virtual machine workloads.</p>
+
+<p>Calico creates and manages a flat layer 3 network, assigning each workload a fully routable IP address. Workloads can communicate without IP encapsulation or network address translation for bare metal performance, easier troubleshooting, and better interoperability. In environments that require an overlay, Calico uses IP-in-IP tunneling or can work with other overlay networking such as flannel.</p>
+
+<h2 id="kubevirt">KubeVirt</h2>
+
+<p>Virtualization API for kubernetes in order to manage virtual machines</p>
+
+<p>KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.</p>
+
+<p>Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.</p>
+
+<h2 id="istio">Istio</h2>
+
+<p>An open platform to connect, manage, and secure microservices.</p>
+
+<p>Istio provides an easy way to create a network of deployed services with load balancing, service-to-service authentication, monitoring, and more, without requiring any changes in service code. You add Istio support to services by deploying a special sidecar proxy throughout your environment that intercepts all network communication between microservices, configured and managed using Istio’s control plane functionality.</p>
+
+<h2 id="bookinfo-application">Bookinfo application</h2>
+
+<p>A simple application that displays information about a book, similar to a single catalog entry of an online book store. Displayed on the page is a description of the book, book details (ISBN, number of pages, and so on), and a few book reviews.</p>
+
+<p>The Bookinfo application is broken into four separate microservices:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">productpage</code>. The productpage microservice calls the details and reviews microservices to populate the page.</li>
+  <li><code class="highlighter-rouge">details</code>. The details microservice contains book information.</li>
+  <li><code class="highlighter-rouge">reviews</code>. The reviews microservice contains book reviews. It also calls the ratings microservice.</li>
+  <li><code class="highlighter-rouge">ratings</code>. The ratings microservice contains book ranking information that accompanies a book review.</li>
+</ul>
+
+<p><img src="../assets/2019-06-21-Run-Istio-with-kubevirt/Bookinfo.png" alt="Bookinfo-application" /></p>
+
+<p><strong>Note:</strong> This demo is going to be deployed on a kubernetes 1.10 cluster.</p>
+
+<h1 id="requirements">Requirements</h1>
+
+<ul>
+  <li>docker</li>
+  <li>kubeadm</li>
+</ul>
+
+<p>Follow this <a href="https://kubernetes.io/docs/setup/independent/install-kubeadm/">document</a> to install everything we need for the POC</p>
+
+<h1 id="deployment">Deployment</h1>
+
+<p>For the POC we clone <a href="https://github.com/SchSeba/kubevirt-istio-poc">this repo</a></p>
+
+<p>The repo contains all the configuration we need to deploy KubeVirt and Istio.</p>
+
+<ul>
+  <li>kubevirt.yaml</li>
+  <li>istio-demo-auth.yaml</li>
+</ul>
+
+<p>It also contains the deployment configuration of our sample application.</p>
+
+<ul>
+  <li>bookinfo.yaml</li>
+  <li>bookinfo-gateway.yaml</li>
+</ul>
+
+<p>Run the bash script</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-istio-poc
+./deploy-istio-poc.sh
+</code></pre></div></div>
+
+<h1 id="demo-application">Demo application</h1>
+
+<p>We are going to use the <a href="https://istio.io/docs/examples/bookinfo/">bookinfo sample application</a> from the istio webpage.</p>
+
+<p>The following yaml will deploy the bookinfo application with a ‘small’ change the details service will run on a virtual machine inside our kubernetes cluster!</p>
+
+<p><strong>Note:</strong> it will take like 5 minutes for the application to by running inside the virtual machine because we install git and ruby, then clone the istio repo and start the application.</p>
+
+<h1 id="poc-details">POC details</h1>
+
+<p>Lets start with the bash script:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c">#!/bin/bash</span>
+
+<span class="nb">set</span> <span class="nt">-x</span>
+
+kubeadm init <span class="nt">--pod-network-cidr</span><span class="o">=</span>192.168.0.0/16
+
+<span class="nb">yes</span> | <span class="nb">cp</span> <span class="nt">-i</span> /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+
+kubectl apply <span class="nt">-f</span> https://docs.projectcalico.org/v3.0/getting-started/kubernetes/installation/hosted/kubeadm/1.7/calico.yaml
+
+<span class="k">while</span> <span class="o">[[</span> <span class="si">$(</span>kubectl get po <span class="nt">-n</span> kube-system | <span class="nb">grep </span>kube-dns | <span class="nb">grep </span>Running | <span class="nb">wc</span> <span class="nt">-l</span><span class="si">)</span> <span class="nt">-eq</span> 0 <span class="o">]]</span>
+<span class="k">do
+        </span><span class="nb">echo </span>Calico deployment is no ready yet.
+        <span class="nb">sleep </span>5
+<span class="k">done
+
+</span><span class="nb">echo </span>Calico is ready.
+
+<span class="nb">echo </span>Taint the master node.
+
+kubectl taint nodes <span class="nt">--all</span> node-role.kubernetes.io/master-
+
+<span class="nb">echo </span>Deploy kubevirt.
+
+kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.7.0/kubevirt.yaml
+
+<span class="nb">echo </span>Deploy istio.
+
+kubectl apply <span class="nt">-f</span> istio-demo-auth.yaml
+
+<span class="nb">echo </span>Add istio-injection to the default namespace.
+
+kubectl label namespace default istio-injection<span class="o">=</span>enabled
+
+<span class="k">while</span> <span class="o">[[</span> <span class="si">$(</span>kubectl get po <span class="nt">-n</span> istio-system | <span class="nb">grep </span>sidecar-injector | <span class="nb">grep </span>Running | <span class="nb">wc</span> <span class="nt">-l</span><span class="si">)</span> <span class="nt">-eq</span> 0 <span class="o">]]</span>
+<span class="k">do
+        </span><span class="nb">echo </span>Istio deployment is no ready yet.
+        <span class="nb">sleep </span>5
+<span class="k">done
+
+</span><span class="nb">echo </span>Istio is ready.
+
+<span class="nb">sleep </span>20
+
+<span class="nb">echo </span>Deploy the bookinfo example application
+
+kubectl apply <span class="nt">-f</span> bookinfo.yaml
+
+kubectl apply <span class="nt">-f</span> bookinfo-gateway.yaml
+</code></pre></div></div>
+
+<p>The follow script create a kubernetes cluster using the kubeadm command, deploy calico as a network CNI and taint the master node (have only one node in the cluster).</p>
+
+<p>After the cluster is up the script deploy both istio with mutual TLS and kubevirt projects, it also add the auto injection to the default namespace.</p>
+
+<p>At last the script deploy the bookinfo demo application that we change a bit.</p>
+
+<p>Lets take a closer look in the virtual machine part inside the bookinfo.yaml file</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c1">##################################################################################################</span>
+<span class="c1"># Details service</span>
+<span class="c1">##################################################################################################</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">details</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">details</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">details</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">special</span><span class="pi">:</span> <span class="s">vmi-details</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">details</span>
+    <span class="na">version</span><span class="pi">:</span> <span class="s">v1</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vmi-details</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+            <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">registrydisk</span>
+          <span class="na">volumeName</span><span class="pi">:</span> <span class="s">registryvolume</span>
+        <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+            <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">volumeName</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+      <span class="na">interfaces</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testSlirp</span>
+          <span class="na">slirp</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+              <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
+    <span class="na">machine</span><span class="pi">:</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+  <span class="na">networks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testSlirp</span>
+      <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">registryvolume</span>
+      <span class="na">registryDisk</span><span class="pi">:</span>
+        <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/fedora-cloud-registry-disk-demo:latest</span>
+    <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+        <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+          <span class="s">#!/bin/bash</span>
+          <span class="s">echo "fedora" |passwd fedora --stdin</span>
+          <span class="s">yum install git ruby -y</span>
+          <span class="s">git clone https://github.com/istio/istio.git</span>
+          <span class="s">cd istio/samples/bookinfo/src/details/</span>
+          <span class="s">ruby details.rb 9080 &amp;</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+<span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
+<span class="nn">---</span>
+<span class="s">..........</span>
+</code></pre></div></div>
+
+<h3 id="details">Details:</h3>
+
+<ul>
+  <li>Create a network of type pod</li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">networks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testSlirp</span>
+    <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Create an interface of type slirp and connect it to the pod network by matching the pod network name</li>
+  <li>Add our application port</li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">interfaces</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testSlirp</span>
+    <span class="na">slirp</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">ports</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+        <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
+</code></pre></div></div>
+
+<ul>
+  <li>Use the cloud init script to download install and run the details application</li>
+</ul>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+    <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+      <span class="s">#!/bin/bash</span>
+      <span class="s">echo "fedora" |passwd fedora --stdin</span>
+      <span class="s">yum install git ruby -y</span>
+      <span class="s">git clone https://github.com/istio/istio.git</span>
+      <span class="s">cd istio/samples/bookinfo/src/details/</span>
+      <span class="s">ruby details.rb 9080 &amp;</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+</code></pre></div></div>
+
+<h1 id="poc-check">POC Check</h1>
+
+<p>After running the bash script the environment should look like this</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                              READY     STATUS    RESTARTS   AGE
+productpage-v1-7bbdd59459-w6nwq   2/2       Running   0          1h
+ratings-v1-76dc7f6b9-6n6s9        2/2       Running   0          1h
+reviews-v1-64545d97b4-tvgl2       2/2       Running   0          1h
+reviews-v2-8cb9489c6-wjp9x        2/2       Running   0          1h
+reviews-v3-6bc884b456-hr5bm       2/2       Running   0          1h
+virt-launcher-vmi-details-94pb6   3/3       Running   0          1h
+</code></pre></div></div>
+
+<p>Let’s find the istio ingress service port</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># kubectl get service -n istio-system  | grep istio-ingressgateway
+istio-ingressgateway       LoadBalancer   10.97.163.91     &lt;pending&gt;     80:31380/TCP,443:31390/TCP,31400:31400/TCP                            3h
+</code></pre></div></div>
+
+<p>Then browse the following url</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://&lt;k8s-node-ip-address&gt;:&lt;istio-ingress-service-port-exposed-by-k8s&gt;/productpage
+</code></pre></div></div>
+
+<p>Example:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>http://10.0.0.1:31380/productpage
+</code></pre></div></div>
+
+<h1 id="conclusions">Conclusions</h1>
+
+<p>This POC show how we can use KubeVirt with Istio to integrate the Istio service mesh to virtual machine workloads running inside our kubernetes cluster.</p>
+:ET

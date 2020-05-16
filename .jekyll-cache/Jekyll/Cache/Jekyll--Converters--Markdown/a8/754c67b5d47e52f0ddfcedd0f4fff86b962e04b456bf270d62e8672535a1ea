@@ -1,0 +1,53 @@
+I"Q<div class="container">
+  <div class="row">
+    <h1 class="page-title">{{ page.title }}</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      {% if site.data.blogs_toc.toc[0] %}
+        {% for item in site.data.blogs_toc.toc %}
+          {% if item.subfolderitems[0] %}
+          <ul class="blogs-navigation">
+            <h3>{{ item.title }}</h3>
+            {% for entry in item.subfolderitems %}
+              <li class="blogs-navigation--item">
+                &lt;a href="{{ entry.url }}" {% if page.title == entry.page %} class="blogs-navigation--item_link active" {% else %} class="blogs-navigation--item_link" {% endif %}&gt;
+                  {{ entry.page }}
+                &lt;/a&gt;
+                {% if entry.subsubfolderitems[0] %}
+                    <ul class="blogs-navigation">
+                    {% for subentry in entry.subsubfolderitems %}
+                        <li class="blogs-navigation--item">
+                          &lt;a href="{{ subentry.url }}" {% if page.title == entry.page %} class="blogs-navigation--item_link active" {% else %} class="blogs-navigation--item_link" {% endif %}&gt;
+                            {{ subentry.page }}
+                          &lt;/a&gt;
+                        </li>
+                    {% endfor %}
+                    </ul>
+                  {% endif %}
+              </li>
+            {% endfor %}
+          </ul>
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    </div>
+    <div class="col-sm-12 col-md-9">
+      <ul class="posts">
+        {% for post in paginator.posts %}
+          <li>
+            <h2 class="posts-title"><a href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a></h2>
+            <div class="posts-date">{{ post.pub-date }}, {{ post.pub-year }}</div>
+            {{ post.description | strip_html | truncatewords:50 }}
+            {% capture readmorelink %}
+              {{ post.url | prepend: site.baseurl }}
+            {% endcapture %}
+            {% include readmore.html %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% include paging.html %}
+  </div>
+</div>
+:ET

@@ -1,0 +1,2 @@
+I"Í<p>Ensure that the <code class="highlighter-rouge">storageClassName</code> contains the name of the storage class you have created, in this case, <code class="highlighter-rouge">rook-ceph-block</code></p>
+:ET

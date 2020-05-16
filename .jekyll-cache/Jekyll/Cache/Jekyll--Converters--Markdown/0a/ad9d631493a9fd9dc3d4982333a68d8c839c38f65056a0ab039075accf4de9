@@ -1,0 +1,505 @@
+I"9<div class="container">
+  <div class="row">
+    <h1 class="page-title">Blogs</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      
+  <ul class="blogs-navigation">
+    <h3>Categories</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/news.html" class="blogs-navigation--item_link">
+          News
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/updates.html" class="blogs-navigation--item_link active">
+          Weekly Updates
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/releases.html" class="blogs-navigation--item_link">
+          Releases
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/uncategorized.html" class="blogs-navigation--item_link">
+          Uncategorized
+        </a>
+      </li>
+    
+  </ul>
+
+  <ul class="blogs-navigation">
+    <h3>Additional filters</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/date.html" class="blogs-navigation--item_link">
+          Grouped by Date
+        </a>
+      </li>
+    
+  </ul>
+
+
+    </div>
+    <div class="col-sm-12 col-md-9 blogs">
+      <ul class="posts">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-23.html">This Week In Kube Virt 23</a></h2>
+            <div class="posts-date">April 27, 2018</div>
+              This is a close-to weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-23.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-22.html">This Week In Kube Virt 22</a></h2>
+            <div class="posts-date">April 06, 2018</div>
+              This is a close-to weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-22.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-21.html">This Week In Kube Virt 21</a></h2>
+            <div class="posts-date">March 20, 2018</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-21.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-20.html">This Week In Kube Virt 20</a></h2>
+            <div class="posts-date">March 08, 2018</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-20.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-19.html">This Week In Kube Virt 19</a></h2>
+            <div class="posts-date">February 23, 2018</div>
+              This is a bi-weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-19.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-18.html">This Week In Kube Virt 18</a></h2>
+            <div class="posts-date">February 10, 2018</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-18.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-17.html">This Week In Kube Virt 17</a></h2>
+            <div class="posts-date">January 30, 2018</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-17.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-16-size-XL.html">This Week In Kube Virt 16 Size Xl</a></h2>
+            <div class="posts-date">January 19, 2018</div>
+              This is a weekly update from the KubeVirt team - including the holiday backlog update.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-16-size-XL.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html">This Week In Kube Virt 16 Holiday Wrap Up Edition</a></h2>
+            <div class="posts-date">January 19, 2018</div>
+              This is a weekly update from the KubeVirt team - including the holiday backlog update.
+              
+              <div class="readmore">
+    <a href="/2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-15.html">This Week In Kube Virt 15</a></h2>
+            <div class="posts-date">December 15, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-15.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-14.html">This Week In Kube Virt 14</a></h2>
+            <div class="posts-date">December 08, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-14.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-13.html">This Week In Kube Virt 13</a></h2>
+            <div class="posts-date">December 04, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-13.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-12.html">This Week In Kube Virt 12</a></h2>
+            <div class="posts-date">November 25, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-12.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-11.html">This Week In Kube Virt 11</a></h2>
+            <div class="posts-date">November 21, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-11.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-10-base-10.html">This Week In Kube Virt 10 Base 10</a></h2>
+            <div class="posts-date">November 10, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-10-base-10.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-9.html">This Week In Kube Virt 9</a></h2>
+            <div class="posts-date">November 06, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-9.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-8.html">This Week In Kube Virt 8</a></h2>
+            <div class="posts-date">October 28, 2017</div>
+              This is a weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-8.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-7.html">This Week In Kube Virt 7</a></h2>
+            <div class="posts-date">October 24, 2017</div>
+              This is the seventh weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-7.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-6.html">This Week In Kube Virt 6</a></h2>
+            <div class="posts-date">October 15, 2017</div>
+              This is the sixth weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-6.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-5.html">This Week In Kube Virt 5</a></h2>
+            <div class="posts-date">October 06, 2017</div>
+              This is the fith weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-5.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-4.html">This Week In Kube Virt 4</a></h2>
+            <div class="posts-date">September 29, 2017</div>
+              This is the fourth weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-4.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-3.html">This Week In Kube Virt 3</a></h2>
+            <div class="posts-date">September 22, 2017</div>
+              This is the third weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-3.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-2.html">This Week In Kube Virt 2</a></h2>
+            <div class="posts-date">September 15, 2017</div>
+              This is the second weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-2.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-1.html">This Week In Kube Virt 1</a></h2>
+            <div class="posts-date">September 08, 2017</div>
+              This is the first weekly update from the KubeVirt team.
+              
+              <div class="readmore">
+    <a href="/2017/This-Week-in-Kube-Virt-1.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+      </ul>
+    </div>
+  </div>
+</div>
+:ET

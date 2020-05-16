@@ -1,0 +1,2 @@
+I"‘<p>In the previous post, <a href="/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a> were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</p>
+:ET

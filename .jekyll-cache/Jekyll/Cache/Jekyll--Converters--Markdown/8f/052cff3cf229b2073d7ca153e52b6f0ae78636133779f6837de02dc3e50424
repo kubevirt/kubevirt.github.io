@@ -1,0 +1,75 @@
+I"Å
+<p>This is a weekly update from the KubeVirt team.</p>
+
+<p>We are currently driven by</p>
+
+<ul>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+  <li>
+    <p>Enabling people to contribute</p>
+  </li>
+  <li>
+    <p>Streamlining and improving the Kubernetes experience</p>
+  </li>
+</ul>
+
+<!-- more -->
+
+<p>This week we achieved to:</p>
+
+<ul>
+  <li>VM Grace period and shutdown improvements (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/526">https://github.com/kubevirt/kubevirt/pull/526</a>)</li>
+</ul>
+
+<p>On another side we were also successful in:</p>
+
+<ul>
+  <li>
+    <p>Initiating a Kubernetes WG Virtualization mainlinglist:
+<a href="https://groups.google.com/forum/#!forum/kubernetes-wg-virtualization">https://groups.google.com/forum/#!forum/kubernetes-wg-virtualization</a></p>
+  </li>
+  <li>
+    <p>Triggering a #virtualization slack channel in the Kubernetes org</p>
+  </li>
+</ul>
+
+<p>In addition to this, we are also working on quite a few things:</p>
+
+<ul>
+  <li>
+    <p>Serial console rework (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/613">https://github.com/kubevirt/kubevirt/pull/613</a>)</p>
+  </li>
+  <li>
+    <p>VM API Redesign (@rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/606">https://github.com/kubevirt/kubevirt/pull/606</a>)</p>
+  </li>
+  <li>
+    <p>Add OpenShift support (@karimb)
+(<a href="https://github.com/kubevirt/kubevirt/pull/608">https://github.com/kubevirt/kubevirt/pull/608</a>,
+<a href="https://github.com/kubevirt-incubator/kubevirt-ansible/pull/29">https://github.com/kubevirt-incubator/kubevirt-ansible/pull/29</a>)</p>
+  </li>
+  <li>
+    <p>Ansible Broker support (@gbenhaim)
+(<a href="https://github.com/kubevirt-incubator/kubevirt-ansible/pull/30">https://github.com/kubevirt-incubator/kubevirt-ansible/pull/30</a>)</p>
+  </li>
+  <li>
+    <p>Improve development builds (@petrkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/609">https://github.com/kubevirt/kubevirt/pull/609</a>) - Take a look at
+the pulse, to get an overview over all changes of this week:
+<a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
+  </li>
+</ul>
+
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
+
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
+
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>
+:ET

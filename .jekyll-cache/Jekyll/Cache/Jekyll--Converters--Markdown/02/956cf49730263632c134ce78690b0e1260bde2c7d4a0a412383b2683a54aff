@@ -1,0 +1,2 @@
+I"R<p>Kubernetes is traditionally used to deploy and manage containerized applications. Did you know Kubernetes can also be used to deploy and manage virtual machines? This guide will walk you through installing a Kubernetes environment backed by GlusterFS for storage and the KubeVirt add-on to enable deployment and management of VMs.</p>
+:ET

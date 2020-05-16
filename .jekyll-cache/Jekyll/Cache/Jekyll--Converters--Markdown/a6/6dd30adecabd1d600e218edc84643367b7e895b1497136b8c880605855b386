@@ -1,0 +1,2 @@
+I"µ<p>As it is detailed in the <a href="https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/">labels and annotations official documentation</a>, starting in v1.17, label <em>failure-domain.beta.kubernetes.io/region</em> and <em>failure-domain.beta.kubernetes.io/zone</em> are deprecated in favour of <strong>topology.kubernetes.io/region</strong> and <strong>topology kubernetes.io/zone respectively</strong>.</p>
+:ET

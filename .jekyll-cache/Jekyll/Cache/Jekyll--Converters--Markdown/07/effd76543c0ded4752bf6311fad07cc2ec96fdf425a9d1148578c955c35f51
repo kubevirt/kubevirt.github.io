@@ -1,0 +1,87 @@
+I"I<h1 id="use-kubevirt">Use KubeVirt</h1>
+
+<p>You can experiment this lab online at <a href="https://katacoda.com/kubevirt/scenarios/kubevirt-101"><img src="/assets/images/katacoda-logo.png" alt="Katacoda" /></a></p>
+
+<h3 id="create-a-virtual-machine">Create a Virtual Machine</h3>
+
+<p>Download the VM manifest and explore it. Note it uses a <a href="https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk">registry disk</a> and as such doesn’t persist data. Such registry disks currently exist for alpine, cirros and fedora.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+less vm.yaml
+</code></pre></div></div>
+
+<p>Apply the manifest to Kubernetes.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+virtualmachine.kubevirt.io <span class="s2">"testvm"</span> created
+  virtualmachineinstancepreset.kubevirt.io <span class="s2">"small"</span> created
+</code></pre></div></div>
+
+<h3 id="manage-virtual-machines-optional">Manage Virtual Machines (optional):</h3>
+
+<p>To get a list of existing Virtual Machines. Note the <code class="highlighter-rouge">running</code> status.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vms
+kubectl get vms -o yaml testvm
+</code></pre></div></div>
+
+<p>To start a Virtual Machine you can use:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl start testvm
+</code></pre></div></div>
+
+<p>If you installed virtctl via krew, you can use <code class="highlighter-rouge">kubectl virt</code>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Start the virtual machine:</span>
+kubectl virt start testvm
+
+<span class="c"># Stop the virtual machine:</span>
+kubectl virt stop testvm
+</code></pre></div></div>
+
+<p>Alternatively you could use <code class="highlighter-rouge">kubectl patch</code>:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Start the virtual machine:</span>
+kubectl patch virtualmachine myvm <span class="nt">--type</span> merge <span class="nt">-p</span> <span class="se">\</span>
+    <span class="s1">'{"spec":{"running":true}}'</span>
+
+<span class="c"># Stop the virtual machine:</span>
+kubectl patch virtualmachine myvm <span class="nt">--type</span> merge <span class="nt">-p</span> <span class="se">\</span>
+    <span class="s1">'{"spec":{"running":false}}'</span>
+</code></pre></div></div>
+
+<p>Now that the Virtual Machine has been started, check the status. Note the <code class="highlighter-rouge">running</code> status.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmis
+kubectl get vmis -o yaml testvm
+</code></pre></div></div>
+
+<h3 id="accessing-vms-serial-console">Accessing VMs (serial console)</h3>
+
+<p>Connect to the serial console of the Cirros VM. Hit return / enter a few times and login with the displayed username and password.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console testvm
+</code></pre></div></div>
+
+<p>Disconnect from the virtual machine console by typing: <code class="highlighter-rouge">ctrl+]</code>.</p>
+
+<h3 id="controlling-the-state-of-the-vm">Controlling the State of the VM</h3>
+
+<p>To shut it down:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl stop testvm
+</code></pre></div></div>
+
+<p>To delete a Virtual Machine:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete vm testvm
+</code></pre></div></div>
+
+<p>This concludes this section of the lab.</p>
+
+<p>You can watch how the laboratory is done in the following video:</p>
+
+<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/eQZPCeOs9-c" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<p><a href="/labs/kubernetes/lab2">Next Lab</a></p>
+:ET

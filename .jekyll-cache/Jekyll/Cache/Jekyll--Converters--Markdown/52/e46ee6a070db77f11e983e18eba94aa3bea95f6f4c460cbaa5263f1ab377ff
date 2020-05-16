@@ -1,0 +1,4 @@
+I"À<p>In this <a href="https://www.youtube.com/watch?v=Qejlyny0G58">video</a>, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes.
+Using NVIDIAâ€™s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some
+performance metrics comparing KubeVirt to standalone KVM.</p>
+:ET

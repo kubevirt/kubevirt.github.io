@@ -1,0 +1,2 @@
+I"¦<p>This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity">affinity and anti-affinity</a> rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</p>
+:ET

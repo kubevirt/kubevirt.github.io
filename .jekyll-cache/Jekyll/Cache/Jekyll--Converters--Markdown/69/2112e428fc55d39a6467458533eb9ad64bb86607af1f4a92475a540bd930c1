@@ -1,0 +1,204 @@
+I"�@<blockquote>
+  <p>The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. <a href="https://en.wikipedia.org/wiki/User_interface">Wikipedia:User Interface</a></p>
+</blockquote>
+
+<p>In this blogpost we show the results of a research about the different options existing in the market to enable KubeVirt with a user interface to manage, access and control the life cycle of the Virtual Machines inside Kubernetes with KubeVirt.</p>
+
+<p>The different UI options available for KubeVirt that we have been checking, at the moment of writing this article, are the following:</p>
+
+<ul>
+  <li><a href="https://github.com/vmware-tanzu/octant">Octant</a></li>
+  <li><a href="https://github.com/openshift/okd">OKD: The Origin Community Distribution of Kubernetes</a></li>
+  <li><a href="https://github.com/openshift/console">OpenShift console</a> running on vanilla Kubernetes</li>
+  <li><a href="https://cockpit-project.org/">Cockpit</a></li>
+  <li><a href="https://novnc.com/info.html">noVNC</a></li>
+</ul>
+
+<h2 id="octant">Octant</h2>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/octant-logo.png" alt="Octant logo" /></p>
+
+<p>As the <a href="https://octant.dev/">Octant webpage</a> claims:</p>
+
+<blockquote>
+  <p>Octant is an open-source developer-centric web interface for Kubernetes that lets you inspect a Kubernetes cluster and its applications. Octant is a tool for developers to understand how applications run on a Kubernetes cluster. It aims to be part of the developer’s toolkit for gaining insight and approaching complexity found in Kubernetes. Octant offers a combination of introspective tooling, cluster navigation, and object management along with a plugin system to further extend its capabilities.</p>
+</blockquote>
+
+<p>Some of the key features of this tool can be checked in their <a href="https://octant.dev/docs/master/">latest release notes</a>:</p>
+
+<ul>
+  <li><strong>Resource Viewer</strong>: Graphically visualize relationships between objects in a Kubernetes cluster. The status of individual objects is represented by colour to show workload performance.</li>
+  <li><strong>Summary View</strong>: Consolidated status and configuration information in a single page aggregated from output typically found using multiple kubectl commands.</li>
+  <li><strong>Port Forward</strong>: Forward a local port to a running pod with a single button for debugging applications and even port forward multiple pods across namespaces.</li>
+  <li><strong>Log Stream</strong>: View log streams of pod and container activity for troubleshooting or monitoring without holding multiple terminals open.</li>
+  <li><strong>Label Filter</strong>: Organize workloads with label filtering for inspecting clusters with a high volume of objects in a namespace.</li>
+  <li><strong>Cluster Navigation</strong>: Easily change between namespaces or contexts across different clusters. Multiple kubeconfig files are also supported.</li>
+  <li><strong>Plugin System</strong>: Highly extensible plugin system for users to provide additional functionality through gRPC. Plugin authors can add components on top of existing views.</li>
+</ul>
+
+<p>We installed it and found out that:</p>
+
+<ul>
+  <li>Octant provides a very basic dashboard for Kubernetes and it is pretty straightforward to install. It can be installed in your laptop or in a remote server.</li>
+  <li>Regular Kubernetes objects can be seen from the UI. Pod logs can be checked as well. However, mostly everything is in view mode, even the YAML description of the objects. Therefore, as a developer or cluster operator you cannot edit YAML files directly from the UI</li>
+  <li>Custom resources (CRs) and custom resource definitions (CRDs) are automatically detected and shown in the UI. This means that KubeVirt CRs can be viewed from the dashboard. However, VirtualMachines and VirtualMachineInstances cannot be modified from Octant, they can only be deleted.</li>
+  <li>There is an option to extend the functionality adding <a href="https://octant.dev/docs/master/plugins/reference/">plugins</a> to the dashboard.</li>
+  <li>No specific options to manage KubeVirt workloads have been found.</li>
+</ul>
+
+<video autoplay="" loop="" muted="" playsinline="" src="/assets/2019-12-19-KubeVirt_UI_options/octant.mp4" type="video/mp4" width="1280" height="720"></video>
+
+<p>With further work and investigation, it could be an option to develop a specific plugin to enable remote console or VNC access to KubeVirt workloads.</p>
+
+<h2 id="okd-the-origin-community-distribution-of-kubernetes">OKD: The Origin Community Distribution of Kubernetes</h2>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png" alt="OKD logo" /></p>
+
+<p>As defined in the <a href="https://www.okd.io/">official webpage</a>:</p>
+
+<blockquote>
+  <p>OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.</p>
+</blockquote>
+
+<blockquote>
+  <p>OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.</p>
+</blockquote>
+
+<p>A few weeks ago Kubernetes distribution <a href="https://github.com/openshift/okd">OKD4</a> was released as preview. OKD is the official upstream version of Red Hat’s OpenShift. Since OpenShift includes KubeVirt (Red Hat calls it <a href="https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html">CNV</a>) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.</p>
+
+<p>Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with OpenShift. We have noticed that from the UI a user can:</p>
+
+<ul>
+  <li>Install the KubeVirt operator from the operator marketplace.</li>
+  <li>Create Virtual Machines by importing YAML files or following a wizard. The wizard prevents you from moving to the next screen until you provide values in the required fields.</li>
+  <li>Modify the status of the Virtual Machine: stop, start, migrate, clone, edit label, edit annotations, edit CD-ROMs and delete</li>
+  <li>Edit network interfaces. It is possible to add multiple network interfaces to the VM.</li>
+  <li>Add disks to the VM</li>
+  <li>Connect to the VM via serial or VNC console.</li>
+  <li>Edit the YAML object files online.</li>
+  <li>Create VM templates. The web console features an interactive wizard that guides you through the Basic Settings, Networking, and Storage screens to simplify the process of creating virtual machine templates.</li>
+  <li>Check VM events in real time.</li>
+  <li>Gather metrics and utilization of the VM.</li>
+  <li>Pretty much everything you can do with KubeVirt from the command line.</li>
+</ul>
+
+<video autoplay="" loop="" muted="" playsinline="" src="/assets/2019-12-19-KubeVirt_UI_options/okd.mp4" type="video/mp4" width="1280" height="720"></video>
+
+<p>One of the drawbacks is that the current <a href="https://operatorhub.io/operator/kubevirt">KubeVirt HCO operator</a> contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest <a href="https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo">Fedora cloud container disk image</a> and instead we were forced to use the one tagged as v0.18.1 which matches the version of KubeVirt deployed.</p>
+
+<p>If for any reason there is a need to deploy the latest version, it can be done by running the following script which applies directly the HCO operator: <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">unreleased bundles using the hco without marketplace</a>. Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.</p>
+
+<h2 id="openshift-console-bridge">OpenShift console (bridge)</h2>
+
+<p>There is actually a <a href="https://github.com/kubevirt/web-ui">KubeVirt Web User Interface</a>, however the standalone project was deprecated in favor of OpenShift Console where it is included as a plugin.</p>
+
+<p>As we reviewed previously the <a href="https://github.com/openshift/console">OpenShift web console</a> is just another piece inside OKD. It is an independent part and, as it is stated in their official GitHub repository, it can run on top of native Kubernetes. OpenShift Console a.k.a bridge is defined as:</p>
+
+<blockquote>
+  <p>a friendly kubectl in the form of a single page web application. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:</p>
+</blockquote>
+
+<ul>
+  <li>Proxying the Kubernetes API under /api/kubernetes</li>
+  <li>Providing additional non-Kubernetes APIs for interacting with the cluster</li>
+  <li>Serving all frontend static assets</li>
+  <li>User Authentication</li>
+</ul>
+
+<p>Then, as briefly explained in their <a href="https://github.com/openshift/console#native-kubernetes">repository</a>, our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar to the ones found in the OKD installation except:</p>
+
+<ul>
+  <li>KubeVirt installation is done using the <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">Hyperconverged Cluster Operator (HCO) without OLM or Marketplace</a> instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically</li>
+  <li>Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.</li>
+  <li>Connection to the VM via serial or VNC console is flaky.</li>
+  <li>VM templates can only be created from YAML. The wizard dialog is based on OpenShift templates.</li>
+</ul>
+
+<video autoplay="" loop="" muted="" playsinline="" src="/assets/2019-12-19-KubeVirt_UI_options/bridge-k8s.mp4" type="video/mp4" width="1280" height="720"></video>
+
+<p>Note that the OpenShift console documentation briefly points out how to integrate the OpenShift console with a native Kubernetes deployment. It is uncertain if it can be installed in any other Kubernetes cluster.</p>
+
+<h2 id="cockpit">Cockpit</h2>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit-logo.png" alt="Cockpit logo" /></p>
+
+<p>When testing cockpit in a CentOS 7 server with a Kubernetes cluster and KubeVirt we have realised that some of the containers/k8s features have to be enabled installing extra cockpit packages:</p>
+
+<ul>
+  <li>To see the containers and images the package <code class="highlighter-rouge">cockpit-docker</code> has to be installed, then a new option called containers appears in the menu.</li>
+</ul>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_containers_800.png" alt="Containers" title="cockpit containers" /></p>
+
+<ul>
+  <li>
+    <p>To see the k8s cluster the package <code class="highlighter-rouge">cockpit-kubernetes</code> has to be installed and a new tab appears in the left menu. The new options allow you to:</p>
+
+    <ul>
+      <li><strong>Overview</strong>: filtering by project, it shows Pods, volumes, Nodes, services and resources used.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_cluster_overview_800.png" alt="Cluster overview" title="cockpit cluster overview" /></p>
+
+<ul>
+  <li><strong>Nodes</strong>: nodes and the resources used are being shown here.</li>
+  <li><strong>Containers</strong>: a full list of containers and some metadata about them is displayed in this option.</li>
+  <li><strong>Topology</strong>: A graph with the pods, services and nodes is shown in this option.</li>
+</ul>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_topology_800.png" alt="Cluster topology" title="cockpit cluster topology" /></p>
+
+<ul>
+  <li><strong>Details</strong>: allows to filter by project and type of resource and shows some metadata in the results.</li>
+  <li><strong>Volumes</strong>: allows to filter by project and shows the volumes with the type and the status.</li>
+</ul>
+
+<p>In CentOS 7 there are also the following packages:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">cockpit-machines.x86_64</code> : Cockpit user interface for virtual machines. If “virt-install” is installed, you can also create new virtual machines.
+It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.</li>
+  <li><code class="highlighter-rouge">cockpit-machines-ovirt.noarch</code> : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.</li>
+</ul>
+
+<p>At the moment none of the cockpit complements has support for KubeVirt Virtual Machine.</p>
+
+<p>KubeVirt support for cockpit was <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1629608">removed from fedora 29</a></p>
+
+<h2 id="novnc">noVNC</h2>
+
+<p>noVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas.
+It just allows you to connect through VNC to the virtual Machine already deployed in KubeVirt.</p>
+
+<p>No VM management or even a dashboard is enabled with this option, it’s a pure DIY code that can embed the VNC access to the VM into HTML in any application or webpage.
+There is a <a href="/2019/Access-Virtual-Machines-graphic-console-using-noVNC.html">noVNC blogpost</a> detailing how to install noVNC.</p>
+
+<p>In this animation you can see the feature of connecting to the Virtual Machine with noVNC:
+<img src="/assets/2019-12-19-KubeVirt_UI_options/virtvnc.gif" alt="noVNC" title="noVNC" /></p>
+
+<h2 id="summary">Summary</h2>
+
+<p>From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a powerful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.</p>
+
+<p>OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.</p>
+
+<p>On the other hand, noVNC provides a lightweight interface to simply connect to the console of your virtual machine.</p>
+
+<p>Octant, although it does not have any specific integration with KubeVirt, looks like a promising Kubernetes user interface that could be extended to manage our KubeVirt instances in the future.</p>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list</p>
+
+
+</div></div>
+<h2 id="references">References:</h2>
+
+<ul>
+  <li><a href="https://octant.dev">Octant</a></li>
+  <li><a href="https://www.okd.io/">OKD</a></li>
+  <li><a href="https://github.com/openshift/origin-web-console">OKD Console</a></li>
+  <li><a href="https://cockpit-project.org/">Cockpit</a></li>
+  <li><a href="https://github.com/wavezhang/virtVNC/">virtVNC, noVNC for Kubevirt</a></li>
+</ul>
+:ET

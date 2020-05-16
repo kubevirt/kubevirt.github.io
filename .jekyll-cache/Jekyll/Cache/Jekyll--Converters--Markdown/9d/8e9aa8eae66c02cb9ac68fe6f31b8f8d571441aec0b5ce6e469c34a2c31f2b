@@ -1,0 +1,242 @@
+I"º
+<div class="container">
+  <div class="row">
+    <h1 class="page-title">Blogs</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      
+  <ul class="blogs-navigation">
+    <h3>Categories</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/news.html" class="blogs-navigation--item_link">
+          News
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/updates.html" class="blogs-navigation--item_link">
+          Weekly Updates
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/releases.html" class="blogs-navigation--item_link">
+          Releases
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/uncategorized.html" class="blogs-navigation--item_link">
+          Uncategorized
+        </a>
+      </li>
+    
+  </ul>
+
+  <ul class="blogs-navigation">
+    <h3>Additional filters</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/date.html" class="blogs-navigation--item_link">
+          Grouped by Date
+        </a>
+      </li>
+    
+  </ul>
+
+
+    </div>
+    <div class="col-sm-12 col-md-9 blogs">
+      <ul class="posts">
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+      </ul>
+    </div>
+  </div>
+</div>
+:ET

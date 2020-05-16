@@ -1,0 +1,35 @@
+I"‘<p>In this video, we are showing the step by step of the <a href="/labs/kubernetes/lab3">KubeVirt Laboratory 3: Upgrades</a></p>
+
+<h2 id="pre-requisites">Pre-requisites</h2>
+
+<p>In the video, there is a Kubernetes cluster already running. Also, the <code class="highlighter-rouge">virtctl</code> command is already installed and available in the PATH.</p>
+
+<h2 id="video">Video</h2>
+
+<iframe width="560" height="315" style="height: 315px" src="https://www.youtube.com/embed/OAPzOvqp0is" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<h2 id="operations">Operations</h2>
+
+<p>The following operations are shown in the video:</p>
+
+<ul>
+  <li>Install a specific version of the KubeVirt Operator and Custom Resource</li>
+  <li>Create a cirros Virtual Machine running in KubeVirt</li>
+  <li>Connect to the Virtual Machine using SSH</li>
+  <li>Upgrade to a specific version of KubeVirt while the Virtual Machine is running</li>
+  <li>Check the new KubeVirt version</li>
+</ul>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="/labs/kubernetes/lab3">Kubevirt Laboratory 3: Upgrades</a></li>
+  <li><a href="/2019/KubeVirt_lab2_experiment_with_cdi.html">Kubevirt Laboratory 2 blogpost: Experimenting with CDI</a></li>
+  <li><a href="/labs/kubernetes/lab2">Kubevirt Laboratory 2: Experimenting with CDI</a></li>
+  <li><a href="/2019/KubeVirt_lab1_use_kubevirt.html">Kubevirt Laboratory 1 blogpost: Use Kubevirt</a></li>
+  <li><a href="/labs/kubernetes/lab1">Kubevirt Laboratory 1: Use KubeVirt</a></li>
+  <li><a href="https://www.youtube.com/watch?v=KC03G60shIc">KubeVirt basic operations video on youtube</a></li>
+  <li><a href="https://kubevirt.io/user-guide/#/installation/installation">Kubevirt installation notes</a></li>
+  <li><a href="https://www.katacoda.com/kubevirt/scenarios/kubevirt-101">First steps with KubeVirt - Katacoda scenario</a></li>
+</ul>
+:ET

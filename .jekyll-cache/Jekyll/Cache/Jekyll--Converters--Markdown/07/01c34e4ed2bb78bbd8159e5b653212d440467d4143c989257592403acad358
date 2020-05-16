@@ -1,0 +1,165 @@
+I"�<p>Access to KubeVirt resources are controlled entirely by Kubernete’s Resource
+Based Access Control (RBAC) system. This system allows KubeVirt to tie directly
+into the existing authentication and authorization mechanisms Kubernetes
+already provides to its core api objects.</p>
+
+<h2 id="kubevirt-rbac-role-basics">KubeVirt RBAC Role Basics</h2>
+
+<p>Typically, when people think of Kubernetes RBAC system, they’re thinking about
+granting users access to create/delete kubernetes objects (like Pods,
+deployments, etc), however those same RBAC mechanisms work naturally with
+KubeVirt objects as well.</p>
+
+<p>When we look at KubeVirt’s objects, we can see they are structured just like
+the objects that come predefined in the Kubernetes core.</p>
+
+<p>For example, look here’s an example of a VirtualMachine spec.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha1
+kind: VirtualMachine
+metadata:
+  name: vm-ephemeral
+spec:
+  domain:
+    devices:
+      disks:
+      - disk:
+          bus: virtio
+        name: registrydisk
+        volumeName: registryvolume
+    resources:
+      requests:
+        memory: 64M
+  volumes:
+  - name: registryvolume
+    registryDisk:
+      image: kubevirt/cirros-registry-disk-demo:devel
+</code></pre></div></div>
+
+<p>In the spec above, we see the KubeVirt VirtualMachine object has an <em>apiVersion</em>
+field and a <em>kind</em> field just like a Pod spec does. The <strong>kubevirt.io</strong> portion
+of the apiVersion field represents KubeVirt apiGroup the resource is a part of.
+The <strong>kind</strong> field reflects the resource type.</p>
+
+<p>Using that information, we can create an RBAC role that gives a user permission
+to create, delete, and view all VirtualMachine objects.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: vm-access
+  labels:
+    kubevirt.io: ""
+rules:
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+    verbs:
+      - get
+      - delete
+      - create
+      - update
+      - patch
+      - list
+      - watch
+</code></pre></div></div>
+
+<p>This same logic can be applied when creating RBAC roles for other KubeVirt
+objects as well. If we wanted to extend this RBAC role to grant similar
+permissions for VirtualMachinePreset objects, we’d just have to add a second
+resource kubevirt.io resource list. The result would look like this.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: vm-access
+  labels:
+    kubevirt.io: ""
+rules:
+  - apiGroups:
+      - kubevirt.io
+    resources:
+      - virtualmachines
+      - virtualmachinepresets
+    verbs:
+      - get
+      - delete
+      - create
+      - update
+      - patch
+      - list
+      - watch
+</code></pre></div></div>
+
+<h2 id="kubevirt-subresource-rbac-roles">KubeVirt Subresource RBAC Roles</h2>
+
+<p>Access to a VirtualMachines’s VNC and console stream using KubeVirt’s
+<strong>virtctl</strong> tool is managed by the Kubernetes RBAC system as well. Permissions
+for these resources work slightly different than the other KubeVirt objects
+though.</p>
+
+<p>Console and VNC access is performed using the KubeVirt Stream API, which has
+its own api group called <strong>subresources.kubevirt.io</strong>. Below is an example of
+how to create a role that grants access to the VNC and console streams APIs.</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: vm-vnc-access
+  labels:
+    kubevirt.io: ""
+rules:
+  - apiGroups:
+      - subresources.kubevirt.io
+    resources:
+      - virtualmachines/console
+      - virtualmachines/vnc
+    verbs:
+      - get
+</code></pre></div></div>
+
+<h2 id="limiting-rbac-to-a-single-namespace">Limiting RBAC To a Single Namespace.</h2>
+
+<p>A ClusterRole can be bound to a user in two different ways.</p>
+
+<p>When a ClusterRoleBinding is used, a user is permitted access to all resources
+defined in the ClusterRole across all namespaces in the cluster.</p>
+
+<p>When a RoleBinding is used, a user is limited to accessing only the resources
+defined in the ClusterRole within the namespace RoleBinding exists in.</p>
+
+<h2 id="limiting-rbac-to-a-single-resource">Limiting RBAC To a Single Resource.</h2>
+
+<p>A user can also be limit to accessing only a single resource within a resource
+type. Below is an example that only grants VNC access to the VirtualMachine
+named ‘bobs-vm’</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+kind: ClusterRole
+metadata:
+  name: vm-vnc-access
+  labels:
+    kubevirt.io: ""
+rules:
+  - apiGroups:
+      - subresources.kubevirt.io
+    resources:
+      - virtualmachines/console
+      - virtualmachines/vnc
+    resourceName:
+      - bobs-vm
+    verbs:
+      - get
+</code></pre></div></div>
+
+<h2 id="default-kubevirt-rbac-roles">Default KubeVirt RBAC Roles</h2>
+
+<p>The next release of KubeVirt is coming with three default ClusterRoles that
+admins can use to grant users access to KubeVirt resources. In most cases,
+these roles will prevent admins from ever having to create their own custom
+KubeVirt RBAC roles.</p>
+
+<p>More information about these default roles can be found in the KubeVirt
+user guide <a href="https://www.kubevirt.io/user-guide/#/authorization">here</a></p>
+:ET

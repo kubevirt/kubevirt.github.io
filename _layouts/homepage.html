@@ -12,7 +12,10 @@
         <div class="row align-items-center justify-content-center">
           <div class="col align-self-center">
             <h1 class="hero-overlay-text">Building a virtualization API for Kubernetes</h1>
-            <p class="text-white">Virtual Machine Management on Kubernetes</p>
+            <a id="demo-video" href="#" video-url="https://youtu.be/uusM5SyK-vc" class="btn kv-btn kv-btn-primary hero-overlay__action">
+              Watch our intro video
+              <svg width="20px" height="20px" enable-background="new 0 0 142.448 142.448" viewBox="0 0 142.448 142.448" xmlns="http://www.w3.org/2000/svg"><g fill="#006166"><path d="m142.411 68.9c-1.195-37.42-31.443-67.667-68.862-68.862-20.361-.646-39.41 7.104-53.488 21.639-13.534 13.973-20.645 32.394-20.023 51.872 1.194 37.419 31.442 67.667 68.861 68.861.779.025 1.551.037 2.325.037 19.454 0 37.624-7.698 51.163-21.676 13.534-13.972 20.646-32.394 20.024-51.871zm-30.798 41.436c-10.688 11.035-25.032 17.112-40.389 17.112-.614 0-1.228-.01-1.847-.029-29.532-.943-53.404-24.815-54.348-54.348-.491-15.382 5.122-29.928 15.806-40.958 10.688-11.035 25.032-17.112 40.389-17.112.614 0 1.228.01 1.847.029 29.532.943 53.404 24.815 54.348 54.348.491 15.382-5.123 29.928-15.806 40.958z"/><path d="m94.585 67.086-31.584-22.646c-3.369-2.416-8.059-.008-8.059 4.138v45.293c0 4.146 4.69 6.554 8.059 4.138l31.583-22.647c2.834-2.031 2.834-6.244.001-8.276z"/></g></svg>
+            </a>
           </div>
         </div>
         <div class="row align-items-center justify-content-center">
@@ -79,11 +82,15 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
     <script src="{{ site.baseurl }}/js/kubevirt-io.js"></script>
+    <script src="{{ site.baseurl }}/js/video.popup.js"></script>
     <script type="text/javascript">
         if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
             _satellite.pageBottom();
         }
+        $("#demo-video").videoPopup();
+
     </script>
+    
   </body>
 
 </html>

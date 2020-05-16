@@ -1,0 +1,2 @@
+I"%<p>In this blog post we are going to talk about istio and virtual machines on top of Kubernetes. Some of the components we are going to use are <a href="https://istio.io/docs/concepts/what-is-istio/overview/">istio</a>, <a href="https://libvirt.org/index.html">libvirt</a>, <a href="http://ebtables.netfilter.org/">ebtables</a>, <a href="https://en.wikipedia.org/wiki/Iptables">iptables</a>, and <a href="https://github.com/LiamHaworth/go-tproxy">tproxy</a>. Please review the links provided for an overview and deeper dive into each technology</p>
+:ET

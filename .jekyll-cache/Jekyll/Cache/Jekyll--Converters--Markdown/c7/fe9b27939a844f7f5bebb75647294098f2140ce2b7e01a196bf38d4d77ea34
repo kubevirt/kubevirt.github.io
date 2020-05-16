@@ -1,0 +1,824 @@
+I"±x<div class="container">
+  <div class="row">
+    <h1 class="page-title">Blogs</h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      
+  <ul class="blogs-navigation">
+    <h3>Categories</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/news.html" class="blogs-navigation--item_link active">
+          News
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/updates.html" class="blogs-navigation--item_link">
+          Weekly Updates
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/releases.html" class="blogs-navigation--item_link">
+          Releases
+        </a>
+      </li>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/uncategorized.html" class="blogs-navigation--item_link">
+          Uncategorized
+        </a>
+      </li>
+    
+  </ul>
+
+  <ul class="blogs-navigation">
+    <h3>Additional filters</h3>
+    
+      <li class="blogs-navigation--item">
+        <a href="/blogs/date.html" class="blogs-navigation--item_link">
+          Grouped by Date
+        </a>
+      </li>
+    
+  </ul>
+
+
+    </div>
+    <div class="col-sm-12 col-md-9 blogs">
+      <ul class="posts">
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-VM-Image-Usage-Patterns.html">KubeVirt VM Image Usage Patterns</a></h2>
+            <div class="posts-date">May 12, 2020</div>
+              This blog post outlines methods for building and using virtual machine images with KubeVirt
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt-VM-Image-Usage-Patterns.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-Operation-Fundamentals.html">KubeVirt Operation Fundamentals</a></h2>
+            <div class="posts-date">April 30, 2020</div>
+              This blog post outlines fundamentals around the KubeVirt's approach to installs and updates.
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt-Operation-Fundamentals.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-Security-Fundamentals.html">KubeVirt Security Fundamentals</a></h2>
+            <div class="posts-date">April 29, 2020</div>
+              This blog post outlines fundamentals around the KubeVirt's approach to security.
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt-Security-Fundamentals.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-Architecture-Fundamentals.html">KubeVirt Architecture Fundamentals</a></h2>
+            <div class="posts-date">April 28, 2020</div>
+              This blog post outlines the core set of design decisions that shaped KubeVirt into what it is today.
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt-Architecture-Fundamentals.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/Advanced-scheduling-with-affinity-rules.html">Advanced scheduling using affinity and anti-affinity rules</a></h2>
+            <div class="posts-date">February 25, 2020</div>
+              KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to  virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.
+              
+              <div class="readmore">
+    <a href="/2020/Advanced-scheduling-with-affinity-rules.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">KubeVirt: installing Microsoft Windows from an ISO</a></h2>
+            <div class="posts-date">February, 14, 2020</div>
+              In this blogpost a Virtual Machine is created to install Microsoft Windows in KubeVirt from an ISO following the traditional way.
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA</a></h2>
+            <div class="posts-date">February, 06, 2019</div>
+              In this blogpost, we talk about the presentation that David Vossel and Vishesh Tanksale did at the KubeCon 2019 in North America. The talk is called KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt and they go through from a KubeVirt introduction until a complex architecture with NVIDIA GPU devices...
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</a></h2>
+            <div class="posts-date">February, 01, 2019</div>
+              KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp; Chandrakanth Jakkidi
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/OKD-web-console-install.html">Managing KubeVirt with OpenShift Web Console</a></h2>
+            <div class="posts-date">January 24, 2020</div>
+              This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface
+              
+              <div class="readmore">
+    <a href="/2020/OKD-web-console-install.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2020/KubeVirt_lab3_upgrade.html">KubeVirt Laboratory 3, upgrades</a></h2>
+            <div class="posts-date">January, 21, 2020</div>
+              In this video, we are showing the step by step of the KubeVirt Laboratory 3 how to upgrade KubeVirt
+              
+              <div class="readmore">
+    <a href="/2020/KubeVirt_lab3_upgrade.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a></h2>
+            <div class="posts-date">December, 2019</div>
+              Overview of different user interface options to manage KubeVirt
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_UI_options.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_lab2_experiment_with_cdi.html">KubeVirt Laboratory 2, experimenting with CDI</a></h2>
+            <div class="posts-date">December 10, 2019</div>
+              In this video, we are showing the step by step of the KubeVirt Laboratory 2 Experimenting with CDI
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_lab2_experiment_with_cdi.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_lab1_use_kubevirt.html">KubeVirt Laboratory 1, use KubeVirt</a></h2>
+            <div class="posts-date">December 4, 2019</div>
+              In this video, we are showing the step by step of the KubeVirt Laboratory 1 Use KubeVirt
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_lab1_use_kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_basic_operations_video.html">KubeVirt basic operations video</a></h2>
+            <div class="posts-date">November 28, 2019</div>
+              KubeVirt basic operations video
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_basic_operations_video.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt.html">Jenkins Infra upgrade</a></h2>
+            <div class="posts-date">November 22, 2019</div>
+              Jenkins CI server upgrade and jobs for KubeVirt labs and image creation refresh
+              
+              <div class="readmore">
+    <a href="/2019/jenkins-ci-server-upgrade-and-jobs-for-kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/kubecon-na-2019.html">KubeVirt at KubeCon + CloudNativeCon North America</a></h2>
+            <div class="posts-date">November 12, 2019</div>
+              A summary of KubeVirt related activities during KubeCon + CloudNativeCon North America 2019 in San Diego
+              
+              <div class="readmore">
+    <a href="/2019/kubecon-na-2019.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/Access-Virtual-Machines-graphic-console-using-noVNC.html">Access Virtual Machines' graphic console using noVNC</a></h2>
+            <div class="posts-date">November 11, 2019</div>
+              Demonstrate how to access virtual machines' graphic console using noVNC.
+              
+              <div class="readmore">
+    <a href="/2019/Access-Virtual-Machines-graphic-console-using-noVNC.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/prow-jobs-for-kubevirt.html">Prow jobs for KubeVirt website and Tutorial repo</a></h2>
+            <div class="posts-date">October 31, 2019</div>
+              How prow is used to keep website and tutorials 'up'
+              
+              <div class="readmore">
+    <a href="/2019/prow-jobs-for-kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/jenkins-jobs-for-kubevirt-lab-validation.html">Jenkins Jobs for KubeVirt lab validation</a></h2>
+            <div class="posts-date">October 31, 2019</div>
+              How Jenkins is leveraged for automation at KubeVirt Cloud Image Builder and Lab Validation
+              
+              <div class="readmore">
+    <a href="/2019/jenkins-jobs-for-kubevirt-lab-validation.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_storage_rook_ceph.html">Persistent storage of your Virtual Machines in KubeVirt with Rook</a></h2>
+            <div class="posts-date">October, 2019</div>
+              Persistent storage of your Virtual Machines in KubeVirt with Rook
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_storage_rook_ceph.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_k8s_crio_from_scratch_installing_KubeVirt.html">KubeVirt on Kubernetes with CRI-O from scratch - Installing KubeVirt</a></h2>
+            <div class="posts-date">October 23, 2019</div>
+              How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide - Installing KubeVirt
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_k8s_crio_from_scratch_installing_KubeVirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_k8s_crio_from_scratch_installing_kubernetes.html">KubeVirt on Kubernetes with CRI-O from scratch - Installing Kubernetes</a></h2>
+            <div class="posts-date">October 16, 2019</div>
+              How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide - Installing Kubernetes
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_k8s_crio_from_scratch_installing_kubernetes.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt_k8s_crio_from_scratch.html">KubeVirt on Kubernetes with CRI-O from scratch</a></h2>
+            <div class="posts-date">October, 2019</div>
+              How to setup a home lab environment with Kubernetes, CRI-O and KubeVirt step by step guide
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt_k8s_crio_from_scratch.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/CNCF-Sandbox.html">KubeVirt is now part of CNCF Sandbox</a></h2>
+            <div class="posts-date">September, 2019</div>
+              KubeVirt has been approved as a project in the sandbox
+              
+              <div class="readmore">
+    <a href="/2019/CNCF-Sandbox.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/Kubevirt-CR-Condition-Types-Rename-Now-ACTIVE.html">KubeVirt Condition Types Renamed</a></h2>
+            <div class="posts-date">Aug 9, 2019</div>
+              Condition Types have been RENAMED
+              
+              <div class="readmore">
+    <a href="/2019/Kubevirt-CR-Condition-Types-Rename-Now-ACTIVE.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/KubeVirt-CR-Condition-Types-Rename.html">KubeVirt Condition Types Rename in Custom Resource</a></h2>
+            <div class="posts-date">Aug 1, 2019</div>
+              KubeVirt is renaming Condition Types in next release
+              
+              <div class="readmore">
+    <a href="/2019/KubeVirt-CR-Condition-Types-Rename.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/NodeDrain-KubeVirt.html">Node Drain in KubeVirt</a></h2>
+            <div class="posts-date">Jul 30, 2019</div>
+              Evicting VM's using Node Drain Functionality
+              
+              <div class="readmore">
+    <a href="/2019/NodeDrain-KubeVirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/How-To-Import-VM-into-Kubevirt.html">How to import VM into KubeVirt</a></h2>
+            <div class="posts-date">Jul 29, 2019</div>
+              Import a VM into the Kubernetes Platform using CDI
+              
+              <div class="readmore">
+    <a href="/2019/How-To-Import-VM-into-Kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/website-roadmap.html">Website roadmap</a></h2>
+            <div class="posts-date">8 Jul, 2019</div>
+              List of identified things that might need an improvement
+              
+              <div class="readmore">
+    <a href="/2019/website-roadmap.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/kubevirt-with-ansible-part-2.html">KubeVirt with Ansible, part 2</a></h2>
+            <div class="posts-date">8 Jul, 2019</div>
+              A deeper dive into Ansible 2.8's KubeVirt features
+              
+              <div class="readmore">
+    <a href="/2019/kubevirt-with-ansible-part-2.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/Kubevirt-vagrant-provider.html">KubeVirt vagrant provider</a></h2>
+            <div class="posts-date">June 4, 2019</div>
+              The post describes how to use kubevirt vagrant provider
+              
+              <div class="readmore">
+    <a href="/2019/Kubevirt-vagrant-provider.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/kubevirt-with-ansible-part-1.html">KubeVirt with Ansible, part 1 â€“ Introduction</a></h2>
+            <div class="posts-date">May 21, 2019</div>
+              With the release of Ansible 2.8 comes a new set of KubeVirt modules
+              
+              <div class="readmore">
+    <a href="/2019/kubevirt-with-ansible-part-1.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/Hyper-Converged-Operator.html">Hyper Converged Operator</a></h2>
+            <div class="posts-date">May 08, 2019</div>
+              Hyper Converged Operator on OCP 4 and K8s(HCO)
+              
+              <div class="readmore">
+    <a href="/2019/Hyper-Converged-Operator.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/More-about-Kubevirt-metrics.html">More About Kubevirt Metrics</a></h2>
+            <div class="posts-date">Mar 14, 2019</div>
+              A status update about KubeVirt metrics
+              
+              <div class="readmore">
+    <a href="/2019/More-about-Kubevirt-metrics.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/federated-kubevirt.html">Federated Kubevirt</a></h2>
+            <div class="posts-date">Feb 22, 2019</div>
+              Federated KubeVirt
+              
+              <div class="readmore">
+    <a href="/2019/federated-kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2019/An-overview-to-KubeVirt-metrics.html">An Overview To Kubevirt Metrics</a></h2>
+            <div class="posts-date">Jan 22, 2019</div>
+              An overview to KubeVirt metrics
+              
+              <div class="readmore">
+    <a href="/2019/An-overview-to-KubeVirt-metrics.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/kubevirt-autolatest.html">Kubevirt Autolatest</a></h2>
+            <div class="posts-date">Dec 13, 2018</div>
+              KubeVirt Autodeployer
+              
+              <div class="readmore">
+    <a href="/2018/kubevirt-autolatest.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/kubevirt-at-kubecon-na.html">Kubevirt At Kubecon Na</a></h2>
+            <div class="posts-date">November 26, 2018</div>
+              KubeVirt at KubeCon North America 2019
+              
+              <div class="readmore">
+    <a href="/2018/kubevirt-at-kubecon-na.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/ignition-support.html">Ignition Support</a></h2>
+            <div class="posts-date">November 20, 2018</div>
+              Ignition Support
+              
+              <div class="readmore">
+    <a href="/2018/ignition-support.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/new-volume-types.html">New Volume Types</a></h2>
+            <div class="posts-date">November 16, 2018</div>
+              New Volume Types - ConfigMap, Secret and ServiceAccount
+              
+              <div class="readmore">
+    <a href="/2018/new-volume-types.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/CDI-DataVolumes.html">Cdi Datavolumes</a></h2>
+            <div class="posts-date">October 11, 2018</div>
+              CDI DataVolumes
+              
+              <div class="readmore">
+    <a href="/2018/CDI-DataVolumes.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/containerized-data-importer.html">Containerized Data Importer</a></h2>
+            <div class="posts-date">October 09, 2018</div>
+              This post describes how to import, clone and upload a Virtual Machine disk image to kubernetes cluster.
+              
+              <div class="readmore">
+    <a href="/2018/containerized-data-importer.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/KubeVirt-Network-Rehash.html">Kubevirt Network Rehash</a></h2>
+            <div class="posts-date">October 11, 2018</div>
+              Quick rehash of the network deep-dive
+              
+              <div class="readmore">
+    <a href="/2018/KubeVirt-Network-Rehash.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/attaching-to-multiple-networks.html">Attaching To Multiple Networks</a></h2>
+            <div class="posts-date">September 12, 2018</div>
+              This post describes how to connect a Virtual Machine to more than one network using the Multus CNI.
+              
+              <div class="readmore">
+    <a href="/2018/attaching-to-multiple-networks.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/KubeVirt-Memory-Overcommit.html">Kubevirt Memory Overcommit</a></h2>
+            <div class="posts-date">Sept 11, 2018</div>
+              KubeVirt Memory Overcommitment
+              
+              <div class="readmore">
+    <a href="/2018/KubeVirt-Memory-Overcommit.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/kubevirtci.html">Kubevirtci</a></h2>
+            <div class="posts-date">August 8, 2018</div>
+              This post tries to give a quick overview of kubevirtci and why we use it to build our testing clusters.
+              
+              <div class="readmore">
+    <a href="/2018/kubevirtci.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/Kubevirt-v0.7.0.html">Kubevirt V0.7.0</a></h2>
+            <div class="posts-date">July 23, 2018</div>
+              KubeVirt 0.7.0 Highlights
+              
+              <div class="readmore">
+    <a href="/2018/Kubevirt-v0.7.0.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/Unit-Test-Howto.html">Unit Test Howto</a></h2>
+            <div class="posts-date">July 3, 2018</div>
+              This post tries to demystify some of our unit test mechanism, hopefully will make it easier to write more tests and increase our code coverage!
+              
+              <div class="readmore">
+    <a href="/2018/Unit-Test-Howto.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/Run-Istio-with-kubevirt.html">Run Istio With Kubevirt</a></h2>
+            <div class="posts-date">June 21, 2018</div>
+              Use Istio with KubeVirt
+              
+              <div class="readmore">
+    <a href="/2018/Run-Istio-with-kubevirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/KVM-Using-Device-Plugins.html">Kvm Using Device Plugins</a></h2>
+            <div class="posts-date">June 20, 2018</div>
+              KubeVirt Using Device Plugins For KVM
+              
+              <div class="readmore">
+    <a href="/2018/KVM-Using-Device-Plugins.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2018/Some-notes-on-some-highlights-of-v020.html">Some Notes On Some Highlights Of V020</a></h2>
+            <div class="posts-date">January 05, 2018</div>
+              The very first KubeVirt release of KubeVirt in the new year () had a few notable highlights which were brewing over the last few weeks.
+              
+              <div class="readmore">
+    <a href="/2018/Some-notes-on-some-highlights-of-v020.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/technology-comparison.html">Comparing KubeVirt to other technologies</a></h2>
+            <div class="posts-date">July, 18, 2017</div>
+              In this blogpost, we discuss on the technology provided by KubeVirt and how it stands against other technologies available
+              
+              <div class="readmore">
+    <a href="/2017/technology-comparison.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+        
+          <li>
+            <h2 class="posts-title"><a href="/2017/role-of-libvirt.html">The Role of LibVirt</a></h2>
+            <div class="posts-date">July, 18, 2017</div>
+              In this blogpost, we discuss on libvirt role in KubeVirt
+              
+              <div class="readmore">
+    <a href="/2017/role-of-libvirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
+</div>
+
+          </li>
+        
+      
+      </ul>
+    </div>
+  </div>
+</div>
+:ET

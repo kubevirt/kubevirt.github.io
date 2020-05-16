@@ -1,0 +1,2 @@
+I"Ù<p><code class="highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "4"</code> could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>
+:ET

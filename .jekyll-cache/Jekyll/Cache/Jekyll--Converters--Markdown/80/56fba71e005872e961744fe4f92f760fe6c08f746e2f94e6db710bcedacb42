@@ -1,0 +1,259 @@
+I"M<h2 id="introduction">Introduction</h2>
+
+<p>Kubernetes has become the new way to orchestrate the containers and to handle the microservices, but what if I already have applications running on my old VM’s in my datacenter ? Can those apps ever be made k8s friendly ? Well, if that is the use-case for you, then we have a solution with KubeVirt!</p>
+
+<p>In this blog post we will show you how to deploy a VM as a yaml template and the required steps on how to import it as a <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">PVC</a> onto your kubernetes environment using the CDI and KubeVirt add-ons.</p>
+
+<p><strong>Assumptions:</strong></p>
+
+<ul>
+  <li>
+    <p>A basic understanding of the k8s architecture: In its simplest terms Kubernetes is a portable, extensible open-source platform for managing containerized workloads and services, that facilitates both declarative configuration and automation. It has a large, rapidly growing ecosystem. Kubernetes services, support, and tools are widely available. For complete details check <a href="https://www.aquasec.com/wiki/display/containers/Kubernetes+Architecture+101">Kubernetes-architecture</a></p>
+  </li>
+  <li>
+    <p>User is familiar with the concept of a <a href="https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/virtualization_deployment_and_administration_guide/sect-guest_virtual_machine_installation_overview-creating_guests_with_virt_install">Libvirt based VM</a></p>
+  </li>
+  <li>
+    <p>PersistentVolume (PV) is a piece of storage in the cluster that has been provisioned by an administrator. Feel free to check more on <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">Persistent Volume(PV)</a>.</p>
+  </li>
+  <li>
+    <p>Persistent Volume Claim (PVC) is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources. Feel free to check more on <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims">Persistent Volume Claim(PVC)</a>.</p>
+  </li>
+  <li>
+    <p>User is familiar with the concept of <a href="https://github.com/kubevirt/kubevirt/blob/master/docs/architecture.md">KubeVirt-architecture</a> and <a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design">CDI-architecture</a></p>
+  </li>
+  <li>
+    <p>User has already installed KubeVirt in an available K8s environment, if not please follow the link <a href="https://kubevirt.io/user-guide/#/installation/installation?id=installation">Installing KubeVirt</a> to further proceed.</p>
+  </li>
+  <li>
+    <p>User is already familiar with VM operation with Kubernetes, for a refresher on how to use ‘Virtual Machines’ in Kubernetes, please do check <a href="/labs/kubernetes/lab1">LAB 1</a> before proceeding.</p>
+  </li>
+</ul>
+
+<h2 id="creating-virtual-machines-from-local-images-with-cdi-and-virtctl">Creating Virtual Machines from local images with CDI and virtctl</h2>
+
+<p>The <a href="https://github.com/kubevirt/containerized-data-importer">Containerized Data Importer (CDI)</a> project provides facilities for enabling Persistent Volume Claims (PVCs) to be used as disks for KubeVirt VMs. The three main CDI use cases are:</p>
+
+<ul>
+  <li>Import a disk image from a URL to a PVC (HTTP/S3)</li>
+  <li>Clone an existing PVC</li>
+  <li>Upload a local disk image to a PVC</li>
+</ul>
+
+<p>This document covers the third use case and covers the HTTP based import use case at the end of this post.</p>
+
+<p><strong>NOTE</strong>: You should have CDI installed in your cluster, a VM disk that you’d like to upload, and virtctl in your path</p>
+
+<p>Please follow the instructions for the <a href="https://github.com/kubevirt/containerized-data-importer">installation of CDI</a> (v1.9.0 as of this writing)</p>
+
+<p><strong>Expose cdi-uploadproxy service:</strong></p>
+
+<p>The cdi-uploadproxy service must be accessible from outside the cluster. Here are some ways to do that:</p>
+
+<ul>
+  <li><a href="https://kubernetes.io/docs/concepts/services-networking/service/#nodeport">NodePort Service</a></li>
+  <li><a href="https://kubernetes.io/docs/concepts/services-networking/ingress/">Ingress</a></li>
+  <li><a href="https://docs.openshift.com/container-platform/3.9/architecture/networking/routes.html">Route</a></li>
+</ul>
+
+<p>We can take a look at example manifests <a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md">here</a></p>
+
+<p>The supported image formats are:</p>
+
+<ul>
+  <li><code class="highlighter-rouge">.img</code></li>
+  <li><code class="highlighter-rouge">.iso</code></li>
+  <li><code class="highlighter-rouge">.qcow2</code></li>
+  <li>Compressed (<code class="highlighter-rouge">.tar</code>, <code class="highlighter-rouge">.gz</code> or <code class="highlighter-rouge">.xz</code>) of the above formats.</li>
+</ul>
+
+<p>We will use <a href="http://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img">this image</a> from <a href="https://launchpad.net/cirros">CirrOS Project</a> (in <code class="highlighter-rouge">.img</code> format)</p>
+
+<p>We can use <code class="highlighter-rouge">virtctl</code> command for uploading the image as shown below:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl image-upload <span class="nt">--help</span>
+Upload a VM image to a PersistentVolumeClaim.
+
+Usage:
+  virtctl image-upload <span class="o">[</span>flags]
+
+Examples:
+  <span class="c"># Upload a local disk image to a newly created PersistentVolumeClaim:</span>
+    virtctl image-upload <span class="nt">--uploadproxy-url</span><span class="o">=</span>https://cdi-uploadproxy.mycluster.com <span class="nt">--pvc-name</span><span class="o">=</span>upload-pvc <span class="nt">--pvc-size</span><span class="o">=</span>10Gi <span class="nt">--image-path</span><span class="o">=</span>/images/fedora28.qcow2
+
+Flags:
+      <span class="nt">--access-mode</span> string       The access mode <span class="k">for </span>the PVC. <span class="o">(</span>default <span class="s2">"ReadWriteOnce"</span><span class="o">)</span>
+  <span class="nt">-h</span>, <span class="nt">--help</span>                     <span class="nb">help </span><span class="k">for </span>image-upload
+      <span class="nt">--image-path</span> string        Path to the <span class="nb">local </span>VM image.
+      <span class="nt">--insecure</span>                 Allow insecure server connections when using HTTPS.
+      <span class="nt">--no-create</span>                Don<span class="s1">'t attempt to create a new PVC.
+      --pvc-name string          The destination PVC.
+      --pvc-size string          The size of the PVC to create (ex. 10Gi, 500Mi).
+      --storage-class string     The storage class for the PVC.
+      --uploadproxy-url string   The URL of the cdi-upload proxy service.
+      --wait-secs uint           Seconds to wait for upload pod to start. (default 60)
+
+Use "virtctl options" for a list of global command-line options (applies to all commands).
+</span></code></pre></div></div>
+
+<h3 id="creation-of-virtualmachineinstance-from-a-pvc">Creation of VirtualMachineInstance from a PVC</h3>
+
+<p>Here, <code class="highlighter-rouge">virtctl image-upload</code> works by creating a PVC of the requested size, sending an <code class="highlighter-rouge">UploadTokenRequest</code> to the <code class="highlighter-rouge">cdi-apiserver</code>, and uploading the file to the <code class="highlighter-rouge">cdi-uploadproxy</code>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl image-upload <span class="nt">--pvc-name</span><span class="o">=</span>cirros-vm-disk <span class="nt">--pvc-size</span><span class="o">=</span>500Mi <span class="nt">--image-path</span><span class="o">=</span>/home/shegde/images/cirros-0.4.0-x86_64-disk.img <span class="nt">--uploadproxy-url</span><span class="o">=</span>&lt;url to upload proxy service&gt;
+</code></pre></div></div>
+
+<p>The data inside are ephemeral meaning is lost when the VM restarts, in order to prevent that, and provide a persistent data storage, we use PVC (<code class="highlighter-rouge">persistentVolumeClaim</code>) which allows connecting a PersistentVolumeClaim to a VM disk.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachineInstance
+metadata:
+  name: cirros-vm
+spec:
+  domain:
+    devices:
+      disks:
+      - disk:
+          bus: virtio
+        name: pvcdisk
+    machine:
+      type: ""
+    resources:
+      requests:
+        memory: 64M
+  terminationGracePeriodSeconds: 0
+  volumes:
+  - name: pvcdisk
+    persistentVolumeClaim:
+      claimName: cirros-vm-disk
+status: {}
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>A <code class="highlighter-rouge">PersistentVolume</code> can be in <code class="highlighter-rouge">filesystem</code> or <code class="highlighter-rouge">block</code> mode:</p>
+
+<ul>
+  <li>
+    <p><code class="highlighter-rouge">Filesystem</code>: For KubeVirt to be able to consume the disk present on a PersistentVolume’s filesystem, the disk must be named <code class="highlighter-rouge">disk.img</code> and be placed in the root path of the filesystem. Currently the disk is also required to be in <code class="highlighter-rouge">raw</code> format.</p>
+
+    <p><strong>Important</strong>: The <code class="highlighter-rouge">disk.img</code> image file needs to be owned by the user-id <code class="highlighter-rouge">107</code> in order to avoid permission issues. Additionally, if the <code class="highlighter-rouge">disk.img</code> image file has not been created manually before starting a VM then it will be created automatically with the PersistentVolumeClaim size. Since not every storage provisioner provides volumes with the exact usable amount of space as requested (e.g. due to filesystem overhead), KubeVirt tolerates up to 10% less available space. This can be configured with the <code class="highlighter-rouge">pvc-tolerate-less-space-up-to-percent</code> value in the <code class="highlighter-rouge">kubevirt-config</code> ConfigMap.</p>
+  </li>
+  <li>
+    <p><code class="highlighter-rouge">Block</code>: Use a block volume for consuming raw block devices. To do that, <code class="highlighter-rouge">BlockVolume</code> feature gate must be enabled.</p>
+  </li>
+</ul>
+
+<p>A simple example which attaches a PersistentVolumeClaim as a disk may look like this:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">testvmi-pvc</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">mypvcdisk</span>
+          <span class="na">lun</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">mypvcdisk</span>
+      <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+        <span class="na">claimName</span><span class="pi">:</span> <span class="s">mypvc</span>
+</code></pre></div></div>
+
+<h3 id="creation-with-a-datavolume">Creation with a DataVolume</h3>
+
+<p>DataVolumes are a way to automate importing virtual machine disks onto pvc’s during the virtual machine’s launch flow. Without using a DataVolume, users have to prepare a pvc with a disk image before assigning it to a VM or VMI manifest. With a DataVolume, both the pvc creation and import is automated on behalf of the user.</p>
+
+<h4 id="datavolume-vm-behavior">DataVolume VM Behavior</h4>
+
+<p>DataVolumes can be defined in the VM spec directly by adding the DataVolumes to the dataVolumeTemplates list. Below is an example.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm-alpine-datavolume</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-alpine-datavolume</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm-alpine-datavolume</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">64M</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span> <span class="c1">#Note the type is dataVolume</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">alpine-dv</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">datavolumedisk1</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span> <span class="c1"># Automatically a PVC of size 2Gi is created</span>
+    <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">alpine-dv</span>
+      <span class="na">spec</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">accessModes</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+          <span class="na">resources</span><span class="pi">:</span>
+            <span class="na">requests</span><span class="pi">:</span>
+              <span class="na">storage</span><span class="pi">:</span> <span class="s">2Gi</span>
+        <span class="na">source</span><span class="pi">:</span> <span class="c1">#This is the source where the ISO file resides</span>
+          <span class="na">http</span><span class="pi">:</span>
+            <span class="na">url</span><span class="pi">:</span> <span class="s">http://cdi-http-import-server.kubevirt/images/alpine.iso</span>
+</code></pre></div></div>
+
+<p>From the above manifest the two main sections that needs an attention are <strong><code class="highlighter-rouge">source</code></strong> and <strong><code class="highlighter-rouge">pvc</code></strong>.</p>
+
+<p>The <code class="highlighter-rouge">source</code> part declares that there is a disk image living on an http server that we want to use as a volume for this VM. The <code class="highlighter-rouge">pvc</code> part declares the spec that should be used to create the pvc that hosts the source data.</p>
+
+<p>When this VM manifest is posted to the cluster, as part of the launch flow a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.</p>
+
+<h4 id="a-few-caveats-to-be-considered-before-using-datavolumes">A few caveats to be considered before using DataVolumes</h4>
+
+<p>From the above manifest the two main sections that needs an attention are <code class="highlighter-rouge">source</code> and <code class="highlighter-rouge">pvc</code>.</p>
+
+<p>The <code class="highlighter-rouge">source</code> part declares that there is a disk image living on an http server that we want to use as a volume for this VM. The <code class="highlighter-rouge">pvc</code> part declares the spec that should be used to create the pvc that hosts the source data.</p>
+
+<p>When this VM manifest is posted to the cluster as part of the launch flow, a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.</p>
+
+<p>A DataVolume is a custom resource provided by the Containerized Data Importer (CDI) project. KubeVirt integrates with CDI in order to provide users a workflow for dynamically creating pvcs and importing data into those pvcs.</p>
+
+<p>In order to take advantage of the <code class="highlighter-rouge">DataVolume</code> volume source on a VM or VMI, the DataVolumes feature gate must be enabled in the <code class="highlighter-rouge">kubevirt-config</code> config map before KubeVirt is installed. CDI must also be installed(follow the steps as mentioned above).</p>
+
+<h4 id="enabling-the-datavolumes-feature-gate">Enabling the DataVolumes feature gate</h4>
+
+<p>Below is an example of how to enable DataVolume support using the kubevirt-config config map.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kubevirt-config
+  namespace: kubevirt
+  labels:
+    kubevirt.io: ""
+data:
+  feature-gates: "DataVolumes"
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>This config map assumes KubeVirt will be installed in the KubeVirt namespace. Change the namespace to suit your installation.</p>
+
+<p>First post the configmap above, then install KubeVirt. At that point DataVolume integration will be enabled.</p>
+
+<h2 id="wrap-up">Wrap-up</h2>
+
+<p>As demonstrated, VM can be imported as a k8s object using a CDI project along with KubeVirt. For more detailed insights, please feel free to follow the <a href="https://kubevirt.io/">KubeVirt project</a>.</p>
+:ET

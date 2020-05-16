@@ -1,0 +1,2 @@
+I"Q<p>Kubernetes versions prior to 1.12 contain a bug that might report operations that didn’t really do anything as having changed things. If your second (and third, etc.) run of <code class="highlighter-rouge">01_vm1_running.yaml</code> keep reporting <code class="highlighter-rouge">changed=1</code>, this might be the reason why.</p>
+:ET

@@ -1,0 +1,5 @@
+I"<p>Access to KubeVirt resources are controlled entirely by Kubernete’s Resource
+Based Access Control (RBAC) system. This system allows KubeVirt to tie directly
+into the existing authentication and authorization mechanisms Kubernetes
+already provides to its core api objects.</p>
+:ET

@@ -1,0 +1,2 @@
+I"Ï<p>When deploying ingress-nginx using the provided Service definition the <code class="highlighter-rouge">nodePort</code> is undefined. Kubernetes will assign a random port to ports defined in the spec.</p>
+:ET

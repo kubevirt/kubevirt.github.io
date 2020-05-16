@@ -1,0 +1,260 @@
+I"�I<h1 id="cdi-datavolumes">CDI DataVolumes</h1>
+
+<p>Containerized Data Importer (or CDI for short), is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.</p>
+
+<h2 id="what-it-does">What it does</h2>
+
+<p>DataVolumes are an abstraction of the Kubernetes resource, PVC (Persistent Volume Claim) and it also leverages other CDI features to ease the process of importing data into a Kubernetes cluster.</p>
+
+<p>DataVolumes can be defined by themselves or embedded within a VirtualMachine resource definition, the first method can be used to orchestrate events based on the DataVolume status phases while the second eases the process of providing storage for a VM.</p>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>In this blog post, I’d like to focus on the second method, embedding the information within a VirtualMachine definition, which might seem like the most immediate benefit of this feature. Let’s get started!</p>
+
+<h3 id="environment-description">Environment description</h3>
+
+<ul>
+  <li>
+    <p><strong>OpenShift</strong></p>
+
+    <p>For testing DataVolumes, I’ve spawned a new OpenShift cluster, using dynamic provisioning for storage running OpenShift Cloud Storage (GlusterFS), so the Persistent Volumes (PVs for short) are created on-demand. Other than that, it’s a regular OpenShift cluster, running with a single master (also used for infrastructure components) and two compute nodes.</p>
+  </li>
+  <li>
+    <p><strong>CDI</strong></p>
+
+    <p>We also need CDI, of course, CDI can be deployed either together with KubeVirt or independently, the instructions can be found in the project’s <a href="https://github.com/kubevirt/containerized-data-importer">GitHub repo</a>.</p>
+  </li>
+  <li>
+    <p><strong>KubeVirt</strong></p>
+
+    <p>Last but not least, we’ll need KubeVirt to run the VMs that will make use of the DataVolumes.</p>
+  </li>
+</ul>
+
+<h3 id="enabling-datavolumes-feature">Enabling DataVolumes feature</h3>
+
+<p>As of this writing, DataVolumes have to be enabled through a <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/">feature gate</a>, for KubeVirt, this is achieved by creating the <em>kubevirt-config</em> ConfigMap on the namespace where KubeVirt has been deployed, by default <em>kube-system</em>.</p>
+
+<p>Let’s create the ConfigMap with the following definition:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">feature-gates</span><span class="pi">:</span> <span class="s">DataVolumes</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create <span class="nt">-f</span> kubevirt-config-cm.yml
+</code></pre></div></div>
+
+<p>Alternatively, the following one-liner can also be used to achieve the same result:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create configmap kubevirt-config <span class="nt">--from-literal</span> feature-gates<span class="o">=</span>DataVolumes <span class="nt">-n</span> kube-system
+</code></pre></div></div>
+
+<p>If the ConfigMap was already present on the system, just use <code class="highlighter-rouge">oc edit</code> to add the DataVolumes feature gate under the <em>data</em> field like the YAML above.</p>
+
+<p>If everything went as expected, we should see the following log lines on the <em>virt-controller</em> pods:</p>
+
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 component=virt-controller msg="DataVolume integration enabled"
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE</strong>: It’s worth noting the values in the ConfigMap are not dynamic, in the sense that <em>virt-controller</em> and <em>virt-api</em> will need to be <em>restarted</em>, scaling their deployments down and back up again, just remember to scale it up to the same number of replicas they previously had.</p>
+</blockquote>
+
+<h2 id="creating-a-virtualmachine-embedding-a-datavolume">Creating a VirtualMachine embedding a DataVolume</h2>
+
+<p>Now that the cluster is ready to use the feature, let’s have a look at our VirtualMachine definition, which includes a DataVolume.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">testvm1</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">testvm1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">centos7-dv</span>
+      <span class="na">spec</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">accessModes</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+          <span class="na">resources</span><span class="pi">:</span>
+            <span class="na">requests</span><span class="pi">:</span>
+              <span class="na">storage</span><span class="pi">:</span> <span class="s">10Gi</span>
+        <span class="na">source</span><span class="pi">:</span>
+          <span class="na">http</span><span class="pi">:</span>
+            <span class="na">url</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">testvm1</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">cpu</span><span class="pi">:</span>
+          <span class="na">cores</span><span class="pi">:</span> <span class="m">1</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">volumeName</span><span class="pi">:</span> <span class="s">test-datavolume</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">disk0</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">volumeName</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+              <span class="na">cdrom</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">8Gi</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">centos7-dv</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">test-datavolume</span>
+        <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">hostname: testvm1</span>
+              <span class="s">users:</span>
+                <span class="s">- name: kubevirt</span>
+                  <span class="s">gecos: KubeVirt Project</span>
+                  <span class="s">sudo: ALL=(ALL) NOPASSWD:ALL</span>
+                  <span class="s">passwd: $6$JXbc3063IJir.e5h$ypMlYScNMlUtvQ8Il1ldZi/mat7wXTiRioGx6TQmJjTVMandKqr.jJfe99.QckyfH/JJ.OdvLb5/OrCa8ftLr.</span>
+                  <span class="s">shell: /bin/bash</span>
+                  <span class="s">home: /home/kubevirt</span>
+                  <span class="s">lock_passwd: false</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+</code></pre></div></div>
+
+<p>The new addition to a regular VirtualMachine definition is the <em>dataVolumeTemplates</em> block, which will trigger the import of the CentOS-7 cloud image defined on the <em>url</em> field, storing it on a PV, the resulting DataVolume will be named <em>centos7-dv</em>, being referenced on the <em>volumes</em> section, it will serve as the boot disk (disk0) for our VirtualMachine.</p>
+
+<p>Going ahead and applying the above manifest to our cluster results in the following set of events:</p>
+
+<ul>
+  <li>The DataVolume is created, triggering the creation of a PVC and therefore, using the dynamic provisioning configured on the cluster, a PV is provisioned to satisfy the needs of the PVC.</li>
+  <li>An importer pod is started, this pod is the one actually downloading the image defined in the <em>url</em> field and storing it on the provisioned PV.</li>
+  <li>Once the image has been downloaded and stored, the DataVolume status changes to <em>Succeeded</em>, from that point the virt launcher controller will go ahead and schedule the VirtualMachine.</li>
+</ul>
+
+<p>Taking a look to the resources created after applying the VirtualMachine manifest, we can see the following:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc get pods
+NAME                          READY     STATUS      RESTARTS   AGE
+importer-centos7-dv-t9zx2     0/1       Completed   0          11m
+virt-launcher-testvm1-cpt8n   1/1       Running     0          8m
+</code></pre></div></div>
+
+<p>Let’s look at the importer pod logs to understand what it did:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc logs importer-centos7-dv-t9zx2
+I1009 12:37:45.384032       1 importer.go:32] Starting importer
+I1009 12:37:45.393461       1 importer.go:37] begin import process
+I1009 12:37:45.393519       1 dataStream.go:235] copying <span class="s2">"https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"</span> to <span class="s2">"/data/disk.img"</span>...
+I1009 12:37:45.393569       1 dataStream.go:112] IMPORTER_ACCESS_KEY_ID and/or IMPORTER_SECRET_KEY are empty
+I1009 12:37:45.393606       1 dataStream.go:298] create the initial Reader based on the endpoint<span class="s1">'s "https" scheme
+I1009 12:37:45.393665       1 dataStream.go:208] Attempting to get object "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2" via http client
+I1009 12:37:45.762330       1 dataStream.go:314] constructReaders: checking compression and archive formats: /centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+I1009 12:37:45.841564       1 dataStream.go:323] found header of type "qcow2"
+I1009 12:37:45.841618       1 dataStream.go:338] constructReaders: no headers found for file "/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
+I1009 12:37:45.841635       1 dataStream.go:340] done processing "/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2" headers
+I1009 12:37:45.841650       1 dataStream.go:138] NewDataStream: endpoint "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"'</span>s computed byte size: 8589934592
+I1009 12:37:45.841698       1 dataStream.go:566] Validating qcow2 file
+I1009 12:37:46.848736       1 dataStream.go:572] Doing streaming qcow2 to raw conversion
+I1009 12:40:07.546308       1 importer.go:43] import <span class="nb">complete</span>
+</code></pre></div></div>
+
+<p>So, following the events we see, it fetched the image from the defined <em>url</em>, validated its format and converted it to <em>raw</em> for being used by <em>qemu</em>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc describe dv centos7-dv
+Name:         centos7-dv
+Namespace:    test-dv
+Labels:       kubevirt.io/created-by<span class="o">=</span>1916da5f-cbc0-11e8-b467-c81f666533c3
+Annotations:  kubevirt.io/owned-by<span class="o">=</span>virt-controller
+API Version:  cdi.kubevirt.io/v1alpha1
+Kind:         DataVolume
+Metadata:
+  Creation Timestamp:  2018-10-09T12:37:34Z
+  Generation:          1
+  Owner References:
+    API Version:           kubevirt.io/v1alpha2
+    Block Owner Deletion:  <span class="nb">true
+    </span>Controller:            <span class="nb">true
+    </span>Kind:                  VirtualMachine
+    Name:                  testvm1
+    UID:                   1916da5f-cbc0-11e8-b467-c81f666533c3
+  Resource Version:        2474310
+  Self Link:               /apis/cdi.kubevirt.io/v1alpha1/namespaces/test-dv/datavolumes/centos7-dv
+  UID:                     19186b29-cbc0-11e8-b467-c81f666533c3
+Spec:
+  Pvc:
+    Access Modes:
+      ReadWriteOnce
+    Resources:
+      Requests:
+        Storage:  10Gi
+  Source:
+    Http:
+      URL:  https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+Status:
+  Phase:  Succeeded
+Events:
+  Type    Reason  Age                 From                   Message
+  <span class="nt">----</span>    <span class="nt">------</span>  <span class="nt">----</span>                <span class="nt">----</span>                   <span class="nt">-------</span>
+  Normal  Synced  29s <span class="o">(</span>x13 over 14m<span class="o">)</span>  datavolume-controller  DataVolume synced successfully
+  Normal  Synced  18s                 datavolume-controller  DataVolume synced successfully
+</code></pre></div></div>
+
+<p>The DataVolume description matches what was defined under <em>dataVolumeTemplates</em>. Now, as we know it uses a PV/PVC underneath, let’s have a look:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc describe pvc centos7-dv
+Name:          centos7-dv
+Namespace:     test-dv
+StorageClass:  glusterfs-storage
+Status:        Bound
+Volume:        pvc-191d27c6-cbc0-11e8-b467-c81f666533c3
+Labels:        <span class="nv">app</span><span class="o">=</span>containerized-data-importer
+               cdi-controller<span class="o">=</span>centos7-dv
+Annotations:   cdi.kubevirt.io/storage.import.endpoint<span class="o">=</span>https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+               cdi.kubevirt.io/storage.import.importPodName<span class="o">=</span>importer-centos7-dv-t9zx2
+               cdi.kubevirt.io/storage.pod.phase<span class="o">=</span>Succeeded
+               pv.kubernetes.io/bind-completed<span class="o">=</span><span class="nb">yes
+               </span>pv.kubernetes.io/bound-by-controller<span class="o">=</span><span class="nb">yes
+               </span>volume.beta.kubernetes.io/storage-provisioner<span class="o">=</span>kubernetes.io/glusterfs
+Finalizers:    <span class="o">[</span>kubernetes.io/pvc-protection]
+Capacity:      10Gi
+Access Modes:  RWO
+Events:
+  Type    Reason                 Age   From                         Message
+  <span class="nt">----</span>    <span class="nt">------</span>                 <span class="nt">----</span>  <span class="nt">----</span>                         <span class="nt">-------</span>
+  Normal  ProvisioningSucceeded  18m   persistentvolume-controller  Successfully provisioned volume pvc-191d27c6-cbc0-11e8-b467-c81f666533c3 using kubernetes.io/glusterfs
+</code></pre></div></div>
+
+<p>It’s important to pay attention to the annotations, these are monitored/set by CDI. CDI triggers an import when it detects the <em>cdi.kubevirt.io/storage.import.endpoint</em>, assigns a pod as the import task owner and updates the pod phase annotation.</p>
+
+<p>At this point, everything is in place, the DataVolume has its underlying components, the image has been imported so now the VirtualMachine can start the VirtualMachineInstance based on its definition and using the CentOS7 image as boot disk, as users we can connect to its console as usual, for instance running the following command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl console testvm1
+</code></pre></div></div>
+
+<h2 id="cleaning-it-up">Cleaning it up</h2>
+
+<p>Once we’re happy with the results, it’s time to clean up all these tests. The task is easy:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc delete vm testvm1
+</code></pre></div></div>
+
+<p>Once the VM (and its associated VMI) are gone, all the underlying storage resources are removed, there is no trace of the PVC, PV or DataVolume.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc get dv centos7-dv
+<span class="nv">$ </span>oc get pvc centos7-dv
+<span class="nv">$ </span>oc get pv pvc-191d27c6-cbc0-11e8-b467-c81f666533c3
+</code></pre></div></div>
+
+<p>All three commands returned <em>No resources found</em>.</p>
+:ET

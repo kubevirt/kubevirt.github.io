@@ -1,0 +1,3 @@
+I"'<p>Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt,
+but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?</p>
+:ET
