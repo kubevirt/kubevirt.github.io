@@ -121,16 +121,14 @@ pre {
   @media (max-width: 992px) {
     .nav-item {
       margin-bottom: 0; } }
-  .nav-item a.nav-link {
-    opacity: .8; }
-  .nav-item:hover {
+  .nav-item:not(:last-child):hover, .nav-item:not(:last-child):focus {
     margin-bottom: -8px;
     border-bottom: 3px solid #fed476; }
-    .nav-item:hover a.nav-link {
+    .nav-item:not(:last-child):hover a.nav-link, .nav-item:not(:last-child):focus a.nav-link {
       color: rgba(255, 255, 255, 0.75);
       opacity: 1; }
     @media (max-width: 992px) {
-      .nav-item:hover {
+      .nav-item:not(:last-child):hover, .nav-item:not(:last-child):focus {
         margin-bottom: 0; } }
   .nav-item.active {
     margin-bottom: -8px;
@@ -263,6 +261,12 @@ pre {
       .labs-navigation_sub--item_link.active {
         border-left: 3px solid #00aab2;
         color: #4a4a4a; }
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #fff; }
+
+.navbar-brand {
+  padding: 0; }
 
 .kubevirt-intro {
   background-color: #f5f5f5; }
@@ -416,6 +420,15 @@ pre {
       min-height: 12rem; }
     .hero-overlay-text {
       color: #fff; }
+    .hero-overlay__action {
+      width: auto;
+      height: auto;
+      display: inline-flex;
+      padding: 8px;
+      align-items: center;
+      text-transform: capitalize; }
+      .hero-overlay__action svg {
+        margin-left: 8px; }
   .hero .card {
     background-image: linear-gradient(to bottom, #00aab2, #0099a0);
     background-color: #0099a0;
@@ -437,6 +450,108 @@ pre {
       border-top: none;
       border-radius: 0; }
 
+/*
+    GitHub URL: https://github.com/gucastiliao/video-popup-js
+*/
+.videopopupjs {
+  background-color: #000;
+  background-color: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 99999;
+  text-align: start !important; }
+
+.videopopupjs--hide {
+  -webkit-animation-duration: 0.2s;
+  animation-duration: 0.2s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-name: videoPopupJsHide;
+  animation-name: videoPopupJsHide; }
+
+.videopopupjs__close {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  display: block;
+  margin-bottom: 10px;
+  color: rgba(255, 255, 255, 0.59); }
+
+.videopopupjs__close:after {
+  width: 30px;
+  height: 30px;
+  display: block;
+  text-align: center;
+  content: 'X';
+  font-family: 'Verdana';
+  border-radius: 50%;
+  background: #333;
+  line-height: 2.2;
+  font-size: 13px; }
+
+.videopopupjs__close:hover {
+  opacity: 0.5; }
+
+.videopopupjs--animation {
+  opacity: 0;
+  -webkit-animation-duration: 0.2s;
+  animation-duration: 0.2s;
+  -webkit-animation-fill-mode: both;
+  animation-fill-mode: both;
+  -webkit-animation-name: videoPopupJs;
+  animation-name: videoPopupJs; }
+
+.videopopupjs__content {
+  margin: 0 auto;
+  height: 100%;
+  height: 500px;
+  width: 100%;
+  margin-top: 5%; }
+
+.videopopupjs__content iframe {
+  width: 100%;
+  height: 100%; }
+
+.videopopupjs__block--notfound {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  margin: auto 0;
+  width: 100%;
+  height: 500px;
+  background-color: #fff;
+  text-align: center;
+  vertical-align: middle;
+  line-height: 500px;
+  font-family: 'Arial';
+  font-size: 20px; }
+
+@media (max-width: 768px) {
+  .videopopupjs__content {
+    max-width: 90% !important; } }
+@-webkit-keyframes videoPopupJs {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+@keyframes videoPopupJs {
+  0% {
+    opacity: 0; }
+  100% {
+    opacity: 1; } }
+@-webkit-keyframes videoPopupJsHide {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
+@keyframes videoPopupJsHide {
+  0% {
+    opacity: 1; }
+  100% {
+    opacity: 0; } }
 .posts {
   list-style: none; }
   .posts-date {
@@ -514,7 +629,14 @@ pre {
   margin-top: 7px;
   margin-left: 7px; }
   .docs-search--input {
-    padding-left: 25px; }
+    border: 1px solid #fff;
+    color: #fff; }
+    @media (min-width: 992px) {
+      .docs-search--input {
+        margin-left: 16px;
+        padding: 6px 0 6px 8px; } }
+    .docs-search--input::placeholder {
+      color: #fff; }
   .docs-search--container {
     list-style: none;
     padding-left: 0; }
@@ -814,7 +936,7 @@ input {
   padding: 10px;
   font-size: 16px; }
 
-input[type=text] {
+input[type=text]:not(.docs-search--input) {
   background: transparent;
   border: none;
   width: 100%; }
