@@ -457,6 +457,10 @@
 <lastmod>2020-03-06T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/Live-migration.html</loc>
+<lastmod>2020-03-22T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//2020/changelog-v0.28.0.html</loc>
 <lastmod>2020-04-09T00:00:00+00:00</lastmod>
 </url>
@@ -1094,6 +1098,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/topologykeys.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/live-migration.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//tag/design.html</loc>

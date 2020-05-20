@@ -22,26 +22,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//2018/Use-VS-Code-for-Kube-Virt-Development.html">
+    <link rel="canonical" href="https://kubevirt.io//2020/Live-migration.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Use Vs Code For Kube Virt Development | KubeVirt.io</title>
+    <title>Live Migration in KubeVirt | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="SchSeba" >
+    <meta name="author" content="Pablo Iranzo Gómez" >
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="In this post we will install and configure vscode for KubeVirt development">
-    <meta name="keywords" content="vscode, development, debug" >
-    <meta property="og:title" content="Use Vs Code For Kube Virt Development | KubeVirt.io">
+    <meta name="description" content="KubeVirt leverages Live Migration to support workloads to keep running while nodes can be moved to maintenance, etc Check what is needed to get it working and how it works.">
+    <meta name="keywords" content="kubevirt, kubernetes, virtual machine, VM, Live Migration, node drain" >
+    <meta property="og:title" content="Live Migration in KubeVirt | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//2018/Use-VS-Code-for-Kube-Virt-Development.html" >
+    <meta property="og:url" content="https://kubevirt.io//2020/Live-migration.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="In this post we will install and configure vscode for KubeVirt development" >
+    <meta property="og:description" content="KubeVirt leverages Live Migration to support workloads to keep running while nodes can be moved to maintenance, etc Check what is needed to get it working and how it works." >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="SchSeba" >
-    <meta property="og:article:published_time" content="2018-05-22 00:00:00 +0000" >
-    <meta name="twitter:title" content="Use Vs Code For Kube Virt Development | KubeVirt.io">
-    <meta name="twitter:description" content="In this post we will install and configure vscode for KubeVirt development">
+    <meta property="og:article:author" content="Pablo Iranzo Gómez" >
+    <meta property="og:article:published_time" content="2020-03-22 00:00:00 +0000" >
+    <meta name="twitter:title" content="Live Migration in KubeVirt | KubeVirt.io">
+    <meta name="twitter:description" content="KubeVirt leverages Live Migration to support workloads to keep running while nodes can be moved to maintenance, etc Check what is needed to get it working and how it works.">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -229,194 +229,304 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <div class="post">
         <header class="post-header">
           <h1></h1>
-          <h1 class="post-title">Use Vs Code For Kube Virt Development</h1>
+          <h1 class="post-title">Live Migration in KubeVirt</h1>
           <div class="post-info">
-            <span class="post-author">Author: SchSeba</span>
+            <span class="post-author">Author: Pablo Iranzo Gómez</span>
             <div>
               <span class="post-category-name">
-                Tags: <a href="/tag/vscode">vscode</a>&nbsp;|&nbsp;<a href="/tag/development">development</a>&nbsp;|&nbsp;<a href="/tag/debug">debug</a>
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>&nbsp;|&nbsp;<a href="/tag/live-migration">Live Migration</a>&nbsp;|&nbsp;<a href="/tag/node-drain">node drain</a>
               </span>
             </div>
             <div>
-              <span class="post-meta">Publication Date: May 22, 2018  </span>
+              <span class="post-meta">Publication Date: March 22, 2020  </span>
             </div>
             <div>
               <span class="post-category-name">
-                Category: uncategorized
+                Category: news
               </span>
             </div>
 
           </div>
         </header>
         <article class="post-content">
-          <p>In this post we will install and configure Visual Studio Code (vscode) for KubeVirt development and debug.</p>
+          <!-- TOC depthFrom:2 depthTo:6 orderedList:false -->
 
-<p>Visual Studio Code is a source code editor developed by Microsoft for Windows, Linux and macOS.</p>
+<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#enabling-live-migration">Enabling Live Migration</a></li>
+  <li><a href="#configuring-live-migration">Configuring Live Migration</a></li>
+  <li><a href="#performing-the-live-migration">Performing the Live Migration</a>
+    <ul>
+      <li><a href="#cancelling-a-live-migration">Cancelling a Live Migration</a></li>
+    </ul>
+  </li>
+  <li><a href="#what-can-go-wrong">What can go wrong?</a></li>
+  <li><a href="#node-eviction">Node Eviction</a></li>
+  <li><a href="#conclusion">Conclusion</a></li>
+  <li><a href="#references">References</a></li>
+</ul>
 
-<p>It includes support for debugging, embedded Git control, syntax highlighting, intelligent code completion, snippets, and code refactoring.</p>
+<!-- /TOC -->
 
-<h1 id="golang-installation">Golang Installation</h1>
+<h2 id="introduction">Introduction</h2>
 
-<p>GO installation is required, We can find the binaries in <a href="https://golang.org/dl/">golang page</a>.</p>
+<p>This blog post will be explaining on KubeVirt’s ability to perform live migration of virtual machines.</p>
 
-<h2 id="golang-linux-installation">Golang Linux Installation</h2>
+<blockquote>
+  <p>Live Migration is a process during which a running Virtual Machine Instance moves to another compute node while the guest workload continues to run and remain accessible.</p>
+</blockquote>
 
-<p>After downloading the binaries extract them with the following command:</p>
+<p>The concept of live migration is already well-known among virtualization platforms and enables administrators to keep user workloads running while the servers can be moved to maintenance for any reason that you might think of like:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
+<ul>
+  <li>Hardware maintenance (physical, firmware upgrades, etc)</li>
+  <li>Power management, by moving workloads to a lower number of hypervisors during off-peak hours</li>
+  <li>etc</li>
+</ul>
+
+<p>KubeVirt also includes support for virtual machine migration within Kubernetes when enabled.</p>
+
+<p>Keep reading to learn how!</p>
+
+<h2 id="enabling-live-migration">Enabling Live Migration</h2>
+
+<p>To enable live migration we need to enable the <code class="highlighter-rouge">feature-gate</code> for it by adding <code class="highlighter-rouge">LiveMigration</code> to the key:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+  <span class="na">labels</span><span class="pi">:</span>
+  <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">feature-gates</span><span class="pi">:</span> <span class="s2">"</span><span class="s">LiveMigration"</span>
 </code></pre></div></div>
 
-<p>Now let’s Add /usr/local/go/bin to the PATH environment variable.</p>
+<p><br /></p>
 
-<p>You can do this by adding this line to your /etc/profile (for a system-wide installation) or $HOME/.profile:</p>
+<p>A current <code class="highlighter-rouge">kubevirt-config</code> can be edited to append “<code class="highlighter-rouge">LiveMigration</code>” to an existing configuration:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export PATH=$PATH:/usr/local/go/bin
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl edit configmap kubevirt-config <span class="nt">-n</span> kubevirt
 </code></pre></div></div>
 
-<h2 id="golang-windows-installation">Golang Windows Installation</h2>
-
-<p>Open the MSI file and follow the prompts to install the Go tools.</p>
-
-<p>By default, the installer puts the Go distribution in C:\Go.</p>
-
-<p>The installer should put the C:\Go\bin directory in your PATH environment variable.</p>
-
-<p>You may need to restart any open command prompts for the change to take effect.</p>
-
-<h1 id="vscode-installation">VSCODE Installation</h1>
-
-<p>Now we will install Visual Studio Code in our system.</p>
-
-<h2 id="for-linux-machines">For linux machines</h2>
-
-<p>We need to choose our linux distribution.</p>
-
-<h3 id="for-rhelcentosfedora">For RHEL/Centos/Fedora</h3>
-
-<p>The following script will install the key and repository:</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
-sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" &gt; /etc/yum.repos.d/vscode.repo'
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">data</span><span class="pi">:</span>
+  <span class="na">feature-gates</span><span class="pi">:</span> <span class="s2">"</span><span class="s">DataVolumes,LiveMigration"</span>
 </code></pre></div></div>
 
-<p>Then update the package cache and install the package using dnf (Fedora 22 and above):</p>
+<p><br /></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dnf check-update
-sudo dnf install code
+<h2 id="configuring-live-migration">Configuring Live Migration</h2>
+
+<p>If we want to alter the defaults for Live-Migration, we can further edit the <code class="highlighter-rouge">kubevirt-config</code> like:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+  <span class="na">labels</span><span class="pi">:</span>
+  <span class="s">kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">feature-gates</span><span class="pi">:</span> <span class="s2">"</span><span class="s">LiveMigration"</span>
+  <span class="na">migrations</span><span class="pi">:</span> <span class="pi">|-</span>
+  <span class="s">parallelMigrationsPerCluster: 5</span>
+  <span class="s">parallelOutboundMigrationsPerNode: 2</span>
+  <span class="s">bandwidthPerMigration: 64Mi</span>
+  <span class="s">completionTimeoutPerGiB: 800</span>
+  <span class="s">progressTimeout: 150</span>
 </code></pre></div></div>
 
-<p>Or on older versions using yum:</p>
+<p>Parameters are explained in the below table (check the documentation for more details):</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum check-update
-sudo yum install code
+<table>
+  <thead>
+    <tr>
+      <th style="text-align: left">Parameter</th>
+      <th style="text-align: center">Default value</th>
+      <th style="text-align: left">Description</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="text-align: left"><code class="highlighter-rouge">parallelMigrationsPerCluster</code></td>
+      <td style="text-align: center">5</td>
+      <td style="text-align: left">How many migrations might happen at the same time</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="highlighter-rouge">parallelOutboundMigrationsPerNode</code></td>
+      <td style="text-align: center">2</td>
+      <td style="text-align: left">How many outbound migrations for a particular node</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="highlighter-rouge">bandwidthPerMigration</code></td>
+      <td style="text-align: center">64Mi</td>
+      <td style="text-align: left">MiB/s to have the migration limited to, in order to not affect other systems</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="highlighter-rouge">completionTimeoutPerGiB</code></td>
+      <td style="text-align: center">800</td>
+      <td style="text-align: left">Time for a GiB of data to wait to be completed before aborting the migration.</td>
+    </tr>
+    <tr>
+      <td style="text-align: left"><code class="highlighter-rouge">progressTimeout</code></td>
+      <td style="text-align: center">150</td>
+      <td style="text-align: left">Time to wait for Live Migration to progress in transferring data</td>
+    </tr>
+  </tbody>
+</table>
+
+<h2 id="performing-the-live-migration">Performing the Live Migration</h2>
+
+<div class="premonition error"><div class="fa fa-exclamation-triangle"></div><div class="content"><p class="header">Limitations</p>
+<ol>
+  <li>Virtual Machines using PVC must have a <code class="highlighter-rouge">RWX</code> access mode to be Live-Migrated</li>
+  <li>Additionally, pod network binding of bridge interface is not allowed</li>
+</ol>
+
+
+</div></div>
+<p>Live migration is initiated by posting an object <code class="highlighter-rouge">VirtualMachineInstanceMigration</code> to the cluster, indicating the VM name to migrate, like in the following example:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstanceMigration</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">migration-job</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">vmiName</span><span class="pi">:</span> <span class="s">vmi-fedora</span>
 </code></pre></div></div>
 
-<h3 id="for-debianubuntu">For Debian/Ubuntu</h3>
+<p>This will trigger the process for the VM.</p>
 
-<p>We need to download the .deb package from the <a href="https://code.visualstudio.com/Download">vscode download page</a>,
-and from the command line run the package management.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">NOTE</p>
+<p>When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the <code class="highlighter-rouge">VMI.status.conditions</code>. Currently, most of the calculation is based on the <code class="highlighter-rouge">Access Mode</code> for the VMI volumes but can be based on multiple parameters. For example:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dpkg -i &lt;file&gt;.deb
-sudo apt-get install -f # Install dependencies
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Status</span><span class="pi">:</span>
+  <span class="na">Conditions</span><span class="pi">:</span>
+    <span class="na">Status</span><span class="pi">:</span> <span class="s">True</span>
+    <span class="na">Type</span><span class="pi">:</span> <span class="s">LiveMigratable</span>
+  <span class="na">Migration Method</span><span class="pi">:</span> <span class="s">BlockMigration</span>
 </code></pre></div></div>
 
-<h1 id="for-windows-machines">For Windows machines</h1>
 
-<p>Download the <a href="https://go.microsoft.com/fwlink/?LinkID=534107">Visual Studio Code installer</a>, and then run the installer (VSCodeSetup-version.exe)</p>
+</div></div>
+<p>If the VM is Live-Migratable, the request will submit successfully. The status change will be reported under <code class="highlighter-rouge">VMI.status</code>. Once live migration is complete, a status of <code class="highlighter-rouge">Completed</code> or <code class="highlighter-rouge">Failed</code> will be indicated.</p>
 
-<h1 id="go-project-struct">Go Project struct</h1>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Watch out!</p>
+<p>The <code class="highlighter-rouge">Migration Method</code> field can contain:</p>
 
-<p>Let’s create the following structure for our kubevirt project development environment:</p>
+<ul>
+  <li><code class="highlighter-rouge">BlockMigration</code> : meaning that the disk data is being copied from source to destination</li>
+  <li><code class="highlighter-rouge">LiveMigration</code>: meaning that only the memory is copied from source to destination</li>
+</ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── &lt;Go-projects-folder&gt; # Your Golang projects root folder
-│   ├── bin
-│   ├── pkg
-│   ├── src
-│   │   ├── kubevirt.io
+<p>VMs with block devices located on shared storage backends like the ones provided by <a href="https://rook.io/">Rook</a> that provide PVCs with ReadWriteMany access have the option to live-migrate only memory contents instead of having to also migrate the block devices.</p>
+
+
+</div></div>
+<h3 id="cancelling-a-live-migration">Cancelling a Live Migration</h3>
+
+<p>If we want to abort the Live Migration, ‘Kubernetes-Style’, we’ll just delete the object we created for triggering it.</p>
+
+<p>In this case, the VM status for migration will report some additional information:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">Migration State</span><span class="pi">:</span>
+  <span class="na">Abort Requested</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">Abort Status</span><span class="pi">:</span> <span class="s">Succeeded</span>
+  <span class="na">Completed</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">End Timestamp</span><span class="pi">:</span> <span class="s">2019-03-29T04:02:49Z</span>
+  <span class="na">Failed</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">Migration Config</span><span class="pi">:</span>
+    <span class="na">Completion Timeout Per GiB</span><span class="pi">:</span> <span class="m">800</span>
+    <span class="na">Progress Timeout</span><span class="pi">:</span> <span class="m">150</span>
+  <span class="na">Migration UID</span><span class="pi">:</span> <span class="s">57a693d6-51d7-11e9-b370-525500d15501</span>
+  <span class="na">Source Node</span><span class="pi">:</span> <span class="s">node02</span>
+  <span class="na">Start Timestamp</span><span class="pi">:</span> <span class="s">2019-03-29T04:02:47Z</span>
+  <span class="na">Target Direct Migration Node Ports</span><span class="pi">:</span>
+    <span class="na">39445</span><span class="pi">:</span> <span class="m">0</span>
+    <span class="na">43345</span><span class="pi">:</span> <span class="m">49152</span>
+    <span class="na">44222</span><span class="pi">:</span> <span class="m">49153</span>
+  <span class="na">Target Node</span><span class="pi">:</span> <span class="s">node01</span>
+  <span class="na">Target Node Address</span><span class="pi">:</span> <span class="s">10.128.0.46</span>
+  <span class="na">Target Node Domain Detected</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">Target Pod</span><span class="pi">:</span> <span class="s">virt-launcher-testvmimcbjgw6zrzcmp8wpddvztvzm7x2k6cjbdgktwv8tkq</span>
 </code></pre></div></div>
 
-<p>Now navigate to kubevirt.io folder and run:</p>
+<p>Note that there are some additional fields that indicate that <code class="highlighter-rouge">Abort Requested</code> happened and in the above example that it has <code class="highlighter-rouge">Succeded</code>, in this case, the original fields for migration will report as <code class="highlighter-rouge">Completed</code> (because there’s no running migration) and <code class="highlighter-rouge">Failed</code> set to true.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone &lt;kubevirt-fork&gt;
+<h2 id="what-can-go-wrong">What can go wrong?</h2>
+
+<p>Live-migration is a complex process that requires transferring data from one ‘VM’ in one node to another ‘VM’ into another one, this requires that the activity of the VM being live-migrated to be compatible with the network configuration and throughput so that all the data can be migrated <em>faster</em> than the data is changed at the original VM, this is usually referred to as <em>converging</em>.</p>
+
+<p>Some values can be adjusted (check the <a href="#configuring-live-migration">table</a> for settings that can be tuned), to allow it to succeed but as a trade-off:</p>
+
+<ul>
+  <li>Increasing the number of VMs that can migrate at once, will reduce the available bandwidth.</li>
+  <li>Increasing the bandwidth could affect applications running on that node (origin and target).</li>
+  <li>Storage migration (check the <code class="highlighter-rouge">Info</code> note in the <a href="#performing-the-live-migration">Performing the Live Migration </a> section on the differences) might also consume bandwidth and resources.</li>
+</ul>
+
+<h2 id="node-eviction">Node Eviction</h2>
+
+<p>Sometimes, a node requires to be put on maintenance and it includes workloads on it, either containers or, in KubeVirt’s case, VM’s.</p>
+
+<p>It is possible to use <strong>selectors</strong>, for example, move all the virtual machines to another node via <code class="highlighter-rouge">kubectl drain &lt;nodename&gt;</code>, for example, evicting all KubeVirt VM’s from a node can be done via:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl drain &lt;node name&gt; <span class="nt">--delete-local-data</span> <span class="nt">--ignore-daemonsets</span><span class="o">=</span><span class="nb">true</span> <span class="nt">--force</span> <span class="nt">--pod-selector</span><span class="o">=</span>kubevirt.io<span class="o">=</span>virt-launcher
 </code></pre></div></div>
 
-<h1 id="install-vscode-extensions">Install VSCODE Extensions</h1>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Reenabling node after eviction</p>
+<p>Once the node has been tainted for eviction, we can use <code class="highlighter-rouge">kubectl uncordon &lt;nodename&gt;</code> to make it schedulable again.</p>
 
-<p>Now we are going to install some extensions for a better development experience with the IDE.</p>
 
-<p>Open vscode and select your go project root folder you created in the last step.</p>
+</div></div>
+<p>According to documentation, <code class="highlighter-rouge">--delete-local-data</code>, <code class="highlighter-rouge">--ignore-daemonsets</code> and <code class="highlighter-rouge">--force</code> are required because:</p>
 
-<p>On the extensions tab (Ctrl+Shift+X), search for golang and install it.</p>
+<ul>
+  <li>Pods using <code class="highlighter-rouge">emptyDir</code> can be deleted because the data is ephemeral.</li>
+  <li>VMI will have <code class="highlighter-rouge">DaemonSets</code> via <code class="highlighter-rouge">virt-handler</code> so it’s safe to proceed.</li>
+  <li>VMIs are not owned by a <code class="highlighter-rouge">ReplicaSet</code> or <code class="highlighter-rouge">DaemonSet</code>, so kubectl can’t guarantee that those are restarted. KubeVirt has its own controllers for it managing VMI, so kubectl shouldn’t bother about it.</li>
+</ul>
 
-<p>Now open the command palette (Ctrl+Shift+P) view-&gt;Command Palette and type “Go: install/update tools”, this will install all the requirements for example: delve debugger, etc…</p>
+<p>If we omit the <code class="highlighter-rouge">--pod-selector</code>, we’ll force eviction of all Pods and VM’s from a node.</p>
 
-<p>(optional) We can install docker extension for syntax highlighting, commands, etc..</p>
+<div class="premonition important"><div class="fa fa-check-square"></div><div class="content">
+<p>In order to have VMIs using <code class="highlighter-rouge">LiveMigration</code> for eviction, we have to add a specific spec in the VMI YAML, so that when the node is tainted with <code class="highlighter-rouge">kubevirt.io/drain:NoSchedule</code> is added to a node.</p>
 
-<p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/extension-install.png" alt="Extension-Install" /></p>
-
-<h1 id="gopath-and-goroot-configuration">GOPATH and GOROOT configuration</h1>
-
-<p>Open the vscode configuration file (<code class="highlighter-rouge">ctrl+,</code>) file-&gt;preferences-&gt;settings.</p>
-
-<p>Now on the right file we need to add this configuration:</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"go.gopath": "&lt;Go-projects-folder&gt;",
-"go.goroot": "/usr/local/go",
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
+  <span class="na">evictionStrategy</span><span class="pi">:</span> <span class="s">LiveMigrate</span>
 </code></pre></div></div>
 
-<p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/settings.png" alt="settings" /></p>
+<p>From that point, when <code class="highlighter-rouge">kubectl taint nodes &lt;foo&gt; kubevirt.io/drain=draining:NoSchedule</code> is executed, the migrations will start.</p>
 
-<h1 id="create-debug-configuration">Create debug configuration</h1>
 
-<p>For the last part we are going to configure the debugger file, open it by Debug-&gt;Open Configurations and add to the configuration list the following structure</p>
+</div></div>
+<h2 id="conclusion">Conclusion</h2>
 
-<p>** Change the <Go-projects-folder> parameter to your golang projects root directory</Go-projects-folder></p>
+<p>As a briefing on the above data:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">{</span>
-  <span class="s2">"</span><span class="s">name"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">Kubevirt"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">type"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">go"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">request"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">launch"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">mode"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">debug"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">remotePath"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">port"</span><span class="pi">:</span> <span class="nv">2345</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">host"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">127.0.0.1"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">program"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">${fileDirname}"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">env"</span><span class="pi">:</span> <span class="pi">{},</span>
-  <span class="s2">"</span><span class="s">args"</span><span class="pi">:</span> <span class="pi">[</span><span class="s2">"</span><span class="s">--kubeconfig"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">cluster/k8s-1.9.3/.kubeconfig"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">--port"</span><span class="pi">,</span> <span class="s2">"</span><span class="s">1234"</span><span class="pi">],</span>
-  <span class="s2">"</span><span class="s">showLog"</span><span class="pi">:</span> <span class="nv">true</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">cwd"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">${workspaceFolder}/src/kubevirt.io/kubevirt"</span><span class="pi">,</span>
-  <span class="s2">"</span><span class="s">output"</span><span class="pi">:</span> <span class="s2">"</span><span class="s">&lt;Go-projects-folder&gt;/bin/${fileBasenameNoExtension}"</span><span class="pi">,</span>
-<span class="pi">}</span>
-</code></pre></div></div>
+<ul>
+  <li><code class="highlighter-rouge">LiveMigrate</code> needs to be enabled on KubeVirt as a feature gate.</li>
+  <li><code class="highlighter-rouge">LiveMigrate</code> will add status to the VMI object indicating if it’s a candidate or not and if so, which mode to use (Block or Live)
+    <ul>
+      <li>Based on the storage backend and other conditions, it will enable <code class="highlighter-rouge">LiveMigration</code> or just <code class="highlighter-rouge">BlockMigration</code>.</li>
+    </ul>
+  </li>
+</ul>
 
-<p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-config.png" alt="debug-config" /></p>
+<h2 id="references">References</h2>
 
-<h1 id="debug-process">Debug Process</h1>
-
-<p>For debug we need to open the main package we want to debug.</p>
-
-<p>For example if we want to debug the virt-api component, open the main package:</p>
-
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt.io/cmd/virt-api/virt-api.go
-</code></pre></div></div>
-
-<p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-file.png" alt="debug-file" /></p>
-
-<p>Now change to debug view (<code class="highlighter-rouge">ctrl+shift+D</code>), check that we are using the kubevirt configuration and hit the play button</p>
-
-<p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-view.png" alt="debug-view" /></p>
-
-<h2 id="more-information">More Information</h2>
-
-<p>For more information, keyboard shortcuts and advance vscode usage please refer the following link</p>
-
-<p><a href="https://code.visualstudio.com/docs/editor/codebasics">editor code basics</a></p>
+<ul>
+  <li><a href="https://kubevirt.io/user-guide/#/installation/live-migration?id=live-migration">Live Migration</a></li>
+  <li><a href="https://kubevirt.io/user-guide/#/installation/node-eviction?id=how-to-evict-all-vms-on-a-node">Node Drain/Eviction</a></li>
+  <li><a href="https://rook.io/">Rook</a></li>
+</ul>
 
         </article>
         
         
 
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Use Vs Code For Kube Virt Development&url=https://www.kubevirt.io/2018/Use-VS-Code-for-Kube-Virt-Development.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Live Migration in KubeVirt&url=https://www.kubevirt.io/2020/Live-migration.html&screen_name=kubevirt" aria-label="Share this on Twitter">
   <i class="fab fa-twitter mr-1"></i> Tweet
 </a>
 <hr/>

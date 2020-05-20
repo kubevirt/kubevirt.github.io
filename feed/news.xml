@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-20T18:27:54+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt VM Image Usage Patterns</title><link href="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html" rel="alternate" type="text/html" title="KubeVirt VM Image Usage Patterns" /><published>2020-05-12T00:00:00+00:00</published><updated>2020-05-12T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html">&lt;h1 id=&quot;building-a-vm-image-repository&quot;&gt;Building a VM Image Repository&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-20T18:41:50+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt VM Image Usage Patterns</title><link href="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html" rel="alternate" type="text/html" title="KubeVirt VM Image Usage Patterns" /><published>2020-05-12T00:00:00+00:00</published><updated>2020-05-12T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html">&lt;h1 id=&quot;building-a-vm-image-repository&quot;&gt;Building a VM Image Repository&lt;/h1&gt;
 
 &lt;p&gt;You know what I hear a lot from new KubeVirt users?&lt;/p&gt;
 
@@ -599,7 +599,278 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;p&gt;Using this established Kubernetes pattern of layering objects on top of one another, we came up with our own virtualization specific API and corresponding workload controller called a &lt;strong&gt;“VirtualMachine”&lt;/strong&gt; (big surprise there on the name, right?). Users declare a VirtualMachine object just like they would a pod by posting the VirtualMachine object’s manifest to the cluster. The big difference here that deviates from how pods are managed is that we allow VirtualMachine objects to be declared to exist in different states. For example, you can declare you want to “start” a virtual machine by setting “running: true” on the VirtualMachine object’s spec. Likewise you can declare you want to “stop” a virtual machine by setting “running: false” on the VirtualMachine object’s spec. Behind the scenes, setting the “running” field to true or false results in the workload controller creating or deleting a pod for the virtual machine to live in.&lt;/p&gt;
 
-&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
+&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry><entry><title type="html">Live Migration in KubeVirt</title><link href="https://kubevirt.io//2020/Live-migration.html" rel="alternate" type="text/html" title="Live Migration in KubeVirt" /><published>2020-03-22T00:00:00+00:00</published><updated>2020-03-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Live-migration</id><content type="html" xml:base="https://kubevirt.io//2020/Live-migration.html">&lt;!-- TOC depthFrom:2 depthTo:6 orderedList:false --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#enabling-live-migration&quot;&gt;Enabling Live Migration&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#configuring-live-migration&quot;&gt;Configuring Live Migration&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#performing-the-live-migration&quot;&gt;Performing the Live Migration&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#cancelling-a-live-migration&quot;&gt;Cancelling a Live Migration&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#what-can-go-wrong&quot;&gt;What can go wrong?&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#node-eviction&quot;&gt;Node Eviction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#references&quot;&gt;References&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;This blog post will be explaining on KubeVirt’s ability to perform live migration of virtual machines.&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;Live Migration is a process during which a running Virtual Machine Instance moves to another compute node while the guest workload continues to run and remain accessible.&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;The concept of live migration is already well-known among virtualization platforms and enables administrators to keep user workloads running while the servers can be moved to maintenance for any reason that you might think of like:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Hardware maintenance (physical, firmware upgrades, etc)&lt;/li&gt;
+  &lt;li&gt;Power management, by moving workloads to a lower number of hypervisors during off-peak hours&lt;/li&gt;
+  &lt;li&gt;etc&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;KubeVirt also includes support for virtual machine migration within Kubernetes when enabled.&lt;/p&gt;
+
+&lt;p&gt;Keep reading to learn how!&lt;/p&gt;
+
+&lt;h2 id=&quot;enabling-live-migration&quot;&gt;Enabling Live Migration&lt;/h2&gt;
+
+&lt;p&gt;To enable live migration we need to enable the &lt;code class=&quot;highlighter-rouge&quot;&gt;feature-gate&lt;/code&gt; for it by adding &lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; to the key:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-config&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;feature-gates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;LiveMigration&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;A current &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; can be edited to append “&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;” to an existing configuration:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl edit configmap kubevirt-config &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;feature-gates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;DataVolumes,LiveMigration&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;configuring-live-migration&quot;&gt;Configuring Live Migration&lt;/h2&gt;
+
+&lt;p&gt;If we want to alter the defaults for Live-Migration, we can further edit the &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; like:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-config&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;feature-gates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;LiveMigration&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;migrations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|-&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;parallelMigrationsPerCluster: 5&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;parallelOutboundMigrationsPerNode: 2&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;bandwidthPerMigration: 64Mi&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;completionTimeoutPerGiB: 800&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;progressTimeout: 150&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Parameters are explained in the below table (check the documentation for more details):&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Parameter&lt;/th&gt;
+      &lt;th style=&quot;text-align: center&quot;&gt;Default value&lt;/th&gt;
+      &lt;th style=&quot;text-align: left&quot;&gt;Description&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;parallelMigrationsPerCluster&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;5&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;How many migrations might happen at the same time&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;parallelOutboundMigrationsPerNode&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;2&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;How many outbound migrations for a particular node&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;bandwidthPerMigration&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;64Mi&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;MiB/s to have the migration limited to, in order to not affect other systems&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;completionTimeoutPerGiB&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;800&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Time for a GiB of data to wait to be completed before aborting the migration.&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;progressTimeout&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: center&quot;&gt;150&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;Time to wait for Live Migration to progress in transferring data&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;h2 id=&quot;performing-the-live-migration&quot;&gt;Performing the Live Migration&lt;/h2&gt;
+
+&lt;div class=&quot;premonition error&quot;&gt;&lt;div class=&quot;fa fa-exclamation-triangle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Limitations&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Virtual Machines using PVC must have a &lt;code class=&quot;highlighter-rouge&quot;&gt;RWX&lt;/code&gt; access mode to be Live-Migrated&lt;/li&gt;
+  &lt;li&gt;Additionally, pod network binding of bridge interface is not allowed&lt;/li&gt;
+&lt;/ol&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Live migration is initiated by posting an object &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceMigration&lt;/code&gt; to the cluster, indicating the VM name to migrate, like in the following example:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceMigration&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;migration-job&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;vmiName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vmi-fedora&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This will trigger the process for the VM.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;
+&lt;p&gt;When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the &lt;code class=&quot;highlighter-rouge&quot;&gt;VMI.status.conditions&lt;/code&gt;. Currently, most of the calculation is based on the &lt;code class=&quot;highlighter-rouge&quot;&gt;Access Mode&lt;/code&gt; for the VMI volumes but can be based on multiple parameters. For example:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Conditions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;True&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;LiveMigratable&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Migration Method&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BlockMigration&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;If the VM is Live-Migratable, the request will submit successfully. The status change will be reported under &lt;code class=&quot;highlighter-rouge&quot;&gt;VMI.status&lt;/code&gt;. Once live migration is complete, a status of &lt;code class=&quot;highlighter-rouge&quot;&gt;Completed&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;Failed&lt;/code&gt; will be indicated.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Watch out!&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;Migration Method&lt;/code&gt; field can contain:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt; : meaning that the disk data is being copied from source to destination&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;: meaning that only the memory is copied from source to destination&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;VMs with block devices located on shared storage backends like the ones provided by &lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt; that provide PVCs with ReadWriteMany access have the option to live-migrate only memory contents instead of having to also migrate the block devices.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;cancelling-a-live-migration&quot;&gt;Cancelling a Live Migration&lt;/h3&gt;
+
+&lt;p&gt;If we want to abort the Live Migration, ‘Kubernetes-Style’, we’ll just delete the object we created for triggering it.&lt;/p&gt;
+
+&lt;p&gt;In this case, the VM status for migration will report some additional information:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;Migration State&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Abort Requested&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Abort Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Succeeded&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Completed&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;End Timestamp&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2019-03-29T04:02:49Z&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Failed&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Migration Config&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;Completion Timeout Per GiB&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;800&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;Progress Timeout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;150&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Migration UID&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;57a693d6-51d7-11e9-b370-525500d15501&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Source Node&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node02&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Start Timestamp&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2019-03-29T04:02:47Z&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Target Direct Migration Node Ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;39445&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;43345&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;49152&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;44222&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;49153&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Target Node&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node01&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Target Node Address&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;10.128.0.46&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Target Node Domain Detected&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Target Pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-launcher-testvmimcbjgw6zrzcmp8wpddvztvzm7x2k6cjbdgktwv8tkq&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that there are some additional fields that indicate that &lt;code class=&quot;highlighter-rouge&quot;&gt;Abort Requested&lt;/code&gt; happened and in the above example that it has &lt;code class=&quot;highlighter-rouge&quot;&gt;Succeded&lt;/code&gt;, in this case, the original fields for migration will report as &lt;code class=&quot;highlighter-rouge&quot;&gt;Completed&lt;/code&gt; (because there’s no running migration) and &lt;code class=&quot;highlighter-rouge&quot;&gt;Failed&lt;/code&gt; set to true.&lt;/p&gt;
+
+&lt;h2 id=&quot;what-can-go-wrong&quot;&gt;What can go wrong?&lt;/h2&gt;
+
+&lt;p&gt;Live-migration is a complex process that requires transferring data from one ‘VM’ in one node to another ‘VM’ into another one, this requires that the activity of the VM being live-migrated to be compatible with the network configuration and throughput so that all the data can be migrated &lt;em&gt;faster&lt;/em&gt; than the data is changed at the original VM, this is usually referred to as &lt;em&gt;converging&lt;/em&gt;.&lt;/p&gt;
+
+&lt;p&gt;Some values can be adjusted (check the &lt;a href=&quot;#configuring-live-migration&quot;&gt;table&lt;/a&gt; for settings that can be tuned), to allow it to succeed but as a trade-off:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Increasing the number of VMs that can migrate at once, will reduce the available bandwidth.&lt;/li&gt;
+  &lt;li&gt;Increasing the bandwidth could affect applications running on that node (origin and target).&lt;/li&gt;
+  &lt;li&gt;Storage migration (check the &lt;code class=&quot;highlighter-rouge&quot;&gt;Info&lt;/code&gt; note in the &lt;a href=&quot;#performing-the-live-migration&quot;&gt;Performing the Live Migration &lt;/a&gt; section on the differences) might also consume bandwidth and resources.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;node-eviction&quot;&gt;Node Eviction&lt;/h2&gt;
+
+&lt;p&gt;Sometimes, a node requires to be put on maintenance and it includes workloads on it, either containers or, in KubeVirt’s case, VM’s.&lt;/p&gt;
+
+&lt;p&gt;It is possible to use &lt;strong&gt;selectors&lt;/strong&gt;, for example, move all the virtual machines to another node via &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl drain &amp;lt;nodename&amp;gt;&lt;/code&gt;, for example, evicting all KubeVirt VM’s from a node can be done via:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl drain &amp;lt;node name&amp;gt; &lt;span class=&quot;nt&quot;&gt;--delete-local-data&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--ignore-daemonsets&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--force&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pod-selector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;virt-launcher
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Reenabling node after eviction&lt;/p&gt;
+&lt;p&gt;Once the node has been tainted for eviction, we can use &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl uncordon &amp;lt;nodename&amp;gt;&lt;/code&gt; to make it schedulable again.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;According to documentation, &lt;code class=&quot;highlighter-rouge&quot;&gt;--delete-local-data&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;--ignore-daemonsets&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;--force&lt;/code&gt; are required because:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Pods using &lt;code class=&quot;highlighter-rouge&quot;&gt;emptyDir&lt;/code&gt; can be deleted because the data is ephemeral.&lt;/li&gt;
+  &lt;li&gt;VMI will have &lt;code class=&quot;highlighter-rouge&quot;&gt;DaemonSets&lt;/code&gt; via &lt;code class=&quot;highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; so it’s safe to proceed.&lt;/li&gt;
+  &lt;li&gt;VMIs are not owned by a &lt;code class=&quot;highlighter-rouge&quot;&gt;ReplicaSet&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;DaemonSet&lt;/code&gt;, so kubectl can’t guarantee that those are restarted. KubeVirt has its own controllers for it managing VMI, so kubectl shouldn’t bother about it.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;If we omit the &lt;code class=&quot;highlighter-rouge&quot;&gt;--pod-selector&lt;/code&gt;, we’ll force eviction of all Pods and VM’s from a node.&lt;/p&gt;
+
+&lt;div class=&quot;premonition important&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;
+&lt;p&gt;In order to have VMIs using &lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; for eviction, we have to add a specific spec in the VMI YAML, so that when the node is tainted with &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt.io/drain:NoSchedule&lt;/code&gt; is added to a node.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;evictionStrategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;LiveMigrate&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;From that point, when &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl taint nodes &amp;lt;foo&amp;gt; kubevirt.io/drain=draining:NoSchedule&lt;/code&gt; is executed, the migrations will start.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;As a briefing on the above data:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; needs to be enabled on KubeVirt as a feature gate.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; will add status to the VMI object indicating if it’s a candidate or not and if so, which mode to use (Block or Live)
+    &lt;ul&gt;
+      &lt;li&gt;Based on the storage backend and other conditions, it will enable &lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; or just &lt;code class=&quot;highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt;.&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/live-migration?id=live-migration&quot;&gt;Live Migration&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/node-eviction?id=how-to-evict-all-vms-on-a-node&quot;&gt;Node Drain/Eviction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Live Migration" /><category term="node drain" /><summary type="html"></summary></entry><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
 
 &lt;p&gt;It is important to notice that from the Kubernetes scheduler stand point, which will be explained later, it only manages Pod and node scheduling. Since the VM is wrapped up in a Pod, the same scheduling rules are completely valid to KubeVirt VMs.&lt;/p&gt;
 
@@ -2408,37 +2679,4 @@ console-deployment-59d8956db5-td462                     1/1     Running         
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on Youtube&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="OpenShift web console" /><category term="web interface" /><category term="OKD" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry><entry><title type="html">KubeVirt Laboratory 3, upgrades</title><link href="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html" rel="alternate" type="text/html" title="KubeVirt Laboratory 3, upgrades" /><published>2020-01-21T00:00:00+00:00</published><updated>2020-01-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_lab3_upgrade</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_lab3_upgrade.html">&lt;p&gt;In this video, we are showing the step by step of the &lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;KubeVirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
-
-&lt;p&gt;In the video, there is a Kubernetes cluster already running. Also, the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command is already installed and available in the PATH.&lt;/p&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/OAPzOvqp0is&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;operations&quot;&gt;Operations&lt;/h2&gt;
-
-&lt;p&gt;The following operations are shown in the video:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Install a specific version of the KubeVirt Operator and Custom Resource&lt;/li&gt;
-  &lt;li&gt;Create a cirros Virtual Machine running in KubeVirt&lt;/li&gt;
-  &lt;li&gt;Connect to the Virtual Machine using SSH&lt;/li&gt;
-  &lt;li&gt;Upgrade to a specific version of KubeVirt while the Virtual Machine is running&lt;/li&gt;
-  &lt;li&gt;Check the new KubeVirt version&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab3&quot;&gt;Kubevirt Laboratory 3: Upgrades&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab2_experiment_with_cdi.html&quot;&gt;Kubevirt Laboratory 2 blogpost: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab2&quot;&gt;Kubevirt Laboratory 2: Experimenting with CDI&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/2019/KubeVirt_lab1_use_kubevirt.html&quot;&gt;Kubevirt Laboratory 1 blogpost: Use Kubevirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=KC03G60shIc&quot;&gt;KubeVirt basic operations video on youtube&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Kubevirt installation notes&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.katacoda.com/kubevirt/scenarios/kubevirt-101&quot;&gt;First steps with KubeVirt - Katacoda scenario&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="lab" /><category term="kubevirt upgrade" /><category term="upgrading" /><category term="lifecycle" /><summary type="html">In this video, we are showing the step by step of the KubeVirt Laboratory 3: Upgrades</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="OpenShift web console" /><category term="web interface" /><category term="OKD" /><summary type="html">In the previous post, KubeVirt user interface options were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</summary></entry></feed>
