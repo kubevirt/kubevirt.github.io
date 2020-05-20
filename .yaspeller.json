@@ -266,6 +266,8 @@
     "RBD",
     "RDP",
     "ReadOnlyMany",
+    "ReadWriteMany",
+    "ReadWriteOnce",
     "Reddy",
     "ReplicaSet",
     "repo",
