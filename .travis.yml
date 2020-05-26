@@ -9,7 +9,7 @@ before_install:
 install: true
 script:
 - scripts/update_changelog.sh
-- yaspeller --only-errors --find-repeat-words --ignore-digits  --ignore-urls ./**/*.md
+- yaspeller --only-errors ./**/*.md
 - rake
 - touch _site/.nojekyll
 env:
