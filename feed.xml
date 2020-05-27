@@ -1,4 +1,85 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-27T13:43:51+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt VM Image Usage Patterns</title><link href="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html" rel="alternate" type="text/html" title="KubeVirt VM Image Usage Patterns" /><published>2020-05-12T00:00:00+00:00</published><updated>2020-05-12T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html">&lt;h1 id=&quot;building-a-vm-image-repository&quot;&gt;Building a VM Image Repository&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-05-27T16:45:50+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">SELinux, from basics to KubeVirt</title><link href="https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html" rel="alternate" type="text/html" title="SELinux, from basics to KubeVirt" /><published>2020-05-25T00:00:00+00:00</published><updated>2020-05-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html">&lt;p&gt;SELinux is one of many security mechanisms leveraged by KubeVirt.&lt;br /&gt;
+For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/KubeVirt-Security-Fundamentals.html&quot;&gt;this excellent article&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h2 id=&quot;selinux-101&quot;&gt;SELinux 101&lt;/h2&gt;
+
+&lt;p&gt;At its core, SELinux is a whitelist-based security policy system intended to limit interactions between Linux processes and files. Simplified, it can be visualized as a “syscall firewall”.&lt;/p&gt;
+
+&lt;p&gt;Policies are based on statically defined types, that can be assigned to files, processes and other objects.&lt;/p&gt;
+
+&lt;p&gt;A simple policy example would be to allow a &lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/test&lt;/code&gt; program to read its &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/test.conf&lt;/code&gt; configuration file.&lt;/p&gt;
+
+&lt;p&gt;The policy for that would include directives to:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Assign types to files and processes, like &lt;code class=&quot;highlighter-rouge&quot;&gt;test_bin_t&lt;/code&gt; for &lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/test&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;test_conf_t&lt;/code&gt; for &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/test.conf&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;test_t&lt;/code&gt; for instances of the test program&lt;/li&gt;
+  &lt;li&gt;Configure a &lt;em&gt;transition&lt;/em&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;test_bin_t&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;test_t&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Allow &lt;code class=&quot;highlighter-rouge&quot;&gt;test_t&lt;/code&gt; processes to read &lt;code class=&quot;highlighter-rouge&quot;&gt;test_conf_t&lt;/code&gt; files.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;the-selinux-standard-reference-policy&quot;&gt;The SELinux standard Reference Policy&lt;/h2&gt;
+
+&lt;p&gt;Since SELinux policies are whitelists, a setup running with the above policy would not be allowed to do anything, except for that test program.&lt;/p&gt;
+
+&lt;p&gt;A policy for an entire Linux distribution as seen in the wild is made of millions of lines, which wouldn’t be practical to write and maintain on a per-distribution basis.&lt;/p&gt;
+
+&lt;p&gt;That is why the &lt;a href=&quot;https://github.com/SELinuxProject/refpolicy&quot;&gt;Reference Policy&lt;/a&gt; (refpolicy) was written. The refpolicy implements various mechanisms to simplify policy writing, but also contains modules for most core Linux applications.&lt;/p&gt;
+
+&lt;p&gt;Most use-cases can be addressed with the “standard” refpolicy, plus optionally some custom modules for specific applications not covered by the Reference Policy.&lt;/p&gt;
+
+&lt;p&gt;Limitations start to arise for use-cases that run the same binary multiple times concurrently, and expect instances to be isolated from each other. Virtualization is one of those use cases. Indeed if 2 virtual machines are running on the same system, it is usually desirable that one VM can’t see the resources of the other one.&lt;/p&gt;
+
+&lt;p&gt;As an example, if qemu processes are labeled &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_t&lt;/code&gt; and disk files are labeled &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_disk_t&lt;/code&gt;, allowing &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_t&lt;/code&gt; to read/write &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_disk_t&lt;/code&gt; files would allow all qemu processes to access all disk files.&lt;/p&gt;
+
+&lt;p&gt;Another mechanism is necessary to provide VM isolation. That is what SELinux MCS addresses.&lt;/p&gt;
+
+&lt;h2 id=&quot;selinux-multi-category-security-mcs&quot;&gt;SELinux Multi-Category Security (MCS)&lt;/h2&gt;
+
+&lt;p&gt;Multi-Category Security, or MCS, provides the ability to dynamically add numerical IDs (called categories) to any SELinux type on any object (file/process/socket/…).&lt;/p&gt;
+
+&lt;p&gt;Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It’s important to note that categories have no order, so &lt;code class=&quot;highlighter-rouge&quot;&gt;c42,c42&lt;/code&gt; is equivalent to &lt;code class=&quot;highlighter-rouge&quot;&gt;c42&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;c1,c2&lt;/code&gt; is equivalent to &lt;code class=&quot;highlighter-rouge&quot;&gt;c2,c1&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;In the example above, we can now:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Dynamically compute a unique random category for each VM&lt;/li&gt;
+  &lt;li&gt;Assign the corresponding categories to all VM resources, like qemu instance and disk files&lt;/li&gt;
+  &lt;li&gt;Only allow access when all the involved resources have the same category number.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;And that is exactly what libvirt does when compiled with SELinux support, as shown in the diagram below.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-05-25-SELinux-from-basics-to-KubeVirt/libvirt.svg&quot; alt=&quot;Components View&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note: MCS can do a lot more, this article only describes the bits that are used by libvirt and kubernetes.&lt;/p&gt;
+
+&lt;h3 id=&quot;mcs-and-containers&quot;&gt;MCS and containers&lt;/h3&gt;
+
+&lt;p&gt;Another application that leverages MCS is Linux containers.&lt;/p&gt;
+
+&lt;p&gt;In fact, containers use very few SELinux types and rely mostly on MCS to provide container isolation. For example, all the files and processes in container filesystems have the same SELinux types. For a non-super-privileged container, those types are usually &lt;code class=&quot;highlighter-rouge&quot;&gt;container_file_t&lt;/code&gt; for file and &lt;code class=&quot;highlighter-rouge&quot;&gt;container_t&lt;/code&gt; for processes. Most operations are permitted within those types, and the categories are really what matters.&lt;/p&gt;
+
+&lt;p&gt;As with libvirt, categories have to match for access to be granted, effectively blocking inter-container communication.&lt;/p&gt;
+
+&lt;p&gt;Super-privileged containers however are exempt from categories. They use the &lt;code class=&quot;highlighter-rouge&quot;&gt;spc_t&lt;/code&gt; SELinux type, which allows them to do pretty much anything, at least as far as SELinux is concerned.&lt;/p&gt;
+
+&lt;p&gt;That is all defined as an SELinux module in the &lt;a href=&quot;https://github.com/containers/container-selinux&quot;&gt;container-selinux Github repository&lt;/a&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;mcs-and-container-orchestrators&quot;&gt;MCS and container orchestrators&lt;/h3&gt;
+
+&lt;p&gt;Container orchestrators add a level of management. They define pods of containers, and within a pod, cross-container communication is acceptable and often even necessary.&lt;/p&gt;
+
+&lt;p&gt;Categories are therefore managed at the pod level, and all the containers that belong to the same pod are assigned the same categories, as illustrated by the following diagram.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-05-25-SELinux-from-basics-to-KubeVirt/kubernetes.svg&quot; alt=&quot;Components View&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;selinux-in-kubevirt&quot;&gt;SELinux in Kubevirt&lt;/h2&gt;
+
+&lt;p&gt;Finally getting to KubeVirt, which relies on all of the above, as it runs libvirt in a container managed by a container orchestrator on SELinux-enabled systems.&lt;/p&gt;
+
+&lt;p&gt;In that context, libvirt runs inside a regular container and can’t manage SELinux object like types and categories. However, MCS isolation is provided by the container orchestrator, and every VM runs in its own pod (virt-launcher). And since no 2 virt-launcher pods will ever have the same categories on a given node, SELinux isolation of VMs is guaranteed.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/2020-05-25-SELinux-from-basics-to-KubeVirt/kubevirt.svg&quot; alt=&quot;Components View&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note: As some host configuration is usually required for VMs to run, each node also runs a super-privileged pod (virt-handler), dedicated to such operations.&lt;/p&gt;</content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><category term="libvirt" /><category term="qemu" /><summary type="html">SELinux is one of many security mechanisms leveraged by KubeVirt. For an overview of KubeVirt security, please first read this excellent article.</summary></entry><entry><title type="html">KubeVirt VM Image Usage Patterns</title><link href="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html" rel="alternate" type="text/html" title="KubeVirt VM Image Usage Patterns" /><published>2020-05-12T00:00:00+00:00</published><updated>2020-05-12T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-VM-Image-Usage-Patterns.html">&lt;h1 id=&quot;building-a-vm-image-repository&quot;&gt;Building a VM Image Repository&lt;/h1&gt;
 
 &lt;p&gt;You know what I hear a lot from new KubeVirt users?&lt;/p&gt;
 
@@ -1659,290 +1740,4 @@ kubevirt      virt-handler   6         6         6       6            6         
   &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;Kubernetes node affinity documentation&lt;/a&gt;.&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/podaffinity.md&quot;&gt;Kubernetes design proposal for Inter-pod topological affinity and anti-affinity&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/2089&quot;&gt;KubeVirt add affinity to virt pods pull request discussion&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Advanced VM scheduling" /><category term="affinity" /><category term="scheduling" /><category term="topologyKeys" /><summary type="html">This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</summary></entry><entry><title type="html">KubeVirt: installing Microsoft Windows from an ISO</title><link href="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows from an ISO" /><published>2020-02-14T00:00:00+00:00</published><updated>2020-02-14T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">&lt;p&gt;Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt,
-but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?&lt;/p&gt;
-
-&lt;p&gt;In this blogpost, we are going to explain how to prepare that VM with the ISO file and the needed drivers to proceed with the installation of Microsoft Windows.&lt;/p&gt;
-
-&lt;h2 id=&quot;pre-requisites&quot;&gt;Pre-requisites&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;A Kubernetes cluster is already up and running&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/README.md&quot;&gt;CDI&lt;/a&gt; are already installed&lt;/li&gt;
-  &lt;li&gt;There is enough free CPU, Memory and disk space in the cluster to deploy a Microsoft Windows VM, in this example, the version 2012 R2 VM is going to be used&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;preparation&quot;&gt;Preparation&lt;/h2&gt;
-
-&lt;p&gt;To proceed with the Installation steps the different elements involved are listed:&lt;/p&gt;
-
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;&lt;p&gt;No need for executing any command until the &lt;a href=&quot;#installation&quot;&gt;Installation&lt;/a&gt; section.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;ol&gt;
-  &lt;li&gt;An empty KubeVirt Virtual Machine
-    &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;win2k12-iso&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;running&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;win2k12-iso&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;...&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;q35&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;8G&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;...&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;A PVC with the Microsoft Windows ISO file attached as CD-ROM to the VM, would be automatically created with the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command when uploading the file&lt;/p&gt;
-
-    &lt;p&gt;First thing here is to download the ISO file of the Microsoft Windows, for that the &lt;a href=&quot;https://www.Microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2&quot;&gt;Microsoft Evaluation Center&lt;/a&gt; offers
-the ISO files to download for evaluation purposes:&lt;/p&gt;
-
-    &lt;p&gt;&lt;img src=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso.png&quot; alt=&quot;win2k12_download_iso.png&quot; title=&quot;KubeVirt Microsoft Windows iso download&quot; /&gt;&lt;/p&gt;
-
-    &lt;p&gt;To be able to start the evaluation some personal data has to be filled in. Afterwards, the architecture to be checked is “64 bit” and the language selected as shown in
-the following picture:&lt;/p&gt;
-
-    &lt;p&gt;&lt;img src=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12_download_iso_64.png&quot; alt=&quot;win2k12_download_iso_64.png&quot; title=&quot;KubeVirt Microsoft Windows iso download&quot; /&gt;&lt;/p&gt;
-
-    &lt;p&gt;Once the ISO file is downloaded it has to be uploaded with &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt;, the parameters used in this example are the following:&lt;/p&gt;
-
-    &lt;ul&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;image-upload&lt;/code&gt;: Upload a VM image to a PersistentVolumeClaim&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--image-path&lt;/code&gt;: The path of the ISO file&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--pvc-name&lt;/code&gt;: The name of the PVC to store the ISO file, in this example is &lt;code class=&quot;highlighter-rouge&quot;&gt;iso-win2k12&lt;/code&gt;&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--access-mode&lt;/code&gt;: the access mode for the PVC, in the example &lt;code class=&quot;highlighter-rouge&quot;&gt;ReadOnlyMany&lt;/code&gt; has been used.&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--pvc-size&lt;/code&gt;: The size of the PVC, is where the ISO will be stored, in this case, the ISO is 4.3G so a PVC OS 5G should be enough&lt;/li&gt;
-      &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--uploadproxy-url&lt;/code&gt;: The URL of the cdi-upload proxy service, in the following example, the CLUSTER-IP is &lt;code class=&quot;highlighter-rouge&quot;&gt;10.96.164.35&lt;/code&gt; and the PORT is &lt;code class=&quot;highlighter-rouge&quot;&gt;443&lt;/code&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;To upload data to the cluster, the cdi-uploadproxy service must be accessible from outside the cluster. In a production environment, this probably involves setting up an Ingress or a LoadBalancer Service.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get services &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi
-   NAME              TYPE        CLUSTER-IP     EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   AGE
-   cdi-api           ClusterIP   10.96.117.29   &amp;lt;none&amp;gt;        443/TCP   6d18h
-   cdi-uploadproxy   ClusterIP   10.96.164.35   &amp;lt;none&amp;gt;        443/TCP   6d18h
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In this example the ISO file was copied to the Kubernetes node, to allow the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; to find it and to simplify the operation.&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--insecure&lt;/code&gt;: Allow insecure server connections when using HTTPS&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;--wait-secs&lt;/code&gt;: The time in seconds to wait for upload pod to start. (default 60)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The final command with the parameters and the values would look like:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;   &lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl image-upload &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iso-win2k12 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--access-mode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ReadOnlyMany &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--pvc-size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5G &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://10.96.164.35:443 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-   &lt;span class=&quot;nt&quot;&gt;--wait-secs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;240
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;A PVC for the hard drive where the Operating System is going to be installed, in this example it is called &lt;code class=&quot;highlighter-rouge&quot;&gt;winhd&lt;/code&gt; and the space requested is 15Gi:&lt;/p&gt;
-
-    &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolumeClaim&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;winhd&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15Gi&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;hostpath&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;A &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers&quot;&gt;container with the virtio drivers&lt;/a&gt; attached as a CD-ROM to the VM.
-The container image has to be pulled to have it available in the local registry.&lt;/p&gt;
-
-    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker pull kubevirt/virtio-container-disk
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-
-    &lt;p&gt;And also it has to be referenced in the VM YAML, in this example the name for the &lt;code class=&quot;highlighter-rouge&quot;&gt;containerDisk&lt;/code&gt; is &lt;code class=&quot;highlighter-rouge&quot;&gt;virtiocontainerdisk&lt;/code&gt;.&lt;/p&gt;
-
-    &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;sata&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
-&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;containerDisk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt/virtio-container-disk&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-
-    &lt;p&gt;If the pre-requisites are fulfilled, the final YAML (&lt;a href=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/win2k12.yml&quot;&gt;win2k12.yml&lt;/a&gt;), will look like:&lt;/p&gt;
-
-    &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolumeClaim&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;winhd&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15Gi&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;hostpath&lt;/span&gt;
-
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;win2k12-iso&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;running&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;win2k12-iso&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;4&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;bootOrder&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;cdrom&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;sata&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdromiso&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;harddrive&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;cdrom&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;sata&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;q35&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;8G&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdromiso&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;claimName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;iso-win2k12&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;harddrive&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;claimName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;winhd&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;containerDisk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt/virtio-container-disk&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Special attention to the &lt;code class=&quot;highlighter-rouge&quot;&gt;bootOrder: 1&lt;/code&gt; parameter in the first disk as it is the volume containing the ISO and it has to be marked as the first device to boot from.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;h2 id=&quot;installation&quot;&gt;Installation&lt;/h2&gt;
-
-&lt;p&gt;To proceed with the installation the commands commented above are going to be executed:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;Uploading the ISO file to the PVC:&lt;/p&gt;
-
-    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl image-upload &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;/root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iso-win2k12 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--access-mode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ReadOnlyMany &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--pvc-size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5G &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://10.96.164.35:443 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
-&lt;span class=&quot;nt&quot;&gt;--wait-secs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;240
-
-DataVolume default/iso-win2k12 created
-Waiting &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;PVC iso-win2k12 upload pod to be ready...
-Pod now ready
-Uploading data to https://10.96.164.35:443
-
-4.23 GiB / 4.23 GiB &lt;span class=&quot;o&quot;&gt;[=======================================================================================================================================================================]&lt;/span&gt; 100.00% 1m21s
-
-Uploading /root/9600.17050.WINBLUE_REFRESH.140317-1640_X64FRE_SERVER_EVAL_EN-US-IR3_SSS_X64FREE_EN-US_DV9.ISO completed successfully
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Pulling the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtio&lt;/code&gt; container image to the locally:&lt;/p&gt;
-
-    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker pull kubevirt/virtio-container-disk
-Using default tag: latest
-Trying to pull repository docker.io/kubevirt/virtio-container-disk ...
-latest: Pulling from docker.io/kubevirt/virtio-container-disk
-Digest: sha256:7e5449cb6a4a9586a3cd79433eeaafd980cb516119c03e499492e1e37965fe82
-Status: Image is up to &lt;span class=&quot;nb&quot;&gt;date &lt;/span&gt;&lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;docker.io/kubevirt/virtio-container-disk:latest
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Creating the PVC and Virtual Machine definitions:&lt;/p&gt;
-
-    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; win2k12.yml
-virtualmachine.kubevirt.io/win2k12-iso configured
-persistentvolumeclaim/winhd created
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Starting the Virtual Machine Instance:&lt;/p&gt;
-
-    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl start win2k12-iso
-VM win2k12-iso was scheduled to start
-
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi
-NAME          AGE   PHASE     IP            NODENAME
-win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Once the status of the VMI is &lt;code class=&quot;highlighter-rouge&quot;&gt;RUNNING&lt;/code&gt; it’s time to connect using VNC:&lt;/p&gt;
-
-    &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl vnc win2k12-iso
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;    &lt;/div&gt;
-
-    &lt;p&gt;&lt;img src=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png&quot; alt=&quot;windows2k12_install.png&quot; title=&quot;KubeVirt Microsoft Windows installation&quot; /&gt;&lt;/p&gt;
-
-    &lt;p&gt;Here is important to comment that to be able to connect through VNC using &lt;code class=&quot;highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; it’s necessary to reach the Kubernetes API.
-The following video shows how to go through the Microsoft Windows installation process:&lt;/p&gt;
-
-    &lt;figure class=&quot;video_container&quot;&gt;
-&lt;video controls=&quot;true&quot; allowfullscreen=&quot;true&quot; poster=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4&quot; width=&quot;800&quot; height=&quot;600&quot;&gt;
-    &lt;source src=&quot;/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/kubevirt_install_windows.mp4&quot; type=&quot;video/mp4&quot; /&gt;
-&lt;/video&gt;
-&lt;/figure&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Once the Virtual Machine is created, the PVC with the ISO and the &lt;code class=&quot;highlighter-rouge&quot;&gt;virtio&lt;/code&gt; drivers can be unattached from the Virtual Machine.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win&quot;&gt;KubeVirt user-guide: Virtio Windows Driver disk usage&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md&quot;&gt;Creating a registry image with a VM disk&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md&quot;&gt;CDI Upload User Guide&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers&quot;&gt;KubeVirt user-guide: How to obtain virtio drivers?&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html">Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Advanced VM scheduling" /><category term="affinity" /><category term="scheduling" /><category term="topologyKeys" /><summary type="html">This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</summary></entry></feed>

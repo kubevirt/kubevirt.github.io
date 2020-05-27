@@ -485,6 +485,10 @@
 <lastmod>2020-05-12T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html</loc>
+<lastmod>2020-05-25T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1185,5 +1189,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page24/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page25/</loc>
 </url>
 </urlset>
