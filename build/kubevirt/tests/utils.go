@@ -1749,6 +1749,10 @@ func NewRandomDataVolumeWithHttpImport(imageUrl, namespace string, accessMode k8
 	return newRandomDataVolumeWithHttpImport(imageUrl, namespace, Config.StorageClassLocal, accessMode)
 }
 
+func NewRandomDataVolumeWithHttpImportInStorageClass(imageUrl, namespace, storageClass string, accessMode k8sv1.PersistentVolumeAccessMode) *cdiv1.DataVolume {
+	return newRandomDataVolumeWithHttpImport(imageUrl, namespace, storageClass, accessMode)
+}
+
 func NewRandomVirtualMachineInstanceWithOCSDisk(imageUrl, namespace string, accessMode k8sv1.PersistentVolumeAccessMode, volMode k8sv1.PersistentVolumeMode) (*v1.VirtualMachineInstance, *cdiv1.DataVolume) {
 	if !HasCDI() {
 		Skip("Skip DataVolume tests when CDI is not present")
@@ -1908,6 +1912,15 @@ func NewRandomVMWithDataVolume(imageUrl string, namespace string) *v1.VirtualMac
 	return vm
 }
 
+func NewRandomVMWithDataVolumeInStorageClass(imageUrl, namespace, storageClass string) *v1.VirtualMachine {
+	dataVolume := NewRandomDataVolumeWithHttpImportInStorageClass(imageUrl, namespace, storageClass, k8sv1.ReadWriteOnce)
+	vmi := NewRandomVMIWithDataVolume(dataVolume.Name)
+	vm := NewRandomVirtualMachine(vmi, false)
+
+	vm.Spec.DataVolumeTemplates = append(vm.Spec.DataVolumeTemplates, *dataVolume)
+	return vm
+}
+
 func NewRandomVMWithCloneDataVolume(sourceNamespace, sourceName, targetNamespace string) *v1.VirtualMachine {
 	dataVolume := NewRandomDataVolumeWithPVCSource(sourceNamespace, sourceName, targetNamespace, k8sv1.ReadWriteOnce)
 	vmi := NewRandomVMIWithDataVolume(dataVolume.Name)
@@ -1947,6 +1960,28 @@ func NewRandomVMIWithEFIBootloader() *v1.VirtualMachineInstance {
 	vmi.Spec.Domain.Firmware = &v1.Firmware{
 		Bootloader: &v1.Bootloader{
 			EFI: &v1.EFI{},
+		},
+	}
+
+	return vmi
+
+}
+
+func NewRandomVMIWithSecureBoot() *v1.VirtualMachineInstance {
+	vmi := NewRandomVMIWithEphemeralDiskHighMemory(ContainerDiskFor(ContainerDiskMicroLiveCD))
+
+	// EFI needs more memory than other images
+	vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("1Gi")
+	vmi.Spec.Domain.Features = &v1.Features{
+		SMM: &v1.FeatureState{
+			Enabled: NewBool(true),
+		},
+	}
+	vmi.Spec.Domain.Firmware = &v1.Firmware{
+		Bootloader: &v1.Bootloader{
+			EFI: &v1.EFI{
+				SecureBoot: NewBool(true),
+			},
 		},
 	}
 
@@ -2775,6 +2810,7 @@ const (
 	ContainerDiskCirros               ContainerDisk = "cirros"
 	ContainerDiskAlpine               ContainerDisk = "alpine"
 	ContainerDiskFedora               ContainerDisk = "fedora-cloud"
+	ContainerDiskMicroLiveCD          ContainerDisk = "microlivecd"
 	ContainerDiskVirtio               ContainerDisk = "virtio-container-disk"
 	ContainerDiskEmpty                ContainerDisk = "empty"
 )
@@ -2784,7 +2820,7 @@ const (
 // Supported values are: cirros, fedora, alpine, guest-agent
 func ContainerDiskFor(name ContainerDisk) string {
 	switch name {
-	case ContainerDiskCirros, ContainerDiskAlpine, ContainerDiskFedora, ContainerDiskCirrosCustomLocation:
+	case ContainerDiskCirros, ContainerDiskAlpine, ContainerDiskFedora, ContainerDiskMicroLiveCD, ContainerDiskCirrosCustomLocation:
 		return fmt.Sprintf("%s/%s-container-disk-demo:%s", KubeVirtUtilityRepoPrefix, name, KubeVirtUtilityVersionTag)
 	case ContainerDiskVirtio:
 		return fmt.Sprintf("%s/virtio-container-disk:%s", KubeVirtUtilityRepoPrefix, KubeVirtUtilityVersionTag)
@@ -2976,6 +3012,26 @@ func ReLoggedInFedoraExpecter(vmi *v1.VirtualMachineInstance, timeout int) (expe
 		expecter.Close()
 		return expecter, err
 	}
+	return expecter, err
+}
+
+func SecureBootExpecter(vmi *v1.VirtualMachineInstance) (expect.Expecter, error) {
+	virtClient, err := kubecli.GetKubevirtClient()
+	PanicOnError(err)
+	expecter, _, err := NewConsoleExpecter(virtClient, vmi, 10*time.Second)
+	if err != nil {
+		return nil, err
+	}
+	b := append([]expect.Batcher{
+		&expect.BExp{R: "secureboot: Secure boot enabled"},
+	})
+	res, err := expecter.ExpectBatch(b, 180*time.Second)
+	if err != nil {
+		log.DefaultLogger().Object(vmi).Infof("Login: %+v", res)
+		expecter.Close()
+		return expecter, err
+	}
+
 	return expecter, err
 }
 
@@ -4104,7 +4160,8 @@ func GetCephStorageClass() (string, bool) {
 	storageClassList, err := virtClient.StorageV1().StorageClasses().List(metav1.ListOptions{})
 	Expect(err).ToNot(HaveOccurred())
 	for _, storageClass := range storageClassList.Items {
-		if storageClass.Provisioner == "csi-rbdplugin" {
+		switch storageClass.Provisioner {
+		case "rook-ceph.rbd.csi.ceph.com", "csi-rbdplugin":
 			return storageClass.Name, true
 		}
 	}
