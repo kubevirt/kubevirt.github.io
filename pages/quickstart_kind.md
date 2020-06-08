@@ -61,7 +61,7 @@ _(*): Ensure that *kubectl\* version complies with the [supported release skew](
 ### Start Kind
 
 Before starting with Kind, let's verify whether nested virtualization is enabled on the
-host where Kind is being installed on:
+host where Kind is being installed on, although, if you run kind on the bare-metal host then you can skip the following step:
 
 ```bash
 {% include scriptlets/quickstart_kind/00_verify_nested_virt.sh -%}
@@ -70,7 +70,7 @@ host where Kind is being installed on:
 If you get an **N**, follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="\_blank"} for enabling it.
 
 > note "Note"
-> Nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can't be enabled,
+> Nested virtualization is not mandatory for testing KubeVirt in a virtual machine, but makes things smoother. If for any reason it can't be enabled,
 > don't forget to enable emulation as shown in the _[Check for the Virtualization Extensions](#check-for-the-virtualization-extensions)_ section.
 
 Let's begin, normally, Kind can be started with default values and those will be enough
