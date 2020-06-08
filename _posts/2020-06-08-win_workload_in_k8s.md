@@ -105,7 +105,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/1-3.png"
-        width="100"
+        width="115"
         height="20"
         itemprop="thumbnail"
         alt="Power down the guest VM">
@@ -119,7 +119,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/1-4.png"
-        width="100"
+        width="125"
         height="20"
         itemprop="thumbnail"
         alt="Convert guest virtual disk img to qcow2">
@@ -152,7 +152,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/2-2.png"
-        width="100"
+        width="125"
         height="75"
         itemprop="thumbnail"
         alt="Observe the importer log">
@@ -164,7 +164,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
           src="/assets/2020-06-08-win_workload_in_k8s/2-3.png"
-          width="100"
+          width="125"
           height="75"
           itemprop="thumbnail"
           alt="Verify PersistentVolumeClaim">
@@ -181,7 +181,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/2-4.png"
-        width="100"
+        width="125"
         height="75"
         itemprop="thumbnail"
         alt="Verify PersistentVolume">
@@ -197,7 +197,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/2-5.png"
-        width="100"
+        width="125"
         height="75"
         itemprop="thumbnail"
         alt="Create a guest VM">
@@ -266,7 +266,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/2-9.png"
-        width="100"
+        width="125"
         height="70"
         itemprop="thumbnail"
         alt="Verify running guest VM">
@@ -276,7 +276,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/2-10.png"
-        width="100"
+        width="125"
         height="70"
         itemprop="thumbnail"
         alt="Guest web browser access">
@@ -286,7 +286,7 @@ Documentation to deploy KubeVirt with CDI image importer linked below.
     <div class="zoom">
       <img
         src="/assets/2020-06-08-win_workload_in_k8s/2-11.png"
-        width="100"
+        width="125"
         height="70"
         alt="Host web browser access">
     </div>
