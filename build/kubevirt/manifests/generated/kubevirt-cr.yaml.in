@@ -6,4 +6,5 @@ metadata:
   namespace: 
 spec:
   certificateRotateStrategy: {}
+  configuration: {}
   imagePullPolicy: 

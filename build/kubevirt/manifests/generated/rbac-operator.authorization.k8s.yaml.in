@@ -289,6 +289,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - kubevirt.io
+  resources:
+  - kubevirts
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - ""
   resources:
   - configmaps
@@ -450,6 +458,14 @@ rules:
   - apiextensions.k8s.io
   resources:
   - customresourcedefinitions
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - kubevirt.io
+  resources:
+  - kubevirts
   verbs:
   - get
   - list
