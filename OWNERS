@@ -5,11 +5,13 @@ filters:
       - iranzo
       - ptrnull
       - alosadagrande
+      - fabiand
     approvers:
       - codificat
       - iranzo
       - ptrnull
       - alosadagrande
+      - fabiand
     emeritus_approvers:
       - karmab # 10 july 2019
       - tripledes # 10 july 2019
