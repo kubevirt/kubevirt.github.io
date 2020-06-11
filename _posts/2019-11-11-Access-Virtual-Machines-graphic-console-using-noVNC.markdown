@@ -292,4 +292,4 @@ http://NODEIP:NODEPORT/?namespace=test
 
 - [Embedding and Deploying noVNC Application](https://github.com/novnc/noVNC/blob/master/docs/EMBEDDING.md)
 - [Kubevirt Api Access Control]({%post_url 2018-05-16-KubeVirt-API-Access-Control %})
-- [Use an HTTP Proxy to Access the Kubernetes API](https://kubernetes.io/docs/tasks/access-kubernetes-api/http-proxy-access-api/)
+- [Use an HTTP Proxy to Access the Kubernetes API](https://kubernetes.io/docs/tasks/extend-kubernetes/http-proxy-access-api/)
