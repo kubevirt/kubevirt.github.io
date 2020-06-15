@@ -178,4 +178,4 @@ these roles will prevent admins from ever having to create their own custom
 KubeVirt RBAC roles.
 
 More information about these default roles can be found in the KubeVirt
-user guide [here](https://www.kubevirt.io/user-guide/#/authorization)
+user guide [here](https://kubevirt.io/user-guide/#/authorization)
