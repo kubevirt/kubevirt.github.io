@@ -5,6 +5,7 @@ metadata:
 spec:
   ports:
     - port: 8096
+      nodePort: 30761
       targetPort: 8096
   selector:
     special: key
