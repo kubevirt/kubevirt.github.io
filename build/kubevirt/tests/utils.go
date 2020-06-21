@@ -4716,7 +4716,7 @@ func GetCertFromSecret(secretName string) []byte {
 func GetBundleFromConfigMap(configMapName string) ([]byte, []*x509.Certificate) {
 	virtClient, err := kubecli.GetKubevirtClient()
 	Expect(err).ToNot(HaveOccurred())
-	configMap, err := virtClient.CoreV1().ConfigMaps(KubeVirtInstallNamespace).Get(components.KubeVirtCASecretName, metav1.GetOptions{})
+	configMap, err := virtClient.CoreV1().ConfigMaps(KubeVirtInstallNamespace).Get(configMapName, metav1.GetOptions{})
 	Expect(err).ToNot(HaveOccurred())
 	if rawBundle, ok := configMap.Data[components.CABundleKey]; ok {
 		crts, err := cert.ParseCertsPEM([]byte(rawBundle))
@@ -4769,12 +4769,6 @@ func IsRunningOnKindInfra() bool {
 func IsRunningOnKindInfraIPv6() bool {
 	provider := os.Getenv("KUBEVIRT_PROVIDER")
 	return strings.HasPrefix(provider, "kind-k8s-1.17.0-ipv6")
-}
-
-func SkipStressTestIfRunnigOnKindInfra() {
-	if IsRunningOnKindInfra() {
-		Skip("Skip stress test till issue https://github.com/kubevirt/kubevirt/issues/3323 is fixed")
-	}
 }
 
 func SkipPVCTestIfRunnigOnKindInfra() {
