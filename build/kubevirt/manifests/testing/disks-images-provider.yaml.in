@@ -98,6 +98,10 @@ spec:
         - name: target
           image: /disks-images-provider:
           imagePullPolicy: Always
+          lifecycle:
+            preStop:
+              exec:
+                command: ["/bin/sh","-c","source /etc/bashrc && losetup -d ${LOOP_DEVICE}"]
           volumeMounts:
           - name: images
             mountPath: /hostImages
