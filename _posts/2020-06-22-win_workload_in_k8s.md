@@ -20,9 +20,10 @@ pub-date: June 22
 pub-year: 2020
 ---
 
-The goal of this blog is to demonstrate the migration of a Windows guest VM
-running on a Windows host to a guest VM orchestrated by Kubernetes and KubeVirt
-on a Fedora Linux host. Yes!  It can be done!
+<p>The goal of this blog is to demonstrate that a web service can continue to run
+after a Windows guest virtual machine providing the service is migrated from
+MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by
+Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!</p>
 
 ### Source details
 
@@ -39,14 +40,15 @@ on a Fedora Linux host. Yes!  It can be done!
 
 * Host platform: Fedora 32 with latest updates applied
 * Kubernetes cluster created
-* KubeVirt installed with CDI
+* [KubeVirt](https://kubevirt.io/quickstart_minikube/) and [CDI](https://kubevirt.io/user-guide/#/installation/image-upload) installed in the Kubernetes cluster.
 
 ## Procedure
 
 ### Tasks to performed on source host
 
 <ol>
-  <li>Ensure application service is running<br>
+  <li>Before we begin let's take a moment to ensure the service is running and
+  web browser accessible<br>
     <div class="zoom">
       <img
         src="/assets/2020-06-22-win_workload_in_k8s/1-1.png"
@@ -55,8 +57,7 @@ on a Fedora Linux host. Yes!  It can be done!
         itemprop="thumbnail"
         alt="Ensure application service is running">
     </div>
-    <br><br>
-  </li><li>Confirm web browser access<br>
+    <br>
     <div class="zoom">
       <img
         src="/assets/2020-06-22-win_workload_in_k8s/1-2.png"
@@ -66,7 +67,8 @@ on a Fedora Linux host. Yes!  It can be done!
         alt="Confirm web browser access">
     </div>
     <br><br>
-  </li><li>Power down the guest VM<br>
+  </li><li>Power down the guest virtual machine to ensure all changes to the
+  filesystem are quiesced to disk.<br>
     <code>VBoxManage.exe controlvm testvm poweroff</code>
     <br>
     <div class="zoom">
@@ -75,10 +77,11 @@ on a Fedora Linux host. Yes!  It can be done!
         width="115"
         height="20"
         itemprop="thumbnail"
-        alt="Power down the guest VM">
+        alt="Power down the guest virtual machine">
     </div>
     <br><br>
-  </li><li>Upload disk img
+  </li><li>Upload the guest virtual machine disk image to the Kubernetes cluster
+  and a target DataVolume called testvm
     <sup id="fnref:2" role="doc-noteref">
       <a href="#fn:2" class="footnote">2</a>
     </sup>
@@ -95,47 +98,26 @@ on a Fedora Linux host. Yes!  It can be done!
         width="100"
         height="60"
         itemprop="thumbnail"
-        alt="Upload disk img">
+        alt="Upload disk image">
     </div>
-  </li>
-</ol>
-
-### Tasks to performed on target host
-
-<ol>
-  <li>Verify PersistentVolumeClaim<br>
+    <br><br>
+  </li><li>Verify the PersistentVolumeClaim created via the DataVolume
+  image upload in the previous step<br>
     <code>
-      kubectl get pvc
       kubectl describe pvc/testvm
     </code>
     <br>
     <div class="zoom">
       <img
-          src="/assets/2020-06-22-win_workload_in_k8s/2-1.png"
-          width="125"
-          height="75"
-          itemprop="thumbnail"
-          alt="Verify PersistentVolumeClaim">
-    </div>
-    <br><br>
-  </li><li>Verify PersistentVolume<br>
-    <code>
-      I=$(kubectl get pvc/testvm -o jsonpath='{.spec.volumeName}');<br>
-      kubectl describe pv/${I};<br>
-      minikube ssh;<br>
-      ls -la /var/lib/minikube/default-testvm-pvc*
-    </code>
-    <br>
-    <div class="zoom">
-      <img
-        src="/assets/2020-06-22-win_workload_in_k8s/2-2.png"
+        src="/assets/2020-06-22-win_workload_in_k8s/2-1.png"
         width="125"
         height="75"
         itemprop="thumbnail"
-        alt="Verify PersistentVolume">
+        alt="Verify PersistentVolumeClaim">
     </div>
-    <br><br>
-  </li><li>Create a guest VM<br>
+  <br><br>
+  </li><li>Create a guest virtual machine definition that references the
+  DataVolume containing our guest virtual machine disk image<br>
     <code>kubectl create -f vm_testvm.yaml</code>
     <sup id="fnref:3" role="doc-noteref">
       <a href="#fn:3" class="footnote">3</a>
@@ -143,14 +125,15 @@ on a Fedora Linux host. Yes!  It can be done!
     <br>
     <div class="zoom">
       <img
-        src="/assets/2020-06-22-win_workload_in_k8s/2-3.png"
+        src="/assets/2020-06-22-win_workload_in_k8s/2-2.png"
         width="125"
         height="75"
         itemprop="thumbnail"
-        alt="Create a guest VM">
+        alt="Create the guest virtual machine">
     </div>
     <br><br>
-  </li><li>Create NodePort service for Jellyfin<br>
+  </li><li>Expose the Jellyfin service in Kubernetes via a NodePort type
+  service<br>
     <code>
       kubectl create -f service_jellyfin.yaml
     </code>
@@ -160,74 +143,52 @@ on a Fedora Linux host. Yes!  It can be done!
     <br>
     <div class="zoom">
       <img
-        src="/assets/2020-06-22-win_workload_in_k8s/2-4.png"
+        src="/assets/2020-06-22-win_workload_in_k8s/2-3.png"
         width="100"
         height="75"
         itemprop="thumbnail"
         alt="Create NodePort service">
     </div>
-    <br><br>
-  </li><li>Acquire service url from minikube<br>
-    <code>
-      minikube service jellyfin
-    </code>
-    <br><br>
-    This data can also be acquired manually via the following:
+  <br><br>
+  </li><li>Let's verify the running guest virtual machine by using the virtctl
+  command to open a vnc session to the MS Window console.  While we are here
+  let's also open a web browser and confirm web browser access to the
+  application.<br>
+    <code>virtctl vnc testvm</code>
     <br>
-    <code>
-      minikube ip;<br>
-      kubectl get service jellyfin -o jsonpath='{.spec.ports..nodePort}'
-    </code>
+    <div class="zoom">
+      <img
+        src="/assets/2020-06-22-win_workload_in_k8s/2-4.png"
+        width="125"
+        height="70"
+        itemprop="thumbnail"
+        alt="Verify running guest virtual machine">
+    </div>
     <br>
     <div class="zoom">
       <img
         src="/assets/2020-06-22-win_workload_in_k8s/2-5.png"
-        width="100"
-        height="50"
+        width="125"
+        height="70"
         itemprop="thumbnail"
-        alt="Acquire service url">
+        alt="Web browser access to application">
     </div>
-    > info "INFO"
-    > Keep the minikube ip, and port in mind. These data points will
-    > be used further along in the demo
+    <br><br>
+  </li>
+</ol>
 
-    > warning "NOTICE"
-    > A `<pending>` state in the `EXTERNAL-IP` column is indicative of an
-    > issue. There must be an assigned IP in this column.
+### Task to performed on user workstation
 
-  <br><br>
-  </li><li>Verify running guest VM<br>
-    <code>virtctl vnc testvm</code>
-    <br>
+<ol>
+  And finally let's confirm web browser access via the Kubernetes service url.<br>
     <div class="zoom">
       <img
         src="/assets/2020-06-22-win_workload_in_k8s/2-6.png"
         width="125"
         height="70"
-        itemprop="thumbnail"
-        alt="Verify running guest VM">
+        alt="Web browser access to Kubernetes service">
     </div>
     <br><br>
-  </li><li>Confirm web browser access to app on guest VM<br>
-    <div class="zoom">
-      <img
-        src="/assets/2020-06-22-win_workload_in_k8s/2-7.png"
-        width="125"
-        height="70"
-        itemprop="thumbnail"
-        alt="Guest web browser access">
-    </div>
-    <br><br>
-  </li><li>Confirm web browser access to app on host<br>
-    <div class="zoom">
-      <img
-        src="/assets/2020-06-22-win_workload_in_k8s/2-8.png"
-        width="125"
-        height="70"
-        alt="Host web browser access">
-    </div>
-    <br><br>
-  </li>
 </ol>
 
 ### SUCCESS!
@@ -242,22 +203,26 @@ questions feel free to join the conversation via one of the project forums.</p>
 <div class="footnotes" role="doc-noteref">
   <ol>
     <li id="fn:1" role="doc-noteref">
-      Fedora virtio drivers need to be installed on Windows hosts or VMs that will be
-      migrated into a Kubernetes environment. Drivers can be found
+      Fedora virtio drivers need to be installed on Windows hosts or virtual
+      machines that will be migrated into a Kubernetes environment. Drivers can
+      be found
       <a href="https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/">
         here
-      </a>
+      </a>.
       <a href="#fnref:1" class="reversefootnote" role="doc-noteref">&#8617;</a>
     </li><li id="fn:2" role="doc-noteref">
       Please note:
       <br>
-      &#8226; users without certificate authority trusted x509 certificates
-      added to the kubernetes api and cdi cdi-proxyuploader secret will require the `--insecure` arg.
+      &#8226; Users without certificate authority trusted certificates added to
+      the kubernetes api and cdi cdi-proxyuploader secret will require the
+      <code>--insecure</code> arg.
       <br>
-      &#8226; users without the uploadProxyURLOverride patch to the cdi cdiconfig.cdi.kubevirt.io/config crd
-      will require the `--uploadProxyURL` arg.
+      &#8226; Users without the uploadProxyURLOverride patch to the cdi
+      cdiconfig.cdi.kubevirt.io/config crd will require the
+      <code>--uploadProxyURL</code> arg.
       <br>
-      &#8226; users need a correctly configured $HOME/.kube/config along with client authentication certificate
+      &#8226; Users need a correctly configured $HOME/.kube/config along with
+      client authentication certificate.
       <a href="#fnref:2" class="reversefootnote" role="doc-noteref">&#8617;</a>
     </li><li id="fn:3" role="doc-noteref">
       <a href="{% link assets/2020-06-22-win_workload_in_k8s/vm_testvm.yaml %}">
@@ -272,7 +237,3 @@ questions feel free to join the conversation via one of the project forums.</p>
     </li>
   </ol>
 </div>
-
-Fedora virtio drivers need to be installed on Windows hosts or VMs that will be
-migrated into a Kubernetes environment. Drivers can be found
-[here](https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/).
