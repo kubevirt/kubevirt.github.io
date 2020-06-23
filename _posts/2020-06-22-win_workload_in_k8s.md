@@ -199,7 +199,8 @@ questions feel free to join the conversation via one of the project forums.</p>
 
 <br>
 
-### Example manifests
+##### Footnotes
+
 <div class="footnotes" role="doc-noteref">
   <ol>
     <li id="fn:1" role="doc-noteref">
