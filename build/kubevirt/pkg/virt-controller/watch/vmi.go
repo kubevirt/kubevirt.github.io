@@ -97,11 +97,14 @@ const (
 	SuccessfulAbortMigrationReason = "SuccessfulAbortMigration"
 	// FailedAbortMigrationReason is added when an attempt to abort migration fails
 	FailedAbortMigrationReason = "FailedAbortMigration"
+	// FailedPVCVolumeSourceMisusedReason is added when PVC volume source is used where Data Volume should be used
+	FailedPVCVolumeSourceMisusedReason = "PVCVolumeSourceMisused"
 )
 
 func NewVMIController(templateService services.TemplateService,
 	vmiInformer cache.SharedIndexInformer,
 	podInformer cache.SharedIndexInformer,
+	pvcInformer cache.SharedIndexInformer,
 	recorder record.EventRecorder,
 	clientset kubecli.KubevirtClient,
 	dataVolumeInformer cache.SharedIndexInformer) *VMIController {
@@ -111,6 +114,7 @@ func NewVMIController(templateService services.TemplateService,
 		Queue:              workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
 		vmiInformer:        vmiInformer,
 		podInformer:        podInformer,
+		pvcInformer:        pvcInformer,
 		recorder:           recorder,
 		clientset:          clientset,
 		podExpectations:    controller.NewUIDTrackingControllerExpectations(controller.NewControllerExpectations()),
@@ -162,6 +166,7 @@ type VMIController struct {
 	Queue              workqueue.RateLimitingInterface
 	vmiInformer        cache.SharedIndexInformer
 	podInformer        cache.SharedIndexInformer
+	pvcInformer        cache.SharedIndexInformer
 	recorder           record.EventRecorder
 	podExpectations    *controller.UIDTrackingControllerExpectations
 	dataVolumeInformer cache.SharedIndexInformer
@@ -363,19 +368,6 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 
 					// vmi is still owned by the controller but pod is already ready,
 					// so let's hand over the vmi too
-					interfaces := make([]virtv1.VirtualMachineInstanceNetworkInterface, 0)
-					for _, network := range vmi.Spec.Networks {
-						if network.NetworkSource.Pod != nil {
-							ifc := virtv1.VirtualMachineInstanceNetworkInterface{
-								Name: network.Name,
-								IP:   pod.Status.PodIP,
-								IPs:  []string{pod.Status.PodIP},
-							}
-							interfaces = append(interfaces, ifc)
-						}
-					}
-					vmiCopy.Status.Interfaces = interfaces
-
 					vmiCopy.Status.Phase = virtv1.Scheduled
 					if vmiCopy.Labels == nil {
 						vmiCopy.Labels = map[string]string{}
@@ -566,6 +558,10 @@ func (c *VMIController) sync(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod,
 
 	if vmi.IsFinal() {
 		return nil
+	}
+
+	if err := handlePVCMisuseInVMI(c.pvcInformer, c.recorder, vmi); err != nil {
+		return &syncErrorImpl{err, FailedPVCVolumeSourceMisusedReason}
 	}
 
 	if !podExists(pod) {

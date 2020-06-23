@@ -1,4 +1,175 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-06-22T13:58:15+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">SELinux, from basics to KubeVirt</title><link href="https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html" rel="alternate" type="text/html" title="SELinux, from basics to KubeVirt" /><published>2020-05-25T00:00:00+00:00</published><updated>2020-05-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html">&lt;p&gt;SELinux is one of many security mechanisms leveraged by KubeVirt.&lt;br /&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-06-23T18:42:18+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
+after a Windows guest virtual machine providing the service is migrated from
+MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by
+Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!&lt;/p&gt;
+
+&lt;h3 id=&quot;source-details&quot;&gt;Source details&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Host platform: Windows 2019 Datacenter&lt;/li&gt;
+  &lt;li&gt;Virtualization platform: Oracle VirtualBox 6.1&lt;/li&gt;
+  &lt;li&gt;Guest platform: Windows 2019 Datacenter (guest to be migrated)
+&lt;sup id=&quot;fnref:1&quot; role=&quot;doc-noteref&quot;&gt;
+&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;
+&lt;/sup&gt;&lt;/li&gt;
+  &lt;li&gt;Guest application: My favorite dotnet application
+&lt;a href=&quot;https://jellyfin.org/&quot;&gt;Jellyfin&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;target-details&quot;&gt;Target details&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Host platform: Fedora 32 with latest updates applied&lt;/li&gt;
+  &lt;li&gt;Kubernetes cluster created&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/quickstart_minikube/&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/image-upload&quot;&gt;CDI&lt;/a&gt; installed in the Kubernetes cluster.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;procedure&quot;&gt;Procedure&lt;/h2&gt;
+
+&lt;h3 id=&quot;tasks-to-performed-on-source-host&quot;&gt;Tasks to performed on source host&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Before we begin let's take a moment to ensure the service is running and
+  web browser accessible&lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-1.png&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Ensure application service is running&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-2.png&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Confirm web browser access&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Power down the guest virtual machine to ensure all changes to the
+  filesystem are quiesced to disk.&lt;br /&gt;
+    &lt;code&gt;VBoxManage.exe controlvm testvm poweroff&lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-3.png&quot; width=&quot;115&quot; height=&quot;20&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Power down the guest virtual machine&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Upload the guest virtual machine disk image to the Kubernetes cluster
+  and a target DataVolume called testvm
+    &lt;sup id=&quot;fnref:2&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;
+    &lt;/sup&gt;
+    &lt;br /&gt;
+    &lt;code&gt;
+      virtctl.exe image-upload dv testvm
+      --size=14Gi
+      --image-path=&quot;C:\Users\Administrator\VirtualBox VMs\testvm\testvm.vdi&quot;
+    &lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-4.png&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Upload disk image&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Verify the PersistentVolumeClaim created via the DataVolume
+  image upload in the previous step&lt;br /&gt;
+    &lt;code&gt;
+      kubectl describe pvc/testvm
+    &lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-1.png&quot; width=&quot;125&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Verify PersistentVolumeClaim&quot; /&gt;
+    &lt;/div&gt;
+  &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Create a guest virtual machine definition that references the
+  DataVolume containing our guest virtual machine disk image&lt;br /&gt;
+    &lt;code&gt;kubectl create -f vm_testvm.yaml&lt;/code&gt;
+    &lt;sup id=&quot;fnref:3&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;
+    &lt;/sup&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-2.png&quot; width=&quot;125&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create the guest virtual machine&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Expose the Jellyfin service in Kubernetes via a NodePort type
+  service&lt;br /&gt;
+    &lt;code&gt;
+      kubectl create -f service_jellyfin.yaml
+    &lt;/code&gt;
+    &lt;sup id=&quot;fnref:4&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;
+    &lt;/sup&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-3.png&quot; width=&quot;100&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create NodePort service&quot; /&gt;
+    &lt;/div&gt;
+  &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Let's verify the running guest virtual machine by using the virtctl
+  command to open a vnc session to the MS Window console.  While we are here
+  let's also open a web browser and confirm web browser access to the
+  application.&lt;br /&gt;
+    &lt;code&gt;virtctl vnc testvm&lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-4.png&quot; width=&quot;125&quot; height=&quot;70&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Verify running guest virtual machine&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-5.png&quot; width=&quot;125&quot; height=&quot;70&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Web browser access to application&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;task-to-performed-on-user-workstation&quot;&gt;Task to performed on user workstation&lt;/h3&gt;
+
+&lt;ol&gt;
+  And finally let's confirm web browser access via the Kubernetes service url.&lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-6.png&quot; width=&quot;125&quot; height=&quot;70&quot; alt=&quot;Web browser access to Kubernetes service&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;success&quot;&gt;SUCCESS!&lt;/h3&gt;
+
+&lt;p&gt;Here we have successfully demonstrated how simple it can be to migrate an
+existing MS Windows platform and application to Kubernetes control. For
+questions feel free to join the conversation via one of the project forums.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;example-manifests&quot;&gt;Example manifests&lt;/h3&gt;
+&lt;div class=&quot;footnotes&quot; role=&quot;doc-noteref&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot; role=&quot;doc-noteref&quot;&gt;
+      Fedora virtio drivers need to be installed on Windows hosts or virtual
+      machines that will be migrated into a Kubernetes environment. Drivers can
+      be found
+      &lt;a href=&quot;https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/&quot;&gt;
+        here
+      &lt;/a&gt;.
+      &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;&lt;li id=&quot;fn:2&quot; role=&quot;doc-noteref&quot;&gt;
+      Please note:
+      &lt;br /&gt;
+      &amp;#8226; Users without certificate authority trusted certificates added to
+      the kubernetes api and cdi cdi-proxyuploader secret will require the
+      &lt;code&gt;--insecure&lt;/code&gt; arg.
+      &lt;br /&gt;
+      &amp;#8226; Users without the uploadProxyURLOverride patch to the cdi
+      cdiconfig.cdi.kubevirt.io/config crd will require the
+      &lt;code&gt;--uploadProxyURL&lt;/code&gt; arg.
+      &lt;br /&gt;
+      &amp;#8226; Users need a correctly configured $HOME/.kube/config along with
+      client authentication certificate.
+      &lt;a href=&quot;#fnref:2&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;&lt;li id=&quot;fn:3&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;/assets/2020-06-22-win_workload_in_k8s/vm_testvm.yaml&quot;&gt;
+        vm_testvm.yaml
+      &lt;/a&gt;: Virtual machine manifest
+      &lt;a href=&quot;#fnref:3&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;&lt;li id=&quot;fn:4&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;/assets/2020-06-22-win_workload_in_k8s/service_jellyfin.yaml&quot;&gt;
+        service_jellyfin.yaml
+      &lt;/a&gt;: Service manifest
+      &lt;a href=&quot;#fnref:4&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="images" /><category term="storage" /><category term="windows" /><summary type="html">The goal of this blog is to demonstrate that a web service can continue to run after a Windows guest virtual machine providing the service is migrated from MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by Kubernetes and KubeVirt on a Fedora Linux host. Yes! It can be done!</summary></entry><entry><title type="html">SELinux, from basics to KubeVirt</title><link href="https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html" rel="alternate" type="text/html" title="SELinux, from basics to KubeVirt" /><published>2020-05-25T00:00:00+00:00</published><updated>2020-05-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2020/SELinux-from-basics-to-KubeVirt.html">&lt;p&gt;SELinux is one of many security mechanisms leveraged by KubeVirt.&lt;br /&gt;
 For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/KubeVirt-Security-Fundamentals.html&quot;&gt;this excellent article&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&quot;selinux-101&quot;&gt;SELinux 101&lt;/h2&gt;
@@ -2154,137 +2325,4 @@ He is specifically interested in GPU workloads on VMs. He is an active contribut
   &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;YouTube video: KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/31/KubeCon%202019%20-%20Virtualized%20GPU%20Workloads%20on%20KubeVirt.pdf&quot;&gt;Presentation: Virtualized GPU workloads on KubeVirt&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VnjX&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="KubeCon" /><category term="GPU" /><category term="NVIDIA" /><category term="GPU workloads" /><category term="pass-through" /><category term="passthrough" /><category term="KVM" /><category term="QEMU" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi</title><link href="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt introduction by Steve Gordon and Chandrakanth Jakkidi" /><published>2020-02-01T00:00:00+00:00</published><updated>2020-02-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes.html">&lt;p&gt;In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an
-orchestration engine for not just application containers but virtual machine workloads as well. This provides a
-unified development platform where developers can build, modify, and deploy applications made up of both application
-containers as well as the virtual machines (VM) in a common, shared environment.&lt;/p&gt;
-
-&lt;p&gt;They show how the KubeVirt community is continuously growing and helping with their contributions to the code in
-&lt;a href=&quot;https://github.com/kubevirt&quot;&gt;KubeVirt GitHub repository&lt;/a&gt;.&lt;/p&gt;
-
-&lt;p&gt;In the session, you will learn more about why KubeVirt exists:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Growing velocity behind Kubernetes and surrounding ecosystem for new applications.&lt;/li&gt;
-  &lt;li&gt;Reality that users will be dealing with virtual machine workloads for many years to come.&lt;/li&gt;
-  &lt;li&gt;Focus on building transition paths for users with workloads that will either never be containerized:
-    &lt;ul&gt;
-      &lt;li&gt;Technical reasons (e.g. older operating system or kernel)&lt;/li&gt;
-      &lt;li&gt;Business reasons (e.g. time to market, cost of conversion)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;…or will be decomposed over a longer time horizon.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;They also explain the common use cases, how people are using it today:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;To run VMs to support new development
-    &lt;ul&gt;
-      &lt;li&gt;Build new applications relying on existing VM-based applications and APIs.&lt;/li&gt;
-      &lt;li&gt;Leverage Kubernetes-based developer flows while bringing in these VM-based dependencies.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;To run VMs to support applications that can’t lift and shift
-    &lt;ul&gt;
-      &lt;li&gt;Users with very old applications who are not in a position to change them significantly.&lt;/li&gt;
-      &lt;li&gt;Vendors with appliances (customer kernels, custom kmods, optimized workflows to build appliances, …) they want to bring to the cloud-native ecosystem.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;To run Kubernetes in Kubernetes (!)
-    &lt;ul&gt;
-      &lt;li&gt;KubeVirt as a Cluster API provider
-        &lt;ul&gt;
-          &lt;li&gt;Hard Multi-Tenancy&lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-      &lt;li&gt;Community provided cloud-provider-kubevirt&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;To run Virtual Network Functions (VNFs) and other virtual appliances
-    &lt;ul&gt;
-      &lt;li&gt;VNFs in the context of Kubernetes are of continued interest, in parallel to Cloud-native Network Function exploration.
-        &lt;ul&gt;
-          &lt;li&gt;Kubernetes is an attractive target for VNFs.
-            &lt;ul&gt;
-              &lt;li&gt;Compute features and management approach is appealing.&lt;/li&gt;
-              &lt;li&gt;But: VNFs are hard to containerize!&lt;/li&gt;
-            &lt;/ul&gt;
-          &lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;They also cover how the project actually works from an architectural perspective and the ideal environment.
-&lt;img src=&quot;/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/containers_and_vms.png&quot; alt=&quot;architectural_perspective&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;And how is the ideal environment with KubeVirt:
-&lt;img src=&quot;/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/kubevirt_environment.png&quot; alt=&quot;kubevirt_environment&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;A walk through the KubeVirt components is also shown:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;virt-api-server: The entry point to KubeVirt for all virtualization related flows and takes care to update the virtualization related custom resource definition (CRD)&lt;/li&gt;
-  &lt;li&gt;virt-launcher: A VM is inside a POD launched by virt-launcher using Libvirt
-&lt;img src=&quot;/assets/2020-01-29-KubeVirt_Intro-Virtual_Machine_Management_on_Kubernetes/pod_networking.png&quot; alt=&quot;pod_networking&quot; /&gt;&lt;/li&gt;
-  &lt;li&gt;virt-controller: Each Object has a corresponding controller&lt;/li&gt;
-  &lt;li&gt;virt-handler: is a Daemonset that acts as a minion communication to Libvirt via socket&lt;/li&gt;
-  &lt;li&gt;libvirtd: toolkit to manage virtualization platforms&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;In the Video, a short demo of the project in action is shown. Eventually, Chandra shows how to install KubeVirt and bring up a virtual machine in a short time!&lt;/p&gt;
-
-&lt;p&gt;Finally, you will hear about future plans for developing KubeVirt capabilities that are emerging from the community. Some hints:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Better support for deterministic workloads:
-    &lt;ul&gt;
-      &lt;li&gt;CPU Pinning○NUMA Topology Alignment&lt;/li&gt;
-      &lt;li&gt;IO Thread pinning&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;Storage-assisted snapshot and cloning.&lt;/li&gt;
-  &lt;li&gt;Forensic virtual machine capture&lt;/li&gt;
-  &lt;li&gt;GPU passthrough&lt;/li&gt;
-  &lt;li&gt;Policy-based live migration and additional migration modes.&lt;/li&gt;
-  &lt;li&gt;Hotplugging of CPUs, RAM, disks, and NICs (not necessarily in that order!).&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/_z5Pjyl0Dq4&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;speakers&quot;&gt;Speakers&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://twitter.com/xsgordon&quot;&gt;Steve Gordon&lt;/a&gt; is currently a Principal Product Manager at Red Hat based in Toronto, Canada.
-Focused on building infrastructure solutions for compute use cases using a spectrum of virtualization, containerization,
-and bare-metal provisioning technologies.&lt;/p&gt;
-
-&lt;p&gt;He got his start in Open Source while building out and managing web-based solutions for the Earth Systems Science Computational
-Centre (ESSCC) at the University of Queensland. After graduating with degrees in Information Technology and Commerce, Stephen took
-a multi-year detour into the wonderful world of the z-Series mainframe while writing new COBOL applications for the Australian Tax Office (ATO).&lt;/p&gt;
-
-&lt;p&gt;Stephen then landed at Red Hat where he has grown his knowledge of the infrastructure space working across multiple roles and solutions
-at the intersection of the Linux virtualization stack (KVM, QEMU, Libvirt), OpenStack, and more recently Kubernetes. Now he is working with a
-team attempting to realize a vision for unification of application containers and virtual machines enabled by the KubeVirt project.&lt;/p&gt;
-
-&lt;p&gt;Stephen has previously presented on a variety of infrastructure topics at OpenStack Summit, multiple Red Hat Summit, KVM Forum, OpenStack Days Canada,
-OpenStack Silicon Valley, and local meetups.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.linkedin.com/in/jakkidi-chandrakanth-reddy-149a5920/&quot;&gt;Chandrakanth Reddy Jakkidi&lt;/a&gt; is an active Open Source Contributor. He is involved in CNCF and open infrastructure community projects.
-He has contributed to OpenStack and Kubernetes projects. Presently an active contributor to the Kubevirt Project.
-Chandrakanth is having 14+ years experience in networking, virtualization, cloud, Kubernetes, SDN, NFV, OpenStack and infrastructure technologies.&lt;/p&gt;
-
-&lt;p&gt;He is currently working with F5 Networks as Senior Software Engineer. He previously worked with Cisco Systems, Starent Networks, Emerson/Artesyn Embedded
-Technologies and NXP/Freescale Semiconductors/Intoto Network Security companies. He is a speaker and drives local open source meetups. His present passion
-is towards CNCF projects. In 2018, he was a speaker of the DevOpsDays Event.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=_z5Pjyl0Dq4&quot;&gt;YouTube Video: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp;amp; Chandrakanth Jakkidi&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/70/Introduction_to_KubeVirt-KUBECONNA19.pdf&quot;&gt;Presentation: KubeVirt Intro: Virtual Machine Management on Kubernetes - Steve Gordon &amp;amp; Chandrakanth Jakkidi&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VyBC&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="video" /><category term="virtual machine management" /><category term="KubeCon" /><category term="NUMA" /><category term="CPU pinning" /><category term="QEMU" /><category term="KVM" /><summary type="html">In this session, Steve and Chandra provide an introduction to the KubeVirt project, which turns Kubernetes into an orchestration engine for not just application containers but virtual machine workloads as well. This provides a unified development platform where developers can build, modify, and deploy applications made up of both application containers as well as the virtual machines (VM) in a common, shared environment.</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="KubeCon" /><category term="GPU" /><category term="NVIDIA" /><category term="GPU workloads" /><category term="pass-through" /><category term="passthrough" /><category term="KVM" /><category term="QEMU" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry></feed>

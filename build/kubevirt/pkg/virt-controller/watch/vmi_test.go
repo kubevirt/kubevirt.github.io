@@ -169,6 +169,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			services.NewTemplateService("a", "b", "c", "d", "e", "f", pvcInformer.GetStore(), virtClient, config, qemuGid),
 			vmiInformer,
 			podInformer,
+			pvcInformer,
 			recorder,
 			virtClient,
 			dataVolumeInformer,
@@ -309,6 +310,55 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, FailedDataVolumeImportReason)
+		})
+
+		It("should not start VMI if it mistakenly uses PVC instead of DV that owns it", func() {
+			vmi := v1.NewMinimalVMI("testvm")
+
+			annotations := map[string]string{}
+			annotations[v1.ControllerAPILatestVersionObservedAnnotation] = v1.ApiLatestVersion
+			annotations[v1.ControllerAPIStorageVersionObservedAnnotation] = v1.ApiStorageVersion
+			vmi.SetAnnotations(annotations)
+
+			vmi.Spec.Volumes = append(vmi.Spec.Volumes, v1.Volume{
+				Name: "dv1",
+				VolumeSource: v1.VolumeSource{
+					PersistentVolumeClaim: &k8sv1.PersistentVolumeClaimVolumeSource{
+						ClaimName: "dv1",
+					},
+				},
+			})
+
+			dv := &cdiv1.DataVolume{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dv1",
+					Namespace: vmi.Namespace,
+				},
+				Status: cdiv1.DataVolumeStatus{
+					Phase: cdiv1.Succeeded,
+				},
+			}
+
+			pvcInformer.GetStore().Add(&k8sv1.PersistentVolumeClaim{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "dv1",
+					Namespace: vmi.Namespace,
+					OwnerReferences: []metav1.OwnerReference{
+						metav1.OwnerReference{
+							Name: "dv1",
+							Kind: "DataVolume",
+						},
+					},
+				},
+			})
+
+			addVirtualMachine(vmi)
+			dataVolumeInformer.GetStore().Add(dv)
+
+			vmiInterface.EXPECT().Update(gomock.Any()).Return(vmi, nil)
+
+			controller.Execute()
+			testutils.ExpectEvent(recorder, FailedPVCVolumeSourceMisusedReason)
 		})
 	})
 
@@ -1004,71 +1054,6 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			table.Entry("and in succeeded state", k8sv1.PodSucceeded),
 			table.Entry("and in failed state", k8sv1.PodFailed),
 		)
-	})
-
-	Context("When VirtualMachineInstance is connected to a network", func() {
-		It("should report the status of this network", func() {
-			vmi := NewPendingVirtualMachine("testvmi")
-			vmi.Status.Phase = v1.Scheduling
-			pod := NewPodForVirtualMachine(vmi, k8sv1.PodRunning)
-
-			addVirtualMachine(vmi)
-			podFeeder.Add(pod)
-
-			networkName := "test net"
-			podIp := "1.1.1.1"
-			pod.Status.PodIP = podIp
-			vmi.Spec.Networks = []v1.Network{
-				v1.Network{
-					Name: networkName,
-					NetworkSource: v1.NetworkSource{
-						Pod: &v1.PodNetwork{
-							VMNetworkCIDR: "1.1.1.1",
-						},
-					},
-				},
-			}
-			vmiInterface.EXPECT().Update(gomock.Any()).Do(func(arg interface{}) {
-				Expect(len(arg.(*v1.VirtualMachineInstance).Status.Interfaces)).To(Equal(1))
-				Expect(arg.(*v1.VirtualMachineInstance).Status.Interfaces[0].Name).To(Equal(networkName))
-				Expect(arg.(*v1.VirtualMachineInstance).Status.Interfaces[0].IP).To(Equal(podIp))
-				Expect(arg.(*v1.VirtualMachineInstance).Status.Interfaces[0].IPs[0]).To(Equal(podIp))
-			}).Return(vmi, nil)
-			controller.Execute()
-		})
-
-		It("should only report the pod network in status", func() {
-			vmi := NewPendingVirtualMachine("testvmi")
-			vmi.Status.Phase = v1.Scheduling
-			pod := NewPodForVirtualMachine(vmi, k8sv1.PodRunning)
-
-			addVirtualMachine(vmi)
-			podFeeder.Add(pod)
-
-			networkName := "test net"
-			vmi.Spec.Networks = []v1.Network{
-				v1.Network{
-					Name: networkName,
-					NetworkSource: v1.NetworkSource{
-						Pod: &v1.PodNetwork{
-							VMNetworkCIDR: "1.1.1.1",
-						},
-					},
-				},
-				v1.Network{
-					Name: networkName,
-					NetworkSource: v1.NetworkSource{
-						Multus: &v1.MultusNetwork{
-							NetworkName: "multus",
-						},
-					},
-				},
-			}
-			vmiInterface.EXPECT().Update(gomock.Any()).Do(func(arg interface{}) {
-				Expect(len(arg.(*v1.VirtualMachineInstance).Status.Interfaces)).To(Equal(1))
-			}).Return(vmi, nil)
-			controller.Execute()
-		})
 	})
 })
 

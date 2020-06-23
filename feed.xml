@@ -1,4 +1,175 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-06-22T13:58:15+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.30.0</title><link href="https://kubevirt.io//2020/changelog-v0.30.0.html" rel="alternate" type="text/html" title="KubeVirt v0.30.0" /><published>2020-06-05T00:00:00+00:00</published><updated>2020-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.30.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.30.0.html">&lt;h2 id=&quot;v0300&quot;&gt;v0.30.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-06-23T18:42:18+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
+after a Windows guest virtual machine providing the service is migrated from
+MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by
+Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!&lt;/p&gt;
+
+&lt;h3 id=&quot;source-details&quot;&gt;Source details&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Host platform: Windows 2019 Datacenter&lt;/li&gt;
+  &lt;li&gt;Virtualization platform: Oracle VirtualBox 6.1&lt;/li&gt;
+  &lt;li&gt;Guest platform: Windows 2019 Datacenter (guest to be migrated)
+&lt;sup id=&quot;fnref:1&quot; role=&quot;doc-noteref&quot;&gt;
+&lt;a href=&quot;#fn:1&quot; class=&quot;footnote&quot;&gt;1&lt;/a&gt;
+&lt;/sup&gt;&lt;/li&gt;
+  &lt;li&gt;Guest application: My favorite dotnet application
+&lt;a href=&quot;https://jellyfin.org/&quot;&gt;Jellyfin&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;target-details&quot;&gt;Target details&lt;/h3&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Host platform: Fedora 32 with latest updates applied&lt;/li&gt;
+  &lt;li&gt;Kubernetes cluster created&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/quickstart_minikube/&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/image-upload&quot;&gt;CDI&lt;/a&gt; installed in the Kubernetes cluster.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;procedure&quot;&gt;Procedure&lt;/h2&gt;
+
+&lt;h3 id=&quot;tasks-to-performed-on-source-host&quot;&gt;Tasks to performed on source host&lt;/h3&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Before we begin let's take a moment to ensure the service is running and
+  web browser accessible&lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-1.png&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Ensure application service is running&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-2.png&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Confirm web browser access&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Power down the guest virtual machine to ensure all changes to the
+  filesystem are quiesced to disk.&lt;br /&gt;
+    &lt;code&gt;VBoxManage.exe controlvm testvm poweroff&lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-3.png&quot; width=&quot;115&quot; height=&quot;20&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Power down the guest virtual machine&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Upload the guest virtual machine disk image to the Kubernetes cluster
+  and a target DataVolume called testvm
+    &lt;sup id=&quot;fnref:2&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;#fn:2&quot; class=&quot;footnote&quot;&gt;2&lt;/a&gt;
+    &lt;/sup&gt;
+    &lt;br /&gt;
+    &lt;code&gt;
+      virtctl.exe image-upload dv testvm
+      --size=14Gi
+      --image-path=&quot;C:\Users\Administrator\VirtualBox VMs\testvm\testvm.vdi&quot;
+    &lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/1-4.png&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Upload disk image&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Verify the PersistentVolumeClaim created via the DataVolume
+  image upload in the previous step&lt;br /&gt;
+    &lt;code&gt;
+      kubectl describe pvc/testvm
+    &lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-1.png&quot; width=&quot;125&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Verify PersistentVolumeClaim&quot; /&gt;
+    &lt;/div&gt;
+  &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Create a guest virtual machine definition that references the
+  DataVolume containing our guest virtual machine disk image&lt;br /&gt;
+    &lt;code&gt;kubectl create -f vm_testvm.yaml&lt;/code&gt;
+    &lt;sup id=&quot;fnref:3&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;#fn:3&quot; class=&quot;footnote&quot;&gt;3&lt;/a&gt;
+    &lt;/sup&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-2.png&quot; width=&quot;125&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create the guest virtual machine&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Expose the Jellyfin service in Kubernetes via a NodePort type
+  service&lt;br /&gt;
+    &lt;code&gt;
+      kubectl create -f service_jellyfin.yaml
+    &lt;/code&gt;
+    &lt;sup id=&quot;fnref:4&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;#fn:4&quot; class=&quot;footnote&quot;&gt;4&lt;/a&gt;
+    &lt;/sup&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-3.png&quot; width=&quot;100&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create NodePort service&quot; /&gt;
+    &lt;/div&gt;
+  &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;&lt;li&gt;Let's verify the running guest virtual machine by using the virtctl
+  command to open a vnc session to the MS Window console.  While we are here
+  let's also open a web browser and confirm web browser access to the
+  application.&lt;br /&gt;
+    &lt;code&gt;virtctl vnc testvm&lt;/code&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-4.png&quot; width=&quot;125&quot; height=&quot;70&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Verify running guest virtual machine&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-5.png&quot; width=&quot;125&quot; height=&quot;70&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Web browser access to application&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;task-to-performed-on-user-workstation&quot;&gt;Task to performed on user workstation&lt;/h3&gt;
+
+&lt;ol&gt;
+  And finally let's confirm web browser access via the Kubernetes service url.&lt;br /&gt;
+    &lt;div class=&quot;zoom&quot;&gt;
+      &lt;img src=&quot;/assets/2020-06-22-win_workload_in_k8s/2-6.png&quot; width=&quot;125&quot; height=&quot;70&quot; alt=&quot;Web browser access to Kubernetes service&quot; /&gt;
+    &lt;/div&gt;
+    &lt;br /&gt;&lt;br /&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;success&quot;&gt;SUCCESS!&lt;/h3&gt;
+
+&lt;p&gt;Here we have successfully demonstrated how simple it can be to migrate an
+existing MS Windows platform and application to Kubernetes control. For
+questions feel free to join the conversation via one of the project forums.&lt;/p&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;example-manifests&quot;&gt;Example manifests&lt;/h3&gt;
+&lt;div class=&quot;footnotes&quot; role=&quot;doc-noteref&quot;&gt;
+  &lt;ol&gt;
+    &lt;li id=&quot;fn:1&quot; role=&quot;doc-noteref&quot;&gt;
+      Fedora virtio drivers need to be installed on Windows hosts or virtual
+      machines that will be migrated into a Kubernetes environment. Drivers can
+      be found
+      &lt;a href=&quot;https://docs.fedoraproject.org/en-US/quick-docs/creating-windows-virtual-machines-using-virtio-drivers/&quot;&gt;
+        here
+      &lt;/a&gt;.
+      &lt;a href=&quot;#fnref:1&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;&lt;li id=&quot;fn:2&quot; role=&quot;doc-noteref&quot;&gt;
+      Please note:
+      &lt;br /&gt;
+      &amp;#8226; Users without certificate authority trusted certificates added to
+      the kubernetes api and cdi cdi-proxyuploader secret will require the
+      &lt;code&gt;--insecure&lt;/code&gt; arg.
+      &lt;br /&gt;
+      &amp;#8226; Users without the uploadProxyURLOverride patch to the cdi
+      cdiconfig.cdi.kubevirt.io/config crd will require the
+      &lt;code&gt;--uploadProxyURL&lt;/code&gt; arg.
+      &lt;br /&gt;
+      &amp;#8226; Users need a correctly configured $HOME/.kube/config along with
+      client authentication certificate.
+      &lt;a href=&quot;#fnref:2&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;&lt;li id=&quot;fn:3&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;/assets/2020-06-22-win_workload_in_k8s/vm_testvm.yaml&quot;&gt;
+        vm_testvm.yaml
+      &lt;/a&gt;: Virtual machine manifest
+      &lt;a href=&quot;#fnref:3&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;&lt;li id=&quot;fn:4&quot; role=&quot;doc-noteref&quot;&gt;
+      &lt;a href=&quot;/assets/2020-06-22-win_workload_in_k8s/service_jellyfin.yaml&quot;&gt;
+        service_jellyfin.yaml
+      &lt;/a&gt;: Service manifest
+      &lt;a href=&quot;#fnref:4&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
+    &lt;/li&gt;
+  &lt;/ol&gt;
+&lt;/div&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="images" /><category term="storage" /><category term="windows" /><summary type="html">The goal of this blog is to demonstrate that a web service can continue to run after a Windows guest virtual machine providing the service is migrated from MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by Kubernetes and KubeVirt on a Fedora Linux host. Yes! It can be done!</summary></entry><entry><title type="html">KubeVirt v0.30.0</title><link href="https://kubevirt.io//2020/changelog-v0.30.0.html" rel="alternate" type="text/html" title="KubeVirt v0.30.0" /><published>2020-06-05T00:00:00+00:00</published><updated>2020-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.30.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.30.0.html">&lt;h2 id=&quot;v0300&quot;&gt;v0.30.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Fri Jun 5 12:19:57 2020 +0200&lt;/p&gt;
 
@@ -1002,19 +1173,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/live-migration?id=live-migration&quot;&gt;Live Migration&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/node-eviction?id=how-to-evict-all-vms-on-a-node&quot;&gt;Node Drain/Eviction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Live Migration" /><category term="node drain" /><summary type="html"></summary></entry><entry><title type="html">KubeVirt v0.27.0</title><link href="https://kubevirt.io//2020/changelog-v0.27.0.html" rel="alternate" type="text/html" title="KubeVirt v0.27.0" /><published>2020-03-06T00:00:00+00:00</published><updated>2020-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.27.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.27.0.html">&lt;h2 id=&quot;v0270&quot;&gt;v0.27.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Fri Mar 6 22:40:34 2020 +0100&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Support for more guest agent informations in the API&lt;/li&gt;
-  &lt;li&gt;Support setting priorityClasses on VMs&lt;/li&gt;
-  &lt;li&gt;Support for additional control plane alerts via prometheus&lt;/li&gt;
-  &lt;li&gt;Support for io and emulator thread pinning&lt;/li&gt;
-  &lt;li&gt;Support setting a custom SELinux type for the launcher&lt;/li&gt;
-  &lt;li&gt;Support to perform network configurations from handler instead of launcher&lt;/li&gt;
-  &lt;li&gt;Support to opt-out of auto attaching the serial console&lt;/li&gt;
-  &lt;li&gt;Support for different uninstallStaretgies for data protection&lt;/li&gt;
-  &lt;li&gt;Fix to let qemu run in the qemu group&lt;/li&gt;
-  &lt;li&gt;Fix guest agen connectivity check after i.e. live migrations&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.27.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Live Migration" /><category term="node drain" /><summary type="html"></summary></entry></feed>

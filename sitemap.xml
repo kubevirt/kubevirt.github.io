@@ -493,6 +493,10 @@
 <lastmod>2020-06-05T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/win_workload_in_k8s.html</loc>
+<lastmod>2020-06-22T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1124,6 +1128,12 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/images.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/kubernetes.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/windows.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
