@@ -1,0 +1,37 @@
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  creationTimestamp: 2018-07-04T15:03:08Z
+  generation: 1
+  labels:
+    kubevirt.io/os: win2k19
+    special: key
+  name: testvm
+spec:
+  running: true
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: testvm
+        special: key
+    spec:
+      domain:
+        cpu:
+          cores: 1
+        devices:
+          blockMultiQueue: true
+          disks:
+          - disk:
+              bus: sata
+            name: disk0
+            cache: none
+        machine:
+          type: q35
+        resources:
+          requests:
+            memory: 2048M
+      volumes:
+      - name: disk0
+        persistentVolumeClaim:
+          claimName: testvm
