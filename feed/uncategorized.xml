@@ -1,168 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-06-26T13:59:57+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Hello Kubevirt On Minikube</title><link href="https://kubevirt.io//2018/Hello-KubeVirt-on-Minikube.html" rel="alternate" type="text/html" title="Hello Kubevirt On Minikube" /><published>2018-06-20T00:00:00+00:00</published><updated>2018-06-20T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Hello-KubeVirt-on-Minikube</id><content type="html" xml:base="https://kubevirt.io//2018/Hello-KubeVirt-on-Minikube.html">&lt;p&gt;In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt. We will also go through the process of installing &lt;a href=&quot;https://kubernetes.io/docs/setup/minikube/&quot;&gt;Minikube&lt;/a&gt; and KubeVirt on a Fedora 28 workstation.&lt;/p&gt;
-
-&lt;!-- more --&gt;
-
-&lt;h2 id=&quot;install-kvm&quot;&gt;Install KVM&lt;/h2&gt;
-
-&lt;p&gt;MiniKube will create a single node Kubernetes cluster in a KVM virtual machine on our Fedora host. KVM is also the virtualization technology used by KubeVirt so we have to make sure that the host is configured to support nested virtual machines. Fedora does not have that feature enabled by default.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# install packages&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;yum &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;libvirt-daemon-kvm qemu-kvm
-
-&lt;span class=&quot;c&quot;&gt;# enable nested virtualization&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# substitute 'kvm_intel' with 'kvm_amd' if your system has an AMD processor&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;modprobe &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; kvm_intel
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;vi /etc/modprobe.d/kvm.conf
-&lt;span class=&quot;c&quot;&gt;# uncomment 'options kvm_intel nested=1' and save&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;modprobe kvm_intel
-
-&lt;span class=&quot;c&quot;&gt;#verify nested virtualization enabled&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; /sys/module/kvm_intel/parameters/nested
-Y
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;install-kvm2-driver-for-minikube&quot;&gt;Install KVM2 driver for Minikube&lt;/h2&gt;
-
-&lt;p&gt;Minikube requires a special driver to manage Docker Machine VMs running in KVM. KVM2 is the latest iteration of the driver. Read more about it &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/drivers/kvm2/&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# install driver to /usr/local/bin&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-LO&lt;/span&gt; https://storage.googleapis.com/minikube/releases/latest/docker-machine-driver-kvm2 &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x docker-machine-driver-kvm2 &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo mv &lt;/span&gt;docker-machine-driver-kvm2 /usr/local/bin/
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;install-minikube&quot;&gt;Install Minikube&lt;/h2&gt;
-
-&lt;p&gt;Minikube is responsible for creating and managing a local single-node Kubernetes cluster. It is installed as a single executable.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;#install minikube to /usr/local/bin&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-Lo&lt;/span&gt; minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x minikube &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo mv &lt;/span&gt;minikube /usr/local/bin/
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;start-minikube&quot;&gt;Start Minikube&lt;/h2&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;minikube start &lt;span class=&quot;nt&quot;&gt;--vm-driver&lt;/span&gt; kvm2 &lt;span class=&quot;nt&quot;&gt;--network-plugin&lt;/span&gt; cni
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;install-kubectl&quot;&gt;Install kubectl&lt;/h2&gt;
-
-&lt;p&gt;Now that we have a Kubernetes cluster running, we need some way to communicate with it. That is where the kubectl CLI comes in.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# install kubectl to /usr/local/bin&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-Lo&lt;/span&gt; kubectl https://storage.googleapis.com/kubernetes-release/release/v1.10.0/bin/linux/amd64/kubectl &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x kubectl &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo mv &lt;/span&gt;kubectl /usr/local/bin/
-
-&lt;span class=&quot;c&quot;&gt;# try out the cli&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# should see similar output&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get all
-NAME         TYPE        CLUSTER-IP   EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;   AGE
-kubernetes   ClusterIP   10.96.0.1    &amp;lt;none&amp;gt;        443/TCP   5m
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;You may be wondering how kubectl knows where to look for the Kubernetes API endpoint. &lt;code class=&quot;highlighter-rouge&quot;&gt;minikube start&lt;/code&gt; actually takes care of creating the kubectl configuration file. Take a look at &lt;code class=&quot;highlighter-rouge&quot;&gt;~/.kube/config&lt;/code&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;deploy-kubevirt&quot;&gt;Deploy KubeVirt&lt;/h2&gt;
-
-&lt;p&gt;Get KubeVirt components running on the Kubernetes cluster.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/v0.15.0/kubevirt.yaml
-
-&lt;span class=&quot;c&quot;&gt;# watch for KubeVirt components to start (bebin with 'virt-')&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# may take awhile as containers are downloaded and started&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;watch kubectl get &lt;span class=&quot;nt&quot;&gt;--all-namespaces&lt;/span&gt; pods
-
-&lt;span class=&quot;c&quot;&gt;# eventually output should look something like this (everything with Running status)&lt;/span&gt;
-NAMESPACE     NAME                                    READY     STATUS    RESTARTS   AGE
-kube-system   etcd-minikube                           1/1	Running   0          16m
-kube-system   kube-addon-manager-minikube             1/1	Running   0          15m
-kube-system   kube-apiserver-minikube                 1/1	Running   0          15m
-kube-system   kube-controller-manager-minikube        1/1	Running   0          16m
-kube-system   kube-dns-86f4d74b45-ppp5p               3/3	Running   0          16m
-kube-system   kube-proxy-rjkxl                        1/1	Running   0          16m
-kube-system   kube-scheduler-minikube                 1/1	Running   0          16m
-kube-system   kubernetes-dashboard-5498ccf677-8zmnk   1/1	Running   0          16m
-kube-system   storage-provisioner                     1/1	Running   0          16m
-kube-system   virt-api-7797f95869-dwrrc               1/1	Running   0          2m
-kube-system   virt-api-7797f95869-fqnhk               1/1	Running   1          2m
-kube-system   virt-controller-69cc6b4897-nlffm        1/1	Running   0          2m
-kube-system   virt-controller-69cc6b4897-xsxmt        1/1	Running   0          2m
-kube-system   virt-handler-f7str                      1/1	Running   0          2m
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;install-virtctl&quot;&gt;Install virtctl&lt;/h2&gt;
-
-&lt;p&gt;Virtctl is the CLI for creating and managing KubeVirt virtual machines.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# install virtctl to /usr/local/bin&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-Lo&lt;/span&gt; virtctl https://github.com/kubevirt/kubevirt/releases/download/v0.15.0/virtctl-v0.15.0-linux-amd64 &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x virtctl &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;sudo mv &lt;/span&gt;virtctl /usr/local/bin
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;create-a-vm&quot;&gt;Create a VM&lt;/h2&gt;
-
-&lt;p&gt;Apply manifest for VM. If you’re curious, download the manifest file locally and take a look.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
-
-&lt;span class=&quot;c&quot;&gt;# check that VM successfully created&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vms
-NAME      AGE
-testvm    7s
-&lt;span class=&quot;c&quot;&gt;# for more detailed info, run&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vms &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml testvm
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;start-a-vm&quot;&gt;Start a VM&lt;/h2&gt;
-
-&lt;p&gt;Time to try out virtctl.&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl start testvm
-
-&lt;span class=&quot;c&quot;&gt;# wait for VM to be running&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;watch kubectl get pods
-
-&lt;span class=&quot;c&quot;&gt;# confirm with kubectl&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmis
-NAME      AGE
-testvm    4s
-
-&lt;span class=&quot;c&quot;&gt;# for more detailed info&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmis &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml testvm
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;connect-to-vm&quot;&gt;Connect to VM&lt;/h2&gt;
-
-&lt;p&gt;The VM is running CirrOS, which is “a Tiny OS that specializes in running on a cloud.” Don’t expect anything fancy. Look &lt;a href=&quot;https://launchpad.net/cirros&quot;&gt;here&lt;/a&gt; for more info on CirrOS&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl console testvm
-
-&lt;span class=&quot;c&quot;&gt;# note escape sequence of '^]'&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# login with creds provided and poke around&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# you are connected to a VM running in Kubernetes!  Pretty cool!&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# 'exit' to logout&lt;/span&gt;
-&lt;span class=&quot;c&quot;&gt;# quit virtctl by providing escape sequence '^]&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;stop-a-vm&quot;&gt;Stop a VM&lt;/h2&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl stop testvm
-
-&lt;span class=&quot;c&quot;&gt;# wait for termination to complete&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;watch kubectl get pods
-
-&lt;span class=&quot;c&quot;&gt;# confirm with kubectl&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmis
-No resources found.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;delete-a-vm&quot;&gt;Delete a VM&lt;/h2&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl delete vms testvm
-
-&lt;span class=&quot;c&quot;&gt;# confirm with kubectl&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vms
-No resources found.
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;next-steps&quot;&gt;Next Steps&lt;/h2&gt;
-
-&lt;p&gt;Take a look at the &lt;a href=&quot;https://kubevirt.io/user-guide/#/&quot;&gt;user guide&lt;/a&gt; and get involved with the &lt;a href=&quot;http://kubevirt.io/community/&quot;&gt;community&lt;/a&gt;.&lt;/p&gt;</content><author><name>mhenriks</name></author><category term="uncategorized" /><category term="kvm" /><category term="minikube" /><category term="qemu" /><summary type="html">In this blog post, we will demonstrate the process for creating and managing virtual machines in Kubernetes with KubeVirt. We will also go through the process of installing Minikube and KubeVirt on a Fedora 28 workstation.</summary></entry><entry><title type="html">Proxy VM Conclusion</title><link href="https://kubevirt.io//2018/Proxy-vm-conclusion.html" rel="alternate" type="text/html" title="Proxy VM Conclusion" /><published>2018-06-13T00:00:00+00:00</published><updated>2018-06-13T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Proxy-vm-conclusion</id><content type="html" xml:base="https://kubevirt.io//2018/Proxy-vm-conclusion.html">&lt;p&gt;This blog post follow my previous research on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-06-26T15:42:28+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Proxy VM Conclusion</title><link href="https://kubevirt.io//2018/Proxy-vm-conclusion.html" rel="alternate" type="text/html" title="Proxy VM Conclusion" /><published>2018-06-13T00:00:00+00:00</published><updated>2018-06-13T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Proxy-vm-conclusion</id><content type="html" xml:base="https://kubevirt.io//2018/Proxy-vm-conclusion.html">&lt;p&gt;This blog post follow my previous research on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.&lt;/p&gt;
 
 &lt;h1 id=&quot;research-conclusions-and-network-roadmap&quot;&gt;Research conclusions and network roadmap&lt;/h1&gt;
 
@@ -2948,4 +2784,227 @@ virt-launcher-cirros-krvv2   0/1       Running     0          13s
 &lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;./virtctl console cirros
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Press enter if a login prompt doesn’t appear.&lt;/p&gt;</content><author><name>rwsu</name></author><category term="uncategorized" /><category term="glusterfs" /><category term="heketi" /><category term="virtual machine" /><category term="weavenet" /><summary type="html">Kubernetes is traditionally used to deploy and manage containerized applications. Did you know Kubernetes can also be used to deploy and manage virtual machines? This guide will walk you through installing a Kubernetes environment backed by GlusterFS for storage and the KubeVirt add-on to enable deployment and management of VMs.</summary></entry></feed>
+&lt;p&gt;Press enter if a login prompt doesn’t appear.&lt;/p&gt;</content><author><name>rwsu</name></author><category term="uncategorized" /><category term="glusterfs" /><category term="heketi" /><category term="virtual machine" /><category term="weavenet" /><summary type="html">Kubernetes is traditionally used to deploy and manage containerized applications. Did you know Kubernetes can also be used to deploy and manage virtual machines? This guide will walk you through installing a Kubernetes environment backed by GlusterFS for storage and the KubeVirt add-on to enable deployment and management of VMs.</summary></entry><entry><title type="html">Deploying Kubevirt On A Single Ovirt Vm</title><link href="https://kubevirt.io//2018/Deploying-KubeVirt-on-a-Single-oVirt-VM.html" rel="alternate" type="text/html" title="Deploying Kubevirt On A Single Ovirt Vm" /><published>2018-05-04T00:00:00+00:00</published><updated>2018-05-04T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Deploying-KubeVirt-on-a-Single-oVirt-VM</id><content type="html" xml:base="https://kubevirt.io//2018/Deploying-KubeVirt-on-a-Single-oVirt-VM.html">&lt;p&gt;In this blog post we are exploring the possibilities of deploying KubeVirt on top of OpenShift which is running inside an oVirt VM. First we must prepare the environment. In my testing I created a VM with 4 cpus, 14G memory and a 100G disk. I then installed CentOS 7.4 minimal on it. I also have nested virtualization
+enabled on my hosts, so any VMs I create can run VMs inside them. These instructions are specific to oVirt, however if you are running another virtualization
+platform that can nested virtualization this will also work.&lt;/p&gt;
+
+&lt;p&gt;For this example I chose to use a single VM for everything, but I could have done different VMs for my master/nodes/storage/etc, for simplicity I used a single
+VM.&lt;/p&gt;
+
+&lt;h2 id=&quot;preparing-the-vm&quot;&gt;Preparing the VM&lt;/h2&gt;
+
+&lt;p&gt;First we will need to enable epel and install some needed tools, like git to get at the source, and ansible to do the deploy:&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;epel-release
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;ansible git wget
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;optional&lt;/em&gt;
+&lt;em&gt;Install ovirt-guest-agent so you can see information in your oVirt admin view.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;ovirt-guest-agent
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl start ovirt-guest-agent
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;ovirt-guest-agent
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;em&gt;Make a template out of the VM, so if something goes wrong you have a good starting point to try again.&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Make sure the VM has a fully qualified domain name, using either DNS or editing /etc/hosts.&lt;/p&gt;
+
+&lt;p&gt;As we are going to install openshift we will need to install the openshift client tooling from &lt;a href=&quot;https://github.com/openshift/origin/releases&quot;&gt;openshift github&lt;/a&gt;
+in this article I opted to simply copy the oc command into /usr/bin, but anywhere in your path will do. Alternatively you can add oc to your PATH.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;wget https://github.com/openshift/origin/releases/download/v3.9.0/openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;zxvf openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;openshift-origin-client-tools-v3.9.0-191fece-linux-64bit/oc /usr/bin
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Next we will install docker and configure it for use with open shift.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;docker
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We need to setup an insecure registry in docker before we can start open shift. To do this we must add:
+&lt;strong&gt;INSECURE_REGISTRY=”–insecure-registry 172.30.0.0/16”&lt;/strong&gt;
+to the end of /etc/sysconfig/docker&lt;/p&gt;
+
+&lt;p&gt;Now we can start docker.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl start docker
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;docker
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we are ready to test if we can bring our cluster to up.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc cluster up
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;installing-kubevirt-with-ansible&quot;&gt;Installing KubeVirt with Ansible&lt;/h2&gt;
+
+&lt;p&gt;Now that we have everything configured we can the rest as a regular user. Also note that if you had an existing cluster you can could have skipped the previous section.&lt;/p&gt;
+
+&lt;p&gt;Clone the kube-virt ansible repo, and setup the ansible galaxy roles needed to deploy.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/kubevirt/kubevirt-ansible
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirt-ansible
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;/galaxy-roles
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ansible-galaxy &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;/galaxy-roles &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; requirements.yml
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ANSIBLE_ROLES_PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;/galaxy-roles
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now that we are in the kubevirt-ansible directory, we have to edit the inventory file on where we are going to deploy the different open shift nodes.
+Because we opted to install everything on a single VM the FQDN we enter is the same as the one we defined for our VM. Had we had different nodes we would
+enter the FQDN of each in the inventory file. Lets assume our VMs FQDN is kubevirt.demo, we would changed the inventory file as follows:&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[masters]
+kubevirt.demo
+[etcd]
+kubevirt.demo
+[nodes]
+kubevirt.demo openshift_node_labels=&quot;{'region': 'infra','zone': 'default'}&quot; openshift_schedulable=true
+[nfs]
+kubevirt.demo
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In order to allow ansible to ssh into the box using ssh keys instead of a password we will need to generate some, assuming we don’t have these
+configured already:&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-base&quot;&gt;$ ssh-keygen -t rsa
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;Fill out the information in the questions, which will generate two files in /root/.ssh, id_rsa and id_rsa.pub. The id_rsa.pub is the public key which will allow
+ssh to verify your identify when you ssh into a machine. Since we are doing all of this on the same machine, we can simply append the contents of
+id_rsa.pub to authorized_keys in /root/.ssh. If that file doesn’t exist you can simply copy id_rsa.pub to authorized_keys. If you are deploying to multiple hosts
+you need to append the contents of id_rsa.pub on each host.&lt;/p&gt;
+
+&lt;p&gt;Next we need to configure docker storage, one can write a whole book about how to do that, so I will post a &lt;a href=&quot;https://docs.okd.io/1.5/install_config/install/host_preparation.html#configuring-docker-storage&quot;&gt;link&lt;/a&gt; to the installation document and for now go with the defaults which are not recommended for production, but since this is an introduction its fine.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;docker-storage-setup
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Lets double check the cluster is up before we start running the ansible play books.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc cluster up
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Install kubernetes.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ansible-playbook &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; inventory playbooks/cluster/kubernetes/config.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Disable selinux on all hosts, this hopefully won’t be needed in the future.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ansible-playbook &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; inventory playbooks/selinux.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;log in as admin to give developer user rights.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;root&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc login &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; system:admin
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc adm policy add-cluster-role-to-user cluster-admin developer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Log in as the developer user.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc login &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; developer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The password for the developer user is developer. Now finally deploy kubevirt.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ansible-playbook &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt; localhost playbooks/kubevirt.yml &lt;span class=&quot;nt&quot;&gt;-e&lt;/span&gt;@vars/all.yml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Verify that the pods are running, you should be in the kube-system namespace, if not switch with oc project kube-system.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods
+NAME                               READY     STATUS    RESTARTS   AGE
+virt-api-747745669-mswk8           1/1       Running   0          10m
+virt-api-747745669-t9dsp           1/1       Running   0          10m
+virt-controller-648945bbcb-ln7dv   1/1       Running   0          10m
+virt-controller-648945bbcb-nxrj8   0/1       Running   0          10m
+virt-handler-6zh77                 1/1       Running   0          10m
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now that we have KubeVirt up and running we are ready to try to start a VM. Let’s install virtctl to make it easier to
+start and stop VMs. The latest available version while writing this was 0.4.1.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;v0.4.1
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; virtctl &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+    https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;nv&quot;&gt;$VERSION&lt;/span&gt;/virtctl-&lt;span class=&quot;nv&quot;&gt;$VERSION&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;-linux-amd64&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x virtctl
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Lets grab the demo VM specification from the kubevirt github page.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we can start the VM.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;./virtctl start testvm
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now a new pod will be running that is controlling the VM.&lt;/p&gt;
+
+&lt;p&gt;As &lt;em&gt;user&lt;/em&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods
+NAME                               READY     STATUS    RESTARTS   AGE
+virt-api-747745669-mswk8           1/1       Running   0          15m
+virt-api-747745669-t9dsp           1/1       Running   0          15m
+virt-controller-648945bbcb-ln7dv   1/1       Running   0          15m
+virt-controller-648945bbcb-nxrj8   0/1       Running   0          15m
+virt-handler-6zh77                 1/1       Running   0          15m
+virt-launcher-testvm-gv5nt         2/2       Running   0          23s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Congratulations you now have a VM running in OpenShift using KubeVirt inside an oVirt VM.&lt;/p&gt;
+
+&lt;h2 id=&quot;useful-resources&quot;&gt;Useful resources&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt&quot;&gt;&lt;strong&gt;KubeVirt&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-ansible&quot;&gt;&lt;strong&gt;KubeVirt Ansible&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/demo&quot;&gt;&lt;strong&gt;Minikube kubevirt Demo&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-native-package-management&quot;&gt;&lt;strong&gt;Kubectl installation&lt;/strong&gt;&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>awels</name></author><category term="uncategorized" /><category term="ovirt" /><category term="openshift" /><summary type="html">In this blog post we are exploring the possibilities of deploying KubeVirt on top of OpenShift which is running inside an oVirt VM. First we must prepare the environment. In my testing I created a VM with 4 cpus, 14G memory and a 100G disk. I then installed CentOS 7.4 minimal on it. I also have nested virtualization enabled on my hosts, so any VMs I create can run VMs inside them. These instructions are specific to oVirt, however if you are running another virtualization platform that can nested virtualization this will also work.</summary></entry></feed>

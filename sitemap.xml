@@ -185,10 +185,6 @@
 <lastmod>2018-06-13T00:00:00+00:00</lastmod>
 </url>
 <url>
-<loc>https://kubevirt.io//2018/Hello-KubeVirt-on-Minikube.html</loc>
-<lastmod>2018-06-20T00:00:00+00:00</lastmod>
-</url>
-<url>
 <loc>https://kubevirt.io//2018/KVM-Using-Device-Plugins.html</loc>
 <lastmod>2018-06-20T00:00:00+00:00</lastmod>
 </url>
@@ -738,9 +734,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/kvm.html</loc>
-</url>
-<url>
-<loc>https://kubevirt.io//tag/minikube.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//tag/qemu.html</loc>
