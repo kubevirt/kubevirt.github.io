@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-07-08T14:14:32+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.31.0</title><link href="https://kubevirt.io//2020/changelog-v0.31.0.html" rel="alternate" type="text/html" title="KubeVirt v0.31.0" /><published>2020-07-08T00:00:00+00:00</published><updated>2020-07-08T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.31.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.31.0.html">&lt;h2 id=&quot;v0310&quot;&gt;v0.31.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-07-08T14:50:01+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.31.0</title><link href="https://kubevirt.io//2020/changelog-v0.31.0.html" rel="alternate" type="text/html" title="KubeVirt v0.31.0" /><published>2020-07-08T00:00:00+00:00</published><updated>2020-07-08T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.31.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.31.0.html">&lt;h2 id=&quot;v0310&quot;&gt;v0.31.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Wed Jul 8 13:53:51 2020 +0000&lt;/p&gt;
 
@@ -14,7 +14,78 @@
   &lt;li&gt;[PR 3455][ashleyschuett] Add KubevirtConfiguration, MigrationConfiguration, DeveloperConfiguration and NetworkConfiguration to API-types&lt;/li&gt;
   &lt;li&gt;[PR 3520][rmohr] Fix hot-looping on the  VMI sync-condition if errors happen during the Scheduled phase of a VMI&lt;/li&gt;
   &lt;li&gt;[PR 3220][mhenriks] API and controller/webhook for VirtualMachineSnapshots&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.31.0</summary></entry><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.31.0</summary></entry><entry><title type="html">Common-templates</title><link href="https://kubevirt.io//2020/Common_templates.html" rel="alternate" type="text/html" title="Common-templates" /><published>2020-07-01T00:00:00+00:00</published><updated>2020-07-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Common_templates</id><content type="html" xml:base="https://kubevirt.io//2020/Common_templates.html">&lt;h2 id=&quot;what-is-a-virtual-machine-template&quot;&gt;What is a virtual machine template?&lt;/h2&gt;
+
+&lt;p&gt;The KubeVirt project provides a set of templates (https://github.com/kubevirt/common-templates) to create VMS to handle common usage scenarios. These templates provide a combination of some key factors that could be further customized and processed to have a Virtual Machine object. With common templates you can easily start in a few minutes many VMS with predefined hardware resources (e.g. number of CPUs, requested memory, etc.).&lt;/p&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Beware&lt;/p&gt;&lt;p&gt;common templates work only on OpenShift. Kubernetes doesn’t have support for templates.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;what-does-a-vm-template-cover&quot;&gt;What does a VM template cover?&lt;/h2&gt;
+
+&lt;p&gt;The key factors which define a template are&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Guest Operating System (OS) This allows to ensure that the emulated hardware is compatible with the guest OS. Furthermore, it allows to maximize the stability of the VM, and allows performance optimizations. Currently common templates support RHEL 6, 7, 8, Centos 6, 7, 8, Fedora 31 and newer, Windows 10, Windows server 2008, 2012 R2, 2016, 2019. The &lt;a href=&quot;https://docs.ansible.com/ansible/latest/user_guide/playbooks.html&quot;&gt;Ansible playbook&lt;/a&gt; &lt;a href=&quot;https://github.com/kubevirt/common-templates/blob/master/generate-templates.yaml&quot;&gt;generate-templates.yaml&lt;/a&gt; describes all combinations of templates that should be generated.&lt;/li&gt;
+  &lt;li&gt;Workload type of most virtual machines should be server or desktop to have maximum flexibility; the highperformance workload trades some of this flexibility (ioThreadsPolicy is set to shared) to provide better performances (e.g. IO threads).&lt;/li&gt;
+  &lt;li&gt;Size (flavor) Defines the amount of resources (CPU, memory) to allocate to the VM. There are 4 sizes: tiny (1 core, 1 Gi memory), small (1 core, 2 Gi memory), medium (1 core, 4 Gi memory), large (2 cores, 8 Gi memory). If these predefined sizes don’t suit you, you can create a new template based on common templates via UI (choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtual Machine Templates&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine Template&lt;/code&gt; blue button) or CLI (update yaml template and create new template).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2020-07-01-Common_templates/create_template.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create new template&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;accessing-the-virtual-machine-templates&quot;&gt;Accessing the virtual machine templates&lt;/h2&gt;
+&lt;p&gt;If you installed KubeVirt using a &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;supported method&lt;/a&gt;, you should find the common templates preinstalled in the cluster. If you want to upgrade the templates, or install them from scratch, you can use one of the &lt;a href=&quot;https://github.com/kubevirt/common-templates/releases&quot;&gt;supported releases&lt;/a&gt;
+There are two ways to install and configure templates:&lt;/p&gt;
+
+&lt;h2 id=&quot;via-cli&quot;&gt;Via CLI:&lt;/h2&gt;
+
+&lt;h6 id=&quot;to-install-the-templates&quot;&gt;To install the templates:&lt;/h6&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ export VERSION=&quot;v0.11.2&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc create -f https://github.com/kubevirt/common-templates/releases/download/$VERSION/common-templates-$VERSION.yaml&lt;/code&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;to-create-vm-from-template&quot;&gt;To create VM from template:&lt;/h6&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc process rhel8-server-tiny PVCNAME=mydisk NAME=rheltinyvm | oc apply -f -&lt;/code&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;to-start-vm-from-created-object&quot;&gt;To start VM from created object:&lt;/h6&gt;
+&lt;p&gt;The created object is now a regular VirtualMachine object and from now it can be controlled by accessing Kubernetes API resources. The preferred way to do this is to use virtctl tool.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ virtctl start rheltinyvm&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;An alternative way to start the VM is with the oc patch command. Example:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc patch virtualmachine rheltinyvm --type merge -p '{&quot;spec&quot;:{&quot;running&quot;:true}}'&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;As soon as VM starts, openshift creates a new type of object - &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt;. It has a similar name to VirtualMachine.&lt;/p&gt;
+
+&lt;h2 id=&quot;via-ui&quot;&gt;Via UI:&lt;/h2&gt;
+&lt;p&gt;The Kubevirt project has an official plugin in OpenShift Cluster Console Web UI. This UI supports the creation of VMS using templates and template features - flavors and workload profiles.&lt;/p&gt;
+
+&lt;h6 id=&quot;to-install-the-templates-1&quot;&gt;To install the templates:&lt;/h6&gt;
+
+&lt;p&gt;Install OpenShift virtualization operator from &lt;code class=&quot;highlighter-rouge&quot;&gt;Operators&lt;/code&gt; &amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;OperatorHub&lt;/code&gt;. The operator-based deployment takes care of installing various components, including the common templates.&lt;/p&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2020-07-01-Common_templates/operator.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Install operator&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h6 id=&quot;to-create-vm-from-template-1&quot;&gt;To create VM from template:&lt;/h6&gt;
+&lt;p&gt;To create a VM from a template, choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; blue button » choose &lt;code class=&quot;highlighter-rouge&quot;&gt;New with Wizard&lt;/code&gt;. Next, you have to see &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; window&lt;/p&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2020-07-01-Common_templates/create_vm.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create vm from template&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This wizard leads you through the basic setup of vm (like guest operating system, workload, flavor, …). After vm is created you can start requested vm.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;after the generation step (UI and CLI), VM objects and template objects have no relationship with each other besides the &lt;code class=&quot;highlighter-rouge&quot;&gt;vm.kubevirt.io/template: rhel8-server-tiny-v0.10.0&lt;/code&gt; label. This means that changes in templates do not automatically affect VMS, or vice versa.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;</content><author><name>Karel Simon</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="common-templates" /><summary type="html">What is a virtual machine template?</summary></entry><entry><title type="html">KubeVirt 0.31.0</title><link href="https://kubevirt.io//2020/changelog-0.31.0.html" rel="alternate" type="text/html" title="KubeVirt 0.31.0" /><published>2020-07-01T00:00:00+00:00</published><updated>2020-07-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-0.31.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-0.31.0.html">&lt;h2 id=&quot;0310&quot;&gt;0.31.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Wed Jul 1 09:48:49 2020 +0200&lt;/p&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">0.31.0</summary></entry><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
 after a Windows guest virtual machine providing the service is migrated from
 MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by
 Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!&lt;/p&gt;
@@ -852,71 +923,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;h2 id=&quot;ca-and-certificate-rotation&quot;&gt;CA and Certificate Rotation&lt;/h2&gt;
 
-&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry><entry><title type="html">KubeVirt Architecture Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Architecture Fundamentals" /><published>2020-04-28T00:00:00+00:00</published><updated>2020-04-28T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals.html">&lt;h2 id=&quot;placing-our-bets&quot;&gt;Placing our Bets&lt;/h2&gt;
-
-&lt;p&gt;Back in 2017 the KubeVirt architecture team got together and placed their bets on a set of core design principles that became the foundation of what KubeVirt is today. At the time, our decisions broke convention. We chose to take some calculated risks with the understanding that those risks had a real chance of not playing out in our favor.&lt;/p&gt;
-
-&lt;p&gt;Luckily, time has proven our bets were well placed. Since those early discussions back in 2017, KubeVirt has grown from a theoretical prototype into a project deployed in production environments with a thriving open source community. While KubeVirt has grown in maturity and sophistication throughout the past few years, the initial set of guidelines established in those early discussions still govern the project’s architecture today.&lt;/p&gt;
-
-&lt;p&gt;Those guidelines can be summarized nearly entirely by the following two key decisions.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virtual machines run in Pods using the existing container runtimes.&lt;/strong&gt; This decision came at a time when other Kubernetes virtualization efforts were creating their own virtualization specific CRI runtimes. We took a bet on our ability to successfully launch virtual machines using existing and future container runtimes within an unadulterated Pod environment.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virtual machines are managed using a custom “Kubernetes like” declarative API.&lt;/strong&gt; When this decision was made, imperative APIs were the defacto standard for how other platforms managed virtual machines. However, we knew in order to succeed in our mission to deliver a truly cloud-native API managed using existing Kubernetes tooling (like kubectl), we had to adhere fully to the declarative workflow. We took a bet that the lackluster Kubernetes Third Party Resource support (now known as CRDs) would eventually provide the ability to create custom declarative APIs as first class citizens in the cluster.&lt;/p&gt;
-
-&lt;p&gt;Let’s dive into these two points a bit and take a look at how these two key decisions permeated throughout our entire design.&lt;/p&gt;
-
-&lt;h2 id=&quot;virtual-machines-as-pods&quot;&gt;Virtual Machines as Pods&lt;/h2&gt;
-
-&lt;p&gt;We often pitch KubeVirt by saying something like “KubeVirt allows you to run virtual machines side by side with your container workloads”. However, the reality is &lt;strong&gt;we’re delivering virtual machines as container workloads.&lt;/strong&gt; So as far as Kubernetes is concerned, there are no virtual machines, just pods and containers. Fundamentally, KubeVirt virtual machines just look like any other containerized application to the rest of the cluster. It’s our KubeVirt API and control plane that make these containerized virtual machines behave like you’d expect from using other virtual machine management platforms.&lt;/p&gt;
-
-&lt;p&gt;The payoff from running virtual machines within a Kubernetes Pod has been huge for us. There’s an entire ecosystem that continues to grow around how to provide pods with access to networks, storage, host devices, cpu, memory, and more. This means every time a problem or feature is added to pods, it’s yet another tool we can use for virtual machines.&lt;/p&gt;
-
-&lt;p&gt;Here are a few examples of how pod features meet the needs of virtual machines as well.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Storage:&lt;/strong&gt; Virtual machines need persistent disks. Users should be able to stop a VM, start a VM, and have the data persist. There’s a Kubernetes storage abstraction called a PVC (persistent volume claim) that allows persistent storage to be attached to a pod. This means by placing the virtual machine in a pod, we can use the existing PVC mechanisms of delivering persistent storage to deliver our virtual machine disks.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Network:&lt;/strong&gt; Virtual machines need access to cluster networking. Pods are provided network interfaces that tie directly into the pod network via CNI. We can give a virtual machine running in a pod access to the pod network using the default CNI allocated network interfaces already present in the pod’s environment.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;CPU/Memory:&lt;/strong&gt; Users need the ability to assign cpu and memory resources to Virtual machines. We can assign cpu and memory to pods using the resource requests/limits on the pod spec. This means through the use of pod resource requests/limits we are able to assign resources directly to virtual machines as well.&lt;/p&gt;
-
-&lt;p&gt;This list goes on and on. As problems are solved for pods, KubeVirt leverages the solution and translates it to the virtual machine equivalent.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-declarative-kubevirt-virtualization-api&quot;&gt;The Declarative KubeVirt Virtualization API&lt;/h2&gt;
-
-&lt;p&gt;While a KubeVirt virtual machine runs within a pod, that doesn’t change the fact that people working with virtual machines have a different set of expectations for how virtual machines should work compared to how pods are managed.&lt;/p&gt;
-
-&lt;p&gt;Here’s the conflict.&lt;/p&gt;
-
-&lt;p&gt;Pods are &lt;strong&gt;mortal workloads&lt;/strong&gt;. A pod is declared by posting it’s manifest to the cluster, the pod runs once to completion, and that’s it. It’s done.&lt;/p&gt;
-
-&lt;p&gt;Virtual machines are &lt;strong&gt;immortal workloads&lt;/strong&gt;. A virtual machine doesn’t just run once to completion. Virtual machines have state. They can be started, stopped, and restarted any number of times. Virtual machines have concepts like live migration as well. Furthermore if the node a virtual machine is running on dies, the expectation is for that exact same virtual machine to resurrect on another node maintaining its state.&lt;/p&gt;
-
-&lt;p&gt;So, pods run once and virtual machines live forever. How do we reconcile the two? Our solution came from taking a play directly out of the Kubernetes playbook.&lt;/p&gt;
-
-&lt;p&gt;The Kubernetes core apis have this concept of layering objects on top of one another through the use of &lt;strong&gt;workload controllers&lt;/strong&gt;. For example, the Kubernetes ReplicaSet is a workload controller layered on top of pods. The ReplicaSet controller manages ensuring that there are always ‘x’ number of pod replicas running within the cluster. If a ReplicaSet object declares that 5 pod replicas should be running, but a node dies bringing that total to 4, then the ReplicaSet workload controller manages spinning up a 5th pod in order to meet the declared replica count. The workload controller is always reconciling on the ReplicaSet objects desired state.&lt;/p&gt;
-
-&lt;p&gt;Using this established Kubernetes pattern of layering objects on top of one another, we came up with our own virtualization specific API and corresponding workload controller called a &lt;strong&gt;“VirtualMachine”&lt;/strong&gt; (big surprise there on the name, right?). Users declare a VirtualMachine object just like they would a pod by posting the VirtualMachine object’s manifest to the cluster. The big difference here that deviates from how pods are managed is that we allow VirtualMachine objects to be declared to exist in different states. For example, you can declare you want to “start” a virtual machine by setting “running: true” on the VirtualMachine object’s spec. Likewise you can declare you want to “stop” a virtual machine by setting “running: false” on the VirtualMachine object’s spec. Behind the scenes, setting the “running” field to true or false results in the workload controller creating or deleting a pod for the virtual machine to live in.&lt;/p&gt;
-
-&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry><entry><title type="html">KubeVirt v0.28.0</title><link href="https://kubevirt.io//2020/changelog-v0.28.0.html" rel="alternate" type="text/html" title="KubeVirt v0.28.0" /><published>2020-04-09T00:00:00+00:00</published><updated>2020-04-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.28.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.28.0.html">&lt;h2 id=&quot;v0280&quot;&gt;v0.28.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Thu Apr 9 23:01:29 2020 +0200&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;CI: Try to discover flaky tests before merge&lt;/li&gt;
-  &lt;li&gt;Fix the use of priorityClasses&lt;/li&gt;
-  &lt;li&gt;Fix guest memory overhead calculation&lt;/li&gt;
-  &lt;li&gt;Fix SR-IOV device overhead requirements&lt;/li&gt;
-  &lt;li&gt;Fix loading of tun module during virt-handler initialization&lt;/li&gt;
-  &lt;li&gt;Fixes for several test cases&lt;/li&gt;
-  &lt;li&gt;Fixes to support running with container_t&lt;/li&gt;
-  &lt;li&gt;Support for renaming a vM&lt;/li&gt;
-  &lt;li&gt;Support ioEmulator thread pinning&lt;/li&gt;
-  &lt;li&gt;Support a couple of alerts for virt-handler&lt;/li&gt;
-  &lt;li&gt;Support for filesystem listing using the guest agent&lt;/li&gt;
-  &lt;li&gt;Support for retrieving data from the guest agent&lt;/li&gt;
-  &lt;li&gt;Support for device role tagging&lt;/li&gt;
-  &lt;li&gt;Support for assigning devices to the PCI root bus&lt;/li&gt;
-  &lt;li&gt;Support for guest overhead override&lt;/li&gt;
-  &lt;li&gt;Rewrite container-disk in C to in order to reduce it’s memory footprint&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.28.0</summary></entry></feed>
+&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry></feed>

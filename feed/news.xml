@@ -1,4 +1,73 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-07-08T14:14:32+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-07-08T14:50:01+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Common-templates</title><link href="https://kubevirt.io//2020/Common_templates.html" rel="alternate" type="text/html" title="Common-templates" /><published>2020-07-01T00:00:00+00:00</published><updated>2020-07-01T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Common_templates</id><content type="html" xml:base="https://kubevirt.io//2020/Common_templates.html">&lt;h2 id=&quot;what-is-a-virtual-machine-template&quot;&gt;What is a virtual machine template?&lt;/h2&gt;
+
+&lt;p&gt;The KubeVirt project provides a set of templates (https://github.com/kubevirt/common-templates) to create VMS to handle common usage scenarios. These templates provide a combination of some key factors that could be further customized and processed to have a Virtual Machine object. With common templates you can easily start in a few minutes many VMS with predefined hardware resources (e.g. number of CPUs, requested memory, etc.).&lt;/p&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Beware&lt;/p&gt;&lt;p&gt;common templates work only on OpenShift. Kubernetes doesn’t have support for templates.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;what-does-a-vm-template-cover&quot;&gt;What does a VM template cover?&lt;/h2&gt;
+
+&lt;p&gt;The key factors which define a template are&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Guest Operating System (OS) This allows to ensure that the emulated hardware is compatible with the guest OS. Furthermore, it allows to maximize the stability of the VM, and allows performance optimizations. Currently common templates support RHEL 6, 7, 8, Centos 6, 7, 8, Fedora 31 and newer, Windows 10, Windows server 2008, 2012 R2, 2016, 2019. The &lt;a href=&quot;https://docs.ansible.com/ansible/latest/user_guide/playbooks.html&quot;&gt;Ansible playbook&lt;/a&gt; &lt;a href=&quot;https://github.com/kubevirt/common-templates/blob/master/generate-templates.yaml&quot;&gt;generate-templates.yaml&lt;/a&gt; describes all combinations of templates that should be generated.&lt;/li&gt;
+  &lt;li&gt;Workload type of most virtual machines should be server or desktop to have maximum flexibility; the highperformance workload trades some of this flexibility (ioThreadsPolicy is set to shared) to provide better performances (e.g. IO threads).&lt;/li&gt;
+  &lt;li&gt;Size (flavor) Defines the amount of resources (CPU, memory) to allocate to the VM. There are 4 sizes: tiny (1 core, 1 Gi memory), small (1 core, 2 Gi memory), medium (1 core, 4 Gi memory), large (2 cores, 8 Gi memory). If these predefined sizes don’t suit you, you can create a new template based on common templates via UI (choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtual Machine Templates&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine Template&lt;/code&gt; blue button) or CLI (update yaml template and create new template).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2020-07-01-Common_templates/create_template.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create new template&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h2 id=&quot;accessing-the-virtual-machine-templates&quot;&gt;Accessing the virtual machine templates&lt;/h2&gt;
+&lt;p&gt;If you installed KubeVirt using a &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;supported method&lt;/a&gt;, you should find the common templates preinstalled in the cluster. If you want to upgrade the templates, or install them from scratch, you can use one of the &lt;a href=&quot;https://github.com/kubevirt/common-templates/releases&quot;&gt;supported releases&lt;/a&gt;
+There are two ways to install and configure templates:&lt;/p&gt;
+
+&lt;h2 id=&quot;via-cli&quot;&gt;Via CLI:&lt;/h2&gt;
+
+&lt;h6 id=&quot;to-install-the-templates&quot;&gt;To install the templates:&lt;/h6&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ export VERSION=&quot;v0.11.2&quot;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc create -f https://github.com/kubevirt/common-templates/releases/download/$VERSION/common-templates-$VERSION.yaml&lt;/code&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;to-create-vm-from-template&quot;&gt;To create VM from template:&lt;/h6&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc process rhel8-server-tiny PVCNAME=mydisk NAME=rheltinyvm | oc apply -f -&lt;/code&gt;&lt;/p&gt;
+
+&lt;h6 id=&quot;to-start-vm-from-created-object&quot;&gt;To start VM from created object:&lt;/h6&gt;
+&lt;p&gt;The created object is now a regular VirtualMachine object and from now it can be controlled by accessing Kubernetes API resources. The preferred way to do this is to use virtctl tool.&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ virtctl start rheltinyvm&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;An alternative way to start the VM is with the oc patch command. Example:&lt;/p&gt;
+
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc patch virtualmachine rheltinyvm --type merge -p '{&quot;spec&quot;:{&quot;running&quot;:true}}'&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;As soon as VM starts, openshift creates a new type of object - &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt;. It has a similar name to VirtualMachine.&lt;/p&gt;
+
+&lt;h2 id=&quot;via-ui&quot;&gt;Via UI:&lt;/h2&gt;
+&lt;p&gt;The Kubevirt project has an official plugin in OpenShift Cluster Console Web UI. This UI supports the creation of VMS using templates and template features - flavors and workload profiles.&lt;/p&gt;
+
+&lt;h6 id=&quot;to-install-the-templates-1&quot;&gt;To install the templates:&lt;/h6&gt;
+
+&lt;p&gt;Install OpenShift virtualization operator from &lt;code class=&quot;highlighter-rouge&quot;&gt;Operators&lt;/code&gt; &amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;OperatorHub&lt;/code&gt;. The operator-based deployment takes care of installing various components, including the common templates.&lt;/p&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2020-07-01-Common_templates/operator.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Install operator&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h6 id=&quot;to-create-vm-from-template-1&quot;&gt;To create VM from template:&lt;/h6&gt;
+&lt;p&gt;To create a VM from a template, choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; blue button » choose &lt;code class=&quot;highlighter-rouge&quot;&gt;New with Wizard&lt;/code&gt;. Next, you have to see &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; window&lt;/p&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2020-07-01-Common_templates/create_vm.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create vm from template&quot; /&gt;
+&lt;/div&gt;
+
+&lt;p&gt;This wizard leads you through the basic setup of vm (like guest operating system, workload, flavor, …). After vm is created you can start requested vm.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;after the generation step (UI and CLI), VM objects and template objects have no relationship with each other besides the &lt;code class=&quot;highlighter-rouge&quot;&gt;vm.kubevirt.io/template: rhel8-server-tiny-v0.10.0&lt;/code&gt; label. This means that changes in templates do not automatically affect VMS, or vice versa.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;</content><author><name>Karel Simon</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="common-templates" /><summary type="html">What is a virtual machine template?</summary></entry><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
 after a Windows guest virtual machine providing the service is migrated from
 MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by
 Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!&lt;/p&gt;
@@ -2146,184 +2215,4 @@ The following video shows how to go through the Microsoft Windows installation p
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md&quot;&gt;Creating a registry image with a VM disk&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md&quot;&gt;CDI Upload User Guide&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers&quot;&gt;KubeVirt user-guide: How to obtain virtio drivers?&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html">Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?</summary></entry><entry><title type="html">NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA</title><link href="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html" rel="alternate" type="text/html" title="NA KubeCon 2019 - KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp; Vishesh Tanksale, NVIDIA" /><published>2020-02-06T00:00:00+00:00</published><updated>2020-02-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt_deep_dive-virtualized_gpu_workloads.html">&lt;p&gt;In this &lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;video&lt;/a&gt;, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes.
-Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some
-performance metrics comparing KubeVirt to standalone KVM.&lt;/p&gt;
-
-&lt;h2 id=&quot;kubevirt-intro&quot;&gt;KubeVirt Intro&lt;/h2&gt;
-
-&lt;p&gt;David introduces the talk showing what KubeVirt is and what is not:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;KubeVirt is not involved with managing AWS or GCP instances&lt;/li&gt;
-  &lt;li&gt;KubeVirt is not a competitor to Firecracker or Kata containers&lt;/li&gt;
-  &lt;li&gt;KubeVirt is not a container runtime replacement&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;He likes to define KubeVirt as:&lt;/p&gt;
-
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;KubeVirt is a Kubernetes extension that allows running traditional VM workloads natively side by side with Container workloads.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;But why KubeVirt?&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Already have on-premise solutions like OpenStack, oVirt&lt;/li&gt;
-  &lt;li&gt;And then there’s the public cloud, AWS, GCP, Azure&lt;/li&gt;
-  &lt;li&gt;Why are we doing this VM management stuff yet again?&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The answer is that the initial motivation for it was this idea of infrastructure convergence:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_infrastructure_convergence.png&quot; alt=&quot;kubevirt_infrastructure_convergence&quot; title=&quot;KubeVirt infrastructure convergence&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The transition to the cloud model involves multiple stacks, containers and VMs, old code and new code.
-With KubeVirt all this is simplified with just one stack to manage containers and VMs to run old code and new code.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_one_stack.png&quot; alt=&quot;kubevirt_one_stack&quot; title=&quot;KubeVirt one stack&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The workflow convergence means that:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Converging VM management into container management workflows&lt;/li&gt;
-  &lt;li&gt;Using the same tooling (kubectl) for containers and Virtual Machines&lt;/li&gt;
-  &lt;li&gt;Keeping the declarative API for VM management (just like pods, deployments, etc…)&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;An example of a VM Instance in YAML could be so simple as the following example:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;$ cat &amp;lt;&amp;lt;EOF | kubectl create -f -&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstance&lt;/span&gt;
-&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-   &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
-   &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora29&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;architecture&quot;&gt;Architecture&lt;/h2&gt;
-
-&lt;p&gt;The truth here is that a KubeVirt VM is a KVM+qemu process running inside a pod. It’s as simple as that.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_virtual_machine.png&quot; alt=&quot;kubevirt_virtual_machine&quot; title=&quot;KubeVirt VM = KVM+qemu&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The VM Launch flow is shown in the following diagram. Since the user posts a VM manifest to the cluster until the Kubelet spins up the VM pod.
-And finally the virt-handler instructs the virt-launcher how to launch the qemu.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_vm_launch_flow.png&quot; alt=&quot;kubevirt_vm_launch_flow&quot; title=&quot;KubeVirt VM launch flow&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The storage in KubeVirt is used in the same way as the pods, if there is a need to have persistent storage in a VM a PVC (Persistent Volume Claim)
-needs to be created.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_volumes.png&quot; alt=&quot;kubevirt_volumes&quot; title=&quot;KubeVirt volumes&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;For example, if you have a VM in your laptop, you can upload that image using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;containerized-data-importer&lt;/a&gt; (CDI) to a PVC and then you can attach
-that PVC to the VM pod to get it running.&lt;/p&gt;
-
-&lt;p&gt;About the use of network services, the traffic routes to the KubeVirt VM in the same way it does to container workloads. Also with Multus there is
-the possibility to have different network interfaces per VM.&lt;/p&gt;
-
-&lt;p&gt;For using the Host Resources:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;VM Guest CPU and NUMA Affinity
-    &lt;ul&gt;
-      &lt;li&gt;CPU Manager (pinning)&lt;/li&gt;
-      &lt;li&gt;Topology Manager (NUMA nodes)&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;VM Guest CPU/MEM requirements
-    &lt;ul&gt;
-      &lt;li&gt;POD resource request/limits&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;VM Guest use of Host Devices
-    &lt;ul&gt;
-      &lt;li&gt;Device Plugins for access to (/dev/kvm, SR-IOV, GPU passthrough)&lt;/li&gt;
-      &lt;li&gt;POD resource request/limits for device allocation&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;gpuvgpu-in-kubevirt-vms&quot;&gt;GPU/vGPU in Kubevirt VMs&lt;/h2&gt;
-
-&lt;p&gt;After the introduction of David, Vishesh takes over and talks in-depth the whys and hows of GPUs in VM. Lots of new Machine and Deep learning applications
-are taking advance of the GPU workloads. Nowadays the Big data is one of the main consumers of GPUs but there are some gaps, the gaming and professional graphics sector
-still need to run VMs and have native GPU functionalities, that is why NVIDIA decided to work with KubeVirt.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpus_on_kubevirt.png&quot; alt=&quot;gpus_on_kubevirt&quot; title=&quot;GPU/vGPU on KubeVirt&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;To enable the device pass-through NVIDIA has developed the KubeVirt GPU device Plugin, it is available in &lt;a href=&quot;https://github.com/NVIDIA/kubevirt-gpu-device-plugin&quot;&gt;GitHub&lt;/a&gt;
-It’s open-source and anybody can take a look to it and download it.&lt;/p&gt;
-
-&lt;p&gt;Using the device plugin framework is a natural choice to provide GPU access to Kubevirt VMs,
-the following diagram shows the different layers involved in the GPU pass-through architecture:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/kubevirt_gpu_passthrough.png&quot; alt=&quot;kubevirt_gpu_passthrough&quot; title=&quot;KubeVirt GPU passthrough&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;Vishesh also comments an example of a YAML code where it can be seen the Node Status containing the NVIDIA card information (5 GPUs in that node), the Virtual Machine specification
-containing the &lt;code class=&quot;highlighter-rouge&quot;&gt;deviceName&lt;/code&gt; that points to that NVIDIA card and also the Pod Status where the user can set the limits and request for that resource as
-any other else in Kubernetes.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_yaml.png&quot; alt=&quot;kubevirt_gpu_pass_yaml&quot; title=&quot;KubeVirt GPU passthrough yaml&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;The main Device Plugin Functions are:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;GPU and vGPU device Discovery
-    &lt;ul&gt;
-      &lt;li&gt;GPUs with VFIO-PCI driver on the host are identified&lt;/li&gt;
-      &lt;li&gt;vGPUs configured using NVIDIA vGPU manager are identified&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;GPU and vGPU device Advertising
-    &lt;ul&gt;
-      &lt;li&gt;Discovered devices are advertised to kubelet as allocatable resources&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;GPU and vGPU device Allocation
-    &lt;ul&gt;
-      &lt;li&gt;Returns the PCI address of allocated GPU device&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;GPU and vGPU Health Check
-    &lt;ul&gt;
-      &lt;li&gt;Performs health check on the discovered GPU and vGPU devices&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;To understand how the GPU passthrough lifecycle works Vishesh shows the different phases involve in the process using the following diagram:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/gpu_pass_lifecycle.png&quot; alt=&quot;gpu_pass_lifecycle&quot; title=&quot;KubeVirt GPU passthrough lifecycle&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;In the following diagram there are some of the Key features that NVIDIA is using with KubeVirt:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-06-KubeVirt_deep_dive-virtualized_gpu_workloads/NVIDIA_usecase_keyfeatures.png&quot; alt=&quot;NVIDIA_usecase_keyfeatures&quot; title=&quot;KubeVirt NVIDIA usecase keyfeatures&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;If you are interested in the details of how the lifecycle works or in why NVIDIA is highly using some of the KubeVirt features listed above, you may be interested in
-taking a look to the following video.&lt;/p&gt;
-
-&lt;h2 id=&quot;video&quot;&gt;Video&lt;/h2&gt;
-
-&lt;iframe width=&quot;560&quot; height=&quot;315&quot; style=&quot;height: 315px&quot; src=&quot;https://www.youtube.com/embed/Qejlyny0G58&quot; frameborder=&quot;0&quot; allow=&quot;accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture&quot; allowfullscreen=&quot;&quot;&gt;&lt;/iframe&gt;
-
-&lt;h2 id=&quot;speakers&quot;&gt;Speakers&lt;/h2&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://github.com/davidvossel&quot;&gt;David Vossel&lt;/a&gt; David Vossel is a Principal Software Engineer at Red Hat. He is currently working on OpenShift’s Container Native Virtualization (CNV)
-and is a core contributor to the open source KubeVirt project.&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://www.linkedin.com/in/vishesh-tanksale&quot;&gt;Vishesh Tanksale&lt;/a&gt; is currently a Senior Software Engineer at NVIDIA. He is focussing on different aspects of enabling VM workload management on Kubernetes Cluster.
-He is specifically interested in GPU workloads on VMs. He is an active contributor to Kubevirt, a CNCF Sandbox Project.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=Qejlyny0G58&quot;&gt;YouTube video: KubeVirt Deep Dive: Virtualized GPU Workloads on KubeVirt - David Vossel, Red Hat &amp;amp; Vishesh Tanksale, NVIDIA&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://static.sched.com/hosted_files/kccncna19/31/KubeCon%202019%20-%20Virtualized%20GPU%20Workloads%20on%20KubeVirt.pdf&quot;&gt;Presentation: Virtualized GPU workloads on KubeVirt&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kccncna19.sched.com/event/VnjX&quot;&gt;KubeCon NA 2019 event&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="KubeCon" /><category term="GPU" /><category term="NVIDIA" /><category term="GPU workloads" /><category term="pass-through" /><category term="passthrough" /><category term="KVM" /><category term="QEMU" /><summary type="html">In this video, David and Vishesh explore the architecture behind KubeVirt and how NVIDIA is leveraging that architecture to power GPU workloads on Kubernetes. Using NVIDIA’s GPU workloads as a case of study, they provide a focused view on how host device passthrough is accomplished with KubeVirt as well as providing some performance metrics comparing KubeVirt to standalone KVM.</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pedro Ibáñez Requena</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html">Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt, but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?</summary></entry></feed>
