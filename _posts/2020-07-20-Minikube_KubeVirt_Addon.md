@@ -20,7 +20,9 @@ pub-year: 2020
 ---
 
 ## Deploying KubeVirt has just gotten easier!
-With the latest release of minikube we can now deploy KubeVirt with a one-liner.
+With the latest release (v1.12) of
+[minikube](https://minikube.sigs.k8s.io/docs/) we can now deploy KubeVirt with
+a one-liner.
 
 
 ## Deploy minikube
@@ -62,8 +64,8 @@ With the latest release of minikube we can now deploy KubeVirt with a one-liner.
         alt="minikube addons enable kubevirt">
     </div>
     <br><br>
-  </li><li>Verify KubeVirt namespace and components<br>
-    <code>kubectl get ns; kubectl get all -n kube-system</code>
+  </li><li>Verify KubeVirt components have been deployed to the kubevirt namespace<br>
+    <code>kubectl get ns; kubectl get all -n kubevirt</code>
     <br>
     <div class="zoom">
       <img
@@ -79,6 +81,12 @@ With the latest release of minikube we can now deploy KubeVirt with a one-liner.
 
 ### SUCCESS!
 
-From here a user can proceed on to the [Kubevirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})
+From here a user can proceed on to the
+[Kubevirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})
+
+<br>
+
+As you can see it is now much easier to deploy KubeVirt in a minikube
+Kubernetes environment.
 
 <br>
