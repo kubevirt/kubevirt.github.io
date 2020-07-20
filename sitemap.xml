@@ -501,6 +501,10 @@
 <lastmod>2020-07-09T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html</loc>
+<lastmod>2020-07-20T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1138,6 +1142,12 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/common-templates.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/minikube.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/addons.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
