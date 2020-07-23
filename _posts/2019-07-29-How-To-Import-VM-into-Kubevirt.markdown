@@ -120,7 +120,7 @@ spec:
       type: ""
     resources:
       requests:
-        memory: 64M
+        memory: 4096M
   terminationGracePeriodSeconds: 0
   volumes:
   - name: pvcdisk
@@ -149,7 +149,7 @@ spec:
   domain:
     resources:
       requests:
-        memory: 64M
+        memory: 4096M
     devices:
       disks:
         - name: mypvcdisk
@@ -190,7 +190,7 @@ spec:
               name: datavolumedisk1
         resources:
           requests:
-            memory: 64M
+            memory: 4096M
       volumes:
         - dataVolume: #Note the type is dataVolume
             name: alpine-dv

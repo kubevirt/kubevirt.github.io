@@ -65,7 +65,7 @@ kubevirt_vm:
   namespace: default
   name: vm1
   cpu_cores: 1
-  memory: 64Mi
+  memory: 4096M
   disks:
     - name: containerdisk
       volume:

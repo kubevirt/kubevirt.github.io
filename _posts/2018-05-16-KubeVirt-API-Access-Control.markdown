@@ -42,7 +42,7 @@ spec:
         volumeName: registryvolume
     resources:
       requests:
-        memory: 64M
+        memory: 4096M
   volumes:
   - name: registryvolume
     registryDisk:

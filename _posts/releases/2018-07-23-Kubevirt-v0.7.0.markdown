@@ -31,7 +31,7 @@ spec:
   domain:
     resources:
       requests:
-        memory: "64Mi"
+        memory: 4096M
     memory:
       hugepages:
         pageSize: "2Mi"
@@ -92,7 +92,7 @@ spec:
   domain:
     resources:
       requests:
-        memory: "64Mi"
+        memory: 4096M
     disks:
       - name: myimage
         volumeName: myimage

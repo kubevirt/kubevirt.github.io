@@ -411,7 +411,7 @@ spec:
           type: ""
         resources:
           requests:
-            memory: 64M
+            memory: 4096M
       terminationGracePeriodSeconds: 0
       volumes:
       - cloudInitNoCloud:
