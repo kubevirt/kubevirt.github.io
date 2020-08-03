@@ -5,12 +5,12 @@ navbar_active: Blogs
 order: 4
 ---
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <h1 class="page-title">{{ page.title }}</h1>
+    <h1 class="page-title pl-3">{{ page.title }}</h1>
   </div>
   <div class="row">
-    <div class="col-sm-12 col-md-3">
+    <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2">
       {% if site.data.blogs_toc.toc[0] %}
         {% for item in site.data.blogs_toc.toc %}
           {% if item.subfolderitems[0] %}
@@ -39,7 +39,7 @@ order: 4
         {% endfor %}
       {% endif %}
     </div>
-    <div class="col-sm-12 col-md-9">
+    <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10">
       <ul class="posts">
         {% for post in paginator.posts %}
           <li>
