@@ -355,7 +355,7 @@ All the nodes are virtual instances configured by libvirt.</p>
 
 <p>After creating the service and endpoints objects lets confirm that DNS is resolving correctly.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh fedora@$(oc get pod -l kubevirt-vm=nodejs --template '') \
+<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh fedora@$(oc get pod -l kubevirt-vm=nodejs --template '{{ range .items }}{{.status.podIP}}{{end}}') \
 "python3 -c \"import socket;print(socket.gethostbyname('mongo.vm.svc.cluster.local'))\""
 192.168.123.139
 </code></pre></div></div>
@@ -442,7 +442,7 @@ NAME      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)     AGE
 mongo     ClusterIP   None         &lt;none&gt;        27017/TCP   8h
 node      ClusterIP   None         &lt;none&gt;        8080/TCP    7h
 
-$ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') cat /etc/sysconfig/nodejs
+$ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') cat /etc/sysconfig/nodejs
 MONGO_URL=mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
 </code></pre></div></div>
 
@@ -595,7 +595,7 @@ vnet1      bridge     k6t-net1   virtio      20:37:cf:e0:ad:f2
 pod ip address and the other the <code class="highlighter-rouge">ovs-cni</code> layer 2 interface. The <code class="highlighter-rouge">eth1</code> interface receives a IP address
 from DHCP provided by dnsmasq that was configured by libvirt network on the physical host.</p>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo ip a</code></p>
+<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ip a</code></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...output...
 2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc fq_codel state UP group default qlen 1000
@@ -618,7 +618,7 @@ from DHCP provided by dnsmasq that was configured by libvirt network on the phys
 configuring the network interfaces. The default route and dns configuration must be
 maintained by <code class="highlighter-rouge">eth0</code>. <code class="highlighter-rouge">eth1</code> has both route and dns configuration disabled.</p>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0</code></p>
+<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0</code></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BOOTPROTO=dhcp
 DEVICE=eth0
@@ -630,7 +630,7 @@ DEFROUTE=yes
 PEERDNS=yes
 </code></pre></div></div>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth1</code></p>
+<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth1</code></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>BOOTPROTO=dhcp
 DEVICE=eth1
@@ -645,7 +645,7 @@ DEFROUTE=no
 
 <p>Just quickly wanted to cat the <code class="highlighter-rouge">/etc/resolv.conf</code> file to show that DNS is configured so that kube-dns will be properly queried.</p>
 
-<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '') sudo cat /etc/resolv.conf</code></p>
+<p><code class="highlighter-rouge">~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '{{.status.podIP}}') sudo cat /etc/resolv.conf</code></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>search vm.svc.cluster.local. svc.cluster.local. cluster.local. 168.122.112.nip.io.
 nameserver 192.168.122.112
@@ -677,7 +677,7 @@ connection to MongoDB and finally check the NodeJS logs looking for confirmation
 <p>After connecting to the nodejs virtual machine via ssh we can use <code class="highlighter-rouge">ss</code> to determine the current TCP connections.
 We are specifically looking for the established connections to the MongoDB service that is running on the mongodb virtual machine.</p>
 
-<p><code class="highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo ss -tanp</code></p>
+<p><code class="highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ss -tanp</code></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>State      Recv-Q Send-Q Local Address:Port               Peer Address:Port
 ...output...
@@ -691,7 +691,7 @@ ESTAB      0      0      192.168.123.140:33164              192.168.123.139:2701
 
 <p>Here we are reviewing the logs of node to confirm we have a database connection to mongo via the service hostname.</p>
 
-<p><code class="highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '') sudo journalctl -u nodejs</code></p>
+<p><code class="highlighter-rouge">ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo journalctl -u nodejs</code></p>
 
 <div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>...output...
 October 01 18:28:09 nodejs.localdomain systemd[1]: Started OpenShift NodeJS Example.
