@@ -1,46 +1,38 @@
 .kv-btn {
-  margin-top: 5px;
-  margin-bottom: 6px;
-  padding-bottom: 2rem;
   color: $kv-color--green-600;
+  padding: .5rem 1rem; 
+  font-weight: bold;
   font-size: 16px;
-  background: $kv-color--gold-500; /* Old browsers */
-  background: linear-gradient(to bottom, $kv-color--gold-100 0%,$kv-color--gold-700 100%);
-  border: 1px solid $kv-color--gold-100;
-  border-radius: 0;
+  background: #fff;
+  border-radius: 5px;
   box-shadow: none;
-  transition:
-    color 0.15s ease-in-out,
-    background-color 0.15s ease-in-out,
-    border-color 0s,
-    box-shadow 0s;
+  display:flex;
+  align-content: center;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  text-transform: capitalize;
+  top: 0;
+  svg {
+    margin-right: .5rem;
+    g {
+      fill: $kv-color--gold-600;
+    }
+    
+  }
+  transition: all 0.15s ease-in-out;
+
   &:hover,
   &:active,
   &:focus {
-    color: $kv-color--green-600;
-    background: $kv-color--gold-500; /* Old browsers */
-    background: linear-gradient(to bottom, $kv-color--gold-300 0%, $kv-color--gold-800 100%);
-    background-color: $kv-color--gold-700 !important;
+    color: $kv-color--gold-600;
+    top: -2px;
+
   }
-  &:focus {
-    border-color: $kv-color--gold-700 !important;
-  }
-  &:focus {
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8) !important;
-  }
-  &-primary {
-    height: 33px;
-    width: 156px;
-    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.8);
-  }
+
   &-community {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 70px;
-    min-width: 220px;
-    padding: .5rem 1rem;
-    box-shadow: none;
+    border: 1px solid $kv-color--green-600;
+    
     @media (max-width: 992px) {
       margin-bottom: 20px;
     }
