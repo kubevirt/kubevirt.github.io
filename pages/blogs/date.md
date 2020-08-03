@@ -16,51 +16,51 @@ order: 10
     </div>
     <div class="col-sm-12 col-md-9 blogs">
 
-{%comment%} ++++++++++ We first find start and end years ++++++++++ {%endcomment%}
+{% comment %} ++++++++++ We first find start and end years ++++++++++ {% endcomment %}
 {% assign startYear = 2222 %}
 {% assign endYear   = 1 %}
 
 {% for post in site.posts %}
-{%comment%} +++++
+{% comment %} +++++
 "| plus: 0" casts postYear to fixnum, because "post.date | date: "%Y"" is a string
 and comparing "2013" with 2012 (string / number) throws an error
-+++++ {%endcomment%}
++++++ {% endcomment %}
 {% assign postYear = post.date | date: "%Y" | plus: 0 %}
 
 {% if postYear > endYear %}{% assign endYear = postYear %}{% endif %}
 {% if postYear < startYear %}{% assign startYear = postYear %}{% endif %}
 {% endfor %}
 
-{%comment%} +++++++++++++++ build the table +++++++++++++++ {%endcomment%}
+{% comment %} +++++++++++++++ build the table +++++++++++++++ {% endcomment %}
 
 {% assign tableContent = "<tr><th></th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th></tr>" %}
 
-{%comment%} +++++
+{% comment %} +++++
 currentPostIndex is used to loop over post in an efficient way
 Knowing that posts a sorted by date, we don't need to loop over
 all posts each time we want to inspect them.
 Instead we only loop through posts we don't already inspect.
-+++++ {%endcomment%}
++++++ {% endcomment %}
 {% assign currentPostIndex = 0 %}
 
-{%comment%} +++++ site.posts array is zero numbered, so last index = size-1 +++++ {%endcomment%}
+{% comment %} +++++ site.posts array is zero numbered, so last index = size-1 +++++ {% endcomment %}
 {% assign lastPostIndex = site.posts.size | minus: 1 %}
 
-{%comment%} +++++ Looping trough years in REVERSE order +++++ {%endcomment%}
-{% for year in (startYear...endYear) reversed %}
+{% comment %} +++++ Looping trough years in REVERSE order +++++ {% endcomment %}
+{% for year in (startYear..endYear) reversed %}
 
 {% assign yearRow = "<tr><th>" | append: year | append: "</th>" %}
 
-{%comment%} +++++ Trick to create an empty array +++++ {%endcomment%}
+{% comment %} +++++ Trick to create an empty array +++++ {% endcomment %}
 {% assign yearCellsArray = "" | split: "/" %}
 
-{%comment%} +++++ Looping over month reversed +++++ {%endcomment%}
-{% for month in (1...12) reversed %}
+{% comment %} +++++ Looping over month reversed +++++ {% endcomment %}
+{% for month in (1..12) reversed %}
 
     {% assign postsThisYearMonth = 0 %}
     {% assign monthCell = "<td>" %}
 
-    {% for postIndex in (currentPostIndex...lastPostIndex) %}
+    {% for postIndex in (currentPostIndex..lastPostIndex) %}
 
       {% assign p      = site.posts[postIndex] %}
       {% assign pYear  = p.date | date: "%Y" | plus: 0 %}
@@ -69,7 +69,7 @@ Instead we only loop through posts we don't already inspect.
       {% if pYear == year and pMonth == month %}
         {% assign postsThisYearMonth = postsThisYearMonth | plus: 1 %}
       {% else %}
-        {%comment%} +++++ Here we stop the loop +++++ {%endcomment%}
+        {% comment %} +++++ Here we stop the loop +++++ {% endcomment %}
         {% assign currentPostIndex = postIndex %}
         {% break %}
       {% endif %}
@@ -103,21 +103,21 @@ Instead we only loop through posts we don't already inspect.
   </tbody>
 </table>
 
-{%comment%} +++++ Printing posts by Year then month +++++ {%endcomment%}
+{% comment %} +++++ Printing posts by Year then month +++++ {% endcomment %}
 
 {% assign currentPostIndex = 0 %}
 {% assign lastPostIndex = site.posts.size | minus: 1 %}
 
-{% for year in (startYear...endYear) reversed %}
+{% for year in (startYear..endYear) reversed %}
 
   <h2>{{year}}</h2>
   {% assign currentYear = year %}
-  {% for month in (1...12) reversed %}
+  {% for month in (1..12) reversed %}
 
     {% assign postsArray = "" | split: "/" %}
 
-    {%comment%} +++++ Find post for this year / month +++++ {%endcomment%}
-    {% for postIndex in (currentPostIndex...lastPostIndex) %}
+    {% comment %} +++++ Find post for this year / month +++++ {% endcomment %}
+    {% for postIndex in (currentPostIndex..lastPostIndex) %}
       {% assign p      = site.posts[postIndex] %}
       {% assign pYear  = p.date | date: "%Y" | plus: 0 %}
       {% assign pMonth = p.date | date: "%m" | plus: 0 %}
@@ -125,7 +125,7 @@ Instead we only loop through posts we don't already inspect.
       {% if pYear == year and pMonth == month %}
         {% assign postsArray = postsArray | push: p %}
       {% else %}
-        {%comment%} +++++ Here we stop the loop +++++ {%endcomment%}
+        {% comment %} +++++ Here we stop the loop +++++ {% endcomment %}
         {% assign currentPostIndex = postIndex %}
         {% break %}
       {% endif %}
@@ -133,10 +133,10 @@ Instead we only loop through posts we don't already inspect.
 
     {% assign postArraySize = postsArray | size %}
 
-    {%comment%} +++++ Printing posts if we have some for this year month +++++ {%endcomment%}
+    {% comment %} +++++ Printing posts if we have some for this year month +++++ {% endcomment %}
     {% if postArraySize and postArraySize > 0 %}
 
-      {%comment%} +++++ get month name from a post.date +++++ {%endcomment%}
+      {% comment %} +++++ get month name from a post.date +++++ {% endcomment %}
       {% assign post = postsArray | first %}
       {% assign monthName = post.date | date: "%B" %}
 

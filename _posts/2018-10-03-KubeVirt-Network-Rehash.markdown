@@ -121,11 +121,13 @@ All the nodes are virtual instances configured by libvirt.
 
 After creating the service and endpoints objects lets confirm that DNS is resolving correctly.
 
+{% raw %}
 ```
 $ ssh fedora@$(oc get pod -l kubevirt-vm=nodejs --template '{{ range .items }}{{.status.podIP}}{{end}}') \
 "python3 -c \"import socket;print(socket.gethostbyname('mongo.vm.svc.cluster.local'))\""
 192.168.123.139
 ```
+{% endraw %}
 
 ### Node
 
@@ -206,6 +208,7 @@ communication and route to virtual machine.
 We have created two headless services one for node and one for mongo.
 This allows us to use the hostname mongo to connect to MongoDB via the alternative interface.
 
+{% raw %}
 ```
 $ oc get services
 NAME      TYPE        CLUSTER-IP   EXTERNAL-IP   PORT(S)     AGE
@@ -215,6 +218,7 @@ node      ClusterIP   None         <none>        8080/TCP    7h
 $ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') cat /etc/sysconfig/nodejs
 MONGO_URL=mongodb://nodejs:nodejspassword@mongo.vm.svc.cluster.local/nodejs
 ```
+{% endraw %}
 
 ### endpoints
 
@@ -373,7 +377,9 @@ Fortunately the vm interfaces are fairly typical. Two interfaces: one that has b
 pod ip address and the other the `ovs-cni` layer 2 interface. The `eth1` interface receives a IP address
 from DHCP provided by dnsmasq that was configured by libvirt network on the physical host.
 
+{% raw %}
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ip a`
+{% endraw %}
 
 ```
 ...output...
@@ -397,7 +403,9 @@ In this example we want to use Kubernetes services so special care must be used 
 configuring the network interfaces. The default route and dns configuration must be
 maintained by `eth0`. `eth1` has both route and dns configuration disabled.
 
+{% raw %}
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth0`
+{% endraw %}
 
 ```
 BOOTPROTO=dhcp
@@ -410,7 +418,9 @@ DEFROUTE=yes
 PEERDNS=yes
 ```
 
+{% raw %}
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo cat /etc/sysconfig/network-scripts/ifcfg-eth1`
+{% endraw %}
 
 ```
 BOOTPROTO=dhcp
@@ -426,7 +436,9 @@ DEFROUTE=no
 
 Just quickly wanted to cat the `/etc/resolv.conf` file to show that DNS is configured so that kube-dns will be properly queried.
 
+{% raw %}
 `~ ssh fedora@$(oc get pod virt-launcher-nodejs-76xk7 --template '{{.status.podIP}}') sudo cat /etc/resolv.conf`
+{% endraw %}
 
 ```
 search vm.svc.cluster.local. svc.cluster.local. cluster.local. 168.122.112.nip.io.
@@ -459,7 +471,9 @@ connection to MongoDB and finally check the NodeJS logs looking for confirmation
 After connecting to the nodejs virtual machine via ssh we can use `ss` to determine the current TCP connections.
 We are specifically looking for the established connections to the MongoDB service that is running on the mongodb virtual machine.
 
+{% raw %}
 `ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo ss -tanp`
+{% endraw %}
 
 ```
 State      Recv-Q Send-Q Local Address:Port               Peer Address:Port
@@ -474,7 +488,9 @@ ESTAB      0      0      192.168.123.140:33164              192.168.123.139:2701
 
 Here we are reviewing the logs of node to confirm we have a database connection to mongo via the service hostname.
 
+{% raw %}
 `ssh fedora@$(oc get pod virt-launcher-nodejs-dlgv6 --template '{{.status.podIP}}') sudo journalctl -u nodejs`
+{% endraw %}
 
 ```
 ...output...
