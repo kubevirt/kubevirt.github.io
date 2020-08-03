@@ -1,14 +1,17 @@
 .hero {
   background-image: linear-gradient(to top, #3accc5, #00aab2);
   background-size: cover;
-  min-height: 60vh;
+  min-height: 80vh;
   color: $kv-color--white;
   text-align: center;
   &-overlay {
     background: url(./../assets/images/hero-overlay.svg);
     background-size: cover;
     background-position: top center;
-    min-height: 60vh;
+    min-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
     padding-top: 50px;
     @media (max-width: 992px) {
       padding-top: 75px;
@@ -18,41 +21,74 @@
     }
     &-text {
       color: $kv-color--white;
+      margin-top: 4rem;
     }
     &__action {
-      width: auto;
-      height: auto;
-      display: inline-flex;
-      padding: 8px;
-      align-items: center;
-      text-transform: capitalize;
-      svg {
-        margin-left: 8px;
-      }
+      margin-top: 1rem;
+     display: inline-flex;
+    } 
+  }
+
+  .kv-card-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1rem;
+    @media (min-width:992px) {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      grid-template-rows: min-content 1fr;
+      gap: .5rem;
+      grid-template-areas:
+      "header header header header"
+      "card-1 card-2 card-3 card-4";
+      grid-row: .2rem;
     }
   }
-  .card {
+  .kv-card-group__header {
+    grid-area: header;
+    margin-bottom: 1rem;
+    & > * { 
+      color: #fff;
+    }
+  }
+
+  .kv-card {
     background-image: linear-gradient(to bottom, $kv-color--green-300, $kv-color--green-450);
     background-color: $kv-color--green-450;
     box-shadow: 0 1px 1px 0 rgba(0, 0, 0, .08);
-    border: none;
-    border-radius: 0;
+    margin-bottom: 1rem;
+    border-radius: 5px;
+    padding: 1rem;
+    display: flex;
+    flex-direction:column;
     color: $kv-color--white;
+    
     &-body {
       display: flex;
-      justify-content: space-evenly;
       align-items: center;
+      flex-direction: column;
+      margin-bottom: 1rem;
+      min-height: 100px;
     }
     &-text {
-      margin-left: 1rem;
+      margin: auto 0 0 0;
       color: $kv-color--white;
       font-size: 18px;
-      text-align: left;
     }
-    &-footer {
-      background-color: transparent;
-      border-top: none;
-      border-radius: 0;
+    .kv-btn {
+      margin-top: auto;
+    }
+    &:nth-of-type(1){
+      grid-area: card-1;
+    }
+    &:nth-of-type(2){
+      grid-area: card-2;
+    }
+    &:nth-of-type(3){
+      grid-area: card-3;
+    }
+    &:nth-of-type(4){
+      grid-area: card-4;
     }
   }
 }
