@@ -1,6 +1,100 @@
-.kubevirt-intro {
-  background-color: $kv-color--black-150;
+.kv-homepage-grid {
+  padding: 4rem 1rem 0 1rem;
+  @media (min-width: 900px) {
+    display: grid;
+    gap: 4rem;
+    grid-template-columns: 3fr 1fr;
+    grid-template-areas: 
+    "why posts"
+    "what posts";  
+  }
 }
+
+.kv-why {
+  grid-area: why;
+}
+
+.kv-what {
+  grid-area: what;
+  @media (min-width: 700px) {
+    display: grid;
+    gap: 2rem;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: min-content min-content min-content;
+    grid-template-areas:
+    "title title title"
+    "img-1 img-2 img-3"
+    "txt-1 txt-2 txt-3"
+    ;
+    &__title {
+      grid-area: title;
+    }
+    &__img{
+      align-self: center;
+      justify-self: center;
+      &:nth-of-type(1) {
+        grid-area: img-1;
+      }
+      &:nth-of-type(2) {
+        grid-area: img-2;
+      }
+      &:nth-of-type(3) {
+        grid-area: img-3;
+      }
+    }
+    &__text {
+      text-align: center;
+      &:nth-of-type(1) {
+        grid-area: txt-1;
+      }
+      &:nth-of-type(2) {
+        grid-area: txt-2;
+      }
+      &:nth-of-type(3) {
+        grid-area: txt-3;
+      }
+    }
+  }
+
+&__img, &__text {
+  margin: .5rem auto;
+  display: block;
+  text-align: center;
+  max-width: 75vw;
+}
+}
+
+.kv-recent-posts {
+  grid-area: posts;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}
+
+.kv-blog__snippet {
+  border-radius: 5px;
+  font-size: 1rem;
+  background: linear-gradient(to bottom, rgba($kv-color--green-300, 0.7), rgba($kv-color--green-450, 0.7));
+  &:not(:last-child){
+    margin-bottom: .5rem;
+  }
+  &__link {
+    padding: 1rem;
+  display: block;
+  }
+  h4 {
+    font-weight: bolder;
+  }
+  & * {
+    color: #fff;
+  }
+  &:hover, &:active, &:focus {
+      background: linear-gradient(to bottom, rgba($kv-color--green-300, 1), rgba($kv-color--green-450, 1));
+
+  }
+}
+
+
 .row-community {
   &-title {
     min-height: 10vh;
