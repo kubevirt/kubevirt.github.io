@@ -40,3 +40,10 @@ pre {
     padding-left: 0;
   }
 }
+
+.post-content {
+  blockquote {
+    border-left: 2px solid #ccc;
+    padding-left: 1rem;
+  }
+}
