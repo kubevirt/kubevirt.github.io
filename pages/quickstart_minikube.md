@@ -2,6 +2,7 @@
 layout: labs
 title: KubeVirt quickstart with Minikube
 permalink: /quickstart_minikube/
+navbar_active: Labs
 redirect_from: "/get_kubevirt/"
 order: 2
 lab: minikube
