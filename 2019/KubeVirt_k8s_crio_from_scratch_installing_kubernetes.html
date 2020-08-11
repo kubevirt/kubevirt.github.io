@@ -298,14 +298,14 @@ k8s-test.local# systemctl <span class="nb">enable</span> <span class="nt">--now<
 
 <h2 id="installing-the-kubernetes-cluster">Installing the Kubernetes cluster</h2>
 
-<p>There are multiple ways for installing a Kubernetes cluster, in this example it will be done with the command <code class="highlighter-rouge">kubeadm</code>, the pod network cidr is the same that has been previously used for the CRI-O bridge in the <code class="highlighter-rouge">10-crio-bridge.conf</code> configuration file:</p>
+<p>There are multiple ways for installing a Kubernetes cluster, in this example it will be done with the command <code class="language-plaintext highlighter-rouge">kubeadm</code>, the pod network cidr is the same that has been previously used for the CRI-O bridge in the <code class="language-plaintext highlighter-rouge">10-crio-bridge.conf</code> configuration file:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubeadm init <span class="nt">--pod-network-cidr</span><span class="o">=</span>10.244.0.0/16
 </code></pre></div></div>
 
 <p>When the installation finishes the command will print a similar message like this one:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Your Kubernetes control-plane has initialized successfully!
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Your Kubernetes control-plane has initialized successfully!
 
 To start using your cluster, you need to run the following as a regular user:
 
@@ -356,7 +356,7 @@ kube-system   kube-scheduler-k8s-test            1/1     Running   0          50
 k8s-test.local# wget https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 </code></pre></div></div>
 
-<p>The version of CNI has to be checked and ensured that is the <code class="highlighter-rouge">0.3.1</code> version, otherwise, it has to be changed, in this example the version <code class="highlighter-rouge">0.2.0</code> is replaced by the <code class="highlighter-rouge">0.3.1</code>:</p>
+<p>The version of CNI has to be checked and ensured that is the <code class="language-plaintext highlighter-rouge">0.3.1</code> version, otherwise, it has to be changed, in this example the version <code class="language-plaintext highlighter-rouge">0.2.0</code> is replaced by the <code class="language-plaintext highlighter-rouge">0.3.1</code>:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# <span class="nb">grep </span>cniVersion kube-flannel.yml
       <span class="s2">"cniVersion"</span>: <span class="s2">"0.2.0"</span>,
@@ -390,7 +390,7 @@ kube-system   kube-proxy-lqjpv                   1/1     Running   0          20
 kube-system   kube-scheduler-k8s-test            1/1     Running   0          20h
 </code></pre></div></div>
 
-<p>To load the multus configuration, the <code class="highlighter-rouge">multus-cni</code> repository has to be cloned, and also the <code class="highlighter-rouge">kube-1.16-change</code> branch has to be used:</p>
+<p>To load the multus configuration, the <code class="language-plaintext highlighter-rouge">multus-cni</code> repository has to be cloned, and also the <code class="language-plaintext highlighter-rouge">kube-1.16-change</code> branch has to be used:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/intel/multus-cni /root/src/github.com/multus-cni
 

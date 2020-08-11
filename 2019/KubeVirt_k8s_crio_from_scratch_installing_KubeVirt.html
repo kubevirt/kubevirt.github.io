@@ -282,7 +282,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl taint nodes k8s-test node-role.kubernetes.io/master:NoSchedule-
 </code></pre></div></div>
 
-<p>The last version of KubeVirt at the moment is <code class="highlighter-rouge">v0.20.8</code>, to check it the following command can be executed:</p>
+<p>The last version of KubeVirt at the moment is <code class="language-plaintext highlighter-rouge">v0.20.8</code>, to check it the following command can be executed:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# <span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq <span class="nt">-r</span> .tag_name<span class="si">)</span>
 
@@ -337,7 +337,7 @@ Use <span class="s2">"virtctl &lt;command&gt; --help"</span> <span class="k">for
 Use <span class="s2">"virtctl options"</span> <span class="k">for </span>a list of global command-line options <span class="o">(</span>applies to all commands<span class="o">)</span><span class="nb">.</span>
 </code></pre></div></div>
 
-<p>This step is optional, right now anything related with the Virtual Machines can be done running the <code class="highlighter-rouge">virtctl</code> command. In case there’s a need to interact with the Virtual Machines without leaving the scope of the <code class="highlighter-rouge">kubectl</code> command, the virt plugin for Krew can be installed following the instructions below:</p>
+<p>This step is optional, right now anything related with the Virtual Machines can be done running the <code class="language-plaintext highlighter-rouge">virtctl</code> command. In case there’s a need to interact with the Virtual Machines without leaving the scope of the <code class="language-plaintext highlighter-rouge">kubectl</code> command, the virt plugin for Krew can be installed following the instructions below:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# <span class="o">(</span>
   <span class="nb">set</span> <span class="nt">-x</span><span class="p">;</span> <span class="nb">cd</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">mktemp</span> <span class="nt">-d</span><span class="si">)</span><span class="s2">"</span> <span class="o">&amp;&amp;</span>
@@ -410,7 +410,7 @@ NAME        AGE     RUNNING   VOLUME
 testvm   7m11s   <span class="nb">true</span>
 </code></pre></div></div>
 
-<p>Next thing to do is to use the <code class="highlighter-rouge">kubectl</code> command for getting the IP address and the actual status of the virtual machines:</p>
+<p>Next thing to do is to use the <code class="language-plaintext highlighter-rouge">kubectl</code> command for getting the IP address and the actual status of the virtual machines:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# kubectl get vmis
 kubectl get vmis
@@ -422,7 +422,7 @@ NAME     AGE   PHASE     IP            NODENAME
 testvm   63s   Running   10.244.0.15   k8s-test
 </code></pre></div></div>
 
-<p>So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (<code class="highlighter-rouge">./virtctl console testvm</code>) or also a direct connection with SSH can be made:</p>
+<p>So, finally the Virtual Machine is running and has an IP address. To connect to that VM, the console can be used (<code class="language-plaintext highlighter-rouge">./virtctl console testvm</code>) or also a direct connection with SSH can be made:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ssh cirros@10.244.0.15
 cirros@10.244.0.15<span class="s1">'s password: gocubsgo
@@ -445,21 +445,21 @@ VM testvm was scheduled to stop
 <p>Each step of this guide has a place where to look for possible issues, in general, the <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/">troubleshooting guide of kubernetes</a> can be checked. The following list tries to ease the possible troubleshooting in case of problems during each step of this guide:</p>
 
 <ul>
-  <li>CRI-O: check the status of the CRI-O service <code class="highlighter-rouge">systemctl status crio</code> and also the messages in the journal <code class="highlighter-rouge">journalctl -u crio -lf</code></li>
-  <li>Kubernetes: check the status of the Kubelet service <code class="highlighter-rouge">systemctl status kubelet</code> and also the messages in the journal <code class="highlighter-rouge">journalctl -u kubelet -fl</code></li>
+  <li>CRI-O: check the status of the CRI-O service <code class="language-plaintext highlighter-rouge">systemctl status crio</code> and also the messages in the journal <code class="language-plaintext highlighter-rouge">journalctl -u crio -lf</code></li>
+  <li>Kubernetes: check the status of the Kubelet service <code class="language-plaintext highlighter-rouge">systemctl status kubelet</code> and also the messages in the journal <code class="language-plaintext highlighter-rouge">journalctl -u kubelet -fl</code></li>
   <li>Pods: for checking the status of the pods the kubectl command can be used in different ways
     <ul>
-      <li><code class="highlighter-rouge">kubectl get pods -A</code></li>
-      <li><code class="highlighter-rouge">kubectl describe pod $pod</code></li>
+      <li><code class="language-plaintext highlighter-rouge">kubectl get pods -A</code></li>
+      <li><code class="language-plaintext highlighter-rouge">kubectl describe pod $pod</code></li>
     </ul>
   </li>
-  <li>Nodes: a <code class="highlighter-rouge">Ready</code> status would mean everything is ok with the node, otherwise the details of that node can be checked.
+  <li>Nodes: a <code class="language-plaintext highlighter-rouge">Ready</code> status would mean everything is ok with the node, otherwise the details of that node can be checked.
     <ul>
-      <li><code class="highlighter-rouge">kubectl get nodes -o wide</code></li>
-      <li><code class="highlighter-rouge">kubectl get node &lt;nodename&gt; -o yaml</code></li>
+      <li><code class="language-plaintext highlighter-rouge">kubectl get nodes -o wide</code></li>
+      <li><code class="language-plaintext highlighter-rouge">kubectl get node &lt;nodename&gt; -o yaml</code></li>
     </ul>
   </li>
-  <li>KubeVirt: to check the status of the KubeVirt pods use <code class="highlighter-rouge">kubectl get pods -n kubevirt</code></li>
+  <li>KubeVirt: to check the status of the KubeVirt pods use <code class="language-plaintext highlighter-rouge">kubectl get pods -n kubevirt</code></li>
 </ul>
 
 <h2 id="references">References</h2>

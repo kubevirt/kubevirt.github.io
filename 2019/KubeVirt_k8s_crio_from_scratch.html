@@ -313,7 +313,7 @@ In this series of blogposts the following topics are going to be covered en each
 
 <p>Ensure the VM system is updated to the latest versions of the software and also ensure that the epel repository is installed:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# yum install epel-release -y
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# yum install epel-release -y
 
 k8s-test.local# yum update -y
 
@@ -322,7 +322,7 @@ k8s-test.local# yum install vim jq -y
 
 <p>The following kernel parameters have to be configured:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cat &gt; /etc/sysctl.d/99-kubernetes-cri.conf &lt;&lt;EOF
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cat &gt; /etc/sysctl.d/99-kubernetes-cri.conf &lt;&lt;EOF
 net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
 net.bridge.bridge-nf-call-ip6tables = 1
@@ -331,7 +331,7 @@ EOF
 
 <p>And also the following kernel modules have to be installed:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# modprobe br_netfilter
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# modprobe br_netfilter
 k8s-test.local# echo br_netfilter &gt; /etc/modules-load.d/br_netfilter.conf
 
 k8s-test.local# modprobe overlay
@@ -340,12 +340,12 @@ k8s-test.local# echo overlay &gt; /etc/modules-load.d/overlay.conf
 
 <p>The new sysctl parameters have to be loaded in the system with the following command:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# sysctl -p/etc/sysctl.d/99-kubernetes-cri.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# sysctl -p/etc/sysctl.d/99-kubernetes-cri.conf
 </code></pre></div></div>
 
 <p>The next step is to disable SELinux:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# setenforce 0
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# setenforce 0
 
 k8s-test.local# sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 </code></pre></div></div>
@@ -358,11 +358,11 @@ k8s-test.local# sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/
 
 <h4 id="the-ansible-way">The ansible way</h4>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>we are waiting for the <a href="https://github.com/cri-o/cri-o-ansible/pull/25">PR</a> to be merged in the official cri-o-ansible repository, meantime a fork in an alternative repository would be used. Also, note that the following commands are executed from a different place, in this case from a computer called <code class="highlighter-rouge">laptop</code>:</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>we are waiting for the <a href="https://github.com/cri-o/cri-o-ansible/pull/25">PR</a> to be merged in the official cri-o-ansible repository, meantime a fork in an alternative repository would be used. Also, note that the following commands are executed from a different place, in this case from a computer called <code class="language-plaintext highlighter-rouge">laptop</code>:</p>
 
 
 </div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>laptop$ sudo yum install ansible -y
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>laptop$ sudo yum install ansible -y
 
 laptop# git clone https://github.com/ptrnull/cri-o-ansible
 
@@ -381,7 +381,7 @@ laptop# ansible-playbook cri-o.yml -i 192.168.0.10,
 
 <p>The required packages may be installed in the system running the following command:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# yum install btrfs-progs-devel container-selinux device-mapper-devel gcc git glib2-devel glibc-devel glibc-static gpgme-devel json-glib-devel libassuan-devel libgpg-error-devel libseccomp-devel make pkgconfig skopeo-containers tar wget -y
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# yum install btrfs-progs-devel container-selinux device-mapper-devel gcc git glib2-devel glibc-devel glibc-static gpgme-devel json-glib-devel libassuan-devel libgpg-error-devel libseccomp-devel make pkgconfig skopeo-containers tar wget -y
 </code></pre></div></div>
 
 <p>Install golang and the md2man packages:</p>
@@ -390,7 +390,7 @@ laptop# ansible-playbook cri-o.yml -i 192.168.0.10,
 
 
 </div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# yum install golang-github-cpuguy83-go-md2man golang -y
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# yum install golang-github-cpuguy83-go-md2man golang -y
 </code></pre></div></div>
 
 <p>The following directories have to be created:</p>
@@ -402,27 +402,27 @@ laptop# ansible-playbook cri-o.yml -i 192.168.0.10,
   <li>/etc/cni/net.d</li>
 </ul>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# for d in "/usr/local/go /etc/systemd/system/kubelet.service.d/ /var/lib/etcd /etc/cni/net.d /etc/containers"; do mkdir -p $d; done
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# for d in "/usr/local/go /etc/systemd/system/kubelet.service.d/ /var/lib/etcd /etc/cni/net.d /etc/containers"; do mkdir -p $d; done
 </code></pre></div></div>
 
 <p>Clone the runc repository:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/opencontainers/runc /root/src/github.com/opencontainers/runc
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/opencontainers/runc /root/src/github.com/opencontainers/runc
 </code></pre></div></div>
 
 <p>Clone the CRI-O repository:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/cri-o/cri-o /root/src/github.com/cri-o/cri-o
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/cri-o/cri-o /root/src/github.com/cri-o/cri-o
 </code></pre></div></div>
 
 <p>Clone the CNI repository:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/containernetworking/plugins /root/src/github.com/containernetworking/plugins
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone https://github.com/containernetworking/plugins /root/src/github.com/containernetworking/plugins
 </code></pre></div></div>
 
 <p>To build each part, a series of commands have to be executed, first building runc:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cd /root/src/github.com/opencontainers/runc
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cd /root/src/github.com/opencontainers/runc
 
 k8s-test.local# export GOPATH=/root
 
@@ -433,12 +433,12 @@ k8s-test.local# make install
 
 <p>And also runc has to be linked in the correct path:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ln -sf /usr/local/sbin/runc /usr/bin/runc
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# ln -sf /usr/local/sbin/runc /usr/bin/runc
 </code></pre></div></div>
 
 <p>Now building CRI-O (special focus on switching the branch):</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# export GOPATH=/root
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# export GOPATH=/root
 
 k8s-test.local# export GOBIN=/usr/local/go/bin
 
@@ -459,7 +459,7 @@ k8s-test.local# make install.config
 
 <p>CRI-O also needs the conmon software as a dependency:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone http://github.com/containers/conmon /root/src/github.com/conmon
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# git clone http://github.com/containers/conmon /root/src/github.com/conmon
 
 k8s-test.local# cd /root/src/github.com/conmon
 
@@ -470,7 +470,7 @@ k8s-test.local# make install
 
 <p>Now, the ContainerNetworking plugins have to be built and installed:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cd /root/src/github.com/containernetworking/plugins
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cd /root/src/github.com/containernetworking/plugins
 
 k8s-test.local# ./build_linux.sh
 
@@ -479,23 +479,23 @@ k8s-test.local# mkdir -p /opt/cni/bin
 k8s-test.local# cp bin/* /opt/cni/bin/
 </code></pre></div></div>
 
-<p>The cgroup manager has to be changed in the CRI-O configuration from the value of <code class="highlighter-rouge">systemd</code> to <code class="highlighter-rouge">cgroupfs</code>, to get it done, the file <code class="highlighter-rouge">/etc/crio/crio.conf</code> has to be edited and the variable <code class="highlighter-rouge">cgroup_manager</code> has to be replaced from its original value of <code class="highlighter-rouge">systemd</code> to <code class="highlighter-rouge">cgroupfs</code> (it could be already set it up to that value, in that case this step can be skipped):</p>
+<p>The cgroup manager has to be changed in the CRI-O configuration from the value of <code class="language-plaintext highlighter-rouge">systemd</code> to <code class="language-plaintext highlighter-rouge">cgroupfs</code>, to get it done, the file <code class="language-plaintext highlighter-rouge">/etc/crio/crio.conf</code> has to be edited and the variable <code class="language-plaintext highlighter-rouge">cgroup_manager</code> has to be replaced from its original value of <code class="language-plaintext highlighter-rouge">systemd</code> to <code class="language-plaintext highlighter-rouge">cgroupfs</code> (it could be already set it up to that value, in that case this step can be skipped):</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim /etc/crio/crio.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim /etc/crio/crio.conf
 # group_manager = "systemd"
 group_manager = "cgroupfs"
 </code></pre></div></div>
 
-<p>In the same file, the storage_driver is not configured, the variable <code class="highlighter-rouge">storage_driver</code> has to be uncommented and the value has to be changed from <code class="highlighter-rouge">overlay</code> to <code class="highlighter-rouge">overlay2</code>:</p>
+<p>In the same file, the storage_driver is not configured, the variable <code class="language-plaintext highlighter-rouge">storage_driver</code> has to be uncommented and the value has to be changed from <code class="language-plaintext highlighter-rouge">overlay</code> to <code class="language-plaintext highlighter-rouge">overlay2</code>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim /etc/crio/crio.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim /etc/crio/crio.conf
 #storage_driver = "overlay"
 storage_driver = "overlay2"
 </code></pre></div></div>
 
-<p>Also related with the storage, the <code class="highlighter-rouge">storage_option</code> has to be configured to have the following value:</p>
+<p>Also related with the storage, the <code class="language-plaintext highlighter-rouge">storage_option</code> has to be configured to have the following value:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim /etc/crio/crio.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# vim /etc/crio/crio.conf
 storage_option = [ "overlay2.override_kernel_check=1" ]
 </code></pre></div></div>
 
@@ -511,9 +511,9 @@ storage_option = [ "overlay2.override_kernel_check=1" ]
   <p>CRI-O supports OCI container images and can pull from any container registry. It is a lightweight alternative to using Docker, Moby or rkt as the runtime for Kubernetes.</p>
 </blockquote>
 
-<p>The first step is to change the configuration of the <code class="highlighter-rouge">network_dir</code> parameter in the CRI-O configuration file, for doing so, the <code class="highlighter-rouge">network_dir</code> parameter in the <code class="highlighter-rouge">/etc/crio/crio.conf</code> file has to be changed to point to <code class="highlighter-rouge">/etc/crio/net.d</code></p>
+<p>The first step is to change the configuration of the <code class="language-plaintext highlighter-rouge">network_dir</code> parameter in the CRI-O configuration file, for doing so, the <code class="language-plaintext highlighter-rouge">network_dir</code> parameter in the <code class="language-plaintext highlighter-rouge">/etc/crio/crio.conf</code> file has to be changed to point to <code class="language-plaintext highlighter-rouge">/etc/crio/net.d</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local$ vim /etc/crio/crio.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local$ vim /etc/crio/crio.conf
 [crio.network]
 # Path to the directory where CNI configuration files are located.
 network_dir = "/etc/crio/net.d/"
@@ -521,24 +521,24 @@ network_dir = "/etc/crio/net.d/"
 
 <p>Also that directory has to be created:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local$ mkdir /etc/crio/net.d
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local$ mkdir /etc/crio/net.d
 </code></pre></div></div>
 
-<p>The reason behind that change is because CRI-O and <code class="highlighter-rouge">kubeadm reset</code> don’t play well together, as <code class="highlighter-rouge">kubeadm reset</code> empties /etc/cni/net.d/. Therefore, it is good to change the <code class="highlighter-rouge">crio.network.network_dir</code> in <code class="highlighter-rouge">crio.conf</code> to somewhere kubeadm won’t touch. To get more information the following link [Running CRI-O with kubeadm] in the References section can be checked.</p>
+<p>The reason behind that change is because CRI-O and <code class="language-plaintext highlighter-rouge">kubeadm reset</code> don’t play well together, as <code class="language-plaintext highlighter-rouge">kubeadm reset</code> empties /etc/cni/net.d/. Therefore, it is good to change the <code class="language-plaintext highlighter-rouge">crio.network.network_dir</code> in <code class="language-plaintext highlighter-rouge">crio.conf</code> to somewhere kubeadm won’t touch. To get more information the following link [Running CRI-O with kubeadm] in the References section can be checked.</p>
 
-<p>Now Kubernetes has to be configured to be able to talk to CRI-O, to proceed, a new file has to be created in <code class="highlighter-rouge">/etc/default/kubelet</code> with the following content:</p>
+<p>Now Kubernetes has to be configured to be able to talk to CRI-O, to proceed, a new file has to be created in <code class="language-plaintext highlighter-rouge">/etc/default/kubelet</code> with the following content:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=cgroupfs --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=cgroupfs --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
 </code></pre></div></div>
 
 <p>Now the systemd has to be reloaded:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# systemctl daemon-reload
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# systemctl daemon-reload
 </code></pre></div></div>
 
 <p>CRI-O will use flannel network as it is recommended for multus so the following file has to be downloaded and configured:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cd /etc/crio/net.d/
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# cd /etc/crio/net.d/
 
 k8s-test.local# wget https://raw.githubusercontent.com/cri-o/cri-o/master/contrib/cni/10-crio-bridge.conf
 
@@ -546,9 +546,9 @@ k8s-test.local# sed -i 's/10.88.0.0/10.244.0.0/g' 10-crio-bridge.conf
 
 </code></pre></div></div>
 
-<p>As the previous code block has shown, the network used is <code class="highlighter-rouge">10.244.0.0</code>, now the crio service can be started and enabled:</p>
+<p>As the previous code block has shown, the network used is <code class="language-plaintext highlighter-rouge">10.244.0.0</code>, now the crio service can be started and enabled:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# systemctl enable crio
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>k8s-test.local# systemctl enable crio
 k8s-test.local# systemctl start crio
 k8s-test.local# systemctl status crio
 ● crio.service - Container Runtime Interface for OCI (CRI-O)

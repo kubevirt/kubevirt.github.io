@@ -307,11 +307,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create configmap kubevirt-config <span class="nt">--from-literal</span> feature-gates<span class="o">=</span>DataVolumes <span class="nt">-n</span> kube-system
 </code></pre></div></div>
 
-<p>If the ConfigMap was already present on the system, just use <code class="highlighter-rouge">oc edit</code> to add the DataVolumes feature gate under the <em>data</em> field like the YAML above.</p>
+<p>If the ConfigMap was already present on the system, just use <code class="language-plaintext highlighter-rouge">oc edit</code> to add the DataVolumes feature gate under the <em>data</em> field like the YAML above.</p>
 
 <p>If everything went as expected, we should see the following log lines on the <em>virt-controller</em> pods:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 component=virt-controller msg="DataVolume integration enabled"
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 component=virt-controller msg="DataVolume integration enabled"
 </code></pre></div></div>
 
 <blockquote>

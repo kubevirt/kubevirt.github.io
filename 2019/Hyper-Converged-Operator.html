@@ -265,7 +265,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h3 id="environment-description">Environment description</h3>
 
-<p>We can use HCO both on <code class="highlighter-rouge">minikube</code> and also on <code class="highlighter-rouge">OpenShift 4</code>. We will be using OpenShift 4 for HCO in this post.</p>
+<p>We can use HCO both on <code class="language-plaintext highlighter-rouge">minikube</code> and also on <code class="language-plaintext highlighter-rouge">OpenShift 4</code>. We will be using OpenShift 4 for HCO in this post.</p>
 
 <p><strong>Note</strong>: All the commands for installing HCO on minikube will remain the same as documented below, please follow the link <a href="/quickstart_minikube/">Install_HCO_minikube</a> install minikube by adjusting the memory to your requirement(atleast 4GiB of RAM is recommended).</p>
 
@@ -418,13 +418,13 @@ virt-controller                   2/2     2            2           8m49s
 virt-operator                     1/1     1            1           16m
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the <code class="highlighter-rouge">-w</code>flag.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Here, Once we applied the Custom Resource the operator took care of deploying the actual KubeVirt pods (virt-api, virt-controller and virt-handler), CDI pods(cdi-upload-proxy, cdi-apiserver, cdi-deployment, cdi-operator) and Network add-on pods ( cluster-network-addons-operator).We will need to wait until all of the resources are up and running. This can be done using the command above or by using the command above with the <code class="language-plaintext highlighter-rouge">-w</code>flag.</p>
 
 
 </div></div>
 <p>After the HCO is up and running on the cluster, we should be able to see the info of CRD’s</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$oc get crds | grep kubevirt
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$oc get crds | grep kubevirt
 cdiconfigs.cdi.kubevirt.io                                       2019-05-07T20:22:17Z
 cdis.cdi.kubevirt.io                                             2019-05-07T20:20:58Z
 datavolumes.cdi.kubevirt.io                                      2019-05-07T20:22:17Z
@@ -443,7 +443,7 @@ virtualmachineinstances.kubevirt.io                              2019-05-07T20:2
 virtualmachines.kubevirt.io                                      2019-05-07T20:23:02Z
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In OpenShift we can use both <code class="highlighter-rouge">kubectl</code> and <code class="highlighter-rouge">oc</code> interchangeably to interact with the cluster objects once HCO is up and running.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In OpenShift we can use both <code class="language-plaintext highlighter-rouge">kubectl</code> and <code class="language-plaintext highlighter-rouge">oc</code> interchangeably to interact with the cluster objects once HCO is up and running.</p>
 
 
 </div></div>
@@ -479,7 +479,7 @@ docker push docker.io/<span class="nv">$HCO_DOCKER_ORG</span>/hco-registry:examp
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker.io/rthallisey/hyperconverged-cluster-operator:latest
 </code></pre></div></div>
 
-<p>Now, Let’s create the <code class="highlighter-rouge">kubevirt-hyperconverged</code> NS as below</p>
+<p>Now, Let’s create the <code class="language-plaintext highlighter-rouge">kubevirt-hyperconverged</code> NS as below</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>oc create ns kubevirt-hyperconverged
 </code></pre></div></div>
@@ -512,7 +512,7 @@ docker push docker.io/<span class="nv">$HCO_DOCKER_ORG</span>/hco-registry:examp
 <span class="s">EOF</span>
 </code></pre></div></div>
 
-<p>Please wait until the <code class="highlighter-rouge">hco-catalogsource</code> pod comes up</p>
+<p>Please wait until the <code class="language-plaintext highlighter-rouge">hco-catalogsource</code> pod comes up</p>
 
 <p>Next is to create a subscription, we can create a subscription from the OpenShift4 web interface as shown below:</p>
 
@@ -526,13 +526,13 @@ docker push docker.io/<span class="nv">$HCO_DOCKER_ORG</span>/hco-registry:examp
 
 <p><img src="../assets/2019-04-17-HyperConvergedOperator/kubevirt-operator-57.png" alt="Installed-HCO" /></p>
 
-<p>Please wait until the <code class="highlighter-rouge">virt-operator</code>, <code class="highlighter-rouge">cdi-operator</code> and <code class="highlighter-rouge">cluster-network-addons-operator</code> comes up.</p>
+<p>Please wait until the <code class="language-plaintext highlighter-rouge">virt-operator</code>, <code class="language-plaintext highlighter-rouge">cdi-operator</code> and <code class="language-plaintext highlighter-rouge">cluster-network-addons-operator</code> comes up.</p>
 
 <p>After they are up, its now time to launch the HCO-Custom Resource itself:</p>
 
 <p><img src="../assets/2019-04-17-HyperConvergedOperator/Installed-operator-HCO-48.png" alt="HCO-CR" /></p>
 
-<p>Once the HCO Operator is deployed in the <code class="highlighter-rouge">kubevirt-hyperconverged</code> NS, we can see all the pods are up and running:</p>
+<p>Once the HCO Operator is deployed in the <code class="language-plaintext highlighter-rouge">kubevirt-hyperconverged</code> NS, we can see all the pods are up and running:</p>
 
 <p><img src="../assets/2019-04-17-HyperConvergedOperator/status-pods-54.png" alt="HCO-Managed-Operators" /></p>
 
@@ -560,7 +560,7 @@ virt-operator-87d7c98b-mh8pg                       1/1     Running   0          
 virt-operator-87d7c98b-p6mbd                       1/1     Running   0          4m55s
 </code></pre></div></div>
 
-<p>We can see how OLM operator manages the HCO pods from the <code class="highlighter-rouge">openshift-operator-lifecycle-manager</code> NS:</p>
+<p>We can see how OLM operator manages the HCO pods from the <code class="language-plaintext highlighter-rouge">openshift-operator-lifecycle-manager</code> NS:</p>
 
 <p><img src="../assets/2019-04-17-HyperConvergedOperator/HCO-Managed-Operators.png" alt="HCO-Managed-Operators" /></p>
 

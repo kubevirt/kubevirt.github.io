@@ -266,7 +266,7 @@ the objects that come predefined in the Kubernetes core.</p>
 
 <p>For example, look here’s an example of a VirtualMachine spec.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: kubevirt.io/v1alpha1
 kind: VirtualMachine
 metadata:
   name: vm-ephemeral
@@ -295,7 +295,7 @@ The <strong>kind</strong> field reflects the resource type.</p>
 <p>Using that information, we can create an RBAC role that gives a user permission
 to create, delete, and view all VirtualMachine objects.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-access
@@ -321,7 +321,7 @@ objects as well. If we wanted to extend this RBAC role to grant similar
 permissions for VirtualMachinePreset objects, we’d just have to add a second
 resource kubevirt.io resource list. The result would look like this.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-access
@@ -354,7 +354,7 @@ though.</p>
 its own api group called <strong>subresources.kubevirt.io</strong>. Below is an example of
 how to create a role that grants access to the VNC and console streams APIs.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-vnc-access
@@ -386,7 +386,7 @@ defined in the ClusterRole within the namespace RoleBinding exists in.</p>
 type. Below is an example that only grants VNC access to the VirtualMachine
 named ‘bobs-vm’</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>apiVersion: rbac.authorization.k8s.io/v1beta1
 kind: ClusterRole
 metadata:
   name: vm-vnc-access

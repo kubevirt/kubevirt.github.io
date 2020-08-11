@@ -255,7 +255,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>As per the message from Marc Sluiter on our <a href="https://groups.google.com/d/msg/kubevirt-dev/LhTm77nWxzM/Qr3c-hDWCQAJ">mailing list</a>:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hello everybody,
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Hello everybody,
 
 today we merged a PR [0], which renamed the condition types on the KubeVirt custom resources.
 This was done for alignment of conditions of all components in the KubeVirt ecosystem, which are deployed by the Hyperconverged Cluster Operator (HCO)[1], in order to make it easier for HCO to determine the deployment status of these components. The conditions are explained in detail in [2].
@@ -278,17 +278,17 @@ Best regards,
 
 <h2 id="what-does-it-mean-to-us">What does it mean to us</h2>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">CR Rename</p><p>We’re making KubeVirt more compatible with the standard for Operators, when doing so, some of the <code class="highlighter-rouge">conditions</code> are changing, so check your scripts using checks for conditions to use the new ones.</p>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">CR Rename</p><p>We’re making KubeVirt more compatible with the standard for Operators, when doing so, some of the <code class="language-plaintext highlighter-rouge">conditions</code> are changing, so check your scripts using checks for conditions to use the new ones.</p>
 
 
 </div></div>
 <p>|  <strong>Prior</strong>   |    <strong>Actual</strong>     | <strong>Note</strong>          |
 | :———-: | :—————: | :—————- |
-|  <del>Ready</del>   |  <strong><code class="highlighter-rouge">Available</code></strong>  | <strong>Updated</strong>       |
-| <del>Updating</del> | <strong><code class="highlighter-rouge">Progressing</code></strong> | <strong>Updated</strong>       |
-|      -       |    <code class="highlighter-rouge">Degraded</code>     | <strong>New condition</strong> |
-|   Created    |     <code class="highlighter-rouge">Created</code>     | <strong>Unchanged</strong>     |
-| Synchronized |  <code class="highlighter-rouge">Synchronized</code>   | <strong>Unchanged</strong>     |</p>
+|  <del>Ready</del>   |  <strong><code class="language-plaintext highlighter-rouge">Available</code></strong>  | <strong>Updated</strong>       |
+| <del>Updating</del> | <strong><code class="language-plaintext highlighter-rouge">Progressing</code></strong> | <strong>Updated</strong>       |
+|      -       |    <code class="language-plaintext highlighter-rouge">Degraded</code>     | <strong>New condition</strong> |
+|   Created    |     <code class="language-plaintext highlighter-rouge">Created</code>     | <strong>Unchanged</strong>     |
+| Synchronized |  <code class="language-plaintext highlighter-rouge">Synchronized</code>   | <strong>Unchanged</strong>     |</p>
 
 <h2 id="references">References</h2>
 

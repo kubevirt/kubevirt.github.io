@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-08-05 14:22:18 +0000" >
+    <meta property="og:article:published_time" content="2020-08-11 06:52:06 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Kind | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -303,7 +303,7 @@ already installed the following command is all you need:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">GO111MODULE</span><span class="o">=</span><span class="s2">"on"</span> go get sigs.k8s.io/kind@v0.7.0 <span class="o">&amp;&amp;</span> kind create cluster
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Please use the latest <code class="highlighter-rouge">go</code> to do this, ideally go 1.13 or greater.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Please use the latest <code class="language-plaintext highlighter-rouge">go</code> to do this, ideally go 1.13 or greater.</p>
 
 
 </div></div>
@@ -312,7 +312,7 @@ either add that directory to your $PATH as shown <a href="https://golang.org/doc
 the repo and run make build from the repository.</p>
 
 <p>Stable binaries are also available on the <a href="https://github.com/kubernetes-sigs/kind/releases">releases</a> page. Stable releases are generally
-recommended for CI usage in particular. To install, download the binary for your platform from “Assets” and place this into your <code class="highlighter-rouge">$PATH</code>:</p>
+recommended for CI usage in particular. To install, download the binary for your platform from “Assets” and place this into your <code class="language-plaintext highlighter-rouge">$PATH</code>:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-Lo</span> ./kind <span class="s2">"https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-</span><span class="si">$(</span><span class="nb">uname</span><span class="si">)</span><span class="s2">-amd64"</span>
 <span class="nb">chmod</span> +x ./kind
@@ -353,7 +353,7 @@ to run this quickstart guide.</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kind create cluster <span class="c"># Default cluster context name is `kind`.</span>
 </code></pre></div></div>
 
-<p>If you want to have multiple clusters in the same server you can name them with the <code class="highlighter-rouge">--name</code> parameter:</p>
+<p>If you want to have multiple clusters in the same server you can name them with the <code class="language-plaintext highlighter-rouge">--name</code> parameter:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kind create cluster <span class="nt">--name</span> kind
 </code></pre></div></div>
@@ -411,7 +411,7 @@ variable that will be used on few commands:</p>
 <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
 </code></pre></div></div>
 
-<p>Now, using the <code class="highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
+<p>Now, using the <code class="language-plaintext highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 </code></pre></div></div>
@@ -477,12 +477,12 @@ The tool is called <em>virtctl</em> and can be retrieved from the release page o
 <span class="nb">chmod</span> +x virtctl
 </code></pre></div></div>
 
-<p>If <a href="https://krew.dev/"><code class="highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="highlighter-rouge">virtctl</code> can be installed via <code class="highlighter-rouge">krew</code>:</p>
+<p>If <a href="https://krew.dev/"><code class="language-plaintext highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="language-plaintext highlighter-rouge">virtctl</code> can be installed via <code class="language-plaintext highlighter-rouge">krew</code>:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
 </code></pre></div></div>
 
-<p>Then <code class="highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
+<p>Then <code class="language-plaintext highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
 </code></pre></div></div>

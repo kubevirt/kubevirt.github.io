@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-08-05 14:22:18 +0000" >
+    <meta property="og:article:published_time" content="2020-08-11 06:52:06 +0000" >
     <meta name="twitter:title" content="Experiment with CDI | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -288,7 +288,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named <em>disk.img</em> with the desired content into the associated PVC.</p>
 
-<p><strong>NOTE</strong>: This ‘lab’ targets deployment on <em>one node</em> as it uses <code class="highlighter-rouge">hostpath</code> storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.</p>
+<p><strong>NOTE</strong>: This ‘lab’ targets deployment on <em>one node</em> as it uses <code class="language-plaintext highlighter-rouge">hostpath</code> storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.</p>
 
 <h4 id="install-the-cdi">Install the CDI</h4>
 
@@ -304,7 +304,7 @@ kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containeri
 
 <p>Review the “cdi” pods that were added.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods -n cdi
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods -n cdi
 </code></pre></div></div>
 
 <h4 id="use-the-cdi">Use the CDI</h4>
@@ -316,7 +316,7 @@ kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containeri
 
 <p>This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the <em>cdi.kubevirt.io/storage.import.endpoint</em> annotation.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc fedora -o yaml
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pvc fedora -o yaml
 kubectl get pod # Make note of the pod name assigned to the import process
 kubectl logs -f importer-fedora-pnbqh   # Substitute your importer-fedora pod name here.
 </code></pre></div></div>
@@ -333,38 +333,38 @@ kubectl logs -f importer-fedora-pnbqh   # Substitute your importer-fedora pod na
 
 <p>We change the yaml definition of this Virtual Machine to inject the default public key of user in the cloud instance.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Generate a password-less SSH key using the default location.
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Generate a password-less SSH key using the default location.
 ssh-keygen
 PUBKEY=`cat ~/.ssh/id_rsa.pub`
 sed -i "s%ssh-rsa.*%$PUBKEY%" vm1_pvc.yml
 kubectl create -f vm1_pvc.yml
 </code></pre></div></div>
 
-<p>This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to <code class="highlighter-rouge">gather its IP</code>. You are looking for the IP address beside the <code class="highlighter-rouge">virt-launcher</code> pod.</p>
+<p>This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to <code class="language-plaintext highlighter-rouge">gather its IP</code>. You are looking for the IP address beside the <code class="language-plaintext highlighter-rouge">virt-launcher</code> pod.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pod -o wide
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pod -o wide
 </code></pre></div></div>
 
 <p>Since we are running an all in one setup, the corresponding Virtual Machine is actually running on the same node, we can check its qemu process.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps -ef | grep qemu | grep vm1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ps -ef | grep qemu | grep vm1
 </code></pre></div></div>
 
 <p>Wait for the Virtual Machine to boot and to be available for login. You may monitor its progress through the console. The speed at which the VM boots depends on whether baremetal hardware is used. It is much slower when nested virtualization is used, which is likely the case if you are completing this lab on an instance on a cloud provider.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console vm1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console vm1
 </code></pre></div></div>
 
-<p>Disconnect from the virtual machine console by typing: <code class="highlighter-rouge">ctrl+]</code></p>
+<p>Disconnect from the virtual machine console by typing: <code class="language-plaintext highlighter-rouge">ctrl+]</code></p>
 
 <p>Finally, we will connect to vm1 Virtual Machine (VM) as a regular user would do, i.e. via ssh. This can be achieved by just ssh to the gathered ip in case we are <strong>in the Kubernetes software defined network (SDN)</strong>. This is true, if we are connected to a node that belongs to the Kubernetes cluster network. Probably if you followed the <a href="/pages/ec2">Easy install using AWS</a> or <a href="/pages/gcp">Easy install using GCP</a> your cloud instance is already part of the cluster.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh fedora@VM_IP
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ssh fedora@VM_IP
 </code></pre></div></div>
 
 <p>On the other side, if you followed <a href="/quickstart_minikube/">Easy install using minikube</a> take into account that you will need to ssh into Minikube first, as shown below.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vmi
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get vmi
 NAME      AGE       PHASE     IP            NODENAME
 vm1       109s      Running   172.17.0.16   minikube
 
@@ -388,7 +388,7 @@ fedora@172.17.0.16's password:
 
 <p>First, we are going expose the ssh port of the vm1 as NodePort type. Then verify that the Kubernetes object service was created successfully on a random port of the Minikube or cloud instance.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ virtctl expose vmi vm1 --name=vm1-ssh --port=20222 --target-port=22 --type=NodePort
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ virtctl expose vmi vm1 --name=vm1-ssh --port=20222 --target-port=22 --type=NodePort
   Service vm1-ssh successfully exposed for vmi vm1
 
 $ kubectl get svc
@@ -398,14 +398,14 @@ vm1-ssh   NodePort   10.101.226.150   &lt;none&gt;        20222:32495/TCP   24m
 
 <p>Once exposed successfully, check the IP of your Minikube VM or cloud instance and verify you can reach the VM using your public SSH key previously configured. In case of cloud instances verify that security group applied allows traffic to the random port created.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ minikube status
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ minikube status
   host: Running
   kubelet: Running
   apiserver: Running
   kubectl: Correctly Configured: pointing to minikube-vm at 192.168.39.74
 </code></pre></div></div>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh -i ~/.ssh/id_rsa.pub fedora@192.168.39.74 -p 32495
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ ssh -i ~/.ssh/id_rsa.pub fedora@192.168.39.74 -p 32495
   Last login: Wed Oct  9 13:59:29 2019 from 172.17.0.1
   [fedora@vm1 ~]$
 </code></pre></div></div>

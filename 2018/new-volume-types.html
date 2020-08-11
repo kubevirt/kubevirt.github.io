@@ -257,14 +257,14 @@ well known Kubernetes resources.</p>
 <h2 id="configmap-and-secret">ConfigMap and Secret</h2>
 
 <p>Both <a href="https://kubernetes.io/docs/tasks/configure-pod-container/configure-pod-configmap/">ConfigMaps</a>
-and <a href="https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/">Secrets</a> are used to provide configuration settings and credentials to Pods. In order to use them in your VM too, you can add them as additional disks, using the new <code class="highlighter-rouge">configMap</code>
-and <code class="highlighter-rouge">secret</code> volume types.</p>
+and <a href="https://kubernetes.io/docs/tasks/inject-data-application/distribute-credentials-secure/">Secrets</a> are used to provide configuration settings and credentials to Pods. In order to use them in your VM too, you can add them as additional disks, using the new <code class="language-plaintext highlighter-rouge">configMap</code>
+and <code class="language-plaintext highlighter-rouge">secret</code> volume types.</p>
 
 <h2 id="serviceaccount">ServiceAccount</h2>
 
 <p>Kubernetes pods can be configured to get a special type of secret injected, which can be used for
 <a href="https://kubernetes.io/docs/tasks/access-application-cluster/access-cluster/#accessing-the-api-from-a-pod">accessing the Kubernetes API</a>.
-With the third new volume type <code class="highlighter-rouge">serviceAccount</code> you can get this information into your VM, too.</p>
+With the third new volume type <code class="language-plaintext highlighter-rouge">serviceAccount</code> you can get this information into your VM, too.</p>
 
 <h2 id="example">Example</h2>
 
@@ -274,7 +274,7 @@ With the third new volume type <code class="highlighter-rouge">serviceAccount</c
 
 <p>Create a ConfigMap and Secret, which will be used in your VM:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create secret generic mysecret --from-literal=PASSWORD=hidden
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create secret generic mysecret --from-literal=PASSWORD=hidden
 secret "mysecret" created
 $ kubectl create configmap myconfigmap --from-literal=DATABASE=staging
 configmap "myconfigmap" created
@@ -282,9 +282,9 @@ configmap "myconfigmap" created
 
 <h3 id="step-2">Step 2</h3>
 
-<p>Define a VirtualMachineInstance which uses all three new volume types, and save it to <code class="highlighter-rouge">vmi-fedora.yaml</code>.
-Note how we add 3 disks for the ConfigMap and Secret we just created, and for the <code class="highlighter-rouge">default</code> ServiceAccount.
-In order to automount these disks, we also add a <code class="highlighter-rouge">cloudInitNoCloud</code> disk with mount instructions. Details on
+<p>Define a VirtualMachineInstance which uses all three new volume types, and save it to <code class="language-plaintext highlighter-rouge">vmi-fedora.yaml</code>.
+Note how we add 3 disks for the ConfigMap and Secret we just created, and for the <code class="language-plaintext highlighter-rouge">default</code> ServiceAccount.
+In order to automount these disks, we also add a <code class="language-plaintext highlighter-rouge">cloudInitNoCloud</code> disk with mount instructions. Details on
 how to do this might vary depending on the VM’s operating system.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>

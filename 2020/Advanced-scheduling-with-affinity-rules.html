@@ -361,7 +361,7 @@ kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
 
 <h3 id="the-clustered-database">The clustered database</h3>
 
-<p>A MS Windows 2016 Server virtual machine is already containerized and ready to be deployed. As we have to deploy 3 replicas of the operating system a <code class="highlighter-rouge">VirtualMachineInstanceReplicaSet</code> has been created. Once the replicas are up and running, database administrators will be able to reach the VMs running in our Kubernetes cluster through Remote Desktop Protocol (RDP). Eventually, MS SQL2016 database is installed and configured as a clustered database to provide high availability to our customapp.</p>
+<p>A MS Windows 2016 Server virtual machine is already containerized and ready to be deployed. As we have to deploy 3 replicas of the operating system a <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceReplicaSet</code> has been created. Once the replicas are up and running, database administrators will be able to reach the VMs running in our Kubernetes cluster through Remote Desktop Protocol (RDP). Eventually, MS SQL2016 database is installed and configured as a clustered database to provide high availability to our customapp.</p>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Check <a href="/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">KubeVirt: installing Microsoft Windows from an ISO</a> if you need further information on how to deploy a MS Windows VM on KubeVirt.</p>
 
@@ -373,7 +373,7 @@ kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
 
 
 </div></div>
-<p>There are two options to accomplish our requirement, use <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector">nodeSelector</a> or configure <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity">nodeAffinity</a> rules. In our first approach, <code class="highlighter-rouge">nodeSelector</code> instead of <code class="highlighter-rouge">nodeAffinity</code> rule is used. <code class="highlighter-rouge">nodeSelector</code> matches the nodes where the <code class="highlighter-rouge">performance</code> key is equal to <code class="highlighter-rouge">high</code> and makes the <code class="highlighter-rouge">VirtualMachineInstance</code> to run on top of the matching nodes. The following code snippet shows the configuration:</p>
+<p>There are two options to accomplish our requirement, use <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector">nodeSelector</a> or configure <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity">nodeAffinity</a> rules. In our first approach, <code class="language-plaintext highlighter-rouge">nodeSelector</code> instead of <code class="language-plaintext highlighter-rouge">nodeAffinity</code> rule is used. <code class="language-plaintext highlighter-rouge">nodeSelector</code> matches the nodes where the <code class="language-plaintext highlighter-rouge">performance</code> key is equal to <code class="language-plaintext highlighter-rouge">high</code> and makes the <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> to run on top of the matching nodes. The following code snippet shows the configuration:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstanceReplicaSet</span>
@@ -414,13 +414,13 @@ kni-worker6         Ready    &lt;none&gt;   17m   v1.17.0   beta.kubernetes.io/a
           <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
 </code></pre></div></div>
 
-<p>Next, the <code class="highlighter-rouge">VirtualMachineInstanceReplicaSet</code> configuration partially shown previously is applied successfully.</p>
+<p>Next, the <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceReplicaSet</code> configuration partially shown previously is applied successfully.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> vmr-windows-mssql.yaml
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 created
 </code></pre></div></div>
 
-<p>Then, it is expected that the 3 <code class="highlighter-rouge">VirtualMachineInstances</code> will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the <em>even</em> nodes.</p>
+<p>Then, it is expected that the 3 <code class="language-plaintext highlighter-rouge">VirtualMachineInstances</code> will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the <em>even</em> nodes.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods <span class="nt">-o</span> wide
 NAME                                 READY   STATUS              RESTARTS   AGE   IP       NODE          NOMINATED NODE   READINESS GATES
@@ -441,7 +441,7 @@ mssql2016rd4lk   3m25s   Running   10.244.2.4   kni-worker2   False
 mssql2016z2qnw   3m25s   Running   10.244.5.4   kni-worker6   False
 </code></pre></div></div>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Warning</p><p><code class="highlighter-rouge">nodeSelector</code> provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.</p>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Warning</p><p><code class="language-plaintext highlighter-rouge">nodeSelector</code> provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.</p>
 
 
 </div></div>
@@ -471,24 +471,24 @@ mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
   <li>You can constrain against labels on other pods running on the node (or other topological domain), rather than against labels on the node itself, which allows rules about which pods can and cannot be co-located.</li>
 </ul>
 
-<p>Before going into more detail, it should be noticed that there are currently two types of <strong>affinity</strong> that applies to both <em>Node and Pod affinity</em>. They are called <code class="highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> and <code class="highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code>. You can think of them as <em>hard</em> and <em>soft</em> respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.</p>
+<p>Before going into more detail, it should be noticed that there are currently two types of <strong>affinity</strong> that applies to both <em>Node and Pod affinity</em>. They are called <code class="language-plaintext highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> and <code class="language-plaintext highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code>. You can think of them as <em>hard</em> and <em>soft</em> respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.</p>
 
-<p>Said that, it is time to edit the <code class="highlighter-rouge">VirtualMachineInstanceReplicaSet</code> YAML file. Actually, <code class="highlighter-rouge">nodeSelector</code> must be removed and two different affinity rules created instead.</p>
+<p>Said that, it is time to edit the <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceReplicaSet</code> YAML file. Actually, <code class="language-plaintext highlighter-rouge">nodeSelector</code> must be removed and two different affinity rules created instead.</p>
 
 <ol>
   <li><strong>nodeAffinity rule</strong>. This rule ensures that during scheduling time the application (MS SQL2016) must be placed <em>only</em> on nodes where the key performance contains the value high. Note the word only, there is no room for other nodes.</li>
-  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="highlighter-rouge">kubevirt.io/domain</code> equals to <code class="highlighter-rouge">mssql2016</code> must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey <code class="highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one database instance can run in each zone, e.g. one database in <em>scu, bcn and sab</em> respectively.</li>
+  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="language-plaintext highlighter-rouge">kubevirt.io/domain</code> equals to <code class="language-plaintext highlighter-rouge">mssql2016</code> must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey <code class="language-plaintext highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one database instance can run in each zone, e.g. one database in <em>scu, bcn and sab</em> respectively.</li>
 </ol>
 
-<p>In principle, the <code class="highlighter-rouge">topologyKey</code> can be any legal label-key. However, for performance and security reasons, there are some constraints on <code class="highlighter-rouge">topologyKey</code> that need to be taken into consideration:</p>
+<p>In principle, the <code class="language-plaintext highlighter-rouge">topologyKey</code> can be any legal label-key. However, for performance and security reasons, there are some constraints on <code class="language-plaintext highlighter-rouge">topologyKey</code> that need to be taken into consideration:</p>
 
 <ul>
-  <li>For affinity and for <code class="highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> pod anti-affinity, empty <code class="highlighter-rouge">topologyKey</code> is not allowed.</li>
-  <li>For <code class="highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code> pod anti-affinity, empty <code class="highlighter-rouge">topologyKey</code> is interpreted as “all topologies” (“all topologies” here is now limited to the combination of <code class="highlighter-rouge">kubernetes.io/hostname</code>, <code class="highlighter-rouge">topology.kubernetes.io/zone</code> and <code class="highlighter-rouge">topology.kubernetes.io/region</code>).</li>
-  <li>For <code class="highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> pod anti-affinity, the admission controller <code class="highlighter-rouge">LimitPodHardAntiAffinityTopology</code> was introduced to limit <code class="highlighter-rouge">topologyKey</code> to <code class="highlighter-rouge">kubernetes.io/hostname</code>. Verify if it is enabled or disabled.</li>
+  <li>For affinity and for <code class="language-plaintext highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> pod anti-affinity, empty <code class="language-plaintext highlighter-rouge">topologyKey</code> is not allowed.</li>
+  <li>For <code class="language-plaintext highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code> pod anti-affinity, empty <code class="language-plaintext highlighter-rouge">topologyKey</code> is interpreted as “all topologies” (“all topologies” here is now limited to the combination of <code class="language-plaintext highlighter-rouge">kubernetes.io/hostname</code>, <code class="language-plaintext highlighter-rouge">topology.kubernetes.io/zone</code> and <code class="language-plaintext highlighter-rouge">topology.kubernetes.io/region</code>).</li>
+  <li>For <code class="language-plaintext highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> pod anti-affinity, the admission controller <code class="language-plaintext highlighter-rouge">LimitPodHardAntiAffinityTopology</code> was introduced to limit <code class="language-plaintext highlighter-rouge">topologyKey</code> to <code class="language-plaintext highlighter-rouge">kubernetes.io/hostname</code>. Verify if it is enabled or disabled.</li>
 </ul>
 
-<p>Here is the <code class="highlighter-rouge">VirtualMachineInstanceReplicaSet</code> object replaced.</p>
+<p>Here is the <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceReplicaSet</code> object replaced.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
@@ -532,7 +532,7 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
       <span class="na">domain</span><span class="pi">:</span>
 </code></pre></div></div>
 
-<p>Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the <code class="highlighter-rouge">VirtualMachineInstances</code> (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).</p>
+<p>Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the <code class="language-plaintext highlighter-rouge">VirtualMachineInstances</code> (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).</p>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Remember to mark the kni-worker2 as schedulable again.</p>
 
@@ -542,7 +542,7 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 node/kni-worker2 uncordoned
 </code></pre></div></div>
 
-<p>Below shows the current status, where two databases are running in the <code class="highlighter-rouge">kni-worker6</code> node. By applying the previous affinity rules this should not happen again:</p>
+<p>Below shows the current status, where two databases are running in the <code class="language-plaintext highlighter-rouge">kni-worker6</code> node. By applying the previous affinity rules this should not happen again:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmi <span class="nt">-o</span> wide
 NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
@@ -551,7 +551,7 @@ mssql2016p948r   24m   Running   10.244.1.4   kni-worker4   False
 mssql2016z2qnw   24m   Running   10.244.5.4   kni-worker6   False
 </code></pre></div></div>
 
-<p>Next, we delete one of the VMIs running in <code class="highlighter-rouge">kni-worker6</code> and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:</p>
+<p>Next, we delete one of the VMIs running in <code class="language-plaintext highlighter-rouge">kni-worker6</code> and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl delete vmi mssql201696sz9
 virtualmachineinstance.kubevirt.io <span class="s2">"mssql201696sz9"</span> deleted
@@ -563,7 +563,7 @@ mssql2016tpj6n   22s   Running   10.244.2.5   kni-worker2   False
 mssql2016z2qnw   40m   Running   10.244.5.4   kni-worker6   False
 </code></pre></div></div>
 
-<p>During the deployment of the clustered database <code class="highlighter-rouge">nodeAffinity</code> and <code class="highlighter-rouge">nodeSelector</code> rules were compared, however, there are a couple of things to take into consideration when creating node affinity rules, it is worth taking a look at <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity">node affinity in Kubernetes documentation</a>.</p>
+<p>During the deployment of the clustered database <code class="language-plaintext highlighter-rouge">nodeAffinity</code> and <code class="language-plaintext highlighter-rouge">nodeSelector</code> rules were compared, however, there are a couple of things to take into consideration when creating node affinity rules, it is worth taking a look at <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity">node affinity in Kubernetes documentation</a>.</p>
 
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>If you remove or change the label of the node where the Pod is scheduled, the Pod will not be removed. In other words, the affinity selection works only at the time of scheduling the Pod.</p>
 
@@ -588,7 +588,7 @@ secret/varnish-secret created
 
 <ol>
   <li><strong>nodeAffinity rule</strong>. This rule ensures that during scheduling time the application should be placed <em>if possible</em> on nodes where the key performance does not contain the value high. Note the word <em>if possible</em>. This means, it will try to run on a not performing server, however, if there none available it will be co-located with the database.</li>
-  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="highlighter-rouge">app</code> equals to <code class="highlighter-rouge">cache</code> must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey <code class="highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in <em>scu, bcn and sab</em> respectively.</li>
+  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="language-plaintext highlighter-rouge">app</code> equals to <code class="language-plaintext highlighter-rouge">cache</code> must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey <code class="language-plaintext highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in <em>scu, bcn and sab</em> respectively.</li>
 </ol>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
@@ -630,7 +630,7 @@ secret/varnish-secret created
           <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
 </code></pre></div></div>
 
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>In this set of affinity rules, a new scheduling policy has been introduced: <code class="highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code>. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.</p>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>In this set of affinity rules, a new scheduling policy has been introduced: <code class="language-plaintext highlighter-rouge">preferredDuringSchedulingIgnoredDuringExecution</code>. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.</p>
 
 <p>The weight field in preferredDuringSchedulingIgnoredDuringExecution must be in the range 1-100 and it is taken into account in the <a href="#introduction">scoring step</a>. Remember that the node(s) with the highest total score is/are the most preferred.</p>
 
@@ -642,7 +642,7 @@ secret/varnish-secret created
 deployment.apps/varnish-cache created
 </code></pre></div></div>
 
-<p>The Pod is scheduled as expected since there is a node available in each zone without the <code class="highlighter-rouge">performance=high</code> label.</p>
+<p>The Pod is scheduled as expected since there is a node available in each zone without the <code class="language-plaintext highlighter-rouge">performance=high</code> label.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods <span class="nt">-o</span> wide
 NAME                                 READY   STATUS    RESTARTS   AGE   IP           NODE          NOMINATED NODE   READINESS GATES
@@ -663,8 +663,8 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
 <p>Following up with our objective, this web application must take advantage of the web cache application running as a Pod. So we require the appliance to be co-located in the same server that Varnish Cache in order to accelerate the delivery of the content provided by the appliance. Also, it is required to run every replica of the appliance in different zones or data centers. Taken into account these prerequisites, the following advanced rules are configured:</p>
 
 <ol>
-  <li><strong>podAffinity rule</strong>. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key <code class="highlighter-rouge">app' equals to</code>cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.</li>
-  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="highlighter-rouge">kubevirt.io/domain</code> equals to <code class="highlighter-rouge">blackbox</code> must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey <code class="highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one appliance instance can run in each zone, e.g. one appliance in <em>scu, bcn and sab</em> respectively.</li>
+  <li><strong>podAffinity rule</strong>. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key <code class="language-plaintext highlighter-rouge">app' equals to</code>cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.</li>
+  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two applications with the key <code class="language-plaintext highlighter-rouge">kubevirt.io/domain</code> equals to <code class="language-plaintext highlighter-rouge">blackbox</code> must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey <code class="language-plaintext highlighter-rouge">topology.kubernetes.io/zone</code>. This means that only one appliance instance can run in each zone, e.g. one appliance in <em>scu, bcn and sab</em> respectively.</li>
 </ol>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
@@ -736,9 +736,9 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h1m    Running   10.244.5.4
 
 <h3 id="draining-a-regular-node">Draining a regular node</h3>
 
-<p>In this test, the node located in <code class="highlighter-rouge">scu</code> zone which is not labelled as high-performance will be upgraded. The proper procedure to maintain a Kubernetes node is as follows: drain the node, upgrade packages and then reboot it.</p>
+<p>In this test, the node located in <code class="language-plaintext highlighter-rouge">scu</code> zone which is not labelled as high-performance will be upgraded. The proper procedure to maintain a Kubernetes node is as follows: drain the node, upgrade packages and then reboot it.</p>
 
-<p>As it is depicted, once the <code class="highlighter-rouge">kni-worker</code> is marked as unschedulable and drained, the Varnish Cache pod and the black box appliance VM are automatically moved to the high-performance node in the same zone.</p>
+<p>As it is depicted, once the <code class="language-plaintext highlighter-rouge">kni-worker</code> is marked as unschedulable and drained, the Varnish Cache pod and the black box appliance VM are automatically moved to the high-performance node in the same zone.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
 pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h8m    10.244.4.5   kni-worker5   &lt;none&gt;           &lt;none&gt;
@@ -789,7 +789,7 @@ pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h20m   10
 
 <p>In order to return to the most desirable state, the pod and VM from kni-worker2 must be deleted.</p>
 
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Both applications must be deleted since the <code class="highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> policy is only applied during scheduling time.</p>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>Both applications must be deleted since the <code class="language-plaintext highlighter-rouge">requiredDuringSchedulingIgnoredDuringExecution</code> policy is only applied during scheduling time.</p>
 
 
 </div></div>
@@ -822,7 +822,7 @@ virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h43m   Running   10.244.2.5
 virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4   kni-worker6   False
 </code></pre></div></div>
 
-<p>This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server <em>in the same zone</em>. Although this is not ideal, our <code class="highlighter-rouge">customapp</code> will be still available while the node recovery is ongoing.</p>
+<p>This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server <em>in the same zone</em>. Although this is not ideal, our <code class="language-plaintext highlighter-rouge">customapp</code> will be still available while the node recovery is ongoing.</p>
 
 <h3 id="draining-a-high-performance-node">Draining a high-performance node</h3>
 
@@ -839,7 +839,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
 <p>For instance, below it is partly shown a snippet of the deployment object for virt-api and virt-controller. Notice the following affinity rule created:</p>
 
 <ol>
-  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node (<code class="highlighter-rouge">kubernetes.io/hostname</code>). It is used the key <code class="highlighter-rouge">kubevirt.io</code> to match the application <code class="highlighter-rouge">virt-api</code> or <code class="highlighter-rouge">virt-controller</code>. See that it is a soft requirement, which means that the kube-scheduler will try to match the rule, however, if it is not possible it can place both replicas in the same node.</li>
+  <li><strong>podAntiAffinity rule</strong>. This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node (<code class="language-plaintext highlighter-rouge">kubernetes.io/hostname</code>). It is used the key <code class="language-plaintext highlighter-rouge">kubevirt.io</code> to match the application <code class="language-plaintext highlighter-rouge">virt-api</code> or <code class="language-plaintext highlighter-rouge">virt-controller</code>. See that it is a soft requirement, which means that the kube-scheduler will try to match the rule, however, if it is not possible it can place both replicas in the same node.</li>
 </ol>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
@@ -918,7 +918,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
               <span class="na">weight</span><span class="pi">:</span> <span class="m">1</span>
 </code></pre></div></div>
 
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are <code class="highlighter-rouge">nodeAffinity</code> rules in order to place each replica in each Kubernetes node of the cluster.</p>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p class="header">Information</p><p>It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are <code class="language-plaintext highlighter-rouge">nodeAffinity</code> rules in order to place each replica in each Kubernetes node of the cluster.</p>
 
 
 </div></div>
@@ -931,7 +931,7 @@ NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE 
 kubevirt      virt-handler   6         6         6       6            6           &lt;none&gt;                        25h
 </code></pre></div></div>
 
-<p>See the partial snippet of a <code class="highlighter-rouge">virt-handler</code> Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a <code class="highlighter-rouge">nodeAffinity</code> rule that requires the Pod to run in a specific hostname matched by the key <code class="highlighter-rouge">metadata.name</code> and value the name of the node (<code class="highlighter-rouge">kni-worker2</code>). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.</p>
+<p>See the partial snippet of a <code class="language-plaintext highlighter-rouge">virt-handler</code> Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a <code class="language-plaintext highlighter-rouge">nodeAffinity</code> rule that requires the Pod to run in a specific hostname matched by the key <code class="language-plaintext highlighter-rouge">metadata.name</code> and value the name of the node (<code class="language-plaintext highlighter-rouge">kni-worker2</code>). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Pod</span>

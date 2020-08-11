@@ -265,7 +265,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Add the Kubernetes repository</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat &lt;&lt;EOF &gt; /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-\$basearch
@@ -278,7 +278,7 @@ EOF
 
 <p>Update and install prerequisites.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum update -y
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum update -y
 yum install kubelet-1.9.4 \
             kubeadm-1.9.4 \
             kubectl-1.9.4 \
@@ -291,9 +291,9 @@ yum install kubelet-1.9.4 \
 
 <h3 id="docker-prerequisites">Docker prerequisites</h3>
 
-<p>For docker storage we will use a new disk <code class="highlighter-rouge">vdb</code> formatted XFS using the Overlay driver.</p>
+<p>For docker storage we will use a new disk <code class="language-plaintext highlighter-rouge">vdb</code> formatted XFS using the Overlay driver.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat &lt;&lt;EOF &gt; /etc/sysconfig/docker-storage-setup
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cat &lt;&lt;EOF &gt; /etc/sysconfig/docker-storage-setup
 STORAGE_DRIVER=overlay2
 DEVS=/dev/vdb
 CONTAINER_ROOT_LV_NAME=dockerlv
@@ -305,7 +305,7 @@ EOF
 
 <p>Start and enable Docker</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl start docker
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl start docker
 systemctl enable docker
 </code></pre></div></div>
 
@@ -313,7 +313,7 @@ systemctl enable docker
 
 <p>In this section we continue with the required prerequistes. This is also described in the <a href="https://kubernetes.io/docs/setup/independent/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl">install kubeadm</a> kubernetes documentation.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl enable kubelet
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl enable kubelet
 </code></pre></div></div>
 
 <p>This is a requirement for Flannel - pass bridged IPv4 traffic to iptables’ chains</p>
@@ -326,9 +326,9 @@ systemctl enable docker
 </span>    sysctl <span class="nt">--system</span>
 </code></pre></div></div>
 
-<p>Temporarily disable selinux so we can run <code class="highlighter-rouge">kubeadm init</code></p>
+<p>Temporarily disable selinux so we can run <code class="language-plaintext highlighter-rouge">kubeadm init</code></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>setenforce 0
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>setenforce 0
 </code></pre></div></div>
 
 <p>And let’s also permanently disable selinux - yes I know. If this isn’t done once you reboot your node kubernetes won’t start and then you will be wondering what happened :)</p>
@@ -352,11 +352,11 @@ systemctl enable docker
 
 <p>Now we are ready to <a href="https://kubernetes.io/docs/setup/independent/create-cluster-kubeadm/">create our cluster</a> starting with the first and only master.</p>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="highlighter-rouge">--pod-network-cidr</code> is required for Flannel</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-plaintext highlighter-rouge">--pod-network-cidr</code> is required for Flannel</p>
 
 
 </div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubeadm init --pod-network-cidr=10.244.0.0/16
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubeadm init --pod-network-cidr=10.244.0.0/16
 
 ...output...
 
@@ -367,18 +367,18 @@ mkdir -p $HOME/.kube
 
 <p>There are multiple CNI providers in this example environment just going to use Flannel since its simple to deploy and configure.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml
 </code></pre></div></div>
 
 <p>After Flannel is deployed join the nodes to the cluster.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubeadm join --token 045c1c.04765c236e1bd8da 172.31.50.221:6443 \
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubeadm join --token 045c1c.04765c236e1bd8da 172.31.50.221:6443 \
              --discovery-token-ca-cert-hash sha256:redacted
 </code></pre></div></div>
 
 <p>Once all the nodes have been joined check the status.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get node
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get node
 NAME                  STATUS    ROLES     AGE       VERSION
 km1.virtomation.com   Ready     master    11m       v1.9.4
 kn1.virtomation.com   Ready     &lt;none&gt;    10m       v1.9.4
@@ -391,11 +391,11 @@ kn2.virtomation.com   Ready     &lt;none&gt;    10m       v1.9.4
 
 <hr />
 
-<p>The recommended installation method is to use <a href="https://github.com/kubevirt/kubevirt-ansible">kubevirt-ansible</a>. For this example I don’t require storage so just deploying using <code class="highlighter-rouge">kubectl create</code>.</p>
+<p>The recommended installation method is to use <a href="https://github.com/kubevirt/kubevirt-ansible">kubevirt-ansible</a>. For this example I don’t require storage so just deploying using <code class="language-plaintext highlighter-rouge">kubectl create</code>.</p>
 
 <p>For additional information regarding KubeVirt install see the <a href="http://kubevirt.io/user-guide/#/installation/installation">installation readme</a>.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v0.4.1/kubevirt.yaml
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v0.4.1/kubevirt.yaml
 serviceaccount "kubevirt-apiserver" created
 
 ... output ...
@@ -405,7 +405,7 @@ customresourcedefinition "offlinevirtualmachines.kubevirt.io" created
 
 <p>Let’s make sure that all the pods are running.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n kube-system -l 'kubevirt.io'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n kube-system -l 'kubevirt.io'
 NAME                               READY     STATUS    RESTARTS   AGE
 virt-api-747745669-62cww           1/1       Running   0          4m
 virt-api-747745669-qtn7f           1/1       Running   0          4m
@@ -419,13 +419,13 @@ virt-handler-z5lsh                 1/1       Running   0          4m
 
 <p>I have used <a href="https://github.com/skydive-project/skydive">Skydive</a> in the past. It is a great tool to understand the topology of software-defined-networking. The only caveat is that Skydive doesn’t create a complete topology when using Flannel but there is still a good picture of what is going on. So with that let’s go ahead and install.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create ns skydive
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create ns skydive
 kubectl create -n skydive -f https://raw.githubusercontent.com/skydive-project/skydive/master/contrib/kubernetes/skydive.yaml
 </code></pre></div></div>
 
 <p>Check the status of Skydive agent and analyzer</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n skydive
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n skydive
 NAME                                READY     STATUS    RESTARTS   AGE
 skydive-agent-5hh8k                 1/1       Running   0          5m
 skydive-agent-c29l7                 1/1       Running   0          5m
@@ -436,14 +436,14 @@ skydive-analyzer-5db567b4bc-m77kq   2/2       Running   0          5m
 
 <p>To provide external access our example NodeJS application we need to an ingress controller. For this example we are going to use <a href="https://github.com/kubernetes/ingress-nginx/tree/master/deploy">ingress-nginx</a></p>
 
-<p>I created a simple script <code class="highlighter-rouge">ingress.sh</code> that follows the installation documentation for ingress-nginx with a couple minor modifications:</p>
+<p>I created a simple script <code class="language-plaintext highlighter-rouge">ingress.sh</code> that follows the installation documentation for ingress-nginx with a couple minor modifications:</p>
 
 <ul>
   <li>
-    <p>Patch the <code class="highlighter-rouge">nginx-configuration</code> ConfigMap to enable vts status</p>
+    <p>Patch the <code class="language-plaintext highlighter-rouge">nginx-configuration</code> ConfigMap to enable vts status</p>
   </li>
   <li>
-    <p>Add an additional <code class="highlighter-rouge">containerPort</code> to the deployment and an additional port to the service.</p>
+    <p>Add an additional <code class="language-plaintext highlighter-rouge">containerPort</code> to the deployment and an additional port to the service.</p>
   </li>
   <li>
     <p>Create an ingress to access nginx status page</p>
@@ -452,14 +452,14 @@ skydive-analyzer-5db567b4bc-m77kq   2/2       Running   0          5m
 
 <p>The script and additional files are available in the github repo listed below.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/jcpowermac/kubevirt-network-deepdive
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/jcpowermac/kubevirt-network-deepdive
 cd kubevirt-network-deepdive/kubernetes/ingress
 bash ingress.sh
 </code></pre></div></div>
 
 <p>After the script is complete confirm that ingress-nginx pods are running.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n ingress-nginx
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n ingress-nginx
 NAME                                        READY     STATUS    RESTARTS   AGE
 default-http-backend-55c6c69b88-jpl95       1/1       Running   0          1m
 nginx-ingress-controller-85c8787886-vf5tp   1/1       Running   0          1m
@@ -473,13 +473,13 @@ nginx-ingress-controller-85c8787886-vf5tp   1/1       Running   0          1m
 
 <p>Let’s create a clean new namespace to use.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create ns nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create ns nodejs-ex
 namespace "nodejs-ex" created
 </code></pre></div></div>
 
-<p>The <code class="highlighter-rouge">nodejs-ex.yaml</code> contains multiple objects. The definitions for our two virtual machines - mongodb and nodejs. Two Kubernetes <code class="highlighter-rouge">Services</code> and a one Kubernetes <code class="highlighter-rouge">Ingress</code> object. These instances will be created as offline virtual machines so after <code class="highlighter-rouge">kubectl create</code> we will start them up.</p>
+<p>The <code class="language-plaintext highlighter-rouge">nodejs-ex.yaml</code> contains multiple objects. The definitions for our two virtual machines - mongodb and nodejs. Two Kubernetes <code class="language-plaintext highlighter-rouge">Services</code> and a one Kubernetes <code class="language-plaintext highlighter-rouge">Ingress</code> object. These instances will be created as offline virtual machines so after <code class="language-plaintext highlighter-rouge">kubectl create</code> we will start them up.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create -f https://raw.githubusercontent.com/jcpowermac/kubevirt-network-deepdive/master/kubernetes/nodejs-ex.yaml -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl create -f https://raw.githubusercontent.com/jcpowermac/kubevirt-network-deepdive/master/kubernetes/nodejs-ex.yaml -n nodejs-ex
 offlinevirtualmachine "nodejs" created
 offlinevirtualmachine "mongodb" created
 service "mongodb" created
@@ -489,19 +489,19 @@ ingress "nodejs" created
 
 <p>Start the nodejs virtual machine</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl patch offlinevirtualmachine nodejs --type merge -p '{"spec":{"running":true}}' -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl patch offlinevirtualmachine nodejs --type merge -p '{"spec":{"running":true}}' -n nodejs-ex
 offlinevirtualmachine "nodejs" patched
 </code></pre></div></div>
 
 <p>Start the mongodb virtual machine</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true}}' -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true}}' -n nodejs-ex
 offlinevirtualmachine "mongodb" patched
 </code></pre></div></div>
 
 <p>Review kubevirt virtual machine objects</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ovms -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ovms -n nodejs-ex
 NAME      AGE
 mongodb   7m
 nodejs    7m
@@ -514,28 +514,28 @@ nodejs    5m
 
 <p>Where are the virtual machines and what is their IP address?</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -o wide -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -o wide -n nodejs-ex
 NAME                          READY     STATUS    RESTARTS   AGE       IP           NODE
 virt-launcher-mongodb-qdpmg   2/2       Running   0          4m        10.244.2.7   kn2.virtomation.com
 virt-launcher-nodejs-5r59c    2/2       Running   0          4m        10.244.1.8   kn1.virtomation.com
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>To test virtual machine to virtual machine network connectivity I purposely set the host where which instance would run by using a <code class="highlighter-rouge">nodeSelector</code>.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>To test virtual machine to virtual machine network connectivity I purposely set the host where which instance would run by using a <code class="language-plaintext highlighter-rouge">nodeSelector</code>.</p>
 
 
 </div></div>
 <h2 id="installing-the-nodejs-example-application">Installing the NodeJS Example Application</h2>
 
-<p>To quickly deploy our example application Ansible project is included in the repository. Two inventory files need to be modified before executing <code class="highlighter-rouge">ansible-playbook</code>. Within <code class="highlighter-rouge">all.yml</code> change the <code class="highlighter-rouge">analyzers</code> IP address to what is listed in the command below.</p>
+<p>To quickly deploy our example application Ansible project is included in the repository. Two inventory files need to be modified before executing <code class="language-plaintext highlighter-rouge">ansible-playbook</code>. Within <code class="language-plaintext highlighter-rouge">all.yml</code> change the <code class="language-plaintext highlighter-rouge">analyzers</code> IP address to what is listed in the command below.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get endpoints -n skydive
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get endpoints -n skydive
 NAME               ENDPOINTS                                                      AGE
 skydive-analyzer   10.244.1.2:9200,10.244.1.2:12379,10.244.1.2:8082 + 1 more...   18h
 </code></pre></div></div>
 
-<p>And finally use the IP Addresses from the <code class="highlighter-rouge">kubectl get pod -o wide -n nodejs-ex</code> command (example above) to modify <code class="highlighter-rouge">inventory/hosts.ini</code>. Now we can run <code class="highlighter-rouge">ansible-playbook</code>.</p>
+<p>And finally use the IP Addresses from the <code class="language-plaintext highlighter-rouge">kubectl get pod -o wide -n nodejs-ex</code> command (example above) to modify <code class="language-plaintext highlighter-rouge">inventory/hosts.ini</code>. Now we can run <code class="language-plaintext highlighter-rouge">ansible-playbook</code>.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-network-deepdive/ansible
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd kubevirt-network-deepdive/ansible
 vim inventory/group_vars/all.yml
 vim inventory/hosts.ini
 
@@ -545,27 +545,27 @@ ansible-playbook -i inventory/hosts.ini playbook/main.yml
 
 <h3 id="determine-ingress-url">Determine Ingress URL</h3>
 
-<p>First let’s find the host. This is defined within the <code class="highlighter-rouge">Ingress</code> object. In this case it is <code class="highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
+<p>First let’s find the host. This is defined within the <code class="language-plaintext highlighter-rouge">Ingress</code> object. In this case it is <code class="language-plaintext highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ingress -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ingress -n nodejs-ex
 NAME      HOSTS                            ADDRESS   PORTS     AGE
 nodejs    nodejs.ingress.virtomation.com             80        22m
 </code></pre></div></div>
 
-<p>What are the NodePorts? For this installation Service spec was modified to include <code class="highlighter-rouge">nodePort</code> for http (30000) and http-mgmt (32000).</p>
+<p>What are the NodePorts? For this installation Service spec was modified to include <code class="language-plaintext highlighter-rouge">nodePort</code> for http (30000) and http-mgmt (32000).</p>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>When deploying ingress-nginx using the provided Service definition the <code class="highlighter-rouge">nodePort</code> is undefined. Kubernetes will assign a random port to ports defined in the spec.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>When deploying ingress-nginx using the provided Service definition the <code class="language-plaintext highlighter-rouge">nodePort</code> is undefined. Kubernetes will assign a random port to ports defined in the spec.</p>
 
 
 </div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get service ingress-nginx -n ingress-nginx
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get service ingress-nginx -n ingress-nginx
 NAME            TYPE       CLUSTER-IP      EXTERNAL-IP   PORT(S)                                      AGE
 ingress-nginx   NodePort   10.110.173.97   &lt;none&gt;        80:30000/TCP,443:30327/TCP,18080:32000/TCP   52m
 </code></pre></div></div>
 
 <p>What node is the nginx-ingress controller running on? This is needed to configure DNS.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n ingress-nginx -o wide
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod -n ingress-nginx -o wide
 NAME                                        READY     STATUS    RESTARTS   AGE       IP           NODE
 default-http-backend-55c6c69b88-jpl95       1/1       Running   0          53m       10.244.1.3   kn1.virtomation.com
 nginx-ingress-controller-85c8787886-vf5tp   1/1       Running   0          53m       10.244.1.4   kn1.virtomation.com
@@ -575,7 +575,7 @@ nginx-ingress-controller-85c8787886-vf5tp   1/1       Running   0          53m  
 
 <p>In my homelab I am using dnsmasq. To support ingress add the host where the controller is running as an A record.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@dns1 ~]# cat /etc/dnsmasq.d/virtomation.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@dns1 ~]# cat /etc/dnsmasq.d/virtomation.conf
 ... output ...
 address=/km1.virtomation.com/172.31.50.221
 address=/kn1.virtomation.com/172.31.50.231
@@ -588,22 +588,22 @@ address=/.ingress.virtomation.com/172.31.50.231
 
 <p>Restart dnsmasq for the new config</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl restart dnsmasq
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>systemctl restart dnsmasq
 </code></pre></div></div>
 
 <h3 id="testing-our-application">Testing our application</h3>
 
-<p>This application uses MongoDB to store the views of the website. Listing the <code class="highlighter-rouge">count-value</code> shows that the database is connected and networking is functioning correctly.</p>
+<p>This application uses MongoDB to store the views of the website. Listing the <code class="language-plaintext highlighter-rouge">count-value</code> shows that the database is connected and networking is functioning correctly.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl http://nodejs.ingress.virtomation.com:30000/
-<span class="cp">&lt;!doctype html&gt;</span>
-<span class="nt">&lt;html</span> <span class="na">lang=</span><span class="s">"en"</span><span class="nt">&gt;</span>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ curl http://nodejs.ingress.virtomation.com:30000/
+&lt;!doctype html&gt;
+&lt;html lang="en"&gt;
 
 ...output...
 
-<span class="nt">&lt;p&gt;</span>Page view count:
-<span class="nt">&lt;span</span> <span class="na">class=</span><span class="s">"code"</span> <span class="na">id=</span><span class="s">"count-value"</span><span class="nt">&gt;</span>7<span class="nt">&lt;/span&gt;</span>
-<span class="nt">&lt;/p&gt;</span>
+&lt;p&gt;Page view count:
+&lt;span class="code" id="count-value"&gt;7&lt;/span&gt;
+&lt;/p&gt;
 
 ...output...
 </code></pre></div></div>
@@ -627,11 +627,11 @@ address=/.ingress.virtomation.com/172.31.50.231
 
 <h3 id="virtwrap-manager"><a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/manager.go">virtwrap manager</a></h3>
 
-<p>Before the virtual machine is started the <code class="highlighter-rouge">preStartHook</code> will run <code class="highlighter-rouge">SetupPodNetwork</code>.</p>
+<p>Before the virtual machine is started the <code class="language-plaintext highlighter-rouge">preStartHook</code> will run <code class="language-plaintext highlighter-rouge">SetupPodNetwork</code>.</p>
 
 <h3 id="setuppodnetwork--setupdefaultpodnetwork">SetupPodNetwork → <a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/network/network.go">SetupDefaultPodNetwork</a></h3>
 
-<p>This function calls three functions that are detailed below <code class="highlighter-rouge">discoverPodNetworkInterface</code>, <code class="highlighter-rouge">preparePodNetworkInterface</code> and <code class="highlighter-rouge">StartDHCP</code></p>
+<p>This function calls three functions that are detailed below <code class="language-plaintext highlighter-rouge">discoverPodNetworkInterface</code>, <code class="language-plaintext highlighter-rouge">preparePodNetworkInterface</code> and <code class="language-plaintext highlighter-rouge">StartDHCP</code></p>
 
 <h4 id="discoverpodnetworkinterface"><a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/network/network.go">discoverPodNetworkInterface</a></h4>
 
@@ -693,9 +693,9 @@ address=/.ingress.virtomation.com/172.31.50.231
 
 <h3 id="services">services</h3>
 
-<p>There are two services defined in the manifest that was deployed above. One each for mongodb and nodejs applications. This allows us to use the hostname <code class="highlighter-rouge">mongodb</code> to connect to MongoDB. Review <a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/">DNS for Services and Pods</a> for additional information.</p>
+<p>There are two services defined in the manifest that was deployed above. One each for mongodb and nodejs applications. This allows us to use the hostname <code class="language-plaintext highlighter-rouge">mongodb</code> to connect to MongoDB. Review <a href="https://kubernetes.io/docs/concepts/services-networking/dns-pod-service/">DNS for Services and Pods</a> for additional information.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get services -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get services -n nodejs-ex
 NAME      TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)     AGE
 mongodb   ClusterIP   10.108.188.170   &lt;none&gt;        27017/TCP   3h
 nodejs    ClusterIP   10.110.233.114   &lt;none&gt;        8080/TCP    3h
@@ -705,7 +705,7 @@ nodejs    ClusterIP   10.110.233.114   &lt;none&gt;        8080/TCP    3h
 
 <p>The endpoints below were automatically created because there was a selector</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spec:
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>spec:
   selector:
     kubevirt.io: virt-launcher
     kubevirt.io/domain: nodejs
@@ -713,7 +713,7 @@ nodejs    ClusterIP   10.110.233.114   &lt;none&gt;        8080/TCP    3h
 
 <p>defined in the Service object.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get endpoints -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get endpoints -n nodejs-ex
 NAME      ENDPOINTS          AGE
 mongodb   10.244.2.7:27017   1h
 nodejs    10.244.1.8:8080    1h
@@ -723,7 +723,7 @@ nodejs    10.244.1.8:8080    1h
 
 <p>Also defined in the manifest was the ingress object. This will allow us to contact the NodeJS example application using a URL.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ingress -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get ingress -n nodejs-ex
 NAME      HOSTS                            ADDRESS   PORTS     AGE
 nodejs    nodejs.ingress.virtomation.com             80        3h
 </code></pre></div></div>
@@ -732,9 +732,9 @@ nodejs    nodejs.ingress.virtomation.com             80        3h
 
 <h3 id="interfaces">interfaces</h3>
 
-<p>A few important interfaces to note. The <code class="highlighter-rouge">flannel.1</code> interface is type <code class="highlighter-rouge">vxlan</code> for connectivity between hosts. I removed from the <code class="highlighter-rouge">ip a</code> output the veth interfaces but the details are shown further below with <code class="highlighter-rouge">bridge link show</code>.</p>
+<p>A few important interfaces to note. The <code class="language-plaintext highlighter-rouge">flannel.1</code> interface is type <code class="language-plaintext highlighter-rouge">vxlan</code> for connectivity between hosts. I removed from the <code class="language-plaintext highlighter-rouge">ip a</code> output the veth interfaces but the details are shown further below with <code class="language-plaintext highlighter-rouge">bridge link show</code>.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ip a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ip a
 ...output...
 2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc pfifo_fast state UP qlen 1000
     link/ether 52:54:00:97:a6:ee brd ff:ff:ff:ff:ff:ff
@@ -758,9 +758,9 @@ nodejs    nodejs.ingress.virtomation.com             80        3h
 ...output...
 </code></pre></div></div>
 
-<p><code class="highlighter-rouge">cni0</code> is a bridge where one side of the veth interface pair is attached.</p>
+<p><code class="language-plaintext highlighter-rouge">cni0</code> is a bridge where one side of the veth interface pair is attached.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# bridge link show
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# bridge link show
 6: vethb4424886 state UP @docker0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master cni0 state forwarding priority 32 cost 2
 7: veth1657737b state UP @docker0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master cni0 state forwarding priority 32 cost 2
 8: vethdfd32c87 state UP @docker0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master cni0 state forwarding priority 32 cost 2
@@ -772,23 +772,23 @@ nodejs    nodejs.ingress.virtomation.com             80        3h
 
 <h3 id="routes">routes</h3>
 
-<p>The pod network subnet is <code class="highlighter-rouge">10.244.0.0/16</code> and broken up per host:</p>
+<p>The pod network subnet is <code class="language-plaintext highlighter-rouge">10.244.0.0/16</code> and broken up per host:</p>
 
 <ul>
   <li>
-    <p>km1 - <code class="highlighter-rouge">10.244.0.0/24</code></p>
+    <p>km1 - <code class="language-plaintext highlighter-rouge">10.244.0.0/24</code></p>
   </li>
   <li>
-    <p>kn1 - <code class="highlighter-rouge">10.244.1.0/24</code></p>
+    <p>kn1 - <code class="language-plaintext highlighter-rouge">10.244.1.0/24</code></p>
   </li>
   <li>
-    <p>kn2 - <code class="highlighter-rouge">10.244.2.0/24</code></p>
+    <p>kn2 - <code class="language-plaintext highlighter-rouge">10.244.2.0/24</code></p>
   </li>
 </ul>
 
 <p>So the table will route the packets to correct interface.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ip r
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ip r
 default via 172.31.50.1 dev eth0
 10.244.0.0/24 via 10.244.0.0 dev flannel.1 onlink
 10.244.1.0/24 dev cni0 proto kernel scope link src 10.244.1.1
@@ -801,7 +801,7 @@ default via 172.31.50.1 dev eth0
 
 <p>To also support kubernetes services kube-proxy writes iptables rules for those services. In the output below you can see our mongodb and nodejs services with destination NAT rules defined. For more information regarding iptables and services refer to <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/debug-service/#is-kube-proxy-writing-iptables-rules">debug-service</a> in the kubernetes documentation.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# iptables -n -L -t nat | grep nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# iptables -n -L -t nat | grep nodejs-ex
 KUBE-MARK-MASQ  all  --  10.244.1.8           0.0.0.0/0            /* nodejs-ex/nodejs: */
 DNAT       tcp  --  0.0.0.0/0            0.0.0.0/0            /* nodejs-ex/nodejs: */ tcp to:10.244.1.8:8080
 KUBE-MARK-MASQ  all  --  10.244.2.7           0.0.0.0/0            /* nodejs-ex/mongodb: */
@@ -818,13 +818,13 @@ KUBE-SEP-QD4L7MQHCIVOWZAO  all  --  0.0.0.0/0            0.0.0.0/0            /*
 
 <h3 id="interfaces-1">interfaces</h3>
 
-<p>The bridge <code class="highlighter-rouge">br1</code> is the main focus in the pod level. It contains the <code class="highlighter-rouge">eth0</code> and <code class="highlighter-rouge">vnet0</code> ports. <code class="highlighter-rouge">eth0</code> becomes the uplink to the bridge which is the other side of the veth pair which is a port on the host’s <code class="highlighter-rouge">cni0</code> bridge.</p>
+<p>The bridge <code class="language-plaintext highlighter-rouge">br1</code> is the main focus in the pod level. It contains the <code class="language-plaintext highlighter-rouge">eth0</code> and <code class="language-plaintext highlighter-rouge">vnet0</code> ports. <code class="language-plaintext highlighter-rouge">eth0</code> becomes the uplink to the bridge which is the other side of the veth pair which is a port on the host’s <code class="language-plaintext highlighter-rouge">cni0</code> bridge.</p>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Important</p><p>Since <code class="highlighter-rouge">eth0</code> has no IP address and <code class="highlighter-rouge">br1</code> is in the self-assigned range the pod has no network access. There are also no routes in the pod. This can be resolved for troubleshooting by creating a veth pair, adding one of the interfaces to the bridge and assigning an IP address in the pod subnet for the host. Routes are also required to be added. This is performed for running skydive in the pod see <a href="https://github.com/jcpowermac/kubevirt-network-deepdive/blob/master/kubernetes/skydive/skydive.sh">skydive.sh</a> for more details.</p>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Important</p><p>Since <code class="language-plaintext highlighter-rouge">eth0</code> has no IP address and <code class="language-plaintext highlighter-rouge">br1</code> is in the self-assigned range the pod has no network access. There are also no routes in the pod. This can be resolved for troubleshooting by creating a veth pair, adding one of the interfaces to the bridge and assigning an IP address in the pod subnet for the host. Routes are also required to be added. This is performed for running skydive in the pod see <a href="https://github.com/jcpowermac/kubevirt-network-deepdive/blob/master/kubernetes/skydive/skydive.sh">skydive.sh</a> for more details.</p>
 
 
 </div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- ip a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- ip a
 ...output...
 3: eth0@if12: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 qdisc noqueue master br1 state UP group default
     link/ether a6:97:da:96:cf:07 brd ff:ff:ff:ff:ff:ff link-netnsid 0
@@ -842,27 +842,27 @@ KUBE-SEP-QD4L7MQHCIVOWZAO  all  --  0.0.0.0/0            0.0.0.0/0            /*
        valid_lft forever preferred_lft forever
 </code></pre></div></div>
 
-<p>Showing the bridge <code class="highlighter-rouge">br1</code> member ports.</p>
+<p>Showing the bridge <code class="language-plaintext highlighter-rouge">br1</code> member ports.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- bridge link show
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- bridge link show
 3: eth0 state UP @if12: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master br1 state forwarding priority 32 cost 2
 5: vnet0 state UNKNOWN : &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1450 master br1 state forwarding priority 32 cost 100
 </code></pre></div></div>
 
 <h3 id="dhcp">DHCP</h3>
 
-<p>The virtual machine network is configured by DHCP. You can see <code class="highlighter-rouge">virt-launcher</code> has UDP port 67 open on the <code class="highlighter-rouge">br1</code> interface to serve DHCP to the virtual machine.</p>
+<p>The virtual machine network is configured by DHCP. You can see <code class="language-plaintext highlighter-rouge">virt-launcher</code> has UDP port 67 open on the <code class="language-plaintext highlighter-rouge">br1</code> interface to serve DHCP to the virtual machine.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- ss -tuapn
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- ss -tuapn
 Netid  State    Recv-Q   Send-Q      Local Address:Port      Peer Address:Port
 udp    UNCONN   0        0             0.0.0.0%br1:67             0.0.0.0:*      users:(("virt-launcher",pid=10,fd=12))
 </code></pre></div></div>
 
 <h3 id="libvirt">libvirt</h3>
 
-<p>With <code class="highlighter-rouge">virsh domiflist</code> we can also see that the <code class="highlighter-rouge">vnet0</code> interface is a port on the <code class="highlighter-rouge">br1</code> bridge.</p>
+<p>With <code class="language-plaintext highlighter-rouge">virsh domiflist</code> we can also see that the <code class="language-plaintext highlighter-rouge">vnet0</code> interface is a port on the <code class="language-plaintext highlighter-rouge">br1</code> bridge.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- virsh domiflist nodejs-ex_nodejs
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl exec -n nodejs-ex -c compute virt-launcher-nodejs-5r59c -- virsh domiflist nodejs-ex_nodejs
 Interface  Type       Source     Model       MAC
 vnet0      bridge     br1        e1000       0a:58:0a:f4:01:08
 </code></pre></div></div>
@@ -877,7 +877,7 @@ vnet0      bridge     br1        e1000       0a:58:0a:f4:01:08
 
 
 </div></div>
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ ip a
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ ip a
 ...output...
 2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1500 qdisc fq_codel state UP group default qlen 1000
     link/ether 0a:58:0a:f4:01:08 brd ff:ff:ff:ff:ff:ff
@@ -889,9 +889,9 @@ vnet0      bridge     br1        e1000       0a:58:0a:f4:01:08
 
 <h3 id="dns">DNS</h3>
 
-<p>Just quickly wanted to cat the <code class="highlighter-rouge">/etc/resolv.conf</code> file to show that DNS is configured so that kube-dns will be properly queried.</p>
+<p>Just quickly wanted to cat the <code class="language-plaintext highlighter-rouge">/etc/resolv.conf</code> file to show that DNS is configured so that kube-dns will be properly queried.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ cat /etc/resolv.conf
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ cat /etc/resolv.conf
 ; generated by /usr/sbin/dhclient-script
 search nodejs-ex.svc.cluster.local. svc.cluster.local. cluster.local.
 nameserver 10.96.0.10
@@ -918,7 +918,7 @@ nameserver 10.96.0.10
 
 <p>Service-based DNS resolution is an important feature of Kubernetes. Since dig,host or nslookup are not installed in our virtual machine a quick python script fills in. This output below shows that the mongodb name is available for resolution.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ python3 -c "import socket;print(socket.gethostbyname('mongodb.nodejs-ex.svc.cluster.local'))"
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ python3 -c "import socket;print(socket.gethostbyname('mongodb.nodejs-ex.svc.cluster.local'))"
 10.108.188.170
 [fedora@nodejs ~]$ python3 -c "import socket;print(socket.gethostbyname('mongodb'))"
 10.108.188.170
@@ -926,9 +926,9 @@ nameserver 10.96.0.10
 
 <h4 id="tcp-connection">TCP connection</h4>
 
-<p>After connecting to the nodejs virtual machine via ssh we can use <code class="highlighter-rouge">ss</code> to determine the current TCP connections. We are specifically looking for the established connections to the MongoDB service that is running on the mongodb virtual machine on node kn2.</p>
+<p>After connecting to the nodejs virtual machine via ssh we can use <code class="language-plaintext highlighter-rouge">ss</code> to determine the current TCP connections. We are specifically looking for the established connections to the MongoDB service that is running on the mongodb virtual machine on node kn2.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ ss -tanp
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ ss -tanp
 State      Recv-Q Send-Q                Local Address:Port                               Peer Address:Port
 ... output ...
 LISTEN     0      128                               *:8080                                          *:*
@@ -939,7 +939,7 @@ ESTAB      0      0                        10.244.1.8:47824                     
 
 <h4 id="logs">Logs</h4>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ journalctl -u nodejs
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[fedora@nodejs ~]$ journalctl -u nodejs
 ...output..
 Apr 18 20:07:37 nodejs.localdomain node[4303]: Connected to MongoDB at: mongodb://nodejs:nodejspassword@mongodb/nodejs
 ...output...
@@ -958,9 +958,9 @@ Apr 18 20:07:37 nodejs.localdomain node[4303]: Connected to MongoDB at: mongodb:
     </figure>
 </div>
 
-<p>The <a href="https://kubernetes.io/docs/reference/generated/kube-proxy/">kube-proxy</a> has port 30000 open that was defined by the <code class="highlighter-rouge">nodePort</code> of the <code class="highlighter-rouge">ingress-nginx</code> service. Additional details on kube-proxy and iptables role is available from <a href="https://kubernetes.io/docs/concepts/services-networking/service/#ips-and-vips">Service - IPs and VIPs</a> in the Kubernetes documentation.</p>
+<p>The <a href="https://kubernetes.io/docs/reference/generated/kube-proxy/">kube-proxy</a> has port 30000 open that was defined by the <code class="language-plaintext highlighter-rouge">nodePort</code> of the <code class="language-plaintext highlighter-rouge">ingress-nginx</code> service. Additional details on kube-proxy and iptables role is available from <a href="https://kubernetes.io/docs/concepts/services-networking/service/#ips-and-vips">Service - IPs and VIPs</a> in the Kubernetes documentation.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ss -tanp | grep 30000
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ss -tanp | grep 30000
 LISTEN     0      128         :::30000                   :::*                   users:(("kube-proxy",pid=6534,fd=13))
 
 [root@kn1 ~]# iptables -n -L -t nat | grep ingress-nginx/ingress-nginx | grep http | grep -v https | grep -v http-mgmt
@@ -973,9 +973,9 @@ KUBE-SVC-REQ4FPVT7WYF4VLA  tcp  --  0.0.0.0/0            10.110.173.97        /*
 KUBE-SEP-BKJT4JXHZ3TCOTKA  all  --  0.0.0.0/0            0.0.0.0/0            /* ingress-nginx/ingress-nginx:http */
 </code></pre></div></div>
 
-<p>Since the ingress-nginx pod is on the same host as the nodejs virtual machine we just need to be routed to the <code class="highlighter-rouge">cni0</code> bridge to communicate with the pod and vm.</p>
+<p>Since the ingress-nginx pod is on the same host as the nodejs virtual machine we just need to be routed to the <code class="language-plaintext highlighter-rouge">cni0</code> bridge to communicate with the pod and vm.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ip r
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@kn1 ~]# ip r
 ...output...
 10.244.1.0/24 dev cni0 proto kernel scope link src 10.244.1.1
 ...output...
@@ -987,7 +987,7 @@ KUBE-SEP-BKJT4JXHZ3TCOTKA  all  --  0.0.0.0/0            0.0.0.0/0            /*
 
 <h4 id="nginx-vhost-traffic-status">Nginx Vhost Traffic Status</h4>
 
-<p>ingress-nginx provides an optional setting to enable traffic status - which we already enabled. The screenshot below shows the requests that Nginx is receiving for <code class="highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
+<p>ingress-nginx provides an optional setting to enable traffic status - which we already enabled. The screenshot below shows the requests that Nginx is receiving for <code class="language-plaintext highlighter-rouge">nodejs.ingress.virtomation.com</code>.</p>
 
 <div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
     <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
@@ -1000,9 +1000,9 @@ KUBE-SEP-BKJT4JXHZ3TCOTKA  all  --  0.0.0.0/0            0.0.0.0/0            /*
 
 <h4 id="service-nodeport-to-nginx-pod">Service NodePort to Nginx Pod</h4>
 
-<p>My <code class="highlighter-rouge">tcpdump</code> fu is lacking so I found an <a href="https://sites.google.com/site/jimmyxu101/testing/use-tcpdump-to-monitor-http-traffic">example</a> query that will provide the details we are looking for. I removed a significant amount of the content but you can see my desktop (172.31.51.52) create a <code class="highlighter-rouge">GET</code> request to the NodePort 30000. This could have also been done in Skydive but I wanted to provide an alternative if you didn’t want to install it or just stick to the cli.</p>
+<p>My <code class="language-plaintext highlighter-rouge">tcpdump</code> fu is lacking so I found an <a href="https://sites.google.com/site/jimmyxu101/testing/use-tcpdump-to-monitor-http-traffic">example</a> query that will provide the details we are looking for. I removed a significant amount of the content but you can see my desktop (172.31.51.52) create a <code class="language-plaintext highlighter-rouge">GET</code> request to the NodePort 30000. This could have also been done in Skydive but I wanted to provide an alternative if you didn’t want to install it or just stick to the cli.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code># tcpdump -nni eth0 -A -s 0 'tcp port 30000 and (((ip[2:2] - ((ip[0]&amp;0xf)&lt;&lt;2)) - ((tcp[12]&amp;0xf0)&gt;&gt;2)) != 0)'
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># tcpdump -nni eth0 -A -s 0 'tcp port 30000 and (((ip[2:2] - ((ip[0]&amp;0xf)&lt;&lt;2)) - ((tcp[12]&amp;0xf0)&gt;&gt;2)) != 0)'
 
 ...output...
 
@@ -1037,9 +1037,9 @@ E.      m|.@.?.....2...34u0.....[...n...........
 
 <h4 id="nginx-pod-to-nodejs-vm">Nginx Pod to NodeJS VM</h4>
 
-<p>In (1) we can see flows to and from <code class="highlighter-rouge">10.244.1.4</code> and <code class="highlighter-rouge">10.244.1.8</code>. <code class="highlighter-rouge">.8</code> is the nodejs virtual machine and <code class="highlighter-rouge">.4</code> is as listed below the nginx-ingress-controller.</p>
+<p>In (1) we can see flows to and from <code class="language-plaintext highlighter-rouge">10.244.1.4</code> and <code class="language-plaintext highlighter-rouge">10.244.1.8</code>. <code class="language-plaintext highlighter-rouge">.8</code> is the nodejs virtual machine and <code class="language-plaintext highlighter-rouge">.4</code> is as listed below the nginx-ingress-controller.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod --all-namespaces -o wide
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ kubectl get pod --all-namespaces -o wide
 NAMESPACE       NAME                                          READY     STATUS    RESTARTS   AGE       IP              NODE
 ...output...
 ingress-nginx   nginx-ingress-controller-85c8787886-vf5tp     1/1       Running   0          1d        10.244.1.4      kn1.virtomation.com

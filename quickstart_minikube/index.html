@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-08-05 14:22:18 +0000" >
+    <meta property="og:article:published_time" content="2020-08-11 06:52:06 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -355,7 +355,7 @@ variable that will be used on few commands:</p>
 <span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
 </code></pre></div></div>
 
-<p>Now, using the <code class="highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
+<p>Now, using the <code class="language-plaintext highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 </code></pre></div></div>
@@ -421,12 +421,12 @@ The tool is called <em>virtctl</em> and can be retrieved from the release page o
 <span class="nb">chmod</span> +x virtctl
 </code></pre></div></div>
 
-<p>If <a href="https://krew.dev/"><code class="highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="highlighter-rouge">virtctl</code> can be installed via <code class="highlighter-rouge">krew</code>:</p>
+<p>If <a href="https://krew.dev/"><code class="language-plaintext highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="language-plaintext highlighter-rouge">virtctl</code> can be installed via <code class="language-plaintext highlighter-rouge">krew</code>:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
 </code></pre></div></div>
 
-<p>Then <code class="highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
+<p>Then <code class="language-plaintext highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
 </code></pre></div></div>

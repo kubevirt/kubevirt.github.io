@@ -338,7 +338,7 @@ cdi.cdi.kubevirt.io/cdi created
 
 </code></pre></div></div>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">The nodes of the cluster have to be time synchronized</p><p>This should have been done for you by <code class="highlighter-rouge">chronyd</code></p>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">The nodes of the cluster have to be time synchronized</p><p>This should have been done for you by <code class="language-plaintext highlighter-rouge">chronyd</code></p>
 
 
 </div></div>
@@ -423,7 +423,7 @@ cephcluster.ceph.rook.io/rook-ceph created
     <span class="c"># Individual nodes and their config can be specified as well, but 'useAllNodes' above must be set to false. Then, only the named</span>
 </code></pre></div></div>
 
-<p>The progress can be checked now, check the pods in the <code class="highlighter-rouge">rook-ceph</code> namespace:</p>
+<p>The progress can be checked now, check the pods in the <code class="language-plaintext highlighter-rouge">rook-ceph</code> namespace:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# watch kubectl <span class="nt">-n</span> rook-ceph get pods
 NAME                                            READY   STATUS              RESTARTS   AGE
@@ -485,15 +485,15 @@ sh-4.2# ceph status
     pgs:
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In this example, the health value is <code class="highlighter-rouge">HEALTH_WARN</code> because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a <code class="highlighter-rouge">HEALTH_OK</code>.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In this example, the health value is <code class="language-plaintext highlighter-rouge">HEALTH_WARN</code> because there is a clock skew between the monitor in node c and the rest of the cluster. If this is your case, go to the troubleshooting point at the end of the blogpost to find out how to solve this issue and get a <code class="language-plaintext highlighter-rouge">HEALTH_OK</code>.</p>
 
 
 </div></div>
-<p>Next, some other resources need to be created. First, the block pool that defines the name (and specification) of the RBD pool that will be used for creating persistent volumes, in this case, is called <code class="highlighter-rouge">replicapool</code>:</p>
+<p>Next, some other resources need to be created. First, the block pool that defines the name (and specification) of the RBD pool that will be used for creating persistent volumes, in this case, is called <code class="language-plaintext highlighter-rouge">replicapool</code>:</p>
 
 <h2 id="configuring-the-cephblockpool-and-the-kubernetes-storageclass-for-using-ceph-hosting-the-virtual-machines">Configuring the CephBlockPool and the Kubernetes StorageClass for using Ceph hosting the Virtual Machines</h2>
 
-<p>The <code class="highlighter-rouge">cephblockpool.yml</code> is based in the <code class="highlighter-rouge">pool.yml</code>, you can check that file in the same directory to learn about the details of each parameter:</p>
+<p>The <code class="language-plaintext highlighter-rouge">cephblockpool.yml</code> is based in the <code class="language-plaintext highlighter-rouge">pool.yml</code>, you can check that file in the same directory to learn about the details of each parameter:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# <span class="nb">cat </span>pool.yml
 </code></pre></div></div>
@@ -628,7 +628,7 @@ sh-4.2# ceph <span class="nt">-s</span>
     pgs:     8 active+clean
 </code></pre></div></div>
 
-<p>Oh Wait! the health value is again <code class="highlighter-rouge">HEALTH_WARN</code>, no problem! it is because there are too few PGs per OSD, in this case 4, for a minimum value of 30. Let’s fix it changing that value to 256:</p>
+<p>Oh Wait! the health value is again <code class="language-plaintext highlighter-rouge">HEALTH_WARN</code>, no problem! it is because there are too few PGs per OSD, in this case 4, for a minimum value of 30. Let’s fix it changing that value to 256:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl <span class="nt">-n</span> rook-ceph <span class="nb">exec</span> <span class="nt">-it</span> <span class="nv">$toolbox</span> sh
 sh-4.2# ceph osd pool <span class="nb">set </span>replicapool pg_num 256
@@ -656,7 +656,7 @@ sh-4.2# ceph <span class="nt">-s</span>
 
 </code></pre></div></div>
 
-<p>In a moment, Ceph will end peering and the status of the pgs would be <code class="highlighter-rouge">active+clean</code>:</p>
+<p>In a moment, Ceph will end peering and the status of the pgs would be <code class="language-plaintext highlighter-rouge">active+clean</code>:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sh-4.2# ceph <span class="nt">-s</span>
   cluster:
@@ -701,7 +701,7 @@ sh-4.2# ceph osd status
 
 </code></pre></div></div>
 
-<p>That should match the available block devices in the nodes, let’s check it in the <code class="highlighter-rouge">kv-master-00</code> node:</p>
+<p>That should match the available block devices in the nodes, let’s check it in the <code class="language-plaintext highlighter-rouge">kv-master-00</code> node:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# lsblk
 NAME                                                                                                 MAJ:MIN RM  SIZE RO TYPE MOUNTPOINT
@@ -712,7 +712,7 @@ vdb                                                                             
 └─ceph--09112f92--11cd--4284--b763--447065cc169c-osd--data--0102789c--852c--4696--96ce--54c2ad3a848b 252:0    0   19G  0 lvm
 </code></pre></div></div>
 
-<p>To validate that the pods are running on the correct nodes, check the <code class="highlighter-rouge">NODE</code> column below:</p>
+<p>To validate that the pods are running on the correct nodes, check the <code class="language-plaintext highlighter-rouge">NODE</code> column below:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl get pods <span class="nt">-n</span> rook-ceph <span class="nt">-o</span> wide | egrep <span class="s1">'(NAME|osd)'</span>
 NAME                                                   READY   STATUS      RESTARTS   AGE   IP                NODE                       NOMINATED NODE   READINESS GATES
@@ -750,11 +750,11 @@ rook-ceph-osd-prepare-kv-worker-00.kubevirt-io-5qmjg   0/1     Completed   0    
 persistentvolumeclaim/pv-claim created
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>Ensure that the <code class="highlighter-rouge">storageClassName</code> contains the name of the storage class you have created, in this case, <code class="highlighter-rouge">rook-ceph-block</code></p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>Ensure that the <code class="language-plaintext highlighter-rouge">storageClassName</code> contains the name of the storage class you have created, in this case, <code class="language-plaintext highlighter-rouge">rook-ceph-block</code></p>
 
 
 </div></div>
-<p>For checking that it has been bound, list the PVCs and look for the ones in the <code class="highlighter-rouge">rook-ceph-block</code> storageclass:</p>
+<p>For checking that it has been bound, list the PVCs and look for the ones in the <code class="language-plaintext highlighter-rouge">rook-ceph-block</code> storageclass:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# kubectl get pvc
 NAME       STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS      AGE
@@ -783,10 +783,10 @@ persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
 <span class="o">[</span>root@kv-master-00 ~]# <span class="nb">sed</span> <span class="nt">-i</span> <span class="s1">'s/memory: 64M/memory: 1G/'</span> vm-dv.yaml
 </code></pre></div></div>
 
-<p>The modified YAML could be run already like this but a user won’t be able to log in as we don’t know the password used in that image. <code class="highlighter-rouge">cloud-init</code> can be used to change the password of the default user of that image <code class="highlighter-rouge">centos</code> and grant us access, two parts have to be added:</p>
+<p>The modified YAML could be run already like this but a user won’t be able to log in as we don’t know the password used in that image. <code class="language-plaintext highlighter-rouge">cloud-init</code> can be used to change the password of the default user of that image <code class="language-plaintext highlighter-rouge">centos</code> and grant us access, two parts have to be added:</p>
 
 <ul>
-  <li>Add a second disk after the <code class="highlighter-rouge">datavolumevolume</code> (already existing), in this example is called <code class="highlighter-rouge">cloudint</code>:</li>
+  <li>Add a second disk after the <code class="language-plaintext highlighter-rouge">datavolumevolume</code> (already existing), in this example is called <code class="language-plaintext highlighter-rouge">cloudint</code>:</li>
 </ul>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim vm-dv.yaml
@@ -810,7 +810,7 @@ persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
 </code></pre></div></div>
 
 <ul>
-  <li>Afterwards, add the volume at the end of the file, after the volume already defined as <code class="highlighter-rouge">datavolumevolume</code>, in this example it’s also called <code class="highlighter-rouge">cloudinit</code>:</li>
+  <li>Afterwards, add the volume at the end of the file, after the volume already defined as <code class="language-plaintext highlighter-rouge">datavolumevolume</code>, in this example it’s also called <code class="language-plaintext highlighter-rouge">cloudinit</code>:</li>
 </ul>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>root@kv-master-00 ~]# vim vm-dv.yaml
@@ -829,7 +829,7 @@ persistentvolumeclaim <span class="s2">"pv-claim"</span> deleted
     <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinit</span>
 </code></pre></div></div>
 
-<p>The password value (<code class="highlighter-rouge">changeme</code> in this example), can be set to your preferred one.</p>
+<p>The password value (<code class="language-plaintext highlighter-rouge">changeme</code> in this example), can be set to your preferred one.</p>
 
 <p>Once the YAML file is prepared the Virtual Machine can be created and started:</p>
 
@@ -880,7 +880,7 @@ Password:
 
 <h2 id="troubleshooting">Troubleshooting</h2>
 
-<p>It might happen that once the Ceph cluster is created, the hosts are not properly time-synchronized, in that case, the Ceph configuration can be modified to allow a bigger time difference between the nodes, in this case, the variable <code class="highlighter-rouge">mon clock drift allowed</code> is changed to 0.5 seconds, the steps to do so are the following:</p>
+<p>It might happen that once the Ceph cluster is created, the hosts are not properly time-synchronized, in that case, the Ceph configuration can be modified to allow a bigger time difference between the nodes, in this case, the variable <code class="language-plaintext highlighter-rouge">mon clock drift allowed</code> is changed to 0.5 seconds, the steps to do so are the following:</p>
 
 <ul>
   <li>Connect to the toolbox pod to check the cluster status</li>

@@ -263,14 +263,14 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>After downloading the binaries extract them with the following command:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>tar -C /usr/local -xzf go$VERSION.$OS-$ARCH.tar.gz
 </code></pre></div></div>
 
 <p>Now let’s Add /usr/local/go/bin to the PATH environment variable.</p>
 
 <p>You can do this by adding this line to your /etc/profile (for a system-wide installation) or $HOME/.profile:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export PATH=$PATH:/usr/local/go/bin
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export PATH=$PATH:/usr/local/go/bin
 </code></pre></div></div>
 
 <h2 id="golang-windows-installation">Golang Windows Installation</h2>
@@ -295,19 +295,19 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>The following script will install the key and repository:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo rpm --import https://packages.microsoft.com/keys/microsoft.asc
 sudo sh -c 'echo -e "[code]\nname=Visual Studio Code\nbaseurl=https://packages.microsoft.com/yumrepos/vscode\nenabled=1\ngpgcheck=1\ngpgkey=https://packages.microsoft.com/keys/microsoft.asc" &gt; /etc/yum.repos.d/vscode.repo'
 </code></pre></div></div>
 
 <p>Then update the package cache and install the package using dnf (Fedora 22 and above):</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dnf check-update
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>dnf check-update
 sudo dnf install code
 </code></pre></div></div>
 
 <p>Or on older versions using yum:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum check-update
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yum check-update
 sudo yum install code
 </code></pre></div></div>
 
@@ -316,7 +316,7 @@ sudo yum install code
 <p>We need to download the .deb package from the <a href="https://code.visualstudio.com/Download">vscode download page</a>,
 and from the command line run the package management.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dpkg -i &lt;file&gt;.deb
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dpkg -i &lt;file&gt;.deb
 sudo apt-get install -f # Install dependencies
 </code></pre></div></div>
 
@@ -328,7 +328,7 @@ sudo apt-get install -f # Install dependencies
 
 <p>Let’s create the following structure for our kubevirt project development environment:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── &lt;Go-projects-folder&gt; # Your Golang projects root folder
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>├── &lt;Go-projects-folder&gt; # Your Golang projects root folder
 │   ├── bin
 │   ├── pkg
 │   ├── src
@@ -356,11 +356,11 @@ sudo apt-get install -f # Install dependencies
 
 <h1 id="gopath-and-goroot-configuration">GOPATH and GOROOT configuration</h1>
 
-<p>Open the vscode configuration file (<code class="highlighter-rouge">ctrl+,</code>) file-&gt;preferences-&gt;settings.</p>
+<p>Open the vscode configuration file (<code class="language-plaintext highlighter-rouge">ctrl+,</code>) file-&gt;preferences-&gt;settings.</p>
 
 <p>Now on the right file we need to add this configuration:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"go.gopath": "&lt;Go-projects-folder&gt;",
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>"go.gopath": "&lt;Go-projects-folder&gt;",
 "go.goroot": "/usr/local/go",
 </code></pre></div></div>
 
@@ -397,12 +397,12 @@ sudo apt-get install -f # Install dependencies
 
 <p>For example if we want to debug the virt-api component, open the main package:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt.io/cmd/virt-api/virt-api.go
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt.io/cmd/virt-api/virt-api.go
 </code></pre></div></div>
 
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-file.png" alt="debug-file" /></p>
 
-<p>Now change to debug view (<code class="highlighter-rouge">ctrl+shift+D</code>), check that we are using the kubevirt configuration and hit the play button</p>
+<p>Now change to debug view (<code class="language-plaintext highlighter-rouge">ctrl+shift+D</code>), check that we are using the kubevirt configuration and hit the play button</p>
 
 <p><img src="../assets/2018-05-22-Use-VS-Code-for-Kube-Virt-Development/debug-view.png" alt="debug-view" /></p>
 

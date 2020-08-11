@@ -259,11 +259,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Our Jenkins instance, is running on top of <a href="https://console.apps.ci.centos.org:8443/console/">CentOS OpenShift</a> and is one of the OS-enhanced Jenkins instances, that provide persistent storage and other pieces bundled, required for non-testing setups.</p>
 
-<p>What we found is that Jenkins was already complaining because of pending updates (security, engine, etc), but the <code class="highlighter-rouge">jenkins.war</code> was embedded in the container image we were using.</p>
+<p>What we found is that Jenkins was already complaining because of pending updates (security, engine, etc), but the <code class="language-plaintext highlighter-rouge">jenkins.war</code> was embedded in the container image we were using.</p>
 
-<p>Initial attempts tried to use environment variables to override the WAR to use, but our image was not prepared for it, so we were given the option to just generate a new container for it, but this seemed a bad approach as our image, also contained custom libraries (<code class="highlighter-rouge">contra-lib</code>) that enables communicating with OpenShift to run the tests inside containers there.</p>
+<p>Initial attempts tried to use environment variables to override the WAR to use, but our image was not prepared for it, so we were given the option to just generate a new container for it, but this seemed a bad approach as our image, also contained custom libraries (<code class="language-plaintext highlighter-rouge">contra-lib</code>) that enables communicating with OpenShift to run the tests inside containers there.</p>
 
-<p>During the investigation and testing, we found that the persistent storage folder we were using (<code class="highlighter-rouge">/var/lib/jenkins</code>) contained a <code class="highlighter-rouge">war</code> folder which contained the unarchived <code class="highlighter-rouge">jenkins.war</code>, so the next attempt was to manually download the latest <code class="highlighter-rouge">jenkins.war</code>, and unzip it on that folder, which finally allowed us to upgrade Jenkins core.</p>
+<p>During the investigation and testing, we found that the persistent storage folder we were using (<code class="language-plaintext highlighter-rouge">/var/lib/jenkins</code>) contained a <code class="language-plaintext highlighter-rouge">war</code> folder which contained the unarchived <code class="language-plaintext highlighter-rouge">jenkins.war</code>, so the next attempt was to manually download the latest <code class="language-plaintext highlighter-rouge">jenkins.war</code>, and unzip it on that folder, which finally allowed us to upgrade Jenkins core.</p>
 
 <h2 id="the-plugins">The plugins</h2>
 
@@ -281,13 +281,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h3 id="openshift-jenkins-sync">OpenShift Jenkins Sync</h3>
 
-<p>Updated and configured to use the console as well with <code class="highlighter-rouge">kubevirt</code> namespace:</p>
+<p>Updated and configured to use the console as well with <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace:</p>
 
 <p><img src="/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-46-47.png" alt="Jenkins OpenShift sync configuration" /></p>
 
 <h3 id="global-pipeline-libraries">Global Pipeline Libraries</h3>
 
-<p>Here we added the libraries we used, but instead of a specific commit, targetting the <code class="highlighter-rouge">master</code> branch.</p>
+<p>Here we added the libraries we used, but instead of a specific commit, targetting the <code class="language-plaintext highlighter-rouge">master</code> branch.</p>
 
 <ul>
   <li>contra-lib: <a href="https://github.com/openshift/contra-lib.git">https://github.com/openshift/contra-lib.git</a></li>
@@ -298,26 +298,26 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>For all of them, we ticked:</p>
 
 <ul>
-  <li><code class="highlighter-rouge">Load Implicitly</code></li>
-  <li><code class="highlighter-rouge">Allow default version to be overriden</code></li>
-  <li><code class="highlighter-rouge">Include @Library changes in job recent changes</code></li>
+  <li><code class="language-plaintext highlighter-rouge">Load Implicitly</code></li>
+  <li><code class="language-plaintext highlighter-rouge">Allow default version to be overriden</code></li>
+  <li><code class="language-plaintext highlighter-rouge">Include @Library changes in job recent changes</code></li>
 </ul>
 
-<p>Jenkins replied with the ‘currently maps to revision: <code class="highlighter-rouge">hash</code>’ for each one of them, after having loaded them properly, indicating that it was successful.</p>
+<p>Jenkins replied with the ‘currently maps to revision: <code class="language-plaintext highlighter-rouge">hash</code>’ for each one of them, after having loaded them properly, indicating that it was successful.</p>
 
 <h3 id="slack-plugin">Slack plugin</h3>
 
-<p>In addition to regular plugins used for builds, we incorporated the slack plugin to validate the notifications of build status to a test slack channel. Configuration is really easy, from within Slack, when added the jenkins notifications plugin, a <code class="highlighter-rouge">token</code> is provided that must be configured in Jenkins as well as a default <code class="highlighter-rouge">room</code> to send notifications to.</p>
+<p>In addition to regular plugins used for builds, we incorporated the slack plugin to validate the notifications of build status to a test slack channel. Configuration is really easy, from within Slack, when added the jenkins notifications plugin, a <code class="language-plaintext highlighter-rouge">token</code> is provided that must be configured in Jenkins as well as a default <code class="language-plaintext highlighter-rouge">room</code> to send notifications to.</p>
 
 <p>This allows us to get notified when a new build is started and the resulting status, just in case something was generated with errors or something external changed (remember that we use latest KubeVirt release, latest tools for virtctl, kubectl and a new image is generated out of them to validate the labs).</p>
 
 <h3 id="kubernetes-cloud">Kubernetes ‘Cloud’</h3>
 
-<p>In addition, Kubernets <code class="highlighter-rouge">Cloud</code> was configured pointing to the same console access and using the <code class="highlighter-rouge">kubevirt</code> namespace:</p>
+<p>In addition, Kubernets <code class="language-plaintext highlighter-rouge">Cloud</code> was configured pointing to the same console access and using the <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace:</p>
 
 <p><img src="/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-51-19.png" alt="OpenShift Cloud definition and URL and tunnel settings" /></p>
 
-<p>The libraries we added, automatically add some pod templates for <code class="highlighter-rouge">jenkins-contra-slave</code>:</p>
+<p>The libraries we added, automatically add some pod templates for <code class="language-plaintext highlighter-rouge">jenkins-contra-slave</code>:</p>
 
 <p><img src="/assets/2019-11-22-jenkins-ci-server-upgrade-and-jobs-for-kubevirt/2019-11-11-09-54-24.png" alt="Jenkins-contra-slave container configuration" /></p>
 
@@ -329,9 +329,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>We had to update the repositories from using some older forks (no longer valid and outdated) to use the latest versions, and for the ansible-executor we also created a fork to use the newest libraries for accessing Google Cloud environment and tuning some other variables (<a href="https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59">https://github.com/CentOS-PaaS-SIG/contra-env-infra/pull/59</a>) (changes have now landed the upstream repo).</p>
 
-<p>The issue that we were facing was related with the failure to write temporary files to the <code class="highlighter-rouge">$HOME</code> folder for the user so ansible configuration was forced to use one in a temporary and writable folder.</p>
+<p>The issue that we were facing was related with the failure to write temporary files to the <code class="language-plaintext highlighter-rouge">$HOME</code> folder for the user so ansible configuration was forced to use one in a temporary and writable folder.</p>
 
-<p>Additionally, Google Cloud access required updating libraries for authentication that were failing as well, that is fixed via the Dockerfile that generated <code class="highlighter-rouge">ansible-executor</code> container image.</p>
+<p>Additionally, Google Cloud access required updating libraries for authentication that were failing as well, that is fixed via the Dockerfile that generated <code class="language-plaintext highlighter-rouge">ansible-executor</code> container image.</p>
 
 <h2 id="job-changes">Job Changes</h2>
 
@@ -341,7 +341,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <li>We have disabled minikube validation as it was failing for both AWS and GCP unless using baremetal (so we’re wondering about using another approach here)</li>
   <li>We’ve added code to do the actual ‘Slack’ notification we mentioned above</li>
   <li>Extend the try/catch block to include a ‘finally’ to send the notifications</li>
-  <li>Change the syntax for ‘artifacts’ as it was previously <code class="highlighter-rouge">ArchiveArtifacts</code> and now it’s a <code class="highlighter-rouge">postBuild</code></li>
+  <li>Change the syntax for ‘artifacts’ as it was previously <code class="language-plaintext highlighter-rouge">ArchiveArtifacts</code> and now it’s a <code class="language-plaintext highlighter-rouge">postBuild</code></li>
 </ul>
 
 <h2 id="the-outcome">The outcome</h2>

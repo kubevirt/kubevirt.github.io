@@ -258,13 +258,13 @@ For an overview of KubeVirt security, please first read <a href="/2020/KubeVirt-
 
 <p>Policies are based on statically defined types, that can be assigned to files, processes and other objects.</p>
 
-<p>A simple policy example would be to allow a <code class="highlighter-rouge">/bin/test</code> program to read its <code class="highlighter-rouge">/etc/test.conf</code> configuration file.</p>
+<p>A simple policy example would be to allow a <code class="language-plaintext highlighter-rouge">/bin/test</code> program to read its <code class="language-plaintext highlighter-rouge">/etc/test.conf</code> configuration file.</p>
 
 <p>The policy for that would include directives to:</p>
 <ul>
-  <li>Assign types to files and processes, like <code class="highlighter-rouge">test_bin_t</code> for <code class="highlighter-rouge">/bin/test</code>, <code class="highlighter-rouge">test_conf_t</code> for <code class="highlighter-rouge">/etc/test.conf</code>, and <code class="highlighter-rouge">test_t</code> for instances of the test program</li>
-  <li>Configure a <em>transition</em> from <code class="highlighter-rouge">test_bin_t</code> to <code class="highlighter-rouge">test_t</code></li>
-  <li>Allow <code class="highlighter-rouge">test_t</code> processes to read <code class="highlighter-rouge">test_conf_t</code> files.</li>
+  <li>Assign types to files and processes, like <code class="language-plaintext highlighter-rouge">test_bin_t</code> for <code class="language-plaintext highlighter-rouge">/bin/test</code>, <code class="language-plaintext highlighter-rouge">test_conf_t</code> for <code class="language-plaintext highlighter-rouge">/etc/test.conf</code>, and <code class="language-plaintext highlighter-rouge">test_t</code> for instances of the test program</li>
+  <li>Configure a <em>transition</em> from <code class="language-plaintext highlighter-rouge">test_bin_t</code> to <code class="language-plaintext highlighter-rouge">test_t</code></li>
+  <li>Allow <code class="language-plaintext highlighter-rouge">test_t</code> processes to read <code class="language-plaintext highlighter-rouge">test_conf_t</code> files.</li>
 </ul>
 
 <h2 id="the-selinux-standard-reference-policy">The SELinux standard Reference Policy</h2>
@@ -279,7 +279,7 @@ For an overview of KubeVirt security, please first read <a href="/2020/KubeVirt-
 
 <p>Limitations start to arise for use-cases that run the same binary multiple times concurrently, and expect instances to be isolated from each other. Virtualization is one of those use cases. Indeed if 2 virtual machines are running on the same system, it is usually desirable that one VM can’t see the resources of the other one.</p>
 
-<p>As an example, if qemu processes are labeled <code class="highlighter-rouge">qemu_t</code> and disk files are labeled <code class="highlighter-rouge">qemu_disk_t</code>, allowing <code class="highlighter-rouge">qemu_t</code> to read/write <code class="highlighter-rouge">qemu_disk_t</code> files would allow all qemu processes to access all disk files.</p>
+<p>As an example, if qemu processes are labeled <code class="language-plaintext highlighter-rouge">qemu_t</code> and disk files are labeled <code class="language-plaintext highlighter-rouge">qemu_disk_t</code>, allowing <code class="language-plaintext highlighter-rouge">qemu_t</code> to read/write <code class="language-plaintext highlighter-rouge">qemu_disk_t</code> files would allow all qemu processes to access all disk files.</p>
 
 <p>Another mechanism is necessary to provide VM isolation. That is what SELinux MCS addresses.</p>
 
@@ -287,7 +287,7 @@ For an overview of KubeVirt security, please first read <a href="/2020/KubeVirt-
 
 <p>Multi-Category Security, or MCS, provides the ability to dynamically add numerical IDs (called categories) to any SELinux type on any object (file/process/socket/…).</p>
 
-<p>Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It’s important to note that categories have no order, so <code class="highlighter-rouge">c42,c42</code> is equivalent to <code class="highlighter-rouge">c42</code>, and <code class="highlighter-rouge">c1,c2</code> is equivalent to <code class="highlighter-rouge">c2,c1</code>.</p>
+<p>Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It’s important to note that categories have no order, so <code class="language-plaintext highlighter-rouge">c42,c42</code> is equivalent to <code class="language-plaintext highlighter-rouge">c42</code>, and <code class="language-plaintext highlighter-rouge">c1,c2</code> is equivalent to <code class="language-plaintext highlighter-rouge">c2,c1</code>.</p>
 
 <p>In the example above, we can now:</p>
 <ul>
@@ -306,11 +306,11 @@ For an overview of KubeVirt security, please first read <a href="/2020/KubeVirt-
 
 <p>Another application that leverages MCS is Linux containers.</p>
 
-<p>In fact, containers use very few SELinux types and rely mostly on MCS to provide container isolation. For example, all the files and processes in container filesystems have the same SELinux types. For a non-super-privileged container, those types are usually <code class="highlighter-rouge">container_file_t</code> for file and <code class="highlighter-rouge">container_t</code> for processes. Most operations are permitted within those types, and the categories are really what matters.</p>
+<p>In fact, containers use very few SELinux types and rely mostly on MCS to provide container isolation. For example, all the files and processes in container filesystems have the same SELinux types. For a non-super-privileged container, those types are usually <code class="language-plaintext highlighter-rouge">container_file_t</code> for file and <code class="language-plaintext highlighter-rouge">container_t</code> for processes. Most operations are permitted within those types, and the categories are really what matters.</p>
 
 <p>As with libvirt, categories have to match for access to be granted, effectively blocking inter-container communication.</p>
 
-<p>Super-privileged containers however are exempt from categories. They use the <code class="highlighter-rouge">spc_t</code> SELinux type, which allows them to do pretty much anything, at least as far as SELinux is concerned.</p>
+<p>Super-privileged containers however are exempt from categories. They use the <code class="language-plaintext highlighter-rouge">spc_t</code> SELinux type, which allows them to do pretty much anything, at least as far as SELinux is concerned.</p>
 
 <p>That is all defined as an SELinux module in the <a href="https://github.com/containers/container-selinux">container-selinux Github repository</a></p>
 

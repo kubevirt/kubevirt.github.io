@@ -267,12 +267,12 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>In order to use the provider we need to install Vagrant first. The steps how to do it are available <a href="https://www.vagrantup.com/intro/getting-started/install.html">here</a>. Once command line tool is available in our system, we can install the plugin by running:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant plugin install vagrant-kubevirt
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant plugin install vagrant-kubevirt
 </code></pre></div></div>
 
 <p>Now, we can obtain predefined box and start it using:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant up --provider=kubevirt
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ vagrant up --provider=kubevirt
 </code></pre></div></div>
 
 <h1 id="virtual-machine-definition">Virtual machine definition</h1>
@@ -354,32 +354,32 @@ You can view an example box <a href="https://github.com/pkliczewski/vagrant-kube
 
 <p>Now, once we defined a virtual machine we can see how to use the provider to manage it.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant up
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant up
 </code></pre></div></div>
 
 <p>The above command starts a virtual machines and performs any additonal operations defined in the Vagrantfile like provisioning, folder synchronization setup. For more information check <a href="https://www.vagrantup.com/docs/cli/up.html">here</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant halt
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant halt
 </code></pre></div></div>
 
 <p>The above command stops a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/halt.html">here</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant status
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant status
 </code></pre></div></div>
 
 <p>The above command provides status of a virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/status.html">here</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant destroy
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant destroy
 </code></pre></div></div>
 
 <p>The above command stops a virtual machine and destroys all the resources used. For more information check <a href="https://www.vagrantup.com/docs/cli/destroy.html">here</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant provision
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant provision
 </code></pre></div></div>
 
 <p>The above command runs configured provisioners for specific virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/provision.html">here</a></p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant ssh
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vagrant ssh
 </code></pre></div></div>
 
 <p>The above command ssh to running virtual machine. For more information check <a href="https://www.vagrantup.com/docs/cli/ssh.html">here</a></p>

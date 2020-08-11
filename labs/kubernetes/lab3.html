@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-08-05 14:22:18 +0000" >
+    <meta property="og:article:published_time" content="2020-08-11 06:52:06 +0000" >
     <meta name="twitter:title" content="KubeVirt upgrades | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -286,11 +286,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h4 id="deploy-kubevirt">Deploy KubeVirt</h4>
 
-<p><strong><em>NOTE</em></strong>: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you’re already using latest, please start with an older KubeVirt version and follow <a href="/labs/kubernetes/lab1">Lab1</a> to deploy KubeVirt on it, but using version <code class="highlighter-rouge">v0.20.1</code> instead.</p>
+<p><strong><em>NOTE</em></strong>: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you’re already using latest, please start with an older KubeVirt version and follow <a href="/labs/kubernetes/lab1">Lab1</a> to deploy KubeVirt on it, but using version <code class="language-plaintext highlighter-rouge">v0.20.1</code> instead.</p>
 
 <p>If you’ve already covered this, jump over this section.</p>
 
-<p>Let’s stick to use the release <code class="highlighter-rouge">v0.20.1</code>:</p>
+<p>Let’s stick to use the release <code class="language-plaintext highlighter-rouge">v0.20.1</code>:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span>v0.20.1
 </code></pre></div></div>
@@ -368,7 +368,7 @@ testvm  22s <span class="nb">false</span>
 
 <p>Notice from the output that the VM is not running yet.</p>
 
-<p>To start a VM, <code class="highlighter-rouge">virtctl</code>~~~` should be used:</p>
+<p>To start a VM, <code class="language-plaintext highlighter-rouge">virtctl</code>~~~` should be used:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl start testvm
 VM testvm was scheduled to start
@@ -396,16 +396,16 @@ NAME      AGE       PHASE     IP           NODENAME
 testvm    1m        Running   10.32.0.11   master
 </code></pre></div></div>
 
-<p>While the PHASE is still <code class="highlighter-rouge">Scheduling</code> you can run the same command for checking again:</p>
+<p>While the PHASE is still <code class="language-plaintext highlighter-rouge">Scheduling</code> you can run the same command for checking again:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmis
 </code></pre></div></div>
 
-<p>Once the PHASE will change to <code class="highlighter-rouge">Running</code>, we’re ready for upgrading KubeVirt.</p>
+<p>Once the PHASE will change to <code class="language-plaintext highlighter-rouge">Running</code>, we’re ready for upgrading KubeVirt.</p>
 
 <h4 id="define-the-next-version-to-upgrade-to">Define the next version to upgrade to</h4>
 
-<p>KubeVirt starting from <code class="highlighter-rouge">v0.17.0</code> onwards, allows to upgrade one version at a time, by using two approaches as defined in the <a href="https://kubevirt.io/user-guide/#/installation/updating-and-deleting-installs">user-guide</a>:</p>
+<p>KubeVirt starting from <code class="language-plaintext highlighter-rouge">v0.17.0</code> onwards, allows to upgrade one version at a time, by using two approaches as defined in the <a href="https://kubevirt.io/user-guide/#/installation/updating-and-deleting-installs">user-guide</a>:</p>
 
 <ul>
   <li>Patching the imageTag value in the KubeVirt CR spec</li>
@@ -414,15 +414,15 @@ testvm    1m        Running   10.32.0.11   master
 
 <p><strong>WARNING:</strong> In both cases, the supported scenario is updating from N-1 to N</p>
 
-<p><strong>NOTE:</strong> Zero downtime rolling updates are supported starting with release <code class="highlighter-rouge">v0.17.0</code> onwards. Updating from any release prior to the KubeVirt <code class="highlighter-rouge">v0.17.0</code> release is not supported.</p>
+<p><strong>NOTE:</strong> Zero downtime rolling updates are supported starting with release <code class="language-plaintext highlighter-rouge">v0.17.0</code> onwards. Updating from any release prior to the KubeVirt <code class="language-plaintext highlighter-rouge">v0.17.0</code> release is not supported.</p>
 
 <h4 id="performing-the-upgrade">Performing the upgrade</h4>
 
 <h5 id="updating-the-kubevirt-operator-if-no-imagetag-value-is-set">Updating the KubeVirt operator if no imageTag value is set</h5>
 
-<p>When no <code class="highlighter-rouge">imageTag</code> value is set in the KubeVirt CR, the system assumes that the version of KubeVirt is locked to the version of the operator. This means that updating the operator will result in the underlying KubeVirt installation being updated as well.</p>
+<p>When no <code class="language-plaintext highlighter-rouge">imageTag</code> value is set in the KubeVirt CR, the system assumes that the version of KubeVirt is locked to the version of the operator. This means that updating the operator will result in the underlying KubeVirt installation being updated as well.</p>
 
-<p>Let’s upgrade to the newer version after the one installed (<code class="highlighter-rouge">0.20.1</code> -&gt; <code class="highlighter-rouge">0.21.0</code>):</p>
+<p>Let’s upgrade to the newer version after the one installed (<code class="language-plaintext highlighter-rouge">0.20.1</code> -&gt; <code class="language-plaintext highlighter-rouge">0.21.0</code>):</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span>v0.21.0
 <span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
@@ -442,7 +442,7 @@ testvm    1m        Running   10.32.0.11   master
 
 <h4 id="final-upgrades">Final upgrades</h4>
 
-<p>You can keep testing in this lab updating ‘one version at a time’ until reaching the value of <code class="highlighter-rouge">KUBEVIRT_LATEST_VERSION</code>:</p>
+<p>You can keep testing in this lab updating ‘one version at a time’ until reaching the value of <code class="language-plaintext highlighter-rouge">KUBEVIRT_LATEST_VERSION</code>:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_LATEST_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases/latest | jq <span class="nt">-r</span> .tag_name<span class="si">)</span>
 <span class="nv">$ </span><span class="nb">echo</span> <span class="nt">-e</span> <span class="s2">"CURRENT: </span><span class="nv">$KUBEVIRT_VERSION</span><span class="s2">  LATEST: </span><span class="nv">$KUBEVIRT_LATEST_VERSION</span><span class="s2">"</span>
@@ -463,14 +463,14 @@ Warning: kubectl apply should be used on resource created by either kubectl crea
 deployment.apps/virt-operator configured
 </code></pre></div></div>
 
-<p><strong>NOTE:</strong> Since version <code class="highlighter-rouge">0.20.1</code>, the operator version should be checked with the following command:</p>
+<p><strong>NOTE:</strong> Since version <code class="language-plaintext highlighter-rouge">0.20.1</code>, the operator version should be checked with the following command:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="si">$(</span>kubectl get deployment.apps virt-operator <span class="nt">-n</span> kubevirt <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}'</span><span class="si">)</span>
 </code></pre></div></div>
 
 <h4 id="wrap-up">Wrap-up</h4>
 
-<p>Shutting down a VM works by either using <code class="highlighter-rouge">virtctl</code> or editing the VM.</p>
+<p>Shutting down a VM works by either using <code class="language-plaintext highlighter-rouge">virtctl</code> or editing the VM.</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl stop testvm
 VM testvm was scheduled to stop

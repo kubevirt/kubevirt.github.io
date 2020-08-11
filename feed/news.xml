@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.8.7">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-08-05T14:22:18+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-08-11T06:52:06+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
 &lt;p&gt;With the latest release (v1.12) of
 &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/&quot;&gt;minikube&lt;/a&gt; we can now deploy KubeVirt with
 a one-liner.&lt;/p&gt;
@@ -61,7 +61,7 @@ Kubernetes environment.&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;Guest Operating System (OS) This allows to ensure that the emulated hardware is compatible with the guest OS. Furthermore, it allows to maximize the stability of the VM, and allows performance optimizations. Currently common templates support RHEL 6, 7, 8, Centos 6, 7, 8, Fedora 31 and newer, Windows 10, Windows server 2008, 2012 R2, 2016, 2019. The &lt;a href=&quot;https://docs.ansible.com/ansible/latest/user_guide/playbooks.html&quot;&gt;Ansible playbook&lt;/a&gt; &lt;a href=&quot;https://github.com/kubevirt/common-templates/blob/master/generate-templates.yaml&quot;&gt;generate-templates.yaml&lt;/a&gt; describes all combinations of templates that should be generated.&lt;/li&gt;
   &lt;li&gt;Workload type of most virtual machines should be server or desktop to have maximum flexibility; the highperformance workload trades some of this flexibility (ioThreadsPolicy is set to shared) to provide better performances (e.g. IO threads).&lt;/li&gt;
-  &lt;li&gt;Size (flavor) Defines the amount of resources (CPU, memory) to allocate to the VM. There are 4 sizes: tiny (1 core, 1 Gi memory), small (1 core, 2 Gi memory), medium (1 core, 4 Gi memory), large (2 cores, 8 Gi memory). If these predefined sizes don’t suit you, you can create a new template based on common templates via UI (choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtual Machine Templates&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine Template&lt;/code&gt; blue button) or CLI (update yaml template and create new template).&lt;/li&gt;
+  &lt;li&gt;Size (flavor) Defines the amount of resources (CPU, memory) to allocate to the VM. There are 4 sizes: tiny (1 core, 1 Gi memory), small (1 core, 2 Gi memory), medium (1 core, 4 Gi memory), large (2 cores, 8 Gi memory). If these predefined sizes don’t suit you, you can create a new template based on common templates via UI (choose &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Virtual Machine Templates&lt;/code&gt; » press &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Create Virtual Machine Template&lt;/code&gt; blue button) or CLI (update yaml template and create new template).&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;div class=&quot;zoom&quot;&gt;
@@ -75,37 +75,37 @@ There are two ways to install and configure templates:&lt;/p&gt;
 &lt;h2 id=&quot;via-cli&quot;&gt;Via CLI:&lt;/h2&gt;
 
 &lt;h6 id=&quot;to-install-the-templates&quot;&gt;To install the templates:&lt;/h6&gt;
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ export VERSION=&quot;v0.11.2&quot;&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ export VERSION=&quot;v0.11.2&quot;&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc create -f https://github.com/kubevirt/common-templates/releases/download/$VERSION/common-templates-$VERSION.yaml&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ oc create -f https://github.com/kubevirt/common-templates/releases/download/$VERSION/common-templates-$VERSION.yaml&lt;/code&gt;&lt;/p&gt;
 
 &lt;h6 id=&quot;to-create-vm-from-template&quot;&gt;To create VM from template:&lt;/h6&gt;
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc process rhel8-server-tiny PVCNAME=mydisk NAME=rheltinyvm | oc apply -f -&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ oc process rhel8-server-tiny PVCNAME=mydisk NAME=rheltinyvm | oc apply -f -&lt;/code&gt;&lt;/p&gt;
 
 &lt;h6 id=&quot;to-start-vm-from-created-object&quot;&gt;To start VM from created object:&lt;/h6&gt;
 &lt;p&gt;The created object is now a regular VirtualMachine object and from now it can be controlled by accessing Kubernetes API resources. The preferred way to do this is to use virtctl tool.&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ virtctl start rheltinyvm&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ virtctl start rheltinyvm&lt;/code&gt;&lt;/p&gt;
 
 &lt;p&gt;An alternative way to start the VM is with the oc patch command. Example:&lt;/p&gt;
 
-&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;$ oc patch virtualmachine rheltinyvm --type merge -p '{&quot;spec&quot;:{&quot;running&quot;:true}}'&lt;/code&gt;&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;$ oc patch virtualmachine rheltinyvm --type merge -p '{&quot;spec&quot;:{&quot;running&quot;:true}}'&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;As soon as VM starts, openshift creates a new type of object - &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt;. It has a similar name to VirtualMachine.&lt;/p&gt;
+&lt;p&gt;As soon as VM starts, openshift creates a new type of object - &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt;. It has a similar name to VirtualMachine.&lt;/p&gt;
 
 &lt;h2 id=&quot;via-ui&quot;&gt;Via UI:&lt;/h2&gt;
 &lt;p&gt;The Kubevirt project has an official plugin in OpenShift Cluster Console Web UI. This UI supports the creation of VMS using templates and template features - flavors and workload profiles.&lt;/p&gt;
 
 &lt;h6 id=&quot;to-install-the-templates-1&quot;&gt;To install the templates:&lt;/h6&gt;
 
-&lt;p&gt;Install OpenShift virtualization operator from &lt;code class=&quot;highlighter-rouge&quot;&gt;Operators&lt;/code&gt; &amp;gt; &lt;code class=&quot;highlighter-rouge&quot;&gt;OperatorHub&lt;/code&gt;. The operator-based deployment takes care of installing various components, including the common templates.&lt;/p&gt;
+&lt;p&gt;Install OpenShift virtualization operator from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Operators&lt;/code&gt; &amp;gt; &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;OperatorHub&lt;/code&gt;. The operator-based deployment takes care of installing various components, including the common templates.&lt;/p&gt;
 
 &lt;div class=&quot;zoom&quot;&gt;
   &lt;img src=&quot;/assets/2020-07-01-Common_templates/operator.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Install operator&quot; /&gt;
 &lt;/div&gt;
 
 &lt;h6 id=&quot;to-create-vm-from-template-1&quot;&gt;To create VM from template:&lt;/h6&gt;
-&lt;p&gt;To create a VM from a template, choose &lt;code class=&quot;highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; blue button » choose &lt;code class=&quot;highlighter-rouge&quot;&gt;New with Wizard&lt;/code&gt;. Next, you have to see &lt;code class=&quot;highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; window&lt;/p&gt;
+&lt;p&gt;To create a VM from a template, choose &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Workloads&lt;/code&gt; in the left panel » press &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Virtualization&lt;/code&gt; » press &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; blue button » choose &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;New with Wizard&lt;/code&gt;. Next, you have to see &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Create Virtual Machine&lt;/code&gt; window&lt;/p&gt;
 
 &lt;div class=&quot;zoom&quot;&gt;
   &lt;img src=&quot;/assets/2020-07-01-Common_templates/create_vm.jpg&quot; width=&quot;100&quot; height=&quot;60&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Create vm from template&quot; /&gt;
@@ -113,7 +113,7 @@ There are two ways to install and configure templates:&lt;/p&gt;
 
 &lt;p&gt;This wizard leads you through the basic setup of vm (like guest operating system, workload, flavor, …). After vm is created you can start requested vm.&lt;/p&gt;
 
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;after the generation step (UI and CLI), VM objects and template objects have no relationship with each other besides the &lt;code class=&quot;highlighter-rouge&quot;&gt;vm.kubevirt.io/template: rhel8-server-tiny-v0.10.0&lt;/code&gt; label. This means that changes in templates do not automatically affect VMS, or vice versa.&lt;/p&gt;
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;after the generation step (UI and CLI), VM objects and template objects have no relationship with each other besides the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;vm.kubevirt.io/template: rhel8-server-tiny-v0.10.0&lt;/code&gt; label. This means that changes in templates do not automatically affect VMS, or vice versa.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;</content><author><name>Karel Simon</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="common-templates" /><summary type="html">What is a virtual machine template?</summary></entry><entry><title type="html">Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI</title><link href="https://kubevirt.io//2020/win_workload_in_k8s.html" rel="alternate" type="text/html" title="Migrate a sample Windows workload to Kubernetes using KubeVirt and CDI" /><published>2020-06-22T00:00:00+00:00</published><updated>2020-06-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/win_workload_in_k8s</id><content type="html" xml:base="https://kubevirt.io//2020/win_workload_in_k8s.html">&lt;p&gt;The goal of this blog is to demonstrate that a web service can continue to run
@@ -297,13 +297,13 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;p&gt;Policies are based on statically defined types, that can be assigned to files, processes and other objects.&lt;/p&gt;
 
-&lt;p&gt;A simple policy example would be to allow a &lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/test&lt;/code&gt; program to read its &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/test.conf&lt;/code&gt; configuration file.&lt;/p&gt;
+&lt;p&gt;A simple policy example would be to allow a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/test&lt;/code&gt; program to read its &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/test.conf&lt;/code&gt; configuration file.&lt;/p&gt;
 
 &lt;p&gt;The policy for that would include directives to:&lt;/p&gt;
 &lt;ul&gt;
-  &lt;li&gt;Assign types to files and processes, like &lt;code class=&quot;highlighter-rouge&quot;&gt;test_bin_t&lt;/code&gt; for &lt;code class=&quot;highlighter-rouge&quot;&gt;/bin/test&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;test_conf_t&lt;/code&gt; for &lt;code class=&quot;highlighter-rouge&quot;&gt;/etc/test.conf&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;test_t&lt;/code&gt; for instances of the test program&lt;/li&gt;
-  &lt;li&gt;Configure a &lt;em&gt;transition&lt;/em&gt; from &lt;code class=&quot;highlighter-rouge&quot;&gt;test_bin_t&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;test_t&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;Allow &lt;code class=&quot;highlighter-rouge&quot;&gt;test_t&lt;/code&gt; processes to read &lt;code class=&quot;highlighter-rouge&quot;&gt;test_conf_t&lt;/code&gt; files.&lt;/li&gt;
+  &lt;li&gt;Assign types to files and processes, like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_bin_t&lt;/code&gt; for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/bin/test&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_conf_t&lt;/code&gt; for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/test.conf&lt;/code&gt;, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_t&lt;/code&gt; for instances of the test program&lt;/li&gt;
+  &lt;li&gt;Configure a &lt;em&gt;transition&lt;/em&gt; from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_bin_t&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_t&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Allow &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_t&lt;/code&gt; processes to read &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;test_conf_t&lt;/code&gt; files.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;the-selinux-standard-reference-policy&quot;&gt;The SELinux standard Reference Policy&lt;/h2&gt;
@@ -318,7 +318,7 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;p&gt;Limitations start to arise for use-cases that run the same binary multiple times concurrently, and expect instances to be isolated from each other. Virtualization is one of those use cases. Indeed if 2 virtual machines are running on the same system, it is usually desirable that one VM can’t see the resources of the other one.&lt;/p&gt;
 
-&lt;p&gt;As an example, if qemu processes are labeled &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_t&lt;/code&gt; and disk files are labeled &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_disk_t&lt;/code&gt;, allowing &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_t&lt;/code&gt; to read/write &lt;code class=&quot;highlighter-rouge&quot;&gt;qemu_disk_t&lt;/code&gt; files would allow all qemu processes to access all disk files.&lt;/p&gt;
+&lt;p&gt;As an example, if qemu processes are labeled &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;qemu_t&lt;/code&gt; and disk files are labeled &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;qemu_disk_t&lt;/code&gt;, allowing &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;qemu_t&lt;/code&gt; to read/write &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;qemu_disk_t&lt;/code&gt; files would allow all qemu processes to access all disk files.&lt;/p&gt;
 
 &lt;p&gt;Another mechanism is necessary to provide VM isolation. That is what SELinux MCS addresses.&lt;/p&gt;
 
@@ -326,7 +326,7 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;p&gt;Multi-Category Security, or MCS, provides the ability to dynamically add numerical IDs (called categories) to any SELinux type on any object (file/process/socket/…).&lt;/p&gt;
 
-&lt;p&gt;Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It’s important to note that categories have no order, so &lt;code class=&quot;highlighter-rouge&quot;&gt;c42,c42&lt;/code&gt; is equivalent to &lt;code class=&quot;highlighter-rouge&quot;&gt;c42&lt;/code&gt;, and &lt;code class=&quot;highlighter-rouge&quot;&gt;c1,c2&lt;/code&gt; is equivalent to &lt;code class=&quot;highlighter-rouge&quot;&gt;c2,c1&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It’s important to note that categories have no order, so &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c42,c42&lt;/code&gt; is equivalent to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c42&lt;/code&gt;, and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c1,c2&lt;/code&gt; is equivalent to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;c2,c1&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;In the example above, we can now:&lt;/p&gt;
 &lt;ul&gt;
@@ -345,11 +345,11 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;p&gt;Another application that leverages MCS is Linux containers.&lt;/p&gt;
 
-&lt;p&gt;In fact, containers use very few SELinux types and rely mostly on MCS to provide container isolation. For example, all the files and processes in container filesystems have the same SELinux types. For a non-super-privileged container, those types are usually &lt;code class=&quot;highlighter-rouge&quot;&gt;container_file_t&lt;/code&gt; for file and &lt;code class=&quot;highlighter-rouge&quot;&gt;container_t&lt;/code&gt; for processes. Most operations are permitted within those types, and the categories are really what matters.&lt;/p&gt;
+&lt;p&gt;In fact, containers use very few SELinux types and rely mostly on MCS to provide container isolation. For example, all the files and processes in container filesystems have the same SELinux types. For a non-super-privileged container, those types are usually &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_file_t&lt;/code&gt; for file and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;container_t&lt;/code&gt; for processes. Most operations are permitted within those types, and the categories are really what matters.&lt;/p&gt;
 
 &lt;p&gt;As with libvirt, categories have to match for access to be granted, effectively blocking inter-container communication.&lt;/p&gt;
 
-&lt;p&gt;Super-privileged containers however are exempt from categories. They use the &lt;code class=&quot;highlighter-rouge&quot;&gt;spc_t&lt;/code&gt; SELinux type, which allows them to do pretty much anything, at least as far as SELinux is concerned.&lt;/p&gt;
+&lt;p&gt;Super-privileged containers however are exempt from categories. They use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;spc_t&lt;/code&gt; SELinux type, which allows them to do pretty much anything, at least as far as SELinux is concerned.&lt;/p&gt;
 
 &lt;p&gt;That is all defined as an SELinux module in the &lt;a href=&quot;https://github.com/containers/container-selinux&quot;&gt;container-selinux Github repository&lt;/a&gt;&lt;/p&gt;
 
@@ -1011,7 +1011,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;h2 id=&quot;enabling-live-migration&quot;&gt;Enabling Live Migration&lt;/h2&gt;
 
-&lt;p&gt;To enable live migration we need to enable the &lt;code class=&quot;highlighter-rouge&quot;&gt;feature-gate&lt;/code&gt; for it by adding &lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; to the key:&lt;/p&gt;
+&lt;p&gt;To enable live migration we need to enable the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;feature-gate&lt;/code&gt; for it by adding &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; to the key:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
@@ -1026,7 +1026,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
-&lt;p&gt;A current &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; can be edited to append “&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;” to an existing configuration:&lt;/p&gt;
+&lt;p&gt;A current &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; can be edited to append “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;” to an existing configuration:&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl edit configmap kubevirt-config &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -1039,7 +1039,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;h2 id=&quot;configuring-live-migration&quot;&gt;Configuring Live Migration&lt;/h2&gt;
 
-&lt;p&gt;If we want to alter the defaults for Live-Migration, we can further edit the &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; like:&lt;/p&gt;
+&lt;p&gt;If we want to alter the defaults for Live-Migration, we can further edit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; like:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
@@ -1070,27 +1070,27 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
   &lt;/thead&gt;
   &lt;tbody&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;parallelMigrationsPerCluster&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;parallelMigrationsPerCluster&lt;/code&gt;&lt;/td&gt;
       &lt;td style=&quot;text-align: center&quot;&gt;5&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;How many migrations might happen at the same time&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;parallelOutboundMigrationsPerNode&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;parallelOutboundMigrationsPerNode&lt;/code&gt;&lt;/td&gt;
       &lt;td style=&quot;text-align: center&quot;&gt;2&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;How many outbound migrations for a particular node&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;bandwidthPerMigration&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bandwidthPerMigration&lt;/code&gt;&lt;/td&gt;
       &lt;td style=&quot;text-align: center&quot;&gt;64Mi&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;MiB/s to have the migration limited to, in order to not affect other systems&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;completionTimeoutPerGiB&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;completionTimeoutPerGiB&lt;/code&gt;&lt;/td&gt;
       &lt;td style=&quot;text-align: center&quot;&gt;800&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;Time for a GiB of data to wait to be completed before aborting the migration.&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;progressTimeout&lt;/code&gt;&lt;/td&gt;
+      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;progressTimeout&lt;/code&gt;&lt;/td&gt;
       &lt;td style=&quot;text-align: center&quot;&gt;150&lt;/td&gt;
       &lt;td style=&quot;text-align: left&quot;&gt;Time to wait for Live Migration to progress in transferring data&lt;/td&gt;
     &lt;/tr&gt;
@@ -1101,13 +1101,13 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;div class=&quot;premonition error&quot;&gt;&lt;div class=&quot;fa fa-exclamation-triangle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Limitations&lt;/p&gt;
 &lt;ol&gt;
-  &lt;li&gt;Virtual Machines using PVC must have a &lt;code class=&quot;highlighter-rouge&quot;&gt;RWX&lt;/code&gt; access mode to be Live-Migrated&lt;/li&gt;
+  &lt;li&gt;Virtual Machines using PVC must have a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RWX&lt;/code&gt; access mode to be Live-Migrated&lt;/li&gt;
   &lt;li&gt;Additionally, pod network binding of bridge interface is not allowed&lt;/li&gt;
 &lt;/ol&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Live migration is initiated by posting an object &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceMigration&lt;/code&gt; to the cluster, indicating the VM name to migrate, like in the following example:&lt;/p&gt;
+&lt;p&gt;Live migration is initiated by posting an object &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceMigration&lt;/code&gt; to the cluster, indicating the VM name to migrate, like in the following example:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceMigration&lt;/span&gt;
@@ -1120,7 +1120,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 &lt;p&gt;This will trigger the process for the VM.&lt;/p&gt;
 
 &lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;
-&lt;p&gt;When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the &lt;code class=&quot;highlighter-rouge&quot;&gt;VMI.status.conditions&lt;/code&gt;. Currently, most of the calculation is based on the &lt;code class=&quot;highlighter-rouge&quot;&gt;Access Mode&lt;/code&gt; for the VMI volumes but can be based on multiple parameters. For example:&lt;/p&gt;
+&lt;p&gt;When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VMI.status.conditions&lt;/code&gt;. Currently, most of the calculation is based on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Access Mode&lt;/code&gt; for the VMI volumes but can be based on multiple parameters. For example:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;Conditions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -1131,14 +1131,14 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;If the VM is Live-Migratable, the request will submit successfully. The status change will be reported under &lt;code class=&quot;highlighter-rouge&quot;&gt;VMI.status&lt;/code&gt;. Once live migration is complete, a status of &lt;code class=&quot;highlighter-rouge&quot;&gt;Completed&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;Failed&lt;/code&gt; will be indicated.&lt;/p&gt;
+&lt;p&gt;If the VM is Live-Migratable, the request will submit successfully. The status change will be reported under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VMI.status&lt;/code&gt;. Once live migration is complete, a status of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Completed&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Failed&lt;/code&gt; will be indicated.&lt;/p&gt;
 
 &lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Watch out!&lt;/p&gt;
-&lt;p&gt;The &lt;code class=&quot;highlighter-rouge&quot;&gt;Migration Method&lt;/code&gt; field can contain:&lt;/p&gt;
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Migration Method&lt;/code&gt; field can contain:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt; : meaning that the disk data is being copied from source to destination&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;: meaning that only the memory is copied from source to destination&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt; : meaning that the disk data is being copied from source to destination&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;: meaning that only the memory is copied from source to destination&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;VMs with block devices located on shared storage backends like the ones provided by &lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt; that provide PVCs with ReadWriteMany access have the option to live-migrate only memory contents instead of having to also migrate the block devices.&lt;/p&gt;
@@ -1173,7 +1173,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
   &lt;span class=&quot;na&quot;&gt;Target Pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-launcher-testvmimcbjgw6zrzcmp8wpddvztvzm7x2k6cjbdgktwv8tkq&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Note that there are some additional fields that indicate that &lt;code class=&quot;highlighter-rouge&quot;&gt;Abort Requested&lt;/code&gt; happened and in the above example that it has &lt;code class=&quot;highlighter-rouge&quot;&gt;Succeded&lt;/code&gt;, in this case, the original fields for migration will report as &lt;code class=&quot;highlighter-rouge&quot;&gt;Completed&lt;/code&gt; (because there’s no running migration) and &lt;code class=&quot;highlighter-rouge&quot;&gt;Failed&lt;/code&gt; set to true.&lt;/p&gt;
+&lt;p&gt;Note that there are some additional fields that indicate that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Abort Requested&lt;/code&gt; happened and in the above example that it has &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Succeded&lt;/code&gt;, in this case, the original fields for migration will report as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Completed&lt;/code&gt; (because there’s no running migration) and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Failed&lt;/code&gt; set to true.&lt;/p&gt;
 
 &lt;h2 id=&quot;what-can-go-wrong&quot;&gt;What can go wrong?&lt;/h2&gt;
 
@@ -1184,41 +1184,41 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 &lt;ul&gt;
   &lt;li&gt;Increasing the number of VMs that can migrate at once, will reduce the available bandwidth.&lt;/li&gt;
   &lt;li&gt;Increasing the bandwidth could affect applications running on that node (origin and target).&lt;/li&gt;
-  &lt;li&gt;Storage migration (check the &lt;code class=&quot;highlighter-rouge&quot;&gt;Info&lt;/code&gt; note in the &lt;a href=&quot;#performing-the-live-migration&quot;&gt;Performing the Live Migration &lt;/a&gt; section on the differences) might also consume bandwidth and resources.&lt;/li&gt;
+  &lt;li&gt;Storage migration (check the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Info&lt;/code&gt; note in the &lt;a href=&quot;#performing-the-live-migration&quot;&gt;Performing the Live Migration &lt;/a&gt; section on the differences) might also consume bandwidth and resources.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;node-eviction&quot;&gt;Node Eviction&lt;/h2&gt;
 
 &lt;p&gt;Sometimes, a node requires to be put on maintenance and it includes workloads on it, either containers or, in KubeVirt’s case, VM’s.&lt;/p&gt;
 
-&lt;p&gt;It is possible to use &lt;strong&gt;selectors&lt;/strong&gt;, for example, move all the virtual machines to another node via &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl drain &amp;lt;nodename&amp;gt;&lt;/code&gt;, for example, evicting all KubeVirt VM’s from a node can be done via:&lt;/p&gt;
+&lt;p&gt;It is possible to use &lt;strong&gt;selectors&lt;/strong&gt;, for example, move all the virtual machines to another node via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl drain &amp;lt;nodename&amp;gt;&lt;/code&gt;, for example, evicting all KubeVirt VM’s from a node can be done via:&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl drain &amp;lt;node name&amp;gt; &lt;span class=&quot;nt&quot;&gt;--delete-local-data&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--ignore-daemonsets&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--force&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pod-selector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;virt-launcher
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Reenabling node after eviction&lt;/p&gt;
-&lt;p&gt;Once the node has been tainted for eviction, we can use &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl uncordon &amp;lt;nodename&amp;gt;&lt;/code&gt; to make it schedulable again.&lt;/p&gt;
+&lt;p&gt;Once the node has been tainted for eviction, we can use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl uncordon &amp;lt;nodename&amp;gt;&lt;/code&gt; to make it schedulable again.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;According to documentation, &lt;code class=&quot;highlighter-rouge&quot;&gt;--delete-local-data&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;--ignore-daemonsets&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;--force&lt;/code&gt; are required because:&lt;/p&gt;
+&lt;p&gt;According to documentation, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--delete-local-data&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--ignore-daemonsets&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--force&lt;/code&gt; are required because:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;Pods using &lt;code class=&quot;highlighter-rouge&quot;&gt;emptyDir&lt;/code&gt; can be deleted because the data is ephemeral.&lt;/li&gt;
-  &lt;li&gt;VMI will have &lt;code class=&quot;highlighter-rouge&quot;&gt;DaemonSets&lt;/code&gt; via &lt;code class=&quot;highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; so it’s safe to proceed.&lt;/li&gt;
-  &lt;li&gt;VMIs are not owned by a &lt;code class=&quot;highlighter-rouge&quot;&gt;ReplicaSet&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;DaemonSet&lt;/code&gt;, so kubectl can’t guarantee that those are restarted. KubeVirt has its own controllers for it managing VMI, so kubectl shouldn’t bother about it.&lt;/li&gt;
+  &lt;li&gt;Pods using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;emptyDir&lt;/code&gt; can be deleted because the data is ephemeral.&lt;/li&gt;
+  &lt;li&gt;VMI will have &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DaemonSets&lt;/code&gt; via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; so it’s safe to proceed.&lt;/li&gt;
+  &lt;li&gt;VMIs are not owned by a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ReplicaSet&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DaemonSet&lt;/code&gt;, so kubectl can’t guarantee that those are restarted. KubeVirt has its own controllers for it managing VMI, so kubectl shouldn’t bother about it.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;If we omit the &lt;code class=&quot;highlighter-rouge&quot;&gt;--pod-selector&lt;/code&gt;, we’ll force eviction of all Pods and VM’s from a node.&lt;/p&gt;
+&lt;p&gt;If we omit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--pod-selector&lt;/code&gt;, we’ll force eviction of all Pods and VM’s from a node.&lt;/p&gt;
 
 &lt;div class=&quot;premonition important&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;
-&lt;p&gt;In order to have VMIs using &lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; for eviction, we have to add a specific spec in the VMI YAML, so that when the node is tainted with &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt.io/drain:NoSchedule&lt;/code&gt; is added to a node.&lt;/p&gt;
+&lt;p&gt;In order to have VMIs using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; for eviction, we have to add a specific spec in the VMI YAML, so that when the node is tainted with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io/drain:NoSchedule&lt;/code&gt; is added to a node.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;evictionStrategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;LiveMigrate&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;From that point, when &lt;code class=&quot;highlighter-rouge&quot;&gt;kubectl taint nodes &amp;lt;foo&amp;gt; kubevirt.io/drain=draining:NoSchedule&lt;/code&gt; is executed, the migrations will start.&lt;/p&gt;
+&lt;p&gt;From that point, when &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl taint nodes &amp;lt;foo&amp;gt; kubevirt.io/drain=draining:NoSchedule&lt;/code&gt; is executed, the migrations will start.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
@@ -1227,10 +1227,10 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 &lt;p&gt;As a briefing on the above data:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; needs to be enabled on KubeVirt as a feature gate.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; will add status to the VMI object indicating if it’s a candidate or not and if so, which mode to use (Block or Live)
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; needs to be enabled on KubeVirt as a feature gate.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; will add status to the VMI object indicating if it’s a candidate or not and if so, which mode to use (Block or Live)
     &lt;ul&gt;
-      &lt;li&gt;Based on the storage backend and other conditions, it will enable &lt;code class=&quot;highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; or just &lt;code class=&quot;highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt;.&lt;/li&gt;
+      &lt;li&gt;Based on the storage backend and other conditions, it will enable &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; or just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt;.&lt;/li&gt;
     &lt;/ul&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
@@ -1353,7 +1353,7 @@ kni-worker6         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kuberne
 
 &lt;h3 id=&quot;the-clustered-database&quot;&gt;The clustered database&lt;/h3&gt;
 
-&lt;p&gt;A MS Windows 2016 Server virtual machine is already containerized and ready to be deployed. As we have to deploy 3 replicas of the operating system a &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; has been created. Once the replicas are up and running, database administrators will be able to reach the VMs running in our Kubernetes cluster through Remote Desktop Protocol (RDP). Eventually, MS SQL2016 database is installed and configured as a clustered database to provide high availability to our customapp.&lt;/p&gt;
+&lt;p&gt;A MS Windows 2016 Server virtual machine is already containerized and ready to be deployed. As we have to deploy 3 replicas of the operating system a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; has been created. Once the replicas are up and running, database administrators will be able to reach the VMs running in our Kubernetes cluster through Remote Desktop Protocol (RDP). Eventually, MS SQL2016 database is installed and configured as a clustered database to provide high availability to our customapp.&lt;/p&gt;
 
 &lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Check &lt;a href=&quot;/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html&quot;&gt;KubeVirt: installing Microsoft Windows from an ISO&lt;/a&gt; if you need further information on how to deploy a MS Windows VM on KubeVirt.&lt;/p&gt;
 
@@ -1365,7 +1365,7 @@ kni-worker6         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kuberne
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;There are two options to accomplish our requirement, use &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector&quot;&gt;nodeSelector&lt;/a&gt; or configure &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity&quot;&gt;nodeAffinity&lt;/a&gt; rules. In our first approach, &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; instead of &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule is used. &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; matches the nodes where the &lt;code class=&quot;highlighter-rouge&quot;&gt;performance&lt;/code&gt; key is equal to &lt;code class=&quot;highlighter-rouge&quot;&gt;high&lt;/code&gt; and makes the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt; to run on top of the matching nodes. The following code snippet shows the configuration:&lt;/p&gt;
+&lt;p&gt;There are two options to accomplish our requirement, use &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector&quot;&gt;nodeSelector&lt;/a&gt; or configure &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity&quot;&gt;nodeAffinity&lt;/a&gt; rules. In our first approach, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule is used. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; matches the nodes where the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;performance&lt;/code&gt; key is equal to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;high&lt;/code&gt; and makes the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt; to run on top of the matching nodes. The following code snippet shows the configuration:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/span&gt;
@@ -1406,13 +1406,13 @@ kni-worker6         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kuberne
           &lt;span class=&quot;na&quot;&gt;pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Next, the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; configuration partially shown previously is applied successfully.&lt;/p&gt;
+&lt;p&gt;Next, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; configuration partially shown previously is applied successfully.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; vmr-windows-mssql.yaml
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 created
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Then, it is expected that the 3 &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the &lt;em&gt;even&lt;/em&gt; nodes.&lt;/p&gt;
+&lt;p&gt;Then, it is expected that the 3 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the &lt;em&gt;even&lt;/em&gt; nodes.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
 NAME                                 READY   STATUS              RESTARTS   AGE   IP       NODE          NOMINATED NODE   READINESS GATES
@@ -1433,7 +1433,7 @@ mssql2016rd4lk   3m25s   Running   10.244.2.4   kni-worker2   False
 mssql2016z2qnw   3m25s   Running   10.244.5.4   kni-worker6   False
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.&lt;/p&gt;
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
@@ -1463,24 +1463,24 @@ mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
   &lt;li&gt;You can constrain against labels on other pods running on the node (or other topological domain), rather than against labels on the node itself, which allows rules about which pods can and cannot be co-located.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Before going into more detail, it should be noticed that there are currently two types of &lt;strong&gt;affinity&lt;/strong&gt; that applies to both &lt;em&gt;Node and Pod affinity&lt;/em&gt;. They are called &lt;code class=&quot;highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. You can think of them as &lt;em&gt;hard&lt;/em&gt; and &lt;em&gt;soft&lt;/em&gt; respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
+&lt;p&gt;Before going into more detail, it should be noticed that there are currently two types of &lt;strong&gt;affinity&lt;/strong&gt; that applies to both &lt;em&gt;Node and Pod affinity&lt;/em&gt;. They are called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. You can think of them as &lt;em&gt;hard&lt;/em&gt; and &lt;em&gt;soft&lt;/em&gt; respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
 
-&lt;p&gt;Said that, it is time to edit the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; YAML file. Actually, &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; must be removed and two different affinity rules created instead.&lt;/p&gt;
+&lt;p&gt;Said that, it is time to edit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; YAML file. Actually, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; must be removed and two different affinity rules created instead.&lt;/p&gt;
 
 &lt;ol&gt;
   &lt;li&gt;&lt;strong&gt;nodeAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application (MS SQL2016) must be placed &lt;em&gt;only&lt;/em&gt; on nodes where the key performance contains the value high. Note the word only, there is no room for other nodes.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;highlighter-rouge&quot;&gt;mssql2016&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one database instance can run in each zone, e.g. one database in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mssql2016&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one database instance can run in each zone, e.g. one database in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;p&gt;In principle, the &lt;code class=&quot;highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; can be any legal label-key. However, for performance and security reasons, there are some constraints on &lt;code class=&quot;highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; that need to be taken into consideration:&lt;/p&gt;
+&lt;p&gt;In principle, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; can be any legal label-key. However, for performance and security reasons, there are some constraints on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; that need to be taken into consideration:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;For affinity and for &lt;code class=&quot;highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, empty &lt;code class=&quot;highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; is not allowed.&lt;/li&gt;
-  &lt;li&gt;For &lt;code class=&quot;highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, empty &lt;code class=&quot;highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; is interpreted as “all topologies” (“all topologies” here is now limited to the combination of &lt;code class=&quot;highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;, &lt;code class=&quot;highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;topology.kubernetes.io/region&lt;/code&gt;).&lt;/li&gt;
-  &lt;li&gt;For &lt;code class=&quot;highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, the admission controller &lt;code class=&quot;highlighter-rouge&quot;&gt;LimitPodHardAntiAffinityTopology&lt;/code&gt; was introduced to limit &lt;code class=&quot;highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; to &lt;code class=&quot;highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;. Verify if it is enabled or disabled.&lt;/li&gt;
+  &lt;li&gt;For affinity and for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, empty &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; is not allowed.&lt;/li&gt;
+  &lt;li&gt;For &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, empty &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; is interpreted as “all topologies” (“all topologies” here is now limited to the combination of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/region&lt;/code&gt;).&lt;/li&gt;
+  &lt;li&gt;For &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, the admission controller &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LimitPodHardAntiAffinityTopology&lt;/code&gt; was introduced to limit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;. Verify if it is enabled or disabled.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;Here is the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; object replaced.&lt;/p&gt;
+&lt;p&gt;Here is the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; object replaced.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
 virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
@@ -1524,7 +1524,7 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the &lt;code class=&quot;highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).&lt;/p&gt;
+&lt;p&gt;Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).&lt;/p&gt;
 
 &lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Remember to mark the kni-worker2 as schedulable again.&lt;/p&gt;
 
@@ -1534,7 +1534,7 @@ virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
 node/kni-worker2 uncordoned
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Below shows the current status, where two databases are running in the &lt;code class=&quot;highlighter-rouge&quot;&gt;kni-worker6&lt;/code&gt; node. By applying the previous affinity rules this should not happen again:&lt;/p&gt;
+&lt;p&gt;Below shows the current status, where two databases are running in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker6&lt;/code&gt; node. By applying the previous affinity rules this should not happen again:&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
 NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
@@ -1543,7 +1543,7 @@ mssql2016p948r   24m   Running   10.244.1.4   kni-worker4   False
 mssql2016z2qnw   24m   Running   10.244.5.4   kni-worker6   False
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Next, we delete one of the VMIs running in &lt;code class=&quot;highlighter-rouge&quot;&gt;kni-worker6&lt;/code&gt; and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:&lt;/p&gt;
+&lt;p&gt;Next, we delete one of the VMIs running in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker6&lt;/code&gt; and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl delete vmi mssql201696sz9
 virtualmachineinstance.kubevirt.io &lt;span class=&quot;s2&quot;&gt;&quot;mssql201696sz9&quot;&lt;/span&gt; deleted
@@ -1555,7 +1555,7 @@ mssql2016tpj6n   22s   Running   10.244.2.5   kni-worker2   False
 mssql2016z2qnw   40m   Running   10.244.5.4   kni-worker6   False
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;During the deployment of the clustered database &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; and &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; rules were compared, however, there are a couple of things to take into consideration when creating node affinity rules, it is worth taking a look at &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;node affinity in Kubernetes documentation&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;During the deployment of the clustered database &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; rules were compared, however, there are a couple of things to take into consideration when creating node affinity rules, it is worth taking a look at &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;node affinity in Kubernetes documentation&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;If you remove or change the label of the node where the Pod is scheduled, the Pod will not be removed. In other words, the affinity selection works only at the time of scheduling the Pod.&lt;/p&gt;
 
@@ -1580,7 +1580,7 @@ secret/varnish-secret created
 
 &lt;ol&gt;
   &lt;li&gt;&lt;strong&gt;nodeAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application should be placed &lt;em&gt;if possible&lt;/em&gt; on nodes where the key performance does not contain the value high. Note the word &lt;em&gt;if possible&lt;/em&gt;. This means, it will try to run on a not performing server, however, if there none available it will be co-located with the database.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;highlighter-rouge&quot;&gt;app&lt;/code&gt; equals to &lt;code class=&quot;highlighter-rouge&quot;&gt;cache&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;app&lt;/code&gt; equals to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cache&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
@@ -1622,7 +1622,7 @@ secret/varnish-secret created
           &lt;span class=&quot;na&quot;&gt;imagePullPolicy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Always&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In this set of affinity rules, a new scheduling policy has been introduced: &lt;code class=&quot;highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In this set of affinity rules, a new scheduling policy has been introduced: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
 
 &lt;p&gt;The weight field in preferredDuringSchedulingIgnoredDuringExecution must be in the range 1-100 and it is taken into account in the &lt;a href=&quot;#introduction&quot;&gt;scoring step&lt;/a&gt;. Remember that the node(s) with the highest total score is/are the most preferred.&lt;/p&gt;
 
@@ -1634,7 +1634,7 @@ secret/varnish-secret created
 deployment.apps/varnish-cache created
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The Pod is scheduled as expected since there is a node available in each zone without the &lt;code class=&quot;highlighter-rouge&quot;&gt;performance=high&lt;/code&gt; label.&lt;/p&gt;
+&lt;p&gt;The Pod is scheduled as expected since there is a node available in each zone without the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;performance=high&lt;/code&gt; label.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
 NAME                                 READY   STATUS    RESTARTS   AGE   IP           NODE          NOMINATED NODE   READINESS GATES
@@ -1655,8 +1655,8 @@ virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5
 &lt;p&gt;Following up with our objective, this web application must take advantage of the web cache application running as a Pod. So we require the appliance to be co-located in the same server that Varnish Cache in order to accelerate the delivery of the content provided by the appliance. Also, it is required to run every replica of the appliance in different zones or data centers. Taken into account these prerequisites, the following advanced rules are configured:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;podAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key &lt;code class=&quot;highlighter-rouge&quot;&gt;app' equals to&lt;/code&gt;cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;highlighter-rouge&quot;&gt;blackbox&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one appliance instance can run in each zone, e.g. one appliance in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;podAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;app' equals to&lt;/code&gt;cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;blackbox&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one appliance instance can run in each zone, e.g. one appliance in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
@@ -1728,9 +1728,9 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h1m    Running   10.244.5.4
 
 &lt;h3 id=&quot;draining-a-regular-node&quot;&gt;Draining a regular node&lt;/h3&gt;
 
-&lt;p&gt;In this test, the node located in &lt;code class=&quot;highlighter-rouge&quot;&gt;scu&lt;/code&gt; zone which is not labelled as high-performance will be upgraded. The proper procedure to maintain a Kubernetes node is as follows: drain the node, upgrade packages and then reboot it.&lt;/p&gt;
+&lt;p&gt;In this test, the node located in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scu&lt;/code&gt; zone which is not labelled as high-performance will be upgraded. The proper procedure to maintain a Kubernetes node is as follows: drain the node, upgrade packages and then reboot it.&lt;/p&gt;
 
-&lt;p&gt;As it is depicted, once the &lt;code class=&quot;highlighter-rouge&quot;&gt;kni-worker&lt;/code&gt; is marked as unschedulable and drained, the Varnish Cache pod and the black box appliance VM are automatically moved to the high-performance node in the same zone.&lt;/p&gt;
+&lt;p&gt;As it is depicted, once the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker&lt;/code&gt; is marked as unschedulable and drained, the Varnish Cache pod and the black box appliance VM are automatically moved to the high-performance node in the same zone.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
 pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h8m    10.244.4.5   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
@@ -1781,7 +1781,7 @@ pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h20m   10
 
 &lt;p&gt;In order to return to the most desirable state, the pod and VM from kni-worker2 must be deleted.&lt;/p&gt;
 
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Both applications must be deleted since the &lt;code class=&quot;highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; policy is only applied during scheduling time.&lt;/p&gt;
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Both applications must be deleted since the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; policy is only applied during scheduling time.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
@@ -1814,7 +1814,7 @@ virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h43m   Running   10.244.2.5
 virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4   kni-worker6   False
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server &lt;em&gt;in the same zone&lt;/em&gt;. Although this is not ideal, our &lt;code class=&quot;highlighter-rouge&quot;&gt;customapp&lt;/code&gt; will be still available while the node recovery is ongoing.&lt;/p&gt;
+&lt;p&gt;This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server &lt;em&gt;in the same zone&lt;/em&gt;. Although this is not ideal, our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;customapp&lt;/code&gt; will be still available while the node recovery is ongoing.&lt;/p&gt;
 
 &lt;h3 id=&quot;draining-a-high-performance-node&quot;&gt;Draining a high-performance node&lt;/h3&gt;
 
@@ -1831,7 +1831,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
 &lt;p&gt;For instance, below it is partly shown a snippet of the deployment object for virt-api and virt-controller. Notice the following affinity rule created:&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node (&lt;code class=&quot;highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;). It is used the key &lt;code class=&quot;highlighter-rouge&quot;&gt;kubevirt.io&lt;/code&gt; to match the application &lt;code class=&quot;highlighter-rouge&quot;&gt;virt-api&lt;/code&gt; or &lt;code class=&quot;highlighter-rouge&quot;&gt;virt-controller&lt;/code&gt;. See that it is a soft requirement, which means that the kube-scheduler will try to match the rule, however, if it is not possible it can place both replicas in the same node.&lt;/li&gt;
+  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;). It is used the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io&lt;/code&gt; to match the application &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-api&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-controller&lt;/code&gt;. See that it is a soft requirement, which means that the kube-scheduler will try to match the rule, however, if it is not possible it can place both replicas in the same node.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
@@ -1910,7 +1910,7 @@ virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4
               &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rules in order to place each replica in each Kubernetes node of the cluster.&lt;/p&gt;
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rules in order to place each replica in each Kubernetes node of the cluster.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
@@ -1923,7 +1923,7 @@ NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE 
 kubevirt      virt-handler   6         6         6       6            6           &amp;lt;none&amp;gt;                        25h
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;See the partial snippet of a &lt;code class=&quot;highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a &lt;code class=&quot;highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule that requires the Pod to run in a specific hostname matched by the key &lt;code class=&quot;highlighter-rouge&quot;&gt;metadata.name&lt;/code&gt; and value the name of the node (&lt;code class=&quot;highlighter-rouge&quot;&gt;kni-worker2&lt;/code&gt;). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.&lt;/p&gt;
+&lt;p&gt;See the partial snippet of a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule that requires the Pod to run in a specific hostname matched by the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metadata.name&lt;/code&gt; and value the name of the node (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker2&lt;/code&gt;). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Pod&lt;/span&gt;

@@ -281,7 +281,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <h2 id="known-issues">Known Issues</h2>
 
 <ul>
-  <li>You may need to set <code class="highlighter-rouge">SELinux</code> to permissive mode prior to running “kubeadm init” if you see failures attributed to etcd in <code class="highlighter-rouge">/var/log/audit.log</code>.</li>
+  <li>You may need to set <code class="language-plaintext highlighter-rouge">SELinux</code> to permissive mode prior to running “kubeadm init” if you see failures attributed to etcd in <code class="language-plaintext highlighter-rouge">/var/log/audit.log</code>.</li>
   <li>Prior to installing GlusterFS, you may need to disable firewalld until this issue is resolved: https://github.com/gluster/gluster-kubernetes/issues/471</li>
   <li>kubevirt-ansible install may fail in storage-glusterfs role: https://github.com/kubevirt/kubevirt-ansible/issues/219</li>
 </ul>
@@ -299,7 +299,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Move onto the next step when your master and worker nodes are Ready.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get nodes
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get nodes
 NAME                     STATUS    ROLES     AGE       VERSION
 master.somewhere.com     Ready     master    6d        v1.10.1
 worker1.somewhere.com    Ready     &lt;none&gt;    6d        v1.10.1
@@ -308,7 +308,7 @@ worker2.somewhere.com    Ready     &lt;none&gt;    6d        v1.10.1
 
 <p>And all of the pods in the kube-system namespace are Running.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods -n kube-system
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods -n kube-system
 NAME                                           READY     STATUS    RESTARTS   AGE
 etcd-master.somewhere.com                      1/1       Running   0          6d
 kube-apiserver-master.somewhere.com            1/1       Running   0          6d
@@ -331,7 +331,7 @@ weave-net-s4dp6                                2/2       Running   0          6d
 
 <p>There is a detailed <a href="https://github.com/gluster/gluster-kubernetes/blob/master/docs/setup-guide.md">setup guide for gk-deploy</a>. Note each node must have a raw block device that is reserved for use by heketi and they must not contain any data or be pre-formatted. You can reset your block device to a useable state by running:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wipefs -a &lt;path to device&gt;
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wipefs -a &lt;path to device&gt;
 </code></pre></div></div>
 
 <p>To aid you, below are the commands you will need to run if you are following the setup guide.</p>
@@ -429,7 +429,7 @@ git clone https://github.com/gluster/gluster-kubernetes
 
 <p>Add the end of the installation, you will see:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>heketi is now running and accessible via http://10.32.0.4:8080 . To run
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>heketi is now running and accessible via http://10.32.0.4:8080 . To run
 administrative commands you can install 'heketi-cli' and use it as follows:
 
   # heketi-cli -s http://10.32.0.4:8080 --user admin --secret '&lt;ADMIN_KEY&gt;' cluster list
@@ -446,7 +446,7 @@ For dynamic provisioning, create a StorageClass similar to this:\
 
 <p>If successful, 4 additional pods will be shown as Running in the kube-system namespace.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master deploy]# kubectl get pods -n kube-system
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master deploy]# kubectl get pods -n kube-system
 NAME                                                              READY     STATUS    RESTARTS   AGE
 ...snip...
 glusterfs-h4nwf                                                   1/1       Running   0          6d
@@ -502,14 +502,14 @@ We will use <a href="https://github.com/kubevirt/kubevirt-ansible/">kubevirt-ans
 # END CUSTOM SETTINGS
 </span></code></pre></div></div>
 
-<p>Now let’s run the <code class="highlighter-rouge">kubevirt.yml</code> playbook:</p>
+<p>Now let’s run the <code class="language-plaintext highlighter-rouge">kubevirt.yml</code> playbook:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ansible-playbook <span class="nt">-i</span> inventory playbooks/kubevirt.yml <span class="nt">-e</span> <span class="nv">cluster</span><span class="o">=</span>k8s <span class="nt">-e</span> <span class="nv">storage_role</span><span class="o">=</span>storage-glusterfs <span class="nt">-e</span> <span class="nv">namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_namespace</span><span class="o">=</span>kube-system <span class="nt">-e</span> <span class="nv">glusterfs_name</span><span class="o">=</span> <span class="nt">-e</span> <span class="nv">heketi_url</span><span class="o">=</span>http://10.32.0.4:8080 <span class="nt">-v</span>
 </code></pre></div></div>
 
 <p>If successful, we should see 7 additional pods as Running in the kube-system namespace.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master kubevirt-ansible]# kubectl get pods -n kube-system
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master kubevirt-ansible]# kubectl get pods -n kube-system
 NAME                                                              READY     STATUS    RESTARTS   AGE
 virt-api-785fd6b4c7-rdknl                                         1/1       Running   0          6d
 virt-api-785fd6b4c7-rfbqv                                         1/1       Running   0          6d
@@ -559,7 +559,7 @@ qemu-img convert /var/www/html/cirros-0.4.0-x86_64-disk.img /var/www/html/cirros
 
 <p>Check the PVC was created and has “Bound” status.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pvc
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pvc
 NAME                 STATUS    VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   AGE
 gluster-pvc-cirros   Bound     pvc-843bd508-4dbf-11e8-9e4e-149ecfc53021   5Gi        RWO            kubevirt       2m
 </code></pre></div></div>
@@ -596,7 +596,7 @@ Note: You will need to substitute <hostname> with actual hostname or IP address.
 
 <p>Check and wait for the image-importer-cirros Pod to complete.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods
 NAME                         READY     STATUS      RESTARTS   AGE
 image-importer-cirros        0/1       Completed   0          28s
 </code></pre></div></div>
@@ -649,7 +649,7 @@ Note the PVC containing the cirros image must be listed as the first disk under 
 
 <p>Finally start the VM.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export VERSION=v0.4.1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export VERSION=v0.4.1
 curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/$VERSION/virtctl-$VERSION-linux-amd64
 chmod +x virtctl
 ./virtctl start cirros
@@ -657,7 +657,7 @@ chmod +x virtctl
 
 <p>Wait for the VM pod to be in “Running” status.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[root@master ~]# kubectl get pods
 NAME                         READY     STATUS      RESTARTS   AGE
 image-importer-cirros        0/1       Completed   0          28s
 virt-launcher-cirros-krvv2   0/1       Running     0          13s
@@ -665,7 +665,7 @@ virt-launcher-cirros-krvv2   0/1       Running     0          13s
 
 <p>Once it is running, we can then connect to its console.</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console cirros
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console cirros
 </code></pre></div></div>
 
 <p>Press enter if a login prompt doesn’t appear.</p>

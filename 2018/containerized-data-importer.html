@@ -603,7 +603,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
     <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "0"</code> would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-plaintext highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "0"</code> would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
 
 
 </div></div>
@@ -620,7 +620,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
     <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">500Gi"</span>
 </code></pre></div></div>
 
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "4"</code> could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-plaintext highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "4"</code> could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>
 
 
 </div></div>

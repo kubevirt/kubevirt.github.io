@@ -276,8 +276,8 @@ in your KubeVirt-powered cluster.</p>
 </span><span class="err">kubevirt_vm_vcpu_seconds</span><span class="p">{</span><span class="err">domain=</span><span class="s2">"$VM_NAME"</span><span class="p">,</span><span class="err">id=</span><span class="s2">"0"</span><span class="p">,</span><span class="err">state=</span><span class="s2">"1"</span><span class="p">}</span><span class="w">
 </span></code></pre></div></div>
 
-<p>The metrics expose <a href="https://www.robustperception.io/exposing-the-software-version-to-prometheus">versioning information according to the recommendations</a> using the <code class="highlighter-rouge">kubevirt_info</code> metric; the other metrics should be self-explanatory.
-As we can expect, labels like <code class="highlighter-rouge">domain</code>, <code class="highlighter-rouge">drive</code> and <code class="highlighter-rouge">interface</code> depend on the specifics of the VM. <code class="highlighter-rouge">type</code>, however, is not and represents the subtype of the metric.</p>
+<p>The metrics expose <a href="https://www.robustperception.io/exposing-the-software-version-to-prometheus">versioning information according to the recommendations</a> using the <code class="language-plaintext highlighter-rouge">kubevirt_info</code> metric; the other metrics should be self-explanatory.
+As we can expect, labels like <code class="language-plaintext highlighter-rouge">domain</code>, <code class="language-plaintext highlighter-rouge">drive</code> and <code class="language-plaintext highlighter-rouge">interface</code> depend on the specifics of the VM. <code class="language-plaintext highlighter-rouge">type</code>, however, is not and represents the subtype of the metric.</p>
 
 <p>Let’s now see a real life example, from this idle, diskless VM:</p>
 
@@ -315,14 +315,14 @@ As we can expect, labels like <code class="highlighter-rouge">domain</code>, <co
 
 <p>Querying the endpoint (see below) yields something like</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0"} 1
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubevirt_info{goversion="go1.11.4",kubeversion="v0.15.0"} 1
 kubevirt_vm_memory_resident_bytes{domain="default_vm-test-01"} 4.25984e+07
 kubevirt_vm_network_traffic_bytes_total{domain="default_vm-test-01",interface="vnet0",type="rx"} 90
 kubevirt_vm_network_traffic_bytes_total{domain="default_vm-test-01",interface="vnet0",type="tx"} 0
 kubevirt_vm_vcpu_seconds{domain="default_vm-test-01",id="0",state="1"} 613
 </code></pre></div></div>
 
-<p>Example of how the <code class="highlighter-rouge">kubevirt_vm_memory_resident_bytes</code> metric looks like in the Prometheus UI</p>
+<p>Example of how the <code class="language-plaintext highlighter-rouge">kubevirt_vm_memory_resident_bytes</code> metric looks like in the Prometheus UI</p>
 
 <p><img src="../assets/2019-03-14-More-about-KubeVirt-metrics/promui_graphs.png" alt="promui_graphs" /></p>
 
@@ -376,7 +376,7 @@ and there are many options to actually set up the monitoring stack. Here we pres
 <h3 id="prometheus-targets">prometheus targets</h3>
 
 <p>An underused feature of the Prometheus server is the <em>target configuration</em>. The Prometehus server exposes data about the targets it is
-looking for, so we can easily asses if the Prometheus server knows that it must scrape the <code class="highlighter-rouge">kubevirt</code> endpoints for metrics.
+looking for, so we can easily asses if the Prometheus server knows that it must scrape the <code class="language-plaintext highlighter-rouge">kubevirt</code> endpoints for metrics.
 We can see this both in the Prometheus UI:</p>
 
 <p><img src="../assets/2019-03-14-More-about-KubeVirt-metrics/promui_targets_1.png" alt="promui_targets_1" /></p>
@@ -494,13 +494,13 @@ We can see this both in the Prometheus UI:</p>
 
 <h3 id="servicemonitors">servicemonitors</h3>
 
-<p><code class="highlighter-rouge">servicemonitors</code> are the objects the <code class="highlighter-rouge">prometheus-operator</code> consume to produce the right <code class="highlighter-rouge">prometheus</code> configuration that the server running in the cluster
+<p><code class="language-plaintext highlighter-rouge">servicemonitors</code> are the objects the <code class="language-plaintext highlighter-rouge">prometheus-operator</code> consume to produce the right <code class="language-plaintext highlighter-rouge">prometheus</code> configuration that the server running in the cluster
 will consume to scrape the metrics endpoints. See the <a href="https://github.com/coreos/prometheus-operator#customresourcedefinitions">documentation</a> for all the details.
 We describe two of the most common pitfalls.</p>
 
 <h4 id="create-the-servicemonitor-in-the-right-namespace">create the servicemonitor in the right namespace</h4>
 
-<p>KubeVirt services run in the <code class="highlighter-rouge">kubevirt</code> namespace. Make sure to <a href="https://kubevirt.io/user-guide/#/installation/monitoring?id=integrating-with-the-prometheus-operator">create the servicemonitor</a> in the same namespace:</p>
+<p>KubeVirt services run in the <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace. Make sure to <a href="https://kubevirt.io/user-guide/#/installation/monitoring?id=integrating-with-the-prometheus-operator">create the servicemonitor</a> in the same namespace:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                               READY   STATUS    RESTARTS   AGE
@@ -516,7 +516,7 @@ NAME       AGE
 kubevirt   16h
 </code></pre></div></div>
 
-<p>Actually, the servicemonitor should be created in the same namespace on which the <code class="highlighter-rouge">kubevirt-prometheus-metrics</code> service is defined:</p>
+<p>Actually, the servicemonitor should be created in the same namespace on which the <code class="language-plaintext highlighter-rouge">kubevirt-prometheus-metrics</code> service is defined:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get svc <span class="nt">-n</span> kubevirt
 NAME                          TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>   AGE
@@ -528,9 +528,9 @@ virt-api                      ClusterIP   10.109.162.102   &lt;none&gt;        4
 
 <h4 id="configure-the-prometheus-instance-to-look-in-the-right-namespace">configure the Prometheus instance to look in the right namespace</h4>
 
-<p>The <code class="highlighter-rouge">prometheus</code> server instance(s) run by default in their own namespace; this is the recommended configuration, and running them in the same <code class="highlighter-rouge">kubevirt</code> namespace
+<p>The <code class="language-plaintext highlighter-rouge">prometheus</code> server instance(s) run by default in their own namespace; this is the recommended configuration, and running them in the same <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace
 is not recommended anyway.
-So, make sure that the <code class="highlighter-rouge">prometheus</code> configuration we use looks in all the relevant namespaces, using something like</p>
+So, make sure that the <code class="language-plaintext highlighter-rouge">prometheus</code> configuration we use looks in all the relevant namespaces, using something like</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">monitoring.coreos.com/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Prometheus</span>
@@ -549,11 +549,11 @@ So, make sure that the <code class="highlighter-rouge">prometheus</code> configu
       <span class="na">memory</span><span class="pi">:</span> <span class="s">400Mi</span>
 </code></pre></div></div>
 
-<p>Please note the usage of the <code class="highlighter-rouge">serviceMonitorNamespaceSelector</code>.
+<p>Please note the usage of the <code class="language-plaintext highlighter-rouge">serviceMonitorNamespaceSelector</code>.
 See <a href="https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md">here</a> and <a href="https://github.com/coreos/prometheus-operator/issues/1331">here</a>
 for more details.</p>
 
-<p>Namespaces must have the right label, <code class="highlighter-rouge">prometheus.kubevirt.io</code>, to be searched for servicemonitors. The <code class="highlighter-rouge">kubevirt</code> namespace is, of course, set correctly by default</p>
+<p>Namespaces must have the right label, <code class="language-plaintext highlighter-rouge">prometheus.kubevirt.io</code>, to be searched for servicemonitors. The <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace is, of course, set correctly by default</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Namespace</span>
@@ -573,11 +573,11 @@ for more details.</p>
   <span class="na">phase</span><span class="pi">:</span> <span class="s">Active</span>
 </code></pre></div></div>
 
-<p>But please make sure that any other namespace you may want to monitor has the correct <code class="highlighter-rouge">label</code>.</p>
+<p>But please make sure that any other namespace you may want to monitor has the correct <code class="language-plaintext highlighter-rouge">label</code>.</p>
 
 <h3 id="endpoint-state">endpoint state</h3>
 
-<p>As in KubeVirt 0.15.0, <code class="highlighter-rouge">virt-handler</code> is the component which exposes the VM metrics through its Prometheus endpoint. Let’s check it reports the data correctly.</p>
+<p>As in KubeVirt 0.15.0, <code class="language-plaintext highlighter-rouge">virt-handler</code> is the component which exposes the VM metrics through its Prometheus endpoint. Let’s check it reports the data correctly.</p>
 
 <p>First, let’s get the virt-handler IP address. We look out the instance we want to check with</p>
 

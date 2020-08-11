@@ -256,7 +256,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <ul>
   <li>They are much faster to run (~30 seconds in our case)</li>
   <li>You get nice coverage reports with <a href="https://coveralls.io/github/kubevirt/kubevirt">coveralls</a></li>
-  <li>No need to: <code class="highlighter-rouge">make cluster up/sync</code></li>
+  <li>No need to: <code class="language-plaintext highlighter-rouge">make cluster up/sync</code></li>
   <li>Cover corner cases and easier to debug</li>
 </ul>
 
@@ -279,7 +279,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <ul>
   <li>The tests themselves are written using <a href="https://github.com/onsi/ginkgo">ginkgo</a>, which is a <a href="https://en.wikipedia.org/wiki/Behavior-driven_development">Behavior-Driven Development (BDD)</a> framework</li>
   <li>The library used for assertions in the tests is <a href="https://github.com/onsi/gomega">gomega</a>. It has a very rich set of matchers, so, before you write you own code around the “equal” matcher, check <a href="http://onsi.github.io/gomega/#provided-matchers">here</a> to see if there is a more expressive assertion you can use</li>
-  <li>We use <a href="https://github.com/golang/mock">GoMock</a> to generate mocks for the different kubevirt interfaces and objects. The command <code class="highlighter-rouge">make generate</code> will (among other things) create a <a href="https://github.com/kubevirt/kubevirt/blob/release-0.18/pkg/kubecli/generated_mock_kubevirt.go">file</a> holding the mocked version of our objects and interfaces
+  <li>We use <a href="https://github.com/golang/mock">GoMock</a> to generate mocks for the different kubevirt interfaces and objects. The command <code class="language-plaintext highlighter-rouge">make generate</code> will (among other things) create a <a href="https://github.com/kubevirt/kubevirt/blob/release-0.18/pkg/kubecli/generated_mock_kubevirt.go">file</a> holding the mocked version of our objects and interfaces
     <ul>
       <li>Many examples exist in our code on how to use this framework</li>
       <li>Also see <a href="https://github.com/golang/mock/tree/master/sample">here</a> for sample code from GoMock</li>
@@ -315,12 +315,12 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Be verbose and use specific matchers. For example, to check that an array has N elements, you can use:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(len(arr)).To(Equal(N))
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(len(arr)).To(Equal(N))
 </code></pre></div></div>
 
 <p>But a better way would be:</p>
 
-<div class="highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(arr).To(HaveLen(N))
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expect(arr).To(HaveLen(N))
 </code></pre></div></div>
 
 <h2 id="function-override">Function Override</h2>
