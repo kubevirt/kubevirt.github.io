@@ -36,7 +36,7 @@ minikube start
 To use the minikube shipped client all normal `kubectl` commands should be performed as `minikube kubectl`.<br><br>
 Or the shipped client can be added to aliases by running the following:
 ```bash
-alias kubectl='minikube kubectl'
+alias kubectl='minikube kubectl --'
 ```
 <br>Or installed directly to the host by running the following:
 ```bash
