@@ -25,7 +25,7 @@ The KubeVirt Vagrant provider implements the following features:
 
 # Installation
 
-In order to use the provider we need to install Vagrant first. The steps how to do it are available [here](https://www.vagrantup.com/intro/getting-started/install.html). Once command line tool is available in our system, we can install the plugin by running:
+In order to use the provider we need to install Vagrant first. The steps how to do it are available [here](https://learn.hashicorp.com/collections/vagrant/getting-started). Once command line tool is available in our system, we can install the plugin by running:
 
 ```
 $ vagrant plugin install vagrant-kubevirt
