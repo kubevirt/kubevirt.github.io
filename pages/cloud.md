@@ -1,7 +1,8 @@
 ---
 layout: labs
-title: Easy installation on Cloud Providers
+title: Cloud providers
 permalink: pages/cloud
+navbar_active: Labs
 lab: kubernetes
 tags: [GCP, AWS, AliCloud, azure, Amazon, Google, quickstart, tutorial]
 order: 1

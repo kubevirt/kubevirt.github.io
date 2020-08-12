@@ -1,7 +1,8 @@
 ---
 layout: labs
-title: KubeVirt Quickstart with Kind
+title: Kind
 permalink: /quickstart_kind/
+navbar_active: Labs
 order: 2
 lab: kubernetes
 tags: [kind, quickstart, tutorial]
