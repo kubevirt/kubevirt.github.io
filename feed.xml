@@ -1,4 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-08-11T14:28:10+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-08-13T04:57:12+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.32.0</title><link href="https://kubevirt.io//2020/changelog-v0.32.0.html" rel="alternate" type="text/html" title="KubeVirt v0.32.0" /><published>2020-08-11T00:00:00+00:00</published><updated>2020-08-11T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.32.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.32.0.html">&lt;h2 id=&quot;v0320&quot;&gt;v0.32.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Tue Aug 11 19:21:56 2020 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #3921][vladikr] use correct memory units in libvirt xml&lt;/li&gt;
+  &lt;li&gt;[PR #3893][davidvossel] Adds recurring period that resyncs virt-launcher domains with virt-handler&lt;/li&gt;
+  &lt;li&gt;[PR #3880][sgarbour] Better error message when input parameters are not the expected number of parameters for each argument. Help menu will popup in case the number of parameters is incorrect.&lt;/li&gt;
+  &lt;li&gt;[PR #3785][xpivarc] Vcpu wait metrics available&lt;/li&gt;
+  &lt;li&gt;[PR #3642][vatsalparekh] Add a way to update VMI Status with latest Pod IP for Masquerade bindings&lt;/li&gt;
+  &lt;li&gt;[PR #3636][ArthurSens] Adds kubernetes metadata.labels as VMI metrics’ label&lt;/li&gt;
+  &lt;li&gt;[PR #3825][awels] Virtctl now prints error messages from the response body on upload errors.&lt;/li&gt;
+  &lt;li&gt;[PR #3830][davidvossel] Fixes re-establishing domain notify client connections when domain notify server restarts due to an error event.&lt;/li&gt;
+  &lt;li&gt;[PR #3778][danielBelenky] Do not emit a SyncFailed event if we fail to sync a VMI in a final state&lt;/li&gt;
+  &lt;li&gt;[PR #3803][andreabolognani] Not sure what to write here (see above)&lt;/li&gt;
+  &lt;li&gt;[PR #2694][rmohr] Use native go libraries for selinux to not rely on python-selinux tools like semanage, which are not always present.&lt;/li&gt;
+  &lt;li&gt;[PR #3692][victortoso] QEMU logs can now be fetched from outside the pod&lt;/li&gt;
+  &lt;li&gt;[PR #3738][enp0s3] Restrict creation of VMI if it has labels that are used internally by Kubevirt components.&lt;/li&gt;
+  &lt;li&gt;[PR #3725][danielBelenky] The tests binary is now part of the release and can be consumed from the GitHub release page.&lt;/li&gt;
+  &lt;li&gt;[PR #3684][rmohr] Log if critical devices, like kvm, which virt-handler wants to expose are not present on the node.&lt;/li&gt;
+  &lt;li&gt;[PR #3166][petrkotas] Introduce new virtctl commands:&lt;/li&gt;
+  &lt;li&gt;[PR #3708][andreabolognani] Make qemu work on GCE by pulling in a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1822682&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.32.0</summary></entry><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
 &lt;p&gt;With the latest release (v1.12) of
 &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/&quot;&gt;minikube&lt;/a&gt; we can now deploy KubeVirt with
 a one-liner.&lt;/p&gt;
@@ -878,96 +900,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;p&gt;Behind the scenes, virt-operator is coordinating the roll out of all the new KubeVirt components in a way that ensures existing virtual machine workloads are not disrupted.&lt;/p&gt;
 
-&lt;p&gt;The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="operation" /><summary type="html">Simplicity Above All Else</summary></entry><entry><title type="html">KubeVirt Security Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Security Fundamentals" /><published>2020-04-29T00:00:00+00:00</published><updated>2020-04-29T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Security-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html">&lt;h2 id=&quot;security-guidelines&quot;&gt;Security Guidelines&lt;/h2&gt;
-
-&lt;p&gt;In KubeVirt, our approach to security can be summed up by adhering to the following guidelines.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;Maintain the &lt;strong&gt;principle of least privilege&lt;/strong&gt; for all our components, meaning each component only has access to exactly the minimum privileges required to operate.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Establish boundaries between trusted vs untrusted components.&lt;/strong&gt; In our case, an untrusted component is typically anything that executes user third party logic.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Inter-component network communication &lt;strong&gt;must be secured by TLS with mutual peer authentication.&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Let’s take a look at what each of these guidelines mean for us practically when it comes to KubeVirt’s design.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-principle-of-least-privilege&quot;&gt;The Principle of Least Privilege&lt;/h2&gt;
-
-&lt;p&gt;By limiting each component to only the exact privileges it needs to operate, we reduce the blast radius that occurs if a component is compromised.&lt;/p&gt;
-
-&lt;p&gt;Here’s a simple and rather obvious example. If a component needs access to a secret in a specific namespace, then we give that component read-only access to that single secret and not access to read all secrets. If that component is compromised, we’ve then limited the blast radius for what can be exploited.&lt;/p&gt;
-
-&lt;p&gt;For KubeVirt, the principle of least privilege can be broken into two categories.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Cluster Level Access:&lt;/strong&gt; The resources and APIs a component is permitted to access on the cluster.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Host Level Access:&lt;/strong&gt; The local resources a component is permitted to access on the host it is running on.&lt;/p&gt;
-
-&lt;h3 id=&quot;cluster-level-access&quot;&gt;Cluster Level Access&lt;/h3&gt;
-
-&lt;p&gt;For cluster level access the primary tools we have to grant and restrict access to cluster resources are cluster Namespaces and RBAC (Role Based Access Control). Each KubeVirt component only has access to the exact RBAC permissions within the limited set of Namespaces it requires to operate.&lt;/p&gt;
-
-&lt;p&gt;For example, let’s take a look at the KubeVirt control plane and runtime components highlighted in orange below.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-04-29-KubeVirt-Security-Fundamentals/component-view.png&quot; alt=&quot;Components View&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-controller&lt;/strong&gt; is the component responsible for spinning up pods across the entire cluster for virtual machines to live in. As a result, this component needs access to RBAC permissions to manage pods. However, another part of virt-controller’s operation involves needing access to a single secret that contains its TLS certificate information. We aren’t going to give virt-controller access to manage secrets as well as pods simply because it needs access to read a single secret. In fact we aren’t even going to give virt-controller direct API access to any secrets at all. Instead we use the ability to pass a cluster secret as a pod volume into the virt-controller’s pod in order to provide read-only access.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-api&lt;/strong&gt; is the component that validates our api and provides virtual machine console and VNC access. This component doesn’t need access to create Pods like virt-controller does. Instead it mostly only requires read and modify access to existing KubeVirt API objects. As a result, if virt-api is compromised the blast radius is mostly limited to KubeVirt objects.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-handler&lt;/strong&gt; is a privileged daemonset that resides at the host level on every node that is capable of spinning up KubeVirt virtual machines. This component needs cluster access to the KubeVirt VirtualMachineInstance objects in order to manage the startup flow of virtual machines. However it doesn’t need cluster access to the pod objects the virtual machines live in. Similar to virt-api, what little cluster access this component has is mostly read-only and limited to the KubeVirt API.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-launcher&lt;/strong&gt; is a non-privileged component that resides in every virtual machine’s pod. This component is responsible for starting and monitoring the qemu-kvm process. Since this process lives within an “untrusted” environment that is executing third party logic, we’ve designed this component to require no cluster API access. As a result, this pod only receives the default service account for the namespace the pod resides in. If virt-launcher is compromised, cluster API access should not be impacted.&lt;/p&gt;
-
-&lt;h3 id=&quot;host-level-access&quot;&gt;Host Level Access&lt;/h3&gt;
-
-&lt;p&gt;For host level access, the primary tools we have at our disposal for limiting access primarily reside within the Pod specification’s &lt;strong&gt;securityContext&lt;/strong&gt; section. It’s here that we can define settings like what local user a container runs with, whether a container has access to host namespaces, and SELinux related options. Other tools for host level access involve exposing &lt;strong&gt;hostPath volumes&lt;/strong&gt; for shared host directory access and &lt;strong&gt;DevicePlugins&lt;/strong&gt; to pass host devices into the pod environment.&lt;/p&gt;
-
-&lt;p&gt;Let’s take a look at a few examples of how host access is managed for our components.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-controller&lt;/strong&gt; and &lt;strong&gt;virt-api&lt;/strong&gt; are cluster level components only, and have no need for access to host resources. These components run as non-privileged and non-root within their own isolated namespaces. No special host level access is granted to these components. For OpenShift clusters, the &lt;strong&gt;SCC&lt;/strong&gt; (Security Context Constraint) feature even provides the ability to restrict virt-controller’s permissions in a way that prevents it from creating pods with host access.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-launcher&lt;/strong&gt; is a host level component that is non-privileged and untrusted. However this component still needs access to host level devices (like /dev/kvm, gpus, and network devices) in order to start the virtual machine. Through the use of the Kubernetes &lt;strong&gt;Device Plugin&lt;/strong&gt; feature, we can expose host devices into a pod’s environment in a controlled way that doesn’t compromise namespace isolation or require hostPath volumes.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-handler&lt;/strong&gt; is a host level component that is both privileged and trusted. This component’s responsibilities involve reaching into the virt-launcher’s pod to perform actions we don’t want the untrusted virt-launcher component to have permissions to perform itself. The primary method we have to restrict virt-handler’s access to the host is through SELinux. Since virt-handler requires maintaining some limited persistent state, hostPath volumes are also utilized to allow virt-handler to store persistent information on the host that can persist through virt-handler updates.&lt;/p&gt;
-
-&lt;h2 id=&quot;trusted-vs-untrusted-components&quot;&gt;Trusted vs Untrusted Components&lt;/h2&gt;
-
-&lt;p&gt;For KubeVirt, the separation between trusted and untrusted components comes when users can execute their own third party logic within a component’s environment. We can clearly illustrate this concept using the boundary between our two host level components, virt-launcher and virt-handler.&lt;/p&gt;
-
-&lt;h3 id=&quot;establishing-boundaries&quot;&gt;Establishing Boundaries&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-04-29-KubeVirt-Security-Fundamentals/trusted-v-untrusted-boundary.png&quot; alt=&quot;Trusted vs Untrusted Boundary&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;The virt-launcher pod is an untrusted environment.&lt;/strong&gt; The third party code executed within this environment is the user’s kvm virtual machine. KubeVirt has no control over what is executing within this virtual machine guest, so if there is a security vulnerability that allows breaking out of the kvm hypervisor, we want to make sure the environment that’s broken into is as limited as possible. This is why the virt-launcher’s pod has such restricted cluster and host access.&lt;/p&gt;
-
-&lt;p&gt;The &lt;strong&gt;virt-handler pod, on the other hand, is a trusted environment&lt;/strong&gt; that does not involve executing any third party code. During the virtual machine startup flow, there are privileged tasks that need to take place on the host in order to prepare the virtual machine for starting. This ranges from performing the Device Plugin logic that injects a host device into a pod’s environment, to setting up network bridges and interfaces within a pod’s environment. To accomplish this, we use the trusted virt-handler component to reach into the untrusted virt-launcher environment to perform privileged tasks.&lt;/p&gt;
-
-&lt;p&gt;The boundary established here is that we trust virt-handler with the ability to influence and provide information about all virtual machines running on a host, and limit virt-launcher to only influence and provide information about itself.&lt;/p&gt;
-
-&lt;h3 id=&quot;securing-boundaries&quot;&gt;Securing Boundaries&lt;/h3&gt;
-
-&lt;p&gt;Any communication channel that gives an untrusted environment the ability to present information to a trusted environment must be heavily scrutinized to prevent the possibility of privilege escalation. For example, the boundary between virt-handler and virt-launcher is meant to work like a one way mirror. The trusted virt-handler component can reach directly into the untrusted virt-launcher environments, but each virt-launcher can’t reach outside of its own isolated environment. Host namespace isolation provides a reasonable guarantee that virt-launcher can’t reach outside of its own environment directly, however we still have to be mindful about indirection communication.&lt;/p&gt;
-
-&lt;p&gt;Virt-handler observes information presented to it by each virt-launcher pod. If a virt-launcher environment is able to present fake information about another virtual machine, then the untrusted virt-launcher environment could indirectly influence the execution of another workload.&lt;/p&gt;
-
-&lt;p&gt;To counter this, when designing communication channels between trusted and untrusted components, we have to be careful to only allow communication from untrusted sources to influence itself and furthermore only influence itself in a way that can’t result in escalated privileges.&lt;/p&gt;
-
-&lt;h2 id=&quot;mutual-tls-authentication&quot;&gt;Mutual TLS Authentication&lt;/h2&gt;
-
-&lt;p&gt;There is a built in trust that components have for interacting with one another. For example, virt-api is allowed to establish virtual machine Console/VNC streams with virt-handler, and live migration is performed by streaming information between two virt-handler instances.&lt;/p&gt;
-
-&lt;p&gt;However for these types of interactions to work, we have to have a strong guarantee that the endpoints we’re talking to are in fact who they present themselves to be. Otherwise we could live migrate a virtual machine to an untrusted location, or provide VNC access to a virtual machine to an unauthorized endpoint.&lt;/p&gt;
-
-&lt;p&gt;In KubeVirt we solve this issue of inter-component communication trust in the same way Kubernetes solves it. Each component receives a unique TLS certificate signed by a cluster Certificate Authority which is used to guarantee the component is who they say they are. The certificate and CA information is injected into each component using a secret passed in as a Pod volume. Whenever a component acts as a client establishing a new connection with another component, it uses its unique certificate to prove its identify. Likewise, the server accepting the clients connection also presents its certificate to the client. This mutual peer certificate authentication allows both the client and server to establish trust.&lt;/p&gt;
-
-&lt;p&gt;So, when virt-api attempts to establish a VNC console stream with a virt-handler component, virt-handler is configured to only allow that stream to be opened by an endpoint providing a valid virt-api certificate, and virt-api will only talk to a server that presents the expected virt-handler certificate.&lt;/p&gt;
-
-&lt;h2 id=&quot;ca-and-certificate-rotation&quot;&gt;CA and Certificate Rotation&lt;/h2&gt;
-
-&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry></feed>
+&lt;p&gt;The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="operation" /><summary type="html">Simplicity Above All Else</summary></entry></feed>
