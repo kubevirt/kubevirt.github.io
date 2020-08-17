@@ -342,7 +342,7 @@ We can see how OLM operator manages the HCO pods from the `openshift-operator-li
 
 The above method demonstrates the integration of HCO operator in OpenShift4.
 
-So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart]({% link pages/quickstart_minikube.md  %}#install-virtctl):
+So, after HCO is up and running we need to test it by deploying a small instance of a VM.To deploy an instance follow the instructions here [minikube_quickstart]({% link pages/quickstart_minikube.md  %}#virtctl):
 
 ## Conclusion
 
