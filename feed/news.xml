@@ -1,4 +1,189 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-08-18T14:33:13+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-08-19T14:18:07+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Import virtual machine from oVirt</title><link href="https://kubevirt.io//2020/Import-VM-from-oVirt.html" rel="alternate" type="text/html" title="Import virtual machine from oVirt" /><published>2020-08-06T00:00:00+00:00</published><updated>2020-08-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Import-VM-from-oVirt</id><content type="html" xml:base="https://kubevirt.io//2020/Import-VM-from-oVirt.html">&lt;h2 id=&quot;about-vm-import-operator&quot;&gt;About vm-import-operator&lt;/h2&gt;
+&lt;p&gt;Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt;, so in order to have the vm import working you must have both KubeVirt and CDI installed.&lt;/p&gt;
+
+&lt;h3 id=&quot;import-rules&quot;&gt;Import rules&lt;/h3&gt;
+&lt;p&gt;Before the import process is initiated we run validation of the source VM, to be sure the KubeVirt will run the source VM smoothly. We have many &lt;a href=&quot;https://github.com/kubevirt/vm-import-operator/blob/master/docs/rules.md&quot;&gt;rules&lt;/a&gt; defined including storage, network and the VM. You will see all warning messages in the conditions field. For example:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-11T11:13:31Z&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-11T11:13:31Z&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;specifies&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;IO&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Threads:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;1,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;NUMA&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;tune&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;secified:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;interleave'&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerificationReportedWarnings&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerified&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;supported-guest-operating-systems&quot;&gt;Supported Guest Operating Systems&lt;/h3&gt;
+&lt;p&gt;We support following guest operating systems:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Red Hat Enterprise Linux 6&lt;/li&gt;
+  &lt;li&gt;Red Hat Enterprise Linux 7&lt;/li&gt;
+  &lt;li&gt;Red Hat Enterprise Linux 8&lt;/li&gt;
+  &lt;li&gt;Microsoft Windows 10&lt;/li&gt;
+  &lt;li&gt;Microsoft Windows Server 2012r2&lt;/li&gt;
+  &lt;li&gt;Microsoft Windows Server 2016&lt;/li&gt;
+  &lt;li&gt;Microsoft Windows Server 2019&lt;/li&gt;
+  &lt;li&gt;CentOS Linux 6&lt;/li&gt;
+  &lt;li&gt;CentOS Linux 7&lt;/li&gt;
+  &lt;li&gt;CentOS Linux 8&lt;/li&gt;
+  &lt;li&gt;Ubuntu 18.04&lt;/li&gt;
+  &lt;li&gt;Fedora&lt;/li&gt;
+  &lt;li&gt;openSUSE&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;setup-vm-import-operator&quot;&gt;Setup vm-import-operator&lt;/h2&gt;
+&lt;p&gt;Source code for virtual machine import operator is hosted on github under &lt;a href=&quot;https://github.com/kubevirt&quot;&gt;KubeVirt&lt;/a&gt; organization. You can very easily deploy it on your Kubernetes by running following commands:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;By default the operator is deployed to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-hyperconverged&lt;/code&gt; namespace,
+you can verify that the operator is deployed and running by running:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get deploy vm-import-controller &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If you are using &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator/&quot;&gt;HCO&lt;/a&gt;, you don’t have to install it manually,
+because the HCO takes care of that.&lt;/p&gt;
+
+&lt;h2 id=&quot;importing-virtual-machine-from-ovirt&quot;&gt;Importing virtual machine from oVirt&lt;/h2&gt;
+&lt;p&gt;In order to import a virtual machine from oVirt user must obtain credentials for the oVirt environment. oVirt environment is usually accessed using username, password and http URL. Note that you must provide CA certificate of your oVirt environment. If you have those - create a secret out of them:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Secret&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirt-secret&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Opaque&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;stringData&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|-&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;apiUrl: https://engine-url/ovirt-engine/api&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;username: admin@internal&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;password: &quot;secretpassword&quot;&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;caCert: |&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;-----BEGIN CERTIFICATE-----&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;MIIEMjCCAxqgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwbDELMAkGA1UEBhMCVVMxJDAiBgNVBAoM&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;....&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;fFyt91ClrUtTE707IFnYdQQUiZ4zI0q+6pmw6+xx8mH5k8Ad6D71pF718xCM1NiBx/Cusg==&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;-----END CERTIFICATE-----&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Another step to initiate the import is creating the mappings. The mappings has three categories - storage mapping, disk mapping and network mapping. For storage mapping user can define which oVirt storage domain will be mapped to which storage class. Disk mapping can override the storage mapping for specific disks. The network mappings map oVirt network to the kubernetes network. So here an simple example of mapping:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2v.kubevirt.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ResourceMapping&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm-mapping&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;networkMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirtmgmt/ovirtmgmt&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;storageMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystoragedomain&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystorageclass&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The above mapping maps &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ovirtmgmt/ovirtmgmt&lt;/code&gt; which is in format of vNIC profile/network to the pod network and disks from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mystoragedomain&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mystorageclass&lt;/code&gt;. Once we have mapping and the secret, we can initiate the import by creating a VM import CR. You must provide the name of the mapping, secret, source VM and target VM name.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2v.kubevirt.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineImport&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;providerCredentialsSecret&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirt-secret&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;resourceMapping&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm-mapping&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;targetVmName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm&lt;/span&gt;
+ &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+   &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+     &lt;span class=&quot;na&quot;&gt;vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+       &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
+       &lt;span class=&quot;na&quot;&gt;cluster&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mycluster&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that it is also possible to use internal mappings, so the user can create the mappings inside the VM import CR, for example:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2v.kubevirt.io/v1alpha1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineImport&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;providerCredentialsSecret&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirt-secret&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;targetVmName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;mappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;networkMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirtmgmt/ovirtmgmt&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;storageMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystoragedomain&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystorageclass&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;cluster&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mycluster&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now let the operator do its work. You can explore the status by checking the status of the VM import CR&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;conditions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Validation completed successfully&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ValidationCompleted&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Valid&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;specifies&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;IO&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Threads:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;1,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;NUMA&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;tune&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;secified:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;interleave'&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerificationReportedWarnings&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerified&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:10:29Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Copying virtual machine disks&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ProcessingCompleted&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Processing&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:10:29Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:10:29Z&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Virtual machine disks import done&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineReady&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Succeeded&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;dataVolumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm-26097887-1f4d-4718-961f-f5b63a49c3f5&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;targetVmName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The import process goes through different stages. The first stage is the validation where HCO checks for unsupported mappings.
+The others are for processing and reporting to provide VM and disks ready status.&lt;/p&gt;
+
+&lt;h2 id=&quot;future&quot;&gt;Future&lt;/h2&gt;
+&lt;p&gt;For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.&lt;/p&gt;</content><author><name>Ondra Machacek</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="import" /><category term="oVirt" /><summary type="html">About vm-import-operator Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the CDI, so in order to have the vm import working you must have both KubeVirt and CDI installed.</summary></entry><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
 &lt;p&gt;With the latest release (v1.12) of
 &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/&quot;&gt;minikube&lt;/a&gt; we can now deploy KubeVirt with
 a one-liner.&lt;/p&gt;
@@ -1241,741 +1426,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/live-migration?id=live-migration&quot;&gt;Live Migration&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/node-eviction?id=how-to-evict-all-vms-on-a-node&quot;&gt;Node Drain/Eviction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Live Migration" /><category term="node drain" /><summary type="html"></summary></entry><entry><title type="html">Advanced scheduling using affinity and anti-affinity rules</title><link href="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html" rel="alternate" type="text/html" title="Advanced scheduling using affinity and anti-affinity rules" /><published>2020-02-25T00:00:00+00:00</published><updated>2020-02-25T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules</id><content type="html" xml:base="https://kubevirt.io//2020/Advanced-scheduling-with-affinity-rules.html">&lt;p&gt;This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.&lt;/p&gt;
-
-&lt;p&gt;It is important to notice that from the Kubernetes scheduler stand point, which will be explained later, it only manages Pod and node scheduling. Since the VM is wrapped up in a Pod, the same scheduling rules are completely valid to KubeVirt VMs.&lt;/p&gt;
-
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;As informed in the &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#inter-pod-affinity-and-anti-affinity&quot;&gt;official Kubernetes documentation&lt;/a&gt;: inter-pod affinity and anti-affinity require substantial amount of processing which can slow-down scheduling in large clusters significantly. This can be specially notorious in clusters larger than several hundred nodes.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
-
-&lt;p&gt;In a Kubernetes cluster, &lt;a href=&quot;https://kubernetes.io/docs/reference/command-line-tools-reference/kube-scheduler/&quot;&gt;kube-scheduler&lt;/a&gt; is the default scheduler and runs as part of the control plane. Kube-scheduler is in charge of selecting an optimal node for every newly created or unscheduled pod to run on. However, every container within a pod and the pods themselves, have different requirements for resources. Therefore, existing nodes need to be filtered according to the specific requirements.&lt;/p&gt;
-
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;If you want and need to, you can write your own scheduling component and use it instead.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;When we talk about scheduling, we refer basically to making sure that Pods are matched to Nodes so that a Kubelet can run them. Actually, kube-scheduler selects a node for the pod in a 2-step operation:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;strong&gt;Filtering.&lt;/strong&gt; The filtering step finds the set of candidate Nodes where it’s possible to schedule the Pod. The result is a list of Nodes, usually more than one.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;Scoring.&lt;/strong&gt; In the scoring step, the scheduler ranks the remaining nodes to choose the most suitable Pod placement. This is accomplished based on a score obtained from a list of scoring rules that are applied by the scheduler.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;The obtained list of candidate nodes is evaluated using multiple priority criteria, which add up to a weighted score. Nodes with higher values are better candidates to run the pod. Among the criteria are affinity and anti-affinity rules; nodes with higher affinity for the pod have a higher score, and nodes with higher anti-affinity have a lower score. Finally, kube-scheduler assigns the Pod to the Node with the highest score. If there is more than one node with equal scores, kube-scheduler selects one of these randomly.&lt;/p&gt;
-
-&lt;p&gt;In this blog post we are going to focus on examples of affinity and anti-affinity rules applied to solve real use cases. A common use for affinity rules is to schedule related pods to be close to each other for performance reasons. A common use case for anti-affinity rules is to schedule related pods not too close to each other for high availability reasons.&lt;/p&gt;
-
-&lt;h2 id=&quot;goal-run-my-customapp&quot;&gt;Goal: Run my customapp&lt;/h2&gt;
-
-&lt;p&gt;In this example, our mission is to run a customapp that is composed of 3 tiers:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;A web proxy cache based on varnish HTTP cache.&lt;/li&gt;
-  &lt;li&gt;A web appliance delivered by a third provider.&lt;/li&gt;
-  &lt;li&gt;A clustered database running on MS Windows.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Instructions were delivered to deploy the application in our production Kubernetes cluster taking advantage of the existing KubeVirt integration and making sure the application is resilient to any problems that can occur. The current status of the cluster is the following:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;A stretched Kubernetes cluster is already up and running.&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/&quot;&gt;KubeVirt&lt;/a&gt; is already installed.&lt;/li&gt;
-  &lt;li&gt;There is enough free CPU, Memory and disk space in the cluster to deploy customapp stack.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;information&lt;/p&gt;&lt;p&gt;The Kubernetes stretched cluster is running in 3 different geographical locations to provide high availability. Also, all locations are close and well-connected to provide low latency between the nodes.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Topology used is common for large data centers, such as cloud providers, which is based in organizing hosts into regions and zones:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;A &lt;strong&gt;region&lt;/strong&gt; is a set of hosts in a close geographic area, which guarantees high-speed connectivity between them.&lt;/li&gt;
-  &lt;li&gt;A &lt;strong&gt;zone&lt;/strong&gt;, also called an availability zone, is a set of hosts that might fail together because they share common critical infrastructure components, such as a network, storage, or power.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;There are some important labels when creating advanced scheduling workflows with affinity and anti-affinity rules. As explained previously, they are very close linked to common topologies used in datacenters. Labels such as:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;em&gt;topology.kubernetes.io/zone&lt;/em&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;em&gt;topology.kubernetes.io/region&lt;/em&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;em&gt;kubernetes.io/hostname&lt;/em&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;em&gt;kubernetes.io/arch&lt;/em&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;em&gt;kubernetes.io/os&lt;/em&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;As it is detailed in the &lt;a href=&quot;https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/&quot;&gt;labels and annotations official documentation&lt;/a&gt;, starting in v1.17, label &lt;em&gt;failure-domain.beta.kubernetes.io/region&lt;/em&gt; and &lt;em&gt;failure-domain.beta.kubernetes.io/zone&lt;/em&gt; are deprecated in favour of &lt;strong&gt;topology.kubernetes.io/region&lt;/strong&gt; and &lt;strong&gt;topology kubernetes.io/zone respectively&lt;/strong&gt;.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Previous labels are just prepopulated Kubernetes labels that the system uses to denote such a topology domain. In our case, the cluster is running in &lt;em&gt;Iberia&lt;/em&gt; &lt;strong&gt;region&lt;/strong&gt; across three different &lt;strong&gt;zones&lt;/strong&gt;: &lt;em&gt;scu, bcn and sab&lt;/em&gt;. Therefore, it must be labelled accordingly since advanced scheduling rules are going to be applied:&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-02-25-Advanced-scheduling-with-affinity-rules/kubevirt-blog-affinity.resized.png&quot; alt=&quot;cluster labelling&quot; /&gt;&lt;/p&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Pod anti-affinity requires nodes to be consistently labelled, i.e. every node in the cluster must have an appropriate label matching &lt;strong&gt;topologyKey&lt;/strong&gt;. If some or all nodes are missing the specified topologyKey label, it can lead to unintended behavior.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Below you can find a cluster labeling where topology is based in one region and several zones spread across geographically. Additionally, special &lt;strong&gt;high performing nodes&lt;/strong&gt; composed by nodes with a high number of resources available including memory, cpu, storage and network are marked as well.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl label node kni-worker topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;scu
-node/kni-worker labeled
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl label node kni-worker2 topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;scu &lt;span class=&quot;nv&quot;&gt;performance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;high
-node/kni-worker2 labeled
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl label node kni-worker3 topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;bcn
-node/kni-worker3 labeled
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl label node kni-worker4 topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;bcn &lt;span class=&quot;nv&quot;&gt;performance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;high
-node/kni-worker4 labeled
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl label node kni-worker5 topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;sab
-node/kni-worker5 labeled
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl label node kni-worker6 topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;sab &lt;span class=&quot;nv&quot;&gt;performance&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;high
-node/kni-worker6 labeled
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;At this point, Kubernetes cluster nodes are labelled as expected:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get nodes &lt;span class=&quot;nt&quot;&gt;--show-labels&lt;/span&gt;
-
-NAME                STATUS   ROLES    AGE   VERSION   LABELS
-kni-control-plane   Ready    master   18m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-control-plane,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,node-role.kubernetes.io/master&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;
-kni-worker          Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-worker,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia,topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;scu
-kni-worker2         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-worker2,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,performance&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;high,topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia,topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;scu
-kni-worker3         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-worker3,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia,topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;bcn
-kni-worker4         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-worker4,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,performance&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;high,topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia,topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;bcn
-kni-worker5         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-worker5,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia,topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;sab
-kni-worker6         Ready    &amp;lt;none&amp;gt;   17m   v1.17.0   beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64,kubernetes.io/hostname&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kni-worker6,kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux,performance&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;high,topology.kubernetes.io/region&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iberia,topology.kubernetes.io/zone&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;sab
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Finally, the cluster is ready to run and deploy our specific &lt;em&gt;customapp&lt;/em&gt;.&lt;/p&gt;
-
-&lt;h3 id=&quot;the-clustered-database&quot;&gt;The clustered database&lt;/h3&gt;
-
-&lt;p&gt;A MS Windows 2016 Server virtual machine is already containerized and ready to be deployed. As we have to deploy 3 replicas of the operating system a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; has been created. Once the replicas are up and running, database administrators will be able to reach the VMs running in our Kubernetes cluster through Remote Desktop Protocol (RDP). Eventually, MS SQL2016 database is installed and configured as a clustered database to provide high availability to our customapp.&lt;/p&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Check &lt;a href=&quot;/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html&quot;&gt;KubeVirt: installing Microsoft Windows from an ISO&lt;/a&gt; if you need further information on how to deploy a MS Windows VM on KubeVirt.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Regarding the scheduling, a Kubernetes node of each zone has been labelled as high-performance, e.g. it has more memory, storage, CPU and higher performing disk and network than the other node that shares the same zone. This specific Kubernetes node was provisioned to run the database VM due to the hardware requirements to run database applications. Therefore, a scheduling rule is needed to be sure that all MSSQL2016 instances run &lt;em&gt;only&lt;/em&gt; in these high-performance servers.&lt;/p&gt;
-
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;These nodes were labelled as &lt;strong&gt;performance=high&lt;/strong&gt;.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;There are two options to accomplish our requirement, use &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector&quot;&gt;nodeSelector&lt;/a&gt; or configure &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity&quot;&gt;nodeAffinity&lt;/a&gt; rules. In our first approach, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; instead of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule is used. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; matches the nodes where the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;performance&lt;/code&gt; key is equal to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;high&lt;/code&gt; and makes the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt; to run on top of the matching nodes. The following code snippet shows the configuration:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#nodeSelector matches nodes where performance key has high as value.&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;performance&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;containerdisk&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;interfaces&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;bridge&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;16Gi&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Next, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; configuration partially shown previously is applied successfully.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; vmr-windows-mssql.yaml
-virtualmachineinstancereplicaset.kubevirt.io/mssql2016 created
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Then, it is expected that the 3 &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; will eventually run on the nodes where matching key/value label is configured. Actually, based on the hostname those are the &lt;em&gt;even&lt;/em&gt; nodes.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME                                 READY   STATUS              RESTARTS   AGE   IP       NODE          NOMINATED NODE   READINESS GATES
-virt-launcher-mssql2016p948r-257pn   0/2     ContainerCreating   0          16s   &amp;lt;none&amp;gt;   kni-worker4   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-virt-launcher-mssql2016rd4lk-6zz9d   0/2     ContainerCreating   0          16s   &amp;lt;none&amp;gt;   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-virt-launcher-mssql2016z2qnw-t924b   0/2     ContainerCreating   0          16s   &amp;lt;none&amp;gt;   kni-worker6   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;root@eko1 ind-affinity]# kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME             AGE   PHASE        IP    NODENAME   LIVE-MIGRATABLE
-mssql2016p948r   34s   Scheduling
-mssql2016rd4lk   34s   Scheduling
-mssql2016z2qnw   34s   Scheduling
-
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME             AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
-mssql2016p948r   3m25s   Running   10.244.1.4   kni-worker4   False
-mssql2016rd4lk   3m25s   Running   10.244.2.4   kni-worker2   False
-mssql2016z2qnw   3m25s   Running   10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; provides a very simple way to constrain pods to nodes with particular labels. The affinity/anti-affinity feature greatly expands the types of constraints you can express.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Let’s test what happens if the node running the database must be rebooted due to an upgrade or any other valid reason. First, a &lt;a href=&quot;/2019/NodeDrain-KubeVirt.html&quot;&gt;node drain&lt;/a&gt; must be executed in order to evacuate all pods running and mark the node as unschedulable.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl drain kni-worker2 &lt;span class=&quot;nt&quot;&gt;--delete-local-data&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--ignore-daemonsets&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--force&lt;/span&gt;
-node/kni-worker2 already cordoned
-evicting pod &lt;span class=&quot;s2&quot;&gt;&quot;virt-launcher-mssql2016rd4lk-6zz9d&quot;&lt;/span&gt;
-pod/virt-launcher-mssql2016rd4lk-6zz9d evicted
-node/kni-worker2 evicted
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The result is an unwanted scenario, where two databases are being executed in the same high performing server. &lt;em&gt;This leads us to more advanced scheduling features like affinity and anti-affinity.&lt;/em&gt;&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME             AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
-mssql201696sz9   7m16s   Running   10.244.5.5   kni-worker6   False
-mssql2016p948r   19m     Running   10.244.1.4   kni-worker4   False
-mssql2016z2qnw   19m     Running   10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;affinity/anti-affinity rules&lt;/a&gt; solve much more complex scenarios compared to &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#nodeselector&quot;&gt;nodeSelector&lt;/a&gt;. Some of the key enhancements are:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;The language is more expressive (not just “AND or exact match”).&lt;/li&gt;
-  &lt;li&gt;You can indicate that the rule is “soft”/”preference” rather than a hard requirement, so if the scheduler can’t satisfy it, the pod will still be scheduled.&lt;/li&gt;
-  &lt;li&gt;You can constrain against labels on other pods running on the node (or other topological domain), rather than against labels on the node itself, which allows rules about which pods can and cannot be co-located.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Before going into more detail, it should be noticed that there are currently two types of &lt;strong&gt;affinity&lt;/strong&gt; that applies to both &lt;em&gt;Node and Pod affinity&lt;/em&gt;. They are called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. You can think of them as &lt;em&gt;hard&lt;/em&gt; and &lt;em&gt;soft&lt;/em&gt; respectively, in the sense that the former specifies rules that must be met for a pod to be scheduled onto a node (just like nodeSelector but using a more expressive syntax), while the latter specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
-
-&lt;p&gt;Said that, it is time to edit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; YAML file. Actually, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; must be removed and two different affinity rules created instead.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;nodeAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application (MS SQL2016) must be placed &lt;em&gt;only&lt;/em&gt; on nodes where the key performance contains the value high. Note the word only, there is no room for other nodes.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mssql2016&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the database itself and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one database instance can run in each zone, e.g. one database in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;In principle, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; can be any legal label-key. However, for performance and security reasons, there are some constraints on &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; that need to be taken into consideration:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;For affinity and for &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, empty &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; is not allowed.&lt;/li&gt;
-  &lt;li&gt;For &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, empty &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; is interpreted as “all topologies” (“all topologies” here is now limited to the combination of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/region&lt;/code&gt;).&lt;/li&gt;
-  &lt;li&gt;For &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; pod anti-affinity, the admission controller &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LimitPodHardAntiAffinityTopology&lt;/code&gt; was introduced to limit &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topologyKey&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;. Verify if it is enabled or disabled.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;Here is the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/code&gt; object replaced.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl edit virtualmachineinstancereplicaset.kubevirt.io/mssql2016
-virtualmachineinstancereplicaset.kubevirt.io/mssql2016 edited
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now, it contains both affinity rules:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016replicaset&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures the application (MS SQL2016) must ONLY be placed on nodes where the key performance contains the value high&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;nodeSelectorTerms&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;performance&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two applications with the key kubevirt.io/domain equals to mssql2016 cannot run in the same zone&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mssql2016&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Notice that the VM or POD placement is executed only during the scheduling process, therefore we need to delete one of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstances&lt;/code&gt; (VMI) running in the same node. Deleting the VMI will make Kubernetes spin up a new one to reconcile the desired number of replicas (3).&lt;/p&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Remember to mark the kni-worker2 as schedulable again.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl uncordon kni-worker2
-node/kni-worker2 uncordoned
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Below shows the current status, where two databases are running in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker6&lt;/code&gt; node. By applying the previous affinity rules this should not happen again:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
-mssql201696sz9   12m   Running   10.244.5.5   kni-worker6   False
-mssql2016p948r   24m   Running   10.244.1.4   kni-worker4   False
-mssql2016z2qnw   24m   Running   10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Next, we delete one of the VMIs running in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker6&lt;/code&gt; and wait for the rules to be applied at scheduling time. As can be seen, databases are distributed across zones and high performing nodes:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl delete vmi mssql201696sz9
-virtualmachineinstance.kubevirt.io &lt;span class=&quot;s2&quot;&gt;&quot;mssql201696sz9&quot;&lt;/span&gt; deleted
-
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME             AGE   PHASE     IP           NODENAME      LIVE-MIGRATABLE
-mssql2016p948r   40m   Running   10.244.1.4   kni-worker4   False
-mssql2016tpj6n   22s   Running   10.244.2.5   kni-worker2   False
-mssql2016z2qnw   40m   Running   10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;During the deployment of the clustered database &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeSelector&lt;/code&gt; rules were compared, however, there are a couple of things to take into consideration when creating node affinity rules, it is worth taking a look at &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;node affinity in Kubernetes documentation&lt;/a&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;If you remove or change the label of the node where the Pod is scheduled, the Pod will not be removed. In other words, the affinity selection works only at the time of scheduling the Pod.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;the-proxy-http-cache&quot;&gt;The proxy http cache&lt;/h3&gt;
-
-&lt;p&gt;Now, that the database is configured by database administrators and running across multiple zones, it’s time to spin up the varnish http-cache container image. This time we are going to run it as a Pod instead of as a KubeVirt VM., however, scheduling rules are still valid for both objects.&lt;/p&gt;
-
-&lt;p&gt;A detailed explanation on how to run a &lt;a href=&quot;https://varnish-cache.org/releases/index.html&quot;&gt;Varnish Cache&lt;/a&gt; in a Kubernetes cluster can be found in &lt;a href=&quot;https://github.com/mittwald/kube-httpcache&quot;&gt;kube-httpcache&lt;/a&gt; repository. Below are detailed the steps taken:&lt;/p&gt;
-
-&lt;p&gt;Start by creating a ConfigMap that contains a VCL template and a Secret object that contains the secret for the Varnish administration port. Then apply the &lt;a href=&quot;https://github.com/mittwald/kube-httpcache#deploy-varnish&quot;&gt;Varnish deployment config&lt;/a&gt;.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; configmap.yaml
-configmap/vcl-template created
-
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create secret generic varnish-secret &lt;span class=&quot;nt&quot;&gt;--from-literal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;secret&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;head&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-c32&lt;/span&gt; /dev/urandom  | &lt;span class=&quot;nb&quot;&gt;base64&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
-secret/varnish-secret created
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In our specific mandate, 3 replicas of our web cache application are needed. Each one must be running in a different zone or datacenter. Preferably, if possible, expected to run in a Kubernetes node different from the database since as administrators we would like the database to take advantage of all the possible resources of the high-performing server. Taken into account this prerequisite, the following advanced rules are applied:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;nodeAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application should be placed &lt;em&gt;if possible&lt;/em&gt; on nodes where the key performance does not contain the value high. Note the word &lt;em&gt;if possible&lt;/em&gt;. This means, it will try to run on a not performing server, however, if there none available it will be co-located with the database.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;app&lt;/code&gt; equals to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cache&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the Varnish http-cache itself and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one Varnish http-cache instance can run in each zone, e.g. one http-cache in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;varnish-cache&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that during scheduling time the application must be placed *if possible* on nodes NOT performance=high&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;10&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;preference&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;performance&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NotIn&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;high&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that the application cannot run in the same zone (app=cache).&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;app&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;containers&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;quay.io/spaces/kube-httpcache:stable&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;imagePullPolicy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Always&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In this set of affinity rules, a new scheduling policy has been introduced: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/code&gt;. It can be thought as “soft” scheduling, in the sense that it specifies preferences that the scheduler will try to enforce but will not guarantee.&lt;/p&gt;
-
-&lt;p&gt;The weight field in preferredDuringSchedulingIgnoredDuringExecution must be in the range 1-100 and it is taken into account in the &lt;a href=&quot;#introduction&quot;&gt;scoring step&lt;/a&gt;. Remember that the node(s) with the highest total score is/are the most preferred.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Here, the modified deployment is applied:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;root@eko1 varnish]# kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; deployment.yaml
-deployment.apps/varnish-cache created
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The Pod is scheduled as expected since there is a node available in each zone without the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;performance=high&lt;/code&gt; label.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-NAME                                 READY   STATUS    RESTARTS   AGE   IP           NODE          NOMINATED NODE   READINESS GATES
-varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          91s   10.244.4.5   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          91s   10.244.3.5   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-varnish-cache-54489f9fc9-dflzs       1/1     Running   0          91s   10.244.6.5   kni-worker    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-virt-launcher-mssql2016p948r-257pn   2/2     Running   0          70m   10.244.1.4   kni-worker4   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          31m   10.244.2.5   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          70m   10.244.5.4   kni-worker6   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;At this point, database and http-cache components of our customapp are up and running. Only the appliance created by an external provider needs to be deployed to complete the stack.&lt;/p&gt;
-
-&lt;h3 id=&quot;the-third-party-appliance-virtual-machine&quot;&gt;The third-party appliance virtual machine&lt;/h3&gt;
-
-&lt;p&gt;A third-party provider delivered a black box (appliance) in the form of a virtual machine where the application bought by the finance department is installed. Lucky to us, we have been able to transform it into a container VM ready to be run in our cluster with the help of KubeVirt.&lt;/p&gt;
-
-&lt;p&gt;Following up with our objective, this web application must take advantage of the web cache application running as a Pod. So we require the appliance to be co-located in the same server that Varnish Cache in order to accelerate the delivery of the content provided by the appliance. Also, it is required to run every replica of the appliance in different zones or data centers. Taken into account these prerequisites, the following advanced rules are configured:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;podAffinity rule&lt;/strong&gt;. This rule ensures that during scheduling time the application must be placed on nodes where an application (Pod) with key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;app' equals to&lt;/code&gt;cache` is running. That is to say where the Varnish Cache is running. Note that this is mandatory, it will only run co-located with the web cache Pod.&lt;/li&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two applications with the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io/domain&lt;/code&gt; equals to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;blackbox&lt;/code&gt; must not run in the same zone. Notice that the only application with this key value is the appliance and more important, notice that this rule applies to the topologyKey &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;topology.kubernetes.io/zone&lt;/code&gt;. This means that only one appliance instance can run in each zone, e.g. one appliance in &lt;em&gt;scu, bcn and sab&lt;/em&gt; respectively.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceReplicaSet&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;3&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that during scheduling time the application must be placed on nodes where Varnish Cache is running&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;app&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cache&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/hostname&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two applications with the key `kubevirt.io/domain` equals to `blackbox` cannot run in the same zone&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&quot;&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;blackbox&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;topology.kubernetes.io/zone&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Here, the modified deployment is applied. As expected the VMI is scheduled as expected in the same Kubernetes nodes as Varnish Cache and each one in a different datacenter or zone.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pods,vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; wide
-
-NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          172m    10.244.4.5   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          172m    10.244.3.5   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-dflzs	 1/1     Running   0          172m    10.244.6.5   kni-worker    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxtk49x-nw45s    2/2     Running   0          2m31s   10.244.6.6   kni-worker    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          2m31s   10.244.4.9   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          2m31s   10.244.3.6   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h1m    10.244.1.4   kni-worker4   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h22m   10.244.2.5   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h1m    10.244.5.4   kni-worker6   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-NAME                                                AGE     PHASE     IP           NODENAME	 LIVE-MIGRATABLE
-virtualmachineinstance.kubevirt.io/blackboxtk49x    2m31s   Running   10.244.6.6   kni-worker    False
-virtualmachineinstance.kubevirt.io/blackboxxt829    2m31s   Running   10.244.4.9   kni-worker5   False
-virtualmachineinstance.kubevirt.io/blackboxzf9kt    2m31s   Running   10.244.3.6   kni-worker3   False
-virtualmachineinstance.kubevirt.io/mssql2016p948r   4h1m    Running   10.244.1.4   kni-worker4   False
-virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h22m   Running   10.244.2.5   kni-worker2   False
-virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h1m    Running   10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;At this point, our stack has been successfully deployed and configured accordingly to the requirements agreed. However, it is important before going into production to verify the proper behaviour in case of node failures. That’s what is going to be shown in the next section.&lt;/p&gt;
-
-&lt;h2 id=&quot;verify-the-resiliency-of-our-customapp&quot;&gt;Verify the resiliency of our customapp&lt;/h2&gt;
-
-&lt;p&gt;In this section, several tests must be executed to validate that the scheduling already in place is line up with the expected behaviour of the customapp application.&lt;/p&gt;
-
-&lt;h3 id=&quot;draining-a-regular-node&quot;&gt;Draining a regular node&lt;/h3&gt;
-
-&lt;p&gt;In this test, the node located in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;scu&lt;/code&gt; zone which is not labelled as high-performance will be upgraded. The proper procedure to maintain a Kubernetes node is as follows: drain the node, upgrade packages and then reboot it.&lt;/p&gt;
-
-&lt;p&gt;As it is depicted, once the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker&lt;/code&gt; is marked as unschedulable and drained, the Varnish Cache pod and the black box appliance VM are automatically moved to the high-performance node in the same zone.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h8m    10.244.4.5   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-9s5sr	 1/1     Running   0          2m32s   10.244.2.7   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h8m    10.244.3.5   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxxh5tg-g7hns    2/2     Running   0          13m     10.244.2.8   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          18m     10.244.4.9   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          18m     10.244.3.6   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h17m   10.244.1.4   kni-worker4   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h37m   10.244.2.5   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h17m   10.244.5.4   kni-worker6   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-NAME                                                AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
-virtualmachineinstance.kubevirt.io/blackboxxh5tg    13m     Running   10.244.2.8   kni-worker2   False
-virtualmachineinstance.kubevirt.io/blackboxxt829    18m     Running	 10.244.4.9   kni-worker5   False
-virtualmachineinstance.kubevirt.io/blackboxzf9kt    18m     Running	 10.244.3.6   kni-worker3   False
-virtualmachineinstance.kubevirt.io/mssql2016p948r   4h17m   Running	 10.244.1.4   kni-worker4   False
-virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h37m   Running	 10.244.2.5   kni-worker2   False
-virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h17m   Running	 10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Remember that this is happening because:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;There is a &lt;strong&gt;mandatory&lt;/strong&gt; policy that only one replica of each application can run at the same time in the same zone.&lt;/li&gt;
-  &lt;li&gt;There is a &lt;strong&gt;soft policy&lt;/strong&gt; (preferred) that both applications should run on a non high-performance node. However, since there are any of these nodes available it has been scheduled in the high-performance server along with the database.&lt;/li&gt;
-  &lt;li&gt;Both applications must run in the same node&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Note that uncordoning the node will not make the blackbox appliance and the Varnish Cache pod to come back to the previous node.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl uncordon kni-worker
-node/kni-worker uncordoned
-
-NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h10m   10.244.4.5   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-9s5sr	 1/1     Running   0          5m29s   10.244.2.7   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h10m   10.244.3.5   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxxh5tg-g7hns    2/2     Running   0          16m     10.244.2.8   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          21m     10.244.4.9   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          21m     10.244.3.6   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h20m   10.244.1.4   kni-worker4   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h40m   10.244.2.5   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h20m   10.244.5.4   kni-worker6   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;In order to return to the most desirable state, the pod and VM from kni-worker2 must be deleted.&lt;/p&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Both applications must be deleted since the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/code&gt; policy is only applied during scheduling time.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl delete  pod/varnish-cache-54489f9fc9-9s5sr
-pod &lt;span class=&quot;s2&quot;&gt;&quot;varnish-cache-54489f9fc9-9s5sr&quot;&lt;/span&gt; deleted
-
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl delete virtualmachineinstance.kubevirt.io/blackboxxh5tg
-virtualmachineinstance.kubevirt.io &lt;span class=&quot;s2&quot;&gt;&quot;blackboxxh5tg&quot;&lt;/span&gt; deleted
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Once done, the scheduling process is run again for both applications and the applications are placed in the most desirable node taking into account affinity rules configured.&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h13m   10.244.4.5   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h13m   10.244.3.5   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/varnish-cache-54489f9fc9-fldhc	 1/1     Running   0          2m7s    10.244.6.7   kni-worker    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackbox54l7t-4c6wh    2/2     Running   0          23s     10.244.6.8   kni-worker    &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          23m     10.244.4.9   kni-worker5   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          23m     10.244.3.6   kni-worker3   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h23m   10.244.1.4   kni-worker4   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h43m   10.244.2.5   kni-worker2   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h23m   10.244.5.4   kni-worker6   &amp;lt;none&amp;gt;           &amp;lt;none&amp;gt;
-
-NAME                                                AGE     PHASE     IP           NODENAME	 LIVE-MIGRATABLE
-virtualmachineinstance.kubevirt.io/blackbox54l7t    23s     Running   10.244.6.8   kni-worker    False
-virtualmachineinstance.kubevirt.io/blackboxxt829    23m     Running   10.244.4.9   kni-worker5   False
-virtualmachineinstance.kubevirt.io/blackboxzf9kt    23m     Running   10.244.3.6   kni-worker3   False
-virtualmachineinstance.kubevirt.io/mssql2016p948r   4h23m   Running   10.244.1.4   kni-worker4   False
-virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h43m   Running   10.244.2.5   kni-worker2   False
-virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h23m   Running   10.244.5.4   kni-worker6   False
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;This behaviour can be extrapolated to a failure or shutdown of any odd or non high-performance worker node. In that case, all workloads will be moved to the high performing server &lt;em&gt;in the same zone&lt;/em&gt;. Although this is not ideal, our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;customapp&lt;/code&gt; will be still available while the node recovery is ongoing.&lt;/p&gt;
-
-&lt;h3 id=&quot;draining-a-high-performance-node&quot;&gt;Draining a high-performance node&lt;/h3&gt;
-
-&lt;p&gt;On the other hand, in case of a high-performance worker node failure, which was shown &lt;a href=&quot;#the-clustered-database&quot;&gt;previously&lt;/a&gt;, the database will not be able to move to another server, since there is only one high performing server per zone. A possible solution is just adding a stand-by high-performance node in each zone.&lt;/p&gt;
-
-&lt;p&gt;However, since the database is configured as a clustered database, the application running in the same zone as the failed database will still be able to establish a connection to any of the other two running databases located in different zones. This configuration is done at the application level. Actually, from the application standpoint, it just connects to a database pool of resources.&lt;/p&gt;
-
-&lt;p&gt;Since this is not ideal either, e.g. establishing a connection to another zone or datacenter takes longer than in the same datacenter, the application will be still available and providing service to the clients.&lt;/p&gt;
-
-&lt;h2 id=&quot;affinity-rules-are-everywhere&quot;&gt;Affinity rules are everywhere&lt;/h2&gt;
-
-&lt;p&gt;As written in the title section, affinity rules are essential to provide high availability and resiliency to Kubernetes applications. Furthermore, KubeVirt’s components also take advantage of these rules to avoid unwanted situations that could compromise the stability of the VMs running in the cluster.&lt;/p&gt;
-
-&lt;p&gt;For instance, below it is partly shown a snippet of the deployment object for virt-api and virt-controller. Notice the following affinity rule created:&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;&lt;strong&gt;podAntiAffinity rule&lt;/strong&gt;. This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubernetes.io/hostname&lt;/code&gt;). It is used the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io&lt;/code&gt; to match the application &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-api&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-controller&lt;/code&gt;. See that it is a soft requirement, which means that the kube-scheduler will try to match the rule, however, if it is not possible it can place both replicas in the same node.&lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-api&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-api&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-api&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;strategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/critical-pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/tolerations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;[{&quot;key&quot;:&quot;CriticalAddonsOnly&quot;,&quot;operator&quot;:&quot;Exists&quot;}]'&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-api&lt;/span&gt;
-                &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-api&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node&lt;/span&gt;
-                  &lt;span class=&quot;na&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;podAffinityTerm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                        &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;
-                          &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                          &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-api&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;
-                    &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;containers&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;s&quot;&gt;...&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Deployment&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;replicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;strategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/critical-pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/tolerations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;[{&quot;key&quot;:&quot;CriticalAddonsOnly&quot;,&quot;operator&quot;:&quot;Exists&quot;}]'&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;podAntiAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;#This rule ensures that two replicas of the same application should not run if possible in the same Kubernetes node&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;preferredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;podAffinityTerm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;labelSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                      &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-controller&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;topologyKey&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;weight&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rules in order to place each replica in each Kubernetes node of the cluster.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;A DaemonSet ensures that all (or some) Nodes run a copy of a Pod. As nodes are added to the cluster, Pods are added to them. As nodes are removed from the cluster, those Pods are garbage collected. Deleting a DaemonSet will clean up the Pods it created.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;root@eko1 varnish]# kubectl get daemonset &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt
-NAMESPACE     NAME           DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR                 AGE
-kubevirt      virt-handler   6         6         6       6            6           &amp;lt;none&amp;gt;                        25h
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;See the partial snippet of a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; Pod created by a DaemonSet (see ownerReferences section, kind: DaemonSet) that configures a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeAffinity&lt;/code&gt; rule that requires the Pod to run in a specific hostname matched by the key &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metadata.name&lt;/code&gt; and value the name of the node (&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kni-worker2&lt;/code&gt;). Note that the value of the key changes depending on the nodes that are part of the cluster, this is done by the DaemonSet.&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Pod&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;kubevirt.io/install-strategy-identifier&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;0000ee7f7cd4756bb221037885c3c86816db6de7&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;kubevirt.io/install-strategy-registry&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;index.docker.io/kubevirt&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;kubevirt.io/install-strategy-version&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v0.26.0&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/critical-pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;scheduler.alpha.kubernetes.io/tolerations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;[{&quot;key&quot;:&quot;CriticalAddonsOnly&quot;,&quot;operator&quot;:&quot;Exists&quot;}]'&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;creationTimestamp&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-02-12T11:11:14Z&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;generateName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler-&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;app.kubernetes.io/managed-by&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-operator&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;controller-revision-hash&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;84d96d4775&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;pod-template-generation&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;1&quot;&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler-ctzcg&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;ownerReferences&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;apps/v1&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;blockOwnerDeletion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;controller&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DaemonSet&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-handler&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;uid&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;6e7faece-a7aa-4ed0-959e-4332b2be4ec3&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;resourceVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;28301&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selfLink&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/api/v1/namespaces/kubevirt/pods/virt-handler-ctzcg&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;uid&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;95d68dad-ad06-489f-b3d3-92413bcae1da&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;requiredDuringSchedulingIgnoredDuringExecution&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;nodeSelectorTerms&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;matchFields&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;key&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metadata.name&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;operator&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;In&lt;/span&gt;
-                &lt;span class=&quot;na&quot;&gt;values&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-                  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kni-worker2&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
-
-&lt;p&gt;In this blog post, a real use case has been detailed on how advanced scheduling can be configured in a hybrid scenario where VMs and Pods are part of the same application stack. The reader can realize that Kubernetes itself already provides a lot of functionality out of the box to Pods running on top of it. One of these inherited capabilities is the possibility to create even more complex affinity or/and anti-affinity rules than traditional virtualization products.&lt;/p&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/&quot;&gt;Kubernetes labels and annotations official documentation&lt;/a&gt;]&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/2019/NodeDrain-KubeVirt.html&quot;&gt;Kubevirt node drain blog post&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity&quot;&gt;Kubernetes node affinity documentation&lt;/a&gt;.&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/podaffinity.md&quot;&gt;Kubernetes design proposal for Inter-pod topological affinity and anti-affinity&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/2089&quot;&gt;KubeVirt add affinity to virt pods pull request discussion&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Advanced VM scheduling" /><category term="affinity" /><category term="scheduling" /><category term="topologyKeys" /><summary type="html">This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex affinity and anti-affinity rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Live Migration" /><category term="node drain" /><summary type="html"></summary></entry></feed>

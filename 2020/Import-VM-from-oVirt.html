@@ -22,26 +22,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//2019/kubevirt-with-ansible-part-2.html">
+    <link rel="canonical" href="https://kubevirt.io//2020/Import-VM-from-oVirt.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>KubeVirt with Ansible, part 2 | KubeVirt.io</title>
+    <title>Import virtual machine from oVirt | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="mmazur" >
+    <meta name="author" content="Ondra Machacek" >
     <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="A deeper dive into Ansible 2.8's KubeVirt features">
-    <meta name="keywords" content="ansible" >
-    <meta property="og:title" content="KubeVirt with Ansible, part 2 | KubeVirt.io">
+    <meta name="description" content="This blog post describes how to import virtual machine using vm-import-operator">
+    <meta name="keywords" content="kubevirt, Kubernetes, virtual machine, VM, import, oVirt" >
+    <meta property="og:title" content="Import virtual machine from oVirt | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//2019/kubevirt-with-ansible-part-2.html" >
+    <meta property="og:url" content="https://kubevirt.io//2020/Import-VM-from-oVirt.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="A deeper dive into Ansible 2.8's KubeVirt features" >
+    <meta property="og:description" content="This blog post describes how to import virtual machine using vm-import-operator" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="mmazur" >
-    <meta property="og:article:published_time" content="2019-07-08 00:00:00 +0000" >
-    <meta name="twitter:title" content="KubeVirt with Ansible, part 2 | KubeVirt.io">
-    <meta name="twitter:description" content="A deeper dive into Ansible 2.8's KubeVirt features">
+    <meta property="og:article:author" content="Ondra Machacek" >
+    <meta property="og:article:published_time" content="2020-08-06 00:00:00 +0000" >
+    <meta name="twitter:title" content="Import virtual machine from oVirt | KubeVirt.io">
+    <meta name="twitter:description" content="This blog post describes how to import virtual machine using vm-import-operator">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -229,16 +229,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <div class="post">
         <header class="post-header">
           <h1></h1>
-          <h1 class="post-title">KubeVirt with Ansible, part 2</h1>
+          <h1 class="post-title">Import virtual machine from oVirt</h1>
           <div class="post-info">
-            <span class="post-author">Author: mmazur</span>
+            <span class="post-author">Author: Ondra Machacek</span>
             <div>
               <span class="post-category-name">
-                Tags: <a href="/tag/ansible">ansible</a>
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">Kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>&nbsp;|&nbsp;<a href="/tag/import">import</a>&nbsp;|&nbsp;<a href="/tag/ovirt">oVirt</a>
               </span>
             </div>
             <div>
-              <span class="post-meta">Publication Date: July 8, 2019  </span>
+              <span class="post-meta">Publication Date: August 6, 2020  </span>
             </div>
             <div>
               <span class="post-category-name">
@@ -249,210 +249,198 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <p><a href="/2019/kubevirt-with-ansible-part-1.html">Part 1</a> contained a short introduction to basic VM management with Ansible’s <code class="language-plaintext highlighter-rouge">kubevirt_vm</code> module.
-This time we’ll paint a more complete picture of all the features on offer.</p>
+          <h2 id="about-vm-import-operator">About vm-import-operator</h2>
+<p>Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the <a href="https://github.com/kubevirt/containerized-data-importer">CDI</a>, so in order to have the vm import working you must have both KubeVirt and CDI installed.</p>
 
-<p>As before, examples found herein are also available as full working playbooks in our
-<a href="https://github.com/kubevirt/ansible-kubevirt-modules/tree/master/examples/blog">playbooks example repository</a>.
-Additionally, each section of this post links to the corresponding module’s Ansible documentation page.
-Those pages always contain an <em>Examples</em> section, which the reader is encouraged to look through, as they have
-many more ways of using the modules than can reasonably fit here.</p>
+<h3 id="import-rules">Import rules</h3>
+<p>Before the import process is initiated we run validation of the source VM, to be sure the KubeVirt will run the source VM smoothly. We have many <a href="https://github.com/kubevirt/vm-import-operator/blob/master/docs/rules.md">rules</a> defined including storage, network and the VM. You will see all warning messages in the conditions field. For example:</p>
 
-<h2 id="more-vm-management">More VM management</h2>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">lastHeartbeatTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-11T11:13:31Z"</span>
+  <span class="na">lastTransitionTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-11T11:13:31Z"</span>
+  <span class="na">message</span><span class="pi">:</span> <span class="s1">'</span><span class="s">VM</span><span class="nv"> </span><span class="s">specifies</span><span class="nv"> </span><span class="s">IO</span><span class="nv"> </span><span class="s">Threads:</span><span class="nv"> </span><span class="s">1,</span><span class="nv"> </span><span class="s">VM</span><span class="nv"> </span><span class="s">has</span><span class="nv"> </span><span class="s">NUMA</span><span class="nv"> </span><span class="s">tune</span><span class="nv"> </span><span class="s">mode</span><span class="nv"> </span><span class="s">secified:</span><span class="nv"> </span><span class="s">interleave'</span>
+  <span class="na">reason</span><span class="pi">:</span> <span class="s">MappingRulesVerificationReportedWarnings</span>
+  <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">True"</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">MappingRulesVerified</span>
+</code></pre></div></div>
 
-<p>Virtual machines managed by KubeVirt are highly customizable. Among the features accessible from Ansible, are:</p>
-
-<ul>
-  <li>various libvirt–level virtualized hardware tweaks (e.g. <code class="language-plaintext highlighter-rouge">machine_type</code> or <code class="language-plaintext highlighter-rouge">cpu_model</code>),</li>
-  <li>network interface configuration (<code class="language-plaintext highlighter-rouge">interfaces</code>), including multi–NIC utilizing the Multus CNI,</li>
-  <li>non–persistent VMs (<code class="language-plaintext highlighter-rouge">ephemeral: yes</code>),</li>
-  <li>direct DataVolumes support (<code class="language-plaintext highlighter-rouge">datavolumes</code>),</li>
-  <li>and OpenShift Templates support (<code class="language-plaintext highlighter-rouge">template</code>).</li>
-</ul>
-
-<h3 id="further-resources">Further resources</h3>
+<h3 id="supported-guest-operating-systems">Supported Guest Operating Systems</h3>
+<p>We support following guest operating systems:</p>
 
 <ul>
-  <li><a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html">Ansible module documentation</a>
-    <ul>
-      <li><a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html#examples">Examples, lots of examples</a></li>
-    </ul>
-  </li>
-  <li>DataVolumes
-    <ul>
-      <li><a href="/2018/CDI-DataVolumes.html">Introductory blog post</a></li>
-      <li><a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md">Upstream documentation</a></li>
-    </ul>
-  </li>
-  <li>Multus
-    <ul>
-      <li><a href="/2018/attaching-to-multiple-networks.html">Introductory blog post</a></li>
-      <li><a href="https://github.com/intel/multus-cni">GitHub repo</a></li>
-    </ul>
-  </li>
+  <li>Red Hat Enterprise Linux 6</li>
+  <li>Red Hat Enterprise Linux 7</li>
+  <li>Red Hat Enterprise Linux 8</li>
+  <li>Microsoft Windows 10</li>
+  <li>Microsoft Windows Server 2012r2</li>
+  <li>Microsoft Windows Server 2016</li>
+  <li>Microsoft Windows Server 2019</li>
+  <li>CentOS Linux 6</li>
+  <li>CentOS Linux 7</li>
+  <li>CentOS Linux 8</li>
+  <li>Ubuntu 18.04</li>
+  <li>Fedora</li>
+  <li>openSUSE</li>
 </ul>
 
-<h2 id="vm-image-management-with-the-containerized-data-importer">VM Image Management with the Containerized Data Importer</h2>
+<h2 id="setup-vm-import-operator">Setup vm-import-operator</h2>
+<p>Source code for virtual machine import operator is hosted on github under <a href="https://github.com/kubevirt">KubeVirt</a> organization. You can very easily deploy it on your Kubernetes by running following commands:</p>
 
-<p>The main functionality of the <code class="language-plaintext highlighter-rouge">kubevirt_pvc</code> module is to manage Persistent Volume Claims. The following snippet
-should seem familiar to anyone who dealt with PVCs before:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
+<span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
+<span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
+</code></pre></div></div>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_pvc</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">pvc1</span>
+<p>By default the operator is deployed to <code class="language-plaintext highlighter-rouge">kubevirt-hyperconverged</code> namespace,
+you can verify that the operator is deployed and running by running:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get deploy vm-import-controller <span class="nt">-n</span> kubevirt-hyperconverged
+</code></pre></div></div>
+
+<p>If you are using <a href="https://github.com/kubevirt/hyperconverged-cluster-operator/">HCO</a>, you don’t have to install it manually,
+because the HCO takes care of that.</p>
+
+<h2 id="importing-virtual-machine-from-ovirt">Importing virtual machine from oVirt</h2>
+<p>In order to import a virtual machine from oVirt user must obtain credentials for the oVirt environment. oVirt environment is usually accessed using username, password and http URL. Note that you must provide CA certificate of your oVirt environment. If you have those - create a secret out of them:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Secret</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">ovirt-secret</span>
+<span class="na">type</span><span class="pi">:</span> <span class="s">Opaque</span>
+<span class="na">stringData</span><span class="pi">:</span>
+  <span class="na">ovirt</span><span class="pi">:</span> <span class="pi">|-</span>
+    <span class="s">apiUrl: https://engine-url/ovirt-engine/api</span>
+    <span class="s">username: admin@internal</span>
+    <span class="s">password: "secretpassword"</span>
+    <span class="s">caCert: |</span>
+      <span class="s">-----BEGIN CERTIFICATE-----</span>
+      <span class="s">MIIEMjCCAxqgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwbDELMAkGA1UEBhMCVVMxJDAiBgNVBAoM</span>
+      <span class="s">....</span>
+      <span class="s">fFyt91ClrUtTE707IFnYdQQUiZ4zI0q+6pmw6+xx8mH5k8Ad6D71pF718xCM1NiBx/Cusg==</span>
+      <span class="s">-----END CERTIFICATE-----</span>
+</code></pre></div></div>
+
+<p>Another step to initiate the import is creating the mappings. The mappings has three categories - storage mapping, disk mapping and network mapping. For storage mapping user can define which oVirt storage domain will be mapped to which storage class. Disk mapping can override the storage mapping for specific disks. The network mappings map oVirt network to the kubernetes network. So here an simple example of mapping:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v2v.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ResourceMapping</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">myvm-mapping</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
-  <span class="na">size</span><span class="pi">:</span> <span class="s">100Mi</span>
-  <span class="na">access_modes</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ovirt</span><span class="pi">:</span>
+    <span class="na">networkMappings</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">source</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">ovirtmgmt/ovirtmgmt</span>
+        <span class="na">target</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">pod</span>
+        <span class="na">type</span><span class="pi">:</span> <span class="s">pod</span>
+    <span class="na">storageMappings</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">source</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">mystoragedomain</span>
+        <span class="na">target</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">mystorageclass</span>
 </code></pre></div></div>
 
-<p>Running it inside a playbook will result in a new PVC named <em>pvc1</em> with the access mode <em>ReadWriteOnce</em> and at least
-100Mi of storage assigned.</p>
+<p>The above mapping maps <code class="language-plaintext highlighter-rouge">ovirtmgmt/ovirtmgmt</code> which is in format of vNIC profile/network to the pod network and disks from <code class="language-plaintext highlighter-rouge">mystoragedomain</code> to <code class="language-plaintext highlighter-rouge">mystorageclass</code>. Once we have mapping and the secret, we can initiate the import by creating a VM import CR. You must provide the name of the mapping, secret, source VM and target VM name.</p>
 
-<p>The option dedicated to working with VM images is named <code class="language-plaintext highlighter-rouge">cdi_source</code> and lets one fill a PVC with data immediately
-upon creation. But before we get to the examples, the Containerized Data Importer needs to be properly deployed,
-which is as simple as running the following commands:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">CDI_VER</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
-kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VER</span>/cdi-operator.yaml
-kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VER</span>/cdi-cr.yaml
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v2v.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineImport</span>
+<span class="na">metadata</span><span class="pi">:</span>
+ <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
+ <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+<span class="na">spec</span><span class="pi">:</span>
+ <span class="na">providerCredentialsSecret</span><span class="pi">:</span>
+   <span class="na">name</span><span class="pi">:</span> <span class="s">ovirt-secret</span>
+ <span class="na">resourceMapping</span><span class="pi">:</span>
+   <span class="na">name</span><span class="pi">:</span> <span class="s">myvm-mapping</span>
+ <span class="na">targetVmName</span><span class="pi">:</span> <span class="s">testvm</span>
+ <span class="na">source</span><span class="pi">:</span>
+   <span class="na">ovirt</span><span class="pi">:</span>
+     <span class="na">vm</span><span class="pi">:</span>
+       <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
+       <span class="na">cluster</span><span class="pi">:</span>
+         <span class="na">name</span><span class="pi">:</span> <span class="s">mycluster</span>
 </code></pre></div></div>
 
-<p>Once <code class="language-plaintext highlighter-rouge">kubectl get pods -n cdi</code> confirms all pods are ready, CDI is good to go.</p>
+<p>Note that it is also possible to use internal mappings, so the user can create the mappings inside the VM import CR, for example:</p>
 
-<p>The module can instruct CDI to fill the PVC with data from:</p>
-
-<ul>
-  <li>a remote HTTP(S) server (<code class="language-plaintext highlighter-rouge">http:</code>),</li>
-  <li>a container registry (<code class="language-plaintext highlighter-rouge">registry:</code>),</li>
-  <li>a local file (<code class="language-plaintext highlighter-rouge">upload: yes</code>), though this requires using <code class="language-plaintext highlighter-rouge">kubevirt_cdi_upload</code> for the actual upload step,</li>
-  <li>or nowhere (the <code class="language-plaintext highlighter-rouge">blank: yes</code> option).</li>
-</ul>
-
-<p>Here’s a simple example:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kubevirt_pvc</span><span class="pi">:</span>
-<span class="na">name</span><span class="pi">:</span> <span class="s">pvc2</span>
-<span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
-<span class="na">size</span><span class="pi">:</span> <span class="s">100Mi</span>
-<span class="na">access_modes</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
-<span class="na">wait</span><span class="pi">:</span> <span class="s">yes</span>
-<span class="na">cdi_source</span><span class="pi">:</span>
-  <span class="na">http</span><span class="pi">:</span>
-    <span class="na">url</span><span class="pi">:</span> <span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v2v.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineImport</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">providerCredentialsSecret</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">ovirt-secret</span>
+    <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+  <span class="na">targetVmName</span><span class="pi">:</span> <span class="s">testvm</span>
+  <span class="na">source</span><span class="pi">:</span>
+    <span class="na">ovirt</span><span class="pi">:</span>
+      <span class="na">mappings</span><span class="pi">:</span>
+        <span class="na">networkMappings</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">source</span><span class="pi">:</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">ovirtmgmt/ovirtmgmt</span>
+            <span class="na">target</span><span class="pi">:</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">pod</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">pod</span>
+        <span class="na">storageMappings</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">source</span><span class="pi">:</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">mystoragedomain</span>
+            <span class="na">target</span><span class="pi">:</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">mystorageclass</span>
+      <span class="na">vm</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">myvm</span>
+        <span class="na">cluster</span><span class="pi">:</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">mycluster</span>
 </code></pre></div></div>
 
-<blockquote>
-  <p>info
-Please notice the <code class="language-plaintext highlighter-rouge">wait: yes</code> parameter. The module will only exit after CDI has completed transferring its data.</p>
-</blockquote>
+<p>Now let the operator do its work. You can explore the status by checking the status of the VM import CR</p>
 
-<p>Let’s see this in action:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook pvc_cdi.yaml
-<span class="o">(</span>…<span class="o">)</span>
-
-TASK <span class="o">[</span>Create pvc and fetch data] <span class="k">**********************************************************************************</span>
-changed: <span class="o">[</span>localhost]
-
-PLAY RECAP <span class="k">********************************************************************************************************</span>
-localhost                  : <span class="nv">ok</span><span class="o">=</span>2    <span class="nv">changed</span><span class="o">=</span>1    <span class="nv">unreachable</span><span class="o">=</span>0    <span class="nv">failed</span><span class="o">=</span>0    <span class="nv">skipped</span><span class="o">=</span>0    <span class="nv">rescued</span><span class="o">=</span>0    <span class="nv">ignored</span><span class="o">=</span>0
-
-<span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>kubectl get pvc
-NAME      STATUS    VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-pvc2      Bound     local-pv-6b6380e2   37Gi       RWO            <span class="nb">local          </span>71s
-<span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>kubectl get pvc/pvc2 <span class="nt">-o</span> yaml|grep cdi
-    cdi.kubevirt.io/storage.import.endpoint: https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img
-    cdi.kubevirt.io/storage.import.importPodName: importer-pvc2-gvn5c
-    cdi.kubevirt.io/storage.import.source: http
-    cdi.kubevirt.io/storage.pod.phase: Succeeded
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">...</span>
+<span class="na">status</span><span class="pi">:</span>
+    <span class="na">conditions</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">lastHeartbeatTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:09:22Z"</span>
+      <span class="na">lastTransitionTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:09:22Z"</span>
+      <span class="na">message</span><span class="pi">:</span> <span class="s">Validation completed successfully</span>
+      <span class="na">reason</span><span class="pi">:</span> <span class="s">ValidationCompleted</span>
+      <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">True"</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">Valid</span>
+    <span class="pi">-</span> <span class="na">lastHeartbeatTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:09:22Z"</span>
+      <span class="na">lastTransitionTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:09:22Z"</span>
+      <span class="na">message</span><span class="pi">:</span> <span class="s1">'</span><span class="s">VM</span><span class="nv"> </span><span class="s">specifies</span><span class="nv"> </span><span class="s">IO</span><span class="nv"> </span><span class="s">Threads:</span><span class="nv"> </span><span class="s">1,</span><span class="nv"> </span><span class="s">VM</span><span class="nv"> </span><span class="s">has</span><span class="nv"> </span><span class="s">NUMA</span><span class="nv"> </span><span class="s">tune</span><span class="nv"> </span><span class="s">mode</span><span class="nv"> </span><span class="s">secified:</span><span class="nv"> </span><span class="s">interleave'</span>
+      <span class="na">reason</span><span class="pi">:</span> <span class="s">MappingRulesVerificationReportedWarnings</span>
+      <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">True"</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">MappingRulesVerified</span>
+    <span class="pi">-</span> <span class="na">lastHeartbeatTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:10:29Z"</span>
+      <span class="na">lastTransitionTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:09:22Z"</span>
+      <span class="na">message</span><span class="pi">:</span> <span class="s">Copying virtual machine disks</span>
+      <span class="na">reason</span><span class="pi">:</span> <span class="s">ProcessingCompleted</span>
+      <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">True"</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">Processing</span>
+    <span class="pi">-</span> <span class="na">lastHeartbeatTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:10:29Z"</span>
+      <span class="na">lastTransitionTime</span><span class="pi">:</span> <span class="s2">"</span><span class="s">2020-08-05T13:10:29Z"</span>
+      <span class="na">message</span><span class="pi">:</span> <span class="s">Virtual machine disks import done</span>
+      <span class="na">reason</span><span class="pi">:</span> <span class="s">VirtualMachineReady</span>
+      <span class="na">status</span><span class="pi">:</span> <span class="s2">"</span><span class="s">True"</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">Succeeded</span>
+    <span class="na">dataVolumes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">testvm-26097887-1f4d-4718-961f-f5b63a49c3f5</span>
+    <span class="na">targetVmName</span><span class="pi">:</span> <span class="s">testvm</span>
 </code></pre></div></div>
 
-<p>Everything worked as expected.</p>
+<p>The import process goes through different stages. The first stage is the validation where HCO checks for unsupported mappings.
+The others are for processing and reporting to provide VM and disks ready status.</p>
 
-<h3 id="further-resources-1">Further resources</h3>
-
-<ul>
-  <li><a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_pvc_module.html">Ansible module documentation (kubevirt_pvc)</a></li>
-  <li><a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_cdi_upload_module.html">Ansible module documentation (kubevirt_cdi_upload)</a></li>
-  <li><a href="https://github.com/kubevirt/containerized-data-importer/">CDI GitHub Repo</a></li>
-</ul>
-
-<h2 id="inventory-plugin">Inventory plugin</h2>
-
-<p>The default way of using Ansible is to iterate over a list of hosts and perform operations on each one.
-Listing KubeVirt VMs can be done using the KubeVirt inventory plugin. It needs a bit of setting up before it can
-be used.</p>
-
-<p>First, enable the plugin in <code class="language-plaintext highlighter-rouge">ansible.cfg</code>:</p>
-
-<div class="language-config highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[<span class="n">inventory</span>]
-<span class="n">enable_plugins</span> = <span class="n">kubevirt</span>
-</code></pre></div></div>
-
-<p>Then configure the plugin using a file named <code class="language-plaintext highlighter-rouge">kubevirt.yml</code> or <code class="language-plaintext highlighter-rouge">kubevirt.yaml</code>:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">plugin</span><span class="pi">:</span> <span class="s">kubevirt</span>
-<span class="na">connections</span><span class="pi">:</span>
-  <span class="pi">-</span> <span class="na">namespaces</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="s">default</span>
-    <span class="na">network_name</span><span class="pi">:</span> <span class="s">default</span>
-</code></pre></div></div>
-
-<p>And now let’s see if it worked and there’s a VM running in the default namespace (as represented by the
-<code class="language-plaintext highlighter-rouge">namespace_default</code> inventory group):</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
- <span class="o">[</span>WARNING]: provided hosts list is empty, only localhost is available. Note that the implicit localhost does not
-match <span class="s1">'all'</span>
-
-  hosts <span class="o">(</span>0<span class="o">)</span>:
-</code></pre></div></div>
-
-<p>Right, we don’t have any VMs running. Let’s go back to <a href="/2019/kubevirt-with-ansible-part-1.html">part 1</a>, create <code class="language-plaintext highlighter-rouge">vm1</code>, make sure it’s runing
-and then try again:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook  ../part1/02_vm1.yaml
-<span class="o">(</span>…<span class="o">)</span>
-PLAY RECAP <span class="k">********************************************************************************************************</span>
-localhost                  : <span class="nv">ok</span><span class="o">=</span>2    <span class="nv">changed</span><span class="o">=</span>1    <span class="nv">unreachable</span><span class="o">=</span>0    <span class="nv">failed</span><span class="o">=</span>0    <span class="nv">skipped</span><span class="o">=</span>0    <span class="nv">rescued</span><span class="o">=</span>0    <span class="nv">ignored</span><span class="o">=</span>0
-
-<span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible-playbook  ../part1/01_vm1_running.yaml
-<span class="o">(</span>…<span class="o">)</span>
-PLAY RECAP <span class="k">********************************************************************************************************</span>
-localhost                  : <span class="nv">ok</span><span class="o">=</span>2    <span class="nv">changed</span><span class="o">=</span>1    <span class="nv">unreachable</span><span class="o">=</span>0    <span class="nv">failed</span><span class="o">=</span>0    <span class="nv">skipped</span><span class="o">=</span>0    <span class="nv">rescued</span><span class="o">=</span>0    <span class="nv">ignored</span><span class="o">=</span>0
-
-<span class="o">[</span>mmazur@klapek part2]<span class="nv">$ </span>ansible <span class="nt">-i</span> kubevirt.yaml namespace_default <span class="nt">--list-hosts</span>
-  hosts <span class="o">(</span>1<span class="o">)</span>:
-    default-vm1-2c680040-9e75-11e9-8839-525500d15501
-</code></pre></div></div>
-
-<p>Works!</p>
-
-<h3 id="further-resources-2">Further resources</h3>
-
-<ul>
-  <li><a href="https://docs.ansible.com/ansible/latest/plugins/inventory/kubevirt.html">Ansible inventory plugin documentation</a></li>
-</ul>
-
-<h2 id="more">More</h2>
-
-<p>Lastly, for the sake of brevity, a quick mention of the remaining modules:</p>
-
-<ul>
-  <li><a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_preset_module.html">kubevirt_presets</a> allows setting up
-VM presets to be used by deployed VMs,</li>
-  <li><a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_template_module.html">kubevirt_template</a> brings in a generic
-templating mechanism, when running on top of OpenShift or OKD,</li>
-  <li>and <a href="https://docs.ansible.com/ansible/latest/modules/kubevirt_rs_module.html">kubevirt_rs</a> lets one configure KubeVirt’s
-own ReplicaSets for running multiple instances of a specified virtual machine.</li>
-</ul>
+<h2 id="future">Future</h2>
+<p>For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.</p>
 
         </article>
         
         
 
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt with Ansible, part 2&url=https://www.kubevirt.io/2019/kubevirt-with-ansible-part-2.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Import virtual machine from oVirt&url=https://www.kubevirt.io/2020/Import-VM-from-oVirt.html&screen_name=kubevirt" aria-label="Share this on Twitter">
   <i class="fab fa-twitter mr-1"></i> Tweet
 </a>
 <hr/>
