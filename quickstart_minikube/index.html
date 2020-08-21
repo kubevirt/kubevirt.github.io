@@ -39,7 +39,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-08-20 14:34:50 +0000" >
+    <meta property="og:article:published_time" content="2020-08-21 08:06:58 +0000" >
     <meta name="twitter:title" content="KubeVirt Quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -382,7 +382,7 @@ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSI
 <ul>
   <li>Run the following:
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>kubectl get kubevirt.kubevirt.io/kubevirt <span class="nt">-n</span> kubevirt <span class="nt">-o</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.status.observedKubeVirtVersion}"</span><span class="si">)</span>
-<span class="nv">ARCH</span><span class="o">=</span>darwin-amd64 | linux-amd64 | linux-x86_64 | windows-amd64.exe
+<span class="nv">ARCH</span><span class="o">=</span>darwin-amd64 | linux-amd64 | windows-amd64.exe
 curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>-<span class="k">${</span><span class="nv">ARCH</span><span class="k">}</span>
 <span class="nb">chmod</span> +x virtctl
 <span class="nb">sudo install </span>virtctl /usr/local/bin
