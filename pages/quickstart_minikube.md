@@ -106,7 +106,7 @@ KubeVirt provides an additional binary called _virtctl_ for quick access to the 
 * Run the following:
    ```bash
 VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.observedKubeVirtVersion}")
-ARCH=darwin-amd64 | linux-amd64 | linux-x86_64 | windows-amd64.exe
+ARCH=darwin-amd64 | linux-amd64 | windows-amd64.exe
 curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-${ARCH}
 chmod +x virtctl
 sudo install virtctl /usr/local/bin
