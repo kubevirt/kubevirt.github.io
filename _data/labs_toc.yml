@@ -1,12 +1,12 @@
 toc:
-  - title: Installation
+  - title: Quickstart Guides
     subfolderitems:
       - page: Minikube
         url: quickstart_minikube/
       - page: Kind
         url: quickstart_kind/
       - page: Cloud providers
-        url: pages/cloud.html
+        url: quickstart_cloud
   - title: Labs
     subfolderitems:
       - page: Use KubeVirt

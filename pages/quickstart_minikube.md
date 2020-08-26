@@ -1,6 +1,6 @@
 ---
 layout: labs
-title: KubeVirt Quickstart with Minikube
+title: KubeVirt quickstart with Minikube
 permalink: /quickstart_minikube/
 redirect_from: "/get_kubevirt/"
 order: 2
@@ -22,31 +22,38 @@ Minikube quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows
 
 ## Prepare minikube Kubernetes environment
 
-* To install minikube please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-minikube/){:target="\_blank"}.
+* A kubectl client is necessary for operating a Kubernetes cluster. It is important to install a  kubectl client version that matches the kubernetes version to avoid issues regarding [_skew_](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew).
+<br><br>
+To install kubectl client please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+
+  Minikube ships a kubectl client version that matches the kubernetes version to avoid skew issues. To use the minikube shipped client do one of the following:
+  * All normal `kubectl` commands should be performed as `minikube kubectl`<br><br>
+  * It can be added to aliases by running the following:
+  ```bash
+  alias kubectl='minikube kubectl --'
+  ```
+  <br>
+  * It can be installed directly to the host by running the following:
+  ```bash
+  VERSION=$(minikube kubectl version | head -1 | awk -F', ' {'print $3'} | awk -F':' {'print $2'} | sed s/\"//g)
+  sudo install ${HOME}/.minikube/cache/linux/${VERSION}/kubectl /usr/local/bin
+  ```
+<br>
+* To install minikube please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-minikube/).
 
 * Starting minikube can be as simple as running the following command:
 ```
 minikube start
 ```
 
-    > info "Minikube handbook"
-    > See the minikube handbook [_here_](https://minikube.sigs.k8s.io/docs/) for advanced start options and instructions on how to operate minikube.
-
-* A kubectl client is necessary for operating a Kubernetes cluster. Minikube ships a  kubectl client version that matches the kubernetes version to avoid issues regarding [_skew_](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew).<br><br>
-To use the minikube shipped client all normal `kubectl` commands should be performed as `minikube kubectl`.<br><br>
-Or the shipped client can be added to aliases by running the following:
-```bash
-alias kubectl='minikube kubectl --'
-```
-<br>Or installed directly to the host by running the following:
-```bash
-VERSION=$(minikube kubectl version | head -1 | awk -F', ' {'print $3'} | awk -F':' {'print $2'} | sed s/\"//g)
-sudo install ${HOME}/.minikube/cache/linux/${VERSION}/kubectl /usr/local/bin
-```
+  > info ""
+  > See the minikube handbook [_here_](https://minikube.sigs.k8s.io/docs/) for advanced start options and instructions on how to operate minikube.
 
 ## Deploy KubeVirt
 
-KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components. Below are two examples of how to install KubeVirt using the latest release.
+KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components.
+
+Below are two examples of how to install KubeVirt using the latest release.
 
 ### The easy way
 
@@ -95,32 +102,11 @@ kubectl get all -n kubevirt
 ```
 kubectl logs pod/kubevirt-install-manager -n kube-system
 ```
-
-## Virtctl
-
-KubeVirt provides an additional binary called _virtctl_ for quick access to the serial and graphical ports of a VM and also handle start/stop operations.
-
-### Install
-`virtctl` can be retrieved from the release page of the KubeVirt github page.
-
-* Run the following:
-   ```bash
-VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.observedKubeVirtVersion}")
-ARCH=darwin-amd64 | linux-amd64 | windows-amd64.exe
-curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-${ARCH}
-chmod +x virtctl
-sudo install virtctl /usr/local/bin
-```
 <br>
 
-### Install as Krew plugin
-`virtctl` can be installed as a plugin via the [`krew` plugin manager](https://krew.dev/). Occurrences of `virtctl <command>...` can then be read as `kubectl virt <command>...`.  
+{% include quickstarts/virtctl.md %}
 
-* Run the following to install:
-```bash
-kubectl krew install virt
-```
-<br>
+{% include quickstarts/krew.md %}
 
 {% include labs-description.md %}
 

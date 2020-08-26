@@ -1,39 +1,50 @@
 ---
 layout: labs
-title: KubeVirt quickstart with kind
-permalink: /quickstart_kind/
+title: KubeVirt quickstart with cloud providers
+permalink: /quickstart_cloud/
 redirect_from: "/get_kubevirt/"
 order: 2
-lab: kind
-tags:
-  [
-    "Kubernetes",
-    "kind",
-    "kubevirt",
-    "VM",
-    "virtual machine",
+lab: cloud provider
+tags: [
+  "AliCloud",
+  "Amazon",
+  "AWS",
+  "Google",
+  "GCP",
+  "Kubernetes",
+  "KubeVirt",
+  "quickstart",
+  "tutorial",
+  "VM",
+  "virtual machine",
   ]
 ---
 
-# Easy install using kind
+# Easy install using cloud providers
 
-Kind quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
+KubeVirt can be used on cloud computing providers such as AWS, Azure, GCP, AliCloud.
 
-## Prepare kind Kubernetes environment
+## Prepare a cloud based Kubernetes cluster
 
 * A kubectl client is necessary for operating a Kubernetes cluster. It is important to install a  kubectl client version that matches the kubernetes version to avoid issues regarding [_skew_](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew).
 <br><br>
 To install kubectl client please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
 
-* To install kind please follow the official documentation for your system using the instructions located [_here_](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
+* Check the Kubernetes.io guide for each cloud provider on how to build infrastructure to match your use case:
 
-* Starting kind can be as simple as running the following command:
-```
-kind create cluster
-```
+  | Provider | Link                                                                             |
+  | -------- | -------------------------------------------------------------------------------- |
+  | AliCloud | <https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/> |
+  | AWS      | <https://kubernetes.io/docs/setup/production-environment/turnkey/aws/>           |
+  | Azure    | <https://kubernetes.io/docs/setup/production-environment/turnkey/azure/>         |
+  | GCP      | <https://kubernetes.io/docs/setup/production-environment/turnkey/gce/>           |
+  | Others   | <https://kubernetes.io/docs/setup/production-environment/turnkey/>               |
+
+>  error ""
+>  Be aware of the costs of associated with using infrastructure provided by cloud computing providers.
 
 > info ""
-> See the kind User Guide [_here_](https://kind.docs.kubernetes.io/) for advanced start options and instructions on how to operate kind.
+> Future labs will require at least 30 GiB of disk space.
 
 ## Deploy KubeVirt
 
