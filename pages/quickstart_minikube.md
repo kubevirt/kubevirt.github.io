@@ -106,8 +106,6 @@ kubectl logs pod/kubevirt-install-manager -n kube-system
 
 {% include quickstarts/virtctl.md %}
 
-{% include quickstarts/krew.md %}
-
 {% include labs-description.md %}
 
 {% include found_a_bug.md %}

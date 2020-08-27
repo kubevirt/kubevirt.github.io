@@ -76,8 +76,6 @@ kubectl get all -n kubevirt
 
 {% include quickstarts/virtctl.md %}
 
-{% include quickstarts/krew.md %}
-
 {% include labs-description.md %}
 
 {% include found_a_bug.md %}
