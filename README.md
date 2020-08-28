@@ -9,23 +9,31 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 ## Test your changes in a local container
 
 ### Run a Jekyll container
+- Clone repository, check out source branch and prepare the Jekyll site
+  ```console
+  git clone -b source https://github.com/kubevirt/kubevirt.github.io.git && cd kubevirt.github.io
+  for i in .jekyll-cache _site; do mkdir ${i} && chmod 777 ${i}; done
+  for i in Gemfile.lock; do touch ${i} && chmod 777 ${i}; done
+  ```
 
 - On a SELinux enabled OS:
 
   ```console
-  cd kubevirt.github.io
-  mkdir .jekyll-cache
-  podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch --future
+  podman run -it --rm --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch --future
   ```
 
-  **NOTE**: Be sure to cd into the _kubevirt.github.io_ directory before running the above command as the Z at the end of the volume (-v) will relabel its contents so it can be written from within the container, like running `chcon -Rt svirt_sandbox_file_t -l s0:c1,c2` yourself.
+  **NOTE**: The Z at the end of the volume (-v) will relabel its contents so it can be written from within the container, like running `chcon -Rt svirt_sandbox_file_t -l s0:c1,c2` yourself.
 
 - On an OS without SELinux:
 
   ```console
-  cd kubevirt.github.io
-  mkdir .jekyll-cache
-  podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch --future
+  podman run -it --rm --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch --future
+  ```
+
+- Verify internal and external hyperlinks
+
+  ```console
+  podman run -it --rm --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll /bin/bash -c "bundle install; rake";
   ```
 
 ### View the site
