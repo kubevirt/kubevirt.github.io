@@ -38,15 +38,15 @@ spec:
       disks:
       - disk:
           bus: virtio
-        name: registrydisk
-        volumeName: registryvolume
+        name: containerdisk
+        volumeName: containerdisk
     resources:
       requests:
         memory: 64M
   volumes:
-  - name: registryvolume
-    registryDisk:
-      image: kubevirt/cirros-registry-disk-demo:devel
+  - name: containerdisk
+    containerDisk:
+      image: kubevirt/cirros-container-disk-demo:devel
 ```
 
 In the spec above, we see the KubeVirt VirtualMachine object has an _apiVersion_
@@ -178,4 +178,4 @@ these roles will prevent admins from ever having to create their own custom
 KubeVirt RBAC roles.
 
 More information about these default roles can be found in the KubeVirt
-user guide [here](https://kubevirt.io/user-guide/#/authorization)
+user guide [here](https://kubevirt.io/user-guide/#/installation/authorization)

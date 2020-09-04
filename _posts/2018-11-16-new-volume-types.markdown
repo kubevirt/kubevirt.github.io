@@ -58,8 +58,8 @@ spec:
   domain:
     devices:
       disks:
-        - name: registrydisk
-          volumeName: registryvolume
+        - name: containerdisk
+          volumeName: containervolume
         - name: cloudinitdisk
           volumeName: cloudinitvolume
         - name: configmap-disk
@@ -75,9 +75,9 @@ spec:
       requests:
         memory: 1024M
   volumes:
-    - name: registryvolume
-      registryDisk:
-        image: kubevirt/fedora-cloud-registry-disk-demo:latest
+    - name: containervolume
+      containerDisk:
+        image: kubevirt/fedora-cloud-container-disk-demo:latest
     - name: cloudinitvolume
       cloudInitNoCloud:
         userData: |-
@@ -146,4 +146,4 @@ default
 ## Summary
 
 With these new volume types KubeVirt further improves the integration with native Kubernetes resources.
-Learn more about all available volume types on the [userguide](https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes).
+Learn more about all available volume types on the [userguide](https://kubevirt.io/user-guide/#/creation/disks-and-volumes).
