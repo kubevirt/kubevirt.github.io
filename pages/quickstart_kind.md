@@ -28,7 +28,7 @@ If you have [go](https://golang.org/) ([1.11+](https://golang.org/doc/devel/rele
 already installed the following command is all you need:
 
 ```bash
-GO111MODULE="on" go get sigs.k8s.io/kind@v0.7.0 && kind create cluster
+GO111MODULE="on" go get sigs.k8s.io/kind@v0.8.1 && kind create cluster
 ```
 
 > note "Note"
@@ -42,7 +42,7 @@ Stable binaries are also available on the [releases](https://github.com/kubernet
 recommended for CI usage in particular. To install, download the binary for your platform from "Assets" and place this into your `$PATH`:
 
 ```bash
-curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64"
+curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.8.1/kind-$(uname)-amd64"
 chmod +x ./kind
 mv ./kind /some-dir-in-your-PATH/kind
 ```
