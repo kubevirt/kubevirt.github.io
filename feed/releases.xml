@@ -1,4 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-09-14T14:50:39+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.32.0</title><link href="https://kubevirt.io//2020/changelog-v0.32.0.html" rel="alternate" type="text/html" title="KubeVirt v0.32.0" /><published>2020-08-11T00:00:00+00:00</published><updated>2020-08-11T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.32.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.32.0.html">&lt;h2 id=&quot;v0320&quot;&gt;v0.32.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-09-15T14:48:43+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.33.0</title><link href="https://kubevirt.io//2020/changelog-v0.33.0.html" rel="alternate" type="text/html" title="KubeVirt v0.33.0" /><published>2020-09-15T00:00:00+00:00</published><updated>2020-09-15T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.33.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.33.0.html">&lt;h2 id=&quot;v0330&quot;&gt;v0.33.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Tue Sep 15 14:46:00 2020 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #3226][vatsalparekh] Added tests to verify custom pciAddress slots and function&lt;/li&gt;
+  &lt;li&gt;[PR #4048][davidvossel] Improved reliability for failed migration retries&lt;/li&gt;
+  &lt;li&gt;[PR #3585][mhenriks] “virtctl image-upload pvc …” will create the PVC if it does not exist&lt;/li&gt;
+  &lt;li&gt;[PR #3945][xpivarc] KubeVirt is now being built with Go1.13.14&lt;/li&gt;
+  &lt;li&gt;[PR #3845][ArthurSens] action required: The domain label from VMI metrics is being removed and may break dashboards that use the domain label to identify VMIs. Use name and namespace labels instead&lt;/li&gt;
+  &lt;li&gt;[PR #4011][dhiller] ppc64le arch has been disabled for the moment, see https://github.com/kubevirt/kubevirt/issues/4037&lt;/li&gt;
+  &lt;li&gt;[PR #3875][stu-gott] Resources created by KubeVirt are now labelled more clearly in terms of relationship and role.&lt;/li&gt;
+  &lt;li&gt;[PR #3791][ashleyschuett] make node as kubevirt.io/schedulable=false on virt-handler restart&lt;/li&gt;
+  &lt;li&gt;[PR #3998][vladikr] the local provider is usable again.&lt;/li&gt;
+  &lt;li&gt;[PR #3290][maiqueb] Have virt-handler (KubeVirt agent) create the tap devices on behalf of the virt-launchers.&lt;/li&gt;
+  &lt;li&gt;[PR #3957][AlonaKaplan] virt-launcher support Ipv6 on dual stack cluster.&lt;/li&gt;
+  &lt;li&gt;[PR #3952][davidvossel] Fixes rare situation where vmi may not properly terminate if failure occurs before domain starts.&lt;/li&gt;
+  &lt;li&gt;[PR #3973][xpivarc] Fixes VMs with clock.timezone set.&lt;/li&gt;
+  &lt;li&gt;[PR #3923][danielBelenky] Add support to configure QEMU I/O mode for VMIs&lt;/li&gt;
+  &lt;li&gt;[PR #3889][rmohr] The status fields for our CRDs are now protected on normal PATCH and PUT operations.The /status subresource is now used where possible for status updates.&lt;/li&gt;
+  &lt;li&gt;[PR #3568][xpivarc] Guest swap metrics available&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.33.0</summary></entry><entry><title type="html">KubeVirt v0.32.0</title><link href="https://kubevirt.io//2020/changelog-v0.32.0.html" rel="alternate" type="text/html" title="KubeVirt v0.32.0" /><published>2020-08-11T00:00:00+00:00</published><updated>2020-08-11T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.32.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.32.0.html">&lt;h2 id=&quot;v0320&quot;&gt;v0.32.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Tue Aug 11 19:21:56 2020 +0000&lt;/p&gt;
 
@@ -138,15 +159,4 @@
   &lt;li&gt;Update of libvirt to 5.6.0&lt;/li&gt;
   &lt;li&gt;Fix bug related to parallel scraping of Prometheus endpoints&lt;/li&gt;
   &lt;li&gt;Fix to reliably test VNC&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.24.0</summary></entry><entry><title type="html">KubeVirt v0.23.0</title><link href="https://kubevirt.io//2019/changelog-v0.23.0.html" rel="alternate" type="text/html" title="KubeVirt v0.23.0" /><published>2019-11-04T00:00:00+00:00</published><updated>2019-11-04T00:00:00+00:00</updated><id>https://kubevirt.io//2019/changelog-v0.23.0</id><content type="html" xml:base="https://kubevirt.io//2019/changelog-v0.23.0.html">&lt;h2 id=&quot;v0230&quot;&gt;v0.23.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Mon Nov 4 16:42:54 2019 +0100&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Guest OS Information is available under the VMI status now&lt;/li&gt;
-  &lt;li&gt;Updated to Go 1.12.8 and latest bazel&lt;/li&gt;
-  &lt;li&gt;Updated go-yaml to v2.2.4, which has a ddos vulnerability fixed&lt;/li&gt;
-  &lt;li&gt;Cleaned up and fixed CRD scheme registration&lt;/li&gt;
-  &lt;li&gt;Several bugfixes&lt;/li&gt;
-  &lt;li&gt;Many CI improvements (e.g. more logs in case of test failures)&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.23.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.24.0</summary></entry></feed>
