@@ -22,9 +22,7 @@ Minikube quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows
 
 ## Prepare minikube Kubernetes environment
 
-* A kubectl client is necessary for operating a Kubernetes cluster. It is important to install a  kubectl client version that matches the kubernetes version to avoid issues regarding [_skew_](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew).
-<br><br>
-To install kubectl client please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+{% include quickstarts/kubectl.md %}
 
   Minikube ships a kubectl client version that matches the kubernetes version to avoid skew issues. To use the minikube shipped client do one of the following:
   * All normal `kubectl` commands should be performed as `minikube kubectl`<br><br>

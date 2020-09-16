@@ -26,9 +26,7 @@ KubeVirt can be used on cloud computing providers such as AWS, Azure, GCP, AliCl
 
 ## Prepare a cloud based Kubernetes cluster
 
-* A kubectl client is necessary for operating a Kubernetes cluster. It is important to install a  kubectl client version that matches the kubernetes version to avoid issues regarding [_skew_](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew).
-<br><br>
-To install kubectl client please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-kubectl/).
+{% include quickstarts/kubectl.md %}
 
 * Check the Kubernetes.io guide for each cloud provider on how to build infrastructure to match your use case:
 
