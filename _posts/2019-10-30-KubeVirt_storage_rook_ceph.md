@@ -719,6 +719,6 @@ sh-4.2# ceph status                                                             
 - [Kubernetes getting started](https://kubernetes.io/docs/setup/)
 - [KubeVirt Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
 - [Ceph: free-software storage platform](https://ceph.io)
-- [Ceph hardware recommendations](https://docs.ceph.com/docs/jewel/start/hardware-recommendations/)
+- [Ceph hardware recommendations](https://docs.ceph.com/en/latest/start/hardware-recommendations/)
 - [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
 - [KubeVirt User Guide](https://kubevirt.io/user-guide/#/)
