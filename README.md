@@ -19,7 +19,9 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 - On a SELinux enabled OS:
 
   ```console
-  podman run -it --rm --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch --future
+  podman run -it --rm --name kubevirtio -p 4000:4000 \
+             -v $(pwd):/srv/jekyll:Z jekyll/jekyll \
+             jekyll serve --watch --future
   ```
 
   **NOTE**: The Z at the end of the volume (-v) will relabel its contents so that it can be written from within the container, like running `chcon -Rt svirt_sandbox_file_t -l s0:c1,c2` yourself. Be sure that you have changed your present working directory to the git cloned directory as shown above.
@@ -27,13 +29,17 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 - On an OS without SELinux:
 
   ```console
-  podman run -it --rm --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch --future
+  podman run -it --rm --name kubevirtio -p 4000:4000 \
+             -v $(pwd):/srv/jekyll jekyll/jekyll \
+             jekyll serve --watch --future
   ```
 
 ### Verify internal and external hyperlinks
 
   ```console
-  podman run -it --rm --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll /bin/bash -c "bundle install; rake";
+  podman run -it --rm --name link-check -p 4000:4000 \
+             -v $(pwd):/srv/jekyll jekyll/jekyll:Z \
+             /bin/bash -c "bundle install; rake"
   ```
 
 ### View the site
