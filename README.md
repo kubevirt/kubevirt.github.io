@@ -25,7 +25,7 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
   ```console
   cd kubevirt.github.io
   mkdir .jekyll-cache
-  podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll jekyll/jekyll jekyll serve --watch --future
+  podman run -d --name kubevirtio -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll jekyll serve --watch --future
   ```
 
 ### View the site
