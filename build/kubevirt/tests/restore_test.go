@@ -26,7 +26,7 @@ import (
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
 )
 
-var _ = Describe("VirtualMachineRestore Tests", func() {
+var _ = Describe("[Serial]VirtualMachineRestore Tests", func() {
 
 	var err error
 	var virtClient kubecli.KubevirtClient
@@ -540,7 +540,12 @@ var _ = Describe("VirtualMachineRestore Tests", func() {
 				)
 
 				var err error
-				dv := &vm.Spec.DataVolumeTemplates[0]
+				dvt := &vm.Spec.DataVolumeTemplates[0]
+
+				dv := &cdiv1.DataVolume{}
+				dv.ObjectMeta = *dvt.ObjectMeta.DeepCopy()
+				dv.Spec = *dvt.Spec.DeepCopy()
+
 				originalPVCName := dv.Name
 				vm.Spec.DataVolumeTemplates = nil
 
@@ -631,7 +636,7 @@ var _ = Describe("VirtualMachineRestore Tests", func() {
 				)
 				vm = tests.NewRandomVirtualMachine(vmi, false)
 				dvName := "dv-" + vm.Name
-				vm.Spec.DataVolumeTemplates = []cdiv1.DataVolume{
+				vm.Spec.DataVolumeTemplates = []v1.DataVolumeTemplateSpec{
 					{
 						ObjectMeta: metav1.ObjectMeta{
 							Name: dvName,
