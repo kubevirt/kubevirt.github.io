@@ -523,9 +523,6 @@
 <loc>https://kubevirt.io//cloud-provider-kubevirt/</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//pages/cloud</loc>
-</url>
-<url>
 <loc>https://kubevirt.io//cluster-api-provider-external/</loc>
 </url>
 <url>
@@ -593,6 +590,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//qe-tools/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//quickstart_cloud/</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//quickstart_kind/</loc>

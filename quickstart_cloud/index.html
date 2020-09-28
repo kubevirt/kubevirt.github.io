@@ -23,25 +23,25 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//pages/cloud">
+    <link rel="canonical" href="https://kubevirt.io//quickstart_cloud/">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Easy installation on Cloud Providers | KubeVirt.io</title>
+    <title>KubeVirt quickstart with cloud providers | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
     <meta name="author" content="The KubeVirt.io website team, " >
     
     <meta name="twitter:card" content="summary">
     <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="GCP, AWS, AliCloud, azure, Amazon, Google, quickstart, tutorial" >
-    <meta property="og:title" content="Easy installation on Cloud Providers | KubeVirt.io">
+    <meta name="keywords" content="AliCloud, Amazon, AWS, Google, GCP, Kubernetes, KubeVirt, quickstart, tutorial, VM, virtual machine" >
+    <meta property="og:title" content="KubeVirt quickstart with cloud providers | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//pages/cloud" >
+    <meta property="og:url" content="https://kubevirt.io//quickstart_cloud/" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-09-28 14:58:54 +0000" >
-    <meta name="twitter:title" content="Easy installation on Cloud Providers | KubeVirt.io">
+    <meta property="og:article:published_time" content="2020-09-28 18:49:45 +0000" >
+    <meta name="twitter:title" content="KubeVirt quickstart with cloud providers | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
@@ -240,7 +240,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                   <div class="card-body card-body--sidebar">
                     
                       
-                        <h3>Installation</h3>
+                        <h3>Quickstart Guides</h3>
                         
                           
                             <h3 class="labs-title">
@@ -252,7 +252,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                             </h3>
                           
                             <h3 class="labs-title">
-                              <a href="/pages/cloud.html"  class="labs-title--item" >Cloud providers</a>
+                              <a href="/quickstart_cloud"  class="labs-title--item" >Cloud providers</a>
                             </h3>
                           
                         
@@ -281,164 +281,135 @@ autocomplete(document.getElementById("search-input"), mykeywords);
             </div>
           </div>
           <div class="col-sm-12 col-md-8 col-lg-8 docs">
-            <h1 id="easy-install-using-cloud-providers">Easy install using Cloud Providers</h1>
+            <h1 id="easy-install-using-cloud-providers">Easy install using cloud providers</h1>
 
-<h2 id="introduction">Introduction</h2>
+<p>KubeVirt can be used on cloud computing providers such as AWS, Azure, GCP, AliCloud.</p>
 
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p>KubeVirt has been tested on GCP and AWS providers, this approach is intended for demonstration purposes similar to the environments for <a href="/quickstart_kind/">Kind</a> and <a href="/quickstart_minikube/">Minikube</a> and of course the <a href="https://katacoda.com/kubevirt">Katacoda scenarios</a>.</p>
+<h2 id="prepare-a-cloud-based-kubernetes-cluster">Prepare a cloud based Kubernetes cluster</h2>
 
+<ul>
+  <li>
+    <p>A kubectl client is necessary for operating a Kubernetes cluster. It is important to install a  kubectl client version that matches the kubernetes version to avoid issues regarding <a href="https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew"><em>skew</em></a>.
+<br /><br />
+To install kubectl client please follow the official documentation for your system using the instructions located <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/"><em>here</em></a>.</p>
+  </li>
+  <li>
+    <p>Check the Kubernetes.io guide for each cloud provider on how to build infrastructure to match your use case:</p>
 
-</div></div>
-<p>KubeVirt can be tested on external Cloud Providers like AWS, Azure, GCP, AliCloud, and others.</p>
+    <table>
+      <thead>
+        <tr>
+          <th>Provider</th>
+          <th>Link</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>AliCloud</td>
+          <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/">https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/</a></td>
+        </tr>
+        <tr>
+          <td>AWS</td>
+          <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/aws/">https://kubernetes.io/docs/setup/production-environment/turnkey/aws/</a></td>
+        </tr>
+        <tr>
+          <td>Azure</td>
+          <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/azure/">https://kubernetes.io/docs/setup/production-environment/turnkey/azure/</a></td>
+        </tr>
+        <tr>
+          <td>GCP</td>
+          <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/gce/">https://kubernetes.io/docs/setup/production-environment/turnkey/gce/</a></td>
+        </tr>
+        <tr>
+          <td>Others</td>
+          <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/">https://kubernetes.io/docs/setup/production-environment/turnkey/</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+</ul>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p>Note this setup <strong>is not meant for production</strong>, it is meant to give you a quick taste of KubeVirt’s functionality.</p>
-
-
-</div></div>
-<h2 id="step1-create-a-new-k8s-cluster">Step1: Create a new K8S cluster</h2>
-
-<div class="premonition error"><div class="fa fa-exclamation-triangle"></div><div class="content"><p>Usage of Cloud Providers like GCP or AWS (or others) might have additional costs or require trial account and setup prior to be able to run those instructions, like for example, creating a default keypair or others.</p>
-
-
-</div></div>
-<p>Check Kubernetes.io guide for each cloud provider to match your use case:</p>
-
-<table>
-  <thead>
-    <tr>
-      <th>Provider</th>
-      <th>Link</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>Others</td>
-      <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/">https://kubernetes.io/docs/setup/production-environment/turnkey/</a></td>
-    </tr>
-    <tr>
-      <td>AliCloud</td>
-      <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/">https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/</a></td>
-    </tr>
-    <tr>
-      <td>AWS</td>
-      <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/aws/">https://kubernetes.io/docs/setup/production-environment/turnkey/aws/</a></td>
-    </tr>
-    <tr>
-      <td>Azure</td>
-      <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/azure/">https://kubernetes.io/docs/setup/production-environment/turnkey/azure/</a></td>
-    </tr>
-    <tr>
-      <td>GCP</td>
-      <td><a href="https://kubernetes.io/docs/setup/production-environment/turnkey/gce/">https://kubernetes.io/docs/setup/production-environment/turnkey/gce/</a></td>
-    </tr>
-  </tbody>
-</table>
-
-<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p>Create a disk of 30Gb at least.</p>
+<div class="premonition error"><div class="fa fa-exclamation-triangle"></div><div class="content"><p>Be aware of the costs of associated with using infrastructure provided by cloud computing providers.</p>
 
 
 </div></div>
-<p>After following the instructions provided by <a href="https://kubernetes.io">Kubernetes.io</a>, <code class="language-plaintext highlighter-rouge">kubectl</code> can be used to manage the cluster.</p>
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p>Future labs will require at least 30 GiB of disk space.</p>
 
-<h3 id="deploy-kubevirt-operator">Deploy KubeVirt Operator</h3>
 
-<p>Having the cluster up and running, let’s set the <em>version</em> environment
-variable that will be used on few commands:</p>
+</div></div>
+<h2 id="deploy-kubevirt">Deploy KubeVirt</h2>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># On other OS you might need to define it like</span>
-<span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="s2">"v0.18.0"</span>
+<p>KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components.</p>
 
-<span class="c"># On Linux you can obtain it using 'curl' via:</span>
-<span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> - | <span class="nb">sort</span> <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
+<ul>
+  <li>Use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt operator:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- '-rc' | head -1 | awk -F': ' '{print $2}' | sed 's/,//' | xargs)
+echo $VERSION
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml
+</code></pre></div>    </div>
+  </li>
+</ul>
 
-<span class="nb">echo</span> <span class="nv">$KUBEVIRT_VERSION</span>
-</code></pre></div></div>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Nested virtualization</p><p>If the minikube cluster runs on a virtual machine consider enabling nested virtualization.  Follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="\_blank">here</a>.</p>
 
-<p>Now, using the <code class="language-plaintext highlighter-rouge">kubectl</code> tool, let’s deploy the KubeVirt Operator:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
-</code></pre></div></div>
-
-<p>Check it’s running:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
-NAME                             READY     STATUS              RESTARTS   AGE
-virt-operator-6c5db798d4-9qg56   0/1       ContainerCreating   0          12s
-...
-virt-operator-6c5db798d4-9qg56   1/1       Running   0         28s
-</code></pre></div></div>
-
-<p>We’ll need to execute the command above few times (or add <em>-w</em> for <em>watching</em>
-the pods), until the operator is <em>Running</em> and <em>Ready</em> (1/1), then it’s time
-to head to the next section.</p>
-
-<h3 id="check-for-the-virtualization-extensions">Check for the Virtualization Extensions</h3>
-
-<p>To check if your VM’s CPU supports virtualization extensions execute the
-following command:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>egrep <span class="s1">'svm|vmx'</span> /proc/cpuinfo
-</code></pre></div></div>
-
-<p>If the command doesn’t generate any output, create the following <em>ConfigMap</em>
-so that KubeVirt uses emulation mode, otherwise skip to the next section:</p>
-
+<p>If for any reason nested virtualization cannot be enabled do enable KubeVirt emulation as follows:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
 </code></pre></div></div>
 
-<h3 id="deploy-kubevirt">Deploy KubeVirt</h3>
 
-<p>KubeVirt is then deployed by creating a dedicated custom resource:</p>
+</div></div>
+<ul>
+  <li>Again use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt custom resource definitions:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
+</code></pre></div>    </div>
+  </li>
+</ul>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
-</code></pre></div></div>
+<h3 id="verify-components">Verify components</h3>
 
-<p>Check the deployment:</p>
+<p>By default KubeVirt will deploy 7 pods, 3 services, 1 daemonset, 3 deployment apps, 3 replica sets.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
-NAME                               READY     STATUS    RESTARTS   AGE
-virt-api-649859444c-fmrb7          1/1       Running   0          2m12s
-virt-api-649859444c-qrtb6          1/1       Running   0          2m12s
-virt-controller-7f49b8f77c-kpfxw   1/1       Running   0          2m12s
-virt-controller-7f49b8f77c-m2h7d   1/1       Running   0          2m12s
-virt-handler-t4fgb                 1/1       Running   0          2m12s
-virt-operator-6c5db798d4-9qg56     1/1       Running   0          6m41s
-</code></pre></div></div>
+<ul>
+  <li>Check the deployment:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.phase}"
+</code></pre></div>    </div>
+  </li>
+  <li>Check the components:
+    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get all -n kubevirt
+</code></pre></div>    </div>
+    <p><br /></p>
+  </li>
+</ul>
 
-<p>Once we applied the <em>Custom Resource</em> the operator took care of deploying the
-actual KubeVirt pods (<em>virt-api</em>, <em>virt-controller</em> and <em>virt-handler</em>). Again
-we’ll need to execute the command until everything is <em>up&amp;running</em>
-(or use <em>-w</em>).</p>
+<h2 id="virtctl">Virtctl</h2>
 
-<h3 id="install-virtctl">Install virtctl</h3>
+<p>KubeVirt provides an additional binary called <em>virtctl</em> for quick access to the serial and graphical ports of a VM and also handle start/stop operations.</p>
 
-<p>An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
-The tool is called <em>virtctl</em> and can be retrieved from the release page of KubeVirt:</p>
+<h3 id="install">Install</h3>
+<p><code class="language-plaintext highlighter-rouge">virtctl</code> can be retrieved from the release page of the KubeVirt github page.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
-    https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
+<ul>
+  <li>Run the following:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>kubectl get kubevirt.kubevirt.io/kubevirt <span class="nt">-n</span> kubevirt <span class="nt">-o</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.status.observedKubeVirtVersion}"</span><span class="si">)</span>
+<span class="nv">ARCH</span><span class="o">=</span><span class="si">$(</span><span class="nb">uname</span> <span class="nt">-s</span> | <span class="nb">tr </span>A-Z a-z<span class="si">)</span>-<span class="si">$(</span><span class="nb">uname</span> <span class="nt">-m</span> | <span class="nb">sed</span> <span class="s1">'s/x86_64/amd64/'</span><span class="si">)</span> <span class="o">||</span> windows-amd64.exe
+<span class="nb">echo</span> <span class="k">${</span><span class="nv">ARCH</span><span class="k">}</span>
+curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>-<span class="k">${</span><span class="nv">ARCH</span><span class="k">}</span>
 <span class="nb">chmod</span> +x virtctl
-</code></pre></div></div>
+<span class="nb">sudo install </span>virtctl /usr/local/bin
+</code></pre></div>    </div>
+  </li>
+</ul>
 
-<p>If <a href="https://krew.dev/"><code class="language-plaintext highlighter-rouge">krew</code> plugin manager</a> is <a href="https://github.com/kubernetes-sigs/krew/#installation">installed</a>, <code class="language-plaintext highlighter-rouge">virtctl</code> can be installed via <code class="language-plaintext highlighter-rouge">krew</code>:</p>
+<h3 id="install-as-krew-plugin">Install as Krew plugin</h3>
+<p><code class="language-plaintext highlighter-rouge">virtctl</code> can be installed as a plugin via the <a href="https://krew.dev/"><code class="language-plaintext highlighter-rouge">krew</code> plugin manager</a>. Occurrences of <code class="language-plaintext highlighter-rouge">virtctl &lt;command&gt;...</code> can then be read as <code class="language-plaintext highlighter-rouge">kubectl virt &lt;command&gt;...</code>.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl krew <span class="nb">install </span>virt
-</code></pre></div></div>
-
-<p>Then <code class="language-plaintext highlighter-rouge">virtctl</code> can be used as a kubectl plugin. For a list of available commands run:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt <span class="nb">help</span>
-</code></pre></div></div>
-
-<p>Once krew plugin is installed, every occurrence throughout this guide of</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl &lt;<span class="nb">command</span><span class="o">&gt;</span>...
-</code></pre></div></div>
-
-<p>should then be read as</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl virt &lt;<span class="nb">command</span><span class="o">&gt;</span>...
-</code></pre></div></div>
+<ul>
+  <li>Run the following to install:
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl krew <span class="nb">install </span>virt
+</code></pre></div>    </div>
+    <p><br /></p>
+  </li>
+</ul>
 
 <h2 id="whats-next-labs">What’s next: Labs</h2>
 
@@ -449,6 +420,12 @@ The tool is called <em>virtctl</em> and can be retrieved from the release page o
 <p>The second lab is <a href="/labs/kubernetes/lab2">“Experiment with CDI”</a>. This lab shows how to use the Containerized Data Importer (CDI) to import a VM image into a <a href="https://kubernetes.io/docs/concepts/storage/persistent-volumes/">Persistent Volume Claim</a> (PVC) and then how to attach the PVC to a VM as a block device.</p>
 
 <p>The third lab is <a href="/labs/kubernetes/lab3">“KubeVirt upgrades”</a>. This lab shows how easy and safe is to upgrade the KubeVirt installation with zero down-time.</p>
+
+<h2 id="found-a-bug">Found a bug?</h2>
+
+<p>We are interested in hearing about your experience.</p>
+
+<p>Please report any problems to the <a href="https://github.com/kubevirt/kubevirt.github.io/issues">kubevirt.io issue tracker</a>.</p>
 
 
           </div>
