@@ -510,10 +510,16 @@ rules:
   resources:
   - virtualmachineinstances/console
   - virtualmachineinstances/vnc
+  verbs:
+  - get
+- apiGroups:
+  - subresources.kubevirt.io
+  resources:
   - virtualmachineinstances/pause
   - virtualmachineinstances/unpause
   verbs:
   - get
+  - update
 - apiGroups:
   - subresources.kubevirt.io
   resources:
@@ -559,10 +565,16 @@ rules:
   resources:
   - virtualmachineinstances/console
   - virtualmachineinstances/vnc
+  verbs:
+  - get
+- apiGroups:
+  - subresources.kubevirt.io
+  resources:
   - virtualmachineinstances/pause
   - virtualmachineinstances/unpause
   verbs:
   - get
+  - update
 - apiGroups:
   - subresources.kubevirt.io
   resources:
