@@ -1,6 +1,8 @@
 ---
 layout: labs
 title: KubeVirt quickstart with kind
+permalink: /quickstart_kind/
+redirect_from: "/get_kubevirt/"
 navbar_active: Labs
 order: 2
 lab: kind
