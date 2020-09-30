@@ -40,7 +40,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-09-30 15:00:33 +0000" >
+    <meta property="og:article:published_time" content="2020-09-30 19:11:12 +0000" >
     <meta name="twitter:title" content="KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -228,139 +228,130 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <div class="col align-self-center">
             <h1 class="hero-overlay-text">Building a virtualization API for Kubernetes</h1>
             <a id="demo-video" href="#" video-url="https://youtu.be/uusM5SyK-vc" class="btn kv-btn kv-btn-primary hero-overlay__action">
-              Watch our intro video
               <svg width="20px" height="20px" enable-background="new 0 0 142.448 142.448" viewBox="0 0 142.448 142.448" xmlns="http://www.w3.org/2000/svg"><g fill="#006166"><path d="m142.411 68.9c-1.195-37.42-31.443-67.667-68.862-68.862-20.361-.646-39.41 7.104-53.488 21.639-13.534 13.973-20.645 32.394-20.023 51.872 1.194 37.419 31.442 67.667 68.861 68.861.779.025 1.551.037 2.325.037 19.454 0 37.624-7.698 51.163-21.676 13.534-13.972 20.646-32.394 20.024-51.871zm-30.798 41.436c-10.688 11.035-25.032 17.112-40.389 17.112-.614 0-1.228-.01-1.847-.029-29.532-.943-53.404-24.815-54.348-54.348-.491-15.382 5.122-29.928 15.806-40.958 10.688-11.035 25.032-17.112 40.389-17.112.614 0 1.228.01 1.847.029 29.532.943 53.404 24.815 54.348 54.348.491 15.382-5.123 29.928-15.806 40.958z"/><path d="m94.585 67.086-31.584-22.646c-3.369-2.416-8.059-.008-8.059 4.138v45.293c0 4.146 4.69 6.554 8.059 4.138l31.583-22.647c2.834-2.031 2.834-6.244.001-8.276z"/></g></svg>
+              Watch our intro video
             </a>
           </div>
         </div>
-        <div class="row align-items-center justify-content-center">
-          <div class="card-group">
-            <div class="card" style="margin-right: .2rem;">
-              <div class="card-body">
-                <img src="./../assets/images/katacoda-logo.png" width="41px" height="41px" alt="Katacoda Logo">
-                <p class="card-text">
+          <div class="kv-card-group">
+            <header class="kv-card-group__header">
+              <h2>Try KubeVirt now</h2>
+              <p>Try KubeVirt right now on the following platforms</p>
+            </header>
+            <div class="kv-card">
+              <div class="kv-card-body">
+                <img src="./../assets/images/katacoda.svg" alt="Katacoda Logo">
+                <p class="kv-card-text">
                   KubeVirt on katacoda
                 </p>
               </div>
-              <div class="card-footer">
                 <a href="https://www.katacoda.com/kubevirt" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try
-                  It!</a>
-              </div>
+                  katacoda!</a>
             </div>
-            <div class="card" style="margin-right: .2rem;">
-              <div class="card-body">
-                <img src="./../assets/images/minikube-logo.svg" width="41px" height="41px" alt="MiniKube Logo">
-                <p class="card-text">
+            <div class="kv-card">
+              <div class="kv-card-body">
+                <img src="./../assets/images/minikube-logo.svg" width="60px" height="60px" alt="MiniKube Logo">
+                <p class="kv-card-text">
                   KubeVirt on MiniKube
                 </p>
               </div>
-              <div class="card-footer">
-                <a href="quickstart_minikube" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try It!</a>
-              </div>
+                <a href="quickstart_minikube" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try MiniKube!</a>
             </div>
-            <div class="card" style="margin-right: .2rem;">
-              <div class="card-body">
-                <img src="./../assets/images/kind-logo.png" width="60px" height="41px" alt="Kind Logo">
-                <p class="card-text">
+            <div class="kv-card">
+              <div class="kv-card-body">
+                <img src="./../assets/images/kind.svg" width="84px" height="64px" alt="Kind Logo">
+                <p class="kv-card-text">
                   KubeVirt on Kind
                 </p>
               </div>
-              <div class="card-footer">
-                <a href="quickstart_kind" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try It!</a>
-              </div>
+                <a href="quickstart_kind" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try Kind!</a>
             </div>
-            <div class="card" style="margin-right: .2rem;">
-              <div class="card-body">
-                <img src="./../assets/images/cloud.png" width="55px" height="39px" alt="Cloud Logo">
-                <p class="card-text">
+            <div class="kv-card">
+              <div class="kv-card-body">
+                <img src="./../assets/images/cloud.png" height="64px" alt="Cloud Logo">
+                <p class="kv-card-text">
                   KubeVirt on Cloud Providers
                 </p>
               </div>
-              <div class="card-footer">
                 <a href="quickstart_cloud" class="btn kv-btn kv-btn-primary" aria-label="Try It button">Try It!</a>
-              </div>
             </div>
+          </div>
       </div>
     </header>
 
 
-    <main role="main">
-      <section class="kubevirt-intro">
-  <div class="wrapper">
-    <div class="container-fluid">
-      <div id="why" class="row">
-        <div class="col-md-5 offset-md-1 align-self-start">
-          <h2 class="page-subtitle--spacer_top">Why KubeVirt?</h2>
+    <main role="main" class="kv-homepage-grid">
+      <section class="kv-why">
+    <h2>Why KubeVirt?</h2>
           <p>
             KubeVirt technology addresses the needs of development teams that have adopted or want to adopt <a href="https://kubernetes.io/">Kubernetes</a> but
             possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the
             technology provides a unified development platform where developers can build, modify, and deploy applications
             residing in both Application Containers as well as Virtual Machines in a common, shared environment.
           </p>
-          <p class="page-paragraph--spacer_bottom">
+          <p>
             Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are
             empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows,
             teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.
           </p>
-        </div>
-        <div class="col-md-6 col-xl-5 align-self-center text-md-right" style="text-align: center;">
-          <img src="./../assets/images/home-image1.svg" class="img-fluid" alt="Workload Balancing">
-        </div>
-      </div>
-    </div>
-  </div>
+          <!-- <img src="./../assets/images/home-image1.svg" width="300px" height="300px" alt="Workload Balancing"> -->
 </section>
 
-<section class="kubevirt-can-do">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col offset-md-1 align-self-start">
-        <h2 class="page-subtitle--spacer_top page-subtitle--spacer_bottom">What can I do with KubeVirt?</h2>
-      </div>
-    </div>
-    <div class="row justify-content-center">
-      <div class="card-group justify-content-center">
-        <div class="card col-md-4 col-lg-3 text-center">
-          <div class="card-body">
-            <img src="./../assets/images/home-image-col1.svg" class="img-fluid" alt="KubeVirt and Kubernetes">
-          </div>
-          <div class="card-footer">
-            <p>
-              Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.
-            </p>
-          </div>
-        </div>
-        <div class="card col-md-4 col-lg-3 text-center">
-          <div class="card-body">
-            <img src="./../assets/images/home-image-col2.svg" class="img-fluid" alt="KubeVirt and VMs">
-          </div>
-          <div class="card-footer">
-            <p>
-              Combine existing virtualized workloads with new container workloads on the one platform.
-            </p>
-          </div>
-        </div>
-        <div class="card col-md-4 col-lg-3 text-center">
-          <div class="card-body">
-            <img src="./../assets/images/home-image-col3.svg" class="img-fluid" alt="Containerized Applications">
-          </div>
-          <div class="card-footer">
-            <p>
-              Support development of new microservice applications in containers that interact with existing virtualized applications.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="kv-what">
+  <h2 class="kv-what__title">What can I do with KubeVirt?</h2>
+  <img class="kv-what__img" src="./../assets/images/home-image-col1.svg" alt="KubeVirt and Kubernetes">
+  <p class="kv-what__text">Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.</p>
+  <img class="kv-what__img" src="./../assets/images/home-image-col2.svg" alt="KubeVirt and VMs">
+  <p class="kv-what__text">Combine existing virtualized workloads with new container workloads on the one platform.</p>
+  <img class="kv-what__img" src="./../assets/images/home-image-col3.svg" alt="Containerized Applications">
+  <p class="kv-what__text">Support development of new microservice applications in containers that interact with existing virtualized applications.</p>
 </section>
 
+<section class="kv-recent-posts">
+  <h2>Recent posts</h2>
+  
+  <article class="kv-blog__snippet">
+    <a href="/2020/changelog-v0.33.0.html" class="kv-blog__snippet__link">
+      <h4 class="">KubeVirt v0.33.0</h4>
+      <time datetime="1999-12-23" class="">Tue, 15/09/20</time>
+  </a>
+  </article>
+
+  <article class="kv-blog__snippet">
+    <a href="/2020/changelog-v0.32.0.html" class="kv-blog__snippet__link">
+      <h4 class="">KubeVirt v0.32.0</h4>
+      <time datetime="1999-12-23" class="">Tue, 11/08/20</time>
+  </a>
+  </article>
+
+  <article class="kv-blog__snippet">
+    <a href="/2020/Import-VM-from-oVirt.html" class="kv-blog__snippet__link">
+      <h4 class="">Import virtual machine from oVirt</h4>
+      <time datetime="1999-12-23" class="">Thu, 6/08/20</time>
+  </a>
+  </article>
+
+  <article class="kv-blog__snippet">
+    <a href="/2020/Minikube_KubeVirt_Addon.html" class="kv-blog__snippet__link">
+      <h4 class="">Minikube KubeVirt addon</h4>
+      <time datetime="1999-12-23" class="">Mon, 20/07/20</time>
+  </a>
+  </article>
+
+  <article class="kv-blog__snippet">
+    <a href="/2020/changelog-v0.31.0.html" class="kv-blog__snippet__link">
+      <h4 class="">KubeVirt v0.31.0</h4>
+      <time datetime="1999-12-23" class="">Thu, 9/07/20</time>
+  </a>
+  </article>
+
+</section>
     </main>
 
 
     <footer class="footer" role="contentinfo">
       <div class="container-fluid">
-  <div class="row justify-content-center">
+  <div class="row justify-content-between">
     <div class="col-sm-12 col-md-5">
       <p class="privacy-statement text-sm-left" style="text-align: center;">
         &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
@@ -400,7 +391,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </div>
   </div>
   <div class="row">
-    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
       Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
       site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>. This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
     </div>

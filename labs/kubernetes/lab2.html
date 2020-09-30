@@ -40,7 +40,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-09-30 15:00:33 +0000" >
+    <meta property="og:article:published_time" content="2020-09-30 19:11:12 +0000" >
     <meta name="twitter:title" content="Experiment with CDI | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -89,7 +89,7 @@
           <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
         </li>
       
-        <li  class="nav-item" >
+        <li  class="nav-item active" >
           <a class="nav-link text-uppercase" href="/labs/">Labs</a>
         </li>
       
@@ -225,63 +225,201 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
     <main role="main" style="margin-top: 60px;">
       <div class="container-fluid">
-        <div class="row">
-          <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
-            <div class="accordion" id="accordionTOC">
-              <div class="card card--sidebar">
-                <div class="card-header card-header--sidebar" id="headingTOC">
-                  <h5 class="mb-0">
-                    <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
-                      Labs
-                    </button>
-                  </h5>
-                </div>
-                <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
-                  <div class="card-body card-body--sidebar">
+  <div class="row">
+    <h1 class="page-title">
+      
+        Labs - Experiment with CDI
+      
+    </h1>
+  </div>
+  <div class="row">
+    <div class="col-sm-12 col-md-3">
+      
+        
+          
+          <ul class="blogs-navigation">
+            <h3>Quickstart Guides</h3>
+            
+              <!-- <h3 class="labs-title">
+                <a href="/quickstart_minikube/"  class="labs-title--item" >Minikube</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/quickstart_minikube/"  class="blogs-navigation--item_link" >
+                  Minikube
+                </a>
+                
+              </li>
+            
+              <!-- <h3 class="labs-title">
+                <a href="/quickstart_kind/"  class="labs-title--item" >Kind</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/quickstart_kind/"  class="blogs-navigation--item_link" >
+                  Kind
+                </a>
+                
+              </li>
+            
+              <!-- <h3 class="labs-title">
+                <a href="/quickstart_cloud"  class="labs-title--item" >Cloud providers</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/quickstart_cloud"  class="blogs-navigation--item_link" >
+                  Cloud providers
+                </a>
+                
+              </li>
+            
+          </ul>
+          
+        
+          
+          <ul class="blogs-navigation">
+            <h3>Labs</h3>
+            
+              <!-- <h3 class="labs-title">
+                <a href="/labs/kubernetes/lab1.html"  class="labs-title--item" >Use KubeVirt</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/labs/kubernetes/lab1.html"  class="blogs-navigation--item_link" >
+                  Use KubeVirt
+                </a>
+                
+              </li>
+            
+              <!-- <h3 class="labs-title">
+                <a href="/labs/kubernetes/lab2.html"  class="labs-title--item active" >Experiment with CDI</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/labs/kubernetes/lab2.html"  class="blogs-navigation--item_link active" >
+                  Experiment with CDI
+                </a>
+                
+              </li>
+            
+              <!-- <h3 class="labs-title">
+                <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/labs/kubernetes/lab3.html"  class="blogs-navigation--item_link" >
+                  KubeVirt Upgrades
+                </a>
+                
+              </li>
+            
+          </ul>
+          
+        
+      
+      <!-- 
+        
+          
+          <ul class="blogs-navigation">
+            <h3>Categories</h3>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/news.html"  class="blogs-navigation--item_link" >
+                  News
+                </a>
+                
+              </li>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/updates.html"  class="blogs-navigation--item_link" >
+                  Weekly Updates
+                </a>
+                
+              </li>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/releases.html"  class="blogs-navigation--item_link" >
+                  Releases
+                </a>
+                
+              </li>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/uncategorized.html"  class="blogs-navigation--item_link" >
+                  Uncategorized
+                </a>
+                
+              </li>
+            
+          </ul>
+          
+        
+          
+          <ul class="blogs-navigation">
+            <h3>Additional filters</h3>
+            
+              <li class="blogs-navigation--item">
+                <a href="/blogs/date.html"  class="blogs-navigation--item_link" >
+                  Grouped by Date
+                </a>
+                
+              </li>
+            
+          </ul>
+          
+        
+       -->
+    </div>
+    <!-- <div class="col-sm-12 col-md-4 col-lg-3 offset-lg-1">
+      <div class="accordion" id="accordionTOC">
+        <div class="card card--sidebar">
+          <div class="card-header card-header--sidebar" id="headingTOC">
+            <h5 class="mb-0">
+              <button class="btn btn-link kv-btn-link--sidebar" type="button" data-toggle="collapse" data-target="#collapseTOC" aria-expanded="true" aria-controls="collapseTOC" style="width: 100%; text-align: left;">
+                Labs
+              </button>
+            </h5>
+          </div>
+          <div id="collapseTOC" class="collapse show" aria-labelledby="headingTOC" data-parent="#accordionTOC">
+            <div class="card-body card-body--sidebar">
+              
+                
+                  <h3>Quickstart Guides</h3>
+                  
                     
-                      
-                        <h3>Quickstart Guides</h3>
-                        
-                          
-                            <h3 class="labs-title">
-                              <a href="/quickstart_minikube/"  class="labs-title--item" >Minikube</a>
-                            </h3>
-                          
-                            <h3 class="labs-title">
-                              <a href="/quickstart_kind/"  class="labs-title--item" >Kind</a>
-                            </h3>
-                          
-                            <h3 class="labs-title">
-                              <a href="/quickstart_cloud"  class="labs-title--item" >Cloud providers</a>
-                            </h3>
-                          
-                        
-                      
-                        <h3>Labs</h3>
-                        
-                          
-                            <h3 class="labs-title">
-                              <a href="/labs/kubernetes/lab1.html"  class="labs-title--item" >Use KubeVirt</a>
-                            </h3>
-                          
-                            <h3 class="labs-title">
-                              <a href="/labs/kubernetes/lab2.html"  class="labs-title--item active" >Experiment with CDI</a>
-                            </h3>
-                          
-                            <h3 class="labs-title">
-                              <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
-                            </h3>
-                          
-                        
-                      
+                      <h3 class="labs-title">
+                        <a href="/quickstart_minikube/"  class="labs-title--item" >Minikube</a>
+                      </h3>
                     
-                  </div>
-                </div>
-              </div>
+                      <h3 class="labs-title">
+                        <a href="/quickstart_kind/"  class="labs-title--item" >Kind</a>
+                      </h3>
+                    
+                      <h3 class="labs-title">
+                        <a href="/quickstart_cloud"  class="labs-title--item" >Cloud providers</a>
+                      </h3>
+                    
+                  
+                
+                  <h3>Labs</h3>
+                  
+                    
+                      <h3 class="labs-title">
+                        <a href="/labs/kubernetes/lab1.html"  class="labs-title--item" >Use KubeVirt</a>
+                      </h3>
+                    
+                      <h3 class="labs-title">
+                        <a href="/labs/kubernetes/lab2.html"  class="labs-title--item active" >Experiment with CDI</a>
+                      </h3>
+                    
+                      <h3 class="labs-title">
+                        <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
+                      </h3>
+                    
+                  
+                
+              
             </div>
           </div>
-          <div class="col-sm-12 col-md-8 col-lg-8 docs">
-            <h1 id="experiment-with-the-containerized-data-importer-cdi">Experiment with the Containerized Data Importer (CDI)</h1>
+        </div>
+      </div>
+    </div> -->
+    <div class="col-sm-12 col-md-9 docs">
+      <h1 id="experiment-with-the-containerized-data-importer-cdi">Experiment with the Containerized Data Importer (CDI)</h1>
 
 <p>You can experiment this lab online at <a href="https://katacoda.com/kubevirt/scenarios/kubevirt-cdi"><img src="/assets/images/katacoda-logo.png" alt="Katacoda" /></a></p>
 
@@ -419,14 +557,16 @@ vm1-ssh   NodePort   10.101.226.150   &lt;none&gt;        20222:32495/TCP   24m
 
 <p><a href="/labs/kubernetes/lab1">Previous Lab</a></p>
 
-          </div>
-        </div>
-      </div>
+    </div>
+  </div>
+</div>
+
+
     </main>
 
     <footer class="footer" role="footer">
       <div class="container-fluid">
-  <div class="row justify-content-center">
+  <div class="row justify-content-between">
     <div class="col-sm-12 col-md-5">
       <p class="privacy-statement text-sm-left" style="text-align: center;">
         &copy; <script type="text/javascript"> document.write(new Date().getFullYear()); </script> KubeVirt | <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
@@ -466,7 +606,7 @@ vm1-ssh   NodePort   10.101.226.150   &lt;none&gt;        20222:32495/TCP   24m
     </div>
   </div>
   <div class="row">
-    <div class="col offset-md-1 text-sm-left footer-licensing" style="text-align: center;">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
       Code licensed under <a href="https://github.com/kubevirt/kubevirt/blob/master/LICENSE">Apache 2.0</a>,
       site under <a href="https://github.com/kubevirt/kubevirt.github.io/blob/master/LICENSE">MIT</a>. This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
     </div>
@@ -482,6 +622,14 @@ vm1-ssh   NodePort   10.101.226.150   &lt;none&gt;        20222:32495/TCP   24m
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
     <script id="dsq-count-scr" src="//kubevirt-io.disqus.com/count.js" async></script>
     <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
     <script type="text/javascript">
         if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
             _satellite.pageBottom();
