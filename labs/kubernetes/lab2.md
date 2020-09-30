@@ -2,6 +2,7 @@
 layout: labs
 title: Experiment with CDI
 permalink: /labs/kubernetes/lab2
+navbar_active: Labs
 lab: kubernetes
 order: 1
 tags: [laboratory, importer, vm import, containerized data importer, CDI, lab]

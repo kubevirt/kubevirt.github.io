@@ -1,7 +1,8 @@
 ---
 layout: labs
-title: KubeVirt upgrades
+title: KubeVirt Upgrades
 permalink: /labs/kubernetes/lab3
+navbar_active: Labs
 lab: kubernetes
 order: 1
 tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]

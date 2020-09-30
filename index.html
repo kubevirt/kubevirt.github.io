@@ -2,72 +2,40 @@
 layout: homepage
 ---
 
-<section class="kubevirt-intro">
-  <div class="wrapper">
-    <div class="container-fluid">
-      <div id="why" class="row">
-        <div class="col-md-5 offset-md-1 align-self-start">
-          <h2 class="page-subtitle--spacer_top">Why KubeVirt?</h2>
+<section class="kv-why">
+    <h2>Why KubeVirt?</h2>
           <p>
             KubeVirt technology addresses the needs of development teams that have adopted or want to adopt <a href="https://kubernetes.io/">Kubernetes</a> but
             possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the
             technology provides a unified development platform where developers can build, modify, and deploy applications
             residing in both Application Containers as well as Virtual Machines in a common, shared environment.
           </p>
-          <p class="page-paragraph--spacer_bottom">
+          <p>
             Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are
             empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows,
             teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.
           </p>
-        </div>
-        <div class="col-md-6 col-xl-5 align-self-center text-md-right" style="text-align: center;">
-          <img src="./../assets/images/home-image1.svg" class="img-fluid" alt="Workload Balancing">
-        </div>
-      </div>
-    </div>
-  </div>
+          <!-- <img src="./../assets/images/home-image1.svg" width="300px" height="300px" alt="Workload Balancing"> -->
 </section>
 
-<section class="kubevirt-can-do">
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col offset-md-1 align-self-start">
-        <h2 class="page-subtitle--spacer_top page-subtitle--spacer_bottom">What can I do with KubeVirt?</h2>
-      </div>
-    </div>
-    <div class="row justify-content-center">
-      <div class="card-group justify-content-center">
-        <div class="card col-md-4 col-lg-3 text-center">
-          <div class="card-body">
-            <img src="./../assets/images/home-image-col1.svg" class="img-fluid" alt="KubeVirt and Kubernetes">
-          </div>
-          <div class="card-footer">
-            <p>
-              Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.
-            </p>
-          </div>
-        </div>
-        <div class="card col-md-4 col-lg-3 text-center">
-          <div class="card-body">
-            <img src="./../assets/images/home-image-col2.svg" class="img-fluid" alt="KubeVirt and VMs">
-          </div>
-          <div class="card-footer">
-            <p>
-              Combine existing virtualized workloads with new container workloads on the one platform.
-            </p>
-          </div>
-        </div>
-        <div class="card col-md-4 col-lg-3 text-center">
-          <div class="card-body">
-            <img src="./../assets/images/home-image-col3.svg" class="img-fluid" alt="Containerized Applications">
-          </div>
-          <div class="card-footer">
-            <p>
-              Support development of new microservice applications in containers that interact with existing virtualized applications.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<section class="kv-what">
+  <h2 class="kv-what__title">What can I do with KubeVirt?</h2>
+  <img class="kv-what__img" src="./../assets/images/home-image-col1.svg" alt="KubeVirt and Kubernetes">
+  <p class="kv-what__text">Leverage KubeVirt and Kubernetes to manage virtual machines for impractical-to-containerize apps.</p>
+  <img class="kv-what__img" src="./../assets/images/home-image-col2.svg" alt="KubeVirt and VMs">
+  <p class="kv-what__text">Combine existing virtualized workloads with new container workloads on the one platform.</p>
+  <img class="kv-what__img" src="./../assets/images/home-image-col3.svg" alt="Containerized Applications">
+  <p class="kv-what__text">Support development of new microservice applications in containers that interact with existing virtualized applications.</p>
+</section>
+
+<section class="kv-recent-posts">
+  <h2>Recent posts</h2>
+  {% for post in site.posts limit:5 %}
+  <article class="kv-blog__snippet">
+    <a href="{{ post.url }}" class="kv-blog__snippet__link">
+      <h4 class="">{{ post.title }}</h4>
+      <time datetime="1999-12-23" class="">{{ post.date | date: "%a, %-d/%m/%y" }}</time>
+  </a>
+  </article>
+{% endfor %}
 </section>

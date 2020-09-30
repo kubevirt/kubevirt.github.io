@@ -2,6 +2,7 @@
 layout: labs
 title: Use KubeVirt
 permalink: /labs/kubernetes/lab1
+navbar_active: Labs
 lab: kubernetes
 order: 1
 tags:
