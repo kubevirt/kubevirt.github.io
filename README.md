@@ -33,7 +33,7 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 ### Verify internal and external hyperlinks
 
   ```console
-  podman run -it --rm --name link-check -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll /bin/bash -c "bundle install; rake"
+  podman run -it --rm --name link-check -p 4000:4000 -v $(pwd):/srv/jekyll:Z jekyll/jekyll /bin/bash -c "bundle install && bundle exec rake -- -u"
   ```
 
 ### View the site
