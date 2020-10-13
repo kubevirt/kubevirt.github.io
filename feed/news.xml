@@ -1,4 +1,516 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-10-12T18:01:44+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Import virtual machine from oVirt</title><link href="https://kubevirt.io//2020/Import-VM-from-oVirt.html" rel="alternate" type="text/html" title="Import virtual machine from oVirt" /><published>2020-08-06T00:00:00+00:00</published><updated>2020-08-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Import-VM-from-oVirt</id><content type="html" xml:base="https://kubevirt.io//2020/Import-VM-from-oVirt.html">&lt;h2 id=&quot;about-vm-import-operator&quot;&gt;About vm-import-operator&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-10-13T12:42:04+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/attaching-to-multiple-networks-followup.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-09-23T00:00:00+00:00</published><updated>2020-09-23T00:00:00+00:00</updated><id>https://kubevirt.io//2020/attaching-to-multiple-networks-followup</id><content type="html" xml:base="https://kubevirt.io//2020/attaching-to-multiple-networks-followup.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Over the last years KubeVirt project has improved a lot regarding secondary interfaces networking configuration. Now it’s possible to do an end to end configuration from host networking to a VM using just the kubernetes API with
+special CRDs. Moreover, the deployment of all the projects has been simplified by introducing &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;kubevirt hyperconverged cluster operator (HCO)&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/cluster-network-addons-operator&quot;&gt;cluster network addons operator (CNAO)&lt;/a&gt; to install the networking components.&lt;/p&gt;
+
+&lt;p&gt;The following is the operator hierarchy list presenting the deployment responsibilities of the HCO and CNAO operators used in this blog post:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;kubevirt-hyperconverged-cluster-operator (HCO)
+    &lt;ul&gt;
+      &lt;li&gt;cluster-network-addons-operator (CNAO)
+        &lt;ul&gt;
+          &lt;li&gt;multus&lt;/li&gt;
+          &lt;li&gt;bridge-cni&lt;/li&gt;
+          &lt;li&gt;kubemacpool&lt;/li&gt;
+          &lt;li&gt;kubernetes-nmstate&lt;/li&gt;
+        &lt;/ul&gt;
+      &lt;/li&gt;
+      &lt;li&gt;KubeVirt&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;introducing-cluster-network-addons-operator&quot;&gt;Introducing cluster-network-addons-operator&lt;/h2&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://github.com/kubevirt/cluster-network-addons-operator&quot;&gt;cluster network addons operator&lt;/a&gt; manages the lifecycle (deploy/update/delete) of different k8s network components needed to
+configure secondary interfaces, manages MAC addresses and defines networking on hosts for pods and VMs.&lt;/p&gt;
+
+&lt;p&gt;Good thing about having an operator is that everything is done through the API and you don’t have to go over all nodes to install these components yourself and assures smooth updates.&lt;/p&gt;
+
+&lt;p&gt;In this blog post we are going to use the following components, explained in a greater detail later on:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;multus: to start a secondary interface on containers in pods&lt;/li&gt;
+  &lt;li&gt;linux bridge CNI: to use bridge CNI and connect the secondary interfaces from pods to a linux bridge at nodes&lt;/li&gt;
+  &lt;li&gt;kubemacpool: to manage mac addresses&lt;/li&gt;
+  &lt;li&gt;kubernetes-nmstate: to configure the linux bridge on the nodes&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;The list of components we want CNAO to deploy is specified by the NetworkAddonsConfig CR and the progress of the installation appears in the CR status field, split per component. To inspect
+this progress we can query the CR status with the following command:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get NetworkAddonsConfig cluster &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To simplify this blog post we are going to use directly the NetworkAddonsConfig from HCO, which by default installs all the network components, but just to illustrate CNAO configuration, the following is a NetworkAddonsConfig CR instructing to deploy multus, linuxBridge, nmstate and kubemacpool components:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;networkaddonsoperator.network.kubevirt.io/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NetworkAddonsConfig&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cluster&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;multus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;linuxBridge&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;nmstate&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;imagePullPolicy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Always&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;connecting-pods-vms-and-nodes-over-a-single-secondary-network-with-bridge-cni&quot;&gt;Connecting Pods, VMs and Nodes over a single secondary network with bridge CNI&lt;/h2&gt;
+
+&lt;p&gt;Although kubernetes provides a default interface that gives connectivity to pods and VMs, it’s not easy to configure which NIC should be used for specific pods or VMs in a multi NIC node cluster. Typical use case is to split control/traffic planes isolated by different NICs on nodes.&lt;/p&gt;
+
+&lt;p&gt;With linux bridge CNI + multus it’s possible to create a secondary NIC in pod containers and attach it to a L2 linux bridge on nodes. This will add container’s connectivity to a specific NIC on nodes if that NIC is part of the L2 linux bridge.&lt;/p&gt;
+
+&lt;p&gt;To ensure the configuration is applied only in pods on nodes that have the bridge, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;k8s.v1.cni.cncf.io/resourceName&lt;/code&gt; label is added. This goes hand in hand with another component, &lt;a href=&quot;https://github.com/kubevirt/bridge-marker&quot;&gt;bridge-marker&lt;/a&gt; which inspects nodes networking and if a new bridge pops up it will mark the node status with it.&lt;/p&gt;
+
+&lt;p&gt;This is an example of the results from bridge-marker on nodes:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;allocatable&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;This is an example of NetworkAttachmentDefinition to create a L2 bridge&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;k8s.cni.cncf.io/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NetworkAttachmentDefinition&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge-network&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/resourceName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;{&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;cniVersion&quot;: &quot;0.3.1&quot;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;name&quot;: &quot;br0-l2&quot;,&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;plugins&quot;: [{&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&quot;type&quot;: &quot;bridge&quot;,&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&quot;bridge&quot;: &quot;br0&quot;,&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&quot;ipam&quot;: {}&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;}]&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then adding bridge secondary network to a pod is a matter of adding the following annotation to
+it:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;br0-l2&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;setting-up-node-networking-with-nodenetworkconfigurationpolicy-aka-nncp&quot;&gt;Setting up node networking with NodeNetworkConfigurationPolicy (aka nncp)&lt;/h2&gt;
+
+&lt;p&gt;Changing kubernetes cluster node networking can be done manually iterating over all the cluster nodes and making changes or using different automatization tools like ansible. However, using just another kubernetes resource is more convenient.
+For this purpose the kubernetes-nmstate project was born as a cluster wide node network administrator based on kubernetes CRs on top of &lt;a href=&quot;https://github.com/nmstate/nmstate&quot;&gt;nmstate&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;It works as a k8s DaemonSet running pods on all the cluster nodes and reconciling three different CRs:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/master/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationpolicy_cr.yaml&quot;&gt;NodeNetworkConfigurationPolicy&lt;/a&gt; to specify cluster node network desired configuration&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/master/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationenactment_cr.yaml&quot;&gt;NodeNetworkConfigurationEnactment&lt;/a&gt; (nnce) to troubleshoot issues with nncp&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/master/deploy/crds/nmstate.io_v1beta1_nodenetworkstate_cr.yaml&quot;&gt;NodeNetworkState&lt;/a&gt; (nns) to view the node’s networking configuration&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;Project kubernetes-nmstate has a distributed architecture to reduce kube-apiserver connectivity dependency, this means that every pod will configure the networking on the node that it’s running without much interaction with kube-apiserver.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;In case something goes wrong and the pod changing the node network cannot ping the default gateway or has lost the kube-apiserver connectivity it will rollback to the previous configuration to go back to a working state. Those errors can be checked by running &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl get nnce&lt;/code&gt;. The command displays potential issue per node and nncp.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;There is a known issue related to clusters not having a default gateway making the nncp always to rollback, there are plans to use different approach like checking name servers.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The desired state field follow the nmstate API described at their &lt;a href=&quot;https://www.nmstate.io/&quot;&gt;awesome doc&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;Also for more details on kubernetes-nmstate there are guides covering &lt;a href=&quot;https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide-101-reporting.md&quot;&gt;reporting&lt;/a&gt;, &lt;a href=&quot;https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide-102-configuration.md&quot;&gt;configuration&lt;/a&gt; and &lt;a href=&quot;https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide-103-troubleshooting.md&quot;&gt;troubleshooting&lt;/a&gt;. There are also &lt;a href=&quot;https://github.com/nmstate/kubernetes-nmstate/tree/master/docs/examples&quot;&gt;nncp examples&lt;/a&gt;.&lt;/p&gt;
+
+&lt;h1 id=&quot;mixing-it-all-together-vmi-to-vmi-communication-between-nodes&quot;&gt;Mixing it all together, VMI to VMI communication between nodes&lt;/h1&gt;
+
+&lt;p&gt;With the following recipe we will end up with a virtual machines pair on two different nodes with one secondary NICs, eth1 at vlan 100. They will be connected to each other using
+the same bridge on nodes that also have the external secondary NIC eth1 connected.&lt;/p&gt;
+
+&lt;h2 id=&quot;requirements&quot;&gt;Requirements&lt;/h2&gt;
+
+&lt;p&gt;We are going to use a &lt;a href=&quot;https://github.com/kubevirt/kubevirtci&quot;&gt;kubevirtci&lt;/a&gt; as kubernetes ephemeral cluster provider.&lt;/p&gt;
+
+&lt;p&gt;To start it up with two nodes and one secondary NIC and install NetworkManager &amp;gt;= 1.22 (needed for kubernetes-nmstate) and dnsmasq follow these steps:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/kubevirt/kubevirtci
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirtci
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_PROVIDER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;k8s-1.19
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_NUM_NODES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_NUM_SECONDARY_NICS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1
+make cluster-up
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;./cluster-up/kubeconfig.sh&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;installing-components&quot;&gt;Installing components&lt;/h2&gt;
+
+&lt;p&gt;To install KubeVirt we are going to use the operator &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;kubevirt-hyper-converged-operator&lt;/a&gt;, this will install all the components
+needed to have a functional KubeVirt with all the features including the ones we are going to use: multus, linux-bridge, kubemacpool and kubernetes-nmstate.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
+kubectl &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;hco &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged kubevirt-hyperconverged &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;500s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we have a kubernetes cluster with all the pieces to startup a VM with bridge attached to a secondary NIC.&lt;/p&gt;
+
+&lt;h2 id=&quot;creating-the-br0-on-nodes-with-a-port-attached-to-secondary-nic-eth1&quot;&gt;Creating the br0 on nodes with a port attached to secondary NIC eth1&lt;/h2&gt;
+
+&lt;p&gt;First step is to create a L2 linux-bridge at nodes with one port on the secondary NIC eth1, this will be
+used later on by the bridge CNI.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; | kubectl apply -f -
+apiVersion: nmstate.io/v1alpha1
+kind: NodeNetworkConfigurationPolicy
+metadata:
+  name: br0-eth1
+spec:
+  desiredState:
+    interfaces:
+    - name: br0
+      description: Linux bridge with eth1 as a port
+      type: linux-bridge
+      state: up
+      ipv4:
+        dhcp: false
+        enabled: false
+      bridge:
+        options:
+          stp:
+            enabled: false
+        port:
+        - name: eth1
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now we wait for the bridge to be created checking nncp conditions:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;nncp br0-eth1 &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt; 2m
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After the nncp becomes available, we can query the nncp resources in the cluster
+and see it listed with successful status.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$kubectl&lt;/span&gt; get nncp
+NAME       STATUS
+br0-eth1   SuccessfullyConfigured
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can inspect the status of applying the policy to each node.
+For that there is the NodeNetworkConfigurationEnactment CR (nnce):&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$kubectl&lt;/span&gt; get nnce
+NAME              STATUS
+node01.br0-eth1   SuccessfullyConfigured
+node02.br0-eth1   SuccessfullyConfigured
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;In case of errors it is possible to retrieve the error dumped by nmstate running
+&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl get nnce -o yaml&lt;/code&gt; the status will contain the error.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We can also inspect the network state on the nodes by retrieving the NodeNetworkState and
+checking if the bridge &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;br0&lt;/code&gt; is up using jsonpath&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get nns node01 &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'{.status.currentState.interfaces[?(@.name==&quot;br0&quot;)].state}'&lt;/span&gt;
+kubectl get nns node02 &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'{.status.currentState.interfaces[?(@.name==&quot;br0&quot;)].state}'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When inspecting the full currentState yaml we get the following
+interface configuration:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get nns node01 &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml
+status:
+  currentState:
+    interfaces:
+      - bridge:
+          options:
+            group-forward-mask: 0
+            mac-ageing-time: 300
+            multicast-snooping: &lt;span class=&quot;nb&quot;&gt;true
+            &lt;/span&gt;stp:
+              enabled: &lt;span class=&quot;nb&quot;&gt;false
+              &lt;/span&gt;forward-delay: 15
+              hello-time: 2
+              max-age: 20
+              priority: 32768
+          port:
+            - name: eth1
+              stp-hairpin-mode: &lt;span class=&quot;nb&quot;&gt;false
+              &lt;/span&gt;stp-path-cost: 100
+              stp-priority: 32
+        description: Linux bridge with eth1 as a port
+        ipv4:
+          dhcp: &lt;span class=&quot;nb&quot;&gt;false
+          &lt;/span&gt;enabled: &lt;span class=&quot;nb&quot;&gt;false
+        &lt;/span&gt;ipv6:
+          autoconf: &lt;span class=&quot;nb&quot;&gt;false
+          &lt;/span&gt;dhcp: &lt;span class=&quot;nb&quot;&gt;false
+          &lt;/span&gt;enabled: &lt;span class=&quot;nb&quot;&gt;false
+        &lt;/span&gt;mac-address: 52:55:00:D1:56:00
+        mtu: 1500
+        name: br0
+        state: up
+        &lt;span class=&quot;nb&quot;&gt;type&lt;/span&gt;: linux-bridge
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can also check that the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bridge-marker&lt;/code&gt; is working and check resources on nodes:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get node node01 -o yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The following should appear stating that br0
+can be consumed on the node:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;allocatable&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At this point we have ready L2 linux bridge connected to NIC eth1.&lt;/p&gt;
+
+&lt;h2 id=&quot;configure-multus-attachment-with-a-l2-bridge-and-a-vlan&quot;&gt;Configure multus attachment with a L2 bridge and a vlan&lt;/h2&gt;
+
+&lt;p&gt;In order to make the bridge a L2 bridge with vlan, we specify no ipam and
+the vlan we want to use to isolate our VMs:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; | kubectl apply -f -
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: br0-100-l2
+  annotations:
+    k8s.v1.cni.cncf.io/resourceName: bridge.network.kubevirt.io/br0
+spec:
+  config: &amp;gt;
+    {
+        &quot;cniVersion&quot;: &quot;0.3.1&quot;,
+        &quot;name&quot;: &quot;br0-100-l2-config&quot;,
+        &quot;plugins&quot;: [{
+            &quot;type&quot;: &quot;bridge&quot;,
+            &quot;bridge&quot;: &quot;br0&quot;,
+            &quot;vlan&quot;: 100,
+            &quot;ipam&quot;: {}}]
+    }
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;start-a-pair-of-vmis-on-different-nodes-using-the-multus-configuration-to-connect-a-secondary-interfaces-to-br0&quot;&gt;Start a pair of VMIs on different nodes using the multus configuration to connect a secondary interfaces to br0&lt;/h2&gt;
+
+&lt;p&gt;Now it’s time to startup the VMIs running on different nodes so we can check external connectivity of
+br0. They will also have a secondary NIC eth1 to connect to the other VM running at different node, so they go
+over the br0 at nodes.&lt;/p&gt;
+
+&lt;p&gt;The following picture illustrate the cluster:&lt;/p&gt;
+
+&lt;!-- yaspeller ignore:start --&gt;
+
+&lt;div class=&quot;jekyll-diagrams diagrams graphviz&quot;&gt;
+  Command Not Found: dot
+&lt;/div&gt;
+
+&lt;!-- yaspeller ignore:end --&gt;
+
+&lt;p&gt;First step is to install the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; command line tool to play with virtual machines:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; virtctl https://github.com/kubevirt/kubevirt/releases/download/v0.33.0/virtctl-v0.33.0-linux-amd64
+&lt;span class=&quot;nb&quot;&gt;chmod&lt;/span&gt; +x virtctl
+&lt;span class=&quot;nb&quot;&gt;sudo install &lt;/span&gt;virtctl /usr/local/bin
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now let’s create two VirtualMachineInstances on each node they will have one secondary NIC connected to br0 using the multus configuration for vlan 100, also activate kubemacpool to be sure that mac addresses are unique in the cluster and install the qemu-guest-agent so ip addresses from secondary NICs are reported to VMI so we can inspect them later on.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; | kubectl apply -f -
+apiVersion: v1
+kind: Namespace
+metadata:
+    name: default
+    annotations:
+        mutatevirtualmachines.kubemacpool.io: allocate
+---
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachineInstance
+metadata:
+  name: vmia
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: node01
+  domain:
+    devices:
+      disks:
+        - name: containerdisk
+          disk:
+            bus: virtio
+        - name: cloudinitdisk
+          disk:
+            bus: virtio
+      interfaces:
+      - name: default
+        bridge: {}
+      - name: br0-100
+        bridge: {}
+    machine:
+      type: &quot;&quot;
+    resources:
+      requests:
+        memory: 1024M
+  networks:
+  - name: default
+    pod: {}
+  - name: br0-100
+    multus:
+      networkName: br0-100-l2
+  terminationGracePeriodSeconds: 0
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: kubevirt/fedora-cloud-container-disk-demo
+    - name: cloudinitdisk
+      cloudInitNoCloud:
+        networkData: |
+          version: 2
+          ethernets:
+            eth1:
+              addresses: [ 10.200.0.1/24 ]
+        userData: |-
+          #!/bin/bash
+          echo &quot;fedora&quot; |passwd fedora --stdin
+          dnf -y install qemu-guest-agent
+          sudo systemctl enable qemu-guest-agent
+          sudo systemctl start qemu-guest-agent
+---
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachineInstance
+metadata:
+  name: vmib
+spec:
+  nodeSelector:
+    kubernetes.io/hostname: node02
+  domain:
+    devices:
+      disks:
+        - name: containerdisk
+          disk:
+            bus: virtio
+        - name: cloudinitdisk
+          disk:
+            bus: virtio
+      interfaces:
+      - name: default
+        bridge: {}
+      - name: br0-100
+        bridge: {}
+    machine:
+      type: &quot;&quot;
+    resources:
+      requests:
+        memory: 1024M
+  networks:
+  - name: default
+    pod: {}
+  - name: br0-100
+    multus:
+      networkName: br0-100-l2
+  terminationGracePeriodSeconds: 0
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: kubevirt/fedora-cloud-container-disk-demo
+    - name: cloudinitdisk
+      cloudInitNoCloud:
+        networkData: |
+          version: 2
+          ethernets:
+            eth1:
+              addresses: [ 10.200.0.2/24 ]
+        userData: |-
+          #!/bin/bash
+          echo &quot;fedora&quot; |passwd fedora --stdin
+          dnf -y install qemu-guest-agent
+          sudo systemctl enable qemu-guest-agent
+          sudo systemctl start qemu-guest-agent
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Wait for the two VMIs to be ready.
+Eventually you will see something like this:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi
+NAME      AGE    PHASE     IP               NODENAME
+vmia      2m4s   Running   10.244.196.142   node01
+vmib      2m4s   Running   10.244.140.86    node02
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can check that they have one secondary NIC without
+address assigned:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml
+&lt;span class=&quot;c&quot;&gt;## vmia&lt;/span&gt;
+ interfaces:
+  - interfaceName: eth0
+    ipAddress: 10.244.196.145/32
+    ipAddresses:
+    - 10.244.196.145/32
+    - fe80::ac2a:27ff:fe59:204/64
+    mac: ae:2a:27:59:02:04
+    name: default
+  - interfaceName: eth1
+    ipAddress: 10.200.0.1/24
+    ipAddresses:
+    - 10.200.0.1/24
+    - fe80::5437:41ff:fe96:c7ac/64
+    mac: 56:37:41:96:c7:ac
+    name: br0-100
+&lt;span class=&quot;c&quot;&gt;## vmib&lt;/span&gt;
+  interfaces:
+  - interfaceName: eth0
+    ipAddress: 10.244.140.83/32
+    ipAddresses:
+    - 10.244.140.83/32
+    - fe80::a4ec:1bff:fe89:3ede/64
+    mac: a6:ec:1b:89:3e:de
+    name: default
+  - interfaceName: eth1
+    ipAddress: 10.200.0.2/24
+    ipAddresses:
+    - 10.200.0.2/24
+    - fe80::bcb9:95ff:fe48:880e/64
+    mac: be:b9:95:48:88:0e
+    name: br0-100
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s finish this section by verifying connectivity between vmia and vmib using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ping&lt;/code&gt;. Open the console of vmia virtual machine and use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ping&lt;/code&gt; command with destination IP address 10.200.0.2, which is the address assigned to the secondary interface of vmib:&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;The user and password for this VMIs is &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;fedora&lt;/code&gt;, it was configured at cloudinit userData&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl console vmia
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;ping 10.200.0.2 &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; 3
+PING 10.200.0.2 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;10.200.0.2&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: 56 data bytes
+64 bytes from 10.200.0.2: &lt;span class=&quot;nb&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;0 &lt;span class=&quot;nv&quot;&gt;ttl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;50 &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;357.040 ms
+64 bytes from 10.200.0.2: &lt;span class=&quot;nb&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1 &lt;span class=&quot;nv&quot;&gt;ttl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;50 &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;379.742 ms
+64 bytes from 10.200.0.2: &lt;span class=&quot;nb&quot;&gt;seq&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2 &lt;span class=&quot;nv&quot;&gt;ttl&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;50 &lt;span class=&quot;nb&quot;&gt;time&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;404.066 ms
+
+&lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; 10.200.0.2 ping statistics &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt;
+3 packets transmitted, 3 packets received, 0% packet loss
+round-trip min/avg/max &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 357.040/380.282/404.066 ms
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;At this blog post we used some network components from kubevirt project to communicate two VMs at different nodes
+through a linux bridge connected to a secondary NIC, this illustrate how VM traffic can be connected to a specific NIC
+at node using a secondary NIC.&lt;/p&gt;</content><author><name>ellorent</name></author><category term="news" /><category term="kubevirt-hyperconverged" /><category term="cnao" /><category term="cluster-network-addons-operator" /><category term="kubernetes-nmstate" /><category term="nmstate" /><category term="bridge" /><category term="multus" /><category term="networking" /><category term="CNI" /><category term="multiple networks" /><summary type="html">Introduction</summary></entry><entry><title type="html">Import virtual machine from oVirt</title><link href="https://kubevirt.io//2020/Import-VM-from-oVirt.html" rel="alternate" type="text/html" title="Import virtual machine from oVirt" /><published>2020-08-06T00:00:00+00:00</published><updated>2020-08-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Import-VM-from-oVirt</id><content type="html" xml:base="https://kubevirt.io//2020/Import-VM-from-oVirt.html">&lt;h2 id=&quot;about-vm-import-operator&quot;&gt;About vm-import-operator&lt;/h2&gt;
 &lt;p&gt;Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt;, so in order to have the vm import working you must have both KubeVirt and CDI installed.&lt;/p&gt;
 
 &lt;h3 id=&quot;import-rules&quot;&gt;Import rules&lt;/h3&gt;
@@ -1155,275 +1667,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;p&gt;Using this established Kubernetes pattern of layering objects on top of one another, we came up with our own virtualization specific API and corresponding workload controller called a &lt;strong&gt;“VirtualMachine”&lt;/strong&gt; (big surprise there on the name, right?). Users declare a VirtualMachine object just like they would a pod by posting the VirtualMachine object’s manifest to the cluster. The big difference here that deviates from how pods are managed is that we allow VirtualMachine objects to be declared to exist in different states. For example, you can declare you want to “start” a virtual machine by setting “running: true” on the VirtualMachine object’s spec. Likewise you can declare you want to “stop” a virtual machine by setting “running: false” on the VirtualMachine object’s spec. Behind the scenes, setting the “running” field to true or false results in the workload controller creating or deleting a pod for the virtual machine to live in.&lt;/p&gt;
 
-&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry><entry><title type="html">Live Migration in KubeVirt</title><link href="https://kubevirt.io//2020/Live-migration.html" rel="alternate" type="text/html" title="Live Migration in KubeVirt" /><published>2020-03-22T00:00:00+00:00</published><updated>2020-03-22T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Live-migration</id><content type="html" xml:base="https://kubevirt.io//2020/Live-migration.html">&lt;!-- TOC depthFrom:2 depthTo:6 orderedList:false --&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#enabling-live-migration&quot;&gt;Enabling Live Migration&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#configuring-live-migration&quot;&gt;Configuring Live Migration&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#performing-the-live-migration&quot;&gt;Performing the Live Migration&lt;/a&gt;
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;#cancelling-a-live-migration&quot;&gt;Cancelling a Live Migration&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#what-can-go-wrong&quot;&gt;What can go wrong?&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#node-eviction&quot;&gt;Node Eviction&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#conclusion&quot;&gt;Conclusion&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#references&quot;&gt;References&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;!-- /TOC --&gt;
-
-&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
-
-&lt;p&gt;This blog post will be explaining on KubeVirt’s ability to perform live migration of virtual machines.&lt;/p&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;Live Migration is a process during which a running Virtual Machine Instance moves to another compute node while the guest workload continues to run and remain accessible.&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;p&gt;The concept of live migration is already well-known among virtualization platforms and enables administrators to keep user workloads running while the servers can be moved to maintenance for any reason that you might think of like:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Hardware maintenance (physical, firmware upgrades, etc)&lt;/li&gt;
-  &lt;li&gt;Power management, by moving workloads to a lower number of hypervisors during off-peak hours&lt;/li&gt;
-  &lt;li&gt;etc&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;KubeVirt also includes support for virtual machine migration within Kubernetes when enabled.&lt;/p&gt;
-
-&lt;p&gt;Keep reading to learn how!&lt;/p&gt;
-
-&lt;h2 id=&quot;enabling-live-migration&quot;&gt;Enabling Live Migration&lt;/h2&gt;
-
-&lt;p&gt;To enable live migration we need to enable the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;feature-gate&lt;/code&gt; for it by adding &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; to the key:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-config&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;feature-gates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;LiveMigration&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;A current &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; can be edited to append “&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;” to an existing configuration:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl edit configmap kubevirt-config &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;feature-gates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;DataVolumes,LiveMigration&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;configuring-live-migration&quot;&gt;Configuring Live Migration&lt;/h2&gt;
-
-&lt;p&gt;If we want to alter the defaults for Live-Migration, we can further edit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-config&lt;/code&gt; like:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-config&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;feature-gates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;LiveMigration&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;migrations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|-&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;parallelMigrationsPerCluster: 5&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;parallelOutboundMigrationsPerNode: 2&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;bandwidthPerMigration: 64Mi&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;completionTimeoutPerGiB: 800&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;progressTimeout: 150&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Parameters are explained in the below table (check the documentation for more details):&lt;/p&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;Parameter&lt;/th&gt;
-      &lt;th style=&quot;text-align: center&quot;&gt;Default value&lt;/th&gt;
-      &lt;th style=&quot;text-align: left&quot;&gt;Description&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;parallelMigrationsPerCluster&lt;/code&gt;&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;5&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;How many migrations might happen at the same time&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;parallelOutboundMigrationsPerNode&lt;/code&gt;&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;2&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;How many outbound migrations for a particular node&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;bandwidthPerMigration&lt;/code&gt;&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;64Mi&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;MiB/s to have the migration limited to, in order to not affect other systems&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;completionTimeoutPerGiB&lt;/code&gt;&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;800&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;Time for a GiB of data to wait to be completed before aborting the migration.&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;progressTimeout&lt;/code&gt;&lt;/td&gt;
-      &lt;td style=&quot;text-align: center&quot;&gt;150&lt;/td&gt;
-      &lt;td style=&quot;text-align: left&quot;&gt;Time to wait for Live Migration to progress in transferring data&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
-
-&lt;h2 id=&quot;performing-the-live-migration&quot;&gt;Performing the Live Migration&lt;/h2&gt;
-
-&lt;div class=&quot;premonition error&quot;&gt;&lt;div class=&quot;fa fa-exclamation-triangle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Limitations&lt;/p&gt;
-&lt;ol&gt;
-  &lt;li&gt;Virtual Machines using PVC must have a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;RWX&lt;/code&gt; access mode to be Live-Migrated&lt;/li&gt;
-  &lt;li&gt;Additionally, pod network binding of bridge interface is not allowed&lt;/li&gt;
-&lt;/ol&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Live migration is initiated by posting an object &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstanceMigration&lt;/code&gt; to the cluster, indicating the VM name to migrate, like in the following example:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineInstanceMigration&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;migration-job&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;vmiName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vmi-fedora&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;This will trigger the process for the VM.&lt;/p&gt;
-
-&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;
-&lt;p&gt;When a VM is started, a calculation has been already performed indicating if the VM is live-migratable or not. This information is stored in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VMI.status.conditions&lt;/code&gt;. Currently, most of the calculation is based on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Access Mode&lt;/code&gt; for the VMI volumes but can be based on multiple parameters. For example:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Conditions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;True&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;Type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;LiveMigratable&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Migration Method&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;BlockMigration&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;If the VM is Live-Migratable, the request will submit successfully. The status change will be reported under &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VMI.status&lt;/code&gt;. Once live migration is complete, a status of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Completed&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Failed&lt;/code&gt; will be indicated.&lt;/p&gt;
-
-&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Watch out!&lt;/p&gt;
-&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Migration Method&lt;/code&gt; field can contain:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt; : meaning that the disk data is being copied from source to destination&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt;: meaning that only the memory is copied from source to destination&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;VMs with block devices located on shared storage backends like the ones provided by &lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt; that provide PVCs with ReadWriteMany access have the option to live-migrate only memory contents instead of having to also migrate the block devices.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;h3 id=&quot;cancelling-a-live-migration&quot;&gt;Cancelling a Live Migration&lt;/h3&gt;
-
-&lt;p&gt;If we want to abort the Live Migration, ‘Kubernetes-Style’, we’ll just delete the object we created for triggering it.&lt;/p&gt;
-
-&lt;p&gt;In this case, the VM status for migration will report some additional information:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;Migration State&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Abort Requested&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Abort Status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Succeeded&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Completed&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;End Timestamp&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2019-03-29T04:02:49Z&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Failed&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Migration Config&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;Completion Timeout Per GiB&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;800&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;Progress Timeout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;150&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Migration UID&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;57a693d6-51d7-11e9-b370-525500d15501&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Source Node&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node02&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Start Timestamp&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2019-03-29T04:02:47Z&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Target Direct Migration Node Ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;39445&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;43345&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;49152&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;44222&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;49153&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Target Node&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node01&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Target Node Address&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;10.128.0.46&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Target Node Domain Detected&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;Target Pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virt-launcher-testvmimcbjgw6zrzcmp8wpddvztvzm7x2k6cjbdgktwv8tkq&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Note that there are some additional fields that indicate that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Abort Requested&lt;/code&gt; happened and in the above example that it has &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Succeded&lt;/code&gt;, in this case, the original fields for migration will report as &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Completed&lt;/code&gt; (because there’s no running migration) and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Failed&lt;/code&gt; set to true.&lt;/p&gt;
-
-&lt;h2 id=&quot;what-can-go-wrong&quot;&gt;What can go wrong?&lt;/h2&gt;
-
-&lt;p&gt;Live-migration is a complex process that requires transferring data from one ‘VM’ in one node to another ‘VM’ into another one, this requires that the activity of the VM being live-migrated to be compatible with the network configuration and throughput so that all the data can be migrated &lt;em&gt;faster&lt;/em&gt; than the data is changed at the original VM, this is usually referred to as &lt;em&gt;converging&lt;/em&gt;.&lt;/p&gt;
-
-&lt;p&gt;Some values can be adjusted (check the &lt;a href=&quot;#configuring-live-migration&quot;&gt;table&lt;/a&gt; for settings that can be tuned), to allow it to succeed but as a trade-off:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Increasing the number of VMs that can migrate at once, will reduce the available bandwidth.&lt;/li&gt;
-  &lt;li&gt;Increasing the bandwidth could affect applications running on that node (origin and target).&lt;/li&gt;
-  &lt;li&gt;Storage migration (check the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Info&lt;/code&gt; note in the &lt;a href=&quot;#performing-the-live-migration&quot;&gt;Performing the Live Migration &lt;/a&gt; section on the differences) might also consume bandwidth and resources.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;node-eviction&quot;&gt;Node Eviction&lt;/h2&gt;
-
-&lt;p&gt;Sometimes, a node requires to be put on maintenance and it includes workloads on it, either containers or, in KubeVirt’s case, VM’s.&lt;/p&gt;
-
-&lt;p&gt;It is possible to use &lt;strong&gt;selectors&lt;/strong&gt;, for example, move all the virtual machines to another node via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl drain &amp;lt;nodename&amp;gt;&lt;/code&gt;, for example, evicting all KubeVirt VM’s from a node can be done via:&lt;/p&gt;
-
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl drain &amp;lt;node name&amp;gt; &lt;span class=&quot;nt&quot;&gt;--delete-local-data&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--ignore-daemonsets&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;true&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--force&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pod-selector&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;virt-launcher
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Reenabling node after eviction&lt;/p&gt;
-&lt;p&gt;Once the node has been tainted for eviction, we can use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl uncordon &amp;lt;nodename&amp;gt;&lt;/code&gt; to make it schedulable again.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;According to documentation, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--delete-local-data&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--ignore-daemonsets&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--force&lt;/code&gt; are required because:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Pods using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;emptyDir&lt;/code&gt; can be deleted because the data is ephemeral.&lt;/li&gt;
-  &lt;li&gt;VMI will have &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DaemonSets&lt;/code&gt; via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-handler&lt;/code&gt; so it’s safe to proceed.&lt;/li&gt;
-  &lt;li&gt;VMIs are not owned by a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ReplicaSet&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DaemonSet&lt;/code&gt;, so kubectl can’t guarantee that those are restarted. KubeVirt has its own controllers for it managing VMI, so kubectl shouldn’t bother about it.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;If we omit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--pod-selector&lt;/code&gt;, we’ll force eviction of all Pods and VM’s from a node.&lt;/p&gt;
-
-&lt;div class=&quot;premonition important&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;
-&lt;p&gt;In order to have VMIs using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; for eviction, we have to add a specific spec in the VMI YAML, so that when the node is tainted with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io/drain:NoSchedule&lt;/code&gt; is added to a node.&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;evictionStrategy&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;LiveMigrate&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;From that point, when &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl taint nodes &amp;lt;foo&amp;gt; kubevirt.io/drain=draining:NoSchedule&lt;/code&gt; is executed, the migrations will start.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;As a briefing on the above data:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; needs to be enabled on KubeVirt as a feature gate.&lt;/li&gt;
-  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigrate&lt;/code&gt; will add status to the VMI object indicating if it’s a candidate or not and if so, which mode to use (Block or Live)
-    &lt;ul&gt;
-      &lt;li&gt;Based on the storage backend and other conditions, it will enable &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;LiveMigration&lt;/code&gt; or just &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;BlockMigration&lt;/code&gt;.&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/live-migration?id=live-migration&quot;&gt;Live Migration&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/node-eviction?id=how-to-evict-all-vms-on-a-node&quot;&gt;Node Drain/Eviction&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://rook.io/&quot;&gt;Rook&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pablo Iranzo Gómez</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Live Migration" /><category term="node drain" /><summary type="html"></summary></entry></feed>
+&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry></feed>
