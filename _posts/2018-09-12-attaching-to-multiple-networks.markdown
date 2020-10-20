@@ -263,7 +263,7 @@ spec:
   volumes:
     - name: registryvolume
       registryDisk:
-        image: kubevirt/fedora-cloud-registry-disk-demo
+        image: kubevirt/fedora-cloud-container-disk-demo
     - cloudInitNoCloud:
         userData: |
           #!/bin/bash

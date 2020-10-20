@@ -58,7 +58,7 @@ spec:
   volumes:
     - name: myvolume
       registryDisk:
-        image: <registry_address>/kubevirt/fedora-cloud-registry-disk-demo:latest
+        image: <registry_address>/kubevirt/fedora-cloud-container-disk-demo:latest
     - cloudInitNoCloud:
       userData: |
         #cloud-config
@@ -105,7 +105,7 @@ spec:
   volumes:
     - name: myvolume
       registryDisk:
-        image: <registry_url>/kubevirt/fedora-cloud-registry-disk-demo:latest
+        image: <registry_url>/kubevirt/fedora-cloud-container-disk-demo:latest
     - cloudInitNoCloud:
         userData: |
           #cloud-config

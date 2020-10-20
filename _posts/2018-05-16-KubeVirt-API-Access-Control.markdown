@@ -46,7 +46,7 @@ spec:
   volumes:
   - name: registryvolume
     registryDisk:
-      image: kubevirt/cirros-registry-disk-demo:devel
+      image: kubevirt/cirros-container-disk-demo:devel
 ```
 
 In the spec above, we see the KubeVirt VirtualMachine object has an _apiVersion_
