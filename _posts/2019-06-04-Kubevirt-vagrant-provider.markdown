@@ -97,7 +97,7 @@ Vagrant.configure("2") do |config|
   config.vm.provider :kubevirt do |kubevirt|
     kubevirt.cpus = 2
     kubevirt.memory = 512
-    kubevirt.image = 'kubevirt/fedora-cloud-registry-disk-demo'
+    kubevirt.image = 'kubevirt/fedora-cloud-container-disk-demo'
   end
 
   # defines a user configured on a virtual machine using cloud-init
