@@ -54,7 +54,6 @@ go-build:
 	hack/dockerized "KUBEVIRT_VERSION=${KUBEVIRT_VERSION} ./hack/build-go.sh install ${WHAT}" && ./hack/build-copy-artifacts.sh ${WHAT}
 
 gosec:
-	hack/dockerized "GENERATE="true" ./hack/gosec.sh"
 	hack/dockerized "./hack/gosec.sh"
 	
 coverage:
@@ -125,7 +124,9 @@ cluster-clean:
 cluster-deploy: cluster-clean
 	./hack/cluster-deploy.sh
 
-cluster-sync: cluster-build cluster-deploy
+cluster-sync:
+	$(MAKE) cluster-build
+	$(MAKE) cluster-deploy
 
 builder-build:
 	./hack/builder/build.sh
