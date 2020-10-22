@@ -178,7 +178,7 @@ spec:
             storage: "2Gi"
 ```
 
-Notice that KubeVirt's VirtualMachine resource has a virtual machine template and a dataVolumeTemplate. On the virtual machine template, it is important noticing that we named our VM `monitorable-vm`, and we will use this name to connect to its console with `virtctl` later on. The label we've added, `prometheus.kubevirt.io: "node-exporter"`, is also important, since we'll use it when [configuring Prometheus to scrape the VM's node-exporter](#Configuring-Prometheus-to-scrape-the-VM's-node-exporter)
+Notice that KubeVirt's VirtualMachine resource has a virtual machine template and a dataVolumeTemplate. On the virtual machine template, it is important noticing that we named our VM `monitorable-vm`, and we will use this name to connect to its console with `virtctl` later on. The label we've added, `prometheus.kubevirt.io: "node-exporter"`, is also important, since we'll use it when [configuring Prometheus to scrape the VM's node-exporter](#configuring-prometheus-to-scrape-the-vms-node-exporter)
 
 On dataVolumeTemplate, it is important noticing that we named the PVC `cirros-dv` and the DataVolume resource will create 2 PVCs with that, `cirros-dv` and `cirros-dv-scratch`. Notice that `cirros-dv` and `cirros-dv-scratch` are the names referenced on our PersistentVolume manifests. The names must match for this to work. 
 
@@ -308,7 +308,7 @@ With this behavior, alerts like the one below won’t work since our target is l
     labels:
       severity: warning
     annotations:
-      summary: KubeVirt VM {{ $labels.pod }} is down.
+      summary: KubeVirt VM {%raw%}{{ $labels.pod }}{%endraw%} is down.
 ```
 
 **BUT**, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:
@@ -319,5 +319,5 @@ With this behavior, alerts like the one below won’t work since our target is l
     labels:
       severity: critical
     annotations:
-      summary: KubeVirt VM {{ $labels.pod }} is constantly crashing before node-exporter starts at boot.
+      summary: KubeVirt VM {%raw%}{{ $labels.pod }}{%endraw%} is constantly crashing before node-exporter starts at boot.
 ```
