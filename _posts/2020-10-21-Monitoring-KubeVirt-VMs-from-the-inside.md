@@ -314,10 +314,10 @@ With this behavior, alerts like the one below won’t work since our target is l
 **BUT**, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:
 ```yaml
 - alert: KubeVirtVMCrashing
-    expr: up{pod=~"virt-launcher.*"} == 0 or changes(up{pod=~"virt-launcher.*"}[5m]) > 0
+    expr: up{pod=~"virt-launcher.*"} == 0
     for: 5m
     labels:
       severity: critical
     annotations:
-      summary: KubeVirt VM {{ $labels.pod }} is constantly crashing before node-exporter starts at boot or has crashed at least once in the last 5 minutes.
+      summary: KubeVirt VM {{ $labels.pod }} is constantly crashing before node-exporter starts at boot.
 ```
