@@ -204,7 +204,7 @@ sudo chmod +x /etc/rc.local
 
 ## Configuring Prometheus to scrape the VM's node-exporter
 
-To configure Prometheus to scrape the node-exporter (or other aplications) is really simple. All we need is to create a new `Service` and a `ServiceMonitor`:
+To configure Prometheus to scrape the node-exporter (or other applications) is really simple. All we need is to create a new `Service` and a `ServiceMonitor`:
 
 ```yaml
 apiVersion: v1
