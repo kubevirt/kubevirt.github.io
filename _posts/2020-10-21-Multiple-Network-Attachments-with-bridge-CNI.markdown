@@ -23,6 +23,8 @@ tags:
 comments: true
 ---
 
+# Do not merge
+
 ## Introduction
 
 Over the last years the KubeVirt project has improved a lot regarding secondary interfaces networking configuration. Now it's possible to do an end to end configuration from host networking to a VM using just the Kubernetes API with
