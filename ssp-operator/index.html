@@ -24,26 +24,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//2019/prow-jobs-for-kubevirt.html">
+    <link rel="canonical" href="https://kubevirt.io//ssp-operator/">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Prow jobs for KubeVirt website and Tutorial repo | KubeVirt.io</title>
+    <title>KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="Pablo Iranzo Gómez" >
-    <meta property="og:type" content="article" >
+    <meta name="author" content="The KubeVirt.io website team, " >
+    
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="How prow is used to keep website and tutorials 'up'">
-    <meta name="keywords" content="prow, infrastructure, kubevirt-tutorial, CI-CD, continuous integration, community" >
-    <meta property="og:title" content="Prow jobs for KubeVirt website and Tutorial repo | KubeVirt.io">
+    <meta name="description" content="Virtual Machine Management on Kubernetes">
+    <meta name="keywords" content="news, updates, releases, uncategorized, " >
+    <meta property="og:title" content="KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//2019/prow-jobs-for-kubevirt.html" >
+    <meta property="og:url" content="https://kubevirt.io//ssp-operator/" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="How prow is used to keep website and tutorials 'up'" >
+    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="Pablo Iranzo Gómez" >
-    <meta property="og:article:published_time" content="2019-10-31 00:00:00 +0000" >
-    <meta name="twitter:title" content="Prow jobs for KubeVirt website and Tutorial repo | KubeVirt.io">
-    <meta name="twitter:description" content="How prow is used to keep website and tutorials 'up'">
+    <meta property="og:article:author" content="The KubeVirt.io website team" >
+    <meta property="og:article:published_time" content="2020-10-26 11:15:58 +0000" >
+    <meta name="twitter:title" content="KubeVirt.io">
+    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -74,7 +74,7 @@
       
 
       
-        <li  class="nav-item active" >
+        <li  class="nav-item" >
           <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
         </li>
       
@@ -225,202 +225,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container">
-  <div class="row">
-    <div class="col">
-      <div class="post">
-        <header class="post-header">
-          <h1></h1>
-          <h1 class="post-title">Prow jobs for KubeVirt website and Tutorial repo</h1>
-          <div class="post-info">
-            <span class="post-author">Author: Pablo Iranzo Gómez</span>
-            <div>
-              <span class="post-category-name">
-                Tags: <a href="/tag/prow">prow</a>&nbsp;|&nbsp;<a href="/tag/infrastructure">infrastructure</a>&nbsp;|&nbsp;<a href="/tag/kubevirt-tutorial">kubevirt-tutorial</a>&nbsp;|&nbsp;<a href="/tag/ci-cd">CI-CD</a>&nbsp;|&nbsp;<a href="/tag/continuous-integration">continuous integration</a>&nbsp;|&nbsp;<a href="/tag/community">community</a>
-              </span>
-            </div>
-            <div>
-              <span class="post-meta">Publication Date: October 31, 2019  </span>
-            </div>
-            <div>
-              <span class="post-category-name">
-                Category: news
-              </span>
-            </div>
+      <div class="container post">
+  <h1 class="page-title"></h1>
+  <article class="post-content">
+    <p>To fetch the KubeVirt SSP Operator sources run <code class="language-plaintext highlighter-rouge">go get -d kubevirt.io/ssp-operator</code>.</p>
 
-          </div>
-        </header>
-        <article class="post-content">
-          <h2 id="introduction">Introduction</h2>
-
-<p><a href="https://github.com/kubernetes/test-infra/tree/master/prow">Prow</a> is a Kubernetes based CI/CD system that has several types of jobs and is used at KubeVirt project.</p>
-
-<p>General PR’s, etc are tested by Prow to be validated to be reviewed by doing some sanity checks defined by developers.</p>
-
-<p>In general, the internals on how it works can be checked at <a href="https://github.com/kubernetes/test-infra/blob/master/prow/life_of_a_prow_job.md">Life of a Prow Job</a>, and of course in the presentation made by <a href="https://github.com/jparrill">Juanma</a> on <a href="https://talks.godoc.org/github.com/jparrill/hands-on-prow/hands-on-prow.slide#1">https://talks.godoc.org/github.com/jparrill/hands-on-prow/hands-on-prow.slide#1</a>.</p>
-
-<h2 id="community-repositories">Community repositories</h2>
-
-<p>There are other repos (involved in the project ecosystem) that have tests to validate the information provided on them.</p>
-
-<p>The community repositories include:</p>
-
-<ul>
-  <li><a href="https://github.com/kubevirt/kubevirt.github.io">KubeVirt website</a></li>
-  <li><a href="https://github.com/kubevirt/kubevirt-tutorial">KubeVirt tutorial</a></li>
-  <li><a href="https://github.com/metal3-io/metal3-io.github.io">Katacoda Scenarios</a></li>
-  <li><a href="https://github.com/kubevirt/community">Community repo</a></li>
-  <li><a href="https://github.com/kubevirt/cloud-image-builder">Cloud Image Builder</a></li>
-</ul>
-
-<p>Those repos contain useful information for new users, like the <code class="language-plaintext highlighter-rouge">try-it</code> scenarios, the Laboratories, <a href="https://katacoda.com/kubevirt">Katacoda scenarios</a>, Community supporting files (like logos, proposals, etc).</p>
-
-<h2 id="the-jobs">The jobs</h2>
-
-<p>For each repo we’ve some types of jobs:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">periodical</code>: Run automatically to validate that the repo, without further changes is still working (for example, detecting broken URL’s).</li>
-  <li><code class="language-plaintext highlighter-rouge">presubmit</code>: Validates that the incoming PR will not break the environment.</li>
-  <li><code class="language-plaintext highlighter-rouge">post-submit</code>: After merging the PR, the repo is still working.</li>
-</ul>
-
-<p>Jobs are defined in the <a href="https://github.com/kubevirt/project-infra/">project-infra</a> repository, for example:</p>
-
-<ul>
-  <li><a href="https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-periodics.yaml">https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-periodics.yaml</a></li>
-  <li><a href="https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-presubmits.yaml">https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-presubmits.yaml</a></li>
-</ul>
-
-<p>Those jobs define the image to use (image and tag), and the commands to execute. In the examples above we’re using ‘Docker-in-Docker’ (dind) images and we’re targetting the KubeVirt-tutorial repository.</p>
-
-<h3 id="kubevirt-tutorial">KubeVirt-tutorial</h3>
-
-<p>The jobs, when executed as part of the Prow workflow, run the commands defined in the repo itself, for example for <code class="language-plaintext highlighter-rouge">kubevirt-tutorial</code> check the following folder:</p>
-
-<ul>
-  <li><a href="https://github.com/kubevirt/kubevirt-tutorial/tree/master/hack">https://github.com/kubevirt/kubevirt-tutorial/tree/master/hack</a></li>
-</ul>
-
-<p>That folder contains three scripts: <code class="language-plaintext highlighter-rouge">build</code>, <code class="language-plaintext highlighter-rouge">test_lab</code> and <code class="language-plaintext highlighter-rouge">tests</code>, which do setup the environment for running the validations, that is:</p>
-
-<ul>
-  <li>install required software on top of the used images.</li>
-  <li>prepare the scripts to be executed via <a href="https://github.com/bashup/mdsh">mdsh</a> which extracts markdown from lab files to be executed against the cluster setup by Prow (using <code class="language-plaintext highlighter-rouge">dind</code>).</li>
-  <li>Run each script and report status</li>
-</ul>
-
-<p>Once the execution has finished, if the final status is <code class="language-plaintext highlighter-rouge">ok</code>, the status is reported back to the GitHub PR so that it can be reviewed by mantainers of the repo.</p>
-
-<h2 id="job-status">Job status</h2>
-
-<p>The jobs executed and the logs are available on the Prow instance we use, for example:</p>
-
-<ul>
-  <li><a href="https://KubeVirt.io">https://KubeVirt.io</a>
-    <ul>
-      <li>Pre-submit link checker: <a href="https://prow.apps.ovirt.org/?job=kubevirt-io-presubmit-link-checker">https://prow.apps.ovirt.org/?job=kubevirt-io-presubmit-link-checker</a></li>
-      <li>Periodical link checker: <a href="https://prow.apps.ovirt.org/?job=kubevirt-io-periodic-link-checker">https://prow.apps.ovirt.org/?job=kubevirt-io-periodic-link-checker</a></li>
-    </ul>
-  </li>
-  <li><a href="https://github.com/kubevirt/kubevirt-tutorial">KubeVirt Tutorial</a>
-    <ul>
-      <li>Pre-submit: <a href="https://prow.apps.ovirt.org/?job=kubevirt-tutorial-presubmit-lab-testing-k8s-1.13.3">https://prow.apps.ovirt.org/?job=kubevirt-tutorial-presubmit-lab-testing-k8s-1.13.3</a></li>
-      <li>Periodical: <a href="https://prow.apps.ovirt.org/?job=periodic-kubevirt-tutorial-lab-testing">https://prow.apps.ovirt.org/?job=periodic-kubevirt-tutorial-lab-testing</a></li>
-    </ul>
-  </li>
-</ul>
-
-<h2 id="wrap-up">Wrap-up</h2>
-
-<p>If you find that a test should be performed to further validate the integrity and information provided, feel free to raise issues or even a PR against the <code class="language-plaintext highlighter-rouge">project-infra</code> repository so that we can get it improved!</p>
-
-        </article>
-        
-        
-
-<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Prow jobs for KubeVirt website and Tutorial repo&url=https://www.kubevirt.io/2019/prow-jobs-for-kubevirt.html&screen_name=kubevirt" aria-label="Share this on Twitter">
-  <i class="fab fa-twitter mr-1"></i> Tweet
-</a>
-<hr/>
-
-
-        
-          <div id="disqus_thread"></div>
-          <script>
-
-          /**
-          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
-          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
-
-          var disqus_config = function () {
-          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
-          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
-          };
-
-          (function() { // DON'T EDIT BELOW THIS LINE
-          var d = document, s = d.createElement('script');
-          s.src = 'https://kubevirt-io.disqus.com/embed.js';
-          s.setAttribute('data-timestamp', +new Date());
-          (d.head || d.body).appendChild(s);
-          })();
-          </script>
-          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
-        
-
-      </div>
-    </div>
-  </div>
+  </article>
 </div>
-<!-- Root element of PhotoSwipe. Must have class pswp. -->
-<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
-    <!-- Background of PhotoSwipe.
-         It's a separate element as animating opacity is faster than rgba(). -->
-    <div class="pswp__bg"></div>
-    <!-- Slides wrapper with overflow:hidden. -->
-    <div class="pswp__scroll-wrap">
-        <!-- Container that holds slides.
-            PhotoSwipe keeps only 3 of them in the DOM to save memory.
-            Don't modify these 3 pswp__item elements, data is added later on. -->
-        <div class="pswp__container">
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-            <div class="pswp__item"></div>
-        </div>
-        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
-        <div class="pswp__ui pswp__ui--hidden">
-            <div class="pswp__top-bar">
-                <!--  Controls are self-explanatory. Order can be changed. -->
-                <div class="pswp__counter"></div>
-                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
-                <button class="pswp__button pswp__button--share" title="Share"></button>
-                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
-                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
-                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
-                <!-- element will get class pswp__preloader--active when preloader is running -->
-                <div class="pswp__preloader">
-                    <div class="pswp__preloader__icn">
-                      <div class="pswp__preloader__cut">
-                        <div class="pswp__preloader__donut"></div>
-                      </div>
-                    </div>
-                </div>
-            </div>
-            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
-                <div class="pswp__share-tooltip"></div>
-            </div>
-            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
-            </button>
-            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
-            </button>
-            <div class="pswp__caption">
-                <div class="pswp__caption__center"></div>
-            </div>
-        </div>
-    </div>
-</div>
-<script src="/js/photoswipe-page.js">
-</script>
 
     </main>
 
