@@ -156,6 +156,9 @@ To start it up with two nodes and one secondary NIC and install NetworkManager >
 ```bash
 git clone https://github.com/kubevirt/kubevirtci
 cd kubevirtci
+# Pin to version working with blog post steps in case
+# k8s-1.19 provider disappear in the future
+git reset d5d8e3e376b4c3b45824fbfe320b4c5175b37171 --hard
 export KUBEVIRT_PROVIDER=k8s-1.19
 export KUBEVIRT_NUM_NODES=2
 export KUBEVIRT_NUM_SECONDARY_NICS=1
@@ -171,7 +174,6 @@ needed to have a functional KubeVirt with all the features including the ones we
 ```bash
 curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
 kubectl wait hco -n kubevirt-hyperconverged kubevirt-hyperconverged --for condition=Available --timeout=500s
-kubectl config set-context --current --namespace=default # Put back the previous context namespace
 ```
 
 Now we have a Kubernetes cluster with all the pieces to startup a VM with bridge attached to a secondary NIC.
@@ -183,7 +185,7 @@ used later on by the bridge CNI.
 
 ```yaml
 cat <<EOF | kubectl apply -f -
-apiVersion: nmstate.io/v1beta1
+apiVersion: nmstate.io/v1alpha1
 kind: NodeNetworkConfigurationPolicy
 metadata:
   name: br0-eth1
@@ -351,7 +353,10 @@ The following picture illustrates the cluster:
 
 <!-- yaspeller ignore:start -->
 
-{% graphviz %}
+{% svg /assets/images/kubevirt-linux-bridge-vm-to-vm.svg %}
+
+<!-- NOTE: When gnudot is at production use proper liquid tags to use this code -->
+<!--
 graph bridge {
 node [shape=square, style=filled color=gold];
 splines=line;
@@ -397,7 +402,7 @@ nd_eth1_vma [label = "eth1"];
 
 }
 }
-{% endgraphviz %}
+-->
 
 <!-- yaspeller ignore:end -->
 
