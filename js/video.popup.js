@@ -9,7 +9,7 @@
         }
 
         var settings = $.extend({
-            autoplay: false,
+            autoplay: true,
             showControls: true,
             controlsColor: null,
             loopVideo: false,
