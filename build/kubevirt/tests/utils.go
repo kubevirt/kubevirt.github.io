@@ -47,19 +47,16 @@ import (
 	"sync"
 	"time"
 
-	"github.com/onsi/ginkgo/config"
-	netutils "k8s.io/utils/net"
-
 	expect "github.com/google/goexpect"
 	covreport "github.com/mfranczy/crd-rest-coverage/pkg/report"
 	. "github.com/onsi/ginkgo"
+	"github.com/onsi/ginkgo/config"
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	k8sv1 "k8s.io/api/core/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	settingsv1alpha1 "k8s.io/api/settings/v1alpha1"
 	storagev1 "k8s.io/api/storage/v1"
 	extclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -81,6 +78,7 @@ import (
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/tools/remotecommand"
 	"k8s.io/client-go/transport/spdy"
+	netutils "k8s.io/utils/net"
 
 	"kubevirt.io/kubevirt/pkg/certificates/triple/cert"
 	"kubevirt.io/kubevirt/pkg/virt-operator/creation/components"
@@ -768,10 +766,6 @@ func BeforeTestSuitSetup(_ []byte) {
 	createNamespaces()
 	createServiceAccounts()
 
-	if IsRunningOnKindInfraIPv6() {
-		createPodPreset("fix-node-uuid", "fake-product-uuid", "virt-launcher", "/kind/product_uuid", "/sys/class/dmi/id/product_uuid")
-	}
-
 	CreateHostPathPVC(osAlpineHostPath, defaultDiskSize)
 	CreatePVC(osWindows, defaultWindowsDiskSize, Config.StorageClassWindows)
 	CreatePVC(osRhel, defaultRhelDiskSize, Config.StorageClassRhel)
@@ -1248,48 +1242,6 @@ func cleanupSubresourceServiceAccount() {
 	}
 }
 
-func createPodPreset(podPresetName, volName, label, srcPath, dstPath string) {
-	virtCli, err := kubecli.GetKubevirtClient()
-	PanicOnError(err)
-
-	hostPathType := k8sv1.HostPathFile
-	podPreset := settingsv1alpha1.PodPreset{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      podPresetName,
-			Namespace: NamespaceTestDefault,
-		},
-		Spec: settingsv1alpha1.PodPresetSpec{
-			Selector: metav1.LabelSelector{
-				MatchLabels: map[string]string{
-					"kubevirt.io": label,
-				},
-			},
-			Volumes: []k8sv1.Volume{
-				{
-					Name: volName,
-					VolumeSource: k8sv1.VolumeSource{
-						HostPath: &k8sv1.HostPathVolumeSource{
-							Path: srcPath,
-							Type: &hostPathType,
-						},
-					},
-				},
-			},
-			VolumeMounts: []k8sv1.VolumeMount{
-				{
-					Name:      volName,
-					MountPath: dstPath,
-				},
-			},
-		},
-	}
-
-	_, err = virtCli.SettingsV1alpha1().PodPresets(NamespaceTestDefault).Create(&podPreset)
-	if !errors.IsAlreadyExists(err) {
-		PanicOnError(err)
-	}
-}
-
 func createServiceAccount(saName string, clusterRole string) {
 	virtCli, err := kubecli.GetKubevirtClient()
 	PanicOnError(err)
@@ -1673,7 +1625,15 @@ func cleanNamespaces() {
 		}
 
 		// Remove all Pods
-		PanicOnError(virtCli.CoreV1().RESTClient().Delete().Namespace(namespace).Resource("pods").Do().Error())
+		podList, err := virtCli.CoreV1().Pods(namespace).List(metav1.ListOptions{})
+		var gracePeriod int64 = 0
+		for _, pod := range podList.Items {
+			err := virtCli.CoreV1().Pods(namespace).Delete(pod.Name, &metav1.DeleteOptions{GracePeriodSeconds: &gracePeriod})
+			if errors.IsNotFound(err) {
+				continue
+			}
+			Expect(err).ToNot(HaveOccurred())
+		}
 
 		// Remove all Services
 		svcList, err := virtCli.CoreV1().Services(namespace).List(metav1.ListOptions{})
@@ -3430,6 +3390,15 @@ func NotDeleted(vmis *v1.VirtualMachineInstanceList) (notDeleted []v1.VirtualMac
 	return
 }
 
+func Running(vmis *v1.VirtualMachineInstanceList) (running []v1.VirtualMachineInstance) {
+	for _, vmi := range vmis.Items {
+		if vmi.DeletionTimestamp == nil && vmi.Status.Phase == v1.Running {
+			running = append(running, vmi)
+		}
+	}
+	return
+}
+
 func UnfinishedVMIPodSelector(vmi *v1.VirtualMachineInstance) metav1.ListOptions {
 	virtClient, err := kubecli.GetKubevirtClient()
 	PanicOnError(err)
@@ -4762,11 +4731,6 @@ func IsRunningOnKindInfra() bool {
 	return strings.HasPrefix(provider, "kind")
 }
 
-func IsRunningOnKindInfraIPv6() bool {
-	provider := os.Getenv("KUBEVIRT_PROVIDER")
-	return strings.HasPrefix(provider, "kind-k8s-1.17.0-ipv6")
-}
-
 func SkipPVCTestIfRunnigOnKindInfra() {
 	if IsRunningOnKindInfra() {
 		Skip("Skip PVC tests till PR https://github.com/kubevirt/kubevirt/pull/3171 is merged")
@@ -4782,18 +4746,6 @@ func SkipNFSTestIfRunnigOnKindInfra() {
 func SkipSELinuxTestIfRunnigOnKindInfra() {
 	if IsRunningOnKindInfra() {
 		Skip("Skip SELinux tests till issue https://github.com/kubevirt/kubevirt/issues/3780 is fixed")
-	}
-}
-
-func SkipMigrationFailTestIfRunningOnKindInfraIPv6() {
-	if IsRunningOnKindInfraIPv6() {
-		Skip("Skip Migration fail test till issue https://github.com/kubevirt/kubevirt/issues/4086 is fixed")
-	}
-}
-
-func SkipDmidecodeTestIfRunningOnKindInfraIPv6() {
-	if IsRunningOnKindInfraIPv6() {
-		Skip("Skip dmidecode tests till issue https://github.com/kubevirt/kubevirt/issues/3901 is fixed")
 	}
 }
 

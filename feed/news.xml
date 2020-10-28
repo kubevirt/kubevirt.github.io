@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-10-26T15:53:10+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-10-21T00:00:00+00:00</published><updated>2020-10-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI</id><content type="html" xml:base="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-10-28T21:24:17+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-10-21T00:00:00+00:00</published><updated>2020-10-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI</id><content type="html" xml:base="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;Over the last years the KubeVirt project has improved a lot regarding secondary interfaces networking configuration. Now it’s possible to do an end to end configuration from host networking to a VM using just the Kubernetes API with
 special Custom Resource Definitions. Moreover, the deployment of all the projects has been simplified by introducing &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;KubeVirt hyperconverged cluster operator (HCO)&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/cluster-network-addons-operator&quot;&gt;cluster network addons operator (CNAO)&lt;/a&gt; to install the networking components.&lt;/p&gt;
@@ -138,6 +138,9 @@ the same bridge on nodes that also have the external secondary NIC eth1 connecte
 
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/kubevirt/kubevirtci
 &lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirtci
+&lt;span class=&quot;c&quot;&gt;# Pin to version working with blog post steps in case&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# k8s-1.19 provider disappear in the future&lt;/span&gt;
+git reset d5d8e3e376b4c3b45824fbfe320b4c5175b37171 &lt;span class=&quot;nt&quot;&gt;--hard&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_PROVIDER&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;k8s-1.19
 &lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_NUM_NODES&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2
 &lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_NUM_SECONDARY_NICS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1
@@ -152,7 +155,6 @@ needed to have a functional KubeVirt with all the features including the ones we
 
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
 kubectl &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;hco &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged kubevirt-hyperconverged &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;500s
-kubectl config set-context &lt;span class=&quot;nt&quot;&gt;--current&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default &lt;span class=&quot;c&quot;&gt;# Put back the previous context namespace&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Now we have a Kubernetes cluster with all the pieces to startup a VM with bridge attached to a secondary NIC.&lt;/p&gt;
@@ -163,7 +165,7 @@ kubectl config set-context &lt;span class=&quot;nt&quot;&gt;--current&lt;/span&g
 used later on by the bridge CNI.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;s&quot;&gt;cat &amp;lt;&amp;lt;EOF | kubectl apply -f -&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nmstate.io/v1beta1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;nmstate.io/v1alpha1&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;NodeNetworkConfigurationPolicy&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;br0-eth1&lt;/span&gt;
@@ -321,9 +323,158 @@ over the br0 at nodes.&lt;/p&gt;
 
 &lt;!-- yaspeller ignore:start --&gt;
 
-&lt;div class=&quot;jekyll-diagrams diagrams graphviz&quot;&gt;
-  Command Not Found: dot
-&lt;/div&gt;
+&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; xmlns:xlink=&quot;http://www.w3.org/1999/xlink&quot; width=&quot;292pt&quot; height=&quot;287pt&quot; viewBox=&quot;0.00 0.00 292.00 286.51&quot;&gt;
+&lt;g id=&quot;graph0&quot; class=&quot;graph&quot; transform=&quot;scale(1 1) rotate(0) translate(4 282.5052)&quot;&gt;
+&lt;title&gt;bridge&lt;/title&gt;
+&lt;polygon fill=&quot;#ffffff&quot; stroke=&quot;transparent&quot; points=&quot;-4,4 -4,-282.5052 288,-282.5052 288,4 -4,4&quot; /&gt;
+&lt;g id=&quot;clust1&quot; class=&quot;cluster&quot;&gt;
+&lt;title&gt;cluster_kubevirtci&lt;/title&gt;
+&lt;polygon fill=&quot;#3cb371&quot; stroke=&quot;#3cb371&quot; points=&quot;8,-8 8,-270.5052 276,-270.5052 276,-8 8,-8&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;142&quot; y=&quot;-253.9052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;kubevirtci cluster&lt;/text&gt;
+&lt;/g&gt;
+&lt;g id=&quot;clust2&quot; class=&quot;cluster&quot;&gt;
+&lt;title&gt;cluster_node01&lt;/title&gt;
+&lt;polygon fill=&quot;#8b864e&quot; stroke=&quot;#8b864e&quot; points=&quot;146,-72 146,-237.7052 268,-237.7052 268,-72 146,-72&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;207&quot; y=&quot;-221.1052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;node01&lt;/text&gt;
+&lt;/g&gt;
+&lt;g id=&quot;clust3&quot; class=&quot;cluster&quot;&gt;
+&lt;title&gt;cluster_vma&lt;/title&gt;
+&lt;polygon fill=&quot;#b4cdcd&quot; stroke=&quot;#b4cdcd&quot; points=&quot;204,-80 204,-160.9052 260,-160.9052 260,-80 204,-80&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;232&quot; y=&quot;-144.3052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;vma&lt;/text&gt;
+&lt;/g&gt;
+&lt;g id=&quot;clust4&quot; class=&quot;cluster&quot;&gt;
+&lt;title&gt;cluster_node02&lt;/title&gt;
+&lt;polygon fill=&quot;#8b864e&quot; stroke=&quot;#8b864e&quot; points=&quot;16,-72 16,-237.7052 138,-237.7052 138,-72 16,-72&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;77&quot; y=&quot;-221.1052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;node02&lt;/text&gt;
+&lt;/g&gt;
+&lt;g id=&quot;clust5&quot; class=&quot;cluster&quot;&gt;
+&lt;title&gt;cluster_vmb&lt;/title&gt;
+&lt;polygon fill=&quot;#b4cdcd&quot; stroke=&quot;#b4cdcd&quot; points=&quot;74,-80 74,-160.9052 130,-160.9052 130,-80 74,-80&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;102&quot; y=&quot;-144.3052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;vmb&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_br1_kubevirtci --&gt;
+&lt;g id=&quot;node1&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_br1_kubevirtci&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;127,-52 91,-52 91,-16 127,-16 127,-52&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;109&quot; y=&quot;-29.8&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;br1&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_br0_node01 --&gt;
+&lt;g id=&quot;node2&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_br0_node01&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;221,-204.9052 185,-204.9052 185,-168.9052 221,-168.9052 221,-204.9052&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;203&quot; y=&quot;-182.7052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;br0&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_eth1_node01 --&gt;
+&lt;g id=&quot;node3&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_eth1_node01&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;194.1053,-128.1579 153.8947,-128.1579 153.8947,-87.9473 194.1053,-87.9473 194.1053,-128.1579&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;174&quot; y=&quot;-103.8526&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;eth1&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_br0_node01&amp;#45;&amp;#45;nd_eth1_node01 --&gt;
+&lt;g id=&quot;edge3&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;nd_br0_node01--nd_eth1_node01&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;#000000&quot; d=&quot;M196.2739,-168.6166C191.8232,-156.5147 185.985,-140.6405 181.4024,-128.18&quot; /&gt;
+&lt;/g&gt;
+&lt;!-- nd_eth1_vma --&gt;
+&lt;g id=&quot;node4&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_eth1_vma&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;252.1053,-128.1579 211.8947,-128.1579 211.8947,-87.9473 252.1053,-87.9473 252.1053,-128.1579&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;232&quot; y=&quot;-103.8526&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;eth1&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_br0_node01&amp;#45;&amp;#45;nd_eth1_vma --&gt;
+&lt;g id=&quot;edge4&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;nd_br0_node01--nd_eth1_vma&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;#000000&quot; d=&quot;M209.7261,-168.6166C214.1768,-156.5147 220.015,-140.6405 224.5976,-128.18&quot; /&gt;
+&lt;/g&gt;
+&lt;!-- nd_eth1_node01&amp;#45;&amp;#45;nd_br1_kubevirtci --&gt;
+&lt;g id=&quot;edge1&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;nd_eth1_node01--nd_br1_kubevirtci&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;#000000&quot; d=&quot;M156.2385,-87.8174C146.4655,-76.6833 134.4366,-62.9792 124.9632,-52.1864&quot; /&gt;
+&lt;/g&gt;
+&lt;!-- nd_br0_node02 --&gt;
+&lt;g id=&quot;node5&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_br0_node02&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;91,-204.9052 55,-204.9052 55,-168.9052 91,-168.9052 91,-204.9052&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;73&quot; y=&quot;-182.7052&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;br0&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_eth1_node02 --&gt;
+&lt;g id=&quot;node6&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_eth1_node02&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;64.1053,-128.1579 23.8947,-128.1579 23.8947,-87.9473 64.1053,-87.9473 64.1053,-128.1579&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;44&quot; y=&quot;-103.8526&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;eth1&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_br0_node02&amp;#45;&amp;#45;nd_eth1_node02 --&gt;
+&lt;g id=&quot;edge5&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;nd_br0_node02--nd_eth1_node02&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;#000000&quot; d=&quot;M66.2739,-168.6166C61.8232,-156.5147 55.985,-140.6405 51.4024,-128.18&quot; /&gt;
+&lt;/g&gt;
+&lt;!-- nd_eth1_vmb --&gt;
+&lt;g id=&quot;node7&quot; class=&quot;node&quot;&gt;
+&lt;title&gt;nd_eth1_vmb&lt;/title&gt;
+&lt;polygon fill=&quot;#ffd700&quot; stroke=&quot;#ffd700&quot; points=&quot;122.1053,-128.1579 81.8947,-128.1579 81.8947,-87.9473 122.1053,-87.9473 122.1053,-128.1579&quot; /&gt;
+&lt;text text-anchor=&quot;middle&quot; x=&quot;102&quot; y=&quot;-103.8526&quot; font-family=&quot;Times,serif&quot; font-size=&quot;14.00&quot; fill=&quot;#000000&quot;&gt;eth1&lt;/text&gt;
+&lt;/g&gt;
+&lt;!-- nd_br0_node02&amp;#45;&amp;#45;nd_eth1_vmb --&gt;
+&lt;g id=&quot;edge6&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;nd_br0_node02--nd_eth1_vmb&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;#000000&quot; d=&quot;M79.7261,-168.6166C84.1768,-156.5147 90.015,-140.6405 94.5976,-128.18&quot; /&gt;
+&lt;/g&gt;
+&lt;!-- nd_eth1_node02&amp;#45;&amp;#45;nd_br1_kubevirtci --&gt;
+&lt;g id=&quot;edge2&quot; class=&quot;edge&quot;&gt;
+&lt;title&gt;nd_eth1_node02--nd_br1_kubevirtci&lt;/title&gt;
+&lt;path fill=&quot;none&quot; stroke=&quot;#000000&quot; d=&quot;M61.7615,-87.8174C71.5345,-76.6833 83.5634,-62.9792 93.0368,-52.1864&quot; /&gt;
+&lt;/g&gt;
+&lt;/g&gt;
+&lt;/svg&gt;
+
+&lt;!-- NOTE: When gnudot is at production use proper liquid tags to use this code --&gt;
+&lt;!--
+graph bridge {
+node [shape=square, style=filled color=gold];
+splines=line;
+subgraph cluster_kubevirtci {
+label = &quot;kubevirtci cluster&quot;;
+color = mediumseagreen;
+style = filled;
+nd_br1_kubevirtci [label = &quot;br1&quot;]
+subgraph cluster_node01 {
+label = &quot;node01&quot;;
+color = khaki4;
+style=filled;
+nd_br0_node01 [label = &quot;br0&quot;]
+nd_eth1_node01 [label = &quot;eth1&quot;]
+subgraph cluster_vma {
+label = &quot;vma&quot;;
+style=filled;
+color=lightcyan3;
+nd_eth1_vma [label = &quot;eth1&quot;];
+}
+
+    }
+    subgraph cluster_node02 {
+      label = &quot;node02&quot;;
+      color = khaki4;
+      style = filled;
+      nd_br0_node02 [label = &quot;br0&quot;]
+      nd_eth1_node02 [label = &quot;eth1&quot;]
+      subgraph cluster_vmb {
+        label = &quot;vmb&quot;;
+        style=filled;
+        color=lightcyan3;
+        nd_eth1_vmb [label = &quot;eth1&quot;];
+      }
+
+    }
+    nd_eth1_node01 -- nd_br1_kubevirtci
+    nd_eth1_node02 -- nd_br1_kubevirtci
+    nd_br0_node01 -- nd_eth1_node01
+    nd_br0_node01 -- nd_eth1_vma
+    nd_br0_node02 -- nd_eth1_node02
+    nd_br0_node02 -- nd_eth1_vmb
+
+}
+}
+--&gt;
 
 &lt;!-- yaspeller ignore:end --&gt;
 
