@@ -37,8 +37,8 @@ Virtual machines managed by KubeVirt are highly customizable. Among the features
 
 ### Further resources
 
-- [Ansible module documentation](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html)
-  - [Examples, lots of examples](https://docs.ansible.com/ansible/latest/modules/kubevirt_vm_module.html#examples)
+- [Ansible module documentation](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_vm_module.html#ansible-collections-community-general-kubevirt-vm-module)
+  - [Examples, lots of examples](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_vm_module.html#examples)
 - DataVolumes
   - [Introductory blog post]({% post_url 2018-10-10-CDI-DataVolumes %})
   - [Upstream documentation](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md)
@@ -126,8 +126,8 @@ Everything worked as expected.
 
 ### Further resources
 
-- [Ansible module documentation (kubevirt_pvc)](https://docs.ansible.com/ansible/latest/modules/kubevirt_pvc_module.html)
-- [Ansible module documentation (kubevirt_cdi_upload)](https://docs.ansible.com/ansible/latest/modules/kubevirt_cdi_upload_module.html)
+- [Ansible module documentation (kubevirt_pvc)](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_pvc_module.html#ansible-collections-community-general-kubevirt-pvc-module)
+- [Ansible module documentation (kubevirt_cdi_upload)](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_cdi_upload_module.html)
 - [CDI GitHub Repo](https://github.com/kubevirt/containerized-data-importer/)
 
 ## Inventory plugin
@@ -187,15 +187,15 @@ Works!
 
 ### Further resources
 
-- [Ansible inventory plugin documentation](https://docs.ansible.com/ansible/latest/plugins/inventory/kubevirt.html)
+- [Ansible inventory plugin documentation](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_inventory.html#ansible-collections-community-general-kubevirt-inventory)
 
 ## More
 
 Lastly, for the sake of brevity, a quick mention of the remaining modules:
 
-- [kubevirt_presets](https://docs.ansible.com/ansible/latest/modules/kubevirt_preset_module.html) allows setting up
+- [kubevirt_presets](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_preset_module.html#ansible-collections-community-general-kubevirt-preset-module) allows setting up
   VM presets to be used by deployed VMs,
-- [kubevirt_template](https://docs.ansible.com/ansible/latest/modules/kubevirt_template_module.html) brings in a generic
+- [kubevirt_template](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_template_module.html#ansible-collections-community-general-kubevirt-template-module) brings in a generic
   templating mechanism, when running on top of OpenShift or OKD,
-- and [kubevirt_rs](https://docs.ansible.com/ansible/latest/modules/kubevirt_rs_module.html) lets one configure KubeVirt's
+- and [kubevirt_rs](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_rs_module.html#ansible-collections-community-general-kubevirt-rs-module) lets one configure KubeVirt's
   own ReplicaSets for running multiple instances of a specified virtual machine.
