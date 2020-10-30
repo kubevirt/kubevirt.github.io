@@ -40,15 +40,15 @@ Those repos contain useful information for new users, like the `try-it` scenario
 
 ## The jobs
 
-Our Jenkins instance is hosted at CentOS OpenShift instance and it's available at <https://jenkins-kubevirt.apps.ci.centos.org/>
+Our Jenkins instance is hosted at CentOS OpenShift instance and it's available at https://jenkins-kubevirt.apps.ci.centos.org/
 
 There, we've two jobs we're currently refining to get better results:
 
-- [Cloud Image Builder](https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/), which builds, according to the repo defined above contents what the AWS, GCP and Minikube images contain (binaries, KubeVirt version, Minikube version).
-  - The [resulting AWS images](https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json) are copied to each region.
+- Cloud Image Builder / https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder, which builds, according to the repo defined above contents what the AWS, GCP and Minikube images contain (binaries, KubeVirt version, Minikube version).
+  - The resulting AWS images / https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json are copied to each region.
   - The resulting GCP images are also copied
   - The resulting Minikube image is used for lab validation
-- [Lab Validation](https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/) which uses above created images with the contents of the `/tests` folder at [Kubevirt.github.io repository](https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests) to spin up instances and validate that the contents of the labs are valid
+- Lab Validation / https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/ which uses above created images with the contents of the `/tests` folder at [Kubevirt.github.io repository](https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests) to spin up instances and validate that the contents of the labs are valid
 
 Both tests can be executed periodically (by default each day), causing a repository rescan to detect new changes and later validation of them and only on branch `master`.
 

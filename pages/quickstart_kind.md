@@ -32,7 +32,7 @@ kind create cluster
 ```
 
 > info ""
-> See the kind User Guide [_here_](https://kind.docs.kubernetes.io/) for advanced start options and instructions on how to operate kind.
+> See the kind User Guide [_here_](https://kind.sigs.k8s.io/) for advanced start options and instructions on how to operate kind.
 
 ## Deploy KubeVirt
 
