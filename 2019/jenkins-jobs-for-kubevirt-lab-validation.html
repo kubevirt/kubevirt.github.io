@@ -275,19 +275,19 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="the-jobs">The jobs</h2>
 
-<p>Our Jenkins instance is hosted at CentOS OpenShift instance and it’s available at <a href="https://jenkins-kubevirt.apps.ci.centos.org/">https://jenkins-kubevirt.apps.ci.centos.org/</a></p>
+<p>Our Jenkins instance is hosted at CentOS OpenShift instance and it’s available at https://jenkins-kubevirt.apps.ci.centos.org/</p>
 
 <p>There, we’ve two jobs we’re currently refining to get better results:</p>
 
 <ul>
-  <li><a href="https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/">Cloud Image Builder</a>, which builds, according to the repo defined above contents what the AWS, GCP and Minikube images contain (binaries, KubeVirt version, Minikube version).
+  <li>Cloud Image Builder / https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder, which builds, according to the repo defined above contents what the AWS, GCP and Minikube images contain (binaries, KubeVirt version, Minikube version).
     <ul>
-      <li>The <a href="https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json">resulting AWS images</a> are copied to each region.</li>
+      <li>The resulting AWS images / https://jenkins-kubevirt.apps.ci.centos.org/job/cloud-image-builder/job/master/lastSuccessfulBuild/artifact/new-images.json are copied to each region.</li>
       <li>The resulting GCP images are also copied</li>
       <li>The resulting Minikube image is used for lab validation</li>
     </ul>
   </li>
-  <li><a href="https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/">Lab Validation</a> which uses above created images with the contents of the <code class="language-plaintext highlighter-rouge">/tests</code> folder at <a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests">Kubevirt.github.io repository</a> to spin up instances and validate that the contents of the labs are valid</li>
+  <li>Lab Validation / https://jenkins-kubevirt.apps.ci.centos.org/job/Lab%20Validation/ which uses above created images with the contents of the <code class="language-plaintext highlighter-rouge">/tests</code> folder at <a href="https://github.com/kubevirt/kubevirt.github.io/blob/abd315b2bcdabd2effa71fd3e6af1207d8fcbf42/tests">Kubevirt.github.io repository</a> to spin up instances and validate that the contents of the labs are valid</li>
 </ul>
 
 <p>Both tests can be executed periodically (by default each day), causing a repository rescan to detect new changes and later validation of them and only on branch <code class="language-plaintext highlighter-rouge">master</code>.</p>
