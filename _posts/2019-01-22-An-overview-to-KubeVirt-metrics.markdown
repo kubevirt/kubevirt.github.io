@@ -98,7 +98,7 @@ In this blog post, we will explore the current state of integration between Kube
 
 ## Let's deploy KubeVirt and dig on the metrics components
 
-- Deploy KubeVirt using the [official documentation](https://kubevirt.io/user-guide/docs/latest/administration/intro.html). For this blog post the version _0.11.0_ has been used.
+- Deploy KubeVirt using the [official documentation](https://kubevirt.io/user-guide/#/README).For this blog post the version _0.11.0_ has been used.
 - Metrics:
   - If you've installed KubeVirt before, there's a service that might be unfamiliar to you, _service/kubevirt-prometheus-metrics_, this service uses a selector set to match the label _prometheus.kubevirt.io: ""_ which is included on all the main KubeVirt components, like the _virt-api_, _virt-controllers_ and _virt-handler_.
   - The _kubevirt-prometheus-metrics_ also exposes the _metrics_ port set to _443_ so Promtheus can scrape the metrics for all the components through it.
@@ -135,7 +135,7 @@ In this blog post, we will explore the current state of integration between Kube
 
   The _rest_client_requests_total_, represents the number of HTTP requests, partitioned by status code, method, and host.
 
-- Now, following again [KubeVirt's docs](https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html), we need to deploy two resources:
+- Now, following again [KubeVirt's docs](https://kubevirt.io/user-guide/#/installation/monitoring), we need to deploy two resources:
 
   1. A [Prometheus resource](https://github.com/coreos/prometheus-operator/blob/master/Documentation/design.md#prometheus). Just copy the YAML snippet from _KubeVirt's docs_ and apply it as follows:
 

@@ -6,15 +6,15 @@ navbar_active: Blogs
 order: 10
 ---
 
-<div class="container">
+<div class="container-fluid">
   <div class="row">
-    <h1 class="page-title">{{ page.navbar_active }}</h1>
+    <h1 class="page-title pl-3">{{ page.navbar_active }}</h1>
   </div>
   <div class="row">
-    <div class="col-sm-12 col-md-3">
+    <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2">
       {% include sidebar-blogs.html %}
     </div>
-    <div class="col-sm-12 col-md-9 blogs">
+    <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10 blogs">
       <ul class="posts">
       {% for post in site.posts %}
         {% if post.categories contains "releases" %}

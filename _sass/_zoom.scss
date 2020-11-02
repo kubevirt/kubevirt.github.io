@@ -1,0 +1,16 @@
+.zoom {
+  transition: transform .2s;
+  transform-origin: 50% 50%;
+  max-width: 103px;
+  max-height: 84px;
+  transform-origin: 0 0;
+}
+.zoom:hover img {
+  -ms-transform: scale(10);
+  -moz-transform: scale(10);
+  -o-transform: scale(10);
+  -webkit-transform: scale(10);
+  position: absolute;
+  transform: scale(10) translateX(45%);
+  z-index: 1;
+}

@@ -266,7 +266,7 @@ We describe two of the most common pitfalls.
 
 #### create the servicemonitor in the right namespace
 
-KubeVirt services run in the `kubevirt` namespace. Make sure to [create the servicemonitor](https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#integrating-with-the-prometheus-operator) in the same namespace:
+KubeVirt services run in the `kubevirt` namespace. Make sure to [create the servicemonitor](https://kubevirt.io/user-guide/#/installation/monitoring?id=integrating-with-the-prometheus-operator) in the same namespace:
 
 ```bash
 kubectl get pods -n kubevirt
@@ -292,7 +292,7 @@ kubevirt-prometheus-metrics   ClusterIP   10.109.85.101    <none>        443/TCP
 virt-api                      ClusterIP   10.109.162.102   <none>        443/TCP   19h
 ```
 
-See [the KubeVirt documentation](https://kubevirt.io/user-guide/docs/latest/administration/monitoring.html#custom-service-discovery) for all the details.
+See [the KubeVirt documentation](https://kubevirt.io/user-guide/#/installation/monitoring?id=custom-service-discovery) for all the details.
 
 #### configure the Prometheus instance to look in the right namespace
 

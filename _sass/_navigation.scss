@@ -4,18 +4,21 @@
   @media (max-width: 992px) {
     margin-bottom: 0;
   }
-  a.nav-link {
-    opacity: .8;
-  }
-  &:hover {
-    margin-bottom: -8px;
-    border-bottom: 3px solid $kv-color--gold-500;
-    a.nav-link {
-      color: rgba(255, 255, 255, .75);
-      opacity: 1;
-    }
-    @media (max-width: 992px) {
-      margin-bottom: 0;
+  // a.nav-link {
+  //   opacity: .8;
+  // }
+  
+  &:not(:last-child) {
+    &:hover, &:focus {
+      margin-bottom: -8px;
+      border-bottom: 3px solid $kv-color--gold-500;
+      a.nav-link {
+        color: rgba(255, 255, 255, .75);
+        opacity: 1;
+      }
+      @media (max-width: 992px) {
+        margin-bottom: 0;
+      }
     }
   }
   &.active {
@@ -167,4 +170,11 @@
       }
     }
   }
+}
+
+.navbar-dark .navbar-nav .nav-link {
+  color: #fff;
+}
+.navbar-brand {
+  padding: 0;
 }

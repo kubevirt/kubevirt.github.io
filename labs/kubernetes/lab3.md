@@ -1,7 +1,8 @@
 ---
 layout: labs
-title: KubeVirt upgrades
+title: KubeVirt Upgrades
 permalink: /labs/kubernetes/lab3
+navbar_active: Labs
 lab: kubernetes
 order: 1
 tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]
@@ -147,7 +148,7 @@ Once the PHASE will change to `Running`, we're ready for upgrading KubeVirt.
 
 #### Define the next version to upgrade to
 
-KubeVirt starting from `v0.17.0` onwards, allows to upgrade one version at a time, by using two approaches as defined in the [user-guide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#update):
+KubeVirt starting from `v0.17.0` onwards, allows to upgrade one version at a time, by using two approaches as defined in the [user-guide](https://kubevirt.io/user-guide/#/installation/updating-and-deleting-installs):
 
 - Patching the imageTag value in the KubeVirt CR spec
 - Updating the operator if no imageTag is defined (defaulting to upgrade to match the operator version)

@@ -25,5 +25,8 @@
   "devDependencies": {
     "pre-commit": "^1.2.2",
     "yaspeller-ci": "^1.0.2"
+  },
+  "dependencies": {
+    "yaspeller": "^7.0.0"
   }
 }

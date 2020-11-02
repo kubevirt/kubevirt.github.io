@@ -25,6 +25,7 @@ code {
 }
 .highlight {
   background-color: $kv-color--black-150 !important;
+  margin-bottom: 1rem;
 }
 code {
   padding: 1px 5px;
@@ -37,5 +38,12 @@ pre {
     border: 0;
     padding-right: 0;
     padding-left: 0;
+  }
+}
+
+.post-content {
+  blockquote {
+    border-left: 2px solid #ccc;
+    padding-left: 1rem;
   }
 }

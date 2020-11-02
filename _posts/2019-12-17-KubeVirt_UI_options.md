@@ -42,7 +42,7 @@ As the [Octant webpage](https://octant.dev/) claims:
 
 > Octant is an open-source developer-centric web interface for Kubernetes that lets you inspect a Kubernetes cluster and its applications. Octant is a tool for developers to understand how applications run on a Kubernetes cluster. It aims to be part of the developer's toolkit for gaining insight and approaching complexity found in Kubernetes. Octant offers a combination of introspective tooling, cluster navigation, and object management along with a plugin system to further extend its capabilities.
 
-Some of the key features of this tool can be checked in their [latest release notes](https://octant.dev/docs/master/):
+Some of the key features of this tool can be checked in their [latest release notes](https://reference.octant.dev/):
 
 - **Resource Viewer**: Graphically visualize relationships between objects in a Kubernetes cluster. The status of individual objects is represented by colour to show workload performance.
 - **Summary View**: Consolidated status and configuration information in a single page aggregated from output typically found using multiple kubectl commands.
@@ -57,7 +57,7 @@ We installed it and found out that:
 - Octant provides a very basic dashboard for Kubernetes and it is pretty straightforward to install. It can be installed in your laptop or in a remote server.
 - Regular Kubernetes objects can be seen from the UI. Pod logs can be checked as well. However, mostly everything is in view mode, even the YAML description of the objects. Therefore, as a developer or cluster operator you cannot edit YAML files directly from the UI
 - Custom resources (CRs) and custom resource definitions (CRDs) are automatically detected and shown in the UI. This means that KubeVirt CRs can be viewed from the dashboard. However, VirtualMachines and VirtualMachineInstances cannot be modified from Octant, they can only be deleted.
-- There is an option to extend the functionality adding [plugins](https://octant.dev/docs/master/plugins/reference/) to the dashboard.
+- There is an option to extend the functionality adding [plugins](https://reference.octant.dev/?path=/docs/docs-plugins-1-getting-started--page) to the dashboard.
 - No specific options to manage KubeVirt workloads have been found.
 
 <video autoplay loop muted playsinline src="/assets/2019-12-19-KubeVirt_UI_options/octant.mp4" type="video/mp4" width="1280" height="720"></video>

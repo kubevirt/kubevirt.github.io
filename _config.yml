@@ -29,7 +29,7 @@ collections:
     output: true
     permalink: /:collection/:path
 
-plugins: [jekyll-paginate, jekyll-asciidoc, jekyll-redirect-from, jekyll-feed, jekyll-sitemap, premonition, jekyll/tagging]
+plugins: [jekyll-paginate, jekyll-asciidoc, jekyll-redirect-from, jekyll-feed, jekyll-sitemap, premonition, jekyll/tagging, jekyll-diagrams, jekyll-inline-svg]
 paginate: 5
 paginate_path: "/blogs/page:num"
 

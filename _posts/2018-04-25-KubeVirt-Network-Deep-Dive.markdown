@@ -139,13 +139,13 @@ Once all the nodes have been joined check the status.
 
 ## Additional Components
 
-### [KubeVirt](http://www.kubevirt.io)
+### [KubeVirt](http://kubevirt.io)
 
 ---
 
 The recommended installation method is to use [kubevirt-ansible](https://github.com/kubevirt/kubevirt-ansible). For this example I don’t require storage so just deploying using `kubectl create`.
 
-For additional information regarding KubeVirt install see the [installation readme](http://www.kubevirt.io/user-guide/#/installation/README).
+For additional information regarding KubeVirt install see the [installation readme](http://kubevirt.io/user-guide/#/installation/installation).
 
     $ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v0.4.1/kubevirt.yaml
     serviceaccount "kubevirt-apiserver" created

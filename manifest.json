@@ -4,7 +4,7 @@
   "name": "KubeVirt.io",
   "short_name": "KubeVirt",
   "lang": "en-US",
-  "homepage_url": "https://www.kubevirt.io",
+  "homepage_url": "https://kubevirt.io",
   "developer": {
     "name": "Adam J. Jolicoeur",
     "url": "https://github.com/mindreeper2420"

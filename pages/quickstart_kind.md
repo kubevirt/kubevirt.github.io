@@ -1,238 +1,80 @@
 ---
 layout: labs
-title: KubeVirt Quickstart with Kind
+title: KubeVirt quickstart with kind
 permalink: /quickstart_kind/
+redirect_from: "/get_kubevirt/"
+navbar_active: Labs
 order: 2
-lab: kubernetes
-tags: [kind, quickstart, tutorial]
+lab: kind
+tags:
+  [
+    "Kubernetes",
+    "kind",
+    "kubevirt",
+    "VM",
+    "virtual machine",
+  ]
 ---
 
-# Easy install using Kind
+# Easy install using kind
 
-Kind (Kubernetes in Docker) is a tool for running local Kubernetes clusters using Docker container "nodes".
+Kind quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
 
-Kind was primarily designed for testing Kubernetes itself, but may be used for local development or CI.
+## Prepare kind Kubernetes environment
 
-In Step 1, we guide you through setting up your environment to launch Kubernetes via Kind
+{% include quickstarts/kubectl.md %}
 
-After it's ready, dive into the two labs below to help you get
-acquainted with KubeVirt.
+* To install kind please follow the official documentation for your system using the instructions located [_here_](https://kind.sigs.k8s.io/docs/user/quick-start/#installation).
 
-## Step 1: Prepare Kind environment
-
-This guide will help you deploying [KubeVirt](https://kubevirt.io) on
-Kubernetes, we'll be using
-[Kind](https://github.com/kubernetes-sigs/kind){:target="\_blank"}.
-
-If you have [go](https://golang.org/) ([1.11+](https://golang.org/doc/devel/release.html#policy)) and [docker](https://www.docker.com/)
-already installed the following command is all you need:
-
-```bash
-GO111MODULE="on" go get sigs.k8s.io/kind@v0.7.0 && kind create cluster
+* Starting kind can be as simple as running the following command:
+```
+kind create cluster
 ```
 
-> note "Note"
-> Please use the latest `go` to do this, ideally go 1.13 or greater.
+> info ""
+> See the kind User Guide [_here_](https://kind.sigs.k8s.io/) for advanced start options and instructions on how to operate kind.
 
-This will put kind in $(go env GOPATH)/bin. If you encounter the error kind: command not found after installation then you may need to
-either add that directory to your $PATH as shown [here](https://golang.org/doc/code.html#GOPATH) or do a manual installation by cloning
-the repo and run make build from the repository.
+## Deploy KubeVirt
 
-Stable binaries are also available on the [releases](https://github.com/kubernetes-sigs/kind/releases) page. Stable releases are generally
-recommended for CI usage in particular. To install, download the binary for your platform from "Assets" and place this into your `$PATH`:
+KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components.
 
-```bash
-curl -Lo ./kind "https://github.com/kubernetes-sigs/kind/releases/download/v0.7.0/kind-$(uname)-amd64"
-chmod +x ./kind
-mv ./kind /some-dir-in-your-PATH/kind
+* Use `kubectl` to deploy the KubeVirt operator:
+```
+export VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- '-rc' | head -1 | awk -F': ' '{print $2}' | sed 's/,//' | xargs)
+echo $VERSION
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml
 ```
 
-Our recommendation is to always run the latest (\*) version of
-[Kind](https://github.com/kubernetes-sigs/kind){:target="\_blank"}
-available for your platform of choice, following their
-[quick start](https://kind.sigs.k8s.io/docs/user/quick-start/){:target="\_blank"}.
+  > warning "Nested virtualization"
+  > If the minikube cluster runs on a virtual machine consider enabling nested virtualization.  Follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="\_blank"}.
+  >
+  > If for any reason nested virtualization cannot be enabled do enable KubeVirt emulation as follows:
+  >```bash
+  > kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
+  > ```
 
-To use kind, you will need to install [docker](https://docs.docker.com/install/).
-
-Finally, you'll need _kubectl_ installed (\*), it can be downloaded from [here](https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-curl){:target="\_blank"} or installed using the means available for your platform.
-
-_(*): Ensure that *kubectl\* version complies with the [supported release skew](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/release/versioning.md#supported-releases-and-component-skew) (The version of kubectl should be close to Kubernetes server version)._
-
-### Start Kind
-
-Before starting with Kind, let's verify whether nested virtualization is enabled on the
-host where Kind is being installed on:
-
-```bash
-{% include scriptlets/quickstart_kind/00_verify_nested_virt.sh -%}
+* Again use `kubectl` to deploy the KubeVirt custom resource definitions:
+```
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
 ```
 
-If you get an **N**, follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="\_blank"} for enabling it.
+### Verify components
 
-> note "Note"
-> Nested virtualization is not mandatory for testing KubeVirt, but makes things smoother. If for any reason it can't be enabled,
-> don't forget to enable emulation as shown in the _[Check for the Virtualization Extensions](#check-for-the-virtualization-extensions)_ section.
+By default KubeVirt will deploy 7 pods, 3 services, 1 daemonset, 3 deployment apps, 3 replica sets.
 
-Let's begin, normally, Kind can be started with default values and those will be enough
-to run this quickstart guide.
-
-For example to create a basic cluster of 1 node you can use the following command:
-
-```bash
-$ kind create cluster # Default cluster context name is `kind`.
+* Check the deployment:
 ```
+kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.phase}"
+````
 
-If you want to have multiple clusters in the same server you can name them with the `--name` parameter:
-
-```bash
-$ kind create cluster --name kind
+* Check the components:
 ```
-
-To retrieve the existing clusters you can execute the following commands:
-
-```bash
-$ kind get clusters
-kind
+kubectl get all -n kubevirt
 ```
+<br>
 
-In order to interact with a specific cluster, you only need to specify the cluster name as a context in kubectl:
-
-```bash
-$ kubectl cluster-info --context kind-kind
-```
-
-We're ready to create the cluster with Kind, in this case we are using a cluster with one control-plane and two workers:
-
-```bash
-{% include scriptlets/quickstart_kind/01_setup_cluster.sh -%}
-Creating cluster "kind" ...
- ✓ Ensuring node image (kindest/node:v1.17.0) 🖼
- ✓ Preparing nodes 📦 📦 📦
- ✓ Writing configuration 📜
- ✓ Starting control-plane 🕹️
- ✓ Installing CNI 🔌
- ✓ Installing StorageClass 💾
- ✓ Joining worker nodes 🚜
-Set kubectl context to "kind-kind"
-You can now use your cluster with:
-
-kubectl cluster-info --context kind-kind
-
-Have a question, bug, or feature request? Let us know! https://kind.sigs.k8s.io/#community 🙂
-```
-
-### Deploy KubeVirt Operator
-
-Having the Kind cluster up and running, let's set the _version_ environment
-variable that will be used on few commands:
-
-```bash
-{% include scriptlets/quickstart_kind/02_setenv_version.sh -%}
-```
-
-Now, using the `kubectl` tool, let's deploy the KubeVirt Operator:
-
-```bash
-{% include scriptlets/quickstart_kind/03_deploy_operator.sh -%}
-```
-
-Check that it's running:
-
-```bash
-{% include scriptlets/quickstart_kind/04_check_operator_running.sh -%}
-
-NAME                             READY     STATUS              RESTARTS   AGE
-virt-operator-6c5db798d4-9qg56   0/1       ContainerCreating   0          12s
-...
-virt-operator-6c5db798d4-9qg56   1/1       Running   0         28s
-```
-
-We can execute the command above few times or add the (_-w_) flag for _watching_
-the pods until the operator is in _Running_ and _Ready_ (1/1) status, then it's time
-to head to the next section.
-
-### Check for the Virtualization Extensions
-
-To check if your CPU supports virtualization extensions execute the
-following command:
-
-```bash
-{% include scriptlets/quickstart_kind/05_verify_virtualization.sh -%}
-```
-
-If the command doesn't generate any output, create the following _ConfigMap_
-so that KubeVirt uses emulation mode, otherwise skip to the next section:
-
-```bash
-{% include scriptlets/quickstart_kind/06_emulate_vm_extensions.sh -%}
-```
-
-### Deploy KubeVirt
-
-KubeVirt is then deployed by creating a dedicated custom resource:
-
-```bash
-{% include scriptlets/quickstart_kind/07_deploy_kubevirt.sh -%}
-```
-
-Check the deployment:
-
-```bash
-{% include scriptlets/quickstart_kind/04_check_operator_running.sh -%}
-
-NAME                               READY     STATUS    RESTARTS   AGE
-virt-api-649859444c-fmrb7          1/1       Running   0          2m12s
-virt-api-649859444c-qrtb6          1/1       Running   0          2m12s
-virt-controller-7f49b8f77c-kpfxw   1/1       Running   0          2m12s
-virt-controller-7f49b8f77c-m2h7d   1/1       Running   0          2m12s
-virt-handler-t4fgb                 1/1       Running   0          2m12s
-virt-operator-6c5db798d4-9qg56     1/1       Running   0          6m41s
-```
-
-Once we applied the KubeVirt's _Custom Resource_ the operator took care of deploying the
-actual KubeVirt pods (_virt-api_, _virt-controller_ and _virt-handler_). Again
-we'll need to execute the command until everything is _up and running_
-(or use the _-w_ flag).
-
-### Install virtctl
-
-An additional binary is provided to get quick access to the serial and graphical ports of a VM, and handle start/stop operations.
-The tool is called _virtctl_ and can be retrieved from the release page of KubeVirt:
-
-```bash
-{% include scriptlets/quickstart_kind/08_get_virtctl.sh -%}
-```
-
-If [`krew` plugin manager](https://krew.dev/) is [installed](https://github.com/kubernetes-sigs/krew/#installation), `virtctl` can be installed via `krew`:
-
-```bash
-$ kubectl krew install virt
-```
-
-Then `virtctl` can be used as a kubectl plugin. For a list of available commands run:
-
-```bash
-$ kubectl virt help
-```
-
-Every occurrence throughout this guide of
-
-```bash
-$ ./virtctl <command>...
-```
-
-should then be read as
-
-```bash
-$ kubectl virt <command>...
-```
-
-### Clean Up (after lab cleanups):
-
-Delete the Kubernetes cluster with kind:
-
-```bash
-{% include scriptlets/quickstart_kind/99_kind_delete.sh -%}
-```
+{% include quickstarts/virtctl.md %}
 
 {% include labs-description.md %}
+
+{% include found_a_bug.md %}

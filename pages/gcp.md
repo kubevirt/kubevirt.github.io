@@ -5,5 +5,5 @@ permalink: pages/gcp
 lab: kubernetes
 order: 1
 redirect_to:
-  - /pages/cloud
+  - /quickstart_cloud/
 ---

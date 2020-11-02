@@ -606,7 +606,7 @@ NAME                       READY   STATUS              RESTARTS   AGE
 importer-centos-dv-8v6l5   0/1     ContainerCreating   0          12s
 ```
 
-Once that pods ends, the Virtual Machine can be started (in this case the virt parameter can be used because of the [krew plugin system](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#client-side-virtctl-deployment):
+Once that pods ends, the Virtual Machine can be started (in this case the virt parameter can be used because of the [krew plugin system](https://kubevirt.io/user-guide/#/installation/virtctl?id=retrieving-the-virtctl-client-tool):
 
 ```sh
 [root@kv-master-00 tmp]# kubectl virt start vm-centos-datavolume
@@ -719,6 +719,6 @@ sh-4.2# ceph status                                                             
 - [Kubernetes getting started](https://kubernetes.io/docs/setup/)
 - [KubeVirt Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
 - [Ceph: free-software storage platform](https://ceph.io)
-- [Ceph hardware recommendations](https://docs.ceph.com/docs/jewel/start/hardware-recommendations/)
+- [Ceph hardware recommendations](https://docs.ceph.com/en/latest/start/hardware-recommendations/)
 - [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
-- [KubeVirt User Guide](https://kubevirt.io/user-guide/docs/latest/administration/intro.html#cluster-side-add-on-deployment)
+- [KubeVirt User Guide](https://kubevirt.io/user-guide/#/)
