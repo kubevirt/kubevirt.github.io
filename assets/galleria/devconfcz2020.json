@@ -1,0 +1,37 @@
+[
+  {
+    "description": "KubeVirt booth",
+    "image": "https://pbs.twimg.com/media/EPCJwpuXsAAGpHm?format=jpg",
+    "title": "KubeVirt booth"
+  },
+  {
+    "description": "KubeVirt booth",
+    "image": "https://pbs.twimg.com/media/EPHwd4zWAAAg8Y-?format=jpg",
+    "title": "KubeVirt booth"
+  },
+  {
+    "description": "Miguel Duarte Barroso talk",
+    "image": "https://pbs.twimg.com/media/EPD6FajX4AIBN9F?format=jpg",
+    "title": "Simplify the simple case networking"
+  },
+  {
+    "description": "Miguel Duarte Barroso KubeVirt connect KVM-in-a-Pod to a host interface",
+    "image": "https://pbs.twimg.com/media/EPD3PJFWkAIo6yY?format=jpg",
+    "title": "KubeVirt connect KVM-in-a-Pod to host interface"
+  },
+  {
+    "image": "https://pbs.twimg.com/media/EPDQScdXsAAwmV4?format=jpg",
+    "title": "CNV presentation",
+    "description": "Container Native Virtualization with  @kubevirt  as part of the solution for multi cluster applications architectures at  @jstakun talk  DevConf_CZ"
+  },
+  {
+    "image": "https://pbs.twimg.com/media/EPCT9h0XUAUh3Rq?format=jpg",
+    "title": "KubeVirt booth",
+    "description": "Lot's of interest in the @kubevirt  booth at  @devconf_cz  come over to hear more about VMs and containers ✨"
+  },
+  {
+    "image": "https://pbs.twimg.com/media/EPCT_x0X4AEgg9n?format=jpg",
+    "title": "KubeVirt booth",
+    "description": "Lot's of interest in the @kubevirt  booth at  @devconf_cz  come over to hear more about VMs and containers ✨"
+  }
+]
