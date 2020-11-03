@@ -321,3 +321,7 @@ With this behavior, alerts like the one below won’t work since our target is l
     annotations:
       summary: KubeVirt VM {%raw%}{{ $labels.pod }}{%endraw%} is constantly crashing before node-exporter starts at boot.
 ```
+
+## Conclusion
+
+In this blog post we used [node-exporter](https://github.com/prometheus/node_exporter) to expose metrics out of a KubeVirt VM. We also configured [Prometheus Operator](https://github.com/prometheus-operator/prometheus-operator) to collect these metrics. This illustrates how to bring Kubernetes monitoring best practices with applications running inside KubeVirt VMs.
