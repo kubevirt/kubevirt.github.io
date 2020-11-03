@@ -250,6 +250,7 @@ var _ = Describe("Template", func() {
 				Expect(pod.Spec.Containers[1].Image).To(Equal("some-image:v1"))
 				Expect(pod.Spec.Containers[1].ImagePullPolicy).To(Equal(kubev1.PullPolicy("IfNotPresent")))
 				Expect(*pod.Spec.TerminationGracePeriodSeconds).To(Equal(int64(60)))
+				Expect(len(pod.Spec.InitContainers)).To(Equal(0))
 				By("setting the right hostname")
 				Expect(pod.Spec.Hostname).To(Equal("testvmi"))
 				Expect(pod.Spec.Subdomain).To(BeEmpty())
@@ -1631,7 +1632,7 @@ var _ = Describe("Template", func() {
 				Expect(len(pod.Spec.Containers)).To(Equal(1))
 				Expect(*pod.Spec.Containers[0].SecurityContext.Privileged).To(BeFalse())
 			})
-			It("should mount pci related host directories", func() {
+			It("should not mount pci related host directories", func() {
 				sriovInterface := v1.InterfaceSRIOV{}
 				domain := v1.DomainSpec{}
 				domain.Devices.Interfaces = []v1.Interface{{Name: "testnet", InterfaceBindingMethod: v1.InterfaceBindingMethod{SRIOV: &sriovInterface}}}
@@ -1646,9 +1647,16 @@ var _ = Describe("Template", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				Expect(len(pod.Spec.Containers)).To(Equal(1))
-				// Skip first four mounts that are generic for all launcher pods
-				Expect(pod.Spec.Containers[0].VolumeMounts[4].MountPath).To(Equal("/sys/devices/"))
-				Expect(pod.Spec.Volumes[1].HostPath.Path).To(Equal("/sys/devices/"))
+
+				for _, volumeMount := range pod.Spec.Containers[0].VolumeMounts {
+					Expect(volumeMount.MountPath).ToNot(Equal("/sys/devices/"))
+				}
+
+				for _, volume := range pod.Spec.Volumes {
+					if volume.HostPath != nil {
+						Expect(volume.HostPath.Path).ToNot(Equal("/sys/devices/"))
+					}
+				}
 			})
 			It("should add 1G of memory overhead", func() {
 				sriovInterface := v1.InterfaceSRIOV{}
