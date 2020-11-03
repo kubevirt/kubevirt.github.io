@@ -17,7 +17,7 @@ tags:
   ]
 comments: true
 title: Monitoring KubeVirt VMs from the inside
-pub-date: October 21
+pub-date: November 05
 pub-year: 2020
 ---
 
@@ -98,7 +98,7 @@ kubectl rollout status -n cdi deployment cdi-deployment
 
 Alright, cool. We have everything we need now. Let's setup the VM.
 
-We will start with the PersistenVolumes required by [CDI’s DataVolume](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md) resources. Since I’m using minikube with no dynamic storage provider, I’ll be creating 2 PV with a reference to the PVCs that will claim them. Notice `claimRef` in each of the PVs.
+We will start with the `PersistenVolume`'s required by [CDI’s DataVolume](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md) resources. Since I’m using minikube with no dynamic storage provider, I’ll be creating 2 PVs with a reference to the PVCs that will claim them. Notice `claimRef` in each of the PVs.
 
 ```yaml
 apiVersion: v1
@@ -178,7 +178,7 @@ spec:
             storage: "2Gi"
 ```
 
-Notice that KubeVirt's VirtualMachine resource has a virtual machine template and a dataVolumeTemplate. On the virtual machine template, it is important noticing that we named our VM `monitorable-vm`, and we will use this name to connect to its console with `virtctl` later on. The label we've added, `prometheus.kubevirt.io: "node-exporter"`, is also important, since we'll use it when [configuring Prometheus to scrape the VM's node-exporter](#configuring-prometheus-to-scrape-the-vms-node-exporter)
+Notice that KubeVirt's VirtualMachine resource has a VirtualMachine template and a dataVolumeTemplate. On the VirtualMachine template, it is important noticing that we named our VM `monitorable-vm`, and we will use this name to connect to its console with `virtctl` later on. The label we've added, `prometheus.kubevirt.io: "node-exporter"`, is also important, since we'll use it when [configuring Prometheus to scrape the VM's node-exporter](#configuring-prometheus-to-scrape-the-vms-node-exporter)
 
 On dataVolumeTemplate, it is important noticing that we named the PVC `cirros-dv` and the DataVolume resource will create 2 PVCs with that, `cirros-dv` and `cirros-dv-scratch`. Notice that `cirros-dv` and `cirros-dv-scratch` are the names referenced on our PersistentVolume manifests. The names must match for this to work. 
 
