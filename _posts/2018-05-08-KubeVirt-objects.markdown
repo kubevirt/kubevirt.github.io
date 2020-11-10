@@ -126,7 +126,7 @@ nodeSelector:
 
 ### Clocks and Timers
 
-Configures the [virtualize hardware](https://kubevirt.io/user-guide/#/creation/devices?id=clock) clock provided by [QEMU](https://www.qemu.org/docs/master/qemu-doc.html#Debug_002fExpert-options).
+Configures the [virtualize hardware](https://kubevirt.io/user-guide/#/creation/devices?id=clock) clock provided by [QEMU](https://www.qemu.org/docs/master/system/invocation.html#hxtool-9).
 
 ```yaml
 domain:
@@ -229,7 +229,7 @@ features:
 
 ### QEMU Machine Type
 
-[.spec.domain.machine.type](https://kubevirt.io/user-guide/#/creation/devices?id=machine-type) is the emulated machine architecture provided by [QEMU](https://www.qemu.org/docs/master/qemu-doc.html#Standard-options).
+[.spec.domain.machine.type](https://kubevirt.io/user-guide/#/creation/devices?id=machine-type) is the emulated machine architecture provided by [QEMU](https://www.qemu.org/docs/master/system/invocation.html#hxtool-0).
 
 ```yaml
 machine:
@@ -251,7 +251,7 @@ Here is an example how to retrieve the supported QEMU machine types.
 
 ### Disks and Volumes
 
-[.spec.domain.devices.disks](http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk) configures a [QEMU](https://www.qemu.org/docs/master/qemu-doc.html#Block-device-options) type of [disk](https://libvirt.org/formatdomain.html#elementsDisks) to the virtual machine and assigns a specific [volume and its type to that disk](https://kubevirt.io/user-guide/#/creation/disks-and-volumes) via the `volumeName`.
+[.spec.domain.devices.disks](http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk) configures a [QEMU](https://www.qemu.org/docs/master/system/invocation.html#hxtool-1) type of [disk](https://libvirt.org/formatdomain.html#elementsDisks) to the virtual machine and assigns a specific [volume and its type to that disk](https://kubevirt.io/user-guide/#/creation/disks-and-volumes) via the `volumeName`.
 
 ```yaml
 devices:
