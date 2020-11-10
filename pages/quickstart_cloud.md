@@ -28,15 +28,8 @@ KubeVirt can be used on cloud computing providers such as AWS, Azure, GCP, AliCl
 
 {% include quickstarts/kubectl.md %}
 
-* Check the Kubernetes.io guide for each cloud provider on how to build infrastructure to match your use case:
+* Check the Kubernetes.io [Turnkey Cloud Solutions guide](https://kubernetes.io/docs/setup/production-environment/turnkey-solutions) for each cloud provider on how to build infrastructure to match your use case.
 
-  | Provider | Link                                                                             |
-  | -------- | -------------------------------------------------------------------------------- |
-  | AliCloud | <https://kubernetes.io/docs/setup/production-environment/turnkey/alibaba-cloud/> |
-  | AWS      | <https://kubernetes.io/docs/setup/production-environment/turnkey/aws/>           |
-  | Azure    | <https://kubernetes.io/docs/setup/production-environment/turnkey/azure/>         |
-  | GCP      | <https://kubernetes.io/docs/setup/production-environment/turnkey/gce/>           |
-  | Others   | <https://kubernetes.io/docs/setup/production-environment/turnkey/>               |
 
 >  error ""
 >  Be aware of the costs of associated with using infrastructure provided by cloud computing providers.
