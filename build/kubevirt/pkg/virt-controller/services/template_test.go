@@ -1827,7 +1827,7 @@ var _ = Describe("Template", func() {
 				caps := pod.Spec.Containers[0].SecurityContext.Capabilities
 
 				Expect(caps.Add).To(ContainElement(kubev1.Capability(CAP_NET_ADMIN)), "Expected compute container to be granted NET_ADMIN capability")
-				Expect(caps.Add).To(ContainElement(kubev1.Capability(CAP_NET_RAW)), "Expected compute container to be granted NET_RAW capability")
+				Expect(caps.Drop).To(ContainElement(kubev1.Capability(CAP_NET_RAW)), "Expected compute container to drop NET_RAW capability")
 			})
 
 			It("Should require tun device if explicitly requested", func() {
@@ -1851,7 +1851,7 @@ var _ = Describe("Template", func() {
 				caps := pod.Spec.Containers[0].SecurityContext.Capabilities
 
 				Expect(caps.Add).To(ContainElement(kubev1.Capability(CAP_NET_ADMIN)), "Expected compute container to be granted NET_ADMIN capability")
-				Expect(caps.Add).To(ContainElement(kubev1.Capability(CAP_NET_RAW)), "Expected compute container to be granted NET_RAW capability")
+				Expect(caps.Drop).To(ContainElement(kubev1.Capability(CAP_NET_RAW)), "Expected compute container to drop NET_RAW capability")
 			})
 
 			It("Should not require tun device if explicitly rejected", func() {
@@ -1874,7 +1874,7 @@ var _ = Describe("Template", func() {
 				caps := pod.Spec.Containers[0].SecurityContext.Capabilities
 
 				Expect(caps.Add).To(Not(ContainElement(kubev1.Capability(CAP_NET_ADMIN))), "Expected compute container not to be granted NET_ADMIN capability")
-				Expect(caps.Add).To(Not(ContainElement(kubev1.Capability(CAP_NET_RAW))), "Expected compute container not to be granted NET_RAW capability")
+				Expect(caps.Drop).To(ContainElement(kubev1.Capability(CAP_NET_RAW)), "Expected compute container to drop NET_RAW capability")
 			})
 		})
 
@@ -2073,6 +2073,72 @@ var _ = Describe("Template", func() {
 
 				resources := pod.Spec.Containers[0].Resources
 				val, ok := resources.Requests["vendor.com/gpu_name"]
+				Expect(ok).To(Equal(true))
+				Expect(val).To(Equal(*resource.NewQuantity(1, resource.DecimalSI)))
+			})
+		})
+
+		Context("with HostDevice device interface", func() {
+			It("should not run privileged", func() {
+				// For Power we are currently running in privileged mode or libvirt will fail to lock memory
+				if runtime.GOARCH == "ppc64le" {
+					Skip("ppc64le is currently running is privileged mode, so skipping test")
+				}
+				vmi := v1.VirtualMachineInstance{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "testvmi",
+						Namespace: "default",
+						UID:       "1234",
+					},
+					Spec: v1.VirtualMachineInstanceSpec{
+						Domain: v1.DomainSpec{
+							Devices: v1.Devices{
+								HostDevices: []v1.HostDevice{
+									v1.HostDevice{
+										Name:       "hostdev1",
+										DeviceName: "vendor.com/dev_name",
+									},
+								},
+							},
+						},
+					},
+				}
+				pod, err := svc.RenderLaunchManifest(&vmi)
+				Expect(err).ToNot(HaveOccurred())
+
+				Expect(len(pod.Spec.Containers)).To(Equal(1))
+				Expect(*pod.Spec.Containers[0].SecurityContext.Privileged).To(BeFalse())
+			})
+			It("should mount pci related host directories", func() {
+				vmi := v1.VirtualMachineInstance{
+					ObjectMeta: metav1.ObjectMeta{
+						Name:      "testvmi",
+						Namespace: "default",
+						UID:       "1234",
+					},
+					Spec: v1.VirtualMachineInstanceSpec{
+						Domain: v1.DomainSpec{
+							Devices: v1.Devices{
+								HostDevices: []v1.HostDevice{
+									v1.HostDevice{
+										Name:       "hostdev1",
+										DeviceName: "vendor.com/dev_name",
+									},
+								},
+							},
+						},
+					},
+				}
+
+				pod, err := svc.RenderLaunchManifest(&vmi)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(len(pod.Spec.Containers)).To(Equal(1))
+				// Skip first four mounts that are generic for all launcher pods
+				Expect(pod.Spec.Containers[0].VolumeMounts[4].MountPath).To(Equal("/sys/devices/"))
+				Expect(pod.Spec.Volumes[1].HostPath.Path).To(Equal("/sys/devices/"))
+
+				resources := pod.Spec.Containers[0].Resources
+				val, ok := resources.Requests["vendor.com/dev_name"]
 				Expect(ok).To(Equal(true))
 				Expect(val).To(Equal(*resource.NewQuantity(1, resource.DecimalSI)))
 			})

@@ -374,7 +374,7 @@ kind: VirtualMachine
 
 <h3 id="clocks-and-timers">Clocks and Timers</h3>
 
-<p>Configures the <a href="https://kubevirt.io/user-guide/#/creation/devices?id=clock">virtualize hardware</a> clock provided by <a href="https://www.qemu.org/docs/master/qemu-doc.html#Debug_002fExpert-options">QEMU</a>.</p>
+<p>Configures the <a href="https://kubevirt.io/user-guide/#/creation/devices?id=clock">virtualize hardware</a> clock provided by <a href="https://www.qemu.org/docs/master/system/invocation.html#hxtool-9">QEMU</a>.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">domain</span><span class="pi">:</span>
   <span class="na">clock</span><span class="pi">:</span>
@@ -421,7 +421,7 @@ kind: VirtualMachine
 
 <h3 id="watchdog-devices">Watchdog Devices</h3>
 
-<p><a href="http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog">.spec.domain.watchdog</a> automatically triggers an action via <a href="https://libvirt.org/formatdomain.html#elementsWatchdog">Libvirt</a> and <a href="https://www.qemu.org/docs/master/qemu-doc.html#Debug_002fExpert-options">QEMU</a> when the virtual machine operating system hangs or crashes.</p>
+<p><a href="http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog">.spec.domain.watchdog</a> automatically triggers an action via <a href="https://libvirt.org/formatdomain.html#elementsWatchdog">Libvirt</a> and <a href="https://www.qemu.org/docs/master/system/invocation.html#hxtool-9">QEMU</a> when the virtual machine operating system hangs or crashes.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">watchdog</span><span class="pi">:</span>
   <span class="na">i6300esb</span><span class="pi">:</span>
@@ -471,7 +471,7 @@ The <a href="http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_featur
 
 <h3 id="qemu-machine-type">QEMU Machine Type</h3>
 
-<p><a href="https://kubevirt.io/user-guide/#/creation/devices?id=machine-type">.spec.domain.machine.type</a> is the emulated machine architecture provided by <a href="https://www.qemu.org/docs/master/qemu-doc.html#Standard-options">QEMU</a>.</p>
+<p><a href="https://kubevirt.io/user-guide/#/creation/devices?id=machine-type">.spec.domain.machine.type</a> is the emulated machine architecture provided by <a href="https://www.qemu.org/docs/master/system/invocation.html#hxtool-0">QEMU</a>.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">machine</span><span class="pi">:</span>
   <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
@@ -491,7 +491,7 @@ The <a href="http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_featur
 
 <h3 id="disks-and-volumes">Disks and Volumes</h3>
 
-<p><a href="http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk">.spec.domain.devices.disks</a> configures a <a href="https://www.qemu.org/docs/master/qemu-doc.html#Block-device-options">QEMU</a> type of <a href="https://libvirt.org/formatdomain.html#elementsDisks">disk</a> to the virtual machine and assigns a specific <a href="https://kubevirt.io/user-guide/#/creation/disks-and-volumes">volume and its type to that disk</a> via the <code class="language-plaintext highlighter-rouge">volumeName</code>.</p>
+<p><a href="http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk">.spec.domain.devices.disks</a> configures a <a href="https://www.qemu.org/docs/master/system/invocation.html#hxtool-1">QEMU</a> type of <a href="https://libvirt.org/formatdomain.html#elementsDisks">disk</a> to the virtual machine and assigns a specific <a href="https://kubevirt.io/user-guide/#/creation/disks-and-volumes">volume and its type to that disk</a> via the <code class="language-plaintext highlighter-rouge">volumeName</code>.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">devices</span><span class="pi">:</span>
   <span class="na">disks</span><span class="pi">:</span>

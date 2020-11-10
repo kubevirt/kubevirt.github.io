@@ -356,10 +356,10 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Create dockerfile with following content to add static html files and set up <code class="language-plaintext highlighter-rouge">kubectl proxy</code> command line args.</p>
 
-<pre><code class="language-Dockerfile">FROM quay.io/bitnami/kubectl:1.15
-ADD static /static
-CMD ["proxy", "--www=/static", "--accept-hosts=^.*$", "--address=[::]", "--api-prefix=/k8s/", "--www-prefix="]
-</code></pre>
+<div class="language-Dockerfile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">FROM</span><span class="s"> quay.io/bitnami/kubectl:1.15</span>
+<span class="k">ADD</span><span class="s"> static /static</span>
+<span class="k">CMD</span><span class="s"> ["proxy", "--www=/static", "--accept-hosts=^.*$", "--address=[::]", "--api-prefix=/k8s/", "--www-prefix="]</span>
+</code></pre></div></div>
 
 <p>Finally use <code class="language-plaintext highlighter-rouge">docker build</code> to build docker image.</p>
 

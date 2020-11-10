@@ -14,6 +14,7 @@ aliases:
       - jean-edouard
       - ashleyschuett
       - mhenriks
+      - enp0s3
   emeritus_approvers:
       - cynepco3hahue
       - slintes
@@ -45,6 +46,7 @@ aliases:
       - ILpinto
       - kbidarkar
       - phoracek
+      - enp0s3
   ci-approvers:
       - dhiller
       - danielBelenky

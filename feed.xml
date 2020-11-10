@@ -1,4 +1,25 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-11-03T19:24:41+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-10-21T00:00:00+00:00</published><updated>2020-10-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI</id><content type="html" xml:base="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-11-10T23:20:19+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.35.0</title><link href="https://kubevirt.io//2020/changelog-v0.35.0.html" rel="alternate" type="text/html" title="KubeVirt v0.35.0" /><published>2020-11-09T00:00:00+00:00</published><updated>2020-11-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.35.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.35.0.html">&lt;h2 id=&quot;v0350&quot;&gt;v0.35.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Nov 9 13:08:27 2020 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #4409][vladikr] Increase the static memory overhead by 10Mi&lt;/li&gt;
+  &lt;li&gt;[PR #4272][maiqueb] Add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ip-family&lt;/code&gt; to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl expose&lt;/code&gt; command.&lt;/li&gt;
+  &lt;li&gt;[PR #4398][rmohr] VMIs reflect deleted stuck virt-launcher pods with the “PodTerminating” Reason in the ready condition. The VMIRS detects this reason and immediately creates replacement VMIs.&lt;/li&gt;
+  &lt;li&gt;[PR #4393][salanki] Disable legacy service links in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-launcher&lt;/code&gt; Pods to speed up Pod instantiation and decrease Kubelet load in namespaces with many services.&lt;/li&gt;
+  &lt;li&gt;[PR #2935][maiqueb] Add the macvtap BindMechanism.&lt;/li&gt;
+  &lt;li&gt;[PR #4132][mstarostik] fixes a bug that prevented unique device name allocation when configuring both scsi and sata drives&lt;/li&gt;
+  &lt;li&gt;[PR #3257][xpivarc] Added support of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl explain&lt;/code&gt; for Kubevirt resources.&lt;/li&gt;
+  &lt;li&gt;[PR #4288][ezrasilvera] Adding DownwardAPI volumes type&lt;/li&gt;
+  &lt;li&gt;[PR #4233][maya-r] Update base image used for pods to Fedora 31.&lt;/li&gt;
+  &lt;li&gt;[PR #4192][xpivarc] We now run gosec in Kubevirt&lt;/li&gt;
+  &lt;li&gt;[PR #4328][stu-gott] Version 2.x QEMU guest agents are supported.&lt;/li&gt;
+  &lt;li&gt;[PR #4289][AlonaKaplan] Masquerade binding - set the virt-launcher pod interface MTU on the bridge.&lt;/li&gt;
+  &lt;li&gt;[PR #4300][maiqueb] Update the NetworkInterfaceMultiqueue openAPI documentation to better specify its semantics within KubeVirt.&lt;/li&gt;
+  &lt;li&gt;[PR #4277][awels] PVCs populated by DVs are now allowed as volumes.&lt;/li&gt;
+  &lt;li&gt;[PR #4265][dhiller] Fix virtctl help text when running as a plugin&lt;/li&gt;
+  &lt;li&gt;[PR #4273][dhiller] Only run Travis build for PRs against release branches&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.35.0</summary></entry><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-10-21T00:00:00+00:00</published><updated>2020-10-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI</id><content type="html" xml:base="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;Over the last years the KubeVirt project has improved a lot regarding secondary interfaces networking configuration. Now it’s possible to do an end to end configuration from host networking to a VM using just the Kubernetes API with
 special Custom Resource Definitions. Moreover, the deployment of all the projects has been simplified by introducing &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;KubeVirt hyperconverged cluster operator (HCO)&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/cluster-network-addons-operator&quot;&gt;cluster network addons operator (CNAO)&lt;/a&gt; to install the networking components.&lt;/p&gt;
@@ -1247,18 +1268,4 @@ questions feel free to join the conversation via one of the project forums.&lt;/
       &lt;a href=&quot;#fnref:4&quot; class=&quot;reversefootnote&quot; role=&quot;doc-noteref&quot;&gt;&amp;#8617;&lt;/a&gt;
     &lt;/li&gt;
   &lt;/ol&gt;
-&lt;/div&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="images" /><category term="storage" /><category term="windows" /><summary type="html">The goal of this blog is to demonstrate that a web service can continue to run after a Windows guest virtual machine providing the service is migrated from MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by Kubernetes and KubeVirt on a Fedora Linux host. Yes! It can be done!</summary></entry><entry><title type="html">KubeVirt v0.30.0</title><link href="https://kubevirt.io//2020/changelog-v0.30.0.html" rel="alternate" type="text/html" title="KubeVirt v0.30.0" /><published>2020-06-05T00:00:00+00:00</published><updated>2020-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.30.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.30.0.html">&lt;h2 id=&quot;v0300&quot;&gt;v0.30.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Fri Jun 5 12:19:57 2020 +0200&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Tests: Many more test fixes&lt;/li&gt;
-  &lt;li&gt;Security: Introduce a custom SELinux policy for virt-launcher&lt;/li&gt;
-  &lt;li&gt;More user friendly IPv6 default CIDR for IPv6 addresses&lt;/li&gt;
-  &lt;li&gt;Fix OpenAPI compatibility issues by switching to openapi-gen&lt;/li&gt;
-  &lt;li&gt;Improved support for EFI boot (configurable OVMF path and test fixes)&lt;/li&gt;
-  &lt;li&gt;Improved VMI IP reporting&lt;/li&gt;
-  &lt;li&gt;Support propagation of annotations from VMI to pods&lt;/li&gt;
-  &lt;li&gt;Support for more fine grained (NET_RAW( capability granting to virt-launcher&lt;/li&gt;
-  &lt;li&gt;Support for eventual consistency with DataVolumes&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.30.0</summary></entry></feed>
+&lt;/div&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="images" /><category term="storage" /><category term="windows" /><summary type="html">The goal of this blog is to demonstrate that a web service can continue to run after a Windows guest virtual machine providing the service is migrated from MS Windows and Oracle VirtualBox to a guest virtual machine orchestrated by Kubernetes and KubeVirt on a Fedora Linux host. Yes! It can be done!</summary></entry></feed>

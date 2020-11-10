@@ -525,6 +525,10 @@
 <lastmod>2020-10-21T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/changelog-v0.35.0.html</loc>
+<lastmod>2020-11-09T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1270,5 +1274,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page26/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page27/</loc>
 </url>
 </urlset>

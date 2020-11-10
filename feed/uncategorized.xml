@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-11-03T19:24:41+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Proxy VM Conclusion</title><link href="https://kubevirt.io//2018/Proxy-vm-conclusion.html" rel="alternate" type="text/html" title="Proxy VM Conclusion" /><published>2018-06-13T00:00:00+00:00</published><updated>2018-06-13T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Proxy-vm-conclusion</id><content type="html" xml:base="https://kubevirt.io//2018/Proxy-vm-conclusion.html">&lt;p&gt;This blog post follow my previous research on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-11-10T23:20:19+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Proxy VM Conclusion</title><link href="https://kubevirt.io//2018/Proxy-vm-conclusion.html" rel="alternate" type="text/html" title="Proxy VM Conclusion" /><published>2018-06-13T00:00:00+00:00</published><updated>2018-06-13T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Proxy-vm-conclusion</id><content type="html" xml:base="https://kubevirt.io//2018/Proxy-vm-conclusion.html">&lt;p&gt;This blog post follow my previous research on how to allow vms inside a k8s cluster tp play nice with istio and other sidecars.&lt;/p&gt;
 
 &lt;h1 id=&quot;research-conclusions-and-network-roadmap&quot;&gt;Research conclusions and network roadmap&lt;/h1&gt;
 
@@ -1957,7 +1957,7 @@ kind: VirtualMachine
 
 &lt;h3 id=&quot;clocks-and-timers&quot;&gt;Clocks and Timers&lt;/h3&gt;
 
-&lt;p&gt;Configures the &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/devices?id=clock&quot;&gt;virtualize hardware&lt;/a&gt; clock provided by &lt;a href=&quot;https://www.qemu.org/docs/master/qemu-doc.html#Debug_002fExpert-options&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Configures the &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/devices?id=clock&quot;&gt;virtualize hardware&lt;/a&gt; clock provided by &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-9&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;clock&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2004,7 +2004,7 @@ kind: VirtualMachine
 
 &lt;h3 id=&quot;watchdog-devices&quot;&gt;Watchdog Devices&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog&quot;&gt;.spec.domain.watchdog&lt;/a&gt; automatically triggers an action via &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsWatchdog&quot;&gt;Libvirt&lt;/a&gt; and &lt;a href=&quot;https://www.qemu.org/docs/master/qemu-doc.html#Debug_002fExpert-options&quot;&gt;QEMU&lt;/a&gt; when the virtual machine operating system hangs or crashes.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog&quot;&gt;.spec.domain.watchdog&lt;/a&gt; automatically triggers an action via &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsWatchdog&quot;&gt;Libvirt&lt;/a&gt; and &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-9&quot;&gt;QEMU&lt;/a&gt; when the virtual machine operating system hangs or crashes.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;watchdog&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;i6300esb&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2054,7 +2054,7 @@ The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v
 
 &lt;h3 id=&quot;qemu-machine-type&quot;&gt;QEMU Machine Type&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/devices?id=machine-type&quot;&gt;.spec.domain.machine.type&lt;/a&gt; is the emulated machine architecture provided by &lt;a href=&quot;https://www.qemu.org/docs/master/qemu-doc.html#Standard-options&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/devices?id=machine-type&quot;&gt;.spec.domain.machine.type&lt;/a&gt; is the emulated machine architecture provided by &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-0&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
@@ -2074,7 +2074,7 @@ The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v
 
 &lt;h3 id=&quot;disks-and-volumes&quot;&gt;Disks and Volumes&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk&quot;&gt;.spec.domain.devices.disks&lt;/a&gt; configures a &lt;a href=&quot;https://www.qemu.org/docs/master/qemu-doc.html#Block-device-options&quot;&gt;QEMU&lt;/a&gt; type of &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsDisks&quot;&gt;disk&lt;/a&gt; to the virtual machine and assigns a specific &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes&quot;&gt;volume and its type to that disk&lt;/a&gt; via the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;volumeName&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk&quot;&gt;.spec.domain.devices.disks&lt;/a&gt; configures a &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-1&quot;&gt;QEMU&lt;/a&gt; type of &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsDisks&quot;&gt;disk&lt;/a&gt; to the virtual machine and assigns a specific &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes&quot;&gt;volume and its type to that disk&lt;/a&gt; via the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;volumeName&lt;/code&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
