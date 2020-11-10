@@ -177,7 +177,7 @@ resources:
 
 ### Watchdog Devices
 
-[.spec.domain.watchdog](http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog) automatically triggers an action via [Libvirt](https://libvirt.org/formatdomain.html#elementsWatchdog) and [QEMU](https://www.qemu.org/docs/master/qemu-doc.html#Debug_002fExpert-options) when the virtual machine operating system hangs or crashes.
+[.spec.domain.watchdog](http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog) automatically triggers an action via [Libvirt](https://libvirt.org/formatdomain.html#elementsWatchdog) and [QEMU](https://www.qemu.org/docs/master/system/invocation.html#hxtool-9) when the virtual machine operating system hangs or crashes.
 
 ```yaml
 watchdog:
