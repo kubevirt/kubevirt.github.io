@@ -18,7 +18,7 @@ In this article, we'll cover the configuration changes in both Jenkins and the J
 
 ## Jenkins
 
-Our Jenkins instance, is running on top of [CentOS OpenShift](https://console.apps.ci.centos.org:8443/console/) and is one of the OS-enhanced Jenkins instances, that provide persistent storage and other pieces bundled, required for non-testing setups.
+Our Jenkins instance, is running on top of (CentOS CI)[https://pagure.io/centos-infra/] and is one of the OS-enhanced Jenkins instances, that provide persistent storage and other pieces bundled, required for non-testing setups.
 
 What we found is that Jenkins was already complaining because of pending updates (security, engine, etc), but the `jenkins.war` was embedded in the container image we were using.
 
