@@ -227,9 +227,8 @@ const (
 )
 
 const (
-	capNetAdmin k8sv1.Capability = "NET_ADMIN"
-	capNetRaw   k8sv1.Capability = "NET_RAW"
-	capSysNice  k8sv1.Capability = "SYS_NICE"
+	capNetRaw  k8sv1.Capability = "NET_RAW"
+	capSysNice k8sv1.Capability = "SYS_NICE"
 )
 
 type ProcessFunc func(event *k8sv1.Event) (done bool)
@@ -785,9 +784,9 @@ func AdjustKubeVirtResource() {
 
 	// Rotate very often during the tests to ensure that things are working
 	kv.Spec.CertificateRotationStrategy = v1.KubeVirtCertificateRotateStrategy{SelfSigned: &v1.KubeVirtSelfSignConfiguration{
-		CARotateInterval:   &metav1.Duration{Duration: 10 * time.Minute},
-		CertRotateInterval: &metav1.Duration{Duration: 7 * time.Minute},
-		CAOverlapInterval:  &metav1.Duration{Duration: 4 * time.Minute},
+		CARotateInterval:   &metav1.Duration{Duration: 20 * time.Minute},
+		CertRotateInterval: &metav1.Duration{Duration: 14 * time.Minute},
+		CAOverlapInterval:  &metav1.Duration{Duration: 8 * time.Minute},
 	}}
 
 	// match default kubevirt-config testing resource
@@ -2159,6 +2158,8 @@ func NewRandomFedoraVMIWitGuestAgent() *v1.VirtualMachineInstance {
 	Expect(err).NotTo(HaveOccurred())
 
 	return libvmi.NewFedora(
+		libvmi.WithInterface(libvmi.InterfaceDeviceWithMasqueradeBinding()),
+		libvmi.WithNetwork(v1.DefaultPodNetwork()),
 		libvmi.WithCloudInitNoCloudUserData(GetGuestAgentUserData(), false),
 		libvmi.WithCloudInitNoCloudNetworkData(networkData, false),
 	)
@@ -4921,7 +4922,6 @@ func DetectLatestUpstreamOfficialTag() (string, error) {
 func IsLauncherCapabilityValid(capability k8sv1.Capability) bool {
 	switch capability {
 	case
-		capNetAdmin,
 		capSysNice:
 		return true
 	}
