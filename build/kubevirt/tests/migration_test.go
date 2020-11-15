@@ -22,6 +22,7 @@ package tests_test
 import (
 	"crypto/tls"
 	"encoding/json"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"sync"
@@ -1187,6 +1188,12 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				By("Checking that the VirtualMachineInstance console has expected output")
 				Expect(tests.LoginToFedora(vmi)).To(Succeed())
 
+				domSpec, err := tests.GetRunningVMIDomainSpec(vmi)
+				Expect(err).ToNot(HaveOccurred())
+				emulator := filepath.Base(strings.TrimPrefix(domSpec.Devices.Emulator, "/"))
+				// ensure that we only match the process
+				emulator = "[" + emulator[0:1] + "]" + emulator[1:]
+
 				// launch killer pod on every node that isn't the vmi's node
 				By("Starting our migration killer pods")
 				nodes := tests.GetAllSchedulableNodes(virtClient)
@@ -1199,11 +1206,11 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 					podName := fmt.Sprintf("migration-killer-pod-%d", idx)
 
 					// kill the handler right as we detect the qemu target process come online
-					pod := tests.RenderPod(podName, []string{"/bin/bash", "-c"}, []string{"while true; do ps aux | grep \"[q]emu-kvm\" && pkill -9 virt-handler && exit 0; done"})
+					pod := tests.RenderPod(podName, []string{"/bin/bash", "-c"}, []string{fmt.Sprintf("while true; do ps aux | grep \"%s\" && pkill -9 virt-handler && exit 0; done", emulator)})
+
 					pod.Spec.NodeName = entry.Name
 					createdPod, err := virtClient.CoreV1().Pods(tests.NamespaceTestDefault).Create(pod)
 					Expect(err).ToNot(HaveOccurred(), "Should create helper pod")
-
 					createdPods = append(createdPods, createdPod.Name)
 				}
 
@@ -1614,6 +1621,56 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 
 				AfterEach(func() {
 					tests.CleanNodes()
+				})
+
+				It("should migrate a VMI only one time", func() {
+					tests.SkipIfVersionBelow("Eviction of completed pods requires v1.13 and above", "1.13")
+
+					vmi = fedoraVMIWithEvictionStrategy()
+
+					By("Starting the VirtualMachineInstance")
+					vmi = runVMIAndExpectLaunch(vmi, 180)
+
+					tests.WaitAgentConnected(virtClient, vmi)
+
+					// Mark the masters as schedulable so we can migrate there
+					setMastersUnschedulable(false)
+
+					// Drain node.
+					node := vmi.Status.NodeName
+					drainNode(node)
+
+					// verify VMI migrated and lives on another node now.
+					Eventually(func() error {
+						vmi, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
+						if err != nil {
+							return err
+						} else if vmi.Status.NodeName == node {
+							return fmt.Errorf("VMI still exist on the same node")
+						} else if vmi.Status.MigrationState == nil || vmi.Status.MigrationState.SourceNode != node {
+							return fmt.Errorf("VMI did not migrate yet")
+						} else if vmi.Status.EvacuationNodeName != "" {
+							return fmt.Errorf("evacuation node name is still set on the VMI")
+						}
+
+						// VMI should still be running at this point. If it
+						// isn't, then there's nothing to be waiting on.
+						Expect(vmi.Status.Phase).To(Equal(v1.Running))
+
+						return nil
+					}, 180*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
+
+					Consistently(func() error {
+						migrations, err := virtClient.VirtualMachineInstanceMigration(vmi.Namespace).List(&metav1.ListOptions{})
+						if err != nil {
+							return err
+						}
+						if len(migrations.Items) > 1 {
+							return fmt.Errorf("should have only 1 migration issued for evacuation of 1 VM")
+						}
+						return nil
+					}, 20*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
+
 				})
 
 				It("[test_id:2221] should migrate a VMI under load to another node", func() {
