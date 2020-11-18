@@ -171,7 +171,7 @@ var _ = Describe("[Serial]Multus", func() {
 
 				_, err = virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Create(detachedVMI)
 				Expect(err).ToNot(HaveOccurred())
-				tests.WaitUntilVMIReady(detachedVMI, tests.LoginToCirros)
+				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
 				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
 			})
@@ -189,7 +189,7 @@ var _ = Describe("[Serial]Multus", func() {
 
 				_, err = virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Create(detachedVMI)
 				Expect(err).ToNot(HaveOccurred())
-				tests.WaitUntilVMIReady(detachedVMI, tests.LoginToCirros)
+				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
 				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
 			})
@@ -210,7 +210,7 @@ var _ = Describe("[Serial]Multus", func() {
 
 				_, err = virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Create(detachedVMI)
 				Expect(err).ToNot(HaveOccurred())
-				tests.WaitUntilVMIReady(detachedVMI, tests.LoginToCirros)
+				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
 				cmdCheck := "sudo /sbin/cirros-dhcpc up eth1 > /dev/null\n"
 				err = console.SafeExpectBatch(detachedVMI, []expect.Batcher{
@@ -246,7 +246,7 @@ var _ = Describe("[Serial]Multus", func() {
 
 				_, err = virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Create(detachedVMI)
 				Expect(err).ToNot(HaveOccurred())
-				tests.WaitUntilVMIReady(detachedVMI, tests.LoginToCirros)
+				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
 				By("checking virtual machine instance can ping 10.1.1.1 using ptp cni plugin")
 				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
@@ -293,7 +293,7 @@ var _ = Describe("[Serial]Multus", func() {
 				By("Creating a VM with custom MAC address on its ptp interface.")
 				interfaces[0].MacAddress = customMacAddress
 				vmiOne := createVMIOnNode(interfaces, networks)
-				tests.WaitUntilVMIReady(vmiOne, tests.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiOne, console.LoginToAlpine)
 
 				By("Configuring static IP address to ptp interface.")
 				Expect(configInterface(vmiOne, "eth0", "10.1.1.1/24")).To(Succeed())
@@ -329,8 +329,8 @@ var _ = Describe("[Serial]Multus", func() {
 				vmiOne := createVMIOnNode(interfaces, networks)
 				vmiTwo := createVMIOnNode(interfaces, networks)
 
-				tests.WaitUntilVMIReady(vmiOne, tests.LoginToAlpine)
-				tests.WaitUntilVMIReady(vmiTwo, tests.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiOne, console.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiTwo, console.LoginToAlpine)
 
 				Expect(configInterface(vmiOne, "eth0", "10.1.1.1/24")).To(Succeed())
 				By("checking virtual machine interface eth0 state")
@@ -358,8 +358,8 @@ var _ = Describe("[Serial]Multus", func() {
 				vmiOne := createVMIOnNode(interfaces, networks)
 				vmiTwo := createVMIOnNode(interfaces, networks)
 
-				tests.WaitUntilVMIReady(vmiOne, tests.LoginToAlpine)
-				tests.WaitUntilVMIReady(vmiTwo, tests.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiOne, console.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiTwo, console.LoginToAlpine)
 
 				Expect(configInterface(vmiOne, "eth1", "10.1.1.1/24")).To(Succeed())
 				By("checking virtual machine interface eth1 state")
@@ -383,12 +383,12 @@ var _ = Describe("[Serial]Multus", func() {
 			It("[test_id:676]should configure valid custom MAC address on Linux bridge CNI interface.", func() {
 				By("Creating a VM with Linux bridge CNI network interface and default MAC address.")
 				vmiTwo := createVMIOnNode(interfaces, networks)
-				tests.WaitUntilVMIReady(vmiTwo, tests.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiTwo, console.LoginToAlpine)
 
 				By("Creating another VM with custom MAC address on its Linux bridge CNI interface.")
 				interfaces[linuxBridgeIfIdx].MacAddress = customMacAddress
 				vmiOne := createVMIOnNode(interfaces, networks)
-				tests.WaitUntilVMIReady(vmiOne, tests.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiOne, console.LoginToAlpine)
 
 				By("Configuring static IP address to the Linux bridge interface.")
 				Expect(configInterface(vmiOne, "eth0", "10.1.1.1/24")).To(Succeed())
@@ -431,7 +431,7 @@ var _ = Describe("[Serial]Multus", func() {
 
 				vmiOne := createVMIOnNode(interfaces, networks)
 
-				tests.WaitUntilVMIReady(vmiOne, tests.LoginToAlpine)
+				tests.WaitUntilVMIReady(vmiOne, console.LoginToAlpine)
 
 				updatedVmi, err := virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Get(vmiOne.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
@@ -661,7 +661,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 			vmi, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
 
-			tests.WaitUntilVMIReady(vmi, tests.LoginToFedora)
+			tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToFedora))
 			tests.WaitAgentConnected(virtClient, vmi)
 			return
 		}
@@ -764,8 +764,9 @@ var _ = Describe("[Serial]SRIOV", func() {
 		})
 
 		It("[test_id:3985]should create a virtual machine with sriov interface with custom MAC address", func() {
-			mac := "de:ad:00:00:be:ef"
-			vmi := getSriovVmi([]string{"sriov"})
+			const mac = "de:ad:00:00:be:ef"
+			const sriovNetworkName = "sriov"
+			vmi := getSriovVmi([]string{sriovNetworkName})
 			vmi.Spec.Domain.Devices.Interfaces[1].MacAddress = mac
 
 			startVmi(vmi)
@@ -782,6 +783,8 @@ var _ = Describe("[Serial]SRIOV", func() {
 
 			By("checking virtual machine instance has an interface with the requested MAC address")
 			Expect(checkMacAddress(vmi, interfaceName, mac)).To(Succeed())
+			By("checking virtual machine instance reports the expected network name")
+			Expect(getInterfaceNetworkNameByMAC(vmi, mac)).To(Equal(sriovNetworkName))
 		})
 
 		It("[test_id:1755]should create a virtual machine with two sriov interfaces referring the same resource", func() {
@@ -925,7 +928,7 @@ var _ = Describe("[Serial]Macvtap", func() {
 		}
 		vmi = tests.WaitUntilVMIReady(
 			tests.StartVmOnNode(vmi, nodeName),
-			tests.LoginToCirros)
+			libnet.WithIPv6(console.LoginToCirros))
 		// configure the client VMI
 		Expect(configVMIInterfaceWithSudo(vmi, ifaceName, ipCIDR)).To(Succeed())
 		return vmi
@@ -1086,6 +1089,16 @@ func getInterfaceNameByMAC(vmi *v1.VirtualMachineInstance, mac string) (string, 
 	}
 
 	return "", fmt.Errorf("could not get sriov interface by MAC: no interface on VMI %s with MAC %s", vmi.Name, mac)
+}
+
+func getInterfaceNetworkNameByMAC(vmi *v1.VirtualMachineInstance, macAddress string) string {
+	for _, iface := range vmi.Status.Interfaces {
+		if iface.MAC == macAddress {
+			return iface.Name
+		}
+	}
+
+	return ""
 }
 
 // Tests in Multus suite are expecting a Linux bridge to be available on each node, with iptables allowing
