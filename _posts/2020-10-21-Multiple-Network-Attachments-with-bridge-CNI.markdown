@@ -140,7 +140,7 @@ In case something goes wrong and the pod changing the node network cannot ping t
 
 The desired state fields follow the nmstate API described at their [awesome doc](https://www.nmstate.io/)
 
-Also for more details on kubernetes-nmstate there are guides covering [reporting](https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide-101-reporting.md), [configuration](https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide-102-configuration.md) and [troubleshooting](https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide-103-troubleshooting.md). There are also [nncp examples](https://github.com/nmstate/kubernetes-nmstate/tree/master/docs/examples).
+Also for more details on kubernetes-nmstate there are guides covering [reporting](https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide/101-reporting.md), [configuration](https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide/102-configuration.md) and [troubleshooting](https://github.com/nmstate/kubernetes-nmstate/blob/master/docs/user-guide/103-troubleshooting.md). There are also [nncp examples](https://github.com/nmstate/kubernetes-nmstate/tree/master/docs/examples).
 
 ## Demo: mixing it all together, VM to VM communication between nodes
 
