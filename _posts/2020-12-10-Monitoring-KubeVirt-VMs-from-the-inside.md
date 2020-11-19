@@ -17,7 +17,7 @@ tags:
   ]
 comments: true
 title: Monitoring KubeVirt VMs from the inside
-pub-date: November 05
+pub-date: December 10
 pub-year: 2020
 ---
 
@@ -107,7 +107,7 @@ metadata:
   name: example-volume
 spec:
   storageClassName: ""
-  claimRef: 
+  claimRef:
     namespace: default
     name: cirros-dv
   accessModes:
@@ -123,7 +123,7 @@ metadata:
   name: example-volume-scratch
 spec:
   storageClassName: ""
-  claimRef: 
+  claimRef:
     namespace: default
     name: cirros-dv-scratch
   accessModes:
@@ -144,9 +144,9 @@ metadata:
 spec:
   running: true
   template:
-    metadata: 
+    metadata:
       name: monitorable-vm
-      labels: 
+      labels:
         prometheus.kubevirt.io: "node-exporter"
     spec:
       domain:
@@ -162,12 +162,12 @@ spec:
       - dataVolume:
           name: cirros-dv
         name: my-data-volume
-  dataVolumeTemplates: 
+  dataVolumeTemplates:
   - metadata:
       name: "cirros-dv"
     spec:
       source:
-          http: 
+          http:
              url: "https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"
       pvc:
         storageClassName: ""
@@ -180,7 +180,7 @@ spec:
 
 Notice that KubeVirt's VirtualMachine resource has a VirtualMachine template and a dataVolumeTemplate. On the VirtualMachine template, it is important noticing that we named our VM `monitorable-vm`, and we will use this name to connect to its console with `virtctl` later on. The label we've added, `prometheus.kubevirt.io: "node-exporter"`, is also important, since we'll use it when [configuring Prometheus to scrape the VM's node-exporter](#configuring-prometheus-to-scrape-the-vms-node-exporter)
 
-On dataVolumeTemplate, it is important noticing that we named the PVC `cirros-dv` and the DataVolume resource will create 2 PVCs with that, `cirros-dv` and `cirros-dv-scratch`. Notice that `cirros-dv` and `cirros-dv-scratch` are the names referenced on our PersistentVolume manifests. The names must match for this to work. 
+On dataVolumeTemplate, it is important noticing that we named the PVC `cirros-dv` and the DataVolume resource will create 2 PVCs with that, `cirros-dv` and `cirros-dv-scratch`. Notice that `cirros-dv` and `cirros-dv-scratch` are the names referenced on our PersistentVolume manifests. The names must match for this to work.
 
 ## Installing the node-exporter inside the VM
 
@@ -215,8 +215,8 @@ metadata:
     prometheus.kubevirt.io: "node-exporter"
 spec:
   ports:
-  - name: metrics 
-    port: 9100 
+  - name: metrics
+    port: 9100
     targetPort: 9100
     protocol: TCP
   selector:
@@ -245,8 +245,8 @@ Let's break this down just to make sure we set up everything right. Starting wit
 ```yaml
 spec:
   ports:
-  - name: metrics 
-    port: 9100 
+  - name: metrics
+    port: 9100
     targetPort: 9100
     protocol: TCP
   selector:
@@ -280,7 +280,7 @@ Since our ServiceMonitor will be deployed at the `monitoring` namespace, but our
 
 We are also telling our ServiceMonitor that Prometheus needs to scrape endpoints from services labeled with `prometheus.kubevirt.io: "node-exporter"` and which ports are named `metrics`. Luckily, that's exactly what we did with our `Service`!
 
-One last thing to keep an eye on. Prometheus configuration can be set up to watch multiple ServiceMonitors. We can see which ServiceMonitors our Prometheus is watching with the following command: 
+One last thing to keep an eye on. Prometheus configuration can be set up to watch multiple ServiceMonitors. We can see which ServiceMonitors our Prometheus is watching with the following command:
 ```
 # Look for Service Monitor Selector
 kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
