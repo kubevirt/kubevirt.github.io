@@ -1,8 +1,7 @@
 # KubeVirt Adopters
 
-Please use this file to let us know that you are using KubeVirt by adding your company name and a description of your use case to this document.
+This is a likely incomplete list of KubeVirt adopters - end-users and distributors alike.
 
-
-| Company | Use-Case | Since |
-| ------- | -------- | ----- |
-| Red Hat | Using it to run classic virtual machines | 2016 |
+| User | Since | Use-Case |
+|-|-|:-|
+| Red Hat | 2016 | As a distributor we are building OpenShift Virtualization on KubeVirt in order to enable VM workloads and -flows on Kubernetes. |
