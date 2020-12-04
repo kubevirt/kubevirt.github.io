@@ -34,6 +34,17 @@ help:
 
 
 envvar:
+ifndef DEBUG
+	@$(eval export DEBUG=@)
+else
+ifeq ($(shell test "$(DEBUG)" = True  -o  \
+	                 "$(DEBUG)" = true && printf "true"), true)
+	@$(eval export DEBUG=)
+else
+	@$(eval export DEBUG=@)
+endif
+endif
+
 ifndef GIT_REPO_DIR
 	@$(eval GIT_REPO_DIR=~/git)
 endif
@@ -70,68 +81,84 @@ endif
 
 
 ## Check external, internal, userguide links
-check_links_website: | envvar stop-kubevirtio
-	@echo "${GREEN}Makefile: Check external, internal, userguide links${RESET}"
-	${CONTAINER_ENGINE} run -it --rm --name kubevirtio --net=host -v ${PWD}:/srv/jekyll"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" jekyll/jekyll /bin/bash -c "bundle install --quiet; rake"
-	@echo
-
-	@echo "${GREEN}Makefile: Check userguide selectors${RESET}"
-	for i in `${CONTAINER_ENGINE} run -it --rm --name kubevirtio --net=host -v ${PWD}:/srv/jekyll"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" jekyll/jekyll /bin/bash -c "bundle install --quiet; rake links:userguide_selectors" 2> /dev/null`; do \
-		if [[ "$${i}" =~ "failure!" ]]; then \
-		  echo "  ${RED}* FAILED ... HTML-Proofer failed.  Run 'make check_userguide_links' to find broken links${RESET}"; \
-			break; \
-		fi; \
-		if [[ "$${i}" =~ https?:// ]]; then \
-			echo -n "${AQUA} * " && \
-			echo "$${i}" | cut -d"," -f 1,2 | sed -e 's/^/"File": "/g' -e 's/,/", "Link": "/g' -e 's/\\$$/"/g' && \
-			echo -n "${RESET}"; \
-			if `egrep -q "/#(\w|-|_)+" <<< "$${i}"`; then \
-				${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/check_selectors.js"; \
-			else \
+check_links_website: | envvar stop-website
+	@echo "${GREEN}Makefile: Check external, internal, userguide links, userguide selectors${RESET}"
+#BEGIN BIG SHELL SCRIPT
+	${DEBUG}OUTPUT=`IFS=$$'\n'; ${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site${SELINUX_ENABLED} jekyll/jekyll /bin/bash -c 'bundle install --quiet; rake && rake links:userguide_selectors'`; \
+	if [[ "$${OUTPUT}" =~ "failure!" ]]; then \
+		echo "$${OUTPUT}"; \
+		exit 1; \
+	fi; \
+	IFS=$$'\n'; \
+	for i in `echo "$${OUTPUT}"`; do \
+		if [[ "$${i}" =~ https?://.*, ]]; then \
+			/bin/echo -n "${AQUA}"; \
+			echo -n "File:" && echo "$${i}" | cut -d"," -f 2; \
+			echo -n "Link:" && echo "$${i}" | cut -d"," -f 1; \
+			/bin/echo "${RESET}"; \
+			if `egrep -q "#/.*\?id=" <<< "$${i}"`; then \
+				RETVAL=1; \
 				echo "  ${RED}* FAILED ... Docsify ?id= links need to be migrated to mkdocs${RESET}"; \
+			else \
+				${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/check_selectors.js"; \
 			fi; \
 		fi; \
-	done
-	@echo
-
-## Check spelling on kubevirtio content
-check_spelling_kubevirtio: | envvar
-	@echo "${GREEN}Makefile: Check kubevirtio spelling${RESET}"
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller --net=host -v `pwd`:/srv"${SELINUX_ENABLED}" -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" yaspeller /bin/bash -c "echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv" | \
-	sed -e 's#\/srv#${GIT_REPO_DIR}\/\./#g'
+	done; \
+	if [ "$${RETVAL}" ]; then echo; exit 1; fi; \
+	echo "Complete!"
+#END BIG SHELL SCRIPT
 	@echo
 
 
 ## Check spelling on userguide content
 check_spelling_userguide: | envvar
 	@echo "${GREEN}Makefile: Check userguide spelling${RESET}"
-	cd ${GIT_REPO_DIR}/user-guide && \
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller --net=host -v `pwd`:/srv"${SELINUX_ENABLED}" -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json"${SELINUX_ENABLED}" yaspeller /bin/bash -c "echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv" | \
-	sed -e 's#\/srv#${GIT_REPO_DIR}\/user-guide#g'
+	${DEBUG}export IFS=$$'\n'; \
+	for i in `cd ${GIT_REPO_DIR}/user-guide && ${CONTAINER_ENGINE} run -it --rm --name yaspeller -v $$(pwd):/srv"${SELINUX_ENABLED}" -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json"${SELINUX_ENABLED}" yaspeller /bin/bash -c 'echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
+		if [[ "$${i}" =~ "✗" ]]; then \
+			export RETVAL=1; \
+		fi; \
+		echo "$${i}"; \
+	done; \
+	if [ "$${RETVAL}" ]; then exit 1; fi; \
+	echo "Complete!"
+
+
+## Check spelling on website content
+check_spelling_website: | envvar
+	@echo "${GREEN}Makefile: Check website spelling${RESET}"
+	${DEBUG}export IFS=$$'\n'; \
+	for i in `${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv"${SELINUX_ENABLED}" -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json"${SELINUX_ENABLED}" yaspeller /bin/bash -c 'echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
+		if [[ "$${i}" =~ "✗" ]]; then \
+			export RETVAL=1; \
+		fi; \
+	  echo "$${i}"; \
+	done; \
+	if [ "$${RETVAL}" ]; then exit 1; fi; \
+	echo "Complete!"
+
+
+## Build image: casperjs
+build-image-casperjs: | envvar stop-casperjs
+	${DEBUG}$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/casperjs)
+	${DEBUG}$(eval export TAG=localhost/casperjs:latest)
+	${DEBUG}$(MAKE) build
 	@echo
 
 
-## Build casperjs image
-build-casperjs-image: | envvar stop-casperjs
-	@$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/casperjs)
-	@$(eval export TAG=localhost/casperjs:latest)
-	@$(MAKE) build
+## Build image: userguide
+build-image-userguide: | envvar stop-userguide
+	${DEBUG}$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/kubevirt-userguide)
+	${DEBUG}$(eval export TAG=localhost/userguide:latest)
+	${DEBUG}$(MAKE) build
 	@echo
 
 
-## Build userguide image
-build-userguide-image: | envvar stop-userguide
-	@$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/kubevirt-userguide)
-	@$(eval export TAG=localhost/userguide:latest)
-	@$(MAKE) build
-	@echo
-
-
-## Build yaspeller image
-build-yaspeller-image: | envvar stop-yaspeller
-	@$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/yaspeller)
-	@$(eval export TAG=localhost/yaspeller:latest)
-	@$(MAKE) build
+## Build image: yaspeller
+build-image-yaspeller: | envvar stop-yaspeller
+	${DEBUG}$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/yaspeller)
+	${DEBUG}$(eval export TAG=localhost/yaspeller:latest)
+	${DEBUG}$(MAKE) build
 	@echo
 
 
@@ -143,28 +170,28 @@ ifeq ($(DIR),)
 endif
 	@echo "${GREEN}Makefile: ${TAG}${RESET}" | sed -e 's/-/ /g' -e 's/: build/: Building/g'
 	cd ${DIR} && \
+	${BUILD_ENGINE} rmi ${TAG} || echo -n && \
 	${BUILD_ENGINE} ${TAG}
 
 
-## Run kubevirtio and userguide containers
-run: | envvar run-userguide run-kubevirtio status
-
-
-## Run kubevirtio image.  App available @ http://0.0.0.0:4000
-run-kubevirtio: | envvar stop-kubevirtio
-	@echo "${GREEN}Makefile: Run kubevirtio image${RESET}"
-	for i in .jekyll-cache _site; do mkdir ./"$${i}" 2> /dev/null; chmod 777 ./"$${i}"; echo -n; done
-	for i in Gemfile.lock; do touch ./"$${i}" && chmod 777 ./"$${i}"; echo -n; done
-	${CONTAINER_ENGINE} run -d --name kubevirtio --net=host -v ${PWD}:/srv/jekyll"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" -e JEKYLL_UID=`id -u` jekyll/jekyll /bin/bash -c "jekyll serve --force_polling --future"
-	@echo
+## Run website and userguide containers
+run: | envvar run-userguide run-website status
 
 
 ## Run userguide image.   App available @ http://0.0.0.0:8000
 run-userguide: | envvar stop-userguide
 	@echo "${GREEN}Makefile: Run userguide image${RESET}"
 	cd ${GIT_REPO_DIR}/user-guide; \
-	for i in site; do mkdir ./"$${i}" 2> /dev/null; chmod 777 ./"$${i}"; echo -n; done; \
-	${CONTAINER_ENGINE} run -d --name userguide --net=host -v `pwd`:/userguide"${SELINUX_ENABLED}" localhost/userguide:latest /bin/bash -c "mkdocs build -f /userguide/mkdocs.yml && mkdocs serve -f /userguide/mkdocs.yml -a 0.0.0.0:8000"
+	${CONTAINER_ENGINE} run -d --name userguide --net=host -v `pwd`:/userguide"${SELINUX_ENABLED}":ro --mount type=tmpfs,destination=/userguide/site"${SELINUX_ENABLED}" localhost/userguide:latest /bin/bash -c "mkdocs build -f /userguide/mkdocs.yml && mkdocs serve -f /userguide/mkdocs.yml -a 0.0.0.0:8000"
+	@echo
+
+
+## Run website image.  App available @ http://0.0.0.0:4000
+run-website: | envvar stop-website
+	@echo "${GREEN}Makefile: Run website image${RESET}"
+	for i in .jekyll-cache _site; do mkdir ./"$${i}" 2> /dev/null; chmod 777 ./"$${i}"; echo -n; done
+	for i in Gemfile.lock; do touch ./"$${i}" && chmod 777 ./"$${i}"; echo -n; done
+	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll"${SELINUX_ENABLED}":ro -e JEKYLL_UID=`id -u` --mount type=tmpfs,destination=/srv/jekyll/_site"${SELINUX_ENABLED}" --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache"${SELINUX_ENABLED}" jekyll/jekyll /bin/bash -c "jekyll serve --force_polling --future"
 	@echo
 
 
@@ -172,33 +199,36 @@ run-userguide: | envvar stop-userguide
 status: | envvar
 	@echo "${GREEN}Makefile: Check image status${RESET}"
 	${CONTAINER_ENGINE} ps
-	@echo
+	@echo -n
 
 
-## Stop kubevirtio and userguide containers
-stop: | envvar stop-kubevirtio stop-userguide status
+## Stop website and userguide containers
+stop: | envvar stop-website stop-userguide status
 
 
 ## Stop casperjs image
 stop-casperjs: | envvar
 	@echo "${GREEN}Makefile: Stop casperjs image${RESET}"
 	${CONTAINER_ENGINE} rm -f casperjs 2> /dev/null; echo
-	@echo
-
-
-## Stop kubevirtio image
-stop-kubevirtio: | envvar
-	@echo "${GREEN}Makefile: Stop kubevirtio image${RESET}"
-	${CONTAINER_ENGINE} rm -f kubevirtio 2> /dev/null; echo
+	@echo -n
 
 
 ## Stop userguide image
 stop-userguide: | envvar
 	@echo "${GREEN}Makefile: Stop userguide image${RESET}"
 	${CONTAINER_ENGINE} rm -f userguide 2> /dev/null; echo
+	@echo -n
+
+
+## Stop website image
+stop-website: | envvar
+	@echo "${GREEN}Makefile: Stop website image${RESET}"
+	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
+	@echo -n
 
 
 ## Stop yaspeller image
 stop-yaspeller: | envvar
 	@echo "${GREEN}Makefile: Stop yaspeller image${RESET}"
 	${CONTAINER_ENGINE} rm -f yaspeller 2> /dev/null; echo
+	@echo

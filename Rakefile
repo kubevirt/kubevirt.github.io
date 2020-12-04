@@ -63,7 +63,7 @@ namespace :links do
             :log_level          => :info,
             :external_only      => true,
             :url_ignore         => [ /http(s)?:\/\/(www.)?katacoda.com.*/ ],
-            :http_status_ignore => [429, 999],
+            :http_status_ignore => [0, 429, 999],
         }
 
         parser = OptionParser.new
@@ -97,7 +97,7 @@ namespace :links do
 
 
     desc 'Checks html files for links to nonexistant userguide selectors'
-    task :userguide_selectors do
+    task :userguide_selectors => :build do
         # Verify regex's at https://regex101.com
         options = {
             :log_level          => :debug,
@@ -120,10 +120,10 @@ namespace :links do
         io = StringIO.new
         $stdout = io
 
-        HTMLProofer.check_directory("./_site", options).run
+        HTMLProofer.check_directory("./_site/quickstart_minikube", options).run
 
         # UNCOMMENT TO enable full output of HTMLProofer
-        # STDOUT.puts $stdout.string
+        STDOUT.puts $stdout.string
 
         $stdout.string.each_line do |f|
             if f.include? "#"
