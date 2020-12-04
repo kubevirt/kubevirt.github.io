@@ -59,7 +59,7 @@ kubectl create namespace vm-images
 
 ### Step 2. Import your image to a PVC in the image namespace
 
-Below are a few options for importing. For each example, I’m using the Fedora Cloud qcow2 image that can be downloaded [here](https://download.fedoraproject.org/pub/fedora/linux/releases/31/Cloud/x86_64/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2)
+Below are a few options for importing. For each example, I’m using the Fedora Cloud x86_64 qcow2 image that can be downloaded [here](https://download.fedoraproject.org/pub/fedora/linux/releases/)
 
 If you try these examples yourself, you’ll need to download the **Fedora-Cloud-Base-31-1.9.x86_64.qcow2** image file in your working directory.
 
