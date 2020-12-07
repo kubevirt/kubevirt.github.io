@@ -19,6 +19,9 @@ namespace :links do
             :external_only      => true,
             :url_swap           => {'https://kubevirt.io/' => '',},
             :http_status_ignore => [429],
+            :typhoeus           => {
+              :headers => { "User-Agent" => "Mozilla/5.0 (compatible; HTMLProofer)" }
+            }
         }
 
         parser = OptionParser.new
