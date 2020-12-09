@@ -825,7 +825,7 @@ Username: alosadag
 Password:
 Login successful.
 
-$ HOST=$(oc get route default-route -n openshift-image-registry --template="{{ .spec.host }}")
+$ HOST=$(oc get route default-route -n openshift-image-registry -o jsonpath='{.spec.host }')
 $ echo $HOST
 default-route-openshift-image-registry.apps.okd.okdlabs.com
 
