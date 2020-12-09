@@ -338,7 +338,7 @@ this progress we can query the CR status with the following command:</p>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">config</span><span class="pi">:</span> <span class="pi">&gt;</span>
     <span class="s">{</span>
-        <span class="s">"cniVersion": "0.3.1"</span>
+        <span class="s">"cniVersion": "0.3.1",</span>
         <span class="s">"name": "br0-l2",</span>
         <span class="s">"plugins": [{</span>
             <span class="s">"type": "bridge",</span>
@@ -352,7 +352,7 @@ this progress we can query the CR status with the following command:</p>
 it:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">annotations</span><span class="pi">:</span>
-  <span class="s">k8s.v1.cni.cncf.io/networks</span><span class="pi">:</span> <span class="s">br0-l2</span>
+  <span class="s">k8s.v1.cni.cncf.io/networks</span><span class="pi">:</span> <span class="s">bridge-network</span>
 </code></pre></div></div>
 
 <h2 id="setting-up-node-networking-with-nodenetworkconfigurationpolicy-aka-nncp">Setting up node networking with NodeNetworkConfigurationPolicy (aka nncp)</h2>

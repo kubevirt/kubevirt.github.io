@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-09T03:02:15+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-09T15:51:25+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
 
 &lt;p&gt;There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.&lt;/p&gt;
 
@@ -140,7 +140,7 @@ this progress we can query the CR status with the following command:&lt;/p&gt;
 &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;{&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;&quot;cniVersion&quot;: &quot;0.3.1&quot;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&quot;cniVersion&quot;: &quot;0.3.1&quot;,&lt;/span&gt;
         &lt;span class=&quot;s&quot;&gt;&quot;name&quot;: &quot;br0-l2&quot;,&lt;/span&gt;
         &lt;span class=&quot;s&quot;&gt;&quot;plugins&quot;: [{&lt;/span&gt;
             &lt;span class=&quot;s&quot;&gt;&quot;type&quot;: &quot;bridge&quot;,&lt;/span&gt;
@@ -154,7 +154,7 @@ this progress we can query the CR status with the following command:&lt;/p&gt;
 it:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;br0-l2&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge-network&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;setting-up-node-networking-with-nodenetworkconfigurationpolicy-aka-nncp&quot;&gt;Setting up node networking with NodeNetworkConfigurationPolicy (aka nncp)&lt;/h2&gt;
