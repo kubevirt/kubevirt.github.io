@@ -104,7 +104,7 @@ metadata:
 spec:
   config: >
     {
-        "cniVersion": "0.3.1"
+        "cniVersion": "0.3.1",
         "name": "br0-l2",
         "plugins": [{
             "type": "bridge",
@@ -119,7 +119,7 @@ it:
 
 ```yaml
 annotations:
-  k8s.v1.cni.cncf.io/networks: br0-l2
+  k8s.v1.cni.cncf.io/networks: bridge-network
 ```
 
 ## Setting up node networking with NodeNetworkConfigurationPolicy (aka nncp)
