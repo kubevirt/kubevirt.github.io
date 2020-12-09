@@ -1312,6 +1312,10 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulat
 		}
 		c.MemBalloonStatsPeriod = uint(options.MemBalloonStatsPeriod)
 	}
+	if err := api.CheckEFI_OVMFRoms(vmi, c); err != nil {
+		logger.Error("EFI OVMF roms missing")
+		return nil, err
+	}
 
 	if err := api.Convert_v1_VirtualMachine_To_api_Domain(vmi, domain, c); err != nil {
 		logger.Error("Conversion failed.")
@@ -1555,7 +1559,16 @@ func (l *LibvirtDomainManager) getDomainSpec(dom cli.VirDomain) (*api.DomainSpec
 	if err != nil {
 		return nil, err
 	}
-	return util.GetDomainSpec(state, dom)
+
+	domainSpec, err := util.GetDomainSpecWithRuntimeInfo(state, dom)
+	if err != nil {
+		// Return without runtime info only for cases we know for sure it's not supposed to be there
+		if domainerrors.IsNotFound(err) || domainerrors.IsInvalidOperation(err) {
+			return util.GetDomainSpec(state, dom)
+		}
+	}
+
+	return domainSpec, err
 }
 
 func (l *LibvirtDomainManager) PauseVMI(vmi *v1.VirtualMachineInstance) error {

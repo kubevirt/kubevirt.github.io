@@ -1,4 +1,38 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-01T02:06:41+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-10-21T00:00:00+00:00</published><updated>2020-10-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI</id><content type="html" xml:base="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-09T03:02:15+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
+
+&lt;p&gt;There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.&lt;/p&gt;
+
+&lt;h1 id=&quot;spec-vs-status&quot;&gt;Spec vs Status&lt;/h1&gt;
+
+&lt;p&gt;KubeVirt objects follow Kubernetes convention in that they generally have Spec and Status stanzas. The Spec is user configurable and allows the user to indicate the desired state of the cluster in a declarative manner. Meanwhile status sections are not user configurable and reflect the actual state of things in the cluster. In short, users edit the Spec and controllers edit the Status.&lt;/p&gt;
+
+&lt;p&gt;So back to the Running field. In this case the Running field is in the VM’s Spec. In other words it’s the user’s intent that the VM is running. It doesn’t reflect the actual running state of the VM.&lt;/p&gt;
+
+&lt;h1 id=&quot;runstrategy&quot;&gt;RunStrategy&lt;/h1&gt;
+
+&lt;p&gt;There’s a flip side to the above, equally as confusing: “Running” isn’t always what the user wants. If a user logs into a VM and shuts it down from inside the guest, KubeVirt will dutifully re-spawn it! There certainly exist high availability use cases where that’s exactly the correct reaction, but in most cases that’s just plain confusing. Shutdown is not restart!&lt;/p&gt;
+
+&lt;p&gt;We decided to tackle both issues at the same time–by deprecating the “Running” field. As already noted, we could have picked a better name to begin with. By using the name “RunStrategy”, it should hopefully be more clear to the end user that they’re asking for a state, which is of course completely separate from what the system can actually provide. While RunStrategy helps address the nomenclature confusion, it also happens to be an enumerated value. Since Running is a boolean, it can only be true or false. We’re now able to create more meaningful states to accommodate different use cases.&lt;/p&gt;
+
+&lt;h2 id=&quot;four-runstrategies-currently-exist&quot;&gt;Four RunStrategies currently exist:&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Always: If a VM is stopped for any reason, a new instance will be spawned.&lt;/li&gt;
+  &lt;li&gt;RerunOnFailure: If a VM ends execution in an error state, a new instance will be spawned. This addressed the second concern listed above. If a user halts a VM manually a new instance will not be spawned.&lt;/li&gt;
+  &lt;li&gt;Manual: This is exactly what it means. KubeVirt will neither attempt to start or stop a VM. In order to change state, the user must invoke start/stop/restart from the API. There exist convenience functions in the virtctl command line client as well.&lt;/li&gt;
+  &lt;li&gt;Halted: The VM will be stopped if it’s running, and will remain off.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;An example using the RerunOnFailure RunStrategy was presented in &lt;a href=&quot;/2020/KubeVirt-VM-Image-Usage-Patterns.html&quot;&gt;KubeVirt VM Image Usage Patterns&lt;/a&gt;&lt;/p&gt;
+
+&lt;h1 id=&quot;high-availability&quot;&gt;High Availability&lt;/h1&gt;
+
+&lt;p&gt;No discussion of RunStrategies is complete without mentioning High Availability. After all, the implication behind the RerunOnFailure and Always RunStrategies is that your VM should always be available. For the most part this is completely true, but there’s one important scenario where there’s a gap to be aware of: if a node fails completely, e.g. loss of networking or power. Without some means of automatic detection that the node is no longer active, KubeVirt won’t know that the VM has failed. On OpenShift clusters installed using Installer Provisioned Infrastructure (IPI) with MachineHealthCheck enabled can detect failed nodes and reschedule workloads running there.&lt;/p&gt;
+
+&lt;p&gt;Mode information on IPI and MHC can be found here:&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/installing/installing_bare_metal_ipi/ipi-install-overview.html#ipi-install-overview&quot;&gt;Installer Provisioned Infrastructure&lt;/a&gt;
+&lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/machine_management/deploying-machine-health-checks.html&quot;&gt;Machine Health Check&lt;/a&gt;&lt;/p&gt;</content><author><name>Stu Gott</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><summary type="html">Why Isn’t My VM Running?</summary></entry><entry><title type="html">Multiple Network Attachments with bridge CNI</title><link href="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html" rel="alternate" type="text/html" title="Multiple Network Attachments with bridge CNI" /><published>2020-10-21T00:00:00+00:00</published><updated>2020-10-21T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI</id><content type="html" xml:base="https://kubevirt.io//2020/Multiple-Network-Attachments-with-bridge-CNI.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;Over the last years the KubeVirt project has improved a lot regarding secondary interfaces networking configuration. Now it’s possible to do an end to end configuration from host networking to a VM using just the Kubernetes API with
 special Custom Resource Definitions. Moreover, the deployment of all the projects has been simplified by introducing &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator&quot;&gt;KubeVirt hyperconverged cluster operator (HCO)&lt;/a&gt; and &lt;a href=&quot;https://github.com/kubevirt/cluster-network-addons-operator&quot;&gt;cluster network addons operator (CNAO)&lt;/a&gt; to install the networking components.&lt;/p&gt;
@@ -1279,7 +1313,7 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;h3 id=&quot;step-2-import-your-image-to-a-pvc-in-the-image-namespace&quot;&gt;Step 2. Import your image to a PVC in the image namespace&lt;/h3&gt;
 
-&lt;p&gt;Below are a few options for importing. For each example, I’m using the Fedora Cloud qcow2 image that can be downloaded &lt;a href=&quot;https://download.fedoraproject.org/pub/fedora/linux/releases/31/Cloud/x86_64/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Below are a few options for importing. For each example, I’m using the Fedora Cloud x86_64 qcow2 image that can be downloaded &lt;a href=&quot;https://download.fedoraproject.org/pub/fedora/linux/releases/&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;If you try these examples yourself, you’ll need to download the &lt;strong&gt;Fedora-Cloud-Base-31-1.9.x86_64.qcow2&lt;/strong&gt; image file in your working directory.&lt;/p&gt;
 
@@ -1791,50 +1825,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;h2 id=&quot;ca-and-certificate-rotation&quot;&gt;CA and Certificate Rotation&lt;/h2&gt;
 
-&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry><entry><title type="html">KubeVirt Architecture Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Architecture Fundamentals" /><published>2020-04-28T00:00:00+00:00</published><updated>2020-04-28T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Architecture-Fundamentals.html">&lt;h2 id=&quot;placing-our-bets&quot;&gt;Placing our Bets&lt;/h2&gt;
-
-&lt;p&gt;Back in 2017 the KubeVirt architecture team got together and placed their bets on a set of core design principles that became the foundation of what KubeVirt is today. At the time, our decisions broke convention. We chose to take some calculated risks with the understanding that those risks had a real chance of not playing out in our favor.&lt;/p&gt;
-
-&lt;p&gt;Luckily, time has proven our bets were well placed. Since those early discussions back in 2017, KubeVirt has grown from a theoretical prototype into a project deployed in production environments with a thriving open source community. While KubeVirt has grown in maturity and sophistication throughout the past few years, the initial set of guidelines established in those early discussions still govern the project’s architecture today.&lt;/p&gt;
-
-&lt;p&gt;Those guidelines can be summarized nearly entirely by the following two key decisions.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virtual machines run in Pods using the existing container runtimes.&lt;/strong&gt; This decision came at a time when other Kubernetes virtualization efforts were creating their own virtualization specific CRI runtimes. We took a bet on our ability to successfully launch virtual machines using existing and future container runtimes within an unadulterated Pod environment.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virtual machines are managed using a custom “Kubernetes like” declarative API.&lt;/strong&gt; When this decision was made, imperative APIs were the defacto standard for how other platforms managed virtual machines. However, we knew in order to succeed in our mission to deliver a truly cloud-native API managed using existing Kubernetes tooling (like kubectl), we had to adhere fully to the declarative workflow. We took a bet that the lackluster Kubernetes Third Party Resource support (now known as CRDs) would eventually provide the ability to create custom declarative APIs as first class citizens in the cluster.&lt;/p&gt;
-
-&lt;p&gt;Let’s dive into these two points a bit and take a look at how these two key decisions permeated throughout our entire design.&lt;/p&gt;
-
-&lt;h2 id=&quot;virtual-machines-as-pods&quot;&gt;Virtual Machines as Pods&lt;/h2&gt;
-
-&lt;p&gt;We often pitch KubeVirt by saying something like “KubeVirt allows you to run virtual machines side by side with your container workloads”. However, the reality is &lt;strong&gt;we’re delivering virtual machines as container workloads.&lt;/strong&gt; So as far as Kubernetes is concerned, there are no virtual machines, just pods and containers. Fundamentally, KubeVirt virtual machines just look like any other containerized application to the rest of the cluster. It’s our KubeVirt API and control plane that make these containerized virtual machines behave like you’d expect from using other virtual machine management platforms.&lt;/p&gt;
-
-&lt;p&gt;The payoff from running virtual machines within a Kubernetes Pod has been huge for us. There’s an entire ecosystem that continues to grow around how to provide pods with access to networks, storage, host devices, cpu, memory, and more. This means every time a problem or feature is added to pods, it’s yet another tool we can use for virtual machines.&lt;/p&gt;
-
-&lt;p&gt;Here are a few examples of how pod features meet the needs of virtual machines as well.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Storage:&lt;/strong&gt; Virtual machines need persistent disks. Users should be able to stop a VM, start a VM, and have the data persist. There’s a Kubernetes storage abstraction called a PVC (persistent volume claim) that allows persistent storage to be attached to a pod. This means by placing the virtual machine in a pod, we can use the existing PVC mechanisms of delivering persistent storage to deliver our virtual machine disks.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Network:&lt;/strong&gt; Virtual machines need access to cluster networking. Pods are provided network interfaces that tie directly into the pod network via CNI. We can give a virtual machine running in a pod access to the pod network using the default CNI allocated network interfaces already present in the pod’s environment.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;CPU/Memory:&lt;/strong&gt; Users need the ability to assign cpu and memory resources to Virtual machines. We can assign cpu and memory to pods using the resource requests/limits on the pod spec. This means through the use of pod resource requests/limits we are able to assign resources directly to virtual machines as well.&lt;/p&gt;
-
-&lt;p&gt;This list goes on and on. As problems are solved for pods, KubeVirt leverages the solution and translates it to the virtual machine equivalent.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-declarative-kubevirt-virtualization-api&quot;&gt;The Declarative KubeVirt Virtualization API&lt;/h2&gt;
-
-&lt;p&gt;While a KubeVirt virtual machine runs within a pod, that doesn’t change the fact that people working with virtual machines have a different set of expectations for how virtual machines should work compared to how pods are managed.&lt;/p&gt;
-
-&lt;p&gt;Here’s the conflict.&lt;/p&gt;
-
-&lt;p&gt;Pods are &lt;strong&gt;mortal workloads&lt;/strong&gt;. A pod is declared by posting it’s manifest to the cluster, the pod runs once to completion, and that’s it. It’s done.&lt;/p&gt;
-
-&lt;p&gt;Virtual machines are &lt;strong&gt;immortal workloads&lt;/strong&gt;. A virtual machine doesn’t just run once to completion. Virtual machines have state. They can be started, stopped, and restarted any number of times. Virtual machines have concepts like live migration as well. Furthermore if the node a virtual machine is running on dies, the expectation is for that exact same virtual machine to resurrect on another node maintaining its state.&lt;/p&gt;
-
-&lt;p&gt;So, pods run once and virtual machines live forever. How do we reconcile the two? Our solution came from taking a play directly out of the Kubernetes playbook.&lt;/p&gt;
-
-&lt;p&gt;The Kubernetes core apis have this concept of layering objects on top of one another through the use of &lt;strong&gt;workload controllers&lt;/strong&gt;. For example, the Kubernetes ReplicaSet is a workload controller layered on top of pods. The ReplicaSet controller manages ensuring that there are always ‘x’ number of pod replicas running within the cluster. If a ReplicaSet object declares that 5 pod replicas should be running, but a node dies bringing that total to 4, then the ReplicaSet workload controller manages spinning up a 5th pod in order to meet the declared replica count. The workload controller is always reconciling on the ReplicaSet objects desired state.&lt;/p&gt;
-
-&lt;p&gt;Using this established Kubernetes pattern of layering objects on top of one another, we came up with our own virtualization specific API and corresponding workload controller called a &lt;strong&gt;“VirtualMachine”&lt;/strong&gt; (big surprise there on the name, right?). Users declare a VirtualMachine object just like they would a pod by posting the VirtualMachine object’s manifest to the cluster. The big difference here that deviates from how pods are managed is that we allow VirtualMachine objects to be declared to exist in different states. For example, you can declare you want to “start” a virtual machine by setting “running: true” on the VirtualMachine object’s spec. Likewise you can declare you want to “stop” a virtual machine by setting “running: false” on the VirtualMachine object’s spec. Behind the scenes, setting the “running” field to true or false results in the workload controller creating or deleting a pod for the virtual machine to live in.&lt;/p&gt;
-
-&lt;p&gt;In the end, we essentially created the concept of an &lt;strong&gt;immortal VirtualMachine&lt;/strong&gt; by laying our own custom API on top of mortal pods. Our API and controller knows how to resurrect a “stopped” VirtualMachine by constructing a pod with all the right network, storage volumes, cpu, and memory attached to in order to accurately bring the VirtualMachine back to life with the exact same state it stopped with.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><summary type="html">Placing our Bets</summary></entry></feed>
+&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry></feed>

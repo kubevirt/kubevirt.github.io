@@ -24,26 +24,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//kubevirt/">
+    <link rel="canonical" href="https://kubevirt.io//2020/run_strategies.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>KubeVirt.io</title>
+    <title>High Availability -- RunStrategies for Virtual Machines | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="Stu Gott" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
-    <meta property="og:title" content="KubeVirt.io">
+    <meta name="description" content="This blog post outlines the various RunStrategies available to VMs">
+    <meta name="keywords" content="kubevirt, Kubernetes, virtual machine, VM" >
+    <meta property="og:title" content="High Availability -- RunStrategies for Virtual Machines | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//kubevirt/" >
+    <meta property="og:url" content="https://kubevirt.io//2020/run_strategies.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This blog post outlines the various RunStrategies available to VMs" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2020-12-09 03:02:15 +0000" >
-    <meta name="twitter:title" content="KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="Stu Gott" >
+    <meta property="og:article:published_time" content="2020-12-04 00:00:00 +0000" >
+    <meta name="twitter:title" content="High Availability -- RunStrategies for Virtual Machines | KubeVirt.io">
+    <meta name="twitter:description" content="This blog post outlines the various RunStrategies available to VMs">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -74,7 +74,7 @@
       
 
       
-        <li  class="nav-item" >
+        <li  class="nav-item active" >
           <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
         </li>
       
@@ -225,13 +225,154 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container post">
-  <h1 class="page-title"></h1>
-  <article class="post-content">
-    <p>To fetch the KubeVirt sources run <code class="language-plaintext highlighter-rouge">go get -d kubevirt.io/kubevirt</code>.</p>
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">High Availability -- RunStrategies for Virtual Machines</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Stu Gott</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">Kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: December 4, 2020  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
 
-  </article>
+          </div>
+        </header>
+        <article class="post-content">
+          <h1 id="why-isnt-my-vm-running">Why Isn’t My VM Running?</h1>
+
+<p>There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.</p>
+
+<h1 id="spec-vs-status">Spec vs Status</h1>
+
+<p>KubeVirt objects follow Kubernetes convention in that they generally have Spec and Status stanzas. The Spec is user configurable and allows the user to indicate the desired state of the cluster in a declarative manner. Meanwhile status sections are not user configurable and reflect the actual state of things in the cluster. In short, users edit the Spec and controllers edit the Status.</p>
+
+<p>So back to the Running field. In this case the Running field is in the VM’s Spec. In other words it’s the user’s intent that the VM is running. It doesn’t reflect the actual running state of the VM.</p>
+
+<h1 id="runstrategy">RunStrategy</h1>
+
+<p>There’s a flip side to the above, equally as confusing: “Running” isn’t always what the user wants. If a user logs into a VM and shuts it down from inside the guest, KubeVirt will dutifully re-spawn it! There certainly exist high availability use cases where that’s exactly the correct reaction, but in most cases that’s just plain confusing. Shutdown is not restart!</p>
+
+<p>We decided to tackle both issues at the same time–by deprecating the “Running” field. As already noted, we could have picked a better name to begin with. By using the name “RunStrategy”, it should hopefully be more clear to the end user that they’re asking for a state, which is of course completely separate from what the system can actually provide. While RunStrategy helps address the nomenclature confusion, it also happens to be an enumerated value. Since Running is a boolean, it can only be true or false. We’re now able to create more meaningful states to accommodate different use cases.</p>
+
+<h2 id="four-runstrategies-currently-exist">Four RunStrategies currently exist:</h2>
+
+<ul>
+  <li>Always: If a VM is stopped for any reason, a new instance will be spawned.</li>
+  <li>RerunOnFailure: If a VM ends execution in an error state, a new instance will be spawned. This addressed the second concern listed above. If a user halts a VM manually a new instance will not be spawned.</li>
+  <li>Manual: This is exactly what it means. KubeVirt will neither attempt to start or stop a VM. In order to change state, the user must invoke start/stop/restart from the API. There exist convenience functions in the virtctl command line client as well.</li>
+  <li>Halted: The VM will be stopped if it’s running, and will remain off.</li>
+</ul>
+
+<p>An example using the RerunOnFailure RunStrategy was presented in <a href="/2020/KubeVirt-VM-Image-Usage-Patterns.html">KubeVirt VM Image Usage Patterns</a></p>
+
+<h1 id="high-availability">High Availability</h1>
+
+<p>No discussion of RunStrategies is complete without mentioning High Availability. After all, the implication behind the RerunOnFailure and Always RunStrategies is that your VM should always be available. For the most part this is completely true, but there’s one important scenario where there’s a gap to be aware of: if a node fails completely, e.g. loss of networking or power. Without some means of automatic detection that the node is no longer active, KubeVirt won’t know that the VM has failed. On OpenShift clusters installed using Installer Provisioned Infrastructure (IPI) with MachineHealthCheck enabled can detect failed nodes and reschedule workloads running there.</p>
+
+<p>Mode information on IPI and MHC can be found here:</p>
+
+<p><a href="https://docs.openshift.com/container-platform/4.6/installing/installing_bare_metal_ipi/ipi-install-overview.html#ipi-install-overview">Installer Provisioned Infrastructure</a>
+<a href="https://docs.openshift.com/container-platform/4.6/machine_management/deploying-machine-health-checks.html">Machine Health Check</a></p>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=High Availability -- RunStrategies for Virtual Machines&url=https://www.kubevirt.io/2020/run_strategies.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+        
+          <div id="disqus_thread"></div>
+          <script>
+
+          /**
+          *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+          *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables*/
+
+          var disqus_config = function () {
+          this.page.url = post.url;  // Replace PAGE_URL with your page's canonical URL variable
+          this.page.identifier = post.title; // Replace PAGE_IDENTIFIER with your page's unique identifier variable
+          };
+
+          (function() { // DON'T EDIT BELOW THIS LINE
+          var d = document, s = d.createElement('script');
+          s.src = 'https://kubevirt-io.disqus.com/embed.js';
+          s.setAttribute('data-timestamp', +new Date());
+          (d.head || d.body).appendChild(s);
+          })();
+          </script>
+          <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+        
+
+      </div>
+    </div>
+  </div>
 </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 
