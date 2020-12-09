@@ -11,7 +11,7 @@ tags:
     "virtual machine",
     "okd",
     "containerDisk",
-    "dockerfile",
+    "Dockerfile",
     "registry",
     "composer-cli",
     "virt-customize",
@@ -36,10 +36,6 @@ pub-year: 2020
     - [Image tailoring with virt-customize](#image-tailoring-with-virt-customize)
 - [Building a standard CentOS 7 image from cloud images](#building-a-standard-centos-7-image-from-cloud-images)
     - [Image creation with virt-customize](#image-creation-with-virt-customize)
-- [Image containerization procedure](#image-containerization-procedure)
-    - [Store the image in the container registry](#store-the-image-in-the-container-registry)
-- [Summary](#summary)
-- [References](#references)
 
 <!-- /TOC -->
 
@@ -128,7 +124,7 @@ $ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUB
 From a long time they had been using the prebuilt [CentOS cloud images](https://cloud.centos.org/centos/) with [virt-customize](http://libguestfs.org/virt-customize.1.html), which allowed them to modify the prebuilt cloud images. As a trade-off, they had to trust on the cloud image provided by CentOS or verify if new packages were added on each release.
 
 > info "Information"
-> **Virt-customize** can customize a virtual machine (disk image) by installing packages, editing configuration files, and so on. Virt-customize modifies the guest or disk image in place.
+> **virt-customize** can customize a virtual machine (disk image) by installing packages, editing configuration files, and so on. Virt-customize modifies the guest or disk image in place.
 
 Now, they are starting to use a new tool called [Image Builder](https://docs.centos.org/en-US/centos/install-guide/Composer/) that creates deployment-ready customized system images from scratch. Furthermore, there is an integration with Cockpit where you can create custom CentOS images in various formats including QCOW2 for OpenStack, AMI (Amazon Machine Image), VHD (Azure Disk Image) etc. from a friendly user interface.
 
@@ -155,7 +151,7 @@ Along this blog post, both tools are used together in the image building process
         alt="VM to VM"
       />
     </a>
-    <figcaption itemprop="caption description">okd imagestream devstation</figcaption>
+    <figcaption itemprop="caption description">okd imageStream devstation</figcaption>
   </figure>
 </div>
 
@@ -355,7 +351,7 @@ devstation-centos8.toml
 
 Now, let’s edit the `devstation-centos8.toml` file which is in charge of building our custom image. 
 
-- The timezone has been added to match Europe/Madrid with proper NTP servers.
+- The time zone has been added to match Europe/Madrid with proper NTP servers.
 - The kernel has been modified to allow connection via console.
 - Several firewall rules have been added to allow our services being accessed from outside.
 - Some services have been configured so that they are enabled and started at boot.
@@ -840,7 +836,7 @@ Login Succeeded!
 Before pushing the images, adapt container images to the proper name so they can be uploaded to private registries. Since it is agreed that all developers must be able to pull the images into their namespaces, the images need to be pushed to the openshift project.
 
 > info "Information"
-> [Understanding containers, images and imagestreams](https://docs.openshift.com/container-platform/4.6/openshift_images/images-understand.html) from OpenShift documentation deeply explains container image naming.
+> [Understanding containers, images and imageStreams](https://docs.openshift.com/container-platform/4.6/openshift_images/images-understand.html) from OpenShift documentation deeply explains container image naming.
 
 ```sh
 $ podman tag localhost/openshift/devstation-centos8:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal
@@ -852,10 +848,10 @@ $ podman tag localhost/openshift/devstation-centos:gui default-route-openshift-i
 $ podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui --tls-verify=false
 ```
 
-Verify that the images are stored correctly in the OKD container registry by checking the [imageStream](https://docs.openshift.com/container-platform/4.6/openshift_images/image-streams-manage.html#working-with-imagestreams). As shown below, both images were uploaded successfully since the `devstation` imagestream contains two images with v8-gui and v8-terminal tags respectively.
+Verify that the images are stored correctly in the OKD container registry by checking the [imageStream](https://docs.openshift.com/container-platform/4.6/openshift_images/image-streams-manage.html#working-with-imagestreams). As shown below, both images were uploaded successfully since the `devstation` imageStream contains two images with v8-gui and v8-terminal tags respectively.
 
 ```sh
-$ oc describe imagestream devstation -n openshift
+$ oc describe imageStream devstation -n openshift
 Name:			devstation
 Namespace:		openshift
 Created:		23 hours ago
