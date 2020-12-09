@@ -59,9 +59,9 @@ kubectl create namespace vm-images
 
 ### Step 2. Import your image to a PVC in the image namespace
 
-Below are a few options for importing. For each example, I’m using the Fedora Cloud x86_64 qcow2 image that can be downloaded [here](https://download.fedoraproject.org/pub/fedora/linux/releases/)
+Below are a few options for importing. For each example, I’m using the Fedora Cloud x86_64 qcow2 image that can be downloaded [here](https://alt.fedoraproject.org/cloud/)
 
-If you try these examples yourself, you’ll need to download the **Fedora-Cloud-Base-31-1.9.x86_64.qcow2** image file in your working directory.
+If you try these examples yourself, you’ll need to download the current Fedora-Cloud-Base qcow2 image file in your working directory.
 
 **Example: Import a local VM from your desktop environment using virtctl**
 
@@ -74,7 +74,7 @@ kubectl port-forward -n cdi service/cdi-uploadproxy 18443:443
 In a separate terminal upload the image over the port forward connection using the virtctl tool. Note that the size of the PVC must be the size of what the qcow image will expand to when converted to a raw image. In this case I chose 5 gigabytes as the PVC size.
 
 ```sh
-virtctl image-upload dv fedora-cloud-base-31 --namespace vm-images  --size=5Gi --image-path Fedora-Cloud-Base-31-1.9.x86_64.qcow2  --uploadproxy-url=https://127.0.0.1:18443 --insecure
+virtctl image-upload dv fedora-cloud-base --namespace vm-images  --size=5Gi --image-path Fedora-Cloud-Base-XX-X.X.x86_64.qcow2  --uploadproxy-url=https://127.0.0.1:18443 --insecure
 ```
 
 Once that completes, you’ll have a PVC in the vm-images namespace that contains the Fedora Cloud image.
@@ -82,7 +82,7 @@ Once that completes, you’ll have a PVC in the vm-images namespace that contain
 ```sh
 kubectl get pvc -n vm-images
 NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            local          60s
+fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            local          60s
 ```
 
 **Example: Import using a container registry**
@@ -94,25 +94,25 @@ In the example below, I start by building a container image with the Fedora Clou
 ```sh
 cat << END > Dockerfile
 FROM scratch
-ADD Fedora-Cloud-Base-31-1.9.x86_64.qcow2 /disk/
+ADD Fedora-Cloud-Base-XX-X.X.x86_64.qcow2 /disk/
 END
-docker build -t quay.io/dvossel/fedora:cloud-base-31 .
-docker push quay.io/dvossel/fedora:cloud-base-31
+docker build -t quay.io/dvossel/fedora:cloud-base .
+docker push quay.io/dvossel/fedora:cloud-base
 ```
 
 Next a CDI DataVolume is used to import the VM image into a new PVC from the container image you just uploaded to your container registry. Posting the DataVolume manifest below will result in a new 5 gigabyte PVC being created and the VM image being placed on that PVC in a way KubeVirt can consume it.
 
 ```sh
-cat << END > fedora-cloud-base-31-datavolume.yaml
+cat << END > fedora-cloud-base-datavolume.yaml
 apiVersion: cdi.kubevirt.io/v1alpha1
 kind: DataVolume
 metadata:
-  name: fedora-cloud-base-31
+  name: fedora-cloud-base
   namespace: vm-images
 spec:
   source:
     registry:
-      url: "docker://quay.io/dvossel/fedora:cloud-base-31"
+      url: "docker://quay.io/dvossel/fedora:cloud-base"
   pvc:
     accessModes:
       - ReadWriteOnce
@@ -120,13 +120,13 @@ spec:
       requests:
         storage: 5Gi
 END
-kubectl create -f fedora-cloud-base-31-datavolume.yaml
+kubectl create -f fedora-cloud-base-datavolume.yaml
 ```
 
 You can observe the CDI complete the import by watching the DataVolume object.
 
 ```sh
-kubectl describe datavolume fedora-cloud-base-31 -n vm-images
+kubectl describe datavolume fedora-cloud-base -n vm-images
 .
 .
 .
@@ -136,10 +136,10 @@ Status:
 Events:
   Type    Reason            Age                   From                   Message
   ----    ------            ----                  ----                   -------
-  Normal  ImportScheduled   2m49s                 datavolume-controller  Import into fedora-cloud-base-31 scheduled
-  Normal  ImportInProgress  2m46s                 datavolume-controller  Import into fedora-cloud-base-31 in progress
+  Normal  ImportScheduled   2m49s                 datavolume-controller  Import into fedora-cloud-base scheduled
+  Normal  ImportInProgress  2m46s                 datavolume-controller  Import into fedora-cloud-base in progress
   Normal  Synced            40s (x11 over 2m51s)  datavolume-controller  DataVolume synced successfully
-  Normal  ImportSucceeded   40s                   datavolume-controller  Successfully imported into PVC fedora-cloud-base-31
+  Normal  ImportSucceeded   40s                   datavolume-controller  Successfully imported into PVC fedora-cloud-base
 ```
 
 Once the import is complete, you’ll see the image available as a PVC in your vm-images namespace. The PVC will have the same name given to the DataVolume.
@@ -147,7 +147,7 @@ Once the import is complete, you’ll see the image available as a PVC in your v
 ```sh
 kubectl get pvc -n vm-images
 NAME                   STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            local          60s
+fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            local          60s
 ```
 
 **Example: Import an image from an http or s3 endpoint**
@@ -159,12 +159,12 @@ Replace the url in this example with one hosting the qcow2 image. More informati
 ```sh
 kind: DataVolume
 metadata:
-  name: fedora-cloud-base-31
+  name: fedora-cloud-base
   namespace: vm-images
 spec:
   source:
     http:
-      url: http://your-web-server-here/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
+      url: http://your-web-server-here/images/Fedora-Cloud-Base-XX-X.X.x86_64.qcow2
   pvc:
     accessModes:
       - ReadWriteOnce
@@ -211,7 +211,7 @@ spec:
       terminationGracePeriodSeconds: 0
       volumes:
       - dataVolume:
-          name: fedora-31-nginx
+          name: fedora-nginx
         name: datavolumedisk1
       - cloudInitNoCloud:
           userData: |
@@ -224,7 +224,7 @@ spec:
         name: cloudinitdisk
   dataVolumeTemplates:
   - metadata:
-      name: fedora-31-nginx
+      name: fedora-nginx
     spec:
       pvc:
         accessModes:
@@ -235,14 +235,14 @@ spec:
       source:
         pvc:
           namespace: vm-images
-          name: fedora-cloud-base-31
+          name: fedora-cloud-base
 ```
 
 There are a few key takeaways from this manifest worth discussing.
 
 1. Usage of **runStrategy: "RerunOnFailure"**. This tells KubeVirt to treat the VM's execution similar to a Kubernetes Job. We want the VM to continue retrying until the VM guest shuts itself down gracefully.
 2. Usage of the **cloudInitNoCloud volume**. This volume allows us to inject a script into the VM's startup procedure. In our case, we want this script to install nginx, configure nginx to launch on startup, and then immediately shutdown the guest gracefully once that is complete.
-3. Usage of the **dataVolumeTemplates section**. This allows us to define a new PVC which is a clone of our fedora-cloud-base-31 base image. The resulting VM image attached to our VM will be a new image pre-populated with nginx.
+3. Usage of the **dataVolumeTemplates section**. This allows us to define a new PVC which is a clone of our fedora-cloud-base base image. The resulting VM image attached to our VM will be a new image pre-populated with nginx.
 
 After posting the VM manifest to the cluster, wait for the corresponding VMI to reach the Succeeded phase.
 
@@ -265,8 +265,8 @@ After deleting the VM, you can see the nginx provisioned PVC in your vm-images n
 ```sh
 kubectl get pvc -n vm-images
 NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            local          60s
-fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            local          60s
+fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            local          60s
+fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            local          60s
 ```
 
 ## Understanding the VM Image Repository
@@ -274,7 +274,7 @@ At this point we have a namespace, vm-images, that contains PVCs with our VM ima
 
 Using CDI's i[cross namespace cloning feature](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one), VM's can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository". Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined [here](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/RBAC.md#pvc-cloning).
 
-Below is an example of the RBAC necessary to enable cross namespace cloning from the vm-images namespace to the default namespace using the default service account. 
+Below is an example of the RBAC necessary to enable cross namespace cloning from the vm-images namespace to the default namespace using the default service account.
 
 ```yaml
 apiVersion: rbac.authorization.k8s.io/v1
@@ -319,7 +319,7 @@ spec:
   source:
     pvc:
       namespace: vm-images
-      name: fedora-31-nginx
+      name: fedora-nginx
   pvc:
     accessModes:
       - ReadOnlyMany
@@ -428,7 +428,7 @@ spec:
       source:
         pvc:
           namespace: vm-images
-          name: fedora-31-nginx
+          name: fedora-nginx
 ```
 
 # Other Custom Creation Image Tools
@@ -437,11 +437,10 @@ In my example I imported a VM base image into the cluster and used KubeVirt to p
 
 If that’s the case, I suggest looking into two tools.
 
-[Packer.io using the qemu builder](https://packer.io/docs/builders/qemu.html). This allows you to automate building custom images on your local machine using configuration files that describe all the build steps. I like this tool because it closely matches the Kubernetes "declarative" approach. 
+[Packer.io using the qemu builder](https://packer.io/docs/builders/qemu.html). This allows you to automate building custom images on your local machine using configuration files that describe all the build steps. I like this tool because it closely matches the Kubernetes "declarative" approach.
 
 [Virt-customize](http://libguestfs.org/virt-customize.1.html) is a cli tool that allows you to customize local VM images by injecting/modifying files on disk and installing packages.
 
 [Virt-install](https://linux.die.net/man/1/virt-install) is a cli tool that allows you to automate a VM install as if you were installing it from a cdrom. You’ll want to look into using a kickstart file to fully automate the process.
 
 The resulting VM image artifact created from any of these tools can then be imported into the cluster in the same way we imported the base image earlier in this document.
-
