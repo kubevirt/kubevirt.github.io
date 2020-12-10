@@ -470,6 +470,7 @@
     "emptyDisks",
     "Xen",
     "imageStream",
+    "imageStreams",
     "spinned",
     "alosadagrande",
     "devstation",
@@ -480,6 +481,8 @@
     "mariadb",
     "memsize",
     "openssh",
+    "virt-customize",
+    "ssl",
     "sysadmin"
   ]
 }

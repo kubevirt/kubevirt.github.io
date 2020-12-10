@@ -11,7 +11,6 @@ tags:
     "virtual machine",
     "okd",
     "containerDisk",
-    "Dockerfile",
     "registry",
     "composer-cli",
     "virt-customize",
@@ -769,7 +768,7 @@ EOF
 ```
 
 ```sh
-$ cat Dockerfile
+$ cat Containerfile
 FROM scratch
 ADD golden-devstation-centos8-disk-10G-gui.qcow2 /disk/
 ```
