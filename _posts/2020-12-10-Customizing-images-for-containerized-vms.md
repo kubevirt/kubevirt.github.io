@@ -18,7 +18,7 @@ tags:
   ]
 comments: true
 title: Customizing images for containerized VMs part I
-pub-date: December 01
+pub-date: December 10
 pub-year: 2020
 ---
 
@@ -250,7 +250,7 @@ The following image shows the Image Build plugin web page. Actually, what it is 
 </div>
 
 > error "Error"
-> If Cockpit's web UI is not working, take a look at the output of the lorax service with the command: 
+> If Cockpit's web UI is not working, take a look at the output of the lorax service with the command:
 > ```sh
 > $ journalctl -fu lorax-composer
 > ```
@@ -348,7 +348,7 @@ devstation-centos8.toml
 > info "Information"
 > All composer-cli options are documented in the [official webpage](https://weldr.io/lorax/composer-cli.html). Take a look if you need further detail.
 
-Now, let’s edit the `devstation-centos8.toml` file which is in charge of building our custom image. 
+Now, let’s edit the `devstation-centos8.toml` file which is in charge of building our custom image.
 
 - The time zone has been added to match Europe/Madrid with proper NTP servers.
 - The kernel has been modified to allow connection via console.
@@ -451,7 +451,7 @@ The building process can take tens of minutes. It is possible to see the process
 
 ```sh
 $ composer-cli compose status
-248161f5-0870-41e8-b871-001348395ca7 RUNNING  Fri Nov 27 15:12:09 2020 devstation-centos8 0.0.2 qcow2            
+248161f5-0870-41e8-b871-001348395ca7 RUNNING  Fri Nov 27 15:12:09 2020 devstation-centos8 0.0.2 qcow2
 
 $ journalctl -u lorax-composer -f
 Nov 27 15:13:31 eko3.cloud.lab.eng.bos.redhat.com lorax-composer[38218]: 2020-11-27 15:13:31,715: Installing.
@@ -465,7 +465,7 @@ Once the building process is finished, it is time to download the `QCOW2` file. 
 
 ```sh
 $ composer-cli compose image 248161f5-0870-41e8-b871-001348395ca7
-248161f5-0870-41e8-b871-001348395ca7-disk.qcow2: 1854.31 MB   
+248161f5-0870-41e8-b871-001348395ca7-disk.qcow2: 1854.31 MB
 
 $ ls -lhrt
 -rw-r--r--.  1 root root 1.5K Nov 27 15:11 devstation-centos8.toml
@@ -720,17 +720,17 @@ Below it is the `virt-customize` command that modifies the CentOS 7 _expanded_ c
 - Setting devstation as hostname to the customized image
 - Configuring the time zone
 - Enabling the installed services
-- Including files from the manual. 
+- Including files from the manual.
 
 > note "Note"
 > Manual files must be pulled first from [alosadagrande/lorax](https://github.com/alosadagrande/lorax) GitHub repository.
 
 ```sh
 $ virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos7-disk-10G.qcow2 \
-                                --install cloud-init,mod_ssl,httpd,mariadb-server,php,openssh-server \ 
-                                --memsize 4096  --hostname devstation  --selinux-relabel --timezone Europe/Madrid \ 
-                                --root-password password:toor --password centos:password:developer123 \ 
-                                --run-command 'systemctl enable httpd' --run-command 'systemctl enable mariadb' \ 
+                                --install cloud-init,mod_ssl,httpd,mariadb-server,php,openssh-server \
+                                --memsize 4096  --hostname devstation  --selinux-relabel --timezone Europe/Madrid \
+                                --root-password password:toor --password centos:password:developer123 \
+                                --run-command 'systemctl enable httpd' --run-command 'systemctl enable mariadb' \
                                 --mkdir /var/www/html/manual --upload ~/lorax/index.html:/var/www/html/manual/index.html
  ```
 

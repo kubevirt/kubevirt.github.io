@@ -483,6 +483,8 @@
     "openssh",
     "virt-customize",
     "ssl",
+    "itemscope",
+    "itemtype",
     "sysadmin"
   ]
 }
