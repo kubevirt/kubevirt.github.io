@@ -1,0 +1,64 @@
+name = "devstation-centos8"
+description = "A developer station"
+version = "0.0.3"
+modules = []
+groups = []
+
+[[packages]]
+name = "httpd"
+version = "2.4.37"
+
+[[packages]]
+name = "mod_ssl"
+version = "2.4.37"
+
+[[packages]]
+name = "php"
+version = "7.2.24"
+
+[[packages]]
+name = "mariadb-server"
+version = "10.3.17"
+
+[[packages]]
+name = "openssh-server"
+version = "*"
+
+[customizations]
+hostname = "devstation"
+
+[customizations.kernel]
+append = "console=tty0 console=ttyS0,19200n81"
+
+[customizations.timezone]
+timezone = "Europe/Madrid"
+ntpservers = ["0.europe.pool.ntp.org", "1.europe.pool.ntp.org"]
+
+[[customizations.user]]
+name = "sysadmin"
+description = "Company Systems Admin"
+password = "$6$ZGmDxvGu3Q0M4RO/$KkfU0bD32FrLNpUCWEL8sy3dknJVyqExoy.NJMOcSCRjpt1H6sFKFjx8mFWn8H5CWTP7.bibPLBrRSRq3MrDb."
+home = "/home/sysadmin/"
+shell = "/usr/bin/bash"
+groups = ["users", "wheel"]
+
+[[customizations.user]]
+name = "developer"
+description = "developer"
+groups = ["wheel"]
+password = "$6$wlIgNacMnqCcXn3o$mPpw0apT4iZ3jDq0q6epXN3xCmNN.oVGFW.Gvu9r0nDVX.FXY3iCwfFkfPEcmhj7Kxw4Ppoes2LsUzPtNRjez0"
+
+[customizations.services]
+enabled = ["httpd","mariadb","sshd"]
+
+[customizations.firewall.services]
+enabled = ["http","https","mysql","ssh"]
+
+[[repos.git]]
+rpmname = "manual"
+rpmversion = "1.0"
+rpmrelease = "1"
+summary = "Manual how to work with devstation"
+repo = "https://github.com/alosadagrande/lorax"
+ref = "master"
+destination = "/var/www/html/manual"

@@ -1,4 +1,880 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-10T17:49:50+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-11T01:35:07+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
+
+&lt;!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true --&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#the-vision&quot;&gt;The vision&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#preparation-of-the-environment&quot;&gt;Preparation of the environment&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#configuration-of-the-builder-image-server&quot;&gt;Configuration of the Builder image server&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#building-standard-centos-8-image&quot;&gt;Building standard CentOS 8 image&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#image-creation-with-builder-tool&quot;&gt;Image creation with Builder Tool&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#verify-the-custom-built-image&quot;&gt;Verify the custom-built image&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#image-tailoring-with-virt-customize&quot;&gt;Image tailoring with virt-customize&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#building-a-standard-centos-7-image-from-cloud-images&quot;&gt;Building a standard CentOS 7 image from cloud images&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#image-creation-with-virt-customize&quot;&gt;Image creation with virt-customize&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;!-- /TOC --&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;The content of this article has been divided into two: this one, which is the first part, explains how to create a golden image using different tools such as &lt;em&gt;Builder Tool&lt;/em&gt; and &lt;em&gt;virt-customize&lt;/em&gt;. Once the custom-built image is ready, it is containerized so that it can be uploaded and stored into a container registry. The second part deals with the different ways the developers can deploy, modify and connect to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt; running in the OKD Kubernetes cluster.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;the-vision&quot;&gt;The vision&lt;/h2&gt;
+
+&lt;p&gt;If you work for a software factory, some kind of development environment standardization is probably in place. There are a lot of approaches which fit different use cases. In this blog post, our example company has allowed developers to choose their preferred editing tools and debugging environment locally to their workstations. However, before committing their changes to a Git repository, they need to validate them in a specifically tailored environment. This environment, due to legal restrictions, contains exact versions of the libraries, databases, web server or any other software previously agreed with customers.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;Aside from the pre-commit environments, the company already has an automated continuous integration workflow composed by several shared environments: &lt;em&gt;development, integration and production&lt;/em&gt;.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;This blog post focuses on showing a use case where containerized VMs running on top of Kubernetes ease the deployment and creation of standardized VMs to our developers. These VMs are meant to be ephemeral. However, if necessary, additional non-persistent disk or shared persistent storage can be attached so that important information can be kept safe.&lt;/p&gt;
+
+&lt;p&gt;Along the process, different approaches and tools to create custom VM images that will be stored in a corporate registry are detailed. Containerizing VMs means adapting them so that they can be saved in a container registry. Being able to manage VMs as container images leverages the benefits of a container registry, such as:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The registry becomes a &lt;strong&gt;source of truth&lt;/strong&gt; for the VMs you want to run. Everybody can list all VMs available searching on a centralized point.&lt;/li&gt;
+  &lt;li&gt;The container registry, depending on the storage size, contains historical information of all the VMs, which might have multiple different versions, identified by their tags. Any developer with the proper permissions is able to run any specific version of your standardized VM.&lt;/li&gt;
+  &lt;li&gt;It is the unique point where all your VMs are stored avoiding having them spread all over your infrastructure.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;A container image registry is a service that stores container images, and is hosted either by a third-party or as a public/private registry such as Docker Hub, Quay, and so on.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The ambitious goal is allowing the developers to deploy standardized VMs on the current Kubernetes infrastructure. Then, execute the required tests and if they are good, push the code to the corporate Git repositories and delete the VM eventually.&lt;/p&gt;
+
+&lt;p&gt;This goal is divided into three main procedures:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Create custom standardized VM images, also known as golden images.&lt;/li&gt;
+  &lt;li&gt;Containerize the resulting golden VM images.&lt;/li&gt;
+  &lt;li&gt;Deploy the proper VM images from the corporate registry into the OKD Kubernetes cluster.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;preparation-of-the-environment&quot;&gt;Preparation of the environment&lt;/h2&gt;
+
+&lt;p&gt;Running containerized VMs in KubeVirt uses the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/disks-and-volumes.html#containerdisk&quot;&gt;containerDisk&lt;/a&gt; feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.&lt;/p&gt;
+
+&lt;p&gt;The company already have an &lt;a href=&quot;https://www.okd.io/&quot;&gt;OKD 4 Kubernetes cluster&lt;/a&gt; installed which provides out of the box a container registry and some required security features such as &lt;em&gt;Role Based Access Controls (RBAC)&lt;/em&gt; and &lt;em&gt;Security Context Constraints (SCC)&lt;/em&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In the &lt;a href=&quot;https://blog.openshift.com/&quot;&gt;OpenShift blog&lt;/a&gt; there is a post called &lt;a href=&quot;https://blog.openshift.com/enterprise-kubernetes-with-openshift-part-one/&quot;&gt;Enterprise Kubernetes with OpenShift&lt;/a&gt; where you can find valuable information between the similarities and differences between OKD and Kubernetes.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;On top of the OKD cluster, KubeVirt is required so that we can run our virtual machines. The installation process is pretty well detailed in the &lt;a href=&quot;https://kubevirt.io/pages/cloud.html&quot;&gt;KubeVirt’s documentation&lt;/a&gt;. Below it is shown how KubeVirt components can be seen from the OKD web console.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;KubeVirt version deployed is &lt;strong&gt;0.34.2&lt;/strong&gt; which is the latest at the moment of writing.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$KUBEVIRT_VERSION&lt;/span&gt;
+0.34.2
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/kubevirt-operator.yaml
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/kubevirt-cr.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/kubevirt_okd.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x520&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/kubevirt_okd.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;&lt;strong&gt;oc&lt;/strong&gt; is the specific command-line tool for OKD, however, it is based in &lt;em&gt;kubectl&lt;/em&gt; plus some additional features detailed here. It is probably that along the blog post, you can find executions with &lt;em&gt;oc&lt;/em&gt; or &lt;em&gt;kubectl&lt;/em&gt; interchangeably.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;containerDisks&lt;/code&gt; are created from RAW or &lt;a href=&quot;https://www.linux-kvm.org/page/Qcow2&quot;&gt;QCOW2&lt;/a&gt; virtual machine images. Nevertheless, virtual machine images with all the agreed software and proper configuration must be created previously. The company currently uses CentOS 7 as their approved base operating system to run their applications. However, during the last months, it has been encouraging to move to the recently released version 8 of CentOS.&lt;/p&gt;
+
+&lt;p&gt;From a long time they had been using the prebuilt &lt;a href=&quot;https://cloud.centos.org/centos/&quot;&gt;CentOS cloud images&lt;/a&gt; with &lt;a href=&quot;http://libguestfs.org/virt-customize.1.html&quot;&gt;virt-customize&lt;/a&gt;, which allowed them to modify the prebuilt cloud images. As a trade-off, they had to trust on the cloud image provided by CentOS or verify if new packages were added on each release.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;&lt;strong&gt;virt-customize&lt;/strong&gt; can customize a virtual machine (disk image) by installing packages, editing configuration files, and so on. Virt-customize modifies the guest or disk image in place.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now, they are starting to use a new tool called &lt;a href=&quot;https://docs.centos.org/en-US/centos/install-guide/Composer/&quot;&gt;Image Builder&lt;/a&gt; that creates deployment-ready customized system images from scratch. Furthermore, there is an integration with Cockpit where you can create custom CentOS images in various formats including QCOW2 for OpenStack, AMI (Amazon Machine Image), VHD (Azure Disk Image) etc. from a friendly user interface.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;There are a lot of tools that can accomplish the objective of creating custom images. Here we are focusing on two: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-customize&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Image Builder&lt;/code&gt;.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Along this blog post, both tools are used together in the image building process, leveraging their strengths. In the following diagram is depicted the different agents that take part in the process of running our standardized VMs in Kubernetes. This workflow includes the creation and customization of the images, their containerization, storing them into the OKD container registry and finally the creation of the VMs in Kubernetes by the employees.&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/diagram-customizing-images.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x320&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/diagram-customizing-images.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;okd imageStream devstation&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;h3 id=&quot;configuration-of-the-builder-image-server&quot;&gt;Configuration of the Builder image server&lt;/h3&gt;
+
+&lt;p&gt;In order to prepare the building environment, it is recommended to install Image Builder in a dedicated server as it has specific security requirements. Actually, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lorax-composer&lt;/code&gt; which is one of its components doesn’t work properly with SELinux running, as it installs an entire OS image in an alternate directory.&lt;/p&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;As shown in the &lt;a href=&quot;https://weldr.io/Running-Composer-on-RHEL/&quot;&gt;lorax-composer documentation&lt;/a&gt; SELinux must be disabled. However, I have been able to create custom images successfully with SELinux enabled. In case you find any problems during your building, check the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lorax-composer&lt;/code&gt; logs in journal in order to get more detailed information.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Here it is a table where the software required to run the builds along with the versions have been used.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;Operating System is &lt;strong&gt;CentOS 8&lt;/strong&gt; since CentOS 7 Image Builder is still an &lt;a href=&quot;https://docs.centos.org/en-US/centos/install-guide/Composer/&quot;&gt;experimental feature&lt;/a&gt;&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Component&lt;/th&gt;
+      &lt;th&gt;Version&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Operating System&lt;/td&gt;
+      &lt;td&gt;CentOS Linux release 8.2.2004 (Core)&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Libvirt&lt;/td&gt;
+      &lt;td&gt;libvirtd (libvirt) 4.5.0&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;virt-customize&lt;/td&gt;
+      &lt;td&gt;virt-customize 1.38.4rhel=8,release=14.module_el8.1.0+248+298dec18,libvirt&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Image Builder&lt;/td&gt;
+      &lt;td&gt;lorax-composer (28.14.42-2), composer-cli (composer-cli-28.14.42-2), cockpit-composer (cockpit-composer-12.1-1.el8.noarch)&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;Once the builder image server is provisioned with latest CentOS 8, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Virtualization Host&lt;/code&gt; group package is installed. It will be required to test our customized images locally before containerizing and pushing them to the OKD registry.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum groupinstall &lt;span class=&quot;s2&quot;&gt;&quot;Virtualization Host&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;libvirtd &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Next, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-customize&lt;/code&gt; is installed from the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;libguestfs-tools&lt;/code&gt; package along with the Image Builder. The latest is composed by lorax-composer, the Cockpit composer plugin and the composer-cli, which will be used to interact directly with Composer using command-line.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; libguestfs-tools lorax-composer composer-cli cockpit-composer
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;lorax-composer.socket
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;lorax-composer &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl start cockpit
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Then, the local firewall is configured so that we can connect to the Cockpit web user interface from our workstation.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cockpit &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cockpit &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Finally, connect to the Cockpit user interface by typing the IP or name of the Builder image server and port &lt;em&gt;TCP/9090&lt;/em&gt; (Cockpit’s default) in your favourite web browser. Then, log in with a local administrator account.&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/cockpit-gui.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x484&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/cockpit-gui.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;p&gt;The following image shows the Image Build plugin web page. Actually, what it is depicted are the different Image Build blueprints that are shipped by default. &lt;em&gt;The blueprint&lt;/em&gt; defines what should be included in your image. This includes packages, users, files, server settings …&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/cockpit-first-page.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x333&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/cockpit-first-page.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;premonition error&quot;&gt;&lt;div class=&quot;fa fa-exclamation-triangle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Error&lt;/p&gt;&lt;p&gt;If Cockpit’s web UI is not working, take a look at the output of the lorax service with the command:&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;journalctl &lt;span class=&quot;nt&quot;&gt;-fu&lt;/span&gt; lorax-composer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;building-standard-centos-8-image&quot;&gt;Building standard CentOS 8 image&lt;/h2&gt;
+
+&lt;p&gt;It is time to create our standardized CentOS 8 image or also called golden CentOS 8 image. This image will be built from the ground up using the Image Builder tool.&lt;/p&gt;
+
+&lt;h3 id=&quot;image-creation-with-builder-tool&quot;&gt;Image creation with Builder Tool&lt;/h3&gt;
+
+&lt;p&gt;The easiest way to start is creating a new blueprint (devstation-centos8) from the Cockpit user interface. This will produce a scaffold file where all the required modifications can be made. Here it is shown the process of creation a new blueprint from Cockpit:&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/create_blueprint.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x449&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/create_blueprint.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;p&gt;I would also suggest adding some users and all the packages you want to install from the user interface. In our case, we are going to create the following users by clicking on the details tab of the new blueprint. In both cases, the password is known by the respective group of users and also belongs to the wheel group.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Users&lt;/th&gt;
+      &lt;th&gt;Note&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;sysadmin&lt;/td&gt;
+      &lt;td&gt;Privileged user owned by the Systems Engineering team to troubleshoot and have access to the VM&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;developer&lt;/td&gt;
+      &lt;td&gt;These are the credentials used by the developers to access the VM&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/users.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x380&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/users.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Next, select the packages to include. Add the proper version of the package already agreed with the customer.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Package&lt;/th&gt;
+      &lt;th&gt;Version&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;httpd&lt;/td&gt;
+      &lt;td&gt;2.4.37&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mod_ssl&lt;/td&gt;
+      &lt;td&gt;2.4.37&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;php&lt;/td&gt;
+      &lt;td&gt;7.2.24&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;mariadb-server&lt;/td&gt;
+      &lt;td&gt;10.3.17&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;openssh-server&lt;/td&gt;
+      &lt;td&gt;latest&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;At this point, you already have a blueprint template to start working. In addition to using the web console, you can also use the &lt;strong&gt;Image Builder CLI&lt;/strong&gt; to create images. When using the CLI, you have access to a few more customization options, such as managing firewall rules or download files from Git. Since we already have installed the composer-cli package in the &lt;a href=&quot;#configuration-of-the-builder-image-server&quot;&gt;Image Builder server&lt;/a&gt;, let’s use it to further customize our golden image.&lt;/p&gt;
+
+&lt;p&gt;First, access to the Builder Image server and download the custom blueprint called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devstation-centos8&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli blueprints list
+devstation-centos8
+example-atlas
+example-development
+Example-http-server
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli blueprints save devstation-centos8
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls
+&lt;/span&gt;devstation-centos8.toml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;All composer-cli options are documented in the &lt;a href=&quot;https://weldr.io/lorax/composer-cli.html&quot;&gt;official webpage&lt;/a&gt;. Take a look if you need further detail.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Now, let’s edit the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devstation-centos8.toml&lt;/code&gt; file which is in charge of building our custom image.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;The time zone has been added to match Europe/Madrid with proper NTP servers.&lt;/li&gt;
+  &lt;li&gt;The kernel has been modified to allow connection via console.&lt;/li&gt;
+  &lt;li&gt;Several firewall rules have been added to allow our services being accessed from outside.&lt;/li&gt;
+  &lt;li&gt;Some services have been configured so that they are enabled and started at boot.&lt;/li&gt;
+  &lt;li&gt;A Git repository has been configured to be cloned. Actually, it is a Git repository that contains a manual detailing how the custom image is configured and how it must be used.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;It is important to add console as a kernel option since the Builder Image tool disables access to serial console by default. It will allow the &lt;em&gt;virtctl&lt;/em&gt; command to connect to the VM while it is booting in our OKD Kubernetes cluster.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;This is the final building configuration file, it can be downloaded from &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/devstation-centos8.toml&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-toml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;devstation-centos8&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;description&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;A developer station&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;0.0.1&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;modules&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;groups&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[]&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[packages]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;httpd&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2.4.37&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[packages]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;mod_ssl&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;2.4.37&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[packages]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;php&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;7.2.24&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[packages]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;mariadb-server&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;10.3.17&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[packages]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;openssh-server&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;version&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;*&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[customizations]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;hostname&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;devstation&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[customizations.kernel]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;append&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;console=tty0 console=ttyS0,19200n81&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[customizations.timezone]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;timezone&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Europe/Madrid&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;ntpservers&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0.europe.pool.ntp.org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1.europe.pool.ntp.org&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[customizations.user]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;sysadmin&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;description&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Company Systems Admin&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;password&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;$6$ZGmDxvGu3Q0M4RO/$KkfU0bD32FrLNpUCWEL8sy3dknJVyqExoy.NJMOcSCRjpt1H6sFKFjx8mFWn8H5CWTP7.bibPLBrRSRq3MrDb.&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;home&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/home/sysadmin/&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;shell&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/usr/bin/bash&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;groups&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;[&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;users&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;wheel&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;]&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[customizations.user]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;name&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;developer&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;description&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;developer&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;groups&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;[&quot;wheel&quot;]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;password&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;$6$wlIgNacMnqCcXn3o$mPpw0apT4iZ3jDq0q6epXN3xCmNN.oVGFW.Gvu9r0nDVX.FXY3iCwfFkfPEcmhj7Kxw4Ppoes2LsUzPtNRjez0&quot;&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[customizations.services]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;enabled&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;[&quot;httpd&quot;,&quot;mariadb&quot;,&quot;sshd&quot;]&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[customizations.firewall.services]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;enabled&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;nn&quot;&gt;[&quot;http&quot;,&quot;https&quot;,&quot;mysql&quot;,&quot;ssh&quot;]&lt;/span&gt;
+
+&lt;span class=&quot;nn&quot;&gt;[[repos.git]]&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;rpmname&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;manual&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;rpmversion&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1.0&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;rpmrelease&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;1&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;summary&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;Manual how to work with devstation&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;repo&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;https://github.com/alosadagrande/lorax&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;ref&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;master&quot;&lt;/span&gt;
+&lt;span class=&quot;py&quot;&gt;destination&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;&quot;/var/www/html/manual&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;In this case, we are using a Git repository to download useful information on how to deal with the customized image. However, it is possible to download for instance code or other information that can be stored in Git. And what is most important, it is versioned.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Once edited, push the configuration to Image Builder and start the building process by selecting the blueprint and the output format. Builder Image tool can export the same blueprint into multiple output formats. Thus, one blueprint might create the same custom image running on multiple providers (qcow2 in our case).&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli blueprints push devstation-centos8.toml
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli compose start devstation-centos8 qcow2
+Compose 248161f5-0870-41e8-b871-001348395ca7 added to the queue
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;It is possible to verify that the modified blueprint has been pushed successfully by executing the show command.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli blueprints show devstation-centos8
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The building process can take tens of minutes. It is possible to see the process by checking the lorax-composer logs in the journal or request the status of the blueprint built from the composer-cli:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli compose status
+248161f5-0870-41e8-b871-001348395ca7 RUNNING  Fri Nov 27 15:12:09 2020 devstation-centos8 0.0.2 qcow2
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;journalctl &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; lorax-composer &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt;
+Nov 27 15:13:31 eko3.cloud.lab.eng.bos.redhat.com lorax-composer[38218]: 2020-11-27 15:13:31,715: Installing.
+Nov 27 15:13:31 eko3.cloud.lab.eng.bos.redhat.com lorax-composer[38218]: 2020-11-27 15:13:31,716: Starting package installation process
+Nov 27 15:13:31 eko3.cloud.lab.eng.bos.redhat.com lorax-composer[38218]: 2020-11-27 15:13:31,716: Downloading packages
+Nov 27 15:13:31 eko3.cloud.lab.eng.bos.redhat.com lorax-composer[38218]: 2020-11-27 15:13:31,716: Downloading 474 RPMs, 3.75 MiB / 396.83 MiB &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;0%&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+Nov 27 15:13:31 eko3.cloud.lab.eng.bos.redhat.com lorax-composer[38218]: 2020-11-27 15:13:31,716: Downloading 474 RPMs, 15.58 MiB / 396.83 MiB &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;3%&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;done&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once the building process is finished, it is time to download the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;QCOW2&lt;/code&gt; file. It can be downloaded from Cockpit UI or from the composer-cli:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;composer-cli compose image 248161f5-0870-41e8-b871-001348395ca7
+248161f5-0870-41e8-b871-001348395ca7-disk.qcow2: 1854.31 MB
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-lhrt&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;  1 root root 1.5K Nov 27 15:11 devstation-centos8.toml
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;  1 root root 1.9G Nov 27 15:26 248161f5-0870-41e8-b871-001348395ca7-disk.qcow2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Afterwards, the image is suggested to be renamed to something more meaningful. Below the information given by qemu is exhibited:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;mv &lt;/span&gt;248161f5-0870-41e8-b871-001348395ca7-disk.qcow2  golden-devstation-centos8-disk.qcow2
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;qemu-img info golden-devstation-centos8-disk.qcow2
+image: golden-devstation-centos8-disk.qcow2
+file format: qcow2
+virtual size: 4.3G &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;4566548480 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+disk size: 1.8G
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: &lt;span class=&quot;nb&quot;&gt;false
+    &lt;/span&gt;refcount bits: 16
+    corrupt: &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;Virtual size of the image is 4.3G, since we agreed 10G the disk must be resized and root filesystem expanded before being containerized. Currently, there is no way to specify disk capacity in containerDisk as it can be done with &lt;a href=&quot;https://github.com/kubevirt/kubevirt/blob/master/docs/container-empty-disks.md#implementation&quot;&gt;emptyDisks&lt;/a&gt;. The size of the root filesystem and disk when running in KubeVirt is driven by the image.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;It is recommended to save the QCOW2 images under /var/lib/libvirt/images/ so that qemu user have permissions to expand or resize them.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;qemu-img resize golden-devstation-centos8-disk.qcow2 10G
+Image resized.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;The expansion is executed on the root partition, which in case of our golden image is &lt;strong&gt;/dev/sda2&lt;/strong&gt; partition. It must be checked previously, for instance using the &lt;em&gt;virt-filesystems&lt;/em&gt; utility:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-filesystems &lt;span class=&quot;nt&quot;&gt;--partitions&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--long&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; golden-devstation-centos8-disk.qcow2
+Name       Type       MBR  Size        Parent
+/dev/sda1  partition  83   1073741824  /dev/sda
+/dev/sda2  partition  83   2966421504  /dev/sda
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Note that a &lt;strong&gt;copy of the golden image&lt;/strong&gt; is created and that’s the one expanded.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos8-disk.qcow2 golden-devstation-centos8-disk-10G.qcow2
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-resize &lt;span class=&quot;nt&quot;&gt;--expand&lt;/span&gt; /dev/sda2  golden-devstation-centos8-disk.qcow2 golden-devstation-centos8-disk-10G.qcow2
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;   0.0] Examining golden-devstation-centos8-disk-10G.qcow2
+&lt;span class=&quot;k&quot;&gt;**********&lt;/span&gt;
+
+Summary of changes:
+
+/dev/sda1: This partition will be left alone.
+
+/dev/sda2: This partition will be resized from 2.7G to 9.0G.  The
+filesystem xfs on /dev/sda2 will be expanded using the ‘xfs_growfs’
+method.
+
+&lt;span class=&quot;k&quot;&gt;**********&lt;/span&gt;
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;   2.2] Setting up initial partition table on golden-devstation-centos8-disk-10G.qcow2
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;   3.1] Copying /dev/sda1
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;   4.0] Copying /dev/sda2
+ 100%
+&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;   8.5] Expanding /dev/sda2 using the ‘xfs_growfs’ method
+
+Resize operation completed with no errors.  Before deleting the old disk,
+carefully check that the resized disk boots and works correctly.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Finally, it is verified that the image meets the expected size (see virtual size):&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;qemu-img info golden-devstation-centos8-disk-10G.qcow2
+image: golden-devstation-centos8-disk-10G.qcow2
+file format: qcow2
+virtual size: 10G &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;10737418240 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+disk size: 1.8G
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: &lt;span class=&quot;nb&quot;&gt;false
+    &lt;/span&gt;refcount bits: 16
+    corrupt: &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;In case the developers are allowed to select between multiple flavours, e.g. different root filesystem sizes, you will end up with multiple containerized VM images. In the event that an additional block device is needed, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;emptyDisk&lt;/code&gt; is the proper way to go.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;verify-the-custom-built-image&quot;&gt;Verify the custom-built image&lt;/h3&gt;
+
+&lt;p&gt;Before continuing, it is suggested to verify the golden expanded image. Since the qcow2 image is not yet containerized, it can easily run on KVM/libvirt. In our case, the builder server has already in place the &lt;em&gt;Virtualization Host&lt;/em&gt; group packages.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;There are a lot of tools that allow us to run a qcow2 image in libvirt. In this example, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-install&lt;/code&gt; is used, however, other tool that makes easy to deploy VM images and worth exploring is &lt;a href=&quot;https://github.com/karmab/kcli&quot;&gt;kcli&lt;/a&gt;&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;First, install &lt;a href=&quot;https://linux.die.net/man/1/virt-install&quot;&gt;virt-install&lt;/a&gt;, which is a command-line tool for creating new KVM, Xen, or Linux container guests using the “libvirt” hypervisor management library, and run a new VM from the golden image:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum &lt;span class=&quot;nb&quot;&gt;install &lt;/span&gt;virt-install &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-install &lt;span class=&quot;nt&quot;&gt;--version&lt;/span&gt;
+2.2.1
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-install &lt;span class=&quot;nt&quot;&gt;--memory&lt;/span&gt; 2048 &lt;span class=&quot;nt&quot;&gt;--vcpus&lt;/span&gt; 2 &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt; devstation-centos8 &lt;span class=&quot;nt&quot;&gt;--disk&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G.qcow2,device&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;disk &lt;span class=&quot;nt&quot;&gt;--os-type&lt;/span&gt; Linux &lt;span class=&quot;nt&quot;&gt;--os-variant&lt;/span&gt; rhel8.1 &lt;span class=&quot;nt&quot;&gt;--virt-type&lt;/span&gt; kvm &lt;span class=&quot;nt&quot;&gt;--graphics&lt;/span&gt; none &lt;span class=&quot;nt&quot;&gt;--network&lt;/span&gt; default &lt;span class=&quot;nt&quot;&gt;--import&lt;/span&gt;
+
+Starting install...
+Connected to domain devstation-centos8
+Escape character is ^]
+
+CentOS Linux 8 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Core&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Kernel 4.18.0-147.5.1.el8_1.x86_64 on an x86_64
+devstation login:
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Login as &lt;a href=&quot;#image-creation-with-builder-tool&quot;&gt;developer or sysadmin user&lt;/a&gt;, scale privileges and check that the VM is configured as expected.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--list-all&lt;/span&gt;
+public &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;active&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+  target: default
+  icmp-block-inversion: no
+  interfaces: ens3
+  sources:
+  services: cockpit dhcpv6-client http https mysql ssh
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl is-active httpd
+active
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl is-active mariadb
+active
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl is-active sshd
+active
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Verify the disk and partition sizes are correctly configured:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;lsblk
+NAME   MAJ:MIN RM SIZE RO TYPE MOUNTPOINT
+vda    252:0    0  10G  0 disk
+├─vda1 252:1    0   1G  0 part /boot
+└─vda2 252:2    0   9G  0 part /
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;df&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-h&lt;/span&gt;
+Filesystem      Size  Used Avail Use% Mounted on
+devtmpfs        962M     0  962M   0% /dev
+tmpfs           995M     0  995M   0% /dev/shm
+tmpfs           995M   17M  979M   2% /run
+tmpfs           995M     0  995M   0% /sys/fs/cgroup
+/dev/vda2       9.0G  1.9G  7.2G  21% /
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;In case you are unsure on which partition you need to expand or contains the root filesystem, just run a VM from the golden qcow2 image and execute the previous commands. Then delete the VM and expand the image accordingly.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Finally, notice how the cloned repository has been copied successfully during the built process. Users can check the custom image information connecting to the local Apache server:&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;root@devstation ~]# curl localhost/manual/
+Dear developer,
+&amp;lt;br&amp;gt;
+&amp;lt;br&amp;gt;
+Welcome to the devstation server.
+
+&amp;lt;h2&amp;gt; How to use the devstation server &amp;lt;/h2&amp;gt;
+
+Remember that before committing your changes to the corporate &lt;span class=&quot;nb&quot;&gt;source &lt;/span&gt;management control server, you need to validate your code here.
+
+&amp;lt;h2&amp;gt; Need &lt;span class=&quot;nb&quot;&gt;help&lt;/span&gt;? &amp;lt;/h2&amp;gt;
+
+Please contact us at sysadmin@corporate.com
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;h3 id=&quot;image-tailoring-with-virt-customize&quot;&gt;Image tailoring with virt-customize&lt;/h3&gt;
+
+&lt;p&gt;In the previous section, we verified that the golden image was successfully built. However, there are still a few things that need to be added so that the golden image can be successfully containerized and run on top of our OKD Kubernetes cluster.&lt;/p&gt;
+
+&lt;p&gt;First, a worthy package that is suggested to be included in the golden image is &lt;a href=&quot;https://cloud-init.io/&quot;&gt;cloud-init&lt;/a&gt;. KubeVirt allows you to create VM objects along with &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/startup-scripts.html#cloud-init&quot;&gt;cloud-init&lt;/a&gt; configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.&lt;/p&gt;
+
+&lt;p&gt;The result will be &lt;strong&gt;two golden images CentOS 8&lt;/strong&gt;, both with cloud-init, but one will include a GUI and the other is terminal-based and therefore much lighter.&lt;/p&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;It is important to set the memsize of the building process to 4096m and have expanded the root filesystem otherwise you will face an out of space or/and out of memory error while installing the GNOME GUI.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos8-disk-10G.qcow2 golden-devstation-centos8-disk-10G-gui.qcow2
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G-gui.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; @graphical-server-environment,cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;systemctl set-default graphical.target&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;At this point we built:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A golden CentOS 8 image which can run on libvirt/KVM virtualization servers (golden-devstation-centos8-disk.qcow2)&lt;/li&gt;
+  &lt;li&gt;A 10G CentOS 8 image prepared to be executed by KubeVirt including cloud-init. (golden-devstation-centos8-disk-10G.qcow2)&lt;/li&gt;
+  &lt;li&gt;A 10G CentOS 8 image prepared to be executed by KubeVirt including both cloud-init and GNOME GUI (golden-devstation-centos8-disk-10G-gui.qcow2)&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;building-a-standard-centos-7-image-from-cloud-images&quot;&gt;Building a standard CentOS 7 image from cloud images&lt;/h2&gt;
+
+&lt;p&gt;In the previous section, it was shown how we can build and customize images from scratch using the Builder Image tool. However, there are settings that could not be configured even with the composer-cli. Thus, &lt;em&gt;virt-customize&lt;/em&gt; is used to fine-tune the custom image, i.e, add cloud-init and a graphical user interface.&lt;/p&gt;
+
+&lt;p&gt;Since the Builder Tool is an &lt;a href=&quot;https://docs.centos.org/en-US/centos/install-guide/Composer/&quot;&gt;experimental tool in CentOS 7&lt;/a&gt;, the company continues creating their golden CentOS 7 images based on CentOS cloud images. Comparing with the CentOS 8 workflow, the cloud image corresponds to the golden image even it is not built by the Systems Engineering department.&lt;/p&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;Note that with CentOS 7 images, the company is trusting a cloud image provided by a third party instead of creating one from scratch.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h3 id=&quot;image-creation-with-virt-customize&quot;&gt;Image creation with virt-customize&lt;/h3&gt;
+
+&lt;p&gt;The process to create the golden CentOS 7 image is quite similar to the CentOS 8 one. However, in this case, the customize procedure is entirely done with &lt;em&gt;virt-customize&lt;/em&gt;. The first step is to download the cloud image.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk.qcow2 https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;Then, it is required to resize and expand the image to meet the agreed size of 10GB. The details are the same explained in the &lt;a href=&quot;#image-creation-with-builder-tool&quot;&gt;previous section&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;qemu-img info golden-devstation-centos7-disk.qcow2
+image: golden-devstation-centos7-disk.qcow2
+file format: qcow2
+virtual size: 8.0G &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;8589934592 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+disk size: 819M
+cluster_size: 65536
+Format specific information:
+    compat: 1.1
+    lazy refcounts: &lt;span class=&quot;nb&quot;&gt;false
+    &lt;/span&gt;refcount bits: 16
+    corrupt: &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;qemu-img resize golden-devstation-centos7-disk.qcow2 10G
+Image resized.
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos7-disk.qcow2 golden-devstation-centos7-disk-10G.qcow2
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-resize &lt;span class=&quot;nt&quot;&gt;--expand&lt;/span&gt; /dev/sda1  golden-devstation-centos7-disk.qcow2 golden-devstation-centos7-disk-10G.qcow2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;In this case, unlike CentOS 8 image, the partition where the root filesystem resides is &lt;strong&gt;/dev/sda1&lt;/strong&gt;. That’s the partition that needs to be expanded.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Below it is the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-customize&lt;/code&gt; command that modifies the CentOS 7 &lt;em&gt;expanded&lt;/em&gt; cloud image by:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Installing the required packages (however, not the exact versions)&lt;/li&gt;
+  &lt;li&gt;Changing the root password&lt;/li&gt;
+  &lt;li&gt;Setting devstation as hostname to the customized image&lt;/li&gt;
+  &lt;li&gt;Configuring the time zone&lt;/li&gt;
+  &lt;li&gt;Enabling the installed services&lt;/li&gt;
+  &lt;li&gt;Including files from the manual.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;Manual files must be pulled first from &lt;a href=&quot;https://github.com/alosadagrande/lorax&quot;&gt;alosadagrande/lorax&lt;/a&gt; GitHub repository.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk-10G.qcow2 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+                                &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init,mod_ssl,httpd,mariadb-server,php,openssh-server &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+                                &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096  &lt;span class=&quot;nt&quot;&gt;--hostname&lt;/span&gt; devstation  &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--timezone&lt;/span&gt; Europe/Madrid &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+                                &lt;span class=&quot;nt&quot;&gt;--root-password&lt;/span&gt; password:toor &lt;span class=&quot;nt&quot;&gt;--password&lt;/span&gt; centos:password:developer123 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+                                &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'systemctl enable httpd'&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'systemctl enable mariadb'&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+                                &lt;span class=&quot;nt&quot;&gt;--mkdir&lt;/span&gt; /var/www/html/manual &lt;span class=&quot;nt&quot;&gt;--upload&lt;/span&gt; ~/lorax/index.html:/var/www/html/manual/index.html
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;Instead of executing all parameters in the command-line it is possible to create a file that is used as an input file for &lt;em&gt;virt-customize&lt;/em&gt;. See option &lt;a href=&quot;http://libguestfs.org/virt-customize.1.html&quot;&gt;commands-from-file&lt;/a&gt;&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Next, we need to create the graphical user interface image in a similar way as we did previously with CentOS 8 image.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos7-disk-10G.qcow2 golden-devstation-centos7-disk-10G-gui.qcow2
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk-10G-gui.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;yum groupinstall 'GNOME Desktop' -y&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;systemctl set-default graphical.target&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At this point we built:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A golden CentOS 7 image which can run on libvirt/KVM virtualization servers (golden-devstation-centos7-disk.qcow2).&lt;/li&gt;
+  &lt;li&gt;A 10G CentOS 7 image prepared to be executed by KubeVirt which includes cloud-init (golden-devstation-centos7-disk-10G.qcow2).&lt;/li&gt;
+  &lt;li&gt;A 10G CentOS 7 image prepared to be executed by KubeVirt which includes cloud-init and GNOME GUI (golden-devstation-centos7-disk-10G-gui.qcow2).&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;image-containerization-procedure&quot;&gt;Image containerization procedure&lt;/h2&gt;
+
+&lt;p&gt;The procedure to inject a &lt;em&gt;VirtualMachineInstance&lt;/em&gt; disk into a container images is pretty well explained in &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?&quot;&gt;containerDisk Workflow example&lt;/a&gt; from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the &lt;em&gt;VirtualMachine&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;Currently, there are 4 standardized images ready to be containerized. The process is the same for all of them, so in order to keep it short, we are just going to show the process of creating a container image from the CentOS 8 QCOW2 images.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;These are the four available images: CentOS 8 with GNOME, CentOS 8 terminal only, CentOS 7 with GNOME and CentOS 7 terminal only.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; Containerfile
+FROM scratch
+ADD golden-devstation-centos8-disk-10G.qcow2 /disk/
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;Containerfile
+FROM scratch
+ADD golden-devstation-centos8-disk-10G-gui.qcow2 /disk/
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then, it is time to build the image. In our case, &lt;a href=&quot;https://podman.io/&quot;&gt;podman&lt;/a&gt; has chosen to execute the task, however, we could have used &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;docker&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;buildah&lt;/code&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman build &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; openshift/devstation-centos8:terminal
+STEP 1: FROM scratch
+STEP 2: ADD golden-devstation-centos8-disk-10G.qcow2 /disk/
+STEP 3: COMMIT openshift/devstation-centos8:terminal
+8a9e83db71f08995fa73699c4e5a2d331c61b393daa18aa0b63269dc10078467
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman build &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; openshift/devstation-centos8:gui
+STEP 1: FROM scratch
+STEP 2: ADD golden-devstation-centos8-disk-10G-gui.qcow2 /disk/
+STEP 3: COMMIT openshift/devstation-centos8:gui
+2a4ecc7bf9da91bcb5847fd1cf46f4cd10726a4ceae88815eb2a9ab38b316be4
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After the successful build, the images are stored locally to the local server, in our case the Builder Server. Remember that they must be uploaded to the OKD container registry.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman images
+REPOSITORY                               TAG        IMAGE ID       CREATED          SIZE
+localhost/openshift/devstation-centos8   gui        2a4ecc7bf9da   3 minutes ago    5.72 GB
+localhost/openshift/devstation-centos8   terminal   8a9e83db71f0   13 minutes ago   1.94 GB
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;store-the-image-in-the-container-registry&quot;&gt;Store the image in the container registry&lt;/h3&gt;
+
+&lt;p&gt;Before pushing the images to the corporate container registry, it must be verified that the OKD registry is available outside the Kubernetes cluster. This allows any authenticated user to gain external access to push images into the OKD Kubernetes cluster. &lt;a href=&quot;https://docs.openshift.com/container-platform/4.3/registry/securing-exposing-registry.html&quot;&gt;Exposing the secure registry&lt;/a&gt; consists basically on configuring a route and expose that route in the OKD routers. Once done, external &lt;strong&gt;authenticated&lt;/strong&gt; access is allowed.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc get route &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; openshift-image-registry
+NAME            HOST/PORT                                                     PATH   SERVICES         PORT    TERMINATION   WILDCARD
+default-route   default-route-openshift-image-registry.apps.okd.okdlabs.com          image-registry   &amp;lt;all&amp;gt;   reencrypt     None
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;In order to upload your containerized images to the OKD registry, the user must be authenticated and &lt;a href=&quot;https://docs.openshift.com/container-platform/4.3/registry/accessing-the-registry.html&quot;&gt;authorized to execute the push action&lt;/a&gt;. The role that must be added to the OKD user is the &lt;em&gt;registry-editor&lt;/em&gt;&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;In order to authenticate with the OKD container registry, podman is employed as explained in the &lt;a href=&quot;https://docs.openshift.com/container-platform/4.3/registry/securing-exposing-registry.html&quot;&gt;official documentation&lt;/a&gt;.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc login https://api.okd.okdlabs.com:6443 &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; alosadag
+The server uses a certificate signed by an unknown authority.
+You can bypass the certificate check, but any data you send to the server could be intercepted by others.
+Use insecure connections? &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;y/n&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: y
+
+Authentication required &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;https://api.okd.okdlabs.com:6443 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;openshift&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+Username: alosadag
+Password:
+Login successful.
+
+&lt;span class=&quot;nv&quot;&gt;$ HOST&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;oc get route default-route &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; openshift-image-registry &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'{.spec.host }'&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;echo&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$HOST&lt;/span&gt;
+default-route-openshift-image-registry.apps.okd.okdlabs.com
+
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt; podman login &lt;span class=&quot;nt&quot;&gt;-u&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;oc &lt;span class=&quot;nb&quot;&gt;whoami&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; &lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;oc &lt;span class=&quot;nb&quot;&gt;whoami&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$HOST&lt;/span&gt;
+Login Succeeded!
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Before pushing the images, adapt container images to the proper name so they can be uploaded to private registries. Since it is agreed that all developers must be able to pull the images into their namespaces, the images need to be pushed to the openshift project.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;&lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/openshift_images/images-understand.html&quot;&gt;Understanding containers, images and imageStreams&lt;/a&gt; from OpenShift documentation deeply explains container image naming.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman tag localhost/openshift/devstation-centos8:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman tag localhost/openshift/devstation-centos:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Verify that the images are stored correctly in the OKD container registry by checking the &lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/openshift_images/image-streams-manage.html#working-with-imagestreams&quot;&gt;imageStream&lt;/a&gt;. As shown below, both images were uploaded successfully since the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devstation&lt;/code&gt; imageStream contains two images with v8-gui and v8-terminal tags respectively.&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc describe imageStream devstation &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; openshift
+Name:			devstation
+Namespace:		openshift
+Created:		23 hours ago
+Labels:			&amp;lt;none&amp;gt;
+Annotations:		&amp;lt;none&amp;gt;
+Image Repository:	default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation
+Image Lookup:		&lt;span class=&quot;nb&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false
+&lt;/span&gt;Unique Images:		2
+Tags:			2
+
+v8-gui
+  no spec tag
+
+  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; image-registry.openshift-image-registry.svc:5000/openshift/devstation@sha256:e301d935c1cb5a64d41df340d78e6162ddb0ede9b9b5df9c20df10d78f8fde0f
+      2 hours ago
+
+v8-terminal
+  no spec tag
+
+  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; image-registry.openshift-image-registry.svc:5000/openshift/devstation@sha256:47c2ba0c463da84fa1569b7fb8552c07167f3464a9ce3b6e3f607207ba4cee65
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At this point, the images are stored in a private registry and ready to be consumed by the developers.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In case you do not have a corporate private registry available, you can upload images to any free public container registry. Then, consume the container images from the public container registry. Just in case you want to use them or take a look, it has been uploaded to my &lt;a href=&quot;https://quay.io/repository/alosadag/devstation?tab=tags&quot;&gt;public container image repository at quay.io&lt;/a&gt;&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/okd_is_devstation.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;1110x467&quot;&gt;
+      &lt;img src=&quot;/assets/2020-12-01-Customizing-images-for-containerized-vms/okd_is_devstation.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;VM to VM&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;p&gt;In the next article, we will show how our developers can consume the custom-built images to run into the OKD Kubernetes cluster.&lt;/p&gt;
+
+&lt;h2 id=&quot;summary&quot;&gt;Summary&lt;/h2&gt;
+
+&lt;p&gt;In this blog post, it was detailed a real use of a company that uses KubeVirt to run standardized environments to run and test the code of their applications. In their use case, VMs are spinned up on-demand in the OKD Kubernetes cluster by the developers. This makes them completely autonomous creating and deleting their environments once the tasks are accomplished.&lt;/p&gt;
+
+&lt;p&gt;The article explained how to create a golden image using different tools such as Builder Tool and virt-customize. Once the custom-built image was ready, then it is transformed into a container image so that it can be uploaded and stored into a container registry.&lt;/p&gt;
+
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Information&lt;/p&gt;&lt;p&gt;In the next blog post, the custom-built containerized VM will be deployed from our corporate registry into our Kubernetes cluster. We will show how the developers can fine-tune even more the image deployment, how extra storage can be requested and how to connect to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt;. Stay tuned!&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;references&quot;&gt;References&lt;/h2&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/pages/cloud.html&quot;&gt;KubeVirt installation&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://developers.redhat.com/blog/2019/05/08/red-hat-enterprise-linux-8-image-builder-building-custom-system-images/&quot;&gt;Image Builder: Building custom system images&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://weldr.io/lorax/composer-cli.html&quot;&gt;Composer-cli information&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://quay.io/repository/alosadag/devstation?tab=tags&quot;&gt;Custom-built images available at quay.io&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
 
 &lt;p&gt;There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.&lt;/p&gt;
 
@@ -1733,96 +2609,4 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
 
 &lt;p&gt;Behind the scenes, virt-operator is coordinating the roll out of all the new KubeVirt components in a way that ensures existing virtual machine workloads are not disrupted.&lt;/p&gt;
 
-&lt;p&gt;The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="operation" /><summary type="html">Simplicity Above All Else</summary></entry><entry><title type="html">KubeVirt Security Fundamentals</title><link href="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html" rel="alternate" type="text/html" title="KubeVirt Security Fundamentals" /><published>2020-04-29T00:00:00+00:00</published><updated>2020-04-29T00:00:00+00:00</updated><id>https://kubevirt.io//2020/KubeVirt-Security-Fundamentals</id><content type="html" xml:base="https://kubevirt.io//2020/KubeVirt-Security-Fundamentals.html">&lt;h2 id=&quot;security-guidelines&quot;&gt;Security Guidelines&lt;/h2&gt;
-
-&lt;p&gt;In KubeVirt, our approach to security can be summed up by adhering to the following guidelines.&lt;/p&gt;
-
-&lt;ol&gt;
-  &lt;li&gt;
-    &lt;p&gt;Maintain the &lt;strong&gt;principle of least privilege&lt;/strong&gt; for all our components, meaning each component only has access to exactly the minimum privileges required to operate.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Establish boundaries between trusted vs untrusted components.&lt;/strong&gt; In our case, an untrusted component is typically anything that executes user third party logic.&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Inter-component network communication &lt;strong&gt;must be secured by TLS with mutual peer authentication.&lt;/strong&gt;&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;p&gt;Let’s take a look at what each of these guidelines mean for us practically when it comes to KubeVirt’s design.&lt;/p&gt;
-
-&lt;h2 id=&quot;the-principle-of-least-privilege&quot;&gt;The Principle of Least Privilege&lt;/h2&gt;
-
-&lt;p&gt;By limiting each component to only the exact privileges it needs to operate, we reduce the blast radius that occurs if a component is compromised.&lt;/p&gt;
-
-&lt;p&gt;Here’s a simple and rather obvious example. If a component needs access to a secret in a specific namespace, then we give that component read-only access to that single secret and not access to read all secrets. If that component is compromised, we’ve then limited the blast radius for what can be exploited.&lt;/p&gt;
-
-&lt;p&gt;For KubeVirt, the principle of least privilege can be broken into two categories.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Cluster Level Access:&lt;/strong&gt; The resources and APIs a component is permitted to access on the cluster.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Host Level Access:&lt;/strong&gt; The local resources a component is permitted to access on the host it is running on.&lt;/p&gt;
-
-&lt;h3 id=&quot;cluster-level-access&quot;&gt;Cluster Level Access&lt;/h3&gt;
-
-&lt;p&gt;For cluster level access the primary tools we have to grant and restrict access to cluster resources are cluster Namespaces and RBAC (Role Based Access Control). Each KubeVirt component only has access to the exact RBAC permissions within the limited set of Namespaces it requires to operate.&lt;/p&gt;
-
-&lt;p&gt;For example, let’s take a look at the KubeVirt control plane and runtime components highlighted in orange below.&lt;/p&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-04-29-KubeVirt-Security-Fundamentals/component-view.png&quot; alt=&quot;Components View&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-controller&lt;/strong&gt; is the component responsible for spinning up pods across the entire cluster for virtual machines to live in. As a result, this component needs access to RBAC permissions to manage pods. However, another part of virt-controller’s operation involves needing access to a single secret that contains its TLS certificate information. We aren’t going to give virt-controller access to manage secrets as well as pods simply because it needs access to read a single secret. In fact we aren’t even going to give virt-controller direct API access to any secrets at all. Instead we use the ability to pass a cluster secret as a pod volume into the virt-controller’s pod in order to provide read-only access.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-api&lt;/strong&gt; is the component that validates our api and provides virtual machine console and VNC access. This component doesn’t need access to create Pods like virt-controller does. Instead it mostly only requires read and modify access to existing KubeVirt API objects. As a result, if virt-api is compromised the blast radius is mostly limited to KubeVirt objects.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-handler&lt;/strong&gt; is a privileged daemonset that resides at the host level on every node that is capable of spinning up KubeVirt virtual machines. This component needs cluster access to the KubeVirt VirtualMachineInstance objects in order to manage the startup flow of virtual machines. However it doesn’t need cluster access to the pod objects the virtual machines live in. Similar to virt-api, what little cluster access this component has is mostly read-only and limited to the KubeVirt API.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-launcher&lt;/strong&gt; is a non-privileged component that resides in every virtual machine’s pod. This component is responsible for starting and monitoring the qemu-kvm process. Since this process lives within an “untrusted” environment that is executing third party logic, we’ve designed this component to require no cluster API access. As a result, this pod only receives the default service account for the namespace the pod resides in. If virt-launcher is compromised, cluster API access should not be impacted.&lt;/p&gt;
-
-&lt;h3 id=&quot;host-level-access&quot;&gt;Host Level Access&lt;/h3&gt;
-
-&lt;p&gt;For host level access, the primary tools we have at our disposal for limiting access primarily reside within the Pod specification’s &lt;strong&gt;securityContext&lt;/strong&gt; section. It’s here that we can define settings like what local user a container runs with, whether a container has access to host namespaces, and SELinux related options. Other tools for host level access involve exposing &lt;strong&gt;hostPath volumes&lt;/strong&gt; for shared host directory access and &lt;strong&gt;DevicePlugins&lt;/strong&gt; to pass host devices into the pod environment.&lt;/p&gt;
-
-&lt;p&gt;Let’s take a look at a few examples of how host access is managed for our components.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-controller&lt;/strong&gt; and &lt;strong&gt;virt-api&lt;/strong&gt; are cluster level components only, and have no need for access to host resources. These components run as non-privileged and non-root within their own isolated namespaces. No special host level access is granted to these components. For OpenShift clusters, the &lt;strong&gt;SCC&lt;/strong&gt; (Security Context Constraint) feature even provides the ability to restrict virt-controller’s permissions in a way that prevents it from creating pods with host access.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-launcher&lt;/strong&gt; is a host level component that is non-privileged and untrusted. However this component still needs access to host level devices (like /dev/kvm, gpus, and network devices) in order to start the virtual machine. Through the use of the Kubernetes &lt;strong&gt;Device Plugin&lt;/strong&gt; feature, we can expose host devices into a pod’s environment in a controlled way that doesn’t compromise namespace isolation or require hostPath volumes.&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;Virt-handler&lt;/strong&gt; is a host level component that is both privileged and trusted. This component’s responsibilities involve reaching into the virt-launcher’s pod to perform actions we don’t want the untrusted virt-launcher component to have permissions to perform itself. The primary method we have to restrict virt-handler’s access to the host is through SELinux. Since virt-handler requires maintaining some limited persistent state, hostPath volumes are also utilized to allow virt-handler to store persistent information on the host that can persist through virt-handler updates.&lt;/p&gt;
-
-&lt;h2 id=&quot;trusted-vs-untrusted-components&quot;&gt;Trusted vs Untrusted Components&lt;/h2&gt;
-
-&lt;p&gt;For KubeVirt, the separation between trusted and untrusted components comes when users can execute their own third party logic within a component’s environment. We can clearly illustrate this concept using the boundary between our two host level components, virt-launcher and virt-handler.&lt;/p&gt;
-
-&lt;h3 id=&quot;establishing-boundaries&quot;&gt;Establishing Boundaries&lt;/h3&gt;
-
-&lt;p&gt;&lt;img src=&quot;/assets/2020-04-29-KubeVirt-Security-Fundamentals/trusted-v-untrusted-boundary.png&quot; alt=&quot;Trusted vs Untrusted Boundary&quot; /&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;strong&gt;The virt-launcher pod is an untrusted environment.&lt;/strong&gt; The third party code executed within this environment is the user’s kvm virtual machine. KubeVirt has no control over what is executing within this virtual machine guest, so if there is a security vulnerability that allows breaking out of the kvm hypervisor, we want to make sure the environment that’s broken into is as limited as possible. This is why the virt-launcher’s pod has such restricted cluster and host access.&lt;/p&gt;
-
-&lt;p&gt;The &lt;strong&gt;virt-handler pod, on the other hand, is a trusted environment&lt;/strong&gt; that does not involve executing any third party code. During the virtual machine startup flow, there are privileged tasks that need to take place on the host in order to prepare the virtual machine for starting. This ranges from performing the Device Plugin logic that injects a host device into a pod’s environment, to setting up network bridges and interfaces within a pod’s environment. To accomplish this, we use the trusted virt-handler component to reach into the untrusted virt-launcher environment to perform privileged tasks.&lt;/p&gt;
-
-&lt;p&gt;The boundary established here is that we trust virt-handler with the ability to influence and provide information about all virtual machines running on a host, and limit virt-launcher to only influence and provide information about itself.&lt;/p&gt;
-
-&lt;h3 id=&quot;securing-boundaries&quot;&gt;Securing Boundaries&lt;/h3&gt;
-
-&lt;p&gt;Any communication channel that gives an untrusted environment the ability to present information to a trusted environment must be heavily scrutinized to prevent the possibility of privilege escalation. For example, the boundary between virt-handler and virt-launcher is meant to work like a one way mirror. The trusted virt-handler component can reach directly into the untrusted virt-launcher environments, but each virt-launcher can’t reach outside of its own isolated environment. Host namespace isolation provides a reasonable guarantee that virt-launcher can’t reach outside of its own environment directly, however we still have to be mindful about indirection communication.&lt;/p&gt;
-
-&lt;p&gt;Virt-handler observes information presented to it by each virt-launcher pod. If a virt-launcher environment is able to present fake information about another virtual machine, then the untrusted virt-launcher environment could indirectly influence the execution of another workload.&lt;/p&gt;
-
-&lt;p&gt;To counter this, when designing communication channels between trusted and untrusted components, we have to be careful to only allow communication from untrusted sources to influence itself and furthermore only influence itself in a way that can’t result in escalated privileges.&lt;/p&gt;
-
-&lt;h2 id=&quot;mutual-tls-authentication&quot;&gt;Mutual TLS Authentication&lt;/h2&gt;
-
-&lt;p&gt;There is a built in trust that components have for interacting with one another. For example, virt-api is allowed to establish virtual machine Console/VNC streams with virt-handler, and live migration is performed by streaming information between two virt-handler instances.&lt;/p&gt;
-
-&lt;p&gt;However for these types of interactions to work, we have to have a strong guarantee that the endpoints we’re talking to are in fact who they present themselves to be. Otherwise we could live migrate a virtual machine to an untrusted location, or provide VNC access to a virtual machine to an unauthorized endpoint.&lt;/p&gt;
-
-&lt;p&gt;In KubeVirt we solve this issue of inter-component communication trust in the same way Kubernetes solves it. Each component receives a unique TLS certificate signed by a cluster Certificate Authority which is used to guarantee the component is who they say they are. The certificate and CA information is injected into each component using a secret passed in as a Pod volume. Whenever a component acts as a client establishing a new connection with another component, it uses its unique certificate to prove its identify. Likewise, the server accepting the clients connection also presents its certificate to the client. This mutual peer certificate authentication allows both the client and server to establish trust.&lt;/p&gt;
-
-&lt;p&gt;So, when virt-api attempts to establish a VNC console stream with a virt-handler component, virt-handler is configured to only allow that stream to be opened by an endpoint providing a valid virt-api certificate, and virt-api will only talk to a server that presents the expected virt-handler certificate.&lt;/p&gt;
-
-&lt;h2 id=&quot;ca-and-certificate-rotation&quot;&gt;CA and Certificate Rotation&lt;/h2&gt;
-
-&lt;p&gt;In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="security" /><summary type="html">Security Guidelines</summary></entry></feed>
+&lt;p&gt;The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="design" /><category term="architecture" /><category term="operation" /><summary type="html">Simplicity Above All Else</summary></entry></feed>
