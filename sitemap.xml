@@ -541,6 +541,10 @@
 <lastmod>2020-12-10T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html</loc>
+<lastmod>2020-12-10T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1232,6 +1236,15 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/builder-tool.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/prometheus-operator.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/node-exporter.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/monitoring.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>

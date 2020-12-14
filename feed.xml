@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-14T16:13:47+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-14T20:17:08+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
 
 &lt;!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true --&gt;
 
@@ -874,7 +874,293 @@ v8-terminal
   &lt;li&gt;&lt;a href=&quot;https://developers.redhat.com/blog/2019/05/08/red-hat-enterprise-linux-8-image-builder-building-custom-system-images/&quot;&gt;Image Builder: Building custom system images&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://weldr.io/lorax/composer-cli.html&quot;&gt;Composer-cli information&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://quay.io/repository/alosadag/devstation?tab=tags&quot;&gt;Custom-built images available at quay.io&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html">&lt;h1 id=&quot;monitoring-kubevirt-vms-from-the-inside&quot;&gt;Monitoring KubeVirt VMs from the inside&lt;/h1&gt;
+
+&lt;p&gt;This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt;. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.&lt;/p&gt;
+
+&lt;h2 id=&quot;environment&quot;&gt;Environment&lt;/h2&gt;
+
+&lt;p&gt;This set of tools will be used on this guide:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/helm/helm&quot;&gt;Helm v3&lt;/a&gt; - To deploy the Prometheus-Operator.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/minikube&quot;&gt;minikube&lt;/a&gt; - Will provide us a k8s cluster, you are free to choose any other k8s provider though.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/kubectl&quot;&gt;kubectl&lt;/a&gt; - To deploy different k8s resources&lt;/li&gt;
+  &lt;li&gt;virtctl - to interact with KubeVirt VirtualMachines, can be downloaded from the &lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases&quot;&gt;KubeVirt repo&lt;/a&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;deploy-prometheus-operator&quot;&gt;Deploy Prometheus Operator&lt;/h2&gt;
+
+&lt;p&gt;Once you have your k8s cluster, with minikube or any other provider, the first step will be to deploy the Prometheus Operator. The reason is that the KubeVirt CR, when installed on the cluster, will detect if the ServiceMonitor CR already exists. If it does, then it will create ServiceMonitors configured to monitor all the KubeVirt components (virt-controller, virt-api, and virt-handler) out-of-the-box.&lt;/p&gt;
+
+&lt;p&gt;Although monitoring KubeVirt itself is not covered in this guide, it is a good practice to always deploy the Prometheus Operator before deploying KubeVirt.&lt;/p&gt;
+
+&lt;p&gt;To deploy the Prometheus Operator, you will need to create its namespace first, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitoring&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create ns monitoring
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Then deploy the operator in the new namespace:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;helm fetch stable/prometheus-operator
+tar xzf prometheus-operator*.tgz
+cd prometheus-operator/ &amp;amp;&amp;amp; helm install -n monitoring -f values.yaml kubevirt-prometheus stable/prometheus-operator
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;After everything is deployed, you can delete everything that was downloaded by helm:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ..
+rm -rf prometheus-operator*
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;One thing to keep in mind is the release name we added here: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-prometheus&lt;/code&gt;. The release name will be used when declaring our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; later on..&lt;/p&gt;
+
+&lt;h2 id=&quot;deploy-kubevirt-operators-and-kubevirt-customresources&quot;&gt;Deploy KubeVirt Operators and KubeVirt CustomResources&lt;/h2&gt;
+
+&lt;p&gt;Alright, the next step will be deploying KubeVirt itself. We will start with its operator.&lt;/p&gt;
+
+&lt;p&gt;We will fetch the latest version, then use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl create&lt;/code&gt; to deploy the manifest directly from Github::&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- - | sort -V | tail -1 | awk -F':' '{print $2}' | sed 's/,//' | xargs)
+kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Before deploying the KubeVirt CR, make sure that all kubevirt-operator replicas are ready, you can do that with:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl rollout status -n kubevirt deployment virt-operator
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After that, we can deploy KubeVirt and wait for all it’s components to get ready in a similar manner:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
+kubectl rollout status -n kubevirt deployment virt-api
+kubectl rollout status -n kubevirt deployment virt-controller
+kubectl rollout status -n kubevirt daemonset virt-handler
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;If we want to monitor VMs that can restart, we want our node-exporter to be persisted and, thus, we need to set up persistent storage for them. &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt; will be the component responsible for that, so we will deploy it’s operator and custom resource as well. As always, waiting for the right components to get ready before proceeding:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export CDI_VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o &quot;v[0-9]\.[0-9]*\.[0-9]*&quot;)
+kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml
+kubectl rollout status -n cdi deployment cdi-operator
+
+kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
+kubectl rollout status -n cdi deployment cdi-apiserver
+kubectl rollout status -n cdi deployment cdi-uploadproxy
+kubectl rollout status -n cdi deployment cdi-deployment
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;deploying-a-virtualmachine-with-persistent-storage&quot;&gt;Deploying a VirtualMachine with persistent storage&lt;/h2&gt;
+
+&lt;p&gt;Alright, cool. We have everything we need now. Let’s setup the VM.&lt;/p&gt;
+
+&lt;p&gt;We will start with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PersistenVolume&lt;/code&gt;’s required by &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md&quot;&gt;CDI’s DataVolume&lt;/a&gt; resources. Since I’m using minikube with no dynamic storage provider, I’ll be creating 2 PVs with a reference to the PVCs that will claim them. Notice &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;claimRef&lt;/code&gt; in each of the PVs.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolume&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;example-volume&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;claimRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cirros-dv&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2Gi&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;hostPath&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/data/example-volume/&lt;/span&gt;
+&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolume&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;example-volume-scratch&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;claimRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cirros-dv-scratch&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2Gi&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;hostPath&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/data/example-volume-scratch/&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;With the persistent storage in place, we can create our VM with the following manifest:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;running&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1024Mi&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;my-data-volume&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;dataVolume&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cirros-dv&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;my-data-volume&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;dataVolumeTemplates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;cirros-dv&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+             &lt;span class=&quot;na&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2Gi&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Notice that KubeVirt’s VirtualMachine resource has a VirtualMachine template and a dataVolumeTemplate. On the VirtualMachine template, it is important noticing that we named our VM &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitorable-vm&lt;/code&gt;, and we will use this name to connect to its console with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; later on. The label we’ve added, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, is also important, since we’ll use it when &lt;a href=&quot;#configuring-prometheus-to-scrape-the-vms-node-exporter&quot;&gt;configuring Prometheus to scrape the VM’s node-exporter&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;On dataVolumeTemplate, it is important noticing that we named the PVC &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv&lt;/code&gt; and the DataVolume resource will create 2 PVCs with that, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv-scratch&lt;/code&gt;. Notice that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv-scratch&lt;/code&gt; are the names referenced on our PersistentVolume manifests. The names must match for this to work.&lt;/p&gt;
+
+&lt;h2 id=&quot;installing-the-node-exporter-inside-the-vm&quot;&gt;Installing the node-exporter inside the VM&lt;/h2&gt;
+
+&lt;p&gt;Once the VirtualMachineInstance is running, we can connect to its console using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl console monitorable-vm&lt;/code&gt;. If user and password are required, provide your credentials accordingly. If you are using the same disk image from this guide, the user and password are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gocubsgo&lt;/code&gt; respectively.&lt;/p&gt;
+
+&lt;p&gt;The following script will install node-exporter and configure the VM to always start the exporter when booting:&lt;/p&gt;
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-LO&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-k&lt;/span&gt; https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
+&lt;span class=&quot;nb&quot;&gt;gunzip&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; node_exporter-1.0.1.linux-amd64.tar.gz | &lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;xopf -
+./node_exporter-1.0.1.linux-amd64/node_exporter &amp;amp;
+
+&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/sh &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'cat &amp;gt; /etc/rc.local &amp;lt;&amp;lt;EOF
+#!/bin/sh
+echo &quot;Starting up node_exporter at :9100!&quot;
+
+/home/cirros/node_exporter-1.0.1.linux-amd64/node_exporter 2&amp;gt;&amp;amp;1 &amp;gt; /dev/null &amp;amp;
+EOF'&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo chmod&lt;/span&gt; +x /etc/rc.local
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;&lt;em&gt;P.S.: If you are using a different base image, please configure node-exporter to start at boot time accordingly&lt;/em&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;configuring-prometheus-to-scrape-the-vms-node-exporter&quot;&gt;Configuring Prometheus to scrape the VM’s node-exporter&lt;/h2&gt;
+
+&lt;p&gt;To configure Prometheus to scrape the node-exporter (or other applications) is really simple. All we need is to create a new &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt; and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt;:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Service&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm-node-exporter&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;targetPort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;TCP&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitoring.coreos.com/v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ServiceMonitor&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-node-exporters-servicemonitor&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitoring&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;release&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitoring&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespaceSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;endpoints&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15s&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Let’s break this down just to make sure we set up everything right. Starting with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt;:&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;targetPort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;TCP&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;On the specification, we are creating a new port named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metrics&lt;/code&gt; that will be redirected to every pod labeled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, at port 9100, which is the default port number for the node-exporter.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Service&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm-node-exporter&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;We are also labeling the Service itself with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, that will be used by the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; object.&lt;/p&gt;
+
+&lt;p&gt;Now let’s take a look at our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; specification:&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;namespaceSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;endpoints&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15s&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;Since our ServiceMonitor will be deployed at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitoring&lt;/code&gt; namespace, but our service is at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;default&lt;/code&gt; namespace, we need &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;namespaceSelector.any=true&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We are also telling our ServiceMonitor that Prometheus needs to scrape endpoints from services labeled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt; and which ports are named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metrics&lt;/code&gt;. Luckily, that’s exactly what we did with our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt;!&lt;/p&gt;
+
+&lt;p&gt;One last thing to keep an eye on. Prometheus configuration can be set up to watch multiple ServiceMonitors. We can see which ServiceMonitors our Prometheus is watching with the following command:&lt;/p&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Look for Service Monitor Selector
+kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Make sure our ServiceMonitor has all labels required by Prometheus’ &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service Monitor Selector&lt;/code&gt;. One common selector is the release name that we’ve set when deploying our Prometheus with helm!&lt;/p&gt;
+
+&lt;h2 id=&quot;testing&quot;&gt;Testing&lt;/h2&gt;
+
+&lt;p&gt;You can do a quick test by port-forwarding Prometheus web UI and executing some PromQL:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl port-forward -n monitoring prometheus-monitoring-prometheus-oper-prometheus-0 9090:9090
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To make sure everything is working, access &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;localhost:9090/graph&lt;/code&gt; and execute the PromQL &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;}&lt;/code&gt;. Prometheus should return data that is being collected from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitorable-vm&lt;/code&gt;’s node-exporter.&lt;/p&gt;
+
+&lt;p&gt;You can play around with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt;, stop and starting the VM to see how the metrics behave. You will notice that when stopping the VM with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl stop monitorable-vm&lt;/code&gt;, the VirtualMachineInstance is killed and, thus, so is it’s pod. This will result with our service not being able to find the pod’s endpoint and then it will be removed from Prometheus’ targets.&lt;/p&gt;
+
+&lt;p&gt;With this behavior, alerts like the one below won’t work since our target is literally gone, not down.&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirtVMDown&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;expr&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;} == &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1m&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;severity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;warning&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;summary&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirt VM {{ $labels.pod }} is down.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;BUT&lt;/strong&gt;, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:&lt;/p&gt;
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirtVMCrashing&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;expr&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;} == &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5m&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;severity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;critical&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;summary&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirt VM {{ $labels.pod }} is constantly crashing before node-exporter starts at boot.&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
+
+&lt;p&gt;In this blog post we used &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt; to expose metrics out of a KubeVirt VM. We also configured &lt;a href=&quot;https://github.com/prometheus-operator/prometheus-operator&quot;&gt;Prometheus Operator&lt;/a&gt; to collect these metrics. This illustrates how to bring Kubernetes monitoring best practices with applications running inside KubeVirt VMs.&lt;/p&gt;</content><author><name>arthursens</name></author><category term="uncategorized" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="prometheus" /><category term="prometheus-operator" /><category term="node-exporter" /><category term="monitoring" /><summary type="html">Monitoring KubeVirt VMs from the inside</summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
 
 &lt;p&gt;There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.&lt;/p&gt;
 
@@ -1921,20 +2207,4 @@ a one-liner.&lt;/p&gt;
 &lt;p&gt;As you can see it is now much easier to deploy KubeVirt in a minikube
 Kubernetes environment.&lt;/p&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="minikube" /><category term="addons" /><summary type="html">Deploying KubeVirt has just gotten easier! With the latest release (v1.12) of minikube we can now deploy KubeVirt with a one-liner.</summary></entry><entry><title type="html">KubeVirt v0.31.0</title><link href="https://kubevirt.io//2020/changelog-v0.31.0.html" rel="alternate" type="text/html" title="KubeVirt v0.31.0" /><published>2020-07-09T00:00:00+00:00</published><updated>2020-07-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.31.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.31.0.html">&lt;h2 id=&quot;v0310&quot;&gt;v0.31.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Thu Jul 9 16:08:18 2020 +0300&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[PR 3690][davidvossel] Update go-grpc dependency to v1.30.0 in order to improve stability&lt;/li&gt;
-  &lt;li&gt;[PR 3628][AlonaKaplan] Avoid virt-handler crash in case of virt-launcher network configuration error&lt;/li&gt;
-  &lt;li&gt;[PR 3635][jean-edouard] The “HostDisk” feature gate has to be enabled to use hostDisks&lt;/li&gt;
-  &lt;li&gt;[PR 3641][vatsalparekh] Reverts kubevirt/kubevirt#3488 because CI seems to have merged it without all tests passing&lt;/li&gt;
-  &lt;li&gt;[PR 3488][vatsalparekh] Add a way to update VMI Status with latest Pod IP for Masquerade bindings&lt;/li&gt;
-  &lt;li&gt;[PR 3406][tomob] If a PVC was created by a DataVolume, it cannot be used as a Volume Source for a VM. The owning DataVolume has to be used instead.&lt;/li&gt;
-  &lt;li&gt;[PR 3566][kraxel] added: tigervnc support for linux &amp;amp; windows&lt;/li&gt;
-  &lt;li&gt;[PR 3529][jean-edouard] Enabling EFI will also enable Secure Boot, which requires SMM to be enabled.&lt;/li&gt;
-  &lt;li&gt;[PR 3455][ashleyschuett] Add KubevirtConfiguration, MigrationConfiguration, DeveloperConfiguration and NetworkConfiguration to API-types&lt;/li&gt;
-  &lt;li&gt;[PR 3520][rmohr] Fix hot-looping on the  VMI sync-condition if errors happen during the Scheduled phase of a VMI&lt;/li&gt;
-  &lt;li&gt;[PR 3220][mhenriks] API and controller/webhook for VirtualMachineSnapshots&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.31.0</summary></entry></feed>
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="minikube" /><category term="addons" /><summary type="html">Deploying KubeVirt has just gotten easier! With the latest release (v1.12) of minikube we can now deploy KubeVirt with a one-liner.</summary></entry></feed>
