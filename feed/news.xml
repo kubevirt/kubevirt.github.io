@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-15T16:14:21+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-15T19:22:01+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
 
 &lt;!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true --&gt;
 
@@ -65,7 +65,7 @@
 
 &lt;h2 id=&quot;preparation-of-the-environment&quot;&gt;Preparation of the environment&lt;/h2&gt;
 
-&lt;p&gt;Running containerized VMs in KubeVirt uses the &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/disks-and-volumes.html#containerdisk&quot;&gt;containerDisk&lt;/a&gt; feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.&lt;/p&gt;
+&lt;p&gt;Running containerized VMs in KubeVirt uses the &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=containerdisk&quot;&gt;containerDisk&lt;/a&gt; feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.&lt;/p&gt;
 
 &lt;p&gt;The company already have an &lt;a href=&quot;https://www.okd.io/&quot;&gt;OKD 4 Kubernetes cluster&lt;/a&gt; installed which provides out of the box a container registry and some required security features such as &lt;em&gt;Role Based Access Controls (RBAC)&lt;/em&gt; and &lt;em&gt;Security Context Constraints (SCC)&lt;/em&gt;.&lt;/p&gt;
 
@@ -616,7 +616,7 @@ Please contact us at sysadmin@corporate.com
 
 &lt;p&gt;In the previous section, we verified that the golden image was successfully built. However, there are still a few things that need to be added so that the golden image can be successfully containerized and run on top of our OKD Kubernetes cluster.&lt;/p&gt;
 
-&lt;p&gt;First, a worthy package that is suggested to be included in the golden image is &lt;a href=&quot;https://cloud-init.io/&quot;&gt;cloud-init&lt;/a&gt;. KubeVirt allows you to create VM objects along with &lt;a href=&quot;https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/startup-scripts.html#cloud-init&quot;&gt;cloud-init&lt;/a&gt; configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.&lt;/p&gt;
+&lt;p&gt;First, a worthy package that is suggested to be included in the golden image is &lt;a href=&quot;https://cloud-init.io/&quot;&gt;cloud-init&lt;/a&gt;. KubeVirt allows you to create VM objects along with &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/cloud-init?id=startup-scripts&quot;&gt;cloud-init&lt;/a&gt; configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.&lt;/p&gt;
 
 &lt;p&gt;The result will be &lt;strong&gt;two golden images CentOS 8&lt;/strong&gt;, both with cloud-init, but one will include a GUI and the other is terminal-based and therefore much lighter.&lt;/p&gt;
 
@@ -2189,9 +2189,9 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;h3 id=&quot;step-2-import-your-image-to-a-pvc-in-the-image-namespace&quot;&gt;Step 2. Import your image to a PVC in the image namespace&lt;/h3&gt;
 
-&lt;p&gt;Below are a few options for importing. For each example, I’m using the Fedora Cloud x86_64 qcow2 image that can be downloaded &lt;a href=&quot;https://download.fedoraproject.org/pub/fedora/linux/releases/&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Below are a few options for importing. For each example, I’m using the Fedora Cloud x86_64 qcow2 image that can be downloaded &lt;a href=&quot;https://alt.fedoraproject.org/cloud/&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
 
-&lt;p&gt;If you try these examples yourself, you’ll need to download the &lt;strong&gt;Fedora-Cloud-Base-31-1.9.x86_64.qcow2&lt;/strong&gt; image file in your working directory.&lt;/p&gt;
+&lt;p&gt;If you try these examples yourself, you’ll need to download the current Fedora-Cloud-Base qcow2 image file in your working directory.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Example: Import a local VM from your desktop environment using virtctl&lt;/strong&gt;&lt;/p&gt;
 
@@ -2202,14 +2202,14 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;p&gt;In a separate terminal upload the image over the port forward connection using the virtctl tool. Note that the size of the PVC must be the size of what the qcow image will expand to when converted to a raw image. In this case I chose 5 gigabytes as the PVC size.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl image-upload dv fedora-cloud-base-31 &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt; vm-images  &lt;span class=&quot;nt&quot;&gt;--size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5Gi &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt; Fedora-Cloud-Base-31-1.9.x86_64.qcow2  &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://127.0.0.1:18443 &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl image-upload dv fedora-cloud-base &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt; vm-images  &lt;span class=&quot;nt&quot;&gt;--size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;5Gi &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt; Fedora-Cloud-Base-XX-X.X.x86_64.qcow2  &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://127.0.0.1:18443 &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Once that completes, you’ll have a PVC in the vm-images namespace that contains the Fedora Cloud image.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pvc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
 NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;Example: Import using a container registry&lt;/strong&gt;&lt;/p&gt;
@@ -2220,24 +2220,24 @@ fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;END&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; Dockerfile
 FROM scratch
-ADD Fedora-Cloud-Base-31-1.9.x86_64.qcow2 /disk/
+ADD Fedora-Cloud-Base-XX-X.X.x86_64.qcow2 /disk/
 &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;END
-&lt;/span&gt;docker build &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; quay.io/dvossel/fedora:cloud-base-31 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
-docker push quay.io/dvossel/fedora:cloud-base-31
+&lt;/span&gt;docker build &lt;span class=&quot;nt&quot;&gt;-t&lt;/span&gt; quay.io/dvossel/fedora:cloud-base &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
+docker push quay.io/dvossel/fedora:cloud-base
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Next a CDI DataVolume is used to import the VM image into a new PVC from the container image you just uploaded to your container registry. Posting the DataVolume manifest below will result in a new 5 gigabyte PVC being created and the VM image being placed on that PVC in a way KubeVirt can consume it.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;END&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; fedora-cloud-base-31-datavolume.yaml
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;END&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; fedora-cloud-base-datavolume.yaml
 apiVersion: cdi.kubevirt.io/v1alpha1
 kind: DataVolume
 metadata:
-  name: fedora-cloud-base-31
+  name: fedora-cloud-base
   namespace: vm-images
 spec:
   source:
     registry:
-      url: &quot;docker://quay.io/dvossel/fedora:cloud-base-31&quot;
+      url: &quot;docker://quay.io/dvossel/fedora:cloud-base&quot;
   pvc:
     accessModes:
       - ReadWriteOnce
@@ -2245,12 +2245,12 @@ spec:
       requests:
         storage: 5Gi
 &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;END
-&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; fedora-cloud-base-31-datavolume.yaml
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; fedora-cloud-base-datavolume.yaml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;You can observe the CDI complete the import by watching the DataVolume object.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl describe datavolume fedora-cloud-base-31 &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl describe datavolume fedora-cloud-base &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt;
@@ -2260,17 +2260,17 @@ Status:
 Events:
   Type    Reason            Age                   From                   Message
   &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;    &lt;span class=&quot;nt&quot;&gt;------&lt;/span&gt;            &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;                  &lt;span class=&quot;nt&quot;&gt;----&lt;/span&gt;                   &lt;span class=&quot;nt&quot;&gt;-------&lt;/span&gt;
-  Normal  ImportScheduled   2m49s                 datavolume-controller  Import into fedora-cloud-base-31 scheduled
-  Normal  ImportInProgress  2m46s                 datavolume-controller  Import into fedora-cloud-base-31 &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;progress
+  Normal  ImportScheduled   2m49s                 datavolume-controller  Import into fedora-cloud-base scheduled
+  Normal  ImportInProgress  2m46s                 datavolume-controller  Import into fedora-cloud-base &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;progress
   Normal  Synced            40s &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;x11 over 2m51s&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;  datavolume-controller  DataVolume synced successfully
-  Normal  ImportSucceeded   40s                   datavolume-controller  Successfully imported into PVC fedora-cloud-base-31
+  Normal  ImportSucceeded   40s                   datavolume-controller  Successfully imported into PVC fedora-cloud-base
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Once the import is complete, you’ll see the image available as a PVC in your vm-images namespace. The PVC will have the same name given to the DataVolume.&lt;/p&gt;
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pvc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
 NAME                   STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;Example: Import an image from an http or s3 endpoint&lt;/strong&gt;&lt;/p&gt;
@@ -2281,12 +2281,12 @@ fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kind: DataVolume
 metadata:
-  name: fedora-cloud-base-31
+  name: fedora-cloud-base
   namespace: vm-images
 spec:
   &lt;span class=&quot;nb&quot;&gt;source&lt;/span&gt;:
     http:
-      url: http://your-web-server-here/images/Fedora-Cloud-Base-31-1.9.x86_64.qcow2
+      url: http://your-web-server-here/images/Fedora-Cloud-Base-XX-X.X.x86_64.qcow2
   pvc:
     accessModes:
       - ReadWriteOnce
@@ -2332,7 +2332,7 @@ spec:
       &lt;span class=&quot;na&quot;&gt;terminationGracePeriodSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;dataVolume&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-nginx&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;datavolumedisk1&lt;/span&gt;
       &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;cloudInitNoCloud&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;userData&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
@@ -2345,7 +2345,7 @@ spec:
         &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cloudinitdisk&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;dataVolumeTemplates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-nginx&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2356,7 +2356,7 @@ spec:
       &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-cloud-base-31&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-cloud-base&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;There are a few key takeaways from this manifest worth discussing.&lt;/p&gt;
@@ -2364,7 +2364,7 @@ spec:
 &lt;ol&gt;
   &lt;li&gt;Usage of &lt;strong&gt;runStrategy: “RerunOnFailure”&lt;/strong&gt;. This tells KubeVirt to treat the VM’s execution similar to a Kubernetes Job. We want the VM to continue retrying until the VM guest shuts itself down gracefully.&lt;/li&gt;
   &lt;li&gt;Usage of the &lt;strong&gt;cloudInitNoCloud volume&lt;/strong&gt;. This volume allows us to inject a script into the VM’s startup procedure. In our case, we want this script to install nginx, configure nginx to launch on startup, and then immediately shutdown the guest gracefully once that is complete.&lt;/li&gt;
-  &lt;li&gt;Usage of the &lt;strong&gt;dataVolumeTemplates section&lt;/strong&gt;. This allows us to define a new PVC which is a clone of our fedora-cloud-base-31 base image. The resulting VM image attached to our VM will be a new image pre-populated with nginx.&lt;/li&gt;
+  &lt;li&gt;Usage of the &lt;strong&gt;dataVolumeTemplates section&lt;/strong&gt;. This allows us to define a new PVC which is a clone of our fedora-cloud-base base image. The resulting VM image attached to our VM will be a new image pre-populated with nginx.&lt;/li&gt;
 &lt;/ol&gt;
 
 &lt;p&gt;After posting the VM manifest to the cluster, wait for the corresponding VMI to reach the Succeeded phase.&lt;/p&gt;
@@ -2385,8 +2385,8 @@ nginx-provisioner   2m26s   Succeeded   10.244.0.22   node01
 
 &lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pvc &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; vm-images
 NAME               STATUS   VOLUME              CAPACITY   ACCESS MODES   STORAGECLASS   AGE
-fedora-cloud-base-31   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
-fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
+fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            &lt;span class=&quot;nb&quot;&gt;local          &lt;/span&gt;60s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;understanding-the-vm-image-repository&quot;&gt;Understanding the VM Image Repository&lt;/h2&gt;
@@ -2437,7 +2437,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
   &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-nginx&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadOnlyMany&lt;/span&gt;
@@ -2544,7 +2544,7 @@ fedora-31-nginx            Bound    local-pv-8dla23ds    5Gi       RWO          
       &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vm-images&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-31-nginx&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;fedora-nginx&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h1 id=&quot;other-custom-creation-image-tools&quot;&gt;Other Custom Creation Image Tools&lt;/h1&gt;

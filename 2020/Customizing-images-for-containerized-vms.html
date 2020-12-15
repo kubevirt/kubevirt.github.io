@@ -320,7 +320,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="preparation-of-the-environment">Preparation of the environment</h2>
 
-<p>Running containerized VMs in KubeVirt uses the <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/disks-and-volumes.html#containerdisk">containerDisk</a> feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.</p>
+<p>Running containerized VMs in KubeVirt uses the <a href="https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=containerdisk">containerDisk</a> feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.</p>
 
 <p>The company already have an <a href="https://www.okd.io/">OKD 4 Kubernetes cluster</a> installed which provides out of the box a container registry and some required security features such as <em>Role Based Access Controls (RBAC)</em> and <em>Security Context Constraints (SCC)</em>.</p>
 
@@ -871,7 +871,7 @@ Please contact us at sysadmin@corporate.com
 
 <p>In the previous section, we verified that the golden image was successfully built. However, there are still a few things that need to be added so that the golden image can be successfully containerized and run on top of our OKD Kubernetes cluster.</p>
 
-<p>First, a worthy package that is suggested to be included in the golden image is <a href="https://cloud-init.io/">cloud-init</a>. KubeVirt allows you to create VM objects along with <a href="https://kubevirt.io/user-guide/docs/latest/creating-virtual-machines/startup-scripts.html#cloud-init">cloud-init</a> configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.</p>
+<p>First, a worthy package that is suggested to be included in the golden image is <a href="https://cloud-init.io/">cloud-init</a>. KubeVirt allows you to create VM objects along with <a href="https://kubevirt.io/user-guide/#/creation/cloud-init?id=startup-scripts">cloud-init</a> configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.</p>
 
 <p>The result will be <strong>two golden images CentOS 8</strong>, both with cloud-init, but one will include a GUI and the other is terminal-based and therefore much lighter.</p>
 
