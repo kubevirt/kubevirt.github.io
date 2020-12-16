@@ -62,8 +62,10 @@ namespace :links do
             :assume_extension   => true,
             :log_level          => :info,
             :external_only      => true,
+            :internal_domains   => ["https://instructor.labs.sysdeseng.com", "https://www.youtube.com"],
             :url_ignore         => [ /http(s)?:\/\/(www.)?katacoda.com.*/ ],
-            :http_status_ignore => [0, 429, 999],
+            :url_swap           => {'https://kubevirt.io/' => '',},
+            :http_status_ignore => [0, 400, 429, 999]
         }
 
         parser = OptionParser.new
@@ -87,7 +89,8 @@ namespace :links do
             :assume_extension   => true,
             :allow_hash_href    => true,
             :log_level          => :info,
-            :disable_external   => true
+            :disable_external   => true,
+            :http_status_ignore => [0, 200, 400, 429, 999]
         }
 
         puts
@@ -120,7 +123,7 @@ namespace :links do
         io = StringIO.new
         $stdout = io
 
-        HTMLProofer.check_directory("./_site/quickstart_minikube", options).run
+        HTMLProofer.check_directory("./_site", options).run
 
         # UNCOMMENT TO enable full output of HTMLProofer
         STDOUT.puts $stdout.string
