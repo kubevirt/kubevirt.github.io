@@ -1,4 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-15T19:22:01+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-16T16:13:48+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.36.0</title><link href="https://kubevirt.io//2020/changelog-v0.36.0.html" rel="alternate" type="text/html" title="KubeVirt v0.36.0" /><published>2020-12-16T00:00:00+00:00</published><updated>2020-12-16T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.36.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.36.0.html">&lt;h2 id=&quot;v0360&quot;&gt;v0.36.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Wed Dec 16 14:30:37 2020 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #4667][kubevirt-bot] Update libvirt base container to be based of packages in rhel-av 8.3&lt;/li&gt;
+  &lt;li&gt;[PR #4634][kubevirt-bot] Failure detection and handling for VM with EFI Insecure Boot in KubeVirt environments where EFI Insecure Boot is not supported by design.&lt;/li&gt;
+  &lt;li&gt;[PR #4647][kubevirt-bot] Re-introduce the CAP_NET_ADMIN, to allow migration of VMs already having it.&lt;/li&gt;
+  &lt;li&gt;[PR #4627][kubevirt-bot] Fix guest agent reporting.&lt;/li&gt;
+  &lt;li&gt;[PR #4458][awels] It is now possible to hotplug DataVolume and PVC volumes into a running Virtual Machine.&lt;/li&gt;
+  &lt;li&gt;[PR #4025][brybacki] Adds a special handling for DataVolumes in WaitForFirstConsumer state to support CDI’s delayed binding mode.&lt;/li&gt;
+  &lt;li&gt;[PR #4217][mfranczy] Set only an IP address for interfaces reported by qemu-guest-agent. Previously that was CIDR.&lt;/li&gt;
+  &lt;li&gt;[PR #4195][davidvossel] AccessCredentials API for dynamic user/password and ssh public key injection&lt;/li&gt;
+  &lt;li&gt;[PR #4335][oshoval] VMI status displays SRIOV interfaces with their network name only when they have originally&lt;/li&gt;
+  &lt;li&gt;[PR #4408][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 6.6.0 and QEMU 5.1.0.&lt;/li&gt;
+  &lt;li&gt;[PR #4514][ArthurSens] &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;domain&lt;/code&gt; label removed from metric &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt_vmi_memory_unused_bytes&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;[PR #4542][danielBelenky] Fix double migration on node evacuation&lt;/li&gt;
+  &lt;li&gt;[PR #4506][maiqueb] Remove CAP_NET_ADMIN from the virt-launcher pod.&lt;/li&gt;
+  &lt;li&gt;[PR #4501][AlonaKaplan] CAP_NET_RAW removed from virt-launcher.&lt;/li&gt;
+  &lt;li&gt;[PR #4488][salanki] Disable Virtio-FS metadata cache to prevent OOM conditions on the host.&lt;/li&gt;
+  &lt;li&gt;[PR #3937][vladikr] Generalize host devices assignment. Provides an interface between kubevirt and external device plugins. Provides a mechanism for whitelisting host devices.&lt;/li&gt;
+  &lt;li&gt;[PR #4443][rmohr] All kubevirt webhooks support now dry-runs.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.36.0</summary></entry><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
 
 &lt;!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true --&gt;
 
@@ -2158,53 +2180,4 @@ because the HCO takes care of that.&lt;/p&gt;
 The others are for processing and reporting to provide VM and disks ready status.&lt;/p&gt;
 
 &lt;h2 id=&quot;future&quot;&gt;Future&lt;/h2&gt;
-&lt;p&gt;For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.&lt;/p&gt;</content><author><name>Ondra Machacek</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="import" /><category term="oVirt" /><summary type="html">About vm-import-operator Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the CDI, so in order to have the vm import working you must have both KubeVirt and CDI installed.</summary></entry><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
-&lt;p&gt;With the latest release (v1.12) of
-&lt;a href=&quot;https://minikube.sigs.k8s.io/docs/&quot;&gt;minikube&lt;/a&gt; we can now deploy KubeVirt with
-a one-liner.&lt;/p&gt;
-
-&lt;h2 id=&quot;deploy-minikube&quot;&gt;Deploy minikube&lt;/h2&gt;
-&lt;ol&gt;
-  &lt;li&gt;Start minikube.  Since my host is Fedora 32 I will use --driver=kvm2 and
-  I will also use --container-runtime=crio&lt;br /&gt;
-    &lt;code&gt;minikube start --driver=kvm2 --container-runtime=cri-o&lt;/code&gt;
-    &lt;br /&gt;
-    &lt;div class=&quot;zoom&quot;&gt;
-      &lt;img src=&quot;/assets/2020-07-20-Minikube_KubeVirt_Addon/1.png&quot; width=&quot;115&quot; height=&quot;72&quot; itemprop=&quot;thumbnail&quot; alt=&quot;minikube start&quot; /&gt;
-    &lt;/div&gt;
-    &lt;br /&gt;&lt;br /&gt;
-  &lt;/li&gt;&lt;li&gt;Check that kubectl client is working correctly&lt;br /&gt;
-    &lt;code&gt;kubectl cluster-info&lt;/code&gt;
-    &lt;br /&gt;
-    &lt;div class=&quot;zoom&quot;&gt;
-      &lt;img src=&quot;/assets/2020-07-20-Minikube_KubeVirt_Addon/2.png&quot; width=&quot;115&quot; height=&quot;11&quot; itemprop=&quot;thumbnail&quot; alt=&quot;kubectl cluster-info&quot; /&gt;
-    &lt;/div&gt;
-    &lt;br /&gt;&lt;br /&gt;
-  &lt;/li&gt;&lt;li&gt;Enable the minikube kubevirt addon&lt;br /&gt;
-    &lt;code&gt;minikube addons enable kubevirt&lt;/code&gt;
-    &lt;br /&gt;
-    &lt;div class=&quot;zoom&quot;&gt;
-      &lt;img src=&quot;/assets/2020-07-20-Minikube_KubeVirt_Addon/3.png&quot; width=&quot;115&quot; height=&quot;10&quot; itemprop=&quot;thumbnail&quot; alt=&quot;minikube addons enable kubevirt&quot; /&gt;
-    &lt;/div&gt;
-    &lt;br /&gt;&lt;br /&gt;
-  &lt;/li&gt;&lt;li&gt;Verify KubeVirt components have been deployed to the kubevirt namespace&lt;br /&gt;
-    &lt;code&gt;kubectl get ns; kubectl get all -n kubevirt&lt;/code&gt;
-    &lt;br /&gt;
-    &lt;div class=&quot;zoom&quot;&gt;
-      &lt;img src=&quot;/assets/2020-07-20-Minikube_KubeVirt_Addon/4.png&quot; width=&quot;115&quot; height=&quot;77&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Verify KubeVirt namespace and components&quot; /&gt;
-    &lt;/div&gt;
-  &lt;br /&gt;&lt;br /&gt;
-  &lt;/li&gt;
-&lt;/ol&gt;
-
-&lt;h3 id=&quot;success&quot;&gt;SUCCESS!&lt;/h3&gt;
-
-&lt;p&gt;From here a user can proceed on to the
-&lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
-
-&lt;p&gt;As you can see it is now much easier to deploy KubeVirt in a minikube
-Kubernetes environment.&lt;/p&gt;
-
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="minikube" /><category term="addons" /><summary type="html">Deploying KubeVirt has just gotten easier! With the latest release (v1.12) of minikube we can now deploy KubeVirt with a one-liner.</summary></entry></feed>
+&lt;p&gt;For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.&lt;/p&gt;</content><author><name>Ondra Machacek</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="import" /><category term="oVirt" /><summary type="html">About vm-import-operator Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the CDI, so in order to have the vm import working you must have both KubeVirt and CDI installed.</summary></entry></feed>

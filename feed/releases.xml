@@ -1,4 +1,26 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-15T19:22:01+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.35.0</title><link href="https://kubevirt.io//2020/changelog-v0.35.0.html" rel="alternate" type="text/html" title="KubeVirt v0.35.0" /><published>2020-11-09T00:00:00+00:00</published><updated>2020-11-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.35.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.35.0.html">&lt;h2 id=&quot;v0350&quot;&gt;v0.35.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2020-12-16T16:13:48+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.36.0</title><link href="https://kubevirt.io//2020/changelog-v0.36.0.html" rel="alternate" type="text/html" title="KubeVirt v0.36.0" /><published>2020-12-16T00:00:00+00:00</published><updated>2020-12-16T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.36.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.36.0.html">&lt;h2 id=&quot;v0360&quot;&gt;v0.36.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Wed Dec 16 14:30:37 2020 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #4667][kubevirt-bot] Update libvirt base container to be based of packages in rhel-av 8.3&lt;/li&gt;
+  &lt;li&gt;[PR #4634][kubevirt-bot] Failure detection and handling for VM with EFI Insecure Boot in KubeVirt environments where EFI Insecure Boot is not supported by design.&lt;/li&gt;
+  &lt;li&gt;[PR #4647][kubevirt-bot] Re-introduce the CAP_NET_ADMIN, to allow migration of VMs already having it.&lt;/li&gt;
+  &lt;li&gt;[PR #4627][kubevirt-bot] Fix guest agent reporting.&lt;/li&gt;
+  &lt;li&gt;[PR #4458][awels] It is now possible to hotplug DataVolume and PVC volumes into a running Virtual Machine.&lt;/li&gt;
+  &lt;li&gt;[PR #4025][brybacki] Adds a special handling for DataVolumes in WaitForFirstConsumer state to support CDI’s delayed binding mode.&lt;/li&gt;
+  &lt;li&gt;[PR #4217][mfranczy] Set only an IP address for interfaces reported by qemu-guest-agent. Previously that was CIDR.&lt;/li&gt;
+  &lt;li&gt;[PR #4195][davidvossel] AccessCredentials API for dynamic user/password and ssh public key injection&lt;/li&gt;
+  &lt;li&gt;[PR #4335][oshoval] VMI status displays SRIOV interfaces with their network name only when they have originally&lt;/li&gt;
+  &lt;li&gt;[PR #4408][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 6.6.0 and QEMU 5.1.0.&lt;/li&gt;
+  &lt;li&gt;[PR #4514][ArthurSens] &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;domain&lt;/code&gt; label removed from metric &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt_vmi_memory_unused_bytes&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;[PR #4542][danielBelenky] Fix double migration on node evacuation&lt;/li&gt;
+  &lt;li&gt;[PR #4506][maiqueb] Remove CAP_NET_ADMIN from the virt-launcher pod.&lt;/li&gt;
+  &lt;li&gt;[PR #4501][AlonaKaplan] CAP_NET_RAW removed from virt-launcher.&lt;/li&gt;
+  &lt;li&gt;[PR #4488][salanki] Disable Virtio-FS metadata cache to prevent OOM conditions on the host.&lt;/li&gt;
+  &lt;li&gt;[PR #3937][vladikr] Generalize host devices assignment. Provides an interface between kubevirt and external device plugins. Provides a mechanism for whitelisting host devices.&lt;/li&gt;
+  &lt;li&gt;[PR #4443][rmohr] All kubevirt webhooks support now dry-runs.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.36.0</summary></entry><entry><title type="html">KubeVirt v0.35.0</title><link href="https://kubevirt.io//2020/changelog-v0.35.0.html" rel="alternate" type="text/html" title="KubeVirt v0.35.0" /><published>2020-11-09T00:00:00+00:00</published><updated>2020-11-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.35.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.35.0.html">&lt;h2 id=&quot;v0350&quot;&gt;v0.35.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Nov 9 13:08:27 2020 +0000&lt;/p&gt;
 
@@ -177,19 +199,4 @@
   &lt;li&gt;Support for different uninstallStaretgies for data protection&lt;/li&gt;
   &lt;li&gt;Fix to let qemu run in the qemu group&lt;/li&gt;
   &lt;li&gt;Fix guest agen connectivity check after i.e. live migrations&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.27.0</summary></entry><entry><title type="html">KubeVirt v0.26.0</title><link href="https://kubevirt.io//2020/changelog-v0.26.0.html" rel="alternate" type="text/html" title="KubeVirt v0.26.0" /><published>2020-02-07T00:00:00+00:00</published><updated>2020-02-07T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.26.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.26.0.html">&lt;h2 id=&quot;v0260&quot;&gt;v0.26.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Fri Feb 7 09:40:07 2020 +0100&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Fix incorrect ownerReferences to avoid VMs getting GCed&lt;/li&gt;
-  &lt;li&gt;Fixes for several tests&lt;/li&gt;
-  &lt;li&gt;Fix greedy permissions around Secrets by delegating them to kubelet&lt;/li&gt;
-  &lt;li&gt;Fix OOM infra pod by increasing it’s memory request&lt;/li&gt;
-  &lt;li&gt;Clarify device support around live migrations&lt;/li&gt;
-  &lt;li&gt;Support for an uninstall strategy to protect workloads during uninstallation&lt;/li&gt;
-  &lt;li&gt;Support for more prometheus metrics and alert rules&lt;/li&gt;
-  &lt;li&gt;Support for testing SRIOV connectivity in functional tests&lt;/li&gt;
-  &lt;li&gt;Update Kubernetes client-go to 1.16.4&lt;/li&gt;
-  &lt;li&gt;FOSSA fixes and status&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.26.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.27.0</summary></entry></feed>
