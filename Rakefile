@@ -123,7 +123,7 @@ namespace :links do
         io = StringIO.new
         $stdout = io
 
-        HTMLProofer.check_directory("./_site/quickstart_minikube", options).run
+        HTMLProofer.check_directory("./_site", options).run
 
         # UNCOMMENT TO enable full output of HTMLProofer
         STDOUT.puts $stdout.string
