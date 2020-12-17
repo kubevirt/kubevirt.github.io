@@ -2,8 +2,8 @@
 layout: labs
 title: KubeVirt quickstart with kind
 permalink: /quickstart_kind/
-redirect_from: "/get_kubevirt/"
 navbar_active: Labs
+redirect_from: "/get_kubevirt/"
 order: 2
 lab: kind
 tags:
