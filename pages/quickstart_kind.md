@@ -46,7 +46,7 @@ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSI
 ```
 
   > warning "Nested virtualization"
-  > If the minikube cluster runs on a virtual machine consider enabling nested virtualization.  Follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="\_blank"}.
+  > If the kind cluster runs on a virtual machine consider enabling nested virtualization.  Follow the instructions described [here](https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html){:target="\_blank"}.
   >
   > If for any reason nested virtualization cannot be enabled do enable KubeVirt emulation as follows:
   >```bash
