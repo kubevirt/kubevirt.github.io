@@ -549,6 +549,10 @@
 <lastmod>2020-12-16T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2021/KubeVirt-Summit-announce.html</loc>
+<lastmod>2021-01-12T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1251,6 +1255,9 @@
 <loc>https://kubevirt.io//tag/monitoring.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//tag/event.html</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
 </url>
 <url>
@@ -1327,5 +1334,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page27/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page28/</loc>
 </url>
 </urlset>
