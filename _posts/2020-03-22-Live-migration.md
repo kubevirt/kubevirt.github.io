@@ -61,7 +61,7 @@ metadata:
   name: kubevirt-config
   namespace: kubevirt
   labels:
-  kubevirt.io: ""
+    kubevirt.io: ""
 data:
   feature-gates: "LiveMigration"
 ```
@@ -92,7 +92,7 @@ metadata:
   name: kubevirt-config
   namespace: kubevirt
   labels:
-  kubevirt.io: ""
+    kubevirt.io: ""
 data:
   feature-gates: "LiveMigration"
   migrations: |-
