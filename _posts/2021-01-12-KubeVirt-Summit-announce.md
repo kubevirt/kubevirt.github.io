@@ -37,6 +37,8 @@ session, and submit your proposal as a Pull Request.
 
 ## Keep up to date
 
+The event has a landing page [here]({% link pages/summit.md %}).
+
 More details will be shared as they become available, here in the website and also on our [mailing list](https://groups.google.com/forum/#!forum/kubevirt-dev), [twitter](https://twitter.com/kubevirt) and our [weekly community meetings](https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT).
 
 Reach out through any of these channels to get involved.
