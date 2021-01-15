@@ -44,7 +44,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-01-14 16:13:12 +0000" >
+    <meta property="og:article:published_time" content="2021-01-15 15:34:03 +0000" >
     <meta name="twitter:title" content="KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -308,7 +308,7 @@ var documents = [{
     "title": "KubeVirt Summit is coming!",
     "author" : "Pep Turró Mauri",
     "tags" : "kubevirt, event, community",
-    "body": "Exciting news! The KubeVirt community are in the process of planning the first ever KubeVirt Summit! Save the dates!: The event will take place online during two half-days:  Dates: February 9 and 10, 2021.  Time: 15:00 – 19:00 UTC (10:00–14:00 EST, 16:00–20:00 CET)Proposing topics: We want to encourage anyone who is interested in presenting to submit a topic toour community repohere. Simplycopy thetemplate in that repo directory as a new file, fill in the details pertaining to yoursession, and submit your proposal as a Pull Request. Keep up to date: More details will be shared as they become available, here in the website and also on our mailing list, twitter and our weekly community meetings. Reach out through any of these channels to get involved. Looking forward to meeting you there! "
+    "body": "Exciting news! The KubeVirt community are in the process of planning the first ever KubeVirt Summit! Save the dates!: The event will take place online during two half-days:  Dates: February 9 and 10, 2021.  Time: 15:00 – 19:00 UTC (10:00–14:00 EST, 16:00–20:00 CET)Proposing topics: We want to encourage anyone who is interested in presenting to submit a topic toour community repohere. Simplycopy thetemplate in that repo directory as a new file, fill in the details pertaining to yoursession, and submit your proposal as a Pull Request. Keep up to date: The event has a landing page here. More details will be shared as they become available, here in the website and also on our mailing list, twitter and our weekly community meetings. Reach out through any of these channels to get involved. Looking forward to meeting you there! "
     }, {
     "id": 1,
     "url": "/2020/changelog-v0.36.0.html",
@@ -1445,237 +1445,244 @@ var documents = [{
     "body": " -    {{ page. navbar_active }}       {% include sidebar-blogs. html %}          {% for post in site. posts %}    {% if post. categories contains  releases  %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}       {{ post. description | strip_html | truncatewords:50 }}       {% capture readmorelink %}        {{ post. url | prepend: site. baseurl }}       {% endcapture %}       {% include readmore. html href_link= readmorelink %}         {% endif %}   {% endfor %}      "
     }, , , {
     "id": 163,
+    "url": "/summit/",
+    "title": "KubeVirt Summit",
+    "author" : "",
+    "tags" : "",
+    "body": " - The KubeVirt community will hold its first ever dedicated online event about allthings KubeVirt. The KubeVirt Summit is a 2-day virtual event to discover,discuss, hack and learn about managing virtual machines in Kubernetes usingKubeVirt. Everyone with an interest in KubeVirt is welcome to join, usersand contributors alike. Looking forward to meeting you there! Save the Date!: The event will take place online during two half-days:  Dates: February 9 and 10, 2021.  Time: 15:00 – 19:00 UTC (10:00–14:00 EST, 16:00–20:00 CET)Call for Proposals: We want to encourage anyone who is interested in presenting or discussing atopic to submit a session proposal. There are two main content tracks, users and contributors, to differentiate the expected audience for each session. Submit a topic by creating a Pull Request toour community repoproposals directory:  Copy thetemplatein that repo directory as a new file.  Edit your proposal and fill in the details pertaining to your session.  Submit your proposal as a Pull Request. The deadline for proposals to be accepted is Friday January 22nd. Logistics: This page will be updated as more details become available (registrations,online platform access details, conference detailed schedule). Sponsors: The KubeVirt Summit will be sponsored by Red Hat. "
+    }, {
+    "id": 164,
     "url": "/videos/talks",
     "title": "Talks",
     "author" : "",
     "tags" : "",
     "body": " -  {% for item in site. data. videos-talks. list %}            KubeVirt Talks Playlist:          A playlist of the various KubeVirt talks.            {% endfor %}"
     }, {
-    "id": 164,
+    "id": 165,
     "url": "/videos/tech-demos",
     "title": "Tech Demos",
     "author" : "",
     "tags" : "",
     "body": " -             KubeVirt Basic Operations demo:          Basic operations to run KubeVirt from a beginner point of view.                       KubeVirt Tech Demos Playlist:          A playlist of KubeVirt tech demos.           "
     }, {
-    "id": 165,
+    "id": 166,
     "url": "/category/uncategorized.html",
     "title": "Uncategorized",
     "author" : "",
     "tags" : "",
     "body": " - "
     }, {
-    "id": 166,
+    "id": 167,
     "url": "/blogs/uncategorized",
     "title": "Uncategorized",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. navbar_active }}       {% include sidebar-blogs. html %}          {% for post in site. posts %}    {% if post. categories contains  uncategorized  %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}       {{ post. description | strip_html | truncatewords:50 }}       {% capture readmorelink %}        {{ post. url | prepend: site. baseurl }}       {% endcapture %}       {% include readmore. html href_link= readmorelink %}         {% endif %}   {% endfor %}      "
     }, {
-    "id": 167,
+    "id": 168,
     "url": "/blogs/updates",
     "title": "Weekly Updates",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. navbar_active }}       {% include sidebar-blogs. html %}          {% for post in site. posts %}    {% if post. categories contains  updates  %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}       {{ post. description | strip_html | truncatewords:50 }}       {% capture readmorelink %}        {{ post. url | prepend: site. baseurl }}       {% endcapture %}       {% include readmore. html href_link= readmorelink %}         {% endif %}   {% endfor %}      "
     }, {
-    "id": 168,
+    "id": 169,
     "url": "/videos/",
     "title": "Videos",
     "author" : "",
     "tags" : "",
     "body": " -     "
     }, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , {
-    "id": 169,
+    "id": 170,
     "url": "/category/weekly-updates.html",
     "title": "Weekly Updates",
     "author" : "",
     "tags" : "",
     "body": " - "
     }, , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , , {
-    "id": 170,
+    "id": 171,
     "url": "/blogs/page2/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 171,
+    "id": 172,
     "url": "/blogs/page3/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 172,
+    "id": 173,
     "url": "/blogs/page4/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 173,
+    "id": 174,
     "url": "/blogs/page5/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 174,
+    "id": 175,
     "url": "/blogs/page6/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 175,
+    "id": 176,
     "url": "/blogs/page7/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 176,
+    "id": 177,
     "url": "/blogs/page8/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 177,
+    "id": 178,
     "url": "/blogs/page9/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 178,
+    "id": 179,
     "url": "/blogs/page10/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 179,
+    "id": 180,
     "url": "/blogs/page11/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 180,
+    "id": 181,
     "url": "/blogs/page12/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 181,
+    "id": 182,
     "url": "/blogs/page13/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 182,
+    "id": 183,
     "url": "/blogs/page14/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 183,
+    "id": 184,
     "url": "/blogs/page15/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 184,
+    "id": 185,
     "url": "/blogs/page16/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 185,
+    "id": 186,
     "url": "/blogs/page17/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 186,
+    "id": 187,
     "url": "/blogs/page18/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 187,
+    "id": 188,
     "url": "/blogs/page19/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 188,
+    "id": 189,
     "url": "/blogs/page20/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 189,
+    "id": 190,
     "url": "/blogs/page21/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 190,
+    "id": 191,
     "url": "/blogs/page22/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 191,
+    "id": 192,
     "url": "/blogs/page23/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 192,
+    "id": 193,
     "url": "/blogs/page24/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 193,
+    "id": 194,
     "url": "/blogs/page25/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 194,
+    "id": 195,
     "url": "/blogs/page26/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 195,
+    "id": 196,
     "url": "/blogs/page27/",
     "title": "Blogs",
     "author" : "",
     "tags" : "",
     "body": " -    {{ page. title }}       {% if site. data. blogs_toc. toc[0] %}    {% for item in site. data. blogs_toc. toc %}     {% if item. subfolderitems[0] %}           {{ item. title }}:       {% for entry in item. subfolderitems %}               &lt;a href= {{ entry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;         {{ entry. page }}        &lt;/a&gt;        {% if entry. subsubfolderitems[0] %}                    {% for subentry in entry. subsubfolderitems %}                         &lt;a href= {{ subentry. url }}  {% if page. title == entry. page %} class= blogs-navigation--item_link active  {% else %} class= blogs-navigation--item_link  {% endif %}&gt;              {{ subentry. page }}             &lt;/a&gt;                      {% endfor %}                   {% endif %}             {% endfor %}          {% endif %}    {% endfor %}   {% endif %}           {% for post in paginator. posts %}           {{ post. title }}:       {{ post. pub-date }}, {{ post. pub-year }}      {{ post. description | strip_html | truncatewords:50 }}      {% capture readmorelink %}       {{ post. url | prepend: site. baseurl }}      {% endcapture %}      {% include readmore. html %}         {% endfor %}       {% include paging. html %} "
     }, {
-    "id": 196,
+    "id": 197,
     "url": "/blogs/page28/",
     "title": "Blogs",
     "author" : "",
