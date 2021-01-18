@@ -1,4 +1,20 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-01-18T16:19:39+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming!</title><link href="https://kubevirt.io//2021/KubeVirt-Summit-announce.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming!" /><published>2021-01-12T00:00:00+00:00</published><updated>2021-01-12T00:00:00+00:00</updated><id>https://kubevirt.io//2021/KubeVirt-Summit-announce</id><content type="html" xml:base="https://kubevirt.io//2021/KubeVirt-Summit-announce.html">&lt;p&gt;Exciting news! The KubeVirt community are in the process of planning the first ever &lt;strong&gt;KubeVirt Summit&lt;/strong&gt;!&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-01-18T20:49:56+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.37.0</title><link href="https://kubevirt.io//2021/changelog-v0.37.0.html" rel="alternate" type="text/html" title="KubeVirt v0.37.0" /><published>2021-01-18T00:00:00+00:00</published><updated>2021-01-18T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.37.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.37.0.html">&lt;h2 id=&quot;v0370&quot;&gt;v0.37.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Jan 18 17:57:03 2021 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #4654][AlonaKaplan] Introduce virt-launcher DHCPv6 server.&lt;/li&gt;
+  &lt;li&gt;[PR #4669][kwiesmueller] Add nodeSelector to kubevirt components restricting them to run on linux nodes only.&lt;/li&gt;
+  &lt;li&gt;[PR #4648][davidvossel] Update libvirt base container to be based of packages in rhel-av 8.3&lt;/li&gt;
+  &lt;li&gt;[PR #4653][qinqon] Allow configure cloud-init with networkData only.&lt;/li&gt;
+  &lt;li&gt;[PR #4644][ashleyschuett] Operator validation webhook will deny updates to the workloads object of the KubeVirt CR if there are running VMIs&lt;/li&gt;
+  &lt;li&gt;[PR #3349][davidvossel] KubeVirt v1 GA api&lt;/li&gt;
+  &lt;li&gt;[PR #4645][maiqueb] Re-introduce the CAP_NET_ADMIN, to allow migration of VMs already having it.&lt;/li&gt;
+  &lt;li&gt;[PR #4546][yuhaohaoyu] Failure detection and handling for VM with EFI Insecure Boot in KubeVirt environments where EFI Insecure Boot is not supported by design.&lt;/li&gt;
+  &lt;li&gt;[PR #4625][awels] virtctl upload now shows error when specifying access mode of ReadOnlyMany&lt;/li&gt;
+  &lt;li&gt;[PR #4396][xpivarc] KubeVirt is now explainable!&lt;/li&gt;
+  &lt;li&gt;[PR #4517][danielBelenky] Fix guest agent reporting.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.37.0</summary></entry><entry><title type="html">KubeVirt Summit is coming!</title><link href="https://kubevirt.io//2021/KubeVirt-Summit-announce.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming!" /><published>2021-01-12T00:00:00+00:00</published><updated>2021-01-12T00:00:00+00:00</updated><id>https://kubevirt.io//2021/KubeVirt-Summit-announce</id><content type="html" xml:base="https://kubevirt.io//2021/KubeVirt-Summit-announce.html">&lt;p&gt;Exciting news! The KubeVirt community are in the process of planning the first ever &lt;strong&gt;KubeVirt Summit&lt;/strong&gt;!&lt;/p&gt;
 
 &lt;h2 id=&quot;save-the-dates&quot;&gt;Save the dates!&lt;/h2&gt;
 
@@ -2001,26 +2017,4 @@ on a node using a secondary NIC on a VM.&lt;/p&gt;</content><author><name>ellore
   &lt;li&gt;[PR #3923][danielBelenky] Add support to configure QEMU I/O mode for VMIs&lt;/li&gt;
   &lt;li&gt;[PR #3889][rmohr] The status fields for our CRDs are now protected on normal PATCH and PUT operations.The /status subresource is now used where possible for status updates.&lt;/li&gt;
   &lt;li&gt;[PR #3568][xpivarc] Guest swap metrics available&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.33.0</summary></entry><entry><title type="html">KubeVirt v0.32.0</title><link href="https://kubevirt.io//2020/changelog-v0.32.0.html" rel="alternate" type="text/html" title="KubeVirt v0.32.0" /><published>2020-08-11T00:00:00+00:00</published><updated>2020-08-11T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.32.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.32.0.html">&lt;h2 id=&quot;v0320&quot;&gt;v0.32.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Tue Aug 11 19:21:56 2020 +0000&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[PR #3921][vladikr] use correct memory units in libvirt xml&lt;/li&gt;
-  &lt;li&gt;[PR #3893][davidvossel] Adds recurring period that resyncs virt-launcher domains with virt-handler&lt;/li&gt;
-  &lt;li&gt;[PR #3880][sgarbour] Better error message when input parameters are not the expected number of parameters for each argument. Help menu will popup in case the number of parameters is incorrect.&lt;/li&gt;
-  &lt;li&gt;[PR #3785][xpivarc] Vcpu wait metrics available&lt;/li&gt;
-  &lt;li&gt;[PR #3642][vatsalparekh] Add a way to update VMI Status with latest Pod IP for Masquerade bindings&lt;/li&gt;
-  &lt;li&gt;[PR #3636][ArthurSens] Adds kubernetes metadata.labels as VMI metrics’ label&lt;/li&gt;
-  &lt;li&gt;[PR #3825][awels] Virtctl now prints error messages from the response body on upload errors.&lt;/li&gt;
-  &lt;li&gt;[PR #3830][davidvossel] Fixes re-establishing domain notify client connections when domain notify server restarts due to an error event.&lt;/li&gt;
-  &lt;li&gt;[PR #3778][danielBelenky] Do not emit a SyncFailed event if we fail to sync a VMI in a final state&lt;/li&gt;
-  &lt;li&gt;[PR #3803][andreabolognani] Not sure what to write here (see above)&lt;/li&gt;
-  &lt;li&gt;[PR #2694][rmohr] Use native go libraries for selinux to not rely on python-selinux tools like semanage, which are not always present.&lt;/li&gt;
-  &lt;li&gt;[PR #3692][victortoso] QEMU logs can now be fetched from outside the pod&lt;/li&gt;
-  &lt;li&gt;[PR #3738][enp0s3] Restrict creation of VMI if it has labels that are used internally by Kubevirt components.&lt;/li&gt;
-  &lt;li&gt;[PR #3725][danielBelenky] The tests binary is now part of the release and can be consumed from the GitHub release page.&lt;/li&gt;
-  &lt;li&gt;[PR #3684][rmohr] Log if critical devices, like kvm, which virt-handler wants to expose are not present on the node.&lt;/li&gt;
-  &lt;li&gt;[PR #3166][petrkotas] Introduce new virtctl commands:&lt;/li&gt;
-  &lt;li&gt;[PR #3708][andreabolognani] Make qemu work on GCE by pulling in a fix for https://bugzilla.redhat.com/show_bug.cgi?id=1822682&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.32.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.33.0</summary></entry></feed>
