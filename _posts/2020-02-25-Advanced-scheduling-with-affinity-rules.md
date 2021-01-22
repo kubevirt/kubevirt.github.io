@@ -75,7 +75,7 @@ There are some important labels when creating advanced scheduling workflows with
 - _kubernetes.io/os_
 
 > warning "Warning"
-> As it is detailed in the [labels and annotations official documentation](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/), starting in v1.17, label _failure-domain.beta.kubernetes.io/region_ and _failure-domain.beta.kubernetes.io/zone_ are deprecated in favour of **topology.kubernetes.io/region** and **topology kubernetes.io/zone respectively**.
+> As it is detailed in the [labels and annotations official documentation](https://v1-19.docs.kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/), starting in v1.17, label _failure-domain.beta.kubernetes.io/region_ and _failure-domain.beta.kubernetes.io/zone_ are deprecated in favour of **topology.kubernetes.io/region** and **topology kubernetes.io/zone respectively**.
 
 Previous labels are just prepopulated Kubernetes labels that the system uses to denote such a topology domain. In our case, the cluster is running in _Iberia_ **region** across three different **zones**: _scu, bcn and sab_. Therefore, it must be labelled accordingly since advanced scheduling rules are going to be applied:
 
@@ -739,7 +739,7 @@ In this blog post, a real use case has been detailed on how advanced scheduling 
 
 ## References
 
-- [Kubernetes labels and annotations official documentation](https://kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/)]
+- [Kubernetes labels and annotations official documentation](https://v1-19.docs.kubernetes.io/docs/reference/kubernetes-api/labels-annotations-taints/)]
 - [Kubevirt node drain blog post](https://kubevirt.io/2019/NodeDrain-KubeVirt.html)
 - [Kubernetes node affinity documentation](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity).
 - [Kubernetes design proposal for Inter-pod topological affinity and anti-affinity](https://github.com/kubernetes/community/blob/master/contributors/design-proposals/scheduling/podaffinity.md)
