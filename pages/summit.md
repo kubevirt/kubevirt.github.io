@@ -48,4 +48,4 @@ online platform access details, conference detailed schedule).
 
 ## Sponsors
 
-The KubeVirt Summit will be sponsored by Red Hat.
+The KubeVirt Summit is sponsored by the [CNCF](https://cncf.io/)
