@@ -9,15 +9,19 @@ RESET  := $(shell tput -Txterm sgr0)
 
 
 TARGET_MAX_CHAR_NUM=20
+
+
 ## Show help
 help:
+	@echo ''
+	@echo 'Makefile for website jekyll application'
 	@echo ''
 	@echo 'Usage:'
 	@echo '  ${YELLOW}make${RESET} ${GREEN}<target>${RESET}'
 	@echo ''
 	@echo 'Env Variables:'
 	@printf "  ${YELLOW}CONTAINER_ENGINE${RESET}\tSet container engine, [*podman*, docker]\n"
-	@printf "  ${YELLOW}BUILD_ENGINE${RESET}\t\tSet build engine, [*buildah*, docker]\n"
+	@printf "  ${YELLOW}BUILD_ENGINE${RESET}\t\tSet build engine, [*podman*, buildah, docker]\n"
 	@printf "  ${YELLOW}GIT_REPO_DIR${RESET}\t\tSet path to git repos, [*~/git*, /path/to/git/repos]\n"
 	@printf "  ${YELLOW}SELINUX_ENABLED${RESET}\tEnable SELinux on containers, [*False*, True]\n"
 	@echo ''
@@ -35,12 +39,13 @@ help:
 
 envvar:
 ifndef BUILD_ENGINE
-	@$(eval export BUILD_ENGINE=buildah build-using-dockerfile -t)
+	@$(eval export BUILD_ENGINE=podman build . -t)
 else
-	@echo ${BUILD_ENGINE}
-ifeq ($(shell test "$(BUILD_ENGINE)" = "podman" && printf true), true)
+ifeq ($(shell test "${BUILD_ENGINE}" == "podman" || test "${BUILD_ENGINE}" == "podman build . -t" && printf true), true)
+	@$(eval export BUILD_ENGINE=podman build . -t)
+else ifeq ($(shell test "${BUILD_ENGINE}" == "buildah" || test "${BUILD_ENGINE}" == "buildah build-using-dockerfile -t" && printf "true"), true)
 	@$(eval export BUILD_ENGINE=buildah build-using-dockerfile -t)
-else ifeq ($(shell test "$(BUILD_ENGINE)" = "docker" && printf "true"), true)
+else ifeq ($(shell test "${BUILD_ENGINE}" == "docker" || test "${BUILD_ENGINE}" == "docker build . -t" && printf "true"), true)
 	@$(eval export BUILD_ENGINE=docker build . -t)
 else
 	@echo ${BUILD_ENGINE}
@@ -50,6 +55,15 @@ endif
 
 ifndef CONTAINER_ENGINE
 	@$(eval CONTAINER_ENGINE=podman)
+else
+ifeq ($(shell test "$(CONTAINER_ENGINE)" = "podman" && printf true), true)
+	@$(eval export CONTAINER_ENGINE=podman)
+else ifeq ($(shell test "$(CONTAINER_ENGINE)" = "docker" && printf "true"), true)
+	@$(eval export CONTAINER_ENGINE=docker)
+else
+	@echo ${CONTAINER_ENGINE}
+	@echo "Invalid value for CONTAINER_ENGINE ... exiting"
+endif
 endif
 
 ifndef DEBUG
@@ -76,16 +90,17 @@ endif
 	@echo
 
 
-## Check external, internal, userguide links
-check_links_website: | envvar stop_website
-	@echo "${GREEN}Makefile: Check external, internal links${RESET}"
+## Check external, internal links and links/selectors to userguide on website content
+check_links: | envvar stop
+	@echo "${GREEN}Makefile: Check external, internal links on website content${RESET}"
 	${DEBUG}for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c 'bundle install --quiet; rake -- -u'
+	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c 'cd /srv/jekyll; bundle install --quiet; rake -- -u'
 	@echo
-	@echo "${GREEN}Makefile: Check userguide links and userguide selectors${RESET}"
+	@echo "${GREEN}Makefile: Check links and selectors to userguide on website content${RESET}"
 #BEGIN BIG SHELL SCRIPT
 	${DEBUG}export IFS=$$'\n'; \
-	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c 'bundle install --quiet; rake links:userguide_selectors'`; \
+	cd ${GIT_REPO_DIR}/user-guide && make run; \
+	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c 'cd /srv/jekyll; bundle install --quiet; rake links:userguide_selectors'`; \
 	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
 	  echo "$${OUTPUT}"; \
 	  exit 1; \
@@ -100,96 +115,62 @@ check_links_website: | envvar stop_website
 	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
 	    echo; \
 	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/check_selectors.js"; \
+	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/check_selectors.js"; \
 	    echo; \
 	  fi; \
 	done; \
+	cd ${GIT_REPO_DIR}/user-guide && make stop; \
 	if [ "$${RETVAL}" ]; then exit 1; fi; \
 	echo "Complete!"
 #END BIG SHELL SCRIPT
 	@echo
 
 
-## Check spelling on userguide content
-check_spelling_userguide: | envvar stop_userguide
-	@echo "${GREEN}Makefile: Check userguide spelling${RESET}"
+## Check spelling on content
+check_spelling: | envvar stop
+	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
+	@echo "Dictionary file: ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json"
 	${DEBUG}export IFS=$$'\n'; \
-	for i in `cd ${GIT_REPO_DIR}/user-guide && ${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ./docs:/srv/docs:ro${SELINUX_ENABLED} -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json:ro${SELINUX_ENABLED} yaspeller /bin/bash -c 'echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv/docs'`; do \
-		if [[ "$${i}" =~ "✗" ]]; then \
-			export RETVAL=1; \
-		fi; \
-		echo "$${i}"; \
-	done; \
-	if [ "$${RETVAL}" ]; then exit 1; fi; \
-	echo "Complete!"
-
-
-## Check spelling on website content
-check_spelling_website: | envvar stop_website
-	@echo "${GREEN}Makefile: Check website spelling${RESET}"
-	${DEBUG}export IFS=$$'\n'; \
-	for i in `${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json:ro${SELINUX_ENABLED} yaspeller /bin/bash -c 'echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
+		for i in `${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v ${GIT_REPO_DIR}/project-infra/images/yaspeller/.yaspeller.json:/srv/.yaspeller.json:ro${SELINUX_ENABLED} yaspeller /bin/bash -c 'echo; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
 		if [[ "$${i}" =~ "✗" ]]; then \
 			export RETVAL=1; \
 		fi; \
 	  echo "$${i}"; \
 	done; \
-	if [ "$${RETVAL}" ]; then exit 1; fi; \
-	echo "Complete!"
+	if [ "$${RETVAL}" ]; then exit 1; fi && echo && echo "Complete!"
 
 
 ## Build image: casperjs
-build_image_casperjs: | envvar stop_casperjs
+build_image_casperjs: stop_casperjs
 	${DEBUG}$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/casperjs)
 	${DEBUG}$(eval export TAG=localhost/casperjs:latest)
-	${DEBUG}$(MAKE) build
-	@echo
-
-
-## Build image: userguide
-build_image_userguide: | envvar stop_userguide
-	${DEBUG}$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/kubevirt-userguide)
-	${DEBUG}$(eval export TAG=localhost/userguide:latest)
-	${DEBUG}$(MAKE) build
+	${DEBUG}$(MAKE) build_image
 	@echo
 
 
 ## Build image: yaspeller
-build_image_yaspeller: | envvar stop_yaspeller
+build_image_yaspeller: stop_yaspeller
 	${DEBUG}$(eval export DIR=${GIT_REPO_DIR}/project-infra/images/yaspeller)
 	${DEBUG}$(eval export TAG=localhost/yaspeller:latest)
-	${DEBUG}$(MAKE) build
+	${DEBUG}$(MAKE) build_image
 	@echo
 
 
-build:
+build_image: envvar
+	@echo "${GREEN}Makefile: Building image: ${TAG}${RESET}"
 ifeq ($(DIR),)
 	@echo "This is a sourced target!"
 	@echo "Do not run this target directly... exitting!"
 	exit 1
 endif
-	@echo "${GREEN}Makefile: ${TAG}${RESET}" | sed -e 's/-/ /g' -e 's/: build/: Building/g'
 	cd ${DIR} && \
-	${BUILD_ENGINE} rmi ${TAG} || echo -n && \
+	(${CONTAINER_ENGINE} rmi ${TAG} || echo -n) && \
 	${BUILD_ENGINE} ${TAG}
 
 
-## Run website and userguide containers
-run: | envvar run_userguide run_website status
-
-
-## Run userguide image.   App available @ http://0.0.0.0:8000
-run_userguide: | envvar stop_userguide
-	@echo "${GREEN}Makefile: Run userguide image${RESET}"
-	cd ${GIT_REPO_DIR}/user-guide && \
-	for i in site; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done && \
-	${CONTAINER_ENGINE} run -d --name userguide --net=host -v ./:/userguide:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/userguide/site localhost/userguide:latest /bin/bash -c "mkdocs build -f /userguide/mkdocs.yml && mkdocs serve -f /userguide/mkdocs.yml -a 0.0.0.0:8000"
-	@echo
-
-
-## Run website image.  App available @ http://0.0.0.0:4000
-run_website: | envvar stop_website
-	@echo "${GREEN}Makefile: Run website image${RESET}"
+## Run site.  App available @ http://0.0.0.0:4000
+run: | envvar stop
+	@echo "${GREEN}Makefile: Run site${RESET}"
 	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
 	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c "jekyll serve --force_polling --future"
 	@echo
@@ -199,11 +180,14 @@ run_website: | envvar stop_website
 status: | envvar
 	@echo "${GREEN}Makefile: Check image status${RESET}"
 	${CONTAINER_ENGINE} ps
+	@echo
+
+
+## Stop site
+stop: | envvar
+	@echo "${GREEN}Makefile: Stop site${RESET}"
+	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
-
-
-## Stop website and userguide containers
-stop: | envvar stop_website stop_userguide status
 
 
 ## Stop casperjs image
@@ -212,23 +196,8 @@ stop_casperjs: | envvar
 	${CONTAINER_ENGINE} rm -f casperjs 2> /dev/null; echo
 	@echo -n
 
-
-## Stop userguide image
-stop_userguide: | envvar
-	@echo "${GREEN}Makefile: Stop userguide image${RESET}"
-	${CONTAINER_ENGINE} rm -f userguide 2> /dev/null; echo
-	@echo -n
-
-
-## Stop website image
-stop_website: | envvar
-	@echo "${GREEN}Makefile: Stop website image${RESET}"
-	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
-	@echo -n
-
-
 ## Stop yaspeller image
 stop_yaspeller: | envvar
 	@echo "${GREEN}Makefile: Stop yaspeller image${RESET}"
 	${CONTAINER_ENGINE} rm -f yaspeller 2> /dev/null; echo
-	@echo
+	@echo -n
