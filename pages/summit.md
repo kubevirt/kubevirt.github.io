@@ -22,8 +22,8 @@ The event will take place online during two half-days:
   - Dates: **February 9 and 10**, 2021.
   - Time: 14:00 – 19:00 UTC (09:00–14:00 EST, 15:00–20:00 CET)
   
-**NOTE**: the lenght of each day has been extended to 5 hours in order to
-accomodate more content proposals in the schedule.
+**NOTE**: the length of each day has been extended to 5 hours in order to
+accommodate more content proposals in the schedule.
 
 ## Registration
 
