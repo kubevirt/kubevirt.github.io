@@ -20,14 +20,20 @@ Looking forward to meeting you there!
 The event will take place online during two half-days:
 
   - Dates: **February 9 and 10**, 2021.
-  - Time: 15:00 – 19:00 UTC (10:00–14:00 EST, 16:00–20:00 CET)
+  - Time: 14:00 – 19:00 UTC (09:00–14:00 EST, 15:00–20:00 CET**
+  
+**NOTE**: the lenght of each day has been extended to 5 hours (starting 1h
+earlier) in order to accomodate more content proposals in the schedule.
 
-## Logistics
+## Registration
 
-This page will be updated as more details become available (registrations,
-online platform access details, conference detailed schedule).
+Registrations are **now open** for the event! There is no cost for registration.
 
-We are currently working to have a public schedule by the end of January.
+Register now [here](https://community.cncf.io/j/2heck9gd9ykxs/).
+
+## Program
+
+We are currently working to have a public schedule by February 2nd.
 
 ## Sponsors
 
