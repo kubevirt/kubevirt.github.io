@@ -27,9 +27,11 @@ accommodate more content proposals in the schedule.
 
 ## Registration
 
-Registrations are **now open** for the event! There is no cost for registration.
+Registrations are **now open** for the event!
 
-Register now [here](https://community.cncf.io/j/2heck9gd9ykxs/).
+**Register now [here](https://community.cncf.io/e/mj79ss/)**.
+
+There is no cost for registration. A Linux Foundation account is required.
 
 ## Program
 
