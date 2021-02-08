@@ -27,26 +27,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//videos/demos">
+    <link rel="canonical" href="https://kubevirt.io//2021/changelog-v0.38.0.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Demos | KubeVirt.io</title>
+    <title>KubeVirt v0.38.0 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
-    <meta property="og:title" content="Demos | KubeVirt.io">
+    <meta name="description" content="This article provides information about KubeVirt release v0.38.0 changes">
+    <meta name="keywords" content="release notes, changelog" >
+    <meta property="og:title" content="KubeVirt v0.38.0 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//videos/demos" >
+    <meta property="og:url" content="https://kubevirt.io//2021/changelog-v0.38.0.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This article provides information about KubeVirt release v0.38.0 changes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-02-08 16:39:22 +0000" >
-    <meta name="twitter:title" content="Demos | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2021-02-08 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v0.38.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v0.38.0 changes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -77,11 +77,11 @@
       
 
       
-        <li  class="nav-item" >
+        <li  class="nav-item active" >
           <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
         </li>
       
-        <li  class="nav-item active" >
+        <li  class="nav-item" >
           <a class="nav-link text-uppercase" href="/videos/">Videos</a>
         </li>
       
@@ -228,75 +228,115 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container-fluid">
-        <div class="row">
-          <h1 class="page-title pl-3">Videos</h1>
-        </div>
-        <div class="row">
-          <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2">
-            
-  <ul class="video-navigation">
-    <h3>General</h3>
-    
-      <li class="video-navigation--item">
-        <a href="/videos/demos.html"  class="video-navigation--item_link active" >
-          Demos
-        </a>
-      </li>
-    
-      <li class="video-navigation--item">
-        <a href="/videos/talks.html"  class="video-navigation--item_link" >
-          Talks
-        </a>
-      </li>
-    
-      <li class="video-navigation--item">
-        <a href="/videos/tech-demos.html"  class="video-navigation--item_link" >
-          Tech Demos
-        </a>
-      </li>
-    
-  </ul>
-
-  <ul class="video-navigation">
-    <h3>Community</h3>
-    
-      <li class="video-navigation--item">
-        <a href="/videos/community/meetings.html"  class="video-navigation--item_link" >
-          Weekly Meetings
-        </a>
-      </li>
-    
-  </ul>
-
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v0.38.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/changelog">changelog</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: February 8, 2021  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
 
           </div>
-          <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10 videos">
-            <!-- <div class="embed-responsive embed-responsive-16by9 mb-5">
-  <iframe src="https://www.youtube-nocookie.com/embed/0dob7KsJizg?rel=0&amp;controls=0&amp;showinfo=0" allowfullscreen></iframe>
-</div>
+        </header>
+        <article class="post-content">
+          <h2 id="v0380">v0.38.0</h2>
 
-<div class="embed-responsive embed-responsive-16by9 mb-5">
-  <script src="https://asciinema.org/a/182627.js" id="asciicast-182627" async></script>
-</div> -->
+<p>Released on: Mon Feb 8 13:15:32 2021 +0000</p>
 
-<div class="row">
-  <div class="col-6">
-    <figure class="figure">
-      <iframe style="width: 400px; height: 300px;" src="https://www.youtube-nocookie.com/embed/videoseries?list=PLnLpXX8KHIYwRftHCICOTC61WxlyPx55x" frameborder="0" allow="autoplay; encrypted-media" title="KubeVirt Community Weekly Meetings" allowfullscreen=""></iframe>
-      <figcaption class="figure-caption">
-        <h3>KubeVirt Demos Playlist</h3>
-        <p>
-          A playlist of all of the KubeVirt demos.
-        </p>
-      </figcaption>
-    </figure>
+<ul>
+  <li>[PR #4870][qinqon] Bump k8s deps to 0.20.2</li>
+  <li>[PR #4571][yuvalturg] Added os, workflow and flavor labels to the kubevirt_vmi_phase_count metric</li>
+  <li>[PR #4659][salanki] Fixed an issue where non-root users inside a guest could not write to a Virtio-FS mount.</li>
+  <li>[PR #4844][xpivarc] Fixed limits/requests to accept int again</li>
+  <li>[PR #4850][rmohr] virtio-scsi now respects the useTransitionalVirtio flag instead of assigning a virtio version depending on the machine layout</li>
+  <li>[PR #4672][vladikr] allow increasing logging verbosity of infra components in KubeVirt CR</li>
+  <li>[PR #4838][rmohr] Fix an issue where it may not be able to update the KubeVirt CR after creation for up to minutes due to certificate propagation delays</li>
+  <li>[PR #4806][rmohr] Make the mutating webhooks for VMIs and VMs  required to avoid letting entities into the cluster which are not properly defaulted</li>
+  <li>[PR #4779][brybacki] Error messsge on virtctl image-upload to WaitForFirstConsumer DV</li>
+  <li>[PR #4749][davidvossel] KUBEVIRT_CLIENT_GO_SCHEME_REGISTRATION_VERSION env var for specifying exactly what client-go scheme version is registered</li>
+  <li>[PR #4772][jean-edouard] Faster VMI phase transitions thanks to an increased number of VMI watch threads in virt-controller</li>
+  <li>[PR #4730][rmohr] Add spec.domain.devices.useVirtioTransitional boolean to support virtio-transitional for old guests</li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v0.38.0&url=https://www.kubevirt.io/2021/changelog-v0.38.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
   </div>
 </div>
-
-          </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
         </div>
-      </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
     </main>
 
     <footer class="footer" role="footer">
@@ -357,6 +397,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
     <script type="text/javascript">
         if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
             _satellite.pageBottom();
