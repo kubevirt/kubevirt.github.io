@@ -24,9 +24,9 @@ The event will take place online during two half-days (5 hours each day):
 
 ## Registration
 
-Registrations are **now open** for the event!
+Registrations are **now open** for the second day of the event!
 
-**Register now [here](https://community.cncf.io/e/mj79ss/)**.
+**Register now [here](https://community.cncf.io/e/m76vzx/)**.
 
 There is no cost for registration. A Linux Foundation account is required.
 
