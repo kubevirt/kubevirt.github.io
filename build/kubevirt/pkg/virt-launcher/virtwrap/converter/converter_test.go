@@ -189,9 +189,10 @@ var _ = Describe("Converter", func() {
 				},
 			}
 			vmi.Spec.Domain.Features = &v1.Features{
-				APIC: &v1.FeatureAPIC{},
-				SMM:  &v1.FeatureState{},
-				KVM:  &v1.FeatureKVM{Hidden: true},
+				APIC:       &v1.FeatureAPIC{},
+				SMM:        &v1.FeatureState{},
+				KVM:        &v1.FeatureKVM{Hidden: true},
+				Pvspinlock: &v1.FeatureState{Enabled: &_false},
 				Hyperv: &v1.FeatureHyperv{
 					Relaxed:         &v1.FeatureState{Enabled: &_false},
 					VAPIC:           &v1.FeatureState{Enabled: &_true},
@@ -615,6 +616,7 @@ var _ = Describe("Converter", func() {
     <kvm>
       <hidden state="on"></hidden>
     </kvm>
+    <pvspinlock state="off"></pvspinlock>
   </features>
   <cpu mode="host-model">
     <topology sockets="1" cores="1" threads="1"></topology>
@@ -815,6 +817,7 @@ var _ = Describe("Converter", func() {
     <kvm>
       <hidden state="on"></hidden>
     </kvm>
+    <pvspinlock state="off"></pvspinlock>
   </features>
   <cpu mode="host-model">
     <topology sockets="1" cores="1" threads="1"></topology>
@@ -1031,6 +1034,7 @@ var _ = Describe("Converter", func() {
     <kvm>
       <hidden state="on"></hidden>
     </kvm>
+    <pvspinlock state="off"></pvspinlock>
   </features>
   <cpu mode="host-model">
     <topology sockets="1" cores="1" threads="1"></topology>
@@ -2538,7 +2542,7 @@ var _ = Describe("Converter", func() {
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Bus).To(Equal("0x19"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Slot).To(Equal("0x90"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Function).To(Equal("0x0"))
-			Expect(domain.Spec.Devices.HostDevices[0].Alias.Name).To(Equal("gpu_name"))
+			Expect(domain.Spec.Devices.HostDevices[0].Alias.GetName()).To(Equal("gpu_name"))
 
 		})
 		It("should convert 2 GPU resource request into host devices", func() {
@@ -2565,14 +2569,14 @@ var _ = Describe("Converter", func() {
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Bus).To(Equal("0x19"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Slot).To(Equal("0x90"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Function).To(Equal("0x0"))
-			Expect(domain.Spec.Devices.HostDevices[0].Alias.Name).To(Equal("gpu_name"))
+			Expect(domain.Spec.Devices.HostDevices[0].Alias.GetName()).To(Equal("gpu_name"))
 			Expect(domain.Spec.Devices.HostDevices[1].Type).To(Equal("pci"))
 			Expect(domain.Spec.Devices.HostDevices[1].Managed).To(Equal("yes"))
 			Expect(domain.Spec.Devices.HostDevices[1].Source.Address.Domain).To(Equal("0x2609"))
 			Expect(domain.Spec.Devices.HostDevices[1].Source.Address.Bus).To(Equal("0x19"))
 			Expect(domain.Spec.Devices.HostDevices[1].Source.Address.Slot).To(Equal("0x90"))
 			Expect(domain.Spec.Devices.HostDevices[1].Source.Address.Function).To(Equal("0x1"))
-			Expect(domain.Spec.Devices.HostDevices[1].Alias.Name).To(Equal("gpu_name1"))
+			Expect(domain.Spec.Devices.HostDevices[1].Alias.GetName()).To(Equal("gpu_name1"))
 
 		})
 
@@ -2611,12 +2615,12 @@ var _ = Describe("Converter", func() {
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Bus).To(Equal("0x19"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Slot).To(Equal("0x90"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Function).To(Equal("0x0"))
-			Expect(domain.Spec.Devices.HostDevices[0].Alias.Name).To(Equal("gpu_name"))
+			Expect(domain.Spec.Devices.HostDevices[0].Alias.GetName()).To(Equal("gpu_name"))
 			Expect(domain.Spec.Devices.HostDevices[1].Type).To(Equal("mdev"))
 			Expect(domain.Spec.Devices.HostDevices[1].Source.Address.UUID).To(Equal("aa618089-8b16-4d01-a136-25a0f3c73123"))
 			Expect(domain.Spec.Devices.HostDevices[1].Mode).To(Equal("subsystem"))
 			Expect(domain.Spec.Devices.HostDevices[1].Model).To(Equal("vfio-pci"))
-			Expect(domain.Spec.Devices.HostDevices[1].Alias.Name).To(Equal("vgpu_name1"))
+			Expect(domain.Spec.Devices.HostDevices[1].Alias.GetName()).To(Equal("vgpu_name1"))
 		})
 	})
 
@@ -2669,12 +2673,12 @@ var _ = Describe("Converter", func() {
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Bus).To(Equal("0x19"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Slot).To(Equal("0x90"))
 			Expect(domain.Spec.Devices.HostDevices[0].Source.Address.Function).To(Equal("0x0"))
-			Expect(domain.Spec.Devices.HostDevices[0].Alias.Name).To(Equal("pci_name"))
+			Expect(domain.Spec.Devices.HostDevices[0].Alias.GetName()).To(Equal("pci_name"))
 			Expect(domain.Spec.Devices.HostDevices[1].Type).To(Equal("mdev"))
 			Expect(domain.Spec.Devices.HostDevices[1].Source.Address.UUID).To(Equal("aa618089-8b16-4d01-a136-25a0f3c73123"))
 			Expect(domain.Spec.Devices.HostDevices[1].Mode).To(Equal("subsystem"))
 			Expect(domain.Spec.Devices.HostDevices[1].Model).To(Equal("vfio-pci"))
-			Expect(domain.Spec.Devices.HostDevices[1].Alias.Name).To(Equal("mdev_name"))
+			Expect(domain.Spec.Devices.HostDevices[1].Alias.GetName()).To(Equal("mdev_name"))
 		})
 	})
 
