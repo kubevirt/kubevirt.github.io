@@ -240,6 +240,6 @@ As a briefing on the above data:
 
 ## References
 
-- [Live Migration](https://kubevirt.io/user-guide/#/installation/live-migration?id=live-migration)
-- [Node Drain/Eviction](https://kubevirt.io/user-guide/#/installation/node-eviction?id=how-to-evict-all-vms-on-a-node)
+- [Live Migration](https://kubevirt.io/user-guide/operations/live_migration/)
+- [Node Drain/Eviction](https://kubevirt.io/user-guide/operations/node_maintenance/#evict-all-vms-from-a-node)
 - [Rook](https://rook.io/)

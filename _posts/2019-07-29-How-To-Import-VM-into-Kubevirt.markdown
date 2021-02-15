@@ -28,7 +28,7 @@ In this blog post we will show you how to deploy a VM as a yaml template and the
 
 - User is familiar with the concept of [KubeVirt-architecture](https://github.com/kubevirt/kubevirt/blob/master/docs/architecture.md) and [CDI-architecture](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design)
 
-- User has already installed KubeVirt in an available K8s environment, if not please follow the link [Installing KubeVirt](https://kubevirt.io/user-guide/#/installation/installation?id=installation) to further proceed.
+- User has already installed KubeVirt in an available K8s environment, if not please follow the link [Installing KubeVirt](https://kubevirt.io/user-guide/operations/installation/) to further proceed.
 
 - User is already familiar with VM operation with Kubernetes, for a refresher on how to use 'Virtual Machines' in Kubernetes, please do check [LAB 1]({% link labs/kubernetes/lab1.md %}) before proceeding.
 

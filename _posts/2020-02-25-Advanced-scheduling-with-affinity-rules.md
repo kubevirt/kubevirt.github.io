@@ -21,7 +21,7 @@ pub-date: February 25
 pub-year: 2020
 ---
 
-This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex [affinity and anti-affinity](https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity) rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.
+This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex [affinity and anti-affinity](https://kubevirt.io/user-guide/operations/node_assignment/#affinity-and-anti-affinity) rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.
 
 It is important to notice that from the Kubernetes scheduler stand point, which will be explained later, it only manages Pod and node scheduling. Since the VM is wrapped up in a Pod, the same scheduling rules are completely valid to KubeVirt VMs.
 
@@ -55,7 +55,7 @@ In this example, our mission is to run a customapp that is composed of 3 tiers:
 Instructions were delivered to deploy the application in our production Kubernetes cluster taking advantage of the existing KubeVirt integration and making sure the application is resilient to any problems that can occur. The current status of the cluster is the following:
 
 - A stretched Kubernetes cluster is already up and running.
-- [KubeVirt](https://kubevirt.io/user-guide/#/) is already installed.
+- [KubeVirt](https://kubevirt.io/user-guide) is already installed.
 - There is enough free CPU, Memory and disk space in the cluster to deploy customapp stack.
 
 > info "information"

@@ -23,7 +23,7 @@ You can experiment this lab online at [![Katacoda](/assets/images/katacoda-logo.
 
 ### Create a Virtual Machine
 
-Download the VM manifest and explore it. Note it uses a [registry disk](https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes?id=registrydisk) and as such doesn't persist data. Such registry disks currently exist for alpine, cirros and fedora.
+Download the VM manifest and explore it. Note it uses a [container disk](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk) and as such doesn't persist data. Such container disks currently exist for alpine, cirros and fedora.
 
 ```bash
 {% include scriptlets/lab1/01_get_vm_manifest.sh -%}

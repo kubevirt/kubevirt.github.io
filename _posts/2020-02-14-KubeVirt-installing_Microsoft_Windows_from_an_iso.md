@@ -27,7 +27,7 @@ In this blogpost, we are going to explain how to prepare that VM with the ISO fi
 ## Pre-requisites
 
 - A Kubernetes cluster is already up and running
-- [KubeVirt](https://kubevirt.io/user-guide/#/) and [CDI](https://github.com/kubevirt/containerized-data-importer/blob/master/README.md) are already installed
+- [KubeVirt](https://kubevirt.io/user-guide) and [CDI](https://github.com/kubevirt/containerized-data-importer/blob/master/README.md) are already installed
 - There is enough free CPU, Memory and disk space in the cluster to deploy a Microsoft Windows VM, in this example, the version 2012 R2 VM is going to be used
 
 ## Preparation
@@ -128,7 +128,7 @@ To proceed with the Installation steps the different elements involved are liste
    storageClassName: hostpath
    ```
 
-4. A [container with the virtio drivers](https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers) attached as a CD-ROM to the VM.
+4. A [container with the virtio drivers](https://kubevirt.io/user-guide/virtual_machines/windows_wirtio_drivers/#how-to-obtain-virtio-drivers) attached as a CD-ROM to the VM.
    The container image has to be pulled to have it available in the local registry.
 
    ```sh
@@ -285,7 +285,7 @@ Once the Virtual Machine is created, the PVC with the ISO and the `virtio` drive
 
 ## References
 
-- [KubeVirt user-guide: Virtio Windows Driver disk usage](https://kubevirt.io/user-guide/#/creation/virtio-win)
+- [KubeVirt user-guide: Virtio Windows Driver disk usage](https://kubevirt.io/user-guide/virtual_machines/windows_wirtio_drivers/)
 - [Creating a registry image with a VM disk](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md)
 - [CDI Upload User Guide](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md)
-- [KubeVirt user-guide: How to obtain virtio drivers?](https://kubevirt.io/user-guide/#/creation/virtio-win?id=how-to-obtain-virtio-drivers)
+- [KubeVirt user-guide: How to obtain virtio drivers?](https://kubevirt.io/user-guide/virtual_machines/windows_wirtio_drivers/#how-to-obtain-virtio-drivers)

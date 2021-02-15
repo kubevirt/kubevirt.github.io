@@ -15,7 +15,7 @@ In this video, we are showing the step by step of the [KubeVirt Laboratory 2: Ex
 
 ## Pre-requisites
 
-In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the [KubeVirt installation notes](https://kubevirt.io/user-guide/#/installation/installation) or try it yourself in the [First steps with KubeVirt](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101) Katacoda scenario.
+In the video, there is a Kubernetes cluster together with KubeVirt already running. If you need help for preparing that setup you can check the [KubeVirt installation notes](https://kubevirt.io/user-guide/operations/installation/) or try it yourself in the [First steps with KubeVirt](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101) Katacoda scenario.
 Also, the `virtctl` command is already installed and available in the PATH.
 
 ## Video
@@ -39,5 +39,5 @@ The following operations are shown in the video:
 - [Kubevirt Laboratory 1 blogpost: Use Kubevirt]({% post_url 2019-12-04-KubeVirt_lab1_use_kubevirt %})
 - [Kubevirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})
 - [KubeVirt basic operations video on youtube](https://www.youtube.com/watch?v=KC03G60shIc)
-- [Kubevirt installation notes](https://kubevirt.io/user-guide/#/installation/installation)
+- [Kubevirt installation notes](https://kubevirt.io/user-guide/operations/installation)
 - [First steps with KubeVirt - Katacoda scenario](https://www.katacoda.com/kubevirt/scenarios/kubevirt-101)

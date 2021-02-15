@@ -146,4 +146,4 @@ default
 ## Summary
 
 With these new volume types KubeVirt further improves the integration with native Kubernetes resources.
-Learn more about all available volume types on the [userguide](https://kubevirt.io/user-guide/#/workloads/virtual-machines/disks-and-volumes).
+Learn more about all available volume types on the [userguide](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes).

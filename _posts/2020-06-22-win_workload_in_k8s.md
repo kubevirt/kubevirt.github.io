@@ -40,7 +40,7 @@ Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!</p>
 
 * Host platform: Fedora 32 with latest updates applied
 * Kubernetes cluster created
-* [KubeVirt](https://kubevirt.io/quickstart_minikube/) and [CDI](https://kubevirt.io/user-guide/#/installation/image-upload) installed in the Kubernetes cluster.
+* [KubeVirt](https://kubevirt.io/quickstart_minikube/) and [CDI](https://kubevirt.io/user-guide/operations/containerized_data_importer/) installed in the Kubernetes cluster.
 
 ## Procedure
 
