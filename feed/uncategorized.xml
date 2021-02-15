@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-02-15T16:23:00+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html">&lt;h1 id=&quot;monitoring-kubevirt-vms-from-the-inside&quot;&gt;Monitoring KubeVirt VMs from the inside&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-02-15T20:28:52+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html">&lt;h1 id=&quot;monitoring-kubevirt-vms-from-the-inside&quot;&gt;Monitoring KubeVirt VMs from the inside&lt;/h1&gt;
 
 &lt;p&gt;This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt;. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.&lt;/p&gt;
 
@@ -1838,7 +1838,7 @@ these roles will prevent admins from ever having to create their own custom
 KubeVirt RBAC roles.&lt;/p&gt;
 
 &lt;p&gt;More information about these default roles can be found in the KubeVirt
-user guide &lt;a href=&quot;https://kubevirt.io/user-guide/#/authorization&quot;&gt;here&lt;/a&gt;&lt;/p&gt;</content><author><name>davidvossel</name></author><category term="uncategorized" /><category term="api" /><category term="rbac" /><category term="roles" /><summary type="html">Access to KubeVirt resources are controlled entirely by Kubernete’s Resource Based Access Control (RBAC) system. This system allows KubeVirt to tie directly into the existing authentication and authorization mechanisms Kubernetes already provides to its core api objects.</summary></entry><entry><title type="html">Use Glusterfs Cloning With Kubevirt</title><link href="https://kubevirt.io//2018/Use-GlusterFS-Cloning-with-KubeVirt.html" rel="alternate" type="text/html" title="Use Glusterfs Cloning With Kubevirt" /><published>2018-05-16T00:00:00+00:00</published><updated>2018-05-16T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Use-GlusterFS-Cloning-with-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2018/Use-GlusterFS-Cloning-with-KubeVirt.html">&lt;p&gt;Gluster seems like a good fit for storage in kubernetes and in particular in kubevirt. Still, as for other storage backends, we will likely need to use a golden set of images and deploy vms from them.&lt;/p&gt;
+user guide &lt;a href=&quot;https://kubevirt.io/user-guide/operations/authorization/&quot;&gt;here&lt;/a&gt;&lt;/p&gt;</content><author><name>davidvossel</name></author><category term="uncategorized" /><category term="api" /><category term="rbac" /><category term="roles" /><summary type="html">Access to KubeVirt resources are controlled entirely by Kubernete’s Resource Based Access Control (RBAC) system. This system allows KubeVirt to tie directly into the existing authentication and authorization mechanisms Kubernetes already provides to its core api objects.</summary></entry><entry><title type="html">Use Glusterfs Cloning With Kubevirt</title><link href="https://kubevirt.io//2018/Use-GlusterFS-Cloning-with-KubeVirt.html" rel="alternate" type="text/html" title="Use Glusterfs Cloning With Kubevirt" /><published>2018-05-16T00:00:00+00:00</published><updated>2018-05-16T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Use-GlusterFS-Cloning-with-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2018/Use-GlusterFS-Cloning-with-KubeVirt.html">&lt;p&gt;Gluster seems like a good fit for storage in kubernetes and in particular in kubevirt. Still, as for other storage backends, we will likely need to use a golden set of images and deploy vms from them.&lt;/p&gt;
 
 &lt;p&gt;That’s where cloning feature of gluster comes at rescue!&lt;/p&gt;
 
@@ -2153,7 +2153,7 @@ compile information for this post:&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_domainspec&quot;&gt;DomainSpec&lt;/a&gt; is listed as a top-level object but is only used within all of the objects above. Currently the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DomainSpec&lt;/code&gt; is a subset of what is configurable via &lt;a href=&quot;https://libvirt.org/formatdomain.html&quot;&gt;libvirt domain XML&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_domainspec&quot;&gt;DomainSpec&lt;/a&gt; is listed as a top-level object but is only used within all of the objects above. Currently the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;DomainSpec&lt;/code&gt; is a subset of what is configurable via &lt;a href=&quot;https://libvirt.org/formatdomain.html&quot;&gt;libvirt domain XML&lt;/a&gt;.&lt;/p&gt;
 
 &lt;h2 id=&quot;virtualmachine&quot;&gt;VirtualMachine&lt;/h2&gt;
 
@@ -2214,7 +2214,7 @@ kind: VirtualMachine
 
 &lt;p&gt;Kubernetes has the ability to schedule a pod to specific nodes based on &lt;a href=&quot;https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#node-affinity-beta-feature&quot;&gt;affinity and anti-affinity&lt;/a&gt; rules.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_nodeaffinity&quot;&gt;Node affinity&lt;/a&gt; is also possible with KubeVirt. To &lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/node-placement?id=affinity-and-anti-affinity&quot;&gt;constrain a virtual machine&lt;/a&gt; to run on a node define a matching expressions using node labels.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_nodeaffinity&quot;&gt;Node affinity&lt;/a&gt; is also possible with KubeVirt. To &lt;a href=&quot;hhttps://kubevirt.io/user-guide/operations/node_assignment/#affinity-and-anti-affinity&quot;&gt;constrain a virtual machine&lt;/a&gt; to run on a node define a matching expressions using node labels.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;affinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;nodeAffinity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2235,7 +2235,7 @@ kind: VirtualMachine
                 &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;A virtual machine can also more easily be constrained by using &lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/node-placement?id=nodeselector&quot;&gt;nodeSelector&lt;/a&gt; which is defined by node’s label and value. Here is an example&lt;/p&gt;
+&lt;p&gt;A virtual machine can also more easily be constrained by using &lt;a href=&quot;https://kubevirt.io/user-guide/operations/node_assignment/#nodeselector&quot;&gt;nodeSelector&lt;/a&gt; which is defined by node’s label and value. Here is an example&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kn1.virtomation.com&lt;/span&gt;
@@ -2243,7 +2243,7 @@ kind: VirtualMachine
 
 &lt;h3 id=&quot;clocks-and-timers&quot;&gt;Clocks and Timers&lt;/h3&gt;
 
-&lt;p&gt;Configures the &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/devices?id=clock&quot;&gt;virtualize hardware&lt;/a&gt; clock provided by &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-9&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;Configures the &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_hardware/#clock&quot;&gt;virtualize hardware&lt;/a&gt; clock provided by &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-9&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;clock&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2252,7 +2252,7 @@ kind: VirtualMachine
       &lt;span class=&quot;na&quot;&gt;offsetSeconds&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The &lt;a href=&quot;http://kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=timers&quot;&gt;timer&lt;/a&gt; defines the &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsTime&quot;&gt;type and policy attribute&lt;/a&gt; that determines what action is take when QEMU misses a deadline for injecting a tick to the guest.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_hardware/#timers&quot;&gt;timer&lt;/a&gt; defines the &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsTime&quot;&gt;type and policy attribute&lt;/a&gt; that determines what action is take when QEMU misses a deadline for injecting a tick to the guest.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;clock&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2275,13 +2275,13 @@ kind: VirtualMachine
 
 &lt;h3 id=&quot;cpu-and-memory&quot;&gt;CPU and Memory&lt;/h3&gt;
 
-&lt;p&gt;The number of &lt;a href=&quot;http://kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=cpu&quot;&gt;CPU cores&lt;/a&gt; a virtual machine will be assigned. &lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_cpu&quot;&gt;.spec.domain.cpu.cores&lt;/a&gt; will not be used for scheduling use &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_resourcerequirements&quot;&gt;.spec.domain.resources.requests.cpu&lt;/a&gt; instead.&lt;/p&gt;
+&lt;p&gt;The number of &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_hardware/#cpu&quot;&gt;CPU cores&lt;/a&gt; a virtual machine will be assigned. &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_cpu&quot;&gt;.spec.domain.cpu.cores&lt;/a&gt; will not be used for scheduling use &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_resourcerequirements&quot;&gt;.spec.domain.resources.requests.cpu&lt;/a&gt; instead.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;There are two supported &lt;a href=&quot;http://kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=resources-requests-and-limits&quot;&gt;resource limits and requests&lt;/a&gt;: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cpu&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;memory&lt;/code&gt;. A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.spec.domain.resources.requests.memory&lt;/code&gt; should be defined to determine the allocation of memory provided to the virtual machine. These values will be used to in scheduling decisions.&lt;/p&gt;
+&lt;p&gt;There are two supported &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_hardware/#resources-requests-and-limits&quot;&gt;resource limits and requests&lt;/a&gt;: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cpu&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;memory&lt;/code&gt;. A &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.spec.domain.resources.requests.memory&lt;/code&gt; should be defined to determine the allocation of memory provided to the virtual machine. These values will be used to in scheduling decisions.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;limits&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
@@ -2290,7 +2290,7 @@ kind: VirtualMachine
 
 &lt;h3 id=&quot;watchdog-devices&quot;&gt;Watchdog Devices&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_watchdog&quot;&gt;.spec.domain.watchdog&lt;/a&gt; automatically triggers an action via &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsWatchdog&quot;&gt;Libvirt&lt;/a&gt; and &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-9&quot;&gt;QEMU&lt;/a&gt; when the virtual machine operating system hangs or crashes.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_watchdog&quot;&gt;.spec.domain.watchdog&lt;/a&gt; automatically triggers an action via &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsWatchdog&quot;&gt;Libvirt&lt;/a&gt; and &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-9&quot;&gt;QEMU&lt;/a&gt; when the virtual machine operating system hangs or crashes.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;watchdog&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;i6300esb&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2300,14 +2300,14 @@ kind: VirtualMachine
 
 &lt;h3 id=&quot;features&quot;&gt;Features&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_features&quot;&gt;.spec.domain.features&lt;/a&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_features&quot;&gt;.spec.domain.features&lt;/a&gt;
 are hypervisor cpu or machine features that can be enabled.
 After reviewing both Linux and Microsoft QEMU virtual machines managed by
 &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsFeatures&quot;&gt;Libvirt&lt;/a&gt;
 both acpi and
-&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_featureapic&quot;&gt;apic&lt;/a&gt;
+&lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_featureapic&quot;&gt;apic&lt;/a&gt;
 should be enabled.
-The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_featurehyperv&quot;&gt;hyperv&lt;/a&gt; features should be enabled only for Windows-based virtual machines. For additional information regarding features please visit the &lt;a href=&quot;http://kubevirt.io/user-guide/#/workloads/virtual-machines/virtualized-hardware-configuration?id=features&quot;&gt;virtual hardware configuration&lt;/a&gt; in the kubevirt user guide.&lt;/p&gt;
+The &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_featurehyperv&quot;&gt;hyperv&lt;/a&gt; features should be enabled only for Windows-based virtual machines. For additional information regarding features please visit the &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_hardware/#features&quot;&gt;virtual hardware configuration&lt;/a&gt; in the kubevirt user guide.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;features&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;acpi&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2340,7 +2340,7 @@ The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v
 
 &lt;h3 id=&quot;qemu-machine-type&quot;&gt;QEMU Machine Type&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/devices?id=machine-type&quot;&gt;.spec.domain.machine.type&lt;/a&gt; is the emulated machine architecture provided by &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-0&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_hardware/#machine-type&quot;&gt;.spec.domain.machine.type&lt;/a&gt; is the emulated machine architecture provided by &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-0&quot;&gt;QEMU&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;machine&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
@@ -2360,7 +2360,7 @@ The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v
 
 &lt;h3 id=&quot;disks-and-volumes&quot;&gt;Disks and Volumes&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_disk&quot;&gt;.spec.domain.devices.disks&lt;/a&gt; configures a &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-1&quot;&gt;QEMU&lt;/a&gt; type of &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsDisks&quot;&gt;disk&lt;/a&gt; to the virtual machine and assigns a specific &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes&quot;&gt;volume and its type to that disk&lt;/a&gt; via the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;volumeName&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/api-reference/master/definitions.html#_v1_disk&quot;&gt;.spec.domain.devices.disks&lt;/a&gt; configures a &lt;a href=&quot;https://www.qemu.org/docs/master/system/invocation.html#hxtool-1&quot;&gt;QEMU&lt;/a&gt; type of &lt;a href=&quot;https://libvirt.org/formatdomain.html#elementsDisks&quot;&gt;disk&lt;/a&gt; to the virtual machine and assigns a specific &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk&quot;&gt;volume and its type to that disk&lt;/a&gt; via the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;volumeName&lt;/code&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2381,12 +2381,12 @@ The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v
       &lt;span class=&quot;na&quot;&gt;volumeName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_cloudinitnocloudsource&quot;&gt;cloudInitNoCloud&lt;/a&gt;
+&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_cloudinitnocloudsource&quot;&gt;cloudInitNoCloud&lt;/a&gt;
 injects scripts and configuration into a virtual machine operating system.
 There are three different parameters that can be used to provide the
 cloud-init coniguration: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;secretRef&lt;/code&gt;, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;userData&lt;/code&gt; or &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;userDataBase64&lt;/code&gt;.&lt;/p&gt;
 
-&lt;p&gt;See the user-guide for examples of how to use &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/cloud-init?id=cloud-init-examples&quot;&gt;.spec.volumes.cloudInitNoCloud&lt;/a&gt;.&lt;/p&gt;
+&lt;p&gt;See the user-guide for examples of how to use &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/startup_scripts/#cloud-init-examples&quot;&gt;.spec.volumes.cloudInitNoCloud&lt;/a&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;cloudInitNoCloud&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2396,13 +2396,13 @@ cloud-init coniguration: &lt;code class=&quot;language-plaintext highlighter-rou
       &lt;span class=&quot;na&quot;&gt;userDataBase64&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;An &lt;a href=&quot;http://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=emptydisk&quot;&gt;emptyDisk volume&lt;/a&gt; creates an extra qcow2 disk that is created with the virtual machine. It will be removed if the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; object is deleted.&lt;/p&gt;
+&lt;p&gt;An &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#emptydisk&quot;&gt;emptyDisk volume&lt;/a&gt; creates an extra qcow2 disk that is created with the virtual machine. It will be removed if the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; object is deleted.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;emptyDisk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href=&quot;http://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral&quot;&gt;Ephemeral volume&lt;/a&gt; creates a temporary local copy on write image storage that will be discarded when the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; is removed.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#ephemeral&quot;&gt;Ephemeral volume&lt;/a&gt; creates a temporary local copy on write image storage that will be discarded when the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; is removed.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;ephemeral&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2411,14 +2411,14 @@ cloud-init coniguration: &lt;code class=&quot;language-plaintext highlighter-rou
 &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=persistentvolumeclaim&quot;&gt;persistentVolumeClaim volume&lt;/a&gt; persists after the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; is deleted.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#persistentvolumeclaim&quot;&gt;persistentVolumeClaim volume&lt;/a&gt; persists after the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; is deleted.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;persistentVolumeClaim&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;claimName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;readOnly&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=containerdisk&quot;&gt;registryDisk volume&lt;/a&gt; type uses a virtual machine disk that is stored in a container image registry.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk&quot;&gt;registryDisk volume&lt;/a&gt; type uses a virtual machine disk that is stored in a container image registry.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;registryDisk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
@@ -2427,7 +2427,7 @@ cloud-init coniguration: &lt;code class=&quot;language-plaintext highlighter-rou
 
 &lt;h3 id=&quot;virtual-machine-status&quot;&gt;Virtual Machine Status&lt;/h3&gt;
 
-&lt;p&gt;Once the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; object has been created the &lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_virtualmachinestatus&quot;&gt;VirtualMachineStatus&lt;/a&gt; will be available. &lt;a href=&quot;http://kubevirt.io/api-reference/v0.4.1/definitions.html#_v1_virtualmachinestatus&quot;&gt;VirtualMachineStatus&lt;/a&gt; can be used in automation tools such as Ansible to confirm running state, determine where a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; is running via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeName&lt;/code&gt; or the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipAddress&lt;/code&gt; of the virtual machine operating system.&lt;/p&gt;
+&lt;p&gt;Once the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; object has been created the &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_virtualmachinestatus&quot;&gt;VirtualMachineStatus&lt;/a&gt; will be available. &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_virtualmachinestatus&quot;&gt;VirtualMachineStatus&lt;/a&gt; can be used in automation tools such as Ansible to confirm running state, determine where a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; is running via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;nodeName&lt;/code&gt; or the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ipAddress&lt;/code&gt; of the virtual machine operating system.&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl -o yaml get vm mongodb -n nodejs-ex
 
@@ -2448,7 +2448,7 @@ Running
 &lt;h3 id=&quot;examples&quot;&gt;Examples&lt;/h3&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/creating-virtual-machines?id=virtualmachineinstance-api&quot;&gt;https://kubevirt.io/user-guide/#/creation/creating-virtual-machines?id=virtualmachineinstance-api&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/virtual_machine_instances/#virtualmachineinstance-api&quot;&gt;https://kubevirt.io/user-guide/virtual_machines/virtual_machine_instances/#virtualmachineinstance-api&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;offlinevirtualmachine&quot;&gt;OfflineVirtualMachine&lt;/h2&gt;
@@ -2490,7 +2490,7 @@ metadata:
 
 &lt;h3 id=&quot;what-is-running-in-offlinevirtualmachine&quot;&gt;What is Running in OfflineVirtualMachine?&lt;/h3&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_offlinevirtualmachinespec&quot;&gt;.spec.running&lt;/a&gt; controls whether the associated VirtualMachine object is created. In other words this changes the &lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/life-cycle?id=stopping-a-virtual-machine&quot;&gt;power status&lt;/a&gt; of the virtual machine.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/api-reference/master/definitions.html#_v1_offlinevirtualmachinespec&quot;&gt;.spec.running&lt;/a&gt; controls whether the associated VirtualMachine object is created. In other words this changes the &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine&quot;&gt;power status&lt;/a&gt; of the virtual machine.&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  running: true
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
@@ -2515,7 +2515,7 @@ a guest.&lt;/p&gt;
 
 &lt;h3 id=&quot;offline-virtual-machine-status&quot;&gt;Offline Virtual Machine Status&lt;/h3&gt;
 
-&lt;p&gt;Once the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;OfflineVirtualMachine&lt;/code&gt; object has been created the &lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_offlinevirtualmachinestatus&quot;&gt;OfflineVirtualMachineStatus&lt;/a&gt; will be available. Like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineStatus&lt;/code&gt; &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;OfflineVirtualMachineStatus&lt;/code&gt; can be used for automation tools such as Ansible.&lt;/p&gt;
+&lt;p&gt;Once the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;OfflineVirtualMachine&lt;/code&gt; object has been created the &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_offlinevirtualmachinestatus&quot;&gt;OfflineVirtualMachineStatus&lt;/a&gt; will be available. Like &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineStatus&lt;/code&gt; &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;OfflineVirtualMachineStatus&lt;/code&gt; can be used for automation tools such as Ansible.&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl -o yaml get ovms mongodb -n nodejs-ex
 
@@ -2533,7 +2533,7 @@ true
 
 &lt;h2 id=&quot;virtualmachinereplicaset&quot;&gt;VirtualMachineReplicaSet&lt;/h2&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/virtual-machine-replica-set&quot;&gt;VirtualMachineReplicaSet&lt;/a&gt; is great when you want to run multiple identical virtual machines.&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/replicaset/&quot;&gt;VirtualMachineReplicaSet&lt;/a&gt; is great when you want to run multiple identical virtual machines.&lt;/p&gt;
 
 &lt;p&gt;Just like the other top-level objects we can retrieve &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineReplicaSet&lt;/code&gt;.&lt;/p&gt;
 
@@ -2552,19 +2552,19 @@ replicarjhdz   7m
 
 &lt;h3 id=&quot;pause-rollout&quot;&gt;Pause rollout&lt;/h3&gt;
 
-&lt;p&gt;The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_vmreplicasetspec&quot;&gt;.spec.paused&lt;/a&gt; parameter if true pauses the deployment of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineReplicaSet&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_vmreplicasetspec&quot;&gt;.spec.paused&lt;/a&gt; parameter if true pauses the deployment of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineReplicaSet&lt;/code&gt;.&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  paused: true
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;replica-quantity&quot;&gt;Replica quantity&lt;/h3&gt;
 
-&lt;p&gt;The &lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/virtual-machine-replica-set?id=how-to-use-a-virtualmachineinstancereplicaset&quot;&gt;.spec.replicas&lt;/a&gt; number of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; objects that should be created.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/replicaset/#using-virtualmachineinstancereplicaset&quot;&gt;.spec.replicas&lt;/a&gt; number of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; objects that should be created.&lt;/p&gt;
 
 &lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  replicas: 0
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;The &lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_labelselector&quot;&gt;selector&lt;/a&gt; must be defined and match labels defined in the template. It is used by the controller to keep track of managed virtual machines.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_labelselector&quot;&gt;selector&lt;/a&gt; must be defined and match labels defined in the template. It is used by the controller to keep track of managed virtual machines.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2575,7 +2575,7 @@ replicarjhdz   7m
   &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;h3 id=&quot;virtual-machine-template-spec&quot;&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/virtual-machine-replica-set?id=how-to-use-a-virtualmachineinstancereplicaset&quot;&gt;Virtual Machine Template Spec&lt;/a&gt;&lt;/h3&gt;
+&lt;h3 id=&quot;virtual-machine-template-spec&quot;&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/replicaset/#using-virtualmachineinstancereplicaset&quot;&gt;Virtual Machine Template Spec&lt;/a&gt;&lt;/h3&gt;
 
 &lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VMTemplateSpec&lt;/code&gt; is the definition of a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; objects that will be created.&lt;/p&gt;
 
@@ -2592,7 +2592,7 @@ replicarjhdz   7m
 
 &lt;h3 id=&quot;replica-status&quot;&gt;Replica Status&lt;/h3&gt;
 
-&lt;p&gt;Like the other objects we already have discussed &lt;a href=&quot;http://kubevirt.io/api-reference/v0.5.0/definitions.html#_v1_vmreplicasetstatus&quot;&gt;VMReplicaSetStatus&lt;/a&gt; is an important object to use for automation.&lt;/p&gt;
+&lt;p&gt;Like the other objects we already have discussed &lt;a href=&quot;http://kubevirt.io/api-reference/master/definitions.html#_v1_vmreplicasetstatus&quot;&gt;VMReplicaSetStatus&lt;/a&gt; is an important object to use for automation.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;readyReplicas&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
@@ -2610,7 +2610,7 @@ $ kubectl get vmrs replica --template &quot;{{.status.replicas}}&quot; -n nodejs
 &lt;h3 id=&quot;examples-1&quot;&gt;Examples&lt;/h3&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/usage/virtual-machine-replica-set?id=example&quot;&gt;https://kubevirt.io/user-guide/#/usage/virtual-machine-replica-set?id=example&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/replicaset/#example&quot;&gt;https://kubevirt.io/user-guide/virtual_machines/replicaset/#example&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;virtualmachinepreset&quot;&gt;VirtualMachinePreset&lt;/h2&gt;
@@ -2634,7 +2634,7 @@ m1.small   17s
 
 &lt;h3 id=&quot;preset-selector&quot;&gt;Preset Selector&lt;/h3&gt;
 
-&lt;p&gt;The &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/presets?id=virtualmachine-selector&quot;&gt;selector&lt;/a&gt; is optional but if not defined will be applied to all &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; objects; which is probably not the intended purpose so I recommend always including a selector.&lt;/p&gt;
+&lt;p&gt;The &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/presets/#virtualmachine-selector&quot;&gt;selector&lt;/a&gt; is optional but if not defined will be applied to all &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; objects; which is probably not the intended purpose so I recommend always including a selector.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;matchExpressions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2648,7 +2648,7 @@ m1.small   17s
 &lt;h3 id=&quot;examples-2&quot;&gt;Examples&lt;/h3&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/presets?id=examples&quot;&gt;https://kubevirt.io/user-guide/#/creation/presets?id=examples&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/presets/#examples&quot;&gt;https://kubevirt.io/user-guide/virtual_machines/presets/#examples&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;p&gt;We provided an annotated view into the KubeVirt objects - VirtualMachine, OfflineVirtualMachine, VirtualMachineReplicaSet and VirtualMachinePreset. Hopefully this will help a user of KubeVirt to understand the options and parameters that are currently available when creating a virtual machine on Kubernetes.&lt;/p&gt;</content><author><name>jcpowermac</name></author><category term="uncategorized" /><category term="custom resources" /><category term="kubevirt objects" /><category term="objects" /><category term="VirtualMachine" /><summary type="html">The KubeVirt project provides extensions to Kubernetes via custom resources.</summary></entry><entry><title type="html">Deploying Vms On Kubernetes Glusterfs Kubevirt</title><link href="https://kubevirt.io//2018/Deploying-VMs-on-Kubernetes-GlusterFS-KubeVirt.html" rel="alternate" type="text/html" title="Deploying Vms On Kubernetes Glusterfs Kubevirt" /><published>2018-05-07T00:00:00+00:00</published><updated>2018-05-07T00:00:00+00:00</updated><id>https://kubevirt.io//2018/Deploying-VMs-on-Kubernetes-GlusterFS-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2018/Deploying-VMs-on-Kubernetes-GlusterFS-KubeVirt.html">&lt;p&gt;Kubernetes is traditionally used to deploy and manage containerized applications. Did you know Kubernetes can also be used to deploy and manage virtual machines? This guide will walk you through installing a Kubernetes environment backed by GlusterFS for storage and the KubeVirt add-on to enable deployment and management of VMs.&lt;/p&gt;

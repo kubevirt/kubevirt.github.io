@@ -258,7 +258,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>In a Kubernetes (k8s) cluster, the control plane(scheduler) is responsible for deploying workloads(<code class="language-plaintext highlighter-rouge">pods</code>, <code class="language-plaintext highlighter-rouge">deployments</code>, <code class="language-plaintext highlighter-rouge">replicasets</code>) on the worker nodes depending on the resource availability. What do we do with the workloads if the need arises for maintaining this node? Well, there is good news, <code class="language-plaintext highlighter-rouge">node-drain</code> feature and node maintenance operator(NMO) both come to our rescue in this situation.</p>
 
-<p>This post discusses evicting the <a href="https://kubevirt.io/user-guide/#/creation/creating-virtual-machines?id=virtual-machines">VMI</a>(virtual machine images) and other resources from the node using node drain feature and NMO.</p>
+<p>This post discusses evicting the <a href="https://kubevirt.io/user-guide/virtual_machines/virtual_machine_instances/#virtual-machines-instances">VMI</a>(virtual machine instance) and other resources from the node using node drain feature and NMO.</p>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>The environment used for writing this post is based on <a href="https://cloud.redhat.com/openshift/install/aws/installer-provisioned">OpenShift 4</a> with 3 Masters and 3 Worker nodes.</p>
 

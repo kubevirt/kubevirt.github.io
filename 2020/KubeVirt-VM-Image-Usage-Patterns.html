@@ -285,8 +285,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>I’m not covering this. Use our documentation linked to below. Understand that CDI (containerized data importer) is the tool we’ll be using to help populate and manage PVCs.</p>
 
-<p><a href="https://kubevirt.io/user-guide/#/installation/installation">Installing KubeVirt</a>
-<a href="https://kubevirt.io/user-guide/#/installation/image-upload?id=install-cdi">Installing CDI</a></p>
+<p><a href="https://kubevirt.io/user-guide/operations/installation">Installing KubeVirt</a>
+<a href="https://kubevirt.io/user-guide/operations/containerized_data_importer">Installing CDI</a></p>
 
 <h3 id="step-1-create-a-namespace-for-our-immutable-vm-images">Step 1. Create a namespace for our immutable VM images.</h3>
 
@@ -554,7 +554,7 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            <
         <span class="na">storage</span><span class="pi">:</span> <span class="s">5Gi</span>
 </code></pre></div></div>
 
-<p>Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) <a href="https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral">ephemeral volume</a> on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.</p>
+<p>Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) <a href="https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#ephemeral">ephemeral volume</a> on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.</p>
 
 <p>Here’s an example manifest of a VirtualMachineInstanceReplicaSet starting 5 instances of our nginx server in separate VMIs.</p>
 

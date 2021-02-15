@@ -254,7 +254,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <p>This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex <a href="https://kubernetes.io/docs/concepts/configuration/assign-pod-node/#affinity-and-anti-affinity">affinity and anti-affinity</a> rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</p>
+          <p>This blog post shows how KubeVirt can take advantage of Kubernetes inner features to provide an advanced scheduling mechanism to virtual machines (VMs). The same or even more complex <a href="https://kubevirt.io/user-guide/operations/node_assignment/#affinity-and-anti-affinity">affinity and anti-affinity</a> rules can be assigned to VMs or Pods in Kubernetes than in traditional virtualization solutions.</p>
 
 <p>It is important to notice that from the Kubernetes scheduler stand point, which will be explained later, it only manages Pod and node scheduling. Since the VM is wrapped up in a Pod, the same scheduling rules are completely valid to KubeVirt VMs.</p>
 
@@ -295,7 +295,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <ul>
   <li>A stretched Kubernetes cluster is already up and running.</li>
-  <li><a href="https://kubevirt.io/user-guide/#/">KubeVirt</a> is already installed.</li>
+  <li><a href="https://kubevirt.io/user-guide">KubeVirt</a> is already installed.</li>
   <li>There is enough free CPU, Memory and disk space in the cluster to deploy customapp stack.</li>
 </ul>
 

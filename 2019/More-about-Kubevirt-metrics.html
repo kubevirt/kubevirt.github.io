@@ -505,7 +505,7 @@ We describe two of the most common pitfalls.</p>
 
 <h4 id="create-the-servicemonitor-in-the-right-namespace">create the servicemonitor in the right namespace</h4>
 
-<p>KubeVirt services run in the <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace. Make sure to <a href="https://kubevirt.io/user-guide/#/installation/monitoring?id=integrating-with-the-prometheus-operator">create the servicemonitor</a> in the same namespace:</p>
+<p>KubeVirt services run in the <code class="language-plaintext highlighter-rouge">kubevirt</code> namespace. Make sure to <a href="https://kubevirt.io/user-guide/operations/component_monitoring/#integrating-with-the-prometheus-operator">create the servicemonitor</a> in the same namespace:</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
 NAME                               READY   STATUS    RESTARTS   AGE
@@ -529,7 +529,7 @@ kubevirt-prometheus-metrics   ClusterIP   10.109.85.101    &lt;none&gt;        4
 virt-api                      ClusterIP   10.109.162.102   &lt;none&gt;        443/TCP   19h
 </code></pre></div></div>
 
-<p>See <a href="https://kubevirt.io/user-guide/#/installation/monitoring?id=custom-service-discovery">the KubeVirt documentation</a> for all the details.</p>
+<p>See <a href="https://kubevirt.io/user-guide/operations/component_monitoring/#custom-service-discovery">the KubeVirt documentation</a> for all the details.</p>
 
 <h4 id="configure-the-prometheus-instance-to-look-in-the-right-namespace">configure the Prometheus instance to look in the right namespace</h4>
 

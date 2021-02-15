@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-02-15T16:23:00+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming!</title><link href="https://kubevirt.io//2021/KubeVirt-Summit-announce.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming!" /><published>2021-01-12T00:00:00+00:00</published><updated>2021-01-12T00:00:00+00:00</updated><id>https://kubevirt.io//2021/KubeVirt-Summit-announce</id><content type="html" xml:base="https://kubevirt.io//2021/KubeVirt-Summit-announce.html">&lt;p&gt;Exciting news! The KubeVirt community are in the process of planning the first ever &lt;strong&gt;KubeVirt Summit&lt;/strong&gt;!&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-02-15T20:28:52+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming!</title><link href="https://kubevirt.io//2021/KubeVirt-Summit-announce.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming!" /><published>2021-01-12T00:00:00+00:00</published><updated>2021-01-12T00:00:00+00:00</updated><id>https://kubevirt.io//2021/KubeVirt-Summit-announce</id><content type="html" xml:base="https://kubevirt.io//2021/KubeVirt-Summit-announce.html">&lt;p&gt;Exciting news! The KubeVirt community are in the process of planning the first ever &lt;strong&gt;KubeVirt Summit&lt;/strong&gt;!&lt;/p&gt;
 
 &lt;h2 id=&quot;save-the-dates&quot;&gt;Save the dates!&lt;/h2&gt;
 
@@ -93,7 +93,7 @@ session, and submit your proposal as a Pull Request.&lt;/p&gt;
 
 &lt;h2 id=&quot;preparation-of-the-environment&quot;&gt;Preparation of the environment&lt;/h2&gt;
 
-&lt;p&gt;Running containerized VMs in KubeVirt uses the &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=containerdisk&quot;&gt;containerDisk&lt;/a&gt; feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.&lt;/p&gt;
+&lt;p&gt;Running containerized VMs in KubeVirt uses the &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk&quot;&gt;containerDisk&lt;/a&gt; feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.&lt;/p&gt;
 
 &lt;p&gt;The company already have an &lt;a href=&quot;https://www.okd.io/&quot;&gt;OKD 4 Kubernetes cluster&lt;/a&gt; installed which provides out of the box a container registry and some required security features such as &lt;em&gt;Role Based Access Controls (RBAC)&lt;/em&gt; and &lt;em&gt;Security Context Constraints (SCC)&lt;/em&gt;.&lt;/p&gt;
 
@@ -644,7 +644,7 @@ Please contact us at sysadmin@corporate.com
 
 &lt;p&gt;In the previous section, we verified that the golden image was successfully built. However, there are still a few things that need to be added so that the golden image can be successfully containerized and run on top of our OKD Kubernetes cluster.&lt;/p&gt;
 
-&lt;p&gt;First, a worthy package that is suggested to be included in the golden image is &lt;a href=&quot;https://cloud-init.io/&quot;&gt;cloud-init&lt;/a&gt;. KubeVirt allows you to create VM objects along with &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/cloud-init?id=startup-scripts&quot;&gt;cloud-init&lt;/a&gt; configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.&lt;/p&gt;
+&lt;p&gt;First, a worthy package that is suggested to be included in the golden image is &lt;a href=&quot;https://cloud-init.io/&quot;&gt;cloud-init&lt;/a&gt;. KubeVirt allows you to create VM objects along with &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/startup_scripts/#cloud-init&quot;&gt;cloud-init&lt;/a&gt; configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.&lt;/p&gt;
 
 &lt;p&gt;The result will be &lt;strong&gt;two golden images CentOS 8&lt;/strong&gt;, both with cloud-init, but one will include a GUI and the other is terminal-based and therefore much lighter.&lt;/p&gt;
 
@@ -754,7 +754,7 @@ Image resized.
 
 &lt;h2 id=&quot;image-containerization-procedure&quot;&gt;Image containerization procedure&lt;/h2&gt;
 
-&lt;p&gt;The procedure to inject a &lt;em&gt;VirtualMachineInstance&lt;/em&gt; disk into a container images is pretty well explained in &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?&quot;&gt;containerDisk Workflow example&lt;/a&gt; from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the &lt;em&gt;VirtualMachine&lt;/em&gt;&lt;/p&gt;
+&lt;p&gt;The procedure to inject a &lt;em&gt;VirtualMachineInstance&lt;/em&gt; disk into a container images is pretty well explained in &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes&quot;&gt;containerDisk Workflow example&lt;/a&gt; from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the &lt;em&gt;VirtualMachine&lt;/em&gt;&lt;/p&gt;
 
 &lt;p&gt;Currently, there are 4 standardized images ready to be containerized. The process is the same for all of them, so in order to keep it short, we are just going to show the process of creating a container image from the CentOS 8 QCOW2 images.&lt;/p&gt;
 
@@ -1944,7 +1944,7 @@ Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;Host platform: Fedora 32 with latest updates applied&lt;/li&gt;
   &lt;li&gt;Kubernetes cluster created&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/quickstart_minikube/&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/image-upload&quot;&gt;CDI&lt;/a&gt; installed in the Kubernetes cluster.&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://kubevirt.io/quickstart_minikube/&quot;&gt;KubeVirt&lt;/a&gt; and &lt;a href=&quot;https://kubevirt.io/user-guide/operations/containerized_data_importer/&quot;&gt;CDI&lt;/a&gt; installed in the Kubernetes cluster.&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;procedure&quot;&gt;Procedure&lt;/h2&gt;
@@ -2098,7 +2098,7 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;h2 id=&quot;selinux-101&quot;&gt;SELinux 101&lt;/h2&gt;
 
-&lt;p&gt;At its core, SELinux is a whitelist-based security policy system intended to limit interactions between Linux processes and files. Simplified, it can be visualized as a “syscall firewall”.&lt;/p&gt;
+&lt;p&gt;At its core, SELinux is a allow list-based security policy system intended to limit interactions between Linux processes and files. Simplified, it can be visualized as a “syscall firewall”.&lt;/p&gt;
 
 &lt;p&gt;Policies are based on statically defined types, that can be assigned to files, processes and other objects.&lt;/p&gt;
 
@@ -2113,7 +2113,7 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;h2 id=&quot;the-selinux-standard-reference-policy&quot;&gt;The SELinux standard Reference Policy&lt;/h2&gt;
 
-&lt;p&gt;Since SELinux policies are whitelists, a setup running with the above policy would not be allowed to do anything, except for that test program.&lt;/p&gt;
+&lt;p&gt;Since SELinux policies are allow lists, a setup running with the above policy would not be allowed to do anything, except for that test program.&lt;/p&gt;
 
 &lt;p&gt;A policy for an entire Linux distribution as seen in the wild is made of millions of lines, which wouldn’t be practical to write and maintain on a per-distribution basis.&lt;/p&gt;
 
@@ -2205,8 +2205,8 @@ For an overview of KubeVirt security, please first read &lt;a href=&quot;/2020/K
 
 &lt;p&gt;I’m not covering this. Use our documentation linked to below. Understand that CDI (containerized data importer) is the tool we’ll be using to help populate and manage PVCs.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/installation&quot;&gt;Installing KubeVirt&lt;/a&gt;
-&lt;a href=&quot;https://kubevirt.io/user-guide/#/installation/image-upload?id=install-cdi&quot;&gt;Installing CDI&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://kubevirt.io/user-guide/operations/installation&quot;&gt;Installing KubeVirt&lt;/a&gt;
+&lt;a href=&quot;https://kubevirt.io/user-guide/operations/containerized_data_importer&quot;&gt;Installing CDI&lt;/a&gt;&lt;/p&gt;
 
 &lt;h3 id=&quot;step-1-create-a-namespace-for-our-immutable-vm-images&quot;&gt;Step 1. Create a namespace for our immutable VM images.&lt;/h3&gt;
 
@@ -2474,7 +2474,7 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            &
         &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5Gi&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) &lt;a href=&quot;https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral&quot;&gt;ephemeral volume&lt;/a&gt; on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.&lt;/p&gt;
+&lt;p&gt;Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) &lt;a href=&quot;https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#ephemeral&quot;&gt;ephemeral volume&lt;/a&gt; on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.&lt;/p&gt;
 
 &lt;p&gt;Here’s an example manifest of a VirtualMachineInstanceReplicaSet starting 5 instances of our nginx server in separate VMIs.&lt;/p&gt;
 
