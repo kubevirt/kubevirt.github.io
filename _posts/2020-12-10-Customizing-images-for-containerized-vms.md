@@ -71,7 +71,7 @@ This goal is divided into three main procedures:
 
 ## Preparation of the environment
 
-Running containerized VMs in KubeVirt uses the [containerDisk](https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=containerdisk) feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.
+Running containerized VMs in KubeVirt uses the [containerDisk](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk) feature which provides the ability to store and distributed VM disks in the container image registry. The disks are pulled from the container registry and reside on the local node hosting the VMs that consume the disks.
 
 The company already have an [OKD 4 Kubernetes cluster](https://www.okd.io/) installed which provides out of the box a container registry and some required security features such as _Role Based Access Controls (RBAC)_ and _Security Context Constraints (SCC)_.
 
@@ -649,7 +649,7 @@ Please contact us at sysadmin@corporate.com
 
 In the previous section, we verified that the golden image was successfully built. However, there are still a few things that need to be added so that the golden image can be successfully containerized and run on top of our OKD Kubernetes cluster.
 
-First, a worthy package that is suggested to be included in the golden image is [cloud-init](https://cloud-init.io/). KubeVirt allows you to create VM objects along with [cloud-init](https://kubevirt.io/user-guide/#/creation/cloud-init?id=startup-scripts) configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.
+First, a worthy package that is suggested to be included in the golden image is [cloud-init](https://cloud-init.io/). KubeVirt allows you to create VM objects along with [cloud-init](https://kubevirt.io/user-guide/virtual_machines/startup_scripts/#cloud-init) configurations. Cloud-init will let our developers further adapt the custom image to their application needs. On the other hand, it has been agreed with the Software Engineering team to add a graphical interface to the custom image since there are developers that are not familiar with the terminal.
 
 The result will be **two golden images CentOS 8**, both with cloud-init, but one will include a GUI and the other is terminal-based and therefore much lighter.
 
@@ -753,7 +753,7 @@ At this point we built:
 
 ## Image containerization procedure
 
-The procedure to inject a *VirtualMachineInstance* disk into a container images is pretty well explained in [containerDisk Workflow example](https://kubevirt.io/user-guide/#/creation/disks-and-volumes?) from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the *VirtualMachine*
+The procedure to inject a *VirtualMachineInstance* disk into a container images is pretty well explained in [containerDisk Workflow example](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes) from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the *VirtualMachine*
 
 Currently, there are 4 standardized images ready to be containerized. The process is the same for all of them, so in order to keep it short, we are just going to show the process of creating a container image from the CentOS 8 QCOW2 images.
 

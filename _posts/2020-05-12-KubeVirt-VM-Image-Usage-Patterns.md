@@ -46,8 +46,8 @@ For our purposes in this workflow, the base image is meant to be immutable. No V
 
 I’m not covering this. Use our documentation linked to below. Understand that CDI (containerized data importer) is the tool we’ll be using to help populate and manage PVCs.
 
-[Installing KubeVirt](https://kubevirt.io/user-guide/#/installation/installation)
-[Installing CDI](https://kubevirt.io/user-guide/#/installation/image-upload?id=install-cdi)
+[Installing KubeVirt](https://kubevirt.io/user-guide/operations/installation)
+[Installing CDI](https://kubevirt.io/user-guide/operations/containerized_data_importer)
 
 ### Step 1. Create a namespace for our immutable VM images.
 
@@ -328,7 +328,7 @@ spec:
         storage: 5Gi
 ```
 
-Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) [ephemeral volume](https://kubevirt.io/user-guide/#/creation/disks-and-volumes?id=ephemeral) on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.
+Next, create a VirtualMachineInstanceReplicaSet that references the nginx-rom PVC as an ephemeral volume. With an ephemeral volume, KubeVirt will mount the PVC read only, and use a cow (copy on write) [ephemeral volume](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#ephemeral) on local storage to back each individual VMI. This ephemeral data’s life cycle is limited to the life cycle of each VMI.
 
 Here’s an example manifest of a VirtualMachineInstanceReplicaSet starting 5 instances of our nginx server in separate VMIs.
 
