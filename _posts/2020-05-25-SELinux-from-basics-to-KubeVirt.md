@@ -26,7 +26,7 @@ For an overview of KubeVirt security, please first read [this excellent article]
 
 ## SELinux 101
 
-At its core, SELinux is a whitelist-based security policy system intended to limit interactions between Linux processes and files. Simplified, it can be visualized as a "syscall firewall".
+At its core, SELinux is a allow list-based security policy system intended to limit interactions between Linux processes and files. Simplified, it can be visualized as a "syscall firewall".
 
 Policies are based on statically defined types, that can be assigned to files, processes and other objects.
 
@@ -39,7 +39,7 @@ The policy for that would include directives to:
 
 ## The SELinux standard Reference Policy
 
-Since SELinux policies are whitelists, a setup running with the above policy would not be allowed to do anything, except for that test program.
+Since SELinux policies are allow lists, a setup running with the above policy would not be allowed to do anything, except for that test program.
 
 A policy for an entire Linux distribution as seen in the wild is made of millions of lines, which wouldn't be practical to write and maintain on a per-distribution basis.
 
