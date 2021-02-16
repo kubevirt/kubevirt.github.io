@@ -115,7 +115,7 @@ check_links: | envvar stop
 	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
 	    echo; \
 	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/check_selectors.js"; \
+	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/jekyll/check_selectors.js"; \
 	    echo; \
 	  fi; \
 	done; \
