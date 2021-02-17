@@ -67,6 +67,7 @@ const CAP_NET_ADMIN = "NET_ADMIN"
 const CAP_NET_RAW = "NET_RAW"
 const CAP_SYS_ADMIN = "SYS_ADMIN"
 const CAP_SYS_NICE = "SYS_NICE"
+const CAP_SYS_RESOURCE = "SYS_RESOURCE"
 
 // LibvirtStartupDelay is added to custom liveness and readiness probes initial delay value.
 // Libvirt needs roughly 10 seconds to start.
@@ -264,6 +265,28 @@ func SetNodeAffinityForForbiddenFeaturePolicy(vmi *v1.VirtualMachineInstance, po
 			}
 		}
 	}
+}
+
+func sysprepVolumeSource(sysprepVolume v1.SysprepSource) (k8sv1.VolumeSource, error) {
+	logger := log.DefaultLogger()
+	if sysprepVolume.Secret != nil {
+		return k8sv1.VolumeSource{
+			Secret: &k8sv1.SecretVolumeSource{
+				SecretName: sysprepVolume.Secret.Name,
+			},
+		}, nil
+	} else if sysprepVolume.ConfigMap != nil {
+		return k8sv1.VolumeSource{
+			ConfigMap: &k8sv1.ConfigMapVolumeSource{
+				LocalObjectReference: k8sv1.LocalObjectReference{
+					Name: sysprepVolume.ConfigMap.Name,
+				},
+			},
+		}, nil
+	}
+	errorStr := fmt.Sprintf("Sysprep must have Secret or ConfigMap reference set %v", sysprepVolume)
+	logger.Errorf(errorStr)
+	return k8sv1.VolumeSource{}, fmt.Errorf(errorStr)
 }
 
 // Request a resource by name. This function bumps the number of resources,
@@ -589,6 +612,24 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			}
 		}
 
+		if volume.Sysprep != nil {
+			var volumeSource k8sv1.VolumeSource
+			// attach a Secret or ConfigMap referenced by the user
+			volumeSource, err := sysprepVolumeSource(*volume.Sysprep)
+			if err != nil {
+				return nil, err
+			}
+			volumes = append(volumes, k8sv1.Volume{
+				Name:         volume.Name,
+				VolumeSource: volumeSource,
+			})
+			volumeMounts = append(volumeMounts, k8sv1.VolumeMount{
+				Name:      volume.Name,
+				MountPath: filepath.Join(config.SysprepSourceDir, volume.Name),
+				ReadOnly:  true,
+			})
+		}
+
 		if volume.CloudInitConfigDrive != nil {
 			if volume.CloudInitConfigDrive.UserDataSecretRef != nil {
 				// attach a secret referenced by the user
@@ -883,7 +924,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 	// Add ports from interfaces to the pod manifest
 	ports := getPortsFromVMI(vmi)
 
-	capabilities := getRequiredCapabilities(vmi)
+	capabilities := getRequiredCapabilities(vmi, t.clusterConfig)
 
 	networkToResourceMap, err := getNetworkToResourceMap(t.virtClient, vmi)
 	if err != nil {
@@ -1309,21 +1350,29 @@ func (t *templateService) RenderHotplugAttachmentPodTemplate(volume *v1.Volume, 
 	return pod, nil
 }
 
-func getRequiredCapabilities(vmi *v1.VirtualMachineInstance) []k8sv1.Capability {
-	res := []k8sv1.Capability{}
+func getRequiredCapabilities(vmi *v1.VirtualMachineInstance, config *virtconfig.ClusterConfig) []k8sv1.Capability {
+	capabilities := []k8sv1.Capability{}
+
 	if (len(vmi.Spec.Domain.Devices.Interfaces) > 0) ||
 		(vmi.Spec.Domain.Devices.AutoattachPodInterface == nil) ||
 		(*vmi.Spec.Domain.Devices.AutoattachPodInterface == true) {
-		res = append(res, CAP_NET_ADMIN)
+		capabilities = append(capabilities, CAP_NET_ADMIN)
 	}
 	// add a CAP_SYS_NICE capability to allow setting cpu affinity
-	res = append(res, CAP_SYS_NICE)
+	capabilities = append(capabilities, CAP_SYS_NICE)
 
 	// add CAP_SYS_ADMIN capability to allow virtiofs
 	if util.IsVMIVirtiofsEnabled(vmi) {
-		res = append(res, CAP_SYS_ADMIN)
+		capabilities = append(capabilities, CAP_SYS_ADMIN)
 	}
-	return res
+
+	// add SYS_RESOURCE capability to enable Live Migration for VM with SRIOV interfaces
+	// until https://bugzilla.redhat.com/show_bug.cgi?id=1916346 is resolved.
+	if config.SRIOVLiveMigrationEnabled() && util.IsSRIOVVmi(vmi) {
+		capabilities = append(capabilities, CAP_SYS_RESOURCE)
+	}
+
+	return capabilities
 }
 
 func getRequiredResources(vmi *v1.VirtualMachineInstance, useEmulation bool) k8sv1.ResourceList {
