@@ -128,7 +128,7 @@ To proceed with the Installation steps the different elements involved are liste
    storageClassName: hostpath
    ```
 
-4. A [container with the virtio drivers](https://kubevirt.io/user-guide/virtual_machines/windows_wirtio_drivers/#how-to-obtain-virtio-drivers) attached as a CD-ROM to the VM.
+4. A [container with the virtio drivers](https://kubevirt.io/user-guide/virtual_machines/windows_virtio_drivers/#how-to-obtain-virtio-drivers) attached as a CD-ROM to the VM.
    The container image has to be pulled to have it available in the local registry.
 
    ```sh
@@ -285,7 +285,7 @@ Once the Virtual Machine is created, the PVC with the ISO and the `virtio` drive
 
 ## References
 
-- [KubeVirt user-guide: Virtio Windows Driver disk usage](https://kubevirt.io/user-guide/virtual_machines/windows_wirtio_drivers/)
+- [KubeVirt user-guide: Virtio Windows Driver disk usage](https://kubevirt.io/user-guide/virtual_machines/windows_virtio_drivers/)
 - [Creating a registry image with a VM disk](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/image-from-registry.md)
 - [CDI Upload User Guide](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md)
-- [KubeVirt user-guide: How to obtain virtio drivers?](https://kubevirt.io/user-guide/virtual_machines/windows_wirtio_drivers/#how-to-obtain-virtio-drivers)
+- [KubeVirt user-guide: How to obtain virtio drivers?](https://kubevirt.io/user-guide/virtual_machines/windows_virtio_drivers/#how-to-obtain-virtio-drivers)
