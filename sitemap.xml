@@ -600,6 +600,9 @@
 <loc>https://kubevirt.io//gallery/</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//hostpath-provisioner-operator/</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//hostpath-provisioner/</loc>
 </url>
 <url>
