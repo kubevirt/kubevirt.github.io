@@ -6,12 +6,9 @@ order: 10
 ---
 
 The KubeVirt community held its first ever dedicated online event about all
-things KubeVirt. The KubeVirt Summit is a 2-day virtual event to discover,
+things KubeVirt. The KubeVirt Summit was a 2-day virtual event to discover,
 discuss, hack and learn about managing virtual machines in Kubernetes using
 KubeVirt.
-
-Everyone with an interest in KubeVirt is welcome to join, users
-and contributors alike.
 
 Many thanks to everyone who contributed to the event!
 
