@@ -61,7 +61,7 @@ Here is a list of all the sessions with a short abstract, presenter information 
 In the first session of the KubeVirt Summit, Fabian Deutsch ([@dummdida](https://twitter.com/dummdida)) talks about the project's history.
 
 <a name="automated-migration"></a>
-### Automated Migration of VMs from VMWare or Openstack to KubeVirt
+### Automated Migration of VMs from VMware or Openstack to KubeVirt
 
 [Recording](https://youtu.be/2Fm8IJ7gyRg) / [Slides](https://drive.google.com/file/d/1gOteQvEwU2vR4dPAxNLC0iAZ0UwlUcYE/view?usp=sharing)
 
@@ -138,7 +138,7 @@ Presenters:
 
 KubeVirt has a very precise and resilient method for ensuring zero downtime updates occur.
 
-In this session I'll cover the general strategy behind how we approach updating KubeVirt from a developer's perspective as well as discuss future improvments to our update process.
+In this session I'll cover the general strategy behind how we approach updating KubeVirt from a developer's perspective as well as discuss future improvements to our update process.
 
 Attendees will come away with an understanding of how KubeVirt's update process has been designed, how it is tested, and what future enhancements are coming soon.
 
@@ -149,7 +149,7 @@ Presenter: David Vossel, Senior Principal Software Engineer, Red Hat, <https://g
 
 [Recording](https://youtu.be/4OxcqF4Lmh0) / [Slides](https://drive.google.com/file/d/18-BpnpAwDbmvWtJ63_tWTzF98XDTFVM7/view?usp=sharing)
 
-Introduction into the current state of volume hotpluging in KubeVirt, what is possible, what is not possible and what are the challenges.
+Introduction into the current state of volume hotplugging in KubeVirt, what is possible, what is not possible and what are the challenges.
 
 Presenter: Alexander Wels, Principal Software Engineer, Red Hat
 
@@ -158,16 +158,16 @@ Presenter: Alexander Wels, Principal Software Engineer, Red Hat
 
 [Recording](https://youtu.be/PJ4D2NqMO2A) / [Slides](https://drive.google.com/file/d/17QJDZQj8zkoyCLjKwDz97vz4Wjw8CH3s/view?usp=sharing)
 
-This sesion introduces PCI device passthrough to containers and VMs managed by KubeVirt.
+This session introduces PCI device passthrough to containers and VMs managed by KubeVirt.
 
 An overview of PCI passthrough and the Generic Device API is provided, illustrated with a specific practical use case that uses Intel QAT to accelerate VNF/CNF in edge computing.
 
 Presenters:
-  - Vladik Romanovsky, Principal Sofware Engineer, Red Hat
+  - Vladik Romanovsky, Principal Software Engineer, Red Hat
   - Le Yao, Intel SSE/CSE
 
 <a name="harvester"></a>
-### Harvester: an OSS HCI soultion built on Kubernetes and KubeVirt
+### Harvester: an OSS HCI solution built on Kubernetes and KubeVirt
 
 [Recording](https://youtu.be/Kp_xs4bfUXI) / [Slides](https://drive.google.com/file/d/1DeCgnDF4aFFMq3tVeWtrO5LuxbjMYPo2/view?usp=sharing)
 
@@ -175,7 +175,7 @@ Project Harvester is a new open source alternative to traditional proprietary hy
 
 In this talk, we will talk about why we decide to build Harvester, how did we integrated with KubeVirt, and the lessons we've learnt along the way. We will also have a demo of current release of Harvester by the end of session.
 
-Presenter: Sheng Yang: Sr Engineering Manager, SUSE, [@yasker](https://twitter.com/yasker), <https://github.com/yasker>
+Presenter: Sheng Yang: Senior Engineering Manager, SUSE, [@yasker](https://twitter.com/yasker), <https://github.com/yasker>
 
 <a name="sriov"></a>
 ### Kubevirt Live migration and SRIOV
@@ -271,7 +271,7 @@ Molecule is a well known test framework for Ansible. But when you run your Molec
 
 In this session I will introduce quickly why it may be better than actual drivers, how it works, and make a demo.
 
-Presenter: Joël Séguillon, Senior Devops Consultant in mission at [www.ateme.com](https://www.ateme.com) - <https://github.com/jseguillon> ([LinkedIn](https://www.linkedin.com/in/jo%C3%ABl-s%C3%A9guillon-91a55814/))
+Presenter: Joël Séguillon, Senior DevOps Consultant in mission at [www.ateme.com](https://www.ateme.com) - <https://github.com/jseguillon> ([LinkedIn](https://www.linkedin.com/in/jo%C3%ABl-s%C3%A9guillon-91a55814/))
 
 <a name="batch-api"></a>
 ### Virtual Machine Batch API
@@ -328,11 +328,11 @@ Session lead: David Vossel, Senior Principal Software Engineer, Red Hat
 
 As the rapid transition to remote work happened, VFX studios and designers used to beefy workstations, on-site storage clusters and high performance networking have had to scramble to make those resources available to people at home.
 
-This presentation details how a VFX studio with 60 designers transitioned from a fully on-prem environment to complete cloud workflow. Combining KubeVirt powered Virtual Workstations with render nodes and storage running natively in Kubernetes provided a solution that beat expectations. Being able to manage all components via the same Kubernetes API allowed for a quick integration into existing systems.
+This presentation details how a VFX studio with 60 designers transitioned from a fully on-premise environment to complete cloud workflow. Combining KubeVirt powered Virtual Workstations with render nodes and storage running natively in Kubernetes provided a solution that beat expectations. Being able to manage all components via the same Kubernetes API allowed for a quick integration into existing systems.
 
 We will be discussing our experience integrating KubeVirt under a strict deadline while leveraging bleeding edge features such as Virtio-FS.
 
-Presenter: Peter Salanki, Director of Engineering, CoreWeve, Inc, <https://github.com/salanki>
+Presenter: Peter Salanki, Director of Engineering, CoreWeave, Inc, <https://github.com/salanki>
 
 <a name="office-hours"></a>
 ### Office Hours: Q&A with KubeVirt maintainers

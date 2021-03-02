@@ -51,5 +51,5 @@ For now, please keep the conversations going through the various community chann
   - The [mailing list](https://groups.google.com/forum/#!forum/kubevirt-dev)
   - The [#virtualization Slack channel](https://kubernetes.slack.com/archives/C8ED7RKFE) in [Kubernetes Slack](https://slack.k8s.io/)
   - Our [community meetings](https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT)
-  - The [github repos](https://github.com/kubevirt)
+  - The [github repositories](https://github.com/kubevirt)
   - Twitter: [@kubevirt](https://twitter.com/kubevirt)
