@@ -57,7 +57,7 @@ import (
 const (
 	postUrl                = "/apis/k8s.cni.cncf.io/v1/namespaces/%s/network-attachment-definitions/%s"
 	linuxBridgeConfCRD     = `{"apiVersion":"k8s.cni.cncf.io/v1","kind":"NetworkAttachmentDefinition","metadata":{"name":"%s","namespace":"%s"},"spec":{"config":"{ \"cniVersion\": \"0.3.1\", \"name\": \"mynet\", \"plugins\": [{\"type\": \"bridge\", \"bridge\": \"br10\", \"vlan\": 100, \"ipam\": {}},{\"type\": \"tuning\"}]}"}}`
-	ptpConfCRD             = `{"apiVersion":"k8s.cni.cncf.io/v1","kind":"NetworkAttachmentDefinition","metadata":{"name":"%s","namespace":"%s"},"spec":{"config":"{ \"cniVersion\": \"0.3.1\", \"name\": \"mynet\", \"plugins\": [{\"type\": \"ptp\", \"ipam\": { \"type\": \"host-local\", \"subnet\": \"10.1.1.0/24\" }},{\"type\": \"tuning\"}]}"}}`
+	ptpConfCRD             = `{"apiVersion":"k8s.cni.cncf.io/v1","kind":"NetworkAttachmentDefinition","metadata":{"name":"%s","namespace":"%s"},"spec":{"config":"{ \"cniVersion\": \"0.3.1\", \"name\": \"mynet\", \"plugins\": [{\"type\": \"ptp\", \"ipam\": { \"type\": \"host-local\", \"subnet\": \"%s\" }},{\"type\": \"tuning\"}]}"}}`
 	sriovConfCRD           = `{"apiVersion":"k8s.cni.cncf.io/v1","kind":"NetworkAttachmentDefinition","metadata":{"name":"%s","namespace":"%s","annotations":{"k8s.v1.cni.cncf.io/resourceName":"%s"}},"spec":{"config":"{ \"cniVersion\": \"0.3.1\", \"name\": \"sriov\", \"type\": \"sriov\", \"ipam\": { \"type\": \"host-local\", \"subnet\": \"10.1.1.0/24\" } }"}}`
 	sriovLinkEnableConfCRD = `{"apiVersion":"k8s.cni.cncf.io/v1","kind":"NetworkAttachmentDefinition","metadata":{"name":"%s","namespace":"%s","annotations":{"k8s.v1.cni.cncf.io/resourceName":"%s"}},"spec":{"config":"{ \"cniVersion\": \"0.3.1\", \"name\": \"sriov\", \"type\": \"sriov\", \"link_state\": \"enable\", \"ipam\": { \"type\": \"host-local\", \"subnet\": \"10.1.1.0/24\" } }"}}`
 	macvtapNetworkConf     = `{"apiVersion":"k8s.cni.cncf.io/v1","kind":"NetworkAttachmentDefinition","metadata":{"name":"%s","namespace":"%s", "annotations": {"k8s.v1.cni.cncf.io/resourceName": "macvtap.network.kubevirt.io/%s"}},"spec":{"config":"{ \"cniVersion\": \"0.3.1\", \"name\": \"%s\", \"type\": \"macvtap\"}"}}`
@@ -69,6 +69,8 @@ const (
 	sriovnet2 = "sriov2"
 	sriovnet3 = "sriov3"
 )
+
+const ptpSubnet = "10.1.1.0/24"
 
 var _ = Describe("[Serial]Multus", func() {
 
@@ -129,14 +131,14 @@ var _ = Describe("[Serial]Multus", func() {
 		result = virtClient.RestClient().
 			Post().
 			RequestURI(fmt.Sprintf(postUrl, tests.NamespaceTestDefault, "ptp-conf-1")).
-			Body([]byte(fmt.Sprintf(ptpConfCRD, "ptp-conf-1", tests.NamespaceTestDefault))).
+			Body([]byte(fmt.Sprintf(ptpConfCRD, "ptp-conf-1", tests.NamespaceTestDefault, ptpSubnet))).
 			Do(context.Background())
 		Expect(result.Error()).NotTo(HaveOccurred())
 
 		result = virtClient.RestClient().
 			Post().
 			RequestURI(fmt.Sprintf(postUrl, tests.NamespaceTestAlternative, "ptp-conf-2")).
-			Body([]byte(fmt.Sprintf(ptpConfCRD, "ptp-conf-2", tests.NamespaceTestAlternative))).
+			Body([]byte(fmt.Sprintf(ptpConfCRD, "ptp-conf-2", tests.NamespaceTestAlternative, ptpSubnet))).
 			Do(context.Background())
 		Expect(result.Error()).NotTo(HaveOccurred())
 	})
@@ -168,9 +170,10 @@ var _ = Describe("[Serial]Multus", func() {
 	}
 
 	Describe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:component]VirtualMachineInstance using different types of interfaces.", func() {
+		const ptpGateway = "10.1.1.1"
 		Context("VirtualMachineInstance with cni ptp plugin interface", func() {
 			It("[test_id:1751]should create a virtual machine with one interface", func() {
-				By("checking virtual machine instance can ping 10.1.1.1 using ptp cni plugin")
+				By("checking virtual machine instance can ping using ptp cni plugin")
 				detachedVMI := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
 				detachedVMI.Spec.Domain.Devices.Interfaces = []v1.Interface{{Name: "ptp", InterfaceBindingMethod: v1.InterfaceBindingMethod{Bridge: &v1.InterfaceBridge{}}}}
 				detachedVMI.Spec.Networks = []v1.Network{
@@ -183,12 +186,12 @@ var _ = Describe("[Serial]Multus", func() {
 				Expect(err).ToNot(HaveOccurred())
 				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
-				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
+				Expect(libnet.PingFromVMConsole(detachedVMI, ptpGateway)).To(Succeed())
 			})
 
 			It("[test_id:1752]should create a virtual machine with one interface with network definition from different namespace", func() {
 				tests.SkipIfOpenShift4("OpenShift 4 does not support usage of the network definition from the different namespace")
-				By("checking virtual machine instance can ping 10.1.1.1 using ptp cni plugin")
+				By("checking virtual machine instance can ping using ptp cni plugin")
 				detachedVMI := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
 				detachedVMI.Spec.Domain.Devices.Interfaces = []v1.Interface{{Name: "ptp", InterfaceBindingMethod: v1.InterfaceBindingMethod{Bridge: &v1.InterfaceBridge{}}}}
 				detachedVMI.Spec.Networks = []v1.Network{
@@ -201,11 +204,11 @@ var _ = Describe("[Serial]Multus", func() {
 				Expect(err).ToNot(HaveOccurred())
 				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
-				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
+				Expect(libnet.PingFromVMConsole(detachedVMI, ptpGateway)).To(Succeed())
 			})
 
 			It("[test_id:1753]should create a virtual machine with two interfaces", func() {
-				By("checking virtual machine instance can ping 10.1.1.1 using ptp cni plugin")
+				By("checking virtual machine instance can ping using ptp cni plugin")
 				detachedVMI := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
 
 				detachedVMI.Spec.Domain.Devices.Interfaces = []v1.Interface{
@@ -237,7 +240,7 @@ var _ = Describe("[Serial]Multus", func() {
 				Expect(checkInterface(detachedVMI, "eth0")).To(Succeed())
 				Expect(checkInterface(detachedVMI, "eth1")).To(Succeed())
 
-				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
+				Expect(libnet.PingFromVMConsole(detachedVMI, ptpGateway)).To(Succeed())
 			})
 		})
 
@@ -257,8 +260,8 @@ var _ = Describe("[Serial]Multus", func() {
 				Expect(err).ToNot(HaveOccurred())
 				tests.WaitUntilVMIReady(detachedVMI, libnet.WithIPv6(console.LoginToCirros))
 
-				By("checking virtual machine instance can ping 10.1.1.1 using ptp cni plugin")
-				Expect(libnet.PingFromVMConsole(detachedVMI, "10.1.1.1")).To(Succeed())
+				By("checking virtual machine instance can ping using ptp cni plugin")
+				Expect(libnet.PingFromVMConsole(detachedVMI, ptpGateway)).To(Succeed())
 
 				By("checking virtual machine instance only has one interface")
 				// lo0, eth0
@@ -606,8 +609,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 
 		tests.BeforeTestCleanup()
 		// Check if the hardware supports SRIOV
-		sriovcheck := checkSriovEnabled(virtClient, sriovResourceName)
-		if !sriovcheck {
+		if err := validateSRIOVSetup(virtClient, sriovResourceName, 1); err != nil {
 			Skip("Sriov is not enabled in this environment. Skip these tests using - export FUNC_TEST_ARGS='--ginkgo.skip=SRIOV'")
 		}
 
@@ -956,6 +958,63 @@ var _ = Describe("[Serial]SRIOV", func() {
 				})
 			})
 		})
+
+		Context("migration", func() {
+
+			BeforeEach(func() {
+				if err := validateSRIOVSetup(virtClient, sriovResourceName, 2); err != nil {
+					Skip("Migration tests require at least 2 nodes: " + err.Error())
+				}
+			})
+
+			BeforeEach(func() {
+				tests.EnableFeatureGate(virtconfig.SRIOVLiveMigrationGate)
+			})
+
+			AfterEach(func() {
+				tests.DisableFeatureGate(virtconfig.SRIOVLiveMigrationGate)
+			})
+
+			var vmi *v1.VirtualMachineInstance
+			var interfaceName string
+
+			const mac = "de:ad:00:00:be:ef"
+
+			BeforeEach(func() {
+				// The SR-IOV VF MAC should be preserved on migration, therefore explicitly specify it.
+				vmi = getSriovVmi([]string{sriovnet1}, defaultCloudInitNetworkData())
+				vmi.Spec.Domain.Devices.Interfaces[1].MacAddress = mac
+
+				vmi = startVmi(vmi)
+				vmi = waitVmi(vmi)
+
+				// It may take some time for the VMI interface status to be updated with the information reported by
+				// the guest-agent.
+				Eventually(func() error {
+					var err error
+					vmi, err = virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
+					Expect(err).NotTo(HaveOccurred())
+					interfaceName, err = getInterfaceNameByMAC(vmi, mac)
+					return err
+				}, 30*time.Second, 5*time.Second).Should(Succeed())
+
+				Expect(checkMacAddress(vmi, interfaceName, mac)).To(Succeed(), "SR-IOV VF is expected to exist in the guest")
+			})
+
+			It("should be successful with a running VMI on the target", func() {
+				By("starting the migration")
+				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+				migrationUID := tests.RunMigrationAndExpectCompletion(virtClient, migration, migrationWaitTime)
+				tests.ConfirmVMIPostMigration(virtClient, vmi, migrationUID)
+
+				assert.XFail(
+					"SR-IOV VF attachement at the target is pending implementation: "+
+						"https://github.com/kubevirt/kubevirt/pull/5037", func() {
+						Expect(checkMacAddress(vmi, interfaceName, mac)).To(Succeed(), "SR-IOV VF is expected to exist in the guest after migration")
+					})
+			})
+		})
+
 	})
 })
 
@@ -1371,21 +1430,26 @@ func configureNodeNetwork(virtClient kubecli.KubevirtClient) {
 	}, time.Minute, time.Second).Should(Equal(len(nodes.Items)))
 }
 
-func checkSriovEnabled(virtClient kubecli.KubevirtClient, sriovResourceName string) bool {
+func validateSRIOVSetup(virtClient kubecli.KubevirtClient, sriovResourceName string, minRequiredNodes int) error {
 	nodes := tests.GetAllSchedulableNodes(virtClient)
 	Expect(nodes.Items).ToNot(BeEmpty(), "There should be some compute node")
 
+	var sriovEnabledNode int
 	for _, node := range nodes.Items {
 		resourceList := node.Status.Allocatable
 		for k, v := range resourceList {
 			if string(k) == sriovResourceName {
 				if v.Value() > 0 {
-					return true
+					sriovEnabledNode++
+					break
 				}
 			}
 		}
 	}
-	return false
+	if sriovEnabledNode < minRequiredNodes {
+		return fmt.Errorf("not enough compute nodes with SR-IOV support detected")
+	}
+	return nil
 }
 
 func validatePodKubevirtResourceName(virtClient kubecli.KubevirtClient, vmiPod *k8sv1.Pod, networkName, sriovResourceName string) error {
