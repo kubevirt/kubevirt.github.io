@@ -66,11 +66,11 @@ Alternatively you could use `kubectl patch`:
 
 ```shell
 # Start the virtual machine:
-kubectl patch virtualmachine myvm --type merge -p \
+kubectl patch virtualmachine testvm --type merge -p \
     '{"spec":{"running":true}}'
 
 # Stop the virtual machine:
-kubectl patch virtualmachine myvm --type merge -p \
+kubectl patch virtualmachine testvm --type merge -p \
     '{"spec":{"running":false}}'
 ```
 
