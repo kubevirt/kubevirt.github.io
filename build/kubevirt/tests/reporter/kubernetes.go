@@ -53,15 +53,15 @@ func NewKubernetesReporter(artifactsDir string, maxFailures int) *KubernetesRepo
 	}
 }
 
-func (r *KubernetesReporter) SpecSuiteWillBegin(config config.GinkgoConfigType, summary *types.SuiteSummary) {
+func (r *KubernetesReporter) SpecSuiteWillBegin(_ config.GinkgoConfigType, _ *types.SuiteSummary) {
 
 }
 
-func (r *KubernetesReporter) BeforeSuiteDidRun(setupSummary *types.SetupSummary) {
+func (r *KubernetesReporter) BeforeSuiteDidRun(_ *types.SetupSummary) {
 	r.Cleanup()
 }
 
-func (r *KubernetesReporter) SpecWillRun(specSummary *types.SpecSummary) {
+func (r *KubernetesReporter) SpecWillRun(_ *types.SpecSummary) {
 	fmt.Fprintf(ginkgo.GinkgoWriter, "On failure, artifacts will be collected in %s/%d_*\n", r.artifactsDir, r.failureCount+1)
 }
 
@@ -301,7 +301,7 @@ func (r *KubernetesReporter) logAuditLogs(virtCli kubecli.KubevirtClient, since 
 				return
 			}
 			// TODO may need to be improved, in case that the auditlog is really huge, since stdout is in memory
-			getAuditLogCmd := []string{"cat", "/proc/1/root/var/log/audit.log"}
+			getAuditLogCmd := []string{"cat", "/proc/1/root/var/log/audit/audit.log"}
 			stdout, _, err := tests.ExecuteCommandOnPodV2(virtCli, pod, "virt-handler", getAuditLogCmd)
 			if err != nil {
 				fmt.Fprintf(
@@ -811,7 +811,7 @@ func (r *KubernetesReporter) AfterSuiteDidRun(setupSummary *types.SetupSummary) 
 	}
 }
 
-func (r *KubernetesReporter) SpecSuiteDidEnd(summary *types.SuiteSummary) {
+func (r *KubernetesReporter) SpecSuiteDidEnd(_ *types.SuiteSummary) {
 
 }
 
