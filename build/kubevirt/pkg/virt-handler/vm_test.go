@@ -164,6 +164,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 		ctrl = gomock.NewController(GinkgoT())
 		virtClient = kubecli.NewMockKubevirtClient(ctrl)
+		virtClient.EXPECT().CoreV1().Return(fake.NewSimpleClientset().CoreV1()).AnyTimes()
 		vmiInterface = kubecli.NewMockVirtualMachineInstanceInterface(ctrl)
 		virtClient.EXPECT().VirtualMachineInstance(metav1.NamespaceDefault).Return(vmiInterface).AnyTimes()
 
@@ -181,6 +182,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 		mockContainerDiskMounter = container_disk.NewMockMounter(ctrl)
 		mockHotplugVolumeMounter = hotplug_volume.NewMockVolumeMounter(ctrl)
+
 		controller = NewController(recorder,
 			virtClient,
 			host,
@@ -1291,9 +1293,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			// since a random port is generated, we have to create the proxy
 			// here in order to know what port will be in the update.
-			err = controller.handleMigrationProxy(vmi)
-			Expect(err).NotTo(HaveOccurred())
-			err = controller.handlePostSyncMigrationProxy(vmi)
+			err = controller.handleTargetMigrationProxy(vmi)
 			Expect(err).NotTo(HaveOccurred())
 
 			destSrcPorts := controller.migrationProxy.GetTargetListenerPorts(string(vmi.UID))
@@ -1340,9 +1340,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			// since a random port is generated, we have to create the proxy
 			// here in order to know what port will be in the update.
-			err = controller.handleMigrationProxy(vmi)
-			Expect(err).NotTo(HaveOccurred())
-			err = controller.handlePostSyncMigrationProxy(vmi)
+			err = controller.handleTargetMigrationProxy(vmi)
 			Expect(err).NotTo(HaveOccurred())
 
 			destSrcPorts := controller.migrationProxy.GetTargetListenerPorts(string(vmi.UID))
@@ -1492,6 +1490,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			vmi.Labels = make(map[string]string)
 			vmi.Status.NodeName = host
 			vmi.Labels[v1.MigrationTargetNodeNameLabel] = "othernode"
+			vmi.Status.Interfaces = make([]v1.VirtualMachineInstanceNetworkInterface, 0)
 			vmi.Status.MigrationState = &v1.VirtualMachineInstanceMigrationState{
 				TargetNode:               "othernode",
 				TargetNodeAddress:        "127.0.0.1:12345",

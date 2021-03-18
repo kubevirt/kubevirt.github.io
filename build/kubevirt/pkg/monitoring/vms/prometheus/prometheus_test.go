@@ -20,6 +20,8 @@
 package prometheus
 
 import (
+	"fmt"
+
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -932,6 +934,39 @@ var _ = Describe("Prometheus", func() {
 			Expect(result).ToNot(BeNil())
 			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_vcpu_wait_seconds"))
 		})
+
+		It("should expose vcpu to cpu pinning metric", func() {
+			ch := make(chan prometheus.Metric, 1)
+			defer close(ch)
+
+			ps := prometheusScraper{ch: ch}
+
+			vmStats := &stats.DomainStats{
+				Cpu:       &stats.DomainStatsCPU{},
+				Memory:    &stats.DomainStatsMemory{},
+				Net:       []stats.DomainStatsNet{},
+				Vcpu:      []stats.DomainStatsVcpu{},
+				CPUMapSet: true,
+				CPUMap:    [][]bool{{true, false, true}},
+			}
+
+			vmi := k6tv1.VirtualMachineInstance{}
+			ps.Report("test", &vmi, vmStats)
+
+			result := <-ch
+			dto := &io_prometheus_client.Metric{}
+			result.Write(dto)
+
+			Expect(result).ToNot(BeNil())
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_cpu_affinity"))
+			s := ""
+			for _, lp := range dto.GetLabel() {
+				s += fmt.Sprintf("%v=%v ", lp.GetName(), lp.GetValue())
+			}
+			Expect(s).To(ContainSubstring("vcpu_0_cpu_0=true"))
+			Expect(s).To(ContainSubstring("vcpu_0_cpu_1=false"))
+			Expect(s).To(ContainSubstring("vcpu_0_cpu_2=true"))
+		})
 	})
 })
 
@@ -952,7 +987,7 @@ var _ = Describe("Utility functions", func() {
 
 		It("should handle different VMI phases", func() {
 			vmis := []*k6tv1.VirtualMachineInstance{
-				&k6tv1.VirtualMachineInstance{
+				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "running#0",
 						Annotations: map[string]string{
@@ -965,7 +1000,7 @@ var _ = Describe("Utility functions", func() {
 						Phase: "Running",
 					},
 				},
-				&k6tv1.VirtualMachineInstance{
+				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "running#1",
 						Annotations: map[string]string{
@@ -978,7 +1013,7 @@ var _ = Describe("Utility functions", func() {
 						Phase: "Running",
 					},
 				},
-				&k6tv1.VirtualMachineInstance{
+				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "pending#0",
 						Annotations: map[string]string{
@@ -991,7 +1026,7 @@ var _ = Describe("Utility functions", func() {
 						Phase: "Pending",
 					},
 				},
-				&k6tv1.VirtualMachineInstance{
+				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "scheduling#0",
 						Annotations: map[string]string{
@@ -1005,7 +1040,7 @@ var _ = Describe("Utility functions", func() {
 						Phase: "Scheduling",
 					},
 				},
-				&k6tv1.VirtualMachineInstance{
+				{
 					ObjectMeta: metav1.ObjectMeta{
 						Name: "scheduling#1",
 						Annotations: map[string]string{

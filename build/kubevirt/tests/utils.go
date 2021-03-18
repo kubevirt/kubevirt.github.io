@@ -695,7 +695,7 @@ func SynchronizedBeforeTestSetup() []byte {
 }
 
 func BeforeTestSuitSetup(_ []byte) {
-	rand.Seed(time.Now().Unix())
+	rand.Seed(int64(config.GinkgoConfig.ParallelNode))
 	log.InitializeLogging("tests")
 	log.Log.SetIOWriter(GinkgoWriter)
 	var err error
@@ -4098,7 +4098,7 @@ func GetCephStorageClass() (string, bool) {
 	Expect(err).ToNot(HaveOccurred())
 	for _, storageClass := range storageClassList.Items {
 		switch storageClass.Provisioner {
-		case "rook-ceph.rbd.csi.ceph.com", "csi-rbdplugin":
+		case "rook-ceph.rbd.csi.ceph.com", "csi-rbdplugin", "openshift-storage.rbd.csi.ceph.com":
 			return storageClass.Name, true
 		}
 	}
