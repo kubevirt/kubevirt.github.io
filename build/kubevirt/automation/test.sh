@@ -35,6 +35,11 @@ readonly ARTIFACTS_PATH="${ARTIFACTS-$WORKSPACE/exported-artifacts}"
 readonly TEMPLATES_SERVER="https://templates.ovirt.org/kubevirt/"
 readonly BAZEL_CACHE="${BAZEL_CACHE:-http://bazel-cache.kubevirt-prow.svc.cluster.local:8080/kubevirt.io/kubevirt}"
 
+if [ -z $TARGET ]; then
+  echo "FATAL: TARGET must be non empty"
+  exit 1
+fi
+
 if [[ $TARGET =~ windows.* ]]; then
   echo "picking the default provider for windows tests"
 elif [[ $TARGET =~ cnao ]]; then
@@ -281,24 +286,30 @@ spec:
     path: /
   storageClassName: windows
 EOF
-  # Run only Windows tests
-  export KUBEVIRT_E2E_FOCUS=Windows
-elif [[ $TARGET =~ (cnao|multus) ]]; then
-  export KUBEVIRT_E2E_FOCUS="Multus|Networking|VMIlifecycle|Expose|Macvtap"
-elif [[ $TARGET =~ sig-network ]]; then
-  export KUBEVIRT_E2E_FOCUS="\\[sig-network\\]"
-elif [[ $TARGET =~ sriov.* ]]; then
-  export KUBEVIRT_E2E_FOCUS=SRIOV
-elif [[ $TARGET =~ gpu.* ]]; then
-  export KUBEVIRT_E2E_FOCUS=GPU
-elif [[ $TARGET =~ (okd|ocp).* ]]; then
-  export KUBEVIRT_E2E_SKIP="SRIOV|GPU"
-else
-  export KUBEVIRT_E2E_SKIP="Multus|SRIOV|GPU|Macvtap"
 fi
 
-if [[ "$KUBEVIRT_STORAGE" == "rook-ceph" ]]; then
-  export KUBEVIRT_E2E_FOCUS=rook-ceph
+# Set KUBEVIRT_E2E_FOCUS and KUBEVIRT_E2E_SKIP only if both of them are not already set
+if [[ -z ${KUBEVIRT_E2E_FOCUS} && -z ${KUBEVIRT_E2E_SKIP} ]]; then
+  if [[ $TARGET =~ windows.* ]]; then
+    # Run only Windows tests
+    export KUBEVIRT_E2E_FOCUS=Windows
+  elif [[ $TARGET =~ (cnao|multus) ]]; then
+    export KUBEVIRT_E2E_FOCUS="Multus|Networking|VMIlifecycle|Expose|Macvtap"
+  elif [[ $TARGET =~ sig-network ]]; then
+    export KUBEVIRT_E2E_FOCUS="\\[sig-network\\]"
+  elif [[ $TARGET =~ sriov.* ]]; then
+    export KUBEVIRT_E2E_FOCUS=SRIOV
+  elif [[ $TARGET =~ gpu.* ]]; then
+    export KUBEVIRT_E2E_FOCUS=GPU
+  elif [[ $TARGET =~ (okd|ocp).* ]]; then
+    export KUBEVIRT_E2E_SKIP="SRIOV|GPU"
+  else
+    export KUBEVIRT_E2E_SKIP="Multus|SRIOV|GPU|Macvtap"
+  fi
+
+  if [[ "$KUBEVIRT_STORAGE" == "rook-ceph" ]]; then
+    export KUBEVIRT_E2E_FOCUS=rook-ceph
+  fi
 fi
 
 # If KUBEVIRT_QUARANTINE is not set, do not run quarantined tests. When it is
