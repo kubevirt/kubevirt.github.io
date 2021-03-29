@@ -4,7 +4,7 @@
 
 ## Contributing contents
 
-We more than welcome contributions in the form of blog posts, pages and/or labs, reach out if you happen to have an idea or find an issue with our contents! [Here's our guidelines for contents](GUIDELINES.md).
+We more than welcome contributions to KubeVirt website. Please reach out if you happen to have an idea or find an issue with our contents! [Here's our guidelines for contents](GUIDELINES.md).
 
 
 ## Get Started
@@ -13,16 +13,17 @@ We more than welcome contributions in the form of blog posts, pages and/or labs,
 
 The KubeVirt.io website is a Jekyll site, hosted with GitHub Pages.
 
-You can find the markdown that power the site under `/pages`.
+You can find the markdown that power the site under `./pages`.
 Each section of the site is broken out into their respective folders.
 
-* `/blogs` for the various Blog pages.
-* `/docs` for the Documentation.
-* `/videos` for the videos that are shared.
+* `./blogs` for the various Blog pages.
+* `./docs` for the Documentation.
+* `./videos` for the videos that are shared.
 
-All site images are located under `/assets/images`. Please do not edit these images.
+All site images are located under `./assets/images`. Please do not edit these images.
 
-Images that relate to blog entries are located under `/assets/images/BLOG_POST_TITLE`. The **BLOG_POST_TITLE** should match the name of the markdown file that you added under `/_posts`.
+Images that relate to blog entries are located under `./assets/images/BLOG_POST_TITLE`.  
+The **BLOG_POST_TITLE** should match the name of the markdown file that you added under `/_posts`.
 
 
 #### sign your commits
@@ -107,7 +108,7 @@ Targets:
 
 * `check_links`: HTMLProofer is used to check any links to external websites as we as any cross-page links.
 * `check_spelling`: yaspeller is used to check spelling. Feel free to update to the dictionary file as needed (kubevirt/project-infra/images/yaspeller/.yaspeller.json).
-* `build_image_casperjs`: casperjs project does not provide a container image.  Use this target to build an image packed with nodejs. casperjs will verify all site links in `/_site`.
+* `build_image_casperjs`: casperjs project does not provide a container image.  Use this target to build an image packed with with nodejs. casperjs will verify all site links in `/_site`.
 * 'build_image_yaspeller': yaspeller project does not provide a container image.  User this target to Build an image packed with nodejs and yaspeller app. yaspeller will check content for spelling and other bad forms of English.
 * `status`: Basically `${BUILD_ENGINE} ps` for an easy way to see what's running.
 * `stop`: Stop container and app
@@ -116,11 +117,15 @@ Targets:
 
 
 
-## Join our Community 
+## Getting Help 
 
-* Github Projects: https://github.com/kubevirt
 * Slack: https://kubernetes.slack.com/messages/virtualization
 * Twitter: https://twitter.com/kubevirt
+
+
+## Developer
+
+* Github Projects: https://github.com/kubevirt
 * Community meetings: [Google Calendar](https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT)
 
 ## Privacy
