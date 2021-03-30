@@ -227,3 +227,14 @@ stop_yaspeller: | envvar
 	@echo "${GREEN}Makefile: Stop yaspeller image${RESET}"
 	${CONTAINER_ENGINE} rm -f yaspeller 2> /dev/null; echo
 	@echo -n
+
+## build Markdownlint 
+linter: | envvar
+	${DEBUG}$(eval export TAG='localhost/markdownlint-cli:latest')
+	@echo "${GREEN}Makefile: Building image ${RESET}"
+	git clone https://github.com/igorshubovych/markdownlint-cli.git; \
+	cd markdownlint-cli; \
+	rm -f ./.dockerignore; \
+	${BUILD_ENGINE} ${TAG}
+	rm -rf markdownlint-cli
+	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro  --workdir /srv  ${TAG} --config /srv/.markdownlint.jsonc **/*.md
