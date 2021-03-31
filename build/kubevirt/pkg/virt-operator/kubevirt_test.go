@@ -46,7 +46,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 	policyv1beta1 "k8s.io/api/policy/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
-	extv1beta1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1beta1"
+	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	extclientfake "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/fake"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
@@ -60,7 +60,6 @@ import (
 	v1 "kubevirt.io/client-go/api/v1"
 	promclientfake "kubevirt.io/client-go/generated/prometheus-operator/clientset/versioned/fake"
 	"kubevirt.io/client-go/kubecli"
-	"kubevirt.io/client-go/log"
 	"kubevirt.io/client-go/version"
 	kubecontroller "kubevirt.io/kubevirt/pkg/controller"
 	"kubevirt.io/kubevirt/pkg/testutils"
@@ -79,7 +78,6 @@ const (
 )
 
 var _ = Describe("KubeVirt Operator", func() {
-	log.Log.SetIOWriter(GinkgoWriter)
 
 	var ctrl *gomock.Controller
 	var kvInterface *kubecli.MockKubeVirtInterface
@@ -253,7 +251,7 @@ var _ = Describe("KubeVirt Operator", func() {
 		informers.RoleBinding, roleBindingSource = testutils.NewFakeInformerFor(&rbacv1.RoleBinding{})
 		stores.RoleBindingCache = informers.RoleBinding.GetStore()
 
-		informers.Crd, crdSource = testutils.NewFakeInformerFor(&extv1beta1.CustomResourceDefinition{})
+		informers.Crd, crdSource = testutils.NewFakeInformerFor(&extv1.CustomResourceDefinition{})
 		stores.CrdCache = informers.Crd.GetStore()
 
 		informers.Service, serviceSource = testutils.NewFakeInformerFor(&k8sv1.Service{})
@@ -446,7 +444,7 @@ var _ = Describe("KubeVirt Operator", func() {
 		mockQueue.Wait()
 	}
 
-	addCrd := func(crd *extv1beta1.CustomResourceDefinition) {
+	addCrd := func(crd *extv1.CustomResourceDefinition) {
 		mockQueue.ExpectAdds(1)
 		crdSource.Add(crd)
 		mockQueue.Wait()
@@ -573,8 +571,8 @@ var _ = Describe("KubeVirt Operator", func() {
 		case *rbacv1.RoleBinding:
 			injectMetadata(&obj.(*rbacv1.RoleBinding).ObjectMeta, config)
 			addRoleBinding(resource)
-		case *extv1beta1.CustomResourceDefinition:
-			injectMetadata(&obj.(*extv1beta1.CustomResourceDefinition).ObjectMeta, config)
+		case *extv1.CustomResourceDefinition:
+			injectMetadata(&obj.(*extv1.CustomResourceDefinition).ObjectMeta, config)
 			addCrd(resource)
 		case *k8sv1.Service:
 			injectMetadata(&obj.(*k8sv1.Service).ObjectMeta, config)
@@ -708,7 +706,7 @@ var _ = Describe("KubeVirt Operator", func() {
 		injectMetadata(&pod.ObjectMeta, configController)
 		addPod(pod)
 
-		handler, _ := components.NewHandlerDaemonSet(NAMESPACE, configHandler.GetImageRegistry(), configHandler.GetImagePrefix(), configHandler.GetHandlerVersion(), "", "", configHandler.GetImagePullPolicy(), configHandler.GetVerbosity(), configHandler.GetExtraEnv())
+		handler, _ := components.NewHandlerDaemonSet(NAMESPACE, configHandler.GetImageRegistry(), configHandler.GetImagePrefix(), configHandler.GetHandlerVersion(), "", "", configController.GetLauncherVersion(), configHandler.GetImagePullPolicy(), configHandler.GetVerbosity(), configHandler.GetExtraEnv())
 		pod = &k8sv1.Pod{
 			ObjectMeta: handler.Spec.Template.ObjectMeta,
 			Spec:       handler.Spec.Template.Spec,
@@ -787,9 +785,9 @@ var _ = Describe("KubeVirt Operator", func() {
 				Name: fmt.Sprintf("rand-%s", rand.String(10)),
 			},
 		})
-		all = append(all, &extv1beta1.CustomResourceDefinition{
+		all = append(all, &extv1.CustomResourceDefinition{
 			TypeMeta: metav1.TypeMeta{
-				APIVersion: "apiextensions.k8s.io/v1beta1",
+				APIVersion: "apiextensions.k8s.io/v1",
 				Kind:       "CustomResourceDefinition",
 			},
 			ObjectMeta: metav1.ObjectMeta{
@@ -869,7 +867,7 @@ var _ = Describe("KubeVirt Operator", func() {
 		all = append(all, rbac.GetAllHandler(NAMESPACE)...)
 		all = append(all, rbac.GetAllController(NAMESPACE)...)
 		// crds
-		functions := []func() (*extv1beta1.CustomResourceDefinition, error){
+		functions := []func() (*extv1.CustomResourceDefinition, error){
 			components.NewVirtualMachineInstanceCrd, components.NewPresetCrd, components.NewReplicaSetCrd,
 			components.NewVirtualMachineCrd, components.NewVirtualMachineInstanceMigrationCrd,
 			components.NewVirtualMachineSnapshotCrd, components.NewVirtualMachineSnapshotContentCrd,
@@ -910,7 +908,7 @@ var _ = Describe("KubeVirt Operator", func() {
 			v1.KubeVirtCustomizeComponentAnnotationHash: c.Hash(),
 		}
 
-		handler, _ := components.NewHandlerDaemonSet(NAMESPACE, config.GetImageRegistry(), config.GetImagePrefix(), config.GetHandlerVersion(), "", "", config.GetImagePullPolicy(), config.GetVerbosity(), config.GetExtraEnv())
+		handler, _ := components.NewHandlerDaemonSet(NAMESPACE, config.GetImageRegistry(), config.GetImagePrefix(), config.GetHandlerVersion(), "", "", config.GetLauncherVersion(), config.GetImagePullPolicy(), config.GetVerbosity(), config.GetExtraEnv())
 		handler.ObjectMeta.Annotations = map[string]string{
 			v1.KubeVirtCustomizeComponentAnnotationHash: c.Hash(),
 		}
@@ -1907,7 +1905,7 @@ var _ = Describe("KubeVirt Operator", func() {
 			envVal := rand.String(10)
 			config.PassthroughEnvVars = map[string]string{envKey: envVal}
 
-			handlerDaemonset, err := components.NewHandlerDaemonSet(NAMESPACE, config.GetImageRegistry(), config.GetImagePrefix(), config.GetHandlerVersion(), "", "", config.GetImagePullPolicy(), config.GetVerbosity(), config.GetExtraEnv())
+			handlerDaemonset, err := components.NewHandlerDaemonSet(NAMESPACE, config.GetImageRegistry(), config.GetImagePrefix(), config.GetHandlerVersion(), "", "", config.GetLauncherVersion(), config.GetImagePullPolicy(), config.GetVerbosity(), config.GetExtraEnv())
 
 			Expect(err).ToNot(HaveOccurred())
 			Expect(handlerDaemonset.Spec.Template.Spec.Containers[0].Env).To(ContainElement(k8sv1.EnvVar{Name: envKey, Value: envVal}))

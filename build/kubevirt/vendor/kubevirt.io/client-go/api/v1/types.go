@@ -613,6 +613,8 @@ const (
 	InstallStrategyRegistryAnnotation = "kubevirt.io/install-strategy-registry"
 	// This annotation represents the kubevirt deployment identifier used for an install strategy configmap.
 	InstallStrategyIdentifierAnnotation = "kubevirt.io/install-strategy-identifier"
+	// This annotation shows the enconding used for the manifests in the Install Strategy ConfigMap.
+	InstallStrategyConfigMapEncoding = "kubevirt.io/install-strategy-cm-encoding"
 	// This annotation is a hash of all customizations that live under spec.CustomizeComponents
 	KubeVirtCustomizeComponentAnnotationHash = "kubevirt.io/customizer-identifier"
 	// This annotation represents the kubevirt generation that was used to create a resource
@@ -633,8 +635,17 @@ const (
 	IgnitionAnnotation           string = "kubevirt.io/ignitiondata"
 	PlacePCIDevicesOnRootComplex string = "kubevirt.io/placePCIDevicesOnRootComplex"
 
+	// This label represents supported cpu features on the node
+	CPUFeatureLabel = "cpu-feature.node.kubevirt.io/"
+	// This laberepresents supported cpu models on the node
+	CPUModelLabel = "cpu-model.node.kubevirt.io/"
+	// This label represents supported HyperV features on the node
+	HypervLabel = "hyperv.node.kubevirt.io/"
+
 	VirtualMachineLabel        = AppLabel + "/vm"
 	MemfdMemoryBackend  string = "kubevirt.io/memfd"
+
+	MigrationSelectorLabel = "kubevirt.io/vmi-name"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {
@@ -1649,6 +1660,8 @@ type KubeVirtConfiguration struct {
 	SupportedGuestAgentVersions []string                `json:"supportedGuestAgentVersions,omitempty"`
 	MemBalloonStatsPeriod       *uint32                 `json:"memBalloonStatsPeriod,omitempty"`
 	PermittedHostDevices        *PermittedHostDevices   `json:"permittedHostDevices,omitempty"`
+	MinCPUModel                 string                  `json:"minCPUModel,omitempty"`
+	ObsoleteCPUModels           map[string]bool         `json:"obsoleteCPUModels,omitempty"`
 }
 
 //

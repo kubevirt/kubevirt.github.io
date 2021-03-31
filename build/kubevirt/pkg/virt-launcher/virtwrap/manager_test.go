@@ -44,7 +44,6 @@ import (
 	"kubevirt.io/kubevirt/pkg/util/net/ip"
 
 	v1 "kubevirt.io/client-go/api/v1"
-	"kubevirt.io/client-go/log"
 	cloudinit "kubevirt.io/kubevirt/pkg/cloud-init"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
@@ -60,8 +59,6 @@ var _ = Describe("Manager", func() {
 	testVmName := "testvmi"
 	testNamespace := "testnamespace"
 	testDomainName := fmt.Sprintf("%s_%s", testNamespace, testVmName)
-
-	log.Log.SetIOWriter(GinkgoWriter)
 
 	tmpDir, _ := ioutil.TempDir("", "cloudinittest")
 	isoCreationFunc := func(isoOutFile, volumeID string, inDir string) error {
@@ -326,6 +323,78 @@ var _ = Describe("Manager", func() {
 			Expect(err).To(BeNil())
 
 		})
+		It("should not add discard=unmap if a disk is preallocated", func() {
+			// Make sure that we always free the domain after use
+			mockDomain.EXPECT().Free()
+			vmi := newVMI(testNamespace, testVmName)
+			vmi.Spec.Domain.Devices.Disks = []v1.Disk{
+				{
+					Name: "permvolume1",
+					DiskDevice: v1.DiskDevice{
+						Disk: &v1.DiskTarget{
+							Bus: "virtio",
+						},
+					},
+					Cache: "none",
+				},
+			}
+			vmi.Spec.Volumes = []v1.Volume{
+				{
+					Name: "permvolume1",
+					VolumeSource: v1.VolumeSource{
+						DataVolume: &v1.DataVolumeSource{
+							Name: "dv1",
+						},
+					},
+				},
+			}
+			vmi.Status.VolumeStatus = []v1.VolumeStatus{
+				{
+					Name:  "permvolume1",
+					Phase: v1.VolumeReady,
+				},
+			}
+			mockConn.EXPECT().LookupDomainByName(testDomainName).Return(mockDomain, libvirt.Error{Code: libvirt.ERR_NO_DOMAIN})
+			domainSpec := expectIsolationDetectionForVMI(vmi)
+			domainSpec.Devices.Disks = []api.Disk{
+				{
+					Device: "disk",
+					Type:   "file",
+					Source: api.DiskSource{
+						File: "/var/run/kubevirt-private/vmi-disks/permvolume1/disk.img",
+					},
+					Target: api.DiskTarget{
+						Bus:    "virtio",
+						Device: "vda",
+					},
+					Driver: &api.DiskDriver{
+						Cache:       "none",
+						Name:        "qemu",
+						Type:        "raw",
+						ErrorPolicy: "stop",
+					},
+					Alias: api.NewUserDefinedAlias("permvolume1"),
+				},
+			}
+			xmlDomain, err := xml.MarshalIndent(domainSpec, "", "\t")
+			Expect(err).ToNot(HaveOccurred())
+			mockConn.EXPECT().DomainDefineXML(gomock.Any()).DoAndReturn(func(xml string) (cli.VirDomain, error) {
+				By(fmt.Sprintf("%s\n", xml))
+				Expect(strings.Contains(xml, "discard=\"unmap\"")).To(BeFalse())
+				return mockDomain, nil
+			})
+			mockDomain.EXPECT().GetState().Return(libvirt.DOMAIN_SHUTDOWN, 1, nil)
+			mockDomain.EXPECT().Create().Return(nil)
+			mockDomain.EXPECT().GetXMLDesc(libvirt.DomainXMLFlags(0)).MaxTimes(2).Return(string(xmlDomain), nil)
+			mockDomain.EXPECT().Free()
+			manager, _ := NewLibvirtDomainManager(mockConn, "fake", nil, 0, nil, "/usr/share/OVMF")
+			newspec, err := manager.SyncVMI(vmi, true, &cmdv1.VirtualMachineOptions{
+				VirtualMachineSMBios: &cmdv1.SMBios{},
+				PreallocatedVolumes:  []string{"permvolume1"},
+			})
+			Expect(err).To(BeNil())
+			Expect(newspec).ToNot(BeNil())
+		})
 		It("should hotplug a disk if a volume was hotplugged", func() {
 			// Make sure that we always free the domain after use
 			mockDomain.EXPECT().Free()
@@ -431,6 +500,7 @@ var _ = Describe("Manager", func() {
 					Name:        "qemu",
 					Type:        "raw",
 					ErrorPolicy: "stop",
+					Discard:     "unmap",
 				},
 				Alias: api.NewUserDefinedAlias("hpvolume1"),
 				Address: &api.Address{
@@ -536,6 +606,7 @@ var _ = Describe("Manager", func() {
 					Name:        "qemu",
 					Type:        "raw",
 					ErrorPolicy: "stop",
+					Discard:     "unmap",
 				},
 				Alias: api.NewUserDefinedAlias("hpvolume1"),
 				Address: &api.Address{

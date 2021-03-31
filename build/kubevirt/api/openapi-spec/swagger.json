@@ -9448,7 +9448,7 @@
       "type": "boolean"
      },
      "blockMultiQueue": {
-      "description": "Whether or not to enable virtio multi-queue for block devices",
+      "description": "Whether or not to enable virtio multi-queue for block devices. Defaults to false.",
       "type": "boolean"
      },
      "disableHotplug": {
@@ -10217,8 +10217,17 @@
      "migrations": {
       "$ref": "#/definitions/v1.MigrationConfiguration"
      },
+     "minCPUModel": {
+      "type": "string"
+     },
      "network": {
       "$ref": "#/definitions/v1.NetworkConfiguration"
+     },
+     "obsoleteCPUModels": {
+      "type": "object",
+      "additionalProperties": {
+       "type": "boolean"
+      }
      },
      "ovmfPath": {
       "type": "string"

@@ -20,6 +20,7 @@
 package virthandler
 
 import (
+	"context"
 	goerror "errors"
 	"fmt"
 	"io"
@@ -32,6 +33,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/opencontainers/runc/libcontainer/cgroups"
 
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -182,7 +185,19 @@ func NewController(
 
 	c.domainNotifyPipes = make(map[string]string)
 
-	c.deviceManagerController = device_manager.NewDeviceController(c.host, maxDevices, clusterConfig)
+	permissions := "rw"
+	if cgroups.IsCgroup2UnifiedMode() {
+		// Need 'rwm' permissions otherwise ebpf filtering program attached by runc
+		// will deny probing the device file with 'access' syscall. That in turn
+		// will lead to libvirtd failure on VM startup.
+		// This has been fixed upstream:
+		//   https://github.com/opencontainers/runc/pull/2796
+		// but the workaround is still needed to support previous versions without
+		// the patch.
+		permissions = "rwm"
+	}
+
+	c.deviceManagerController = device_manager.NewDeviceController(c.host, maxDevices, permissions, clusterConfig)
 	c.heartBeat = heartbeat.NewHeartBeat(clientset.CoreV1(), c.deviceManagerController, clusterConfig, host)
 
 	return c
@@ -2264,6 +2279,26 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 	}
 
 	vmi := origVMI.DeepCopy()
+	// Find preallocated volumes
+	var preallocatedVolumes []string
+	for _, v := range vmi.Spec.Volumes {
+		var name string
+		source := v.VolumeSource
+		if source.PersistentVolumeClaim != nil || source.DataVolume != nil {
+			if source.PersistentVolumeClaim != nil {
+				name = source.PersistentVolumeClaim.ClaimName
+			} else {
+				name = source.DataVolume.Name
+			}
+			pvc, err := d.clientset.CoreV1().PersistentVolumeClaims(vmi.Namespace).Get(context.Background(), name, metav1.GetOptions{})
+			if err != nil {
+				continue
+			}
+			if pvcutils.IsPreallocated(pvc.ObjectMeta.Annotations) {
+				preallocatedVolumes = append(preallocatedVolumes, v.Name)
+			}
+		}
+	}
 
 	err = hostdisk.ReplacePVCByHostDisk(vmi, d.clientset)
 	if err != nil {
@@ -2285,7 +2320,6 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 		if err := d.containerDiskMounter.Mount(vmi, true); err != nil {
 			return err
 		}
-
 		criticalNetworkError, err := d.setPodNetworkPhase1(vmi)
 		if err != nil {
 			if criticalNetworkError {
@@ -2319,6 +2353,7 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 			Version:      smbios.Version,
 		},
 		MemBalloonStatsPeriod: period,
+		PreallocatedVolumes:   preallocatedVolumes,
 	}
 
 	err = client.SyncVirtualMachine(vmi, options)

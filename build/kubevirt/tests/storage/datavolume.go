@@ -65,23 +65,6 @@ var _ = SIGDescribe("[Serial]DataVolume Integration", func() {
 		}
 	})
 
-	runVMIAndExpectLaunch := func(vmi *v1.VirtualMachineInstance, dv *cdiv1.DataVolume, timeout int) *v1.VirtualMachineInstance {
-		By("Starting a VirtualMachineInstance with DataVolume")
-		var obj *v1.VirtualMachineInstance
-		var err error
-		Eventually(func() error {
-			obj, err = virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Create(vmi)
-			return err
-		}, timeout, 1*time.Second).ShouldNot(HaveOccurred())
-
-		By("Waiting until the DV is ready")
-		tests.WaitForSuccessfulDataVolumeImport(dv, timeout)
-
-		By("Waiting until the VirtualMachineInstance will start")
-		tests.WaitForSuccessfulVMIStartWithTimeout(obj, timeout)
-		return obj
-	}
-
 	Describe("[rfe_id:3188][crit:high][vendor:cnv-qe@redhat.com][level:system] Starting a VirtualMachineInstance with a DataVolume as a volume source", func() {
 
 		Context("Alpine import", func() {
@@ -116,7 +99,7 @@ var _ = SIGDescribe("[Serial]DataVolume Integration", func() {
 				By("Starting and stopping the VirtualMachineInstance a number of times")
 				for i := 1; i <= num; i++ {
 					tests.WaitForDataVolumeReadyToStartVMI(vmi, 140)
-					vmi := runVMIAndExpectLaunch(vmi, dataVolume, 500)
+					vmi := tests.RunVMIAndExpectLaunchWithDataVolume(vmi, dataVolume, 500)
 					// Verify console on last iteration to verify the VirtualMachineInstance is still booting properly
 					// after being restarted multiple times
 					if i == num {
@@ -144,7 +127,7 @@ var _ = SIGDescribe("[Serial]DataVolume Integration", func() {
 				}
 				// with WFFC the run actually starts the import and then runs VM, so the timeout has to include both
 				// import and start
-				vmi = runVMIAndExpectLaunch(vmi, dataVolume, 500)
+				vmi = tests.RunVMIAndExpectLaunchWithDataVolume(vmi, dataVolume, 500)
 
 				By("Checking that the VirtualMachineInstance console has expected output")
 				Expect(console.LoginToAlpine(vmi)).To(Succeed())
@@ -539,6 +522,26 @@ var _ = SIGDescribe("[Serial]DataVolume Integration", func() {
 
 	Describe("[rfe_id:3188][crit:high][vendor:cnv-qe@redhat.com][level:system] Starting a VirtualMachine with a DataVolume", func() {
 		Context("using Alpine http import", func() {
+			It("a DataVolume with preallocation shouldn't have discard=unmap", func() {
+				var vm *v1.VirtualMachine
+				vm = tests.NewRandomVMWithDataVolume(tests.GetUrl(tests.AlpineHttpUrl), tests.NamespaceTestDefault)
+				preallocation := true
+				vm.Spec.DataVolumeTemplates[0].Spec.Preallocation = &preallocation
+
+				vm, err = virtClient.VirtualMachine(tests.NamespaceTestDefault).Create(vm)
+				Expect(err).ToNot(HaveOccurred())
+
+				vm = tests.StartVirtualMachine(vm)
+				vmi, err := virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				domXml, err := tests.GetRunningVirtualMachineInstanceDomainXML(virtClient, vmi)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(domXml).ToNot(ContainSubstring("discard='unmap'"))
+				vm = tests.StopVirtualMachine(vm)
+				Expect(virtClient.VirtualMachine(vm.Namespace).Delete(vm.Name, &metav1.DeleteOptions{})).To(Succeed())
+			})
+
 			table.DescribeTable("[test_id:3191]should be successfully started and stopped multiple times", func(isHTTP bool) {
 				var vm *v1.VirtualMachine
 				if isHTTP {

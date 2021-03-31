@@ -55,20 +55,20 @@ type ControlledDevice struct {
 	stopChan     chan struct{}
 }
 
-func getPermanentHostDevicePlugins(maxDevices int) map[string]ControlledDevice {
+func getPermanentHostDevicePlugins(maxDevices int, permissions string) map[string]ControlledDevice {
 	ret := map[string]ControlledDevice{}
 	for name, path := range permanentDevicePluginPaths {
 		ret[name] = ControlledDevice{
-			devicePlugin: NewGenericDevicePlugin(name, path, maxDevices, (name != "kvm")),
+			devicePlugin: NewGenericDevicePlugin(name, path, maxDevices, permissions, (name != "kvm")),
 			stopChan:     make(chan struct{}),
 		}
 	}
 	return ret
 }
 
-func NewDeviceController(host string, maxDevices int, clusterConfig *virtconfig.ClusterConfig) *DeviceController {
+func NewDeviceController(host string, maxDevices int, permissions string, clusterConfig *virtconfig.ClusterConfig) *DeviceController {
 	controller := &DeviceController{
-		devicePlugins: getPermanentHostDevicePlugins(maxDevices),
+		devicePlugins: getPermanentHostDevicePlugins(maxDevices, permissions),
 		host:          host,
 		maxDevices:    maxDevices,
 		backoff:       []time.Duration{1 * time.Second, 2 * time.Second, 5 * time.Second, 10 * time.Second},
@@ -78,7 +78,7 @@ func NewDeviceController(host string, maxDevices int, clusterConfig *virtconfig.
 	return controller
 }
 
-func (c *DeviceController) nodeHasDevice(devicePath string) bool {
+func (c *DeviceController) NodeHasDevice(devicePath string) bool {
 	_, err := os.Stat(devicePath)
 	// Since this is a boolean question, any error means "no"
 	return (err == nil)

@@ -14752,7 +14752,7 @@ func schema_kubevirtio_client_go_api_v1_Devices(ref common.ReferenceCallback) co
 					},
 					"blockMultiQueue": {
 						SchemaProps: spec.SchemaProps{
-							Description: "Whether or not to enable virtio multi-queue for block devices",
+							Description: "Whether or not to enable virtio multi-queue for block devices. Defaults to false.",
 							Type:        []string{"boolean"},
 							Format:      "",
 						},
@@ -16212,6 +16212,26 @@ func schema_kubevirtio_client_go_api_v1_KubeVirtConfiguration(ref common.Referen
 					"permittedHostDevices": {
 						SchemaProps: spec.SchemaProps{
 							Ref: ref("kubevirt.io/client-go/api/v1.PermittedHostDevices"),
+						},
+					},
+					"minCPUModel": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"obsoleteCPUModels": {
+						SchemaProps: spec.SchemaProps{
+							Type: []string{"object"},
+							AdditionalProperties: &spec.SchemaOrBool{
+								Allows: true,
+								Schema: &spec.Schema{
+									SchemaProps: spec.SchemaProps{
+										Type:   []string{"boolean"},
+										Format: "",
+									},
+								},
+							},
 						},
 					},
 				},
