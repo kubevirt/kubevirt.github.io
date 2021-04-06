@@ -230,11 +230,19 @@ stop_yaspeller: | envvar
 
 ## build Markdownlint 
 linter: | envvar
-	${DEBUG}$(eval export TAG='localhost/markdownlint-cli:latest')
-	@echo "${GREEN}Makefile: Building image ${RESET}"
-	git clone https://github.com/igorshubovych/markdownlint-cli.git; \
-	cd markdownlint-cli; \
-	rm -f ./.dockerignore; \
-	${BUILD_ENGINE} ${TAG}
-	rm -rf markdownlint-cli
-	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro  --workdir /srv  ${TAG} --config /srv/.markdownlint.jsonc **/*.md
+	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
+	@echo "${GREEN}Makefile: Running Linter ${RESET}"
+	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro${SELINUX_ENABLED}  --workdir /srv ${TAG} markdownlint --config /srv/markdownlint.yaml **/*.md 
+
+## run Check Spelling 
+run_check_spelling: | envvar
+	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
+	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
+	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${TAG} /bin/bash -c 'update-yaspeller.sh ; yaspeller -c /tmp/yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+
+	
+## run Check Links
+run_check_links: | envvar
+	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
+	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${TAG} /bin/bash -c 'cd /srv/jekyll; bundle install --quiet; rake -- -u'
+	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${TAG} /bin/bash -c 'cd /srv/jekyll; bundle install --quiet; rake --trace links:userguide_selectors'
