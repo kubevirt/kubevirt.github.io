@@ -12,12 +12,12 @@ tags: [laboratory, importer, vm import, containerized data importer, CDI, lab]
 
 You can experiment this lab online at [![Katacoda](/assets/images/katacoda-logo.png)](https://katacoda.com/kubevirt/scenarios/kubevirt-cdi)
 
-[CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt.
+[CDI](https://github.com/kubevirt/containerized-data-importer) is a utility designed to import Virtual Machine images for use with Kubevirt.
 
 At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named _disk.img_ with the desired content into the associated PVC.
 
 > notes "Note"
-> This 'lab' targets deployment on _one node_ as it uses Minikube's `hostpath` storage class which can create PersistentVolumes (PVs) on only one node at a time. In production use, a StorageClass capable of ReadWriteOnce or better operation should be deployed to ensure PVs are accessible from any node.
+> This 'lab' targets deployment on _one node_ as it uses Minikube and its `hostpath` storage class which can create PersistentVolumes (PVs) on only one node at a time. In production use, a StorageClass capable of ReadWriteOnce or better operation should be deployed to ensure PVs are accessible from any node.
 
 #### Install the CDI
 
@@ -40,7 +40,7 @@ Review the "cdi" pods that were added.
 {% include scriptlets/lab2/05_view_cdi_pod_status.sh -%}
 ```
 
-#### Use CDI to Import a Cloud Image
+#### Use CDI to Import a Disk Image
 
 As an example, we will import a Fedora33 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
