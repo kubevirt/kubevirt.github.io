@@ -12,22 +12,26 @@ tags: [laboratory, importer, vm import, containerized data importer, CDI, lab]
 
 You can experiment this lab online at [![Katacoda](/assets/images/katacoda-logo.png)](https://katacoda.com/kubevirt/scenarios/kubevirt-cdi)
 
-[CDI](https://github.com/kubevirt/containerized-data-importer) is an utility designed to import Virtual Machine images for use with Kubevirt.
+[CDI](https://github.com/kubevirt/containerized-data-importer) is a utility designed to import Virtual Machine images for use with Kubevirt.
 
 At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named _disk.img_ with the desired content into the associated PVC.
 
-**NOTE**: This 'lab' targets deployment on _one node_ as it uses `hostpath` storage provisioner which is randomly deployed to any node, causing that in the event of more than one nodes, only one will get the storage and that should be the node where the VM should be deployed on, otherwise, it will fail.
+> notes "Note"
+> This 'lab' targets deployment on _one node_ as it uses Minikube and its `hostpath` storage class which can create PersistentVolumes (PVs) on only one node at a time. In production use, a StorageClass capable of ReadWriteOnce or better operation should be deployed to ensure PVs are accessible from any node.
 
 #### Install the CDI
 
-We will first explore each component and install them. In this exercise we create a hostpath provisioner and storage class. Also we will deploy the CDI component using the Operator.
+In this exercise we deploy the latest release of CDI using its Operator.
 
 ```bash
-{% include scriptlets/lab2/01_get_storage_manifest.sh -%}
-cat storage-setup.yml
-{% include scriptlets/lab2/02_create_storage.sh -%}
 {% include scriptlets/lab2/03_deploy_cdi_operator.sh -%}
 {% include scriptlets/lab2/04_create_cdi-cr.sh -%}
+```
+
+Check the status of the cdi CustomResource (CR) created in the previous step. The CR's Phase will change from Deploying to Deployed as the pods it deploys are created and reach the Running state.
+
+```
+{% include scriptlets/lab2/05_view_cdi_deployment.sh -%}
 ```
 
 Review the "cdi" pods that were added.
@@ -36,9 +40,9 @@ Review the "cdi" pods that were added.
 {% include scriptlets/lab2/05_view_cdi_pod_status.sh -%}
 ```
 
-#### Use the CDI
+#### Use CDI to Import a Disk Image
 
-As an example, we will import a Fedora30 Cloud Image as a PVC and launch a Virtual Machine making use of it.
+As an example, we will import a Fedora33 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
 ```bash
 {% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
@@ -52,7 +56,13 @@ This will create the PVC with a proper annotation so that CDI controller detects
 
 Notice that the importer downloaded the publicly available Fedora Cloud qcow image. Once the importer pod completes, this PVC is ready for use in kubevirt.
 
-If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} PVC, and then recreate the {{ site.data.labs_kubernetes_variables.cdi_lab.pvc_name }} PVC.
+> notes ""
+> If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the PVC, and then recreate the PVC.
+>
+>```bash
+> kubectl delete -f pvc_fedora.yml --wait
+> kubectl create -f pvc_fedora.yml
+>```
 
 Let's create a Virtual Machine making use of it. Review the file _vm1_pvc.yml_.
 
@@ -67,7 +77,7 @@ We change the yaml definition of this Virtual Machine to inject the default publ
 {% include scriptlets/lab2/09_create_vm1.sh -%}
 ```
 
-This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to `gather its IP`. You are looking for the IP address beside the `virt-launcher` pod.
+This will create and start a Virtual Machine named vm1. We can use the following command to check our Virtual Machine is running and to gather its IP. You are looking for the IP address beside the `virt-launcher` pod.
 
 ```
 {% include scriptlets/lab2/10_view_pods.sh -%}

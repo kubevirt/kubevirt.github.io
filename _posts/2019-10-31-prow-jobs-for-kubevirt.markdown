@@ -50,8 +50,8 @@ For each repo we've some types of jobs:
 
 Jobs are defined in the [project-infra](https://github.com/kubevirt/project-infra/) repository, for example:
 
-- <https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-periodics.yaml>
-- <https://github.com/kubevirt/project-infra/blob/master/github/ci/prow/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-presubmits.yaml>
+- <https://github.com/kubevirt/project-infra/blob/master/github/ci/prow-deploy/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-periodics.yaml>
+- <https://github.com/kubevirt/project-infra/blob/master/github/ci/prow-deploy/files/jobs/kubevirt/kubevirt-tutorial/kubevirt-tutorial-presubmits.yaml>
 
 Those jobs define the image to use (image and tag), and the commands to execute. In the examples above we're using 'Docker-in-Docker' (dind) images and we're targetting the KubeVirt-tutorial repository.
 

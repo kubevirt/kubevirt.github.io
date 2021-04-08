@@ -234,12 +234,12 @@ The Hyperconverged Cluster Operator can be installed on bare metal server cluste
 An attendee will learn:
 
 - how to deploy and maintain a KubeVirt cluster with the Hyperconverged Cluster Operator
-- a [demo](https://youtu.be/tHPHfL5PzGM​)
+- a [demo](https://youtu.be/tHPHfL5PzGM)
 - ongoing development and how to contribute
 
 Presenters:
-- Nahshon Unna-Tsametet, Senior Software Engineer, Red Hat, <https://github.com/nunnatsa​>
-- Oren Cohen, Software Engineer, Red Hat, <https://github.com/orenc1​>
+- Nahshon Unna-Tsametet, Senior Software Engineer, Red Hat, <https://github.com/nunnatsa>
+- Oren Cohen, Software Engineer, Red Hat, <https://github.com/orenc1>
 
 References:
 - [HyperConverged Cluster operator](https://github.com/kubevirt/hyperconverged-cluster-operator) (HCO).

@@ -1,1 +1,18 @@
-kubectl create -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/pvc_fedora.yml
+cat <<EOF > pvc_fedora.yml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: "fedora"
+  labels:
+    app: containerized-data-importer
+  annotations:
+    cdi.kubevirt.io/storage.import.endpoint: "https://download.fedoraproject.org/pub/fedora/linux/releases/33/Cloud/x86_64/images/Fedora-Cloud-Base-33-1.2.x86_64.raw.xz"
+spec:
+  accessModes:
+  - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+EOF
+
+kubectl create -f pvc_fedora.yml
