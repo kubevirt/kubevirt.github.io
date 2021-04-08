@@ -58,10 +58,11 @@ Notice that the importer downloaded the publicly available Fedora Cloud qcow ima
 
 > notes ""
 > If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the PVC, and then recreate the PVC.
-
-```bash
-{% include scriptlets/lab2/00_delete_and_recreate_pvc.sh -%}
-```
+>
+>```bash
+> kubectl delete -f pvc_fedora.yml --wait
+> kubectl create -f pvc_fedora.yml
+>```
 
 Let's create a Virtual Machine making use of it. Review the file _vm1_pvc.yml_.
 
