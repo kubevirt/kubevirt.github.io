@@ -86,117 +86,9 @@ endif
 endif
 	@echo
 
-
-## Check external, internal links and links/selectors to userguide on website content
-check_links: | envvar stop
-	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
-	@echo "${GREEN}Makefile: Check external, internal links on website content${RESET}"
-	${DEBUG}for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name ${TAG} --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c 'cd /srv/jekyll; bundle install --quiet; rake -- -u'
-	@echo
-	@echo "${GREEN}Makefile: Check links and selectors to userguide on website content${RESET}"
-#BEGIN BIG SHELL SCRIPT
-	${DEBUG}export IFS=$$'\n'; \
-	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name ${TAG} --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c 'cd /srv/jekyll; bundle install --quiet; rake links:userguide_selectors'`; \
-	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
-	  echo "$${OUTPUT}"; \
-	  exit 1; \
-	fi; \
-	for i in `echo "$${OUTPUT}" | egrep "https?://.*,.*"`; do \
-	  /bin/echo -n "${AQUA}"; \
-	  echo -n "File: " && echo "$${i}" | cut -d"," -f 2; \
-	  echo -n "Link: " && echo "$${i}" | cut -d"," -f 1; \
-	  /bin/echo -n "${RESET}"; \
-	  if `egrep -q "/user-guide/#.*(\?id=)?" <<< "$${i}"`; then \
-	    RETVAL=1; \
-	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
-	    echo; \
-	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name ${TAG} --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site casperjs /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /srv/jekyll/check_selectors.js"; \
-	    echo; \
-	  fi; \
-	done; \
-	if [ "$${RETVAL}" ]; then exit 1; fi; \
-	echo "Complete!"
-#END BIG SHELL SCRIPT
-	@echo
-
-
-## Check spelling on content
-check_spelling: | envvar stop
-	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG}if [ ! -e "./yaspeller.json" ]; then \
-		echo "Dictionary file: https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json"; \
-	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json -o yaspeller.json -w '%{http_code}\n' -s`" != "200" ]; then \
-			echo "Unable to curl yaspeller dictionary file"; \
-			RETVAL=1; \
-		fi; \
-		REMOTE=1; \
-	else \
-		echo "Using local dictionary file"; \
-	  echo "Dictionary file: yasspeller.json"; \
-		echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/yaspeller/.yaspeller.json"; \
-	fi; \
-	export IFS=$$'\n'; \
-	if `cat ./yaspeller.json 2>&1 | jq > /dev/null 2>&1`; then \
-		for i in `${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock -v ./yaspeller.json:/srv/yaspeller.json:ro${SELINUX_ENABLED} yaspeller /bin/bash -c 'echo; yaspeller -c /srv/yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
-			if [[ "$${i}" =~ "✗" ]]; then \
-				RETVAL=1; \
-			fi; \
-		echo "$${i}" | sed -e 's/\/srv\//\.\//g'; \
-		done; \
-	else \
-		echo "yaspeller dictionary file does not exist or is invalid json"; \
-		RETVAL=1; \
-	fi; \
-	if [ "$${REMOTE}" ]; then \
-		rm -rf yaspeller.json > /dev/null 2>&1; \
-	fi; \
-	if [ "$${RETVAL}" ]; then exit 1; else echo "Complete!"; fi
-
-
-## Build image: casperjs
-build_image_casperjs: stop_casperjs
-	${DEBUG}$(eval export TAG=localhost/casperjs:latest)
-	${DEBUG}$(MAKE) build_image
-	@echo
-
-
-## Build image: yaspeller
-build_image_yaspeller: stop_yaspeller
-	${DEBUG}$(eval export TAG='localhost/yaspeller:latest')
-	${DEBUG}$(MAKE) build_image
-	@echo
-
-
-build_image: envvar
-	@echo "${GREEN}Makefile: Building image: ${TAG}${RESET}"
-ifeq ($(TAG),)
-	@echo "This is a sourced target!"
-	@echo "Do not run this target directly... exitting!"
-	@exit 1
-endif
-	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
-		IMAGE="`echo $${TAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
-		if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/$${IMAGE}/Dockerfile -o Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
-			echo "curl Dockerfile failed... exitting!"; \
-			exit 2; \
-		else \
-			REMOTE=1; \
-		fi; \
-	else \
-		IMAGE="`echo $${TAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
-		echo "DOCKERFILE file: ./Dockerfile"; \
-		echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/$${IMAGE}/Dockerfile"; \
-		echo; \
-	fi; \
-	${CONTAINER_ENGINE} rmi ${TAG} 2> /dev/null || echo -n; \
-	${BUILD_ENGINE} ${TAG}; \
-	if [ "$${REMOTE}" ]; then rm -f Dockerfile > /dev/null 2>&1; fi
-
-
 ## Run site.  App available @ http://0.0.0.0:4000
 run: | envvar stop
+	${DEBUG}$(eval export TAG='jekyll/jekyll')
 	@echo "${GREEN}Makefile: Run site${RESET}"
 	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
 	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c "jekyll serve --trace --force_polling --future"
@@ -216,21 +108,8 @@ stop: | envvar
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
 
-
-## Stop casperjs image
-stop_casperjs: | envvar
-	@echo "${GREEN}Makefile: Stop casperjs image${RESET}"
-	${CONTAINER_ENGINE} rm -f casperjs 2> /dev/null; echo
-	@echo -n
-
-## Stop yaspeller image
-stop_yaspeller: | envvar
-	@echo "${GREEN}Makefile: Stop yaspeller image${RESET}"
-	${CONTAINER_ENGINE} rm -f yaspeller 2> /dev/null; echo
-	@echo -n
-
-## Build image localhost/kubevirt.io 
-run_build_image: | envvar
+## Build image localhost/kubevirt.io
+build_image: | envvar
 	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	@echo "${GREEN}Makefile: Cloneing Repo ${RESET}"
 	${DEBUG}git clone https://github.com/kubevirt/project-infra.git /tmp/project-infra; \
@@ -238,35 +117,36 @@ run_build_image: | envvar
 	echo "${GREEN}Makefile: Building Image ${RESET}"; \
 	${BUILD_ENGINE} ${TAG}
 
+## Check if image exist and build
 check_image: | envvar
 	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	${DEBUG}if [[ `${CONTAINER_ENGINE} image ls | grep localhost/kubevirt.io` ]]; \
 	then \
 		echo "${YELLOW}Makefile: Container image exist ${RESET}"; \
 	else \
-		${MAKE} run_build_image; \
+		${MAKE} build_image; \
 	fi
 
 
-## build Markdownlint 
-run_check_linter: | envvar
+## build Markdownlint
+check_linter: | envvar
 	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	${DEBUG}$(MAKE) check_image
 	@echo "${GREEN}Makefile: Running Linter ${RESET}"
-	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro${SELINUX_ENABLED}  --workdir /srv ${TAG} markdownlint --config /srv/markdownlint.yaml **/*.md 
+	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro${SELINUX_ENABLED}  --workdir /srv ${TAG} markdownlint --config /srv/markdownlint.yaml **/*.md
 
-## run Check Spelling 
-run_check_spelling: | envvar
+## Check spelling on content
+check_spelling: | envvar
 	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	${DEBUG}$(MAKE) check_image
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
 	${DEBUG} curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh; \
 	bash update-yaspeller.sh
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${TAG} /bin/bash -c 'update-yaspeller.sh ; yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${TAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
 
-	
-## run Check Links
-run_check_links: | envvar
+
+## Check external, internal links and links/selectors to userguide on website content
+check_links: | envvar
 	${DEBUG}$(MAKE) check_image
 	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${TAG} /bin/bash -c 'cd /srv/jekyll; rake -- -u' # ? check internal external links
