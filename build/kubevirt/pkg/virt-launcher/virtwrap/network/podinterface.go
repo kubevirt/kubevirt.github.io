@@ -65,7 +65,7 @@ type BindMechanism interface {
 	// The following entry points require domain initialized for the
 	// binding and can be used in phase2 only.
 	decorateConfig() error
-	startDHCP(vmi *v1.VirtualMachineInstance) error
+	startDHCP() error
 }
 
 type podNICImpl struct {
@@ -236,7 +236,7 @@ func ensureDHCP(vmi *v1.VirtualMachineInstance, bindMechanism BindMechanism, pod
 	dhcpStartedFile := fmt.Sprintf("/var/run/kubevirt-private/dhcp_started-%s", podInterfaceName)
 	_, err := os.Stat(dhcpStartedFile)
 	if os.IsNotExist(err) {
-		if err := bindMechanism.startDHCP(vmi); err != nil {
+		if err := bindMechanism.startDHCP(); err != nil {
 			return fmt.Errorf("failed to start DHCP server for interface %s", podInterfaceName)
 		}
 		newFile, err := os.Create(dhcpStartedFile)
@@ -447,7 +447,7 @@ func (b *BridgeBindMechanism) getFakeBridgeIP() (string, error) {
 	return "", fmt.Errorf("Failed to generate bridge fake address for interface %s", b.iface.Name)
 }
 
-func (b *BridgeBindMechanism) startDHCP(_ *v1.VirtualMachineInstance) error {
+func (b *BridgeBindMechanism) startDHCP() error {
 	if !b.vif.IPAMDisabled {
 		addr, err := b.getFakeBridgeIP()
 		if err != nil {
@@ -793,7 +793,7 @@ func configureVifV6Addresses(b *MasqueradeBindMechanism, err error) error {
 	return nil
 }
 
-func (b *MasqueradeBindMechanism) startDHCP(_ *v1.VirtualMachineInstance) error {
+func (b *MasqueradeBindMechanism) startDHCP() error {
 	return Handler.StartDHCP(b.vif, b.vif.Gateway, b.bridgeInterfaceName, b.iface.DHCPOptions, false)
 }
 
@@ -1172,51 +1172,51 @@ type SlirpBindMechanism struct {
 	domain    *api.Domain
 }
 
-func (s *SlirpBindMechanism) discoverPodNetworkInterface() error {
+func (b *SlirpBindMechanism) discoverPodNetworkInterface() error {
 	return nil
 }
 
-func (s *SlirpBindMechanism) preparePodNetworkInterfaces(_ uint32, _ int) error {
+func (b *SlirpBindMechanism) preparePodNetworkInterfaces(_ uint32, _ int) error {
 	return nil
 }
 
-func (s *SlirpBindMechanism) startDHCP(_ *v1.VirtualMachineInstance) error {
+func (b *SlirpBindMechanism) startDHCP() error {
 	return nil
 }
 
-func (s *SlirpBindMechanism) decorateConfig() error {
+func (b *SlirpBindMechanism) decorateConfig() error {
 	// remove slirp interface from domain spec devices interfaces
 	var foundIfaceModelType string
-	ifaces := s.domain.Spec.Devices.Interfaces
+	ifaces := b.domain.Spec.Devices.Interfaces
 	for i, iface := range ifaces {
-		if iface.Alias.GetName() == s.iface.Name {
-			s.domain.Spec.Devices.Interfaces = append(ifaces[:i], ifaces[i+1:]...)
+		if iface.Alias.GetName() == b.iface.Name {
+			b.domain.Spec.Devices.Interfaces = append(ifaces[:i], ifaces[i+1:]...)
 			foundIfaceModelType = iface.Model.Type
 			break
 		}
 	}
 
 	if foundIfaceModelType == "" {
-		return fmt.Errorf("failed to find interface %s in vmi spec", s.iface.Name)
+		return fmt.Errorf("failed to find interface %s in vmi spec", b.iface.Name)
 	}
 
-	qemuArg := fmt.Sprintf("%s,netdev=%s,id=%s", foundIfaceModelType, s.iface.Name, s.iface.Name)
-	if s.iface.MacAddress != "" {
+	qemuArg := fmt.Sprintf("%s,netdev=%s,id=%s", foundIfaceModelType, b.iface.Name, b.iface.Name)
+	if b.iface.MacAddress != "" {
 		// We assume address was already validated in API layer so just pass it to libvirt as-is.
-		qemuArg += fmt.Sprintf(",mac=%s", s.iface.MacAddress)
+		qemuArg += fmt.Sprintf(",mac=%s", b.iface.MacAddress)
 	}
 	// Add interface configuration to qemuArgs
-	s.domain.Spec.QEMUCmd.QEMUArg = append(s.domain.Spec.QEMUCmd.QEMUArg, api.Arg{Value: "-device"})
-	s.domain.Spec.QEMUCmd.QEMUArg = append(s.domain.Spec.QEMUCmd.QEMUArg, api.Arg{Value: qemuArg})
+	b.domain.Spec.QEMUCmd.QEMUArg = append(b.domain.Spec.QEMUCmd.QEMUArg, api.Arg{Value: "-device"})
+	b.domain.Spec.QEMUCmd.QEMUArg = append(b.domain.Spec.QEMUCmd.QEMUArg, api.Arg{Value: qemuArg})
 
 	return nil
 }
 
-func (s *SlirpBindMechanism) loadCachedInterface(_, _ string) (bool, error) {
+func (b *SlirpBindMechanism) loadCachedInterface(_, _ string) (bool, error) {
 	return true, nil
 }
 
-func (s *SlirpBindMechanism) loadCachedVIF(_, _ string) (bool, error) {
+func (b *SlirpBindMechanism) loadCachedVIF(_, _ string) (bool, error) {
 	return true, nil
 }
 
@@ -1224,7 +1224,7 @@ func (b *SlirpBindMechanism) setCachedVIF(_, _ string) error {
 	return nil
 }
 
-func (s *SlirpBindMechanism) setCachedInterface(_, _ string) error {
+func (b *SlirpBindMechanism) setCachedInterface(_, _ string) error {
 	return nil
 }
 
@@ -1310,7 +1310,7 @@ func (b *MacvtapBindMechanism) setCachedVIF(_, _ string) error {
 	return nil
 }
 
-func (b *MacvtapBindMechanism) startDHCP(_ *v1.VirtualMachineInstance) error {
+func (b *MacvtapBindMechanism) startDHCP() error {
 	// macvtap will connect to the host's subnet
 	return nil
 }
