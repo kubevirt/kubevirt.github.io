@@ -121,10 +121,22 @@ stop: | envvar
 ## Build image localhost/kubevirt.io
 build_img: | envvar
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
-	@echo "${GREEN}Makefile: Cloneing Repo ${RESET}"
-	${DEBUG}git clone https://github.com/kubevirt/project-infra.git /tmp/project-infra; \
-	cd /tmp/project-infra/images/kubevirt-kubevirt.github.io; \
-	echo "${GREEN}Makefile: Building Image ${RESET}"; \
+	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
+	  IMAGE="`echo $${IMGTAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
+	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/$${IMGTAG}/Dockerfile -o Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
+	    echo "curl Dockerfile failed... exitting!"; \
+	    exit 2; \
+	  else \
+	    REMOTE=1; \
+	  fi; \
+	else \
+	  IMAGE="`echo $${TAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
+	  echo "DOCKERFILE file: ./Dockerfile"; \
+	  echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/$${IMGTAG}/Dockerfile"; \
+	  echo; \
+	fi; \
+	${CONTAINER_ENGINE} rmi ${IMGTAG} 2> /dev/null || echo -n; \
+	if [ "$${REMOTE}" ]; then rm -f Dockerfile > /dev/null 2>&1; fi
 	${BUILD_ENGINE} ${IMGTAG}
 
 ## Check if image exist and build
