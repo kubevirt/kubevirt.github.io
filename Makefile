@@ -76,6 +76,17 @@ else
 endif
 endif
 
+ifndef IMGTAG
+	@$(eval export IMGTAG=localhost/kubevirt.github.io)
+else
+ifeq ($(shell test "$(IMGTAG)" = True  -o  \
+							 	"$(IMGTAG)" = true && printf "true"), true)
+	@$(eval export IMGTAG=localhost/kubevirt.github.io)
+else
+	@$(eval export IMGTAG=localhost/kubevirt.github.io)
+endif
+endif
+
 ifdef SELINUX_ENABLED
 ifeq ($(shell test "$(SELINUX_ENABLED)" = True  -o  \
                    "$(SELINUX_ENABLED)" = true && printf "true"), true)
@@ -88,10 +99,9 @@ endif
 
 ## Run site.  App available @ http://0.0.0.0:4000
 run: | envvar stop
-	${DEBUG}$(eval export TAG='jekyll/jekyll')
 	@echo "${GREEN}Makefile: Run site${RESET}"
 	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache jekyll/jekyll /bin/bash -c "jekyll serve --trace --force_polling --future"
+	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c "jekyll serve --trace --force_polling --future"
 	@echo
 
 
@@ -109,17 +119,16 @@ stop: | envvar
 	@echo -n
 
 ## Build image localhost/kubevirt.io
-build_image: | envvar
-	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
+build_img: | envvar
+	@echo "${GREEN}Makefile: Building Image ${RESET}"
 	@echo "${GREEN}Makefile: Cloneing Repo ${RESET}"
 	${DEBUG}git clone https://github.com/kubevirt/project-infra.git /tmp/project-infra; \
 	cd /tmp/project-infra/images/kubevirt-kubevirt.github.io; \
 	echo "${GREEN}Makefile: Building Image ${RESET}"; \
-	${BUILD_ENGINE} ${TAG}
+	${BUILD_ENGINE} ${IMGTAG}
 
 ## Check if image exist and build
-check_image: | envvar
-	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
+check_img: | envvar
 	${DEBUG}if [[ `${CONTAINER_ENGINE} image ls | grep localhost/kubevirt.io` ]]; \
 	then \
 		echo "${YELLOW}Makefile: Container image exist ${RESET}"; \
@@ -130,29 +139,26 @@ check_image: | envvar
 
 ## build Markdownlint
 check_linter: | envvar
-	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	${DEBUG}$(MAKE) check_image
 	@echo "${GREEN}Makefile: Running Linter ${RESET}"
-	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro${SELINUX_ENABLED}  --workdir /srv ${TAG} markdownlint --config /srv/markdownlint.yaml **/*.md
+	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro${SELINUX_ENABLED}  --workdir /srv ${IMGTAG} markdownlint --config /srv/markdownlint.yaml **/*.md
 
 ## Check spelling on content
 check_spelling: | envvar
-	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
 	${DEBUG}$(MAKE) check_image
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
 	${DEBUG} curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh; \
 	bash update-yaspeller.sh
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${TAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
 
 
 ## Check external, internal links and links/selectors to userguide on website content
 check_links: | envvar
 	${DEBUG}$(MAKE) check_image
-	${DEBUG}$(eval export TAG='localhost/kubevirt.io')
-	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${TAG} /bin/bash -c 'cd /srv/jekyll; rake -- -u' # ? check internal external links
+	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv/jekyll; rake -- -u' # ? check internal external links
 #BEGIN BIG SHELL SCRIPT
 	${DEBUG}export IFS=$$'\n'; \
-	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${TAG} /bin/bash -c 'cd /srv/jekyll; rake --trace links:userguide_selectors'`; \
+	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv/jekyll; rake --trace links:userguide_selectors'`; \
 	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
 	  echo "$${OUTPUT}"; \
 	  exit 1; \
@@ -167,7 +173,7 @@ check_links: | envvar
 	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
 	    echo; \
 	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${TAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
+	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${IMGTAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
 	    echo; \
 	  fi; \
 	done; \
