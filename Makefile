@@ -92,7 +92,7 @@ endif
 
 
 ## Build image localhost/kubevirt.io
-build_img: | envvar
+build_img: | envvar stop
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
 	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
 	  IMAGE="`echo $${IMGTAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
@@ -114,7 +114,7 @@ build_img: | envvar
 
 
 ## Check external, internal links and links/selectors to userguide on website content
-check_links: | envvar
+check_links: | envvar stop
 ifeq ($(shell podman image ls | grep $IMGTAG > /dev/null 2>&1 = False \
 							 	|| printf "false"), false)
 	echo Please run 'make build_img'
@@ -149,10 +149,10 @@ endif
 
 
 ## Check spelling on content
-check_spelling: | envvar
+check_spelling: | envvar stop
 ifeq ($(shell podman image ls | grep $IMGTAG > /dev/null 2>&1 = False \
 							 	|| printf "false"), false)
-	echo Please run 'make build_diskimg'
+	echo Please run 'make build_img'
 	exit 1
 endif
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
