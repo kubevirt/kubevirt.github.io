@@ -76,17 +76,6 @@ else
 endif
 endif
 
-ifndef IMGTAG
-	@$(eval export IMGTAG=localhost/kubevirt.github.io)
-else
-ifeq ($(shell test "$(IMGTAG)" = True  -o  \
-							 	"$(IMGTAG)" = true && printf "true"), true)
-	@$(eval export IMGTAG=localhost/kubevirt.github.io)
-else
-	@$(eval export IMGTAG=localhost/kubevirt.github.io)
-endif
-endif
-
 ifdef SELINUX_ENABLED
 ifeq ($(shell test "$(SELINUX_ENABLED)" = True  -o  \
                    "$(SELINUX_ENABLED)" = true && printf "true"), true)
@@ -97,26 +86,10 @@ endif
 endif
 	@echo
 
-## Run site.  App available @ http://0.0.0.0:4000
-run: | envvar stop
-	@echo "${GREEN}Makefile: Run site${RESET}"
-	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c "jekyll serve --trace --force_polling --future"
-	@echo
+ifndef IMGTAG
+	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
+endif
 
-
-## Container status
-status: | envvar
-	@echo "${GREEN}Makefile: Check image status${RESET}"
-	${CONTAINER_ENGINE} ps
-	@echo
-
-
-## Stop site
-stop: | envvar
-	@echo "${GREEN}Makefile: Stop site${RESET}"
-	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
-	@echo -n
 
 ## Build image localhost/kubevirt.io
 build_img: | envvar
@@ -139,34 +112,14 @@ build_img: | envvar
 	if [ "$${REMOTE}" ]; then rm -f Dockerfile > /dev/null 2>&1; fi
 	${BUILD_ENGINE} ${IMGTAG}
 
-## Check if image exist and build
-check_img: | envvar
-	${DEBUG}if [[ `${CONTAINER_ENGINE} image ls | grep localhost/kubevirt.io` ]]; \
-	then \
-		echo "${YELLOW}Makefile: Container image exist ${RESET}"; \
-	else \
-		${MAKE} build_image; \
-	fi
-
-
-## build Markdownlint
-check_linter: | envvar
-	${DEBUG}$(MAKE) check_image
-	@echo "${GREEN}Makefile: Running Linter ${RESET}"
-	${CONTAINER_ENGINE} run -ti --rm --name markdownlint-cli -v ${PWD}:/srv:ro${SELINUX_ENABLED}  --workdir /srv ${IMGTAG} markdownlint --config /srv/markdownlint.yaml **/*.md
-
-## Check spelling on content
-check_spelling: | envvar
-	${DEBUG}$(MAKE) check_image
-	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG} curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh; \
-	bash update-yaspeller.sh
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
-
 
 ## Check external, internal links and links/selectors to userguide on website content
 check_links: | envvar
-	${DEBUG}$(MAKE) check_image
+ifeq ($(shell podman image ls | grep $IMGTAG > /dev/null 2>&1 = False \
+							 	|| printf "false"), false)
+	echo Please run 'make build_img'
+	exit 1
+endif
 	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv/jekyll; rake -- -u' # ? check internal external links
 #BEGIN BIG SHELL SCRIPT
 	${DEBUG}export IFS=$$'\n'; \
@@ -193,3 +146,43 @@ check_links: | envvar
 	echo "Complete!"
 #END BIG SHELL SCRIPT
 	@echo
+
+
+## Check spelling on content
+check_spelling: | envvar
+ifeq ($(shell podman image ls | grep $IMGTAG > /dev/null 2>&1 = False \
+							 	|| printf "false"), false)
+	echo Please run 'make build_diskimg'
+	exit 1
+endif
+	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
+	${DEBUG} curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh; \
+	bash update-yaspeller.sh
+	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+
+
+## Run site.  App available @ http://0.0.0.0:4000
+run: | envvar stop
+ifeq ($(shell podman image ls | grep $${IMGTAG} > /dev/null 2>&1), false)
+	@echo $${IMGTAG} disk img is not found
+	@echo Please run \'make build_img\'
+	@echo && exit 1
+endif
+	@echo "${GREEN}Makefile: Run site${RESET}"
+	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
+	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c "jekyll serve --trace --force_polling --future"
+	@echo
+
+
+## Container status
+status: | envvar
+	@echo "${GREEN}Makefile: Check image status${RESET}"
+	${CONTAINER_ENGINE} ps
+	@echo
+
+
+## Stop site
+stop: | envvar
+	@echo "${GREEN}Makefile: Stop site${RESET}"
+	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
+	@echo -n
