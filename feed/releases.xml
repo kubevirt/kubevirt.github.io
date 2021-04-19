@@ -1,4 +1,35 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-04-18T16:48:17+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.39.0</title><link href="https://kubevirt.io//2021/changelog-v0.39.0.html" rel="alternate" type="text/html" title="KubeVirt v0.39.0" /><published>2021-03-10T00:00:00+00:00</published><updated>2021-03-10T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.39.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.39.0.html">&lt;h2 id=&quot;v0390&quot;&gt;v0.39.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-04-19T16:49:16+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.40.0</title><link href="https://kubevirt.io//2021/changelog-v0.40.0.html" rel="alternate" type="text/html" title="KubeVirt v0.40.0" /><published>2021-04-19T00:00:00+00:00</published><updated>2021-04-19T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.40.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.40.0.html">&lt;h2 id=&quot;v0400&quot;&gt;v0.40.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Apr 19 12:25:41 2021 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #5467][rmohr] Fixes upgrades from KubeVirt v0.36&lt;/li&gt;
+  &lt;li&gt;[PR #5350][jean-edouard] Removal of entire &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;permittedHostDevices&lt;/code&gt; section will now remove all user-defined host device plugins.&lt;/li&gt;
+  &lt;li&gt;[PR #5242][jean-edouard] Creating more than 1 migration at the same time for a given VMI will now fail&lt;/li&gt;
+  &lt;li&gt;[PR #4907][vasiliy-ul] Initial cgroupv2 support&lt;/li&gt;
+  &lt;li&gt;[PR #5324][jean-edouard] Default feature gates can now be defined in the provider configuration.&lt;/li&gt;
+  &lt;li&gt;[PR #5006][alicefr] Add discard=unmap option&lt;/li&gt;
+  &lt;li&gt;[PR #5022][davidvossel] Fixes race condition between operator adding service and webhooks that can result in installs/uninstalls failing&lt;/li&gt;
+  &lt;li&gt;[PR #5310][ashleyschuett] Reconcile CRD resources&lt;/li&gt;
+  &lt;li&gt;[PR #5102][iholder-redhat] Go version updated to 1.14.14&lt;/li&gt;
+  &lt;li&gt;[PR #4746][ashleyschuett] Reconcile Deployments, DaemonSets, MutatingWebhookConfigurations and ValidatingWebhookConfigurations&lt;/li&gt;
+  &lt;li&gt;[PR #5037][ormergi] Hot-plug SR-IOV VF interfaces to VM’s post a successful migration.&lt;/li&gt;
+  &lt;li&gt;[PR #5269][mlsorensen] Prometheus metrics scraped from virt-handler are now served from the VMI informer cache, rather than calling back to the Kubernetes API for VMI information.&lt;/li&gt;
+  &lt;li&gt;[PR #5138][davidvossel] virt-handler now waits up to 5 minutes for all migrations on the node to complete before shutting down.&lt;/li&gt;
+  &lt;li&gt;[PR #5191][yuvalturg] Added a metric for monitoring CPU affinity&lt;/li&gt;
+  &lt;li&gt;[PR #5215][xphyr] Enable detection of Intel GVT-g vGPU.&lt;/li&gt;
+  &lt;li&gt;[PR #4760][rmohr] Make virt-handler heartbeat more efficient and robust: Only one combined PATCH and no need to detect different cluster types anymore.&lt;/li&gt;
+  &lt;li&gt;[PR #5091][iholder-redhat] QEMU SeaBios debug logs are being seen as part of virt-launcher log.&lt;/li&gt;
+  &lt;li&gt;[PR #5221][rmohr] Remove  workload placement validation webhook which blocks placement updates when VMIs are running&lt;/li&gt;
+  &lt;li&gt;[PR #5128][yuvalturg] Modified memory related metrics by adding several new metrics and splitting the swap traffic bytes metric&lt;/li&gt;
+  &lt;li&gt;[PR #5084][ashleyschuett] Add validation to CustomizeComponents object on the KubeVirt resource&lt;/li&gt;
+  &lt;li&gt;[PR #5182][davidvossel] New [release-blocker] functional test marker to signify tests that can never be disabled before making a release&lt;/li&gt;
+  &lt;li&gt;[PR #5137][davidvossel] Added our policy around release branch backporting in docs/release-branch-backporting.md&lt;/li&gt;
+  &lt;li&gt;[PR #5096][yuvalturg] Modified networking metrics by adding new metrics, splitting existing ones by rx/tx and using the device alias for the interface name when available&lt;/li&gt;
+  &lt;li&gt;[PR #5088][awels] Hotplug works with hostpath storage.&lt;/li&gt;
+  &lt;li&gt;[PR #4908][dhiller] Move travis tag and master builds to kubevirt prow.&lt;/li&gt;
+  &lt;li&gt;[PR #4741][EdDev] Allow live migration for SR-IOV VM/s without preserving the VF interfaces.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.40.0</summary></entry><entry><title type="html">KubeVirt v0.39.0</title><link href="https://kubevirt.io//2021/changelog-v0.39.0.html" rel="alternate" type="text/html" title="KubeVirt v0.39.0" /><published>2021-03-10T00:00:00+00:00</published><updated>2021-03-10T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.39.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.39.0.html">&lt;h2 id=&quot;v0390&quot;&gt;v0.39.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Wed Mar 10 14:51:58 2021 +0000&lt;/p&gt;
 
@@ -189,18 +220,4 @@
   &lt;li&gt;[PR 3455][ashleyschuett] Add KubevirtConfiguration, MigrationConfiguration, DeveloperConfiguration and NetworkConfiguration to API-types&lt;/li&gt;
   &lt;li&gt;[PR 3520][rmohr] Fix hot-looping on the  VMI sync-condition if errors happen during the Scheduled phase of a VMI&lt;/li&gt;
   &lt;li&gt;[PR 3220][mhenriks] API and controller/webhook for VirtualMachineSnapshots&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.31.0</summary></entry><entry><title type="html">KubeVirt v0.30.0</title><link href="https://kubevirt.io//2020/changelog-v0.30.0.html" rel="alternate" type="text/html" title="KubeVirt v0.30.0" /><published>2020-06-05T00:00:00+00:00</published><updated>2020-06-05T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.30.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.30.0.html">&lt;h2 id=&quot;v0300&quot;&gt;v0.30.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Fri Jun 5 12:19:57 2020 +0200&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Tests: Many more test fixes&lt;/li&gt;
-  &lt;li&gt;Security: Introduce a custom SELinux policy for virt-launcher&lt;/li&gt;
-  &lt;li&gt;More user friendly IPv6 default CIDR for IPv6 addresses&lt;/li&gt;
-  &lt;li&gt;Fix OpenAPI compatibility issues by switching to openapi-gen&lt;/li&gt;
-  &lt;li&gt;Improved support for EFI boot (configurable OVMF path and test fixes)&lt;/li&gt;
-  &lt;li&gt;Improved VMI IP reporting&lt;/li&gt;
-  &lt;li&gt;Support propagation of annotations from VMI to pods&lt;/li&gt;
-  &lt;li&gt;Support for more fine grained (NET_RAW( capability granting to virt-launcher&lt;/li&gt;
-  &lt;li&gt;Support for eventual consistency with DataVolumes&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.30.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.31.0</summary></entry></feed>

@@ -27,26 +27,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//blogs/page27/">
+    <link rel="canonical" href="https://kubevirt.io//2021/changelog-v0.40.0.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Blogs | KubeVirt.io</title>
+    <title>KubeVirt v0.40.0 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
-    <meta property="og:title" content="Blogs | KubeVirt.io">
+    <meta name="description" content="This article provides information about KubeVirt release v0.40.0 changes">
+    <meta name="keywords" content="release notes, changelog" >
+    <meta property="og:title" content="KubeVirt v0.40.0 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//blogs/page27/" >
+    <meta property="og:url" content="https://kubevirt.io//2021/changelog-v0.40.0.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This article provides information about KubeVirt release v0.40.0 changes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-04-19 16:49:16 +0000" >
-    <meta name="twitter:title" content="Blogs | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2021-04-19 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v0.40.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v0.40.0 changes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -228,206 +228,128 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container-fluid">
+      <div class="container">
   <div class="row">
-    <h1 class="page-title pl-3">Blogs</h1>
-  </div>
-  <div class="row">
-    <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2">
-      
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v0.40.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/changelog">changelog</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: April 19, 2021  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="v0400">v0.40.0</h2>
+
+<p>Released on: Mon Apr 19 12:25:41 2021 +0000</p>
+
+<ul>
+  <li>[PR #5467][rmohr] Fixes upgrades from KubeVirt v0.36</li>
+  <li>[PR #5350][jean-edouard] Removal of entire <code class="language-plaintext highlighter-rouge">permittedHostDevices</code> section will now remove all user-defined host device plugins.</li>
+  <li>[PR #5242][jean-edouard] Creating more than 1 migration at the same time for a given VMI will now fail</li>
+  <li>[PR #4907][vasiliy-ul] Initial cgroupv2 support</li>
+  <li>[PR #5324][jean-edouard] Default feature gates can now be defined in the provider configuration.</li>
+  <li>[PR #5006][alicefr] Add discard=unmap option</li>
+  <li>[PR #5022][davidvossel] Fixes race condition between operator adding service and webhooks that can result in installs/uninstalls failing</li>
+  <li>[PR #5310][ashleyschuett] Reconcile CRD resources</li>
+  <li>[PR #5102][iholder-redhat] Go version updated to 1.14.14</li>
+  <li>[PR #4746][ashleyschuett] Reconcile Deployments, DaemonSets, MutatingWebhookConfigurations and ValidatingWebhookConfigurations</li>
+  <li>[PR #5037][ormergi] Hot-plug SR-IOV VF interfaces to VM’s post a successful migration.</li>
+  <li>[PR #5269][mlsorensen] Prometheus metrics scraped from virt-handler are now served from the VMI informer cache, rather than calling back to the Kubernetes API for VMI information.</li>
+  <li>[PR #5138][davidvossel] virt-handler now waits up to 5 minutes for all migrations on the node to complete before shutting down.</li>
+  <li>[PR #5191][yuvalturg] Added a metric for monitoring CPU affinity</li>
+  <li>[PR #5215][xphyr] Enable detection of Intel GVT-g vGPU.</li>
+  <li>[PR #4760][rmohr] Make virt-handler heartbeat more efficient and robust: Only one combined PATCH and no need to detect different cluster types anymore.</li>
+  <li>[PR #5091][iholder-redhat] QEMU SeaBios debug logs are being seen as part of virt-launcher log.</li>
+  <li>[PR #5221][rmohr] Remove  workload placement validation webhook which blocks placement updates when VMIs are running</li>
+  <li>[PR #5128][yuvalturg] Modified memory related metrics by adding several new metrics and splitting the swap traffic bytes metric</li>
+  <li>[PR #5084][ashleyschuett] Add validation to CustomizeComponents object on the KubeVirt resource</li>
+  <li>[PR #5182][davidvossel] New [release-blocker] functional test marker to signify tests that can never be disabled before making a release</li>
+  <li>[PR #5137][davidvossel] Added our policy around release branch backporting in docs/release-branch-backporting.md</li>
+  <li>[PR #5096][yuvalturg] Modified networking metrics by adding new metrics, splitting existing ones by rx/tx and using the device alias for the interface name when available</li>
+  <li>[PR #5088][awels] Hotplug works with hostpath storage.</li>
+  <li>[PR #4908][dhiller] Move travis tag and master builds to kubevirt prow.</li>
+  <li>[PR #4741][EdDev] Allow live migration for SR-IOV VM/s without preserving the VF interfaces.</li>
+</ul>
+
+        </article>
         
-          
-          <ul class="blogs-navigation">
-            <h3>Categories</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/news.html"  class="blogs-navigation--item_link" >
-                  News
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/updates.html"  class="blogs-navigation--item_link" >
-                  Weekly Updates
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/releases.html"  class="blogs-navigation--item_link" >
-                  Releases
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/uncategorized.html"  class="blogs-navigation--item_link" >
-                  Uncategorized
-                </a>
-                
-              </li>
-            
-          </ul>
-          
         
-          
-          <ul class="blogs-navigation">
-            <h3>Additional filters</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/date.html"  class="blogs-navigation--item_link" >
-                  Grouped by Date
-                </a>
-                
-              </li>
-            
-          </ul>
-          
-        
-      
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v0.40.0&url=https://www.kubevirt.io/2021/changelog-v0.40.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
     </div>
-    <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10">
-      <ul class="posts">
-        
-          <li>
-            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-9.html">This Week In Kube Virt 9</a></h2>
-            <div class="posts-date">November 06, 2017</div>
-            This is a weekly update from the KubeVirt team.
-            
-            <div class="readmore">
-    <a href="/2017/This-Week-in-Kube-Virt-9.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-8.html">This Week In Kube Virt 8</a></h2>
-            <div class="posts-date">October 28, 2017</div>
-            This is a weekly update from the KubeVirt team.
-            
-            <div class="readmore">
-    <a href="/2017/This-Week-in-Kube-Virt-8.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-7.html">This Week In Kube Virt 7</a></h2>
-            <div class="posts-date">October 24, 2017</div>
-            This is the seventh weekly update from the KubeVirt team.
-            
-            <div class="readmore">
-    <a href="/2017/This-Week-in-Kube-Virt-7.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-6.html">This Week In Kube Virt 6</a></h2>
-            <div class="posts-date">October 15, 2017</div>
-            This is the sixth weekly update from the KubeVirt team.
-            
-            <div class="readmore">
-    <a href="/2017/This-Week-in-Kube-Virt-6.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2017/This-Week-in-Kube-Virt-5.html">This Week In Kube Virt 5</a></h2>
-            <div class="posts-date">October 06, 2017</div>
-            This is the fith weekly update from the KubeVirt team.
-            
-            <div class="readmore">
-    <a href="/2017/This-Week-in-Kube-Virt-5.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-      </ul>
-    </div>
-    
-<div class="pagination align-items-center">
-  
-    <a href="/blogs/page26" class="btn btn-outline-secondary btn-light mr-2">
-      <i class="fas fa-angle-left"></i> New
-    </a>
-  
-
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-        <strong class="font-weight-bold">27</strong>
-      
-  
-      
-  
-      
-  
-  <strong>of 29</strong>
-
-  
-    <a href="/blogs/page28" class="btn btn-outline-secondary btn-light ml-2">
-      Old <i class="fas fa-angle-right"></i>
-    </a>
-  
-
-</div>
-
   </div>
 </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 

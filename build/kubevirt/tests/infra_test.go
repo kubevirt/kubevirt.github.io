@@ -68,7 +68,7 @@ import (
 	"kubevirt.io/kubevirt/tests/libnet"
 )
 
-var _ = Describe("[Serial][owner:@sig-compute]Infrastructure", func() {
+var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 	var (
 		virtClient       kubecli.KubevirtClient
 		aggregatorClient *aggregatorclient.Clientset
@@ -183,7 +183,7 @@ var _ = Describe("[Serial][owner:@sig-compute]Infrastructure", func() {
 			Expect(console.LoginToAlpine(vmi)).To(Succeed())
 		})
 
-		It("[QUARANTINE][owner:@sig-compute][test_id:4100] should be valid during the whole rotation process", func() {
+		It("[QUARANTINE][sig-compute][test_id:4100] should be valid during the whole rotation process", func() {
 			oldAPICert := tests.EnsurePodsCertIsSynced(fmt.Sprintf("%s=%s", v1.AppLabel, "virt-api"), flags.KubeVirtInstallNamespace, "8443")
 			oldHandlerCert := tests.EnsurePodsCertIsSynced(fmt.Sprintf("%s=%s", v1.AppLabel, "virt-handler"), flags.KubeVirtInstallNamespace, "8186")
 			Expect(err).ToNot(HaveOccurred())
@@ -630,9 +630,9 @@ var _ = Describe("[Serial][owner:@sig-compute]Infrastructure", func() {
 						continue
 					}
 					switch data {
-					case "leading_virt_controller 1":
+					case "kubevirt_virt_controller_leading 1":
 						foundMetrics["leading"]++
-					case "ready_virt_controller 1":
+					case "kubevirt_virt_controller_ready 1":
 						foundMetrics["ready"]++
 					}
 				}
@@ -669,9 +669,9 @@ var _ = Describe("[Serial][owner:@sig-compute]Infrastructure", func() {
 						continue
 					}
 					switch data {
-					case "leading_virt_operator 1":
+					case "kubevirt_virt_operator_leading 1":
 						foundMetrics["leading"]++
-					case "ready_virt_operator 1":
+					case "kubevirt_virt_operator_ready 1":
 						foundMetrics["ready"]++
 					}
 				}
