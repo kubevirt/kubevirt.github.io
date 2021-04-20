@@ -27,9 +27,9 @@ comments: true
 
 ## Introduction
 
-Starting with 5th generation Intel Core(TM) processors that have Intel Graphics Processors it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with [Kubevirt 0.40](https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0) support for detecting and allocating the Intel based vGPUs has been added to Kubevirt and, support for virtualizing Intel GPUs is available in the Linux Kernel since 4.19. 
+Starting with 5th generation Intel Core processors that have Intel Graphics Processors it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with [Kubevirt 0.40](https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0) support for detecting and allocating the Intel based vGPUs has been added to Kubevirt and, support for the virtualization of Intel GPUs is available in the Linux Kernel since 4.19. 
 
-The total number of vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see [Create VGPU \(KVMGT only\)](https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only) in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices. 
+The total number of vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see [Create vGPU \(KVMGT only\)](https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only) in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices. 
 
 You can reproduce this work on any Kubernetes cluster running kubevirt v0.40.0 or later, but the steps you need to take to load the kernel modules and enable the virtual devices will vary based on the underlying OS your Kubernetes cluster is running on. In order to demonstrate how you can enable this feature, we will use an all-in-one Kubernetes cluster built using Centos 8.3 and minikube. 
 
@@ -396,7 +396,7 @@ The key piece of information here is this snippet of yaml:
             name: gpu1
 ```
 
-Here we are identifiying the gpu device that we want to attach to this VM. The rest is handled by kubevirt.
+Here we are identifying the gpu device that we want to attach to this VM. The rest is handled by kubevirt.
 
 We can now start the virtual machine with `virtctl start win10vm1`. Check to ensure that the VM is running with `kubectl get vm`.
 
@@ -426,7 +426,7 @@ kubernetes     ClusterIP   10.96.0.1        <none>        443/TCP          18h
 win10vm1-rdp   NodePort    10.105.159.184   <none>        3389:30627/TCP   39s
 ```
 
-Using your favorite RDP client, open a connection to the VM. Use the MAIN IP address of the Centos machine and the node port that is shown in the output above. For example, using the output from the `kubectl get svc` command above, connect to `<centos server ip>:30627`. When prompted use the username and password you created when installing Windows 10. You can now test the GPU accelation. 
+Using your favorite RDP client, open a connection to the VM. Use the MAIN IP address of the Centos machine and the node port that is shown in the output above. For example, using the output from the `kubectl get svc` command above, connect to `<centos server ip>:30627`. When prompted use the username and password you created when installing Windows 10. You can now test the GPU acceleration. 
 
 The easiest way to do this is open a web browser, and goto [http://www.fishgl.com](http://www.fishgl.com).
 <br>
