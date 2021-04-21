@@ -1,4 +1,560 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-04-21T16:49:29+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.40.0</title><link href="https://kubevirt.io//2021/changelog-v0.40.0.html" rel="alternate" type="text/html" title="KubeVirt v0.40.0" /><published>2021-04-19T00:00:00+00:00</published><updated>2021-04-19T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.40.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.40.0.html">&lt;h2 id=&quot;v0400&quot;&gt;v0.40.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-04-21T19:51:34+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+
+&lt;p&gt;This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with &lt;a href=&quot;https://github.com/tektoncd/pipeline&quot;&gt;Tekton Pipelines&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;Tekton Pipelines can be used to create a single &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt; that encapsulates the installation process which can be run and replicated with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRuns&lt;/code&gt;. 
+The pipeline will be built with &lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks&quot;&gt;KubeVirt Tekton Tasks&lt;/a&gt;, which includes all the necessary tasks for this example.&lt;/p&gt;
+
+&lt;h2 id=&quot;pipeline-description&quot;&gt;Pipeline Description&lt;/h2&gt;
+
+&lt;p&gt;The pipeline will prepare an empty Persistent Volume Claim (PVC) and download a Windows source ISO into another PVC. Both of them will be initialized with Containerized Data Importer (CDI).
+It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
+Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
+You can later use the artifact PVC as a base image and copy it for new VMs.&lt;/p&gt;
+&lt;h1 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;KubeVirt &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.39.0&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Tekton Pipelines &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.19.0&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;KubeVirt Tekton Tasks &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.3.0&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h1 id=&quot;running-windows-installer-pipeline&quot;&gt;Running Windows Installer Pipeline&lt;/h1&gt;
+
+&lt;h2 id=&quot;obtaining-a-url-of-windows-source-iso&quot;&gt;Obtaining a URL of Windows Source ISO&lt;/h2&gt;
+
+&lt;p&gt;First we have to obtain a Download URL of Windows Source ISO.&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;Go to https://www.microsoft.com/en-us/software-download/windows10ISO. You can also obtain a server edition for evaluation at https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019.&lt;/li&gt;
+  &lt;li&gt;Fill in the edition and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;English&lt;/code&gt; language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.&lt;/li&gt;
+  &lt;li&gt;Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h2 id=&quot;preparing-autounattendxml-configmap&quot;&gt;Preparing autounattend.xml ConfigMap&lt;/h2&gt;
+
+&lt;p&gt;Now we have to prepare our autounattend.xml Answer File with the installation instructions. We will store it in a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ConfigMap&lt;/code&gt;, but optionally it can be stored in a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Secret&lt;/code&gt; as well.&lt;/p&gt;
+
+&lt;p&gt;The configuration file can be generated with &lt;a href=&quot;https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/windows-system-image-manager-overview-topics&quot;&gt;Windows SIM&lt;/a&gt;
+or it can be specified manually according to &lt;a href=&quot;https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/answer-files-overview&quot;&gt;Answer File Reference&lt;/a&gt;
+and &lt;a href=&quot;https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend&quot;&gt;Answer File Components Reference&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;The following config map includes the required drivers and guest disk configuration.
+It also specifies how the installation should proceed and what users should be created. 
+In our case it is an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Administrator&lt;/code&gt; user with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;changepassword&lt;/code&gt; password. 
+You can also change the Answer File according to your needs by consulting the already mentioned documentation.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ConfigMap&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-autounattend&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;s&quot;&gt;Autounattend.xml&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&amp;lt;unattend xmlns=&quot;urn:schemas-microsoft-com:unattend&quot;&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;windowsPE&quot;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-PnpCustomizationsWinPE&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; processorArchitecture=&quot;amd64&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;DriverPaths&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;PathAndCredentials wcm:action=&quot;add&quot; wcm:keyValue=&quot;1&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Path&amp;gt;E:\viostor\w10\amd64&amp;lt;/Path&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/PathAndCredentials&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;PathAndCredentials wcm:action=&quot;add&quot; wcm:keyValue=&quot;2&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Path&amp;gt;E:\NetKVM\w10\amd64&amp;lt;/Path&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/PathAndCredentials&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;PathAndCredentials wcm:action=&quot;add&quot; wcm:keyValue=&quot;3&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Path&amp;gt;E:\viorng\w10\amd64&amp;lt;/Path&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/PathAndCredentials&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/DriverPaths&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-International-Core-WinPE&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;SetupUILanguage&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;UILanguage&amp;gt;en-US&amp;lt;/UILanguage&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/SetupUILanguage&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;InputLocale&amp;gt;0409:00000409&amp;lt;/InputLocale&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;SystemLocale&amp;gt;en-US&amp;lt;/SystemLocale&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UILanguage&amp;gt;en-US&amp;lt;/UILanguage&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UILanguageFallback&amp;gt;en-US&amp;lt;/UILanguageFallback&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UserLocale&amp;gt;en-US&amp;lt;/UserLocale&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-Setup&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;DiskConfiguration&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;Disk wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;CreatePartitions&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;CreatePartition wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;1&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Type&amp;gt;Primary&amp;lt;/Type&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Size&amp;gt;100&amp;lt;/Size&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;/CreatePartition&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;CreatePartition wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Extend&amp;gt;true&amp;lt;/Extend&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;2&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Type&amp;gt;Primary&amp;lt;/Type&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;/CreatePartition&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;/CreatePartitions&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;ModifyPartitions&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;ModifyPartition wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Active&amp;gt;true&amp;lt;/Active&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Format&amp;gt;NTFS&amp;lt;/Format&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Label&amp;gt;System Reserved&amp;lt;/Label&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;1&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;PartitionID&amp;gt;1&amp;lt;/PartitionID&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;TypeID&amp;gt;0x27&amp;lt;/TypeID&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;/ModifyPartition&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;ModifyPartition wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Active&amp;gt;true&amp;lt;/Active&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Format&amp;gt;NTFS&amp;lt;/Format&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Label&amp;gt;OS&amp;lt;/Label&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Letter&amp;gt;C&amp;lt;/Letter&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;2&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;PartitionID&amp;gt;2&amp;lt;/PartitionID&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;/ModifyPartition&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;/ModifyPartitions&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;DiskID&amp;gt;0&amp;lt;/DiskID&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;WillWipeDisk&amp;gt;true&amp;lt;/WillWipeDisk&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/Disk&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/DiskConfiguration&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;ImageInstall&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;OSImage&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;InstallTo&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;DiskID&amp;gt;0&amp;lt;/DiskID&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;PartitionID&amp;gt;2&amp;lt;/PartitionID&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;/InstallTo&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;InstallToAvailablePartition&amp;gt;false&amp;lt;/InstallToAvailablePartition&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/OSImage&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/ImageInstall&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UserData&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;AcceptEula&amp;gt;true&amp;lt;/AcceptEula&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;FullName&amp;gt;Administrator&amp;lt;/FullName&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;Organization&amp;gt;&amp;lt;/Organization&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;ProductKey&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Key&amp;gt;W269N-WFGWX-YVC9B-4J6C9-T83GX&amp;lt;/Key&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/ProductKey&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/UserData&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;offlineServicing&quot;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-LUA-Settings&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;EnableLUA&amp;gt;false&amp;lt;/EnableLUA&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;generalize&quot;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-Security-SPP&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;SkipRearm&amp;gt;1&amp;lt;/SkipRearm&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;specialize&quot;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-International-Core&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;InputLocale&amp;gt;0409:00000409&amp;lt;/InputLocale&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;SystemLocale&amp;gt;en-US&amp;lt;/SystemLocale&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UILanguage&amp;gt;en-US&amp;lt;/UILanguage&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UILanguageFallback&amp;gt;en-US&amp;lt;/UILanguageFallback&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UserLocale&amp;gt;en-US&amp;lt;/UserLocale&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-Security-SPP-UX&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;SkipAutoActivation&amp;gt;true&amp;lt;/SkipAutoActivation&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-SQMApi&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;CEIPEnabled&amp;gt;0&amp;lt;/CEIPEnabled&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-Shell-Setup&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;ComputerName&amp;gt;WindowsVM&amp;lt;/ComputerName&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;ProductKey&amp;gt;W269N-WFGWX-YVC9B-4J6C9-T83GX&amp;lt;/ProductKey&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;oobeSystem&quot;&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;component name=&quot;Microsoft-Windows-Shell-Setup&quot; processorArchitecture=&quot;amd64&quot; publicKeyToken=&quot;31bf3856ad364e35&quot; language=&quot;neutral&quot; versionScope=&quot;nonSxS&quot; xmlns:wcm=&quot;http://schemas.microsoft.com/WMIConfig/2002/State&quot; xmlns:xsi=&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;AutoLogon&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;Password&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Value&amp;gt;changepassword&amp;lt;/Value&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;PlainText&amp;gt;true&amp;lt;/PlainText&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/Password&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;Enabled&amp;gt;true&amp;lt;/Enabled&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;Username&amp;gt;Administrator&amp;lt;/Username&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/AutoLogon&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;OOBE&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;HideEULAPage&amp;gt;true&amp;lt;/HideEULAPage&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;HideOEMRegistrationScreen&amp;gt;true&amp;lt;/HideOEMRegistrationScreen&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;HideOnlineAccountScreens&amp;gt;true&amp;lt;/HideOnlineAccountScreens&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;HideWirelessSetupInOOBE&amp;gt;true&amp;lt;/HideWirelessSetupInOOBE&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;NetworkLocation&amp;gt;Home&amp;lt;/NetworkLocation&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SkipUserOOBE&amp;gt;true&amp;lt;/SkipUserOOBE&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SkipMachineOOBE&amp;gt;true&amp;lt;/SkipMachineOOBE&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;ProtectYourPC&amp;gt;3&amp;lt;/ProtectYourPC&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/OOBE&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;UserAccounts&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;LocalAccounts&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;LocalAccount wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;Password&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;Value&amp;gt;changepassword&amp;lt;/Value&amp;gt;&lt;/span&gt;
+                                &lt;span class=&quot;s&quot;&gt;&amp;lt;PlainText&amp;gt;true&amp;lt;/PlainText&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;/Password&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;Description&amp;gt;&amp;lt;/Description&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;DisplayName&amp;gt;Administrator&amp;lt;/DisplayName&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;Group&amp;gt;Administrators&amp;lt;/Group&amp;gt;&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;&amp;lt;Name&amp;gt;Administrator&amp;lt;/Name&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;/LocalAccount&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/LocalAccounts&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/UserAccounts&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;RegisteredOrganization&amp;gt;&amp;lt;/RegisteredOrganization&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;RegisteredOwner&amp;gt;Administrator&amp;lt;/RegisteredOwner&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;DisableAutoDaylightTimeSet&amp;gt;false&amp;lt;/DisableAutoDaylightTimeSet&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;FirstLogonCommands&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SynchronousCommand wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Description&amp;gt;Control Panel View&amp;lt;/Description&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;1&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;CommandLine&amp;gt;reg add &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel&quot; /v StartupPage /t REG_DWORD /d 1 /f&amp;lt;/CommandLine&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;RequiresUserInput&amp;gt;true&amp;lt;/RequiresUserInput&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/SynchronousCommand&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SynchronousCommand wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;2&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Description&amp;gt;Control Panel Icon Size&amp;lt;/Description&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;RequiresUserInput&amp;gt;false&amp;lt;/RequiresUserInput&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;CommandLine&amp;gt;reg add &quot;HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel&quot; /v AllItemsIconView /t REG_DWORD /d 0 /f&amp;lt;/CommandLine&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/SynchronousCommand&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SynchronousCommand wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;3&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;RequiresUserInput&amp;gt;false&amp;lt;/RequiresUserInput&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;CommandLine&amp;gt;cmd /C wmic useraccount where name=&quot;Administrator&quot; set PasswordExpires=false&amp;lt;/CommandLine&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Description&amp;gt;Password Never Expires&amp;lt;/Description&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/SynchronousCommand&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SynchronousCommand wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;4&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Description&amp;gt;Remove AutoAdminLogon&amp;lt;/Description&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;RequiresUserInput&amp;gt;false&amp;lt;/RequiresUserInput&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;CommandLine&amp;gt;reg add &quot;HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon&quot; /v AutoAdminLogon /t REG_SZ /d 0 /f&amp;lt;/CommandLine&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/SynchronousCommand&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;SynchronousCommand wcm:action=&quot;add&quot;&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Order&amp;gt;5&amp;lt;/Order&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;RequiresUserInput&amp;gt;false&amp;lt;/RequiresUserInput&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;CommandLine&amp;gt;cmd /c shutdown /s /f /t 10&amp;lt;/CommandLine&amp;gt;&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;&amp;lt;Description&amp;gt;Shuts down the system&amp;lt;/Description&amp;gt;&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;&amp;lt;/SynchronousCommand&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;/FirstLogonCommands&amp;gt;&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;&amp;lt;TimeZone&amp;gt;Alaskan Standard Time&amp;lt;/TimeZone&amp;gt;&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;&amp;lt;/component&amp;gt;&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;&amp;lt;/settings&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&amp;lt;/unattend&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;s&quot;&gt;---&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;creating-the-pipeline&quot;&gt;Creating the Pipeline&lt;/h2&gt;
+
+&lt;p&gt;Let’s create a pipeline which consists of the following tasks.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  create-source-dv --- create-vm-from-manifest --- wait-for-vmi-status --- cleanup-vm
+                    |
+    create-base-dv --
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;create-source-dv&lt;/code&gt; task downloads a Windows source ISO into a PVC called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-10-source-*&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;create-base-dv&lt;/code&gt; task creates an empty PVC for new windows installation called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-10-base-*&lt;/code&gt;.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;create-vm-from-manifest&lt;/code&gt; task creates a VM called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-installer-*&lt;/code&gt;
+from the empty PVC and with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-10-source-*&lt;/code&gt; PVC attached as a CD-ROM.&lt;/li&gt;
+  &lt;li&gt;` wait-for-vmi-status` task waits until the VM shuts down.&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cleanup-vm&lt;/code&gt; deletes the installer VM and ISO PVC.&lt;/li&gt;
+  &lt;li&gt;The output artifact will be the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-10-base-*&lt;/code&gt; PVC with the Windows installation.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;tekton.dev/v1beta1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Pipeline&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-installer&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;winImageDownloadURL&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;autounattendConfigMapName&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;default&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-autounattend&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;string&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;tasks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-source-dv&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;manifest&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;apiVersion: cdi.kubevirt.io/v1beta1&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;kind: DataVolume&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;metadata:&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;generateName: windows-10-source-&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;spec:&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;pvc:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;accessModes:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;- ReadWriteOnce&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;resources:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;requests:&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;storage: 7Gi&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;volumeMode: Filesystem&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;source:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;http:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;url: $(params.winImageDownloadURL)&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;waitForSuccess&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true'&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2h'&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;taskRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterTask&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-datavolume-from-manifest&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-base-dv&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;manifest&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;apiVersion: cdi.kubevirt.io/v1beta1&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;kind: DataVolume&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;metadata:&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;generateName: windows-10-base-&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;spec:&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;pvc:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;accessModes:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;- ReadWriteOnce&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;resources:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;requests:&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;storage: 20Gi&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;volumeMode: Filesystem&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;source:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;blank: {}&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;waitForSuccess&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true'&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;taskRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterTask&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-datavolume-from-manifest&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-vm-from-manifest&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;manifest&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;apiVersion: kubevirt.io/v1alpha3&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;kind: VirtualMachine&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;metadata:&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;generateName: windows-installer-&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;annotation:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;description: Windows VM generated by windows-installer pipeline&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;labels:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;app: windows-installer&lt;/span&gt;
+            &lt;span class=&quot;s&quot;&gt;spec:&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;runStrategy: RerunOnFailure&lt;/span&gt;
+              &lt;span class=&quot;s&quot;&gt;template:&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;metadata:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;labels:&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain: windows-installer&lt;/span&gt;
+                &lt;span class=&quot;s&quot;&gt;spec:&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;domain:&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;cpu:&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;sockets: 2&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;cores: 1&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;threads: 1&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;resources:&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;requests:&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;memory: 2Gi&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;devices:&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;disks:&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;- name: installcdrom&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;cdrom:&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;bus: sata&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;bootOrder: 1&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;- name: rootdisk&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;bootOrder: 2&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;disk:&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;bus: virtio&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;- name: virtiocontainerdisk&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;cdrom:&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;bus: sata&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;- name: sysprepconfig&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;cdrom:&lt;/span&gt;
+                            &lt;span class=&quot;s&quot;&gt;bus: sata&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;interfaces:&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;- bridge: {}&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;name: default&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;inputs:&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;- type: tablet&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;bus: usb&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;name: tablet&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;networks:&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;- name: default&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;pod: {}&lt;/span&gt;
+                  &lt;span class=&quot;s&quot;&gt;volumes:&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;- name: installcdrom&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;- name: rootdisk&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;- name: virtiocontainerdisk&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;containerDisk:&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;image: kubevirt/virtio-container-disk&lt;/span&gt;
+                    &lt;span class=&quot;s&quot;&gt;- name: sysprepconfig&lt;/span&gt;
+                      &lt;span class=&quot;s&quot;&gt;sysprep:&lt;/span&gt;
+                        &lt;span class=&quot;s&quot;&gt;configMap:&lt;/span&gt;
+                          &lt;span class=&quot;s&quot;&gt;name: $(params.autounattendConfigMapName)&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ownDataVolumes&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;installcdrom:$(tasks.create-source-dv.results.name)&quot;&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;dataVolumes&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;rootdisk:$(tasks.create-base-dv.results.name)&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;runAfter&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-source-dv&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-base-dv&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;taskRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterTask&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-vm-from-manifest&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;wait-for-vmi-status&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vmiName&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;$(tasks.create-vm-from-manifest.results.name)&quot;&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;successCondition&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;status.phase&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;==&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Succeeded&quot;&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;failureCondition&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;status.phase&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;in&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;(Failed,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Unknown)&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;runAfter&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-vm-from-manifest&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2h'&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;taskRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterTask&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;wait-for-vmi-status&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cleanup-vm&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;vmName&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;$(tasks.create-vm-from-manifest.results.name)&quot;&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;delete&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;true&quot;&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;runAfter&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;wait-for-vmi-status&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;taskRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ClusterTask&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cleanup-vm&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;running-the-pipeline&quot;&gt;Running the Pipeline&lt;/h2&gt;
+
+&lt;p&gt;To run the pipeline we need to create the following &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; which references our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;. 
+Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.&lt;/p&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;.
+The timeout should be changed appropriately; for example if you have a slow download connection.
+You can also set a timeout for each task in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt; definition.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;tekton.dev/v1beta1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PipelineRun&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;generateName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-installer-run-&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;params&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;winImageDownloadURL&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;value&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DOWNLOAD_URL&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;pipelineRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-installer&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;timeout&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;5h'&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;serviceAccountNames&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taskName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-source-dv&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;serviceAccountName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-datavolume-from-manifest-task&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taskName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-base-dv&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;serviceAccountName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-datavolume-from-manifest-task&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taskName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-vm-from-manifest&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;serviceAccountName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;create-vm-from-manifest-task&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taskName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;wait-for-vmi-status&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;serviceAccountName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;wait-for-vmi-status-task&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;taskName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cleanup-vm&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;serviceAccountName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cleanup-vm-task&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;inspecting-the-output&quot;&gt;Inspecting the output&lt;/h2&gt;
+
+&lt;p&gt;Firstly, you can inspect the progress of the windows-10-source and windows-10-base import:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get dvs | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;windows-10-
+
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; windows-10-base-8zxwr     Succeeded          100.0%                21s
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; windows-10-source-jdv64   ImportInProgress   1.01%                 20s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To inspect the status of the pipeline run:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pipelinerun &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;tekton.dev/pipeline=windows-installer&quot;&lt;/span&gt;
+
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; NAME                          SUCCEEDED   REASON                          STARTTIME   COMPLETIONTIME
+&lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; windows-installer-run-n2mjf   Unknown     Running                         118s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;To check the status of each task and its pods:&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pipelinerun &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; yaml &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;tekton.dev/pipeline=windows-installer&quot;&lt;/span&gt;
+kubectl get pods &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;tekton.dev/pipeline=windows-installer&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once the pipeline run completes, you should be left with a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-10-base-xxxxx&lt;/code&gt; PVC (backed by a DataVolume).
+You can then create a new VM with a copy of this PVC to test it.
+You need to replace PVC_NAME with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;windows-10-base-xxxxx&lt;/code&gt; (you can use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl get dvs -o name | grep -o &quot;windows-10-base-.*&quot;&lt;/code&gt;) and PVC_NAMESPACE with the correct namespace in the following YAML.&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;dataVolumeTemplates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdi.kubevirt.io/v1beta1&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DataVolume&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm-root&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteMany&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;20Gi&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PVC_NAME&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PVC_NAMESPACE&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;running&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;false&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;sockets&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;2&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;cores&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;threads&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2Gi&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rootdisk&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bootOrder&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;1&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;cdrom&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+                &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;sata&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;interfaces&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;bridge&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;inputs&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;tablet&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;usb&lt;/span&gt;
+              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;tablet&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;pod&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;{}&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;rootdisk&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;dataVolume&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm-root&lt;/span&gt;
+        &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtiocontainerdisk&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;containerDisk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt/virtio-container-disk&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;You can start the VM and login with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Administrator&lt;/code&gt; : &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;changepassword&lt;/code&gt; credentials. Then you should be welcomed by your fresh VM.&lt;/p&gt;
+
+&lt;div class=&quot;zoom&quot;&gt;
+  &lt;img src=&quot;/assets/2021-04-21-Automated-Windows-Installation-With-Tekton-Pipelines/win-started.png&quot; width=&quot;100&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Started Windows VM&quot; /&gt;
+&lt;/div&gt;
+
+&lt;h1 id=&quot;resources&quot;&gt;Resources&lt;/h1&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer&quot;&gt;YAML files used in this example&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks&quot;&gt;KubeVirt Tekton Tasks&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;https://github.com/tektoncd/pipeline&quot;&gt;Tekton Pipelines&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>Filip Křepinský</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Tekton Pipelines" /><category term="KubeVirt Tekton Tasks" /><category term="Windows" /><summary type="html">Introduction</summary></entry><entry><title type="html">KubeVirt v0.40.0</title><link href="https://kubevirt.io//2021/changelog-v0.40.0.html" rel="alternate" type="text/html" title="KubeVirt v0.40.0" /><published>2021-04-19T00:00:00+00:00</published><updated>2021-04-19T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.40.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.40.0.html">&lt;h2 id=&quot;v0400&quot;&gt;v0.40.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Apr 19 12:25:41 2021 +0000&lt;/p&gt;
 
@@ -1335,38 +1891,4 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 
 &lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
 
-&lt;p&gt;In this blog post we used &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt; to expose metrics out of a KubeVirt VM. We also configured &lt;a href=&quot;https://github.com/prometheus-operator/prometheus-operator&quot;&gt;Prometheus Operator&lt;/a&gt; to collect these metrics. This illustrates how to bring Kubernetes monitoring best practices with applications running inside KubeVirt VMs.&lt;/p&gt;</content><author><name>arthursens</name></author><category term="uncategorized" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="prometheus" /><category term="prometheus-operator" /><category term="node-exporter" /><category term="monitoring" /><summary type="html">Monitoring KubeVirt VMs from the inside</summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
-
-&lt;p&gt;There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.&lt;/p&gt;
-
-&lt;h1 id=&quot;spec-vs-status&quot;&gt;Spec vs Status&lt;/h1&gt;
-
-&lt;p&gt;KubeVirt objects follow Kubernetes convention in that they generally have Spec and Status stanzas. The Spec is user configurable and allows the user to indicate the desired state of the cluster in a declarative manner. Meanwhile status sections are not user configurable and reflect the actual state of things in the cluster. In short, users edit the Spec and controllers edit the Status.&lt;/p&gt;
-
-&lt;p&gt;So back to the Running field. In this case the Running field is in the VM’s Spec. In other words it’s the user’s intent that the VM is running. It doesn’t reflect the actual running state of the VM.&lt;/p&gt;
-
-&lt;h1 id=&quot;runstrategy&quot;&gt;RunStrategy&lt;/h1&gt;
-
-&lt;p&gt;There’s a flip side to the above, equally as confusing: “Running” isn’t always what the user wants. If a user logs into a VM and shuts it down from inside the guest, KubeVirt will dutifully re-spawn it! There certainly exist high availability use cases where that’s exactly the correct reaction, but in most cases that’s just plain confusing. Shutdown is not restart!&lt;/p&gt;
-
-&lt;p&gt;We decided to tackle both issues at the same time–by deprecating the “Running” field. As already noted, we could have picked a better name to begin with. By using the name “RunStrategy”, it should hopefully be more clear to the end user that they’re asking for a state, which is of course completely separate from what the system can actually provide. While RunStrategy helps address the nomenclature confusion, it also happens to be an enumerated value. Since Running is a boolean, it can only be true or false. We’re now able to create more meaningful states to accommodate different use cases.&lt;/p&gt;
-
-&lt;h2 id=&quot;four-runstrategies-currently-exist&quot;&gt;Four RunStrategies currently exist:&lt;/h2&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Always: If a VM is stopped for any reason, a new instance will be spawned.&lt;/li&gt;
-  &lt;li&gt;RerunOnFailure: If a VM ends execution in an error state, a new instance will be spawned. This addressed the second concern listed above. If a user halts a VM manually a new instance will not be spawned.&lt;/li&gt;
-  &lt;li&gt;Manual: This is exactly what it means. KubeVirt will neither attempt to start or stop a VM. In order to change state, the user must invoke start/stop/restart from the API. There exist convenience functions in the virtctl command line client as well.&lt;/li&gt;
-  &lt;li&gt;Halted: The VM will be stopped if it’s running, and will remain off.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;p&gt;An example using the RerunOnFailure RunStrategy was presented in &lt;a href=&quot;/2020/KubeVirt-VM-Image-Usage-Patterns.html&quot;&gt;KubeVirt VM Image Usage Patterns&lt;/a&gt;&lt;/p&gt;
-
-&lt;h1 id=&quot;high-availability&quot;&gt;High Availability&lt;/h1&gt;
-
-&lt;p&gt;No discussion of RunStrategies is complete without mentioning High Availability. After all, the implication behind the RerunOnFailure and Always RunStrategies is that your VM should always be available. For the most part this is completely true, but there’s one important scenario where there’s a gap to be aware of: if a node fails completely, e.g. loss of networking or power. Without some means of automatic detection that the node is no longer active, KubeVirt won’t know that the VM has failed. On OpenShift clusters installed using Installer Provisioned Infrastructure (IPI) with MachineHealthCheck enabled can detect failed nodes and reschedule workloads running there.&lt;/p&gt;
-
-&lt;p&gt;Mode information on IPI and MHC can be found here:&lt;/p&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/installing/installing_bare_metal_ipi/ipi-install-overview.html#ipi-install-overview&quot;&gt;Installer Provisioned Infrastructure&lt;/a&gt;
-&lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/machine_management/deploying-machine-health-checks.html&quot;&gt;Machine Health Check&lt;/a&gt;&lt;/p&gt;</content><author><name>Stu Gott</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><summary type="html">Why Isn’t My VM Running?</summary></entry></feed>
+&lt;p&gt;In this blog post we used &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt; to expose metrics out of a KubeVirt VM. We also configured &lt;a href=&quot;https://github.com/prometheus-operator/prometheus-operator&quot;&gt;Prometheus Operator&lt;/a&gt; to collect these metrics. This illustrates how to bring Kubernetes monitoring best practices with applications running inside KubeVirt VMs.&lt;/p&gt;</content><author><name>arthursens</name></author><category term="uncategorized" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="prometheus" /><category term="prometheus-operator" /><category term="node-exporter" /><category term="monitoring" /><summary type="html">Monitoring KubeVirt VMs from the inside</summary></entry></feed>
