@@ -25,6 +25,7 @@ import (
 	"strings"
 	"time"
 
+	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/client-go/tools/cache"
 
 	libvirt "libvirt.org/libvirt-go"
@@ -36,6 +37,7 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/client-go/version"
+	"kubevirt.io/kubevirt/pkg/controller"
 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/stats"
 )
@@ -65,6 +67,15 @@ var (
 		"VMI phase.",
 		[]string{
 			"node", "phase", "os", "workload", "flavor",
+		},
+		nil,
+	)
+
+	vmiEvictionBlockerDesc = prometheus.NewDesc(
+		"kubevirt_vmi_non_evictable",
+		"Indication for a VirtualMachine that its eviction strategy is set to Live Migration but is not migratable.",
+		[]string{
+			"node", "namespace", "name",
 		},
 		nil,
 	)
@@ -225,49 +236,99 @@ func (metrics *vmiMetrics) updateBlock(blkStats []stats.DomainStatsBlock) {
 			continue
 		}
 
-		if block.RdReqsSet || block.WrReqsSet {
-			desc := metrics.newPrometheusDesc(
-				"kubevirt_vmi_storage_iops_total",
-				"I/O operation performed.",
-				[]string{"drive", "type"},
-			)
+		blkLabels := []string{"drive"}
+		blkLabelValues := []string{block.Name}
 
-			if block.RdReqsSet {
-				metrics.pushPrometheusMetric(desc, prometheus.CounterValue, float64(block.RdReqs), []string{block.Name, "read"})
-			}
-			if block.WrReqsSet {
-				metrics.pushPrometheusMetric(desc, prometheus.CounterValue, float64(block.WrReqs), []string{block.Name, "write"})
-			}
+		if block.Alias != "" {
+			blkLabelValues[0] = block.Alias
 		}
 
-		if block.RdBytesSet || block.WrBytesSet {
-			desc := metrics.newPrometheusDesc(
-				"kubevirt_vmi_storage_traffic_bytes_total",
-				"storage traffic.",
-				[]string{"drive", "type"},
+		if block.RdReqsSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_iops_read_total",
+				"I/O read operations",
+				prometheus.CounterValue,
+				float64(block.RdReqs),
+				blkLabels,
+				blkLabelValues,
 			)
-
-			if block.RdBytesSet {
-				metrics.pushPrometheusMetric(desc, prometheus.CounterValue, float64(block.RdBytes), []string{block.Name, "read"})
-			}
-			if block.WrBytesSet {
-				metrics.pushPrometheusMetric(desc, prometheus.CounterValue, float64(block.WrBytes), []string{block.Name, "write"})
-			}
 		}
 
-		if block.RdTimesSet || block.WrTimesSet {
-			desc := metrics.newPrometheusDesc(
-				"kubevirt_vmi_storage_times_ms_total",
-				"storage operation time.",
-				[]string{"drive", "type"},
+		if block.WrReqsSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_iops_write_total",
+				"I/O write operations",
+				prometheus.CounterValue,
+				float64(block.WrReqs),
+				blkLabels,
+				blkLabelValues,
 			)
+		}
 
-			if block.RdTimesSet {
-				metrics.pushPrometheusMetric(desc, prometheus.CounterValue, float64(block.RdTimes), []string{block.Name, "read"})
-			}
-			if block.WrTimesSet {
-				metrics.pushPrometheusMetric(desc, prometheus.CounterValue, float64(block.WrTimes), []string{block.Name, "write"})
-			}
+		if block.RdBytesSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_read_traffic_bytes_total",
+				"Storage read traffic in bytes",
+				prometheus.CounterValue,
+				float64(block.RdBytes),
+				blkLabels,
+				blkLabelValues,
+			)
+		}
+
+		if block.WrBytesSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_write_traffic_bytes_total",
+				"Storage write traffic in bytes",
+				prometheus.CounterValue,
+				float64(block.WrBytes),
+				blkLabels,
+				blkLabelValues,
+			)
+		}
+
+		if block.RdTimesSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_read_times_ms_total",
+				"Storage read operation time",
+				prometheus.CounterValue,
+				float64(block.RdTimes)/1000000,
+				blkLabels,
+				blkLabelValues,
+			)
+		}
+
+		if block.WrTimesSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_write_times_ms_total",
+				"Storage write operation time",
+				prometheus.CounterValue,
+				float64(block.WrTimes)/1000000,
+				blkLabels,
+				blkLabelValues,
+			)
+		}
+
+		if block.FlReqsSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_flush_requests_total",
+				"storage flush requests.",
+				prometheus.CounterValue,
+				float64(block.FlReqs),
+				blkLabels,
+				blkLabelValues,
+			)
+		}
+
+		if block.FlTimesSet {
+			metrics.pushCustomMetric(
+				"kubevirt_vmi_storage_flush_times_ms_total",
+				"total time (ms) spent on cache flushing.",
+				prometheus.CounterValue,
+				float64(block.FlTimes)/1000000,
+				blkLabels,
+				blkLabelValues,
+			)
 		}
 	}
 }
@@ -444,6 +505,36 @@ func updateVMIsPhase(nodeName string, vmis []*k6tv1.VirtualMachineInstance, ch c
 	}
 }
 
+func updateVMIEvictionBlocker(nodeName string, vmis []*k6tv1.VirtualMachineInstance, ch chan<- prometheus.Metric) {
+	for _, vmi := range vmis {
+		mv, err := prometheus.NewConstMetric(
+			vmiEvictionBlockerDesc, prometheus.GaugeValue,
+			checkNonEvictableVMAndSetMetric(vmi),
+			nodeName, vmi.Namespace, vmi.Name,
+		)
+		if err != nil {
+			continue
+		}
+		ch <- mv
+	}
+}
+
+func checkNonEvictableVMAndSetMetric(vmi *k6tv1.VirtualMachineInstance) float64 {
+	setVal := 0.0
+	if vmi.IsEvictable() {
+		vmiIsMigratableCond := controller.NewVirtualMachineInstanceConditionManager().
+			GetCondition(vmi, k6tv1.VirtualMachineInstanceIsMigratable)
+
+		//As this metric is used for user alert we refer to be conservative - so if the VirtualMachineInstanceIsMigratable
+		//condition is still not set we treat the VM as if it's "not migratable"
+		if vmiIsMigratableCond == nil || vmiIsMigratableCond.Status == k8sv1.ConditionFalse {
+			setVal = 1.0
+		}
+
+	}
+	return setVal
+}
+
 func updateVersion(ch chan<- prometheus.Metric) {
 	verinfo := version.Get()
 	ch <- prometheus.MustNewConstMetric(
@@ -518,6 +609,7 @@ func (co *Collector) Collect(ch chan<- prometheus.Metric) {
 	co.concCollector.Collect(socketToVMIs, scraper, collectionTimeout)
 
 	updateVMIsPhase(co.nodeName, vmis, ch)
+	updateVMIEvictionBlocker(co.nodeName, vmis, ch)
 	return
 }
 
@@ -581,7 +673,6 @@ func (ps *prometheusScraper) Report(socketFile string, vmi *k6tv1.VirtualMachine
 
 	vmiMetrics := newVmiMetrics(vmi, ps.ch)
 	vmiMetrics.updateMetrics(vmStats)
-
 }
 
 func Handler(MaxRequestsInFlight int) http.Handler {

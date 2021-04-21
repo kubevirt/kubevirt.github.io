@@ -22,9 +22,12 @@ package prometheus
 import (
 	"fmt"
 
+	"github.com/onsi/ginkgo/extensions/table"
 	"github.com/prometheus/client_golang/prometheus"
 	io_prometheus_client "github.com/prometheus/client_model/go"
+	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+
 	libvirt "libvirt.org/libvirt-go"
 
 	. "github.com/onsi/ginkgo"
@@ -471,7 +474,7 @@ var _ = Describe("Prometheus", func() {
 
 			result := <-ch
 			Expect(result).ToNot(BeNil())
-			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_iops_total"))
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_iops_read_total"))
 		})
 
 		It("should handle block write iops metrics", func() {
@@ -498,7 +501,7 @@ var _ = Describe("Prometheus", func() {
 
 			result := <-ch
 			Expect(result).ToNot(BeNil())
-			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_iops_total"))
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_iops_write_total"))
 		})
 
 		It("should handle block read bytes metrics", func() {
@@ -525,7 +528,7 @@ var _ = Describe("Prometheus", func() {
 
 			result := <-ch
 			Expect(result).ToNot(BeNil())
-			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_traffic_bytes_total"))
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_read_traffic_bytes_total"))
 		})
 
 		It("should handle block write bytes metrics", func() {
@@ -552,7 +555,7 @@ var _ = Describe("Prometheus", func() {
 
 			result := <-ch
 			Expect(result).ToNot(BeNil())
-			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_traffic_bytes_total"))
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_write_traffic_bytes_total"))
 		})
 
 		It("should handle block read time metrics", func() {
@@ -579,7 +582,7 @@ var _ = Describe("Prometheus", func() {
 
 			result := <-ch
 			Expect(result).ToNot(BeNil())
-			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_times_ms_total"))
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_read_times_ms_total"))
 		})
 
 		It("should handle block write time metrics", func() {
@@ -606,7 +609,125 @@ var _ = Describe("Prometheus", func() {
 
 			result := <-ch
 			Expect(result).ToNot(BeNil())
-			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_times_ms_total"))
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_write_times_ms_total"))
+		})
+
+		It("should handle block flush requests metrics", func() {
+			ch := make(chan prometheus.Metric, 1)
+			defer close(ch)
+
+			ps := prometheusScraper{ch: ch}
+
+			vmStats := &stats.DomainStats{
+				Cpu:    &stats.DomainStatsCPU{},
+				Memory: &stats.DomainStatsMemory{},
+				Block: []stats.DomainStatsBlock{
+					{
+						NameSet:   true,
+						Name:      "vda",
+						FlReqsSet: true,
+						FlReqs:    1000,
+					},
+				},
+			}
+
+			vmi := k6tv1.VirtualMachineInstance{}
+			ps.Report("test", &vmi, vmStats)
+
+			result := <-ch
+			Expect(result).ToNot(BeNil())
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_flush_requests_total"))
+		})
+
+		It("should handle block flush times metrics", func() {
+			ch := make(chan prometheus.Metric, 1)
+			defer close(ch)
+
+			ps := prometheusScraper{ch: ch}
+
+			vmStats := &stats.DomainStats{
+				Cpu:    &stats.DomainStatsCPU{},
+				Memory: &stats.DomainStatsMemory{},
+				Block: []stats.DomainStatsBlock{
+					{
+						NameSet:    true,
+						Name:       "vda",
+						FlTimesSet: true,
+						FlTimes:    1000000,
+					},
+				},
+			}
+
+			vmi := k6tv1.VirtualMachineInstance{}
+			ps.Report("test", &vmi, vmStats)
+
+			result := <-ch
+			Expect(result).ToNot(BeNil())
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_storage_flush_times_ms_total"))
+		})
+
+		It("should use alias when alias is not empty", func() {
+			ch := make(chan prometheus.Metric, 1)
+			defer close(ch)
+
+			ps := prometheusScraper{ch: ch}
+
+			vmStats := &stats.DomainStats{
+				Cpu:    &stats.DomainStatsCPU{},
+				Memory: &stats.DomainStatsMemory{},
+				Block: []stats.DomainStatsBlock{
+					{
+						NameSet:    true,
+						Name:       "vda",
+						Alias:      "disk0",
+						FlTimesSet: true,
+						FlTimes:    1000000,
+					},
+				},
+			}
+
+			vmi := k6tv1.VirtualMachineInstance{}
+			ps.Report("test", &vmi, vmStats)
+
+			result := <-ch
+			Expect(result).ToNot(BeNil())
+
+			dto := &io_prometheus_client.Metric{}
+			err := result.Write(dto)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(dto.String()).To(ContainSubstring("name:\"drive\" value:\"disk0\""))
+		})
+
+		It("should use the name when alias is empty", func() {
+			ch := make(chan prometheus.Metric, 1)
+			defer close(ch)
+
+			ps := prometheusScraper{ch: ch}
+
+			vmStats := &stats.DomainStats{
+				Cpu:    &stats.DomainStatsCPU{},
+				Memory: &stats.DomainStatsMemory{},
+				Block: []stats.DomainStatsBlock{
+					{
+						NameSet:    true,
+						Name:       "vda",
+						Alias:      "",
+						FlTimesSet: true,
+						FlTimes:    1000000,
+					},
+				},
+			}
+
+			vmi := k6tv1.VirtualMachineInstance{}
+			ps.Report("test", &vmi, vmStats)
+
+			result := <-ch
+			Expect(result).ToNot(BeNil())
+
+			dto := &io_prometheus_client.Metric{}
+			err := result.Write(dto)
+			Expect(err).ShouldNot(HaveOccurred())
+			Expect(dto.String()).To(ContainSubstring("name:\"drive\" value:\"vda\""))
 		})
 
 		It("should not expose nameless block metrics", func() {
@@ -966,7 +1087,60 @@ var _ = Describe("Prometheus", func() {
 			Expect(s).To(ContainSubstring("vcpu_0_cpu_2=true"))
 		})
 	})
+
+	Context("VMI Eviction blocker", func() {
+
+		liveMigrateEvictPolicy := k6tv1.EvictionStrategyLiveMigrate
+		table.DescribeTable("Add evictionion alert matrics", func(evictionPolicy *k6tv1.EvictionStrategy, migrateCondStatus k8sv1.ConditionStatus, expectedVal float64) {
+
+			ch := make(chan prometheus.Metric, 1)
+			defer close(ch)
+
+			vmis := createVMISForEviction(evictionPolicy, migrateCondStatus)
+			updateVMIEvictionBlocker("testNode", vmis, ch)
+
+			result := <-ch
+			dto := &io_prometheus_client.Metric{}
+			result.Write(dto)
+
+			Expect(result).ToNot(BeNil())
+			Expect(result.Desc().String()).To(ContainSubstring("kubevirt_vmi_non_evictable"))
+			Expect(dto.Gauge.GetValue()).To(BeEquivalentTo(expectedVal))
+		},
+			table.Entry("VMI Eviction policy set to LiveMigration and vm is not migratable", &liveMigrateEvictPolicy, k8sv1.ConditionFalse, 1.0),
+			table.Entry("VMI Eviction policy set to LiveMigration and vm migratable status is not known", &liveMigrateEvictPolicy, k8sv1.ConditionUnknown, 1.0),
+			table.Entry("VMI Eviction policy set to LiveMigration and vm is migratable", &liveMigrateEvictPolicy, k8sv1.ConditionTrue, 0.0),
+			table.Entry("VMI Eviction policy is not set and vm is not migratable", nil, k8sv1.ConditionFalse, 0.0),
+			table.Entry("VMI Eviction policy is not set and vm is migratable", nil, k8sv1.ConditionTrue, 0.0),
+			table.Entry("VMI Eviction policy is not set and vm migratable status is not known", nil, k8sv1.ConditionUnknown, 0.0),
+		)
+	})
 })
+
+func createVMISForEviction(evictionStrategy *k6tv1.EvictionStrategy, migratableCondStatus k8sv1.ConditionStatus) []*k6tv1.VirtualMachineInstance {
+
+	vmis := []*k6tv1.VirtualMachineInstance{
+		{
+			ObjectMeta: metav1.ObjectMeta{
+				Namespace: "test-ns",
+				Name:      "testvmi",
+			},
+		},
+	}
+
+	if migratableCondStatus != k8sv1.ConditionUnknown {
+		vmis[0].Status.Conditions = []k6tv1.VirtualMachineInstanceCondition{
+			{
+				Type:   k6tv1.VirtualMachineInstanceIsMigratable,
+				Status: migratableCondStatus,
+			},
+		}
+	}
+
+	vmis[0].Spec.EvictionStrategy = evictionStrategy
+
+	return vmis
+}
 
 var _ = Describe("Utility functions", func() {
 	Context("VMI Count map reporting", func() {
