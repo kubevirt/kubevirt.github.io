@@ -507,7 +507,7 @@ You can also change the Answer File according to your needs by consulting the al
   <li><code class="language-plaintext highlighter-rouge">create-base-dv</code> task creates an empty PVC for new windows installation called <code class="language-plaintext highlighter-rouge">windows-10-base-*</code>.</li>
   <li><code class="language-plaintext highlighter-rouge">create-vm-from-manifest</code> task creates a VM called <code class="language-plaintext highlighter-rouge">windows-installer-*</code>
 from the empty PVC and with the <code class="language-plaintext highlighter-rouge">windows-10-source-*</code> PVC attached as a CD-ROM.</li>
-  <li>` wait-for-vmi-status` task waits until the VM shuts down.</li>
+  <li><code class="language-plaintext highlighter-rouge">wait-for-vmi-status</code> task waits until the VM shuts down.</li>
   <li><code class="language-plaintext highlighter-rouge">cleanup-vm</code> deletes the installer VM and ISO PVC.</li>
   <li>The output artifact will be the <code class="language-plaintext highlighter-rouge">windows-10-base-*</code> PVC with the Windows installation.</li>
 </ol>
