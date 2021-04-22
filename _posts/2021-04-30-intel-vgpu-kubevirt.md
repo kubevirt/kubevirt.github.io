@@ -7,7 +7,7 @@ navbar_active: Blogs
 pub-date: April 30
 pub-year: 2021
 category: news
-tags: vgpu, gpu
+tags: [kubevirt, vGPU, Windows, GPU, Intel]
 comments: true
 ---
 
@@ -27,7 +27,7 @@ comments: true
 
 ## Introduction
 
-Starting with 5th generation Intel Core processors that have Intel Graphics Processors it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with [Kubevirt 0.40](https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0) support for detecting and allocating the Intel based vGPUs has been added to Kubevirt and, support for the virtualization of Intel GPUs is available in the Linux Kernel since 4.19. 
+Starting with 5th generation Intel Core processors that have embedded Intel graphics processing units it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with [Kubevirt 0.40](https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0) support for detecting and allocating the Intel based vGPUs has been added to Kubevirt and, support for the virtualization of Intel GPUs is available in the Linux Kernel since 4.19. 
 
 The total number of vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see [Create vGPU \(KVMGT only\)](https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only) in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices. 
 
@@ -43,7 +43,7 @@ Before we begin you will need a few things to make use of the Intel GPU:
 * A workstation or server with a 5th Generation or higher Intel Core Processor, or E3_v4 or higher Xeon Processor and enough memory to virtualize one or more VMs 
 * A preinstalled Centos 8.3 OS Server, using the Minimal install
 * The following software:
-  * minikube - See [minikube start](https://minikube.sigs.k8s.io/docs/start/)
+  * minikube - See [minikube start](https://kubevirt.io/quickstart_minikube/)
   * virtctl - See [kubevirt releases](https://github.com/kubevirt/kubevirt/releases)
   * kubectl - See [Install and Set Up kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 * A Windows 10 Install ISO Image - See [Download Windows 10 Disk Image](https://www.microsoft.com/en-us/software-download/windows10)
@@ -54,12 +54,12 @@ In order to use minikube on Centos 8.3 we will be installing the Docker binaries
 
 ```
 $ sudo dnf update
-$ sudo dnf install -y pciutils yum-utils
+$ sudo dnf install -y pciutils yum-utils conntrack
 $ sudo yum-config-manager \
     --add-repo \
     https://download.docker.com/linux/centos/docker-ce.repo
-$ sudo yum install docker-ce docker-ce-cli containerd.io    
-$ sudo systemctl start docker
+$ sudo yum install -y docker-ce docker-ce-cli containerd.io    
+$ sudo systemctl enable docker --now
 $ sudo usermod -a -G docker $USER
 ```
 > note "Note"
@@ -83,9 +83,8 @@ The following commands will do the following:
 * update the Linux kernel to enable Intel IOMMU
 
 ```shell
-$ sudo echo options i915 enable_gvt=1 > /etc/modprobe.d/gpu-intel.conf
 $ sudo echo kvmgt > /etc/modules-load.d/gpu-kvmgt.conf
-$ sudo grubby --update-kernel=ALL --args="intel_iommu=on"
+$ sudo grubby --update-kernel=ALL --args="intel_iommu=on i915.enable_gvt=1"
 $ sudo shutdown -r now
 ```
 
@@ -113,6 +112,7 @@ $ sudo lspci
 Take note that in the above output the Intel GPU is on "00:02.0". Now create the `/etc/systemd/system/gvtg-enable.service` but be sure to update the PCI ID as appropriate for your machine:
 
 ```shell
+$ sudo su - 
 $ cat > /etc/systemd/system/gvtg-enable.service << EOM
 [Unit]
 Description=Create Intel GVT-g vGPU
@@ -128,7 +128,8 @@ RemainAfterExit=yes
 [Install]
 WantedBy=multi-user.target
 EOM
-$ systemctl enable gvtg-enable --now
+$ exit
+$ sudo systemctl enable gvtg-enable --now
 ```
 
 We can validate that the vGPU devices were created by looking in the `/sys/devices/pci0000:00/0000:00:02.0/` directory. 
@@ -153,12 +154,22 @@ Note that "mdev_type" points to "i915-GVTg_V5_8", this will come into play later
 We will be using the minikube driver "none" which will install Kubernetes directly onto this server. This will allow you to maintain a copy of the virtual machines that you build through a reboot. Minikube will use the storage mounted on `/tmp/hostpath-provisioner`. Ensure that you have enough storage available in that path for storing both a Windows ISO install file as well as a virtual disk image. I suggest at least 80GB of free space for this demo.
 
 ```shell
-$ sudo /usr/local/bin/minikube start --driver=none
-$ sudo mv /root/.kube /root/.minikube $HOME
-$ sudo chown -R $USER $HOME/.kube $HOME/.minikube
+$ minikube start --driver=none
+😄  minikube v1.19.0 on Centos 8.3.2011
+✨  Using the none driver based on user configuration
+👍  Starting control plane node minikube in cluster minikube
+🤹  Running on localhost (CPUs=12, Memory=31703MB, Disk=71645MB) ...
+ℹ️  OS release is CentOS Linux 8
+🐳  Preparing Kubernetes v1.20.2 on Docker 20.10.6 ...
+    ▪ Generating certificates and keys ...
+    ▪ Booting up control plane ...
+    ▪ Configuring RBAC rules ...
+🤹  Configuring local host environment ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+🌟  Enabled addons: storage-provisioner, default-storageclass
+🏄  Done! kubectl is now configured to use "minikube" cluster and "default" namespace by default
 ```
-
-Because we are using minikube in a non-standard way, we are going to need to update the `.kube/config` file. Edit the `~/.kube/config` file with your favorite editor and replace all instances of "/root" with the path to your home directory (eg. /home/username).
 
 Once the minikube install is complete, validate that everything is working properly.
 
@@ -175,25 +186,15 @@ As long as you don't get any errors, your base Kubernetes cluster is ready to go
 Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. The following steps are copied from the [KubeVirt quickstart with minikube](https://kubevirt.io/quickstart_minikube/)
 
 ```shell
-$ export VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- '-rc' | head -1 | awk -F': ' '{print $2}' | sed 's/,//' | xargs)
-$ echo $VERSION
-$ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml
+$ minikube addons enable kubevirt
+$ kubectl -n kubevirt wait kubevirt kubevirt --for condition=Available
 ```
 
-At this point, we need to create an instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an _mdevNameSelector_ to look for, and a _resourceName_ to assign to it. The _mdevNameSelector_ comes from the "mdev_type" that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.
+At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an _mdevNameSelector_ to look for, and a _resourceName_ to assign to it. The _mdevNameSelector_ comes from the "mdev_type" that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.
 
-Create a kubevirt-cr.yaml with the following:
-
-```shell
-$ cat > kubevirt-cr.yaml << EOM
----
-apiVersion: kubevirt.io/v1
-kind: KubeVirt
-metadata:
-  name: kubevirt
-  namespace: kubevirt
+```
+$ cat > kubevirt-patch.yaml <<EOF
 spec:
-  certificateRotateStrategy: {}
   configuration:
     developerConfiguration:
       featureGates:
@@ -202,14 +203,11 @@ spec:
       mediatedDevices:
       - mdevNameSelector: "i915-GVTg_V5_8"
         resourceName: "intel.com/U630"
-  customizeComponents: {}
-  imagePullPolicy: IfNotPresent
-  workloadUpdateStrategy: {}
-EOM
-$ kubectl create -f kubevirt-cr.yaml
+EOF
+$ kubectl patch kubevirt kubevirt -n kubevirt --patch "$(cat kubevirt-patch.yaml)" --type=merge
 ```
 
-We now need to wait for kubevirt to start. Run `kubectl -n kubevirt wait kv kubevirt --for condition=Available` and wait for this to complete successfully. NOTE you may need to run the command more than once depending on how long it takes for your machine to start kubevirt.
+We now need to wait for kubevirt to reload its configuration. Run `kubectl -n kubevirt wait kv kubevirt --for condition=Available` and wait for this to complete successfully. NOTE you may need to run the command more than once depending on how long it takes for your machine to start kubevirt.
 
 ### Validate vGPU detection
 
