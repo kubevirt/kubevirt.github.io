@@ -225,7 +225,7 @@ func createCriticalNetworkError(err error) *CriticalNetworkError {
 	return &CriticalNetworkError{fmt.Sprintf("Critical network error: %v", err)}
 }
 
-func ensureDHCP(vmi *v1.VirtualMachineInstance, bindMechanism BindMechanism, podInterfaceName string) error {
+func ensureDHCP(bindMechanism BindMechanism, podInterfaceName string) error {
 	dhcpStartedFile := fmt.Sprintf("/var/run/kubevirt-private/dhcp_started-%s", podInterfaceName)
 	_, err := os.Stat(dhcpStartedFile)
 	if os.IsNotExist(err) {
@@ -272,8 +272,7 @@ func (l *podNICImpl) PlugPhase2(vmi *v1.VirtualMachineInstance, iface *v1.Interf
 		log.Log.Reason(err).Critical("failed to create libvirt configuration")
 	}
 
-	err = ensureDHCP(vmi, bindMechanism, podInterfaceName)
-	if err != nil {
+	if err := ensureDHCP(bindMechanism, podInterfaceName); err != nil {
 		log.Log.Reason(err).Criticalf("failed to ensure dhcp service running for %s: %s", podInterfaceName, err)
 		panic(err)
 	}
@@ -346,7 +345,7 @@ func getPhase2Binding(vmi *v1.VirtualMachineInstance, iface *v1.Interface, netwo
 		}, nil
 	}
 	if iface.Slirp != nil {
-		return &SlirpBindMechanism{vmi: vmi, iface: iface, domain: domain}, nil
+		return &SlirpBindMechanism{iface: iface, domain: domain}, nil
 	}
 	if iface.Macvtap != nil {
 		mac, err := retrieveMacAddress(iface)
@@ -482,7 +481,7 @@ func (b *BridgeBindMechanism) preparePodNetworkInterfaces() error {
 		return err
 	}
 
-	err := createAndBindTapToBridge(tapDeviceName, b.bridgeInterfaceName, b.queueCount, *b.launcherPID, int(b.vif.Mtu), "0")
+	err := createAndBindTapToBridge(tapDeviceName, b.bridgeInterfaceName, b.queueCount, *b.launcherPID, int(b.vif.Mtu), libvirtUserAndGroupId)
 	if err != nil {
 		log.Log.Reason(err).Errorf("failed to create tap device named %s", tapDeviceName)
 		return err
@@ -821,7 +820,7 @@ func (b *MasqueradeBindMechanism) preparePodNetworkInterfaces() error {
 	}
 
 	tapDeviceName := generateTapDeviceName(b.podInterfaceName)
-	err = createAndBindTapToBridge(tapDeviceName, b.bridgeInterfaceName, b.queueCount, *b.launcherPID, int(b.vif.Mtu), "0")
+	err = createAndBindTapToBridge(tapDeviceName, b.bridgeInterfaceName, b.queueCount, *b.launcherPID, int(b.vif.Mtu), libvirtUserAndGroupId)
 	if err != nil {
 		log.Log.Reason(err).Errorf("failed to create tap device named %s", tapDeviceName)
 		return err
@@ -1165,10 +1164,8 @@ func (b *MasqueradeBindMechanism) createNatRulesUsingNftables(proto iptables.Pro
 }
 
 type SlirpBindMechanism struct {
-	vmi       *v1.VirtualMachineInstance
-	iface     *v1.Interface
-	virtIface *api.Interface
-	domain    *api.Domain
+	iface  *v1.Interface
+	domain *api.Domain
 }
 
 func (b *SlirpBindMechanism) discoverPodNetworkInterface() error {
