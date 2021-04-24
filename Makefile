@@ -163,9 +163,34 @@ check_spelling: | envvar stop
 		make build_img; \
 	fi
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG}curl -s https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh
-	${DEBUG}source update-yaspeller.sh
-	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+	${DEBUG}if [ ! -e "./yaspeller.json" ]; then \
+		echo "Dictionary file: https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json"; \
+	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json -o yaspeller.json -w '%{http_code}\n' -s`" != "200" ]; then \
+			echo "Unable to curl yaspeller dictionary file"; \
+			RETVAL=1; \
+		fi; \
+		REMOTE=1; \
+	else \
+		echo "Using local dictionary file"; \
+	  echo "Dictionary file: yasspeller.json"; \
+		echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/yaspeller/.yaspeller.json"; \
+	fi; \
+	export IFS=$$'\n'; \
+	if `cat ./yaspeller.json 2>&1 | jq > /dev/null 2>&1`; then \
+		for i in `${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v ${PWD}/yaspeller.json:/srv/yaspeller.json:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
+			if [[ "$${i}" =~ "✗" ]]; then \
+				RETVAL=1; \
+			fi; \
+		echo "$${i}" | sed -e 's/\/srv\//\.\//g'; \
+		done; \
+	else \
+		echo "yaspeller dictionary file does not exist or is invalid json"; \
+		RETVAL=1; \
+	fi; \
+	if [ "$${REMOTE}" ]; then \
+		rm -rf yaspeller.json > /dev/null 2>&1; \
+	fi; \
+	if [ "$${RETVAL}" ]; then exit 1; else echo "Complete!"; fi
 
 
 ## Run site.  App available @ http://0.0.0.0:4000
