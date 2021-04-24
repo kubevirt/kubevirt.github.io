@@ -88,6 +88,13 @@ endif
 
 ifndef IMGTAG
 	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
+else
+ifeq ($(shell test $IMGTAG > /dev/null 2>&1 && printf "true"), true)
+	@echo WARN: Using IMGTAG=$$IMGTAG
+	@echo
+else
+	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
+endif
 endif
 
 
@@ -96,7 +103,7 @@ build_img: | envvar stop
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
 	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
 	  IMAGE="`echo $${IMGTAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
-	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/$${IMGTAG}/Dockerfile -o Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
+	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/${IMGTAG}/Dockerfile -o Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
 	    echo "curl Dockerfile failed... exitting!"; \
 	    exit 2; \
 	  else \
@@ -105,21 +112,22 @@ build_img: | envvar stop
 	else \
 	  IMAGE="`echo $${TAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
 	  echo "DOCKERFILE file: ./Dockerfile"; \
-	  echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/$${IMGTAG}/Dockerfile"; \
+	  echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/${IMGTAG}/Dockerfile"; \
 	  echo; \
 	fi; \
 	${CONTAINER_ENGINE} rmi ${IMGTAG} 2> /dev/null || echo -n; \
 	if [ "$${REMOTE}" ]; then rm -f Dockerfile > /dev/null 2>&1; fi
 	${BUILD_ENGINE} ${IMGTAG}
+	@echo
 
 
 ## Check external, internal links and links/selectors to userguide on website content
 check_links: | envvar stop
-ifeq ($(shell podman image ls | grep $IMGTAG > /dev/null 2>&1 = False \
-							 	|| printf "false"), false)
-	echo Please run 'make build_img'
-	exit 1
-endif
+	${DEBUG}if ! `podman image exists ${IMGTAG}`; then \
+		echo ${IMGTAG} disk img is not found; \
+		make build_img; \
+	fi
+	@echo "${GREEN}Makefile: Checking links now${RESET}"
 	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv/jekyll; rake -- -u' # ? check internal external links
 #BEGIN BIG SHELL SCRIPT
 	${DEBUG}export IFS=$$'\n'; \
@@ -138,7 +146,7 @@ endif
 	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
 	    echo; \
 	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${IMGTAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
+	    ${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${IMGTAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
 	    echo; \
 	  fi; \
 	done; \
@@ -150,27 +158,25 @@ endif
 
 ## Check spelling on content
 check_spelling: | envvar stop
-ifeq ($(shell podman image ls | grep $IMGTAG > /dev/null 2>&1 = False \
-							 	|| printf "false"), false)
-	echo Please run 'make build_img'
-	exit 1
-endif
+	${DEBUG}if ! `podman image exists ${IMGTAG}`; then \
+		echo ${IMGTAG} disk img is not found; \
+		make build_img; \
+	fi
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG} curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh; \
-	bash update-yaspeller.sh
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+	${DEBUG}curl -s https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/update-yaspeller.sh -o update-yaspeller.sh
+	${DEBUG}source update-yaspeller.sh
+	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
 
 
 ## Run site.  App available @ http://0.0.0.0:4000
 run: | envvar stop
-ifeq ($(shell podman image ls | grep $${IMGTAG} > /dev/null 2>&1), false)
-	@echo $${IMGTAG} disk img is not found
-	@echo Please run \'make build_img\'
-	@echo && exit 1
-endif
-	@echo "${GREEN}Makefile: Run site${RESET}"
-	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c "jekyll serve --trace --force_polling --future"
+	${DEBUG}if ! `podman image exists ${IMGTAG}`; then \
+	  echo ${IMGTAG} disk img is not found; \
+	  make build_img; \
+	fi
+	@echo "${GREEN}Makefile: Starting aplication${RESET}"
+	${DEBUG}for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
+	${DEBUG}${CONTAINER_ENGINE} run -d --name website -p 4000:4000 -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c "cd /srv; jekyll serve --host 0.0.0.0 --trace --force_polling --future"
 	@echo
 
 
