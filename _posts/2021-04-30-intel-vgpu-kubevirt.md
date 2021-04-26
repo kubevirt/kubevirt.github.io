@@ -52,13 +52,13 @@ Graphical User Interfaces (GUIs) have come along way over the past few years and
   </figure>
 </div>
 
-Without GPU hardware acceleration the user experience of a Virtual machine can be greatly impacted. 
+Without GPU hardware acceleration the user experience of a Virtual machine can be greatly impacted.
 
-Starting with 5th generation Intel Core processors that have embedded Intel graphics processing units it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with [Kubevirt 0.40](https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0) support for detecting and allocating the Intel based vGPUs has been added to Kubevirt. Support for the creation of these virtualized Intel GPUs is available in the Linux Kernel since the 4.19 release. What does this meaning for you? You no longer need additional drivers or licenses to test out GPU accelerated virtual machines. 
+Starting with 5th generation Intel Core processors that have embedded Intel graphics processing units it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with [Kubevirt 0.40](https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0) support for detecting and allocating the Intel based vGPUs has been added to Kubevirt. Support for the creation of these virtualized Intel GPUs is available in the Linux Kernel since the 4.19 release. What does this meaning for you? You no longer need additional drivers or licenses to test out GPU accelerated virtual machines.
 
-The total number of Intel vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see [Create vGPU \(KVMGT only\)](https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only) in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices. 
+The total number of Intel vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see [Create vGPU \(KVMGT only\)](https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only) in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices.
 
-You can reproduce this work on any Kubernetes cluster running kubevirt v0.40.0 or later, but the steps you need to take to load the kernel modules and enable the virtual devices will vary based on the underlying OS your Kubernetes cluster is running on. In order to demonstrate how you can enable this feature, we will use an all-in-one Kubernetes cluster built using Fedora 32 and minikube. 
+You can reproduce this work on any Kubernetes cluster running kubevirt v0.40.0 or later, but the steps you need to take to load the kernel modules and enable the virtual devices will vary based on the underlying OS your Kubernetes cluster is running on. In order to demonstrate how you can enable this feature, we will use an all-in-one Kubernetes cluster built using Fedora 32 and minikube.
 
 > note "Note"
 > This blog post is a more advanced topic and assumes some Linux and Kubernetes understanding.
@@ -114,7 +114,7 @@ sudo systemctl enable --now crio
 
 ### Preparing the Intel vGPU driver
 
-In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution. 
+In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.
 
 The following commands will do the following:
 * load the kvmgt module to enable support within kvm
@@ -174,7 +174,7 @@ sudo systemctl enable gvtg-enable --now
 > The above systemd service will create two vGPU devices, you can repeat the commands with additional unique GUIDs up to a maximum of 8 vGPU if your particular hardware supports it.
 
 
-We can validate that the vGPU devices were created by looking in the `/sys/devices/pci0000:00/0000:00:02.0/` directory. 
+We can validate that the vGPU devices were created by looking in the `/sys/devices/pci0000:00/0000:00:02.0/` directory.
 
 ```shell
 $ ls -lsa /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d
@@ -272,11 +272,11 @@ EOF
 kubectl patch kubevirt kubevirt -n kubevirt --patch "$(cat kubevirt-patch.yaml)" --type=merge
 ```
 
-We now need to wait for kubevirt to reload its configuration. 
+We now need to wait for kubevirt to reload its configuration.
 
 ### Validate vGPU detection
 
-Now that kubevirt is installed and running, lets ensure that the vGPU was identified correctly. Describe the minikube node, using the command `kubectl describe node` and look for the "Capacity" section. If kubevirt properly detected the vGPU you will see an entry for "intel.com/U630" with a capacity value of greater than 0. 
+Now that kubevirt is installed and running, lets ensure that the vGPU was identified correctly. Describe the minikube node, using the command `kubectl describe node` and look for the "Capacity" section. If kubevirt properly detected the vGPU you will see an entry for "intel.com/U630" with a capacity value of greater than 0.
 
 ```shell
 $ kubectl describe node
@@ -354,7 +354,7 @@ $ virtctl image-upload \
    --wait-secs=240
 ```
 
-We need a place to store our Windows 10 virtual disk, use the following to create a 40Gb space to store our file. In order to do this within minikube we will manually create a PersistentVolume (PV) as well as a PersistentVolumeClaim (PVC). These steps assume that you have 45+ GB of free space in "/".  We will create a "/data" directory as well as a subdirectory for storing our PV. If you do not have at least 45GB of free space in "/", you will need to free up space, or mount storage on "/data" to continue.
+We need a place to store our Windows 10 virtual disk, use the following to create a 40Gb space to store our file. In order to do this within minikube we will manually create a PersistentVolume (PV) as well as a PersistentVolumeClaim (PVC). These steps assume that you have 45+ GiB of free space in "/".  We will create a "/data" directory as well as a subdirectory for storing our PV. If you do not have at least 45 GiB of free space in "/", you will need to free up space, or mount storage on "/data" to continue.
 
 ```shell
 cat > win10-pvc.yaml << EOF
@@ -475,7 +475,7 @@ EOF
 kubectl create -f win10vm1.yaml
 ```
 > note "NOTE"
-> This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers. 
+> This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.
 
 The key piece of information that we have added to this virtual machine definition is this snippet of yaml:
 
@@ -499,13 +499,13 @@ When the output of shows that the vm is in a "Running" phase you can "CTRL+C" to
 
 ## Accessing the Windows VM
 
-Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine. 
+Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.
 
 ```shell
 $ virtctl vnc win10vm1
 ```
 
-A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point. 
+A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.
 
 Once the install is complete you have a Windows 10 VM running with a GPU available. You can test that GPU acceleration is available by opening the Windows 10 task manager, selecting Advanced and then select the "Performance" tab. Note that the first time you start up, Windows is still detecting and installing the appropriate drivers. It may take a minute or two for the GPU information to show up in the Performance tab.
 
@@ -514,9 +514,9 @@ Try testing out the GPU acceleration. Open a web browser in your VM and navigate
 ## Using the GPU
 
 In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:
-1. In the Windows 10 search bar, type "**Remote Desktop Settings**" and then open the result. 
-2. Select "**Enable Remote Desktop**" and confirm the change. 
-3. Select "**Advanced settings**" and un-check "**Require computers to use Network level Authentication**", and confirm this change. 
+1. In the Windows 10 search bar, type "**Remote Desktop Settings**" and then open the result.
+2. Select "**Enable Remote Desktop**" and confirm the change.
+3. Select "**Advanced settings**" and un-check "**Require computers to use Network level Authentication**", and confirm this change.
 4. Finally reboot the Windows 10 Virtual machine.
 
 Now, run the following commands in order to expose the RDP server to outside your Kubernetes cluster:
@@ -531,7 +531,7 @@ win10vm1-rdp   NodePort    10.105.159.184   <none>        3389:30627/TCP   39s
 
 Note the port that was assigned to this service we will use it in the next step. In the above output the port is 30627.
 
-We can now use the rdesktop tool to connect to our VM and get the full advantages of the vGPU. From a command line run `rdesktop localhost:<port>` being sure to update the port based on the output from above. When prompted by rdesktop accept the certificate. Log into your Windows 10 client. You can now test out the vGPU. 
+We can now use the rdesktop tool to connect to our VM and get the full advantages of the vGPU. From a command line run `rdesktop localhost:<port>` being sure to update the port based on the output from above. When prompted by rdesktop accept the certificate. Log into your Windows 10 client. You can now test out the vGPU.
 
 Let's try FishGL again. Open a browser and go to [http://www.fishgl.com](http://www.fishgl.com). You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
 <br>
@@ -560,4 +560,4 @@ Let's try FishGL again. Open a browser and go to [http://www.fishgl.com](http://
 
 Note that since you are running your Fedora 32 workstation on this same GPU you are already sharing the graphics workload between your primary desktop, and the virtualized Windows Desktop also running on this machine.
 
-Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU. 
+Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.
