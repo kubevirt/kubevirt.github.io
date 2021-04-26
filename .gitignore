@@ -9,3 +9,5 @@ Gemfile.lock
 node_modules
 .history
 .vscode
+Dockerfile
+update-yaspeller.sh
