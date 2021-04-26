@@ -92,10 +92,15 @@ endif
 
 ifndef IMGTAG
 	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
+else
+ifeq ($(shell test $IMGTAG > /dev/null 2>&1 && printf "true"), true)
+	@echo WARN: Using IMGTAG=$$IMGTAG
+	@echo
+else
+	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
+endif
 endif
 
-test: | envvar
-	${DEBUG} env
 
 ## Build image localhost/kubevirt.io
 build_img: | envvar
@@ -111,7 +116,7 @@ build_img: | envvar
 	else \
 	  IMAGE="`echo $${TAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`"; \
 	  echo "DOCKERFILE file: ./Dockerfile"; \
-	  echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/$${IMGTAG}/Dockerfile"; \
+	  echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/${IMGTAG}/Dockerfile"; \
 	  echo; \
 	fi; \
 	${CONTAINER_ENGINE} rmi ${IMGTAG} 2> /dev/null || echo -n; \
@@ -140,7 +145,7 @@ check_links: | envvar stop
 	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
 	    echo; \
 	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name casperjs --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${IMGTAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
+	    ${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${IMGTAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
 	    echo; \
 	  fi; \
 	done; \
@@ -177,14 +182,3 @@ stop: | envvar
 	@echo "${GREEN}Makefile: Stop site${RESET}"
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
-
-## Image status
-check_image: | envvar
-	${DEBUG} "$(CONTAINER_ENGINE)" image ls | grep "$(IMGTAG)" || printf false  ### THIS WORKS
-ifeq ($(shell "$(CONTAINER_ENGINE)" image ls | grep "$(IMGTAG)"  || printf false ), false) ### THIS NOT
-	@echo $${IMGTAG} disk img is not found
-	@echo Please run \'make build_img\'
-	@echo && exit 1
-else
-	@echo "${YELLOW}Makefile: Found local image ${IMGTAG}${RESET}"
-endif
