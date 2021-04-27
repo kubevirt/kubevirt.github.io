@@ -66,7 +66,7 @@ endif
 endif
 
 ifndef DEBUG
-	@$(eval export DEBUG=@)~
+	@$(eval export DEBUG=@)
 else
 ifeq ($(shell test "$(DEBUG)" = True  -o  \
 	                 "$(DEBUG)" = true && printf "true"), true)
