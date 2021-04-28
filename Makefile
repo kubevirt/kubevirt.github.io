@@ -102,7 +102,7 @@ endif
 endif
 
 
-## Build image localhost/kubevirt.io
+## Build image localhost/kubevirt-kubevirt.github.io
 build_img: | envvar
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
 	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
@@ -158,8 +158,8 @@ check_links: | envvar stop
 ## Check spelling on content
 check_spelling: | envvar stop
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG} curl $${REPOPATH}/update-yaspeller.sh | bash -  > /dev/null  2>&1 || echo "${YELLOW} Cannot get latest yaspeller, Working with local yaspeller ${RESET}"
-	${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --workdir=/ ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
+	${DEBUG} bash ./_config/src/update-yaspeller.sh > /dev/null  2>&1 || echo "${YELLOW} Cannot get latest yaspeller, Working with local yaspeller ${RESET}"
+	${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --workdir=/ ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
 
 
 ## Run site.  App available @ http://0.0.0.0:4000
@@ -172,13 +172,15 @@ run: | envvar stop
 
 ## Container status
 status: | envvar
-	@echo "${GREEN}Makefile: Check Container status${RESET}"
+	@echo "${GREEN}Makefile: Check container status${RESET}"
 	${CONTAINER_ENGINE} ps
 	@echo
 
 
-## Stop site
+## Stop running container
 stop: | envvar
-	@echo "${GREEN}Makefile: Stop site${RESET}"
+	@echo "${GREEN}Makefile: Stop running container${RESET}"
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
+
+	
