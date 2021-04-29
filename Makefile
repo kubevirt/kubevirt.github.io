@@ -90,6 +90,10 @@ ifndef REPOPATH
 	@$(eval export REPOPATH=https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io)
 endif
 
+ifndef YESPERLLER_PATH
+	@$(eval export YESPERLLER_PATH=https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json)
+endif
+
 ifndef IMGTAG
 	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
 else
@@ -158,9 +162,20 @@ check_links: | envvar stop
 ## Check spelling on content
 check_spelling: | envvar stop
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG} bash ./_config/src/update-yaspeller.sh > /dev/null  2>&1 || echo "${YELLOW} Cannot get latest yaspeller, Working with local yaspeller ${RESET}"
-	${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --workdir=/ ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'
-
+	@echo "${GREEN}Downloading Dictionary file: ${YESPERLLER_PATH} ${RESET}"
+	${DEBUG}echo ${YESPERLLER_PATH}; if [ "`curl ${YESPERLLER_PATH} -o .yaspeller -w '%{http_code}\n' -s`" != "200" ]; then \
+		echo "${RED}ERROR: Unable to curl yaspeller dictionary file ${RESET}"; \
+		rm -f .yaspeller; \
+     	exit 1; \
+	fi; \
+	if `cat .yaspeller 2>&1 | jq > /dev/null 2>&1`; then \
+			echo "${GREEN}yaspeller updated ${RESET}"; \
+			${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --workdir=/ ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv' || { rm -rf .yaspeller; exit 1; }; \
+	else \
+		echo "${RED}ERROR: yaspeller dictionary file does not exist or is invalid json ${RESET}"; \
+		rm -f .yaspeller; \
+		exit 1; \
+	fi
 
 ## Run site.  App available @ http://0.0.0.0:4000
 run: | envvar stop
