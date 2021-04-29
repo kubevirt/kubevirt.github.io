@@ -425,6 +425,7 @@ func isServiceClusterIP(service *corev1.Service) bool {
 	if service.Spec.Type == "" || service.Spec.Type == corev1.ServiceTypeClusterIP {
 		return true
 	}
+
 	return false
 }
 
@@ -518,12 +519,6 @@ func (r *Reconciler) Sync(queue workqueue.RateLimitingInterface) (bool, error) {
 		return false, err
 	}
 
-	// create/update config maps
-	err = r.createOrUpdateConfigMaps()
-	if err != nil {
-		return false, err
-	}
-
 	// create/update serviceMonitor
 	err = r.createOrUpdateServiceMonitors()
 	if err != nil {
@@ -557,7 +552,7 @@ func (r *Reconciler) Sync(queue workqueue.RateLimitingInterface) (bool, error) {
 	}
 
 	// create/update Services
-	pending, err := r.createOrUpdateService()
+	pending, err := r.createOrUpdateServices()
 	if err != nil {
 		return false, err
 	} else if pending {
