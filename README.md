@@ -4,7 +4,7 @@
 
 ## Contributing contents
 
-We more than welcome contributions to KubeVirt website. Please reach out if you happen to have an idea or find an issue with our contents! [Here's our guidelines for contents](GUIDELINES.md).
+We gladly welcome contributions to the KubeVirt website. Please reach out if you happen to have an idea or find an issue with our contents! [Here's our guidelines for contents](GUIDELINES.md).
 
 
 ## Get Started
@@ -114,7 +114,6 @@ Targets:
 * `stop`: Stop container and app
 * `stop_yaspeller`: Sometimes yaspeller goes bonkers.  Stop it here.
  
-
 
 
 ## Getting Help 
