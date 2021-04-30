@@ -1,4 +1,524 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-04-29T16:53:48+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-04-30T16:19:14+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Using Intel vGPUs with Kubevirt</title><link href="https://kubevirt.io//2021/intel-vgpu-kubevirt.html" rel="alternate" type="text/html" title="Using Intel vGPUs with Kubevirt" /><published>2021-04-30T00:00:00+00:00</published><updated>2021-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2021/intel-vgpu-kubevirt</id><content type="html" xml:base="https://kubevirt.io//2021/intel-vgpu-kubevirt.html">&lt;!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true --&gt;
+&lt;ul&gt;
+  &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#prerequisites&quot;&gt;Prerequisites&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#fedora-workstation-prep&quot;&gt;Fedora Workstation Prep&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#preparing-the-intel-vgpu-driver&quot;&gt;Preparing the Intel vGPU driver&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#install-kubernetes-with-minikube&quot;&gt;Install Kubernetes with minikube&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#install-kubevirt&quot;&gt;Install kubevirt&lt;/a&gt;
+    &lt;ul&gt;
+      &lt;li&gt;&lt;a href=&quot;#validate-vgpu-detection&quot;&gt;Validate vGPU detection&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;&lt;a href=&quot;#install-containerize-data-importer&quot;&gt;Install Containerize Data Importer&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#install-windows&quot;&gt;Install Windows&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#accessing-the-windows-vm&quot;&gt;Accessing the Windows VM&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#using-the-gpu&quot;&gt;Using the GPU&lt;/a&gt;
+&lt;!-- /TOC --&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+
+&lt;p&gt;Graphical User Interfaces (GUIs) have come along way over the past few years and most modern desktop environments expect some form of GPU acceleration in order to give you a seamless user experience. If you have tried running things like Windows 10 within Kubevirt you may have noticed that the desktop experience felt a little slow. This is due to Windows 10 reliance on GPU acceleration. In addition many applications are also now taking advantage of GPU acceleration and it can even be used in web based applications such as “FishGL”:
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-nogpu.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;800x530&quot;&gt;
+      &lt;img src=&quot;/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-nogpu.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;FishGL&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Without GPU hardware acceleration the user experience of a Virtual machine can be greatly impacted.&lt;/p&gt;
+
+&lt;p&gt;Starting with 5th generation Intel Core processors that have embedded Intel graphics processing units it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with &lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0&quot;&gt;Kubevirt 0.40&lt;/a&gt; support for detecting and allocating the Intel based vGPUs has been added to Kubevirt. Support for the creation of these virtualized Intel GPUs is available in the Linux Kernel since the 4.19 release. What does this meaning for you? You no longer need additional drivers or licenses to test out GPU accelerated virtual machines.&lt;/p&gt;
+
+&lt;p&gt;The total number of Intel vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see &lt;a href=&quot;https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only&quot;&gt;Create vGPU (KVMGT only)&lt;/a&gt; in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices.&lt;/p&gt;
+
+&lt;p&gt;You can reproduce this work on any Kubernetes cluster running kubevirt v0.40.0 or later, but the steps you need to take to load the kernel modules and enable the virtual devices will vary based on the underlying OS your Kubernetes cluster is running on. In order to demonstrate how you can enable this feature, we will use an all-in-one Kubernetes cluster built using Fedora 32 and minikube.&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;This blog post is a more advanced topic and assumes some Linux and Kubernetes understanding.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;h2 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h2&gt;
+
+&lt;p&gt;Before we begin you will need a few things to make use of the Intel GPU:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;A workstation or server with a 5th Generation or higher Intel Core Processor, or E3_v4 or higher Xeon Processor and enough memory to virtualize one or more VMs&lt;/li&gt;
+  &lt;li&gt;A preinstalled Fedora 32 Workstation with at least 50Gb of free space in the “/” filesystem&lt;/li&gt;
+  &lt;li&gt;The following software:
+    &lt;ul&gt;
+      &lt;li&gt;minikube - See &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/start/&quot;&gt;minikube start&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;virtctl - See &lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases&quot;&gt;kubevirt releases&lt;/a&gt;&lt;/li&gt;
+      &lt;li&gt;kubectl - See &lt;a href=&quot;https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/&quot;&gt;Install and Set Up kubectl on Linux&lt;/a&gt;&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/li&gt;
+  &lt;li&gt;A Windows 10 Install ISO Image - See &lt;a href=&quot;https://www.microsoft.com/en-us/software-download/windows10&quot;&gt;Download Windows 10 Disk Image&lt;/a&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;fedora-workstation-prep&quot;&gt;Fedora Workstation Prep&lt;/h3&gt;
+
+&lt;p&gt;In order to use minikube on Fedora 32 we will be installing multiple applications that will be used throughout this demo. In addition we will be configuring the workstation to use cgroups v1 and we will be updating the firewall to allow proper communication to our Kubernetes cluster as well as any hosted applications. Finally we will be disabling SELinux per the minikube bare-metal install instructions:&lt;/p&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;This post assumes that we are starting with a fresh install of Fedora 32. If you are using an existing configured Fedora 32 Workstation, you may have some software conflicts.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo dnf update -y
+sudo dnf install -y pciutils podman podman-docker conntrack tigervnc rdesktop
+sudo grubby --update-kernel=ALL --args=&quot;systemd.unified_cgroup_hierarchy=0&quot;
+# Setup firewall rules to allow inbound and outbound connections from your minikube cluster
+sudo firewall-cmd --add-port=30000-65535/tcp --permanent
+sudo firewall-cmd --add-port=30000-65535/udp --permanent
+sudo firewall-cmd --add-port=10250-10252/tcp --permanent
+sudo firewall-cmd --add-port=10248/tcp --permanent
+sudo firewall-cmd --add-port=2379-2380/tcp --permanent
+sudo firewall-cmd --add-port=6443/tcp --permanent
+sudo firewall-cmd --add-port=8443/tcp --permanent
+sudo firewall-cmd --add-port=9153/tcp --permanent
+sudo firewall-cmd --add-service=dns --permanent
+sudo firewall-cmd --add-interface=cni-podman0 --permanent
+sudo firewall-cmd --add-masquerade --permanent
+sudo vi /etc/selinux/config
+# change the &quot;SELINUX=enforcing&quot; to &quot;SELINUX=permissive&quot;
+sudo setenforce 0
+sudo systemctl enable sshd --now
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We will now install the CRIO runtime:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo dnf module enable -y cri-o:1.18
+sudo dnf install -y cri-o cri-tools
+sudo systemctl enable --now crio
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h3 id=&quot;preparing-the-intel-vgpu-driver&quot;&gt;Preparing the Intel vGPU driver&lt;/h3&gt;
+
+&lt;p&gt;In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.&lt;/p&gt;
+
+&lt;p&gt;The following commands will do the following:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;load the kvmgt module to enable support within kvm&lt;/li&gt;
+  &lt;li&gt;enable gvt in the i915 module&lt;/li&gt;
+  &lt;li&gt;update the Linux kernel to enable Intel IOMMU&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;sh &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;echo kvmgt &amp;gt; /etc/modules-load.d/gpu-kvmgt.conf&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;grubby &lt;span class=&quot;nt&quot;&gt;--update-kernel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ALL &lt;span class=&quot;nt&quot;&gt;--args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;intel_iommu=on i915.enable_gvt=1&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;shutdown &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; now
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After the reboot check to ensure that the proper kernel modules have been loaded:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;lsmod | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;kvmgt
+kvmgt                  32768  0
+mdev                   20480  2 kvmgt,vfio_mdev
+vfio                   32768  3 kvmgt,vfio_mdev,vfio_iommu_type1
+kvm                   798720  2 kvmgt,kvm_intel
+i915                 2494464  4 kvmgt
+drm                   557056  4 drm_kms_helper,kvmgt,i915
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We will now create our vGPU devices. These virtual devices are created by echoing a GUID into a sys device created by the Intel driver. This needs to be done every time the system boots. The easiest way to do this is using a systemd service that runs on every boot. Before we create this systemd service, we need to validate the PCI ID of your Intel Graphics card. To do this we will use the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;lspci&lt;/code&gt; command&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;lspci
+00:00.0 Host bridge: Intel Corporation Device 9b53 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;rev 03&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+00:02.0 VGA compatible controller: Intel Corporation Device 9bc8 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;rev 03&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+00:08.0 System peripheral: Intel Corporation Xeon E3-1200 v5/v6 / E3-1500 v5 / 6th/7th/8th Gen Core Processor Gaussian Mixture Model
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Take note that in the above output the Intel GPU is on “00:02.0”. Now create the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/etc/systemd/system/gvtg-enable.service&lt;/code&gt; but be sure to update the PCI ID as appropriate for your machine:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; ~/gvtg-enable.service &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+[Unit]
+Description=Create Intel GVT-g vGPU
+
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c &quot;echo '56a4c4e2-c81f-4cba-82bf-af46c30ea32d' &amp;gt; /sys/devices/pci0000:00/0000:00:02.0/mdev_supported_types/i915-GVTg_V5_8/create&quot;
+ExecStart=/bin/sh -c &quot;echo '973069b7-2025-406b-b3c9-301016af3150' &amp;gt; /sys/devices/pci0000:00/0000:00:02.0/mdev_supported_types/i915-GVTg_V5_8/create&quot;
+ExecStop=/bin/sh -c &quot;echo '1' &amp;gt; /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d/remove&quot;
+ExecStop=/bin/sh -c &quot;echo '1' &amp;gt; /sys/devices/pci0000:00/0000:00:02.0/973069b7-2025-406b-b3c9-301016af3150/remove&quot;
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo mv&lt;/span&gt; ~/gvtg-enable.service /etc/systemd/system/gvtg-enable.service
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;gvtg-enable &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Note&lt;/p&gt;&lt;p&gt;The above systemd service will create two vGPU devices, you can repeat the commands with additional unique GUIDs up to a maximum of 8 vGPU if your particular hardware supports it.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can validate that the vGPU devices were created by looking in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/sys/devices/pci0000:00/0000:00:02.0/&lt;/code&gt; directory.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-lsa&lt;/span&gt; /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d
+total 0
+lrwxrwxrwx. 1 root root    0 Apr 20 13:56 driver -&amp;gt; ../../../../bus/mdev/drivers/vfio_mdev
+drwxr-xr-x. 2 root root    0 Apr 20 14:41 intel_vgpu
+lrwxrwxrwx. 1 root root    0 Apr 20 14:41 iommu_group -&amp;gt; ../../../../kernel/iommu_groups/8
+lrwxrwxrwx. 1 root root    0 Apr 20 14:41 mdev_type -&amp;gt; ../mdev_supported_types/i915-GVTg_V5_8
+drwxr-xr-x. 2 root root    0 Apr 20 14:41 power
+&lt;span class=&quot;nt&quot;&gt;--w-------&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; 1 root root 4096 Apr 20 14:41 remove
+lrwxrwxrwx. 1 root root    0 Apr 20 13:56 subsystem -&amp;gt; ../../../../bus/mdev
+&lt;span class=&quot;nt&quot;&gt;-rw-r--r--&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;.&lt;/span&gt; 1 root root 4096 Apr 20 13:56 uevent
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note that “mdev_type” points to “i915-GVTg_V5_8”, this will come into play later when we configure kubevirt to detect the vGPU.&lt;/p&gt;
+
+&lt;h2 id=&quot;install-kubernetes-with-minikube&quot;&gt;Install Kubernetes with minikube&lt;/h2&gt;
+
+&lt;p&gt;We will now install Kubernetes onto our Fedora Workstation. &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/&quot;&gt;Minikube&lt;/a&gt; will help quickly set up our Kubernetes cluster environment. We will start by getting the latest release of minikube and kubectl.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-LO&lt;/span&gt; https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
+&lt;span class=&quot;nb&quot;&gt;sudo install &lt;/span&gt;minikube-linux-amd64 /usr/local/bin/minikube
+&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;minikube kubectl version | &lt;span class=&quot;nb&quot;&gt;head&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;awk&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-F&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;', '&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'print $3'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;awk&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-F&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;':'&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;{&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'print $2'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;}&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;sed &lt;/span&gt;s/&lt;span class=&quot;se&quot;&gt;\&quot;&lt;/span&gt;//g&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo install&lt;/span&gt; &lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;HOME&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/.minikube/cache/linux/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/kubectl /usr/local/bin
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We will be using the minikube driver “none” which will install Kubernetes directly onto this machine. This will allow you to maintain a copy of the virtual machines that you build through a reboot. Later in this post we will create persistent volumes for virtual machine storage in “/data”. As previously noted, ensure that you have at least 50Gb of free space in “/data” to complete this setup. The minikube install will take a few minutes to complete.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; /data/winhd1-pv
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;minikube start &lt;span class=&quot;nt&quot;&gt;--driver&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;none &lt;span class=&quot;nt&quot;&gt;--container-runtime&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;crio
+😄  minikube v1.19.0 on Fedora 32
+✨  Using the none driver based on user configuration
+👍  Starting control plane node minikube &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;cluster minikube
+🤹  Running on localhost &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CPUs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;12, &lt;span class=&quot;nv&quot;&gt;Memory&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;31703MB, &lt;span class=&quot;nv&quot;&gt;Disk&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;71645MB&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt; ...
+ℹ️  OS release is Fedora 32 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Workstation Edition&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+🐳  Preparing Kubernetes v1.20.2 on Docker 20.10.6 ...
+    ▪ Generating certificates and keys ...
+    ▪ Booting up control plane ...
+    ▪ Configuring RBAC rules ...
+🤹  Configuring &lt;span class=&quot;nb&quot;&gt;local &lt;/span&gt;host environment ...
+🔎  Verifying Kubernetes components...
+    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
+🌟  Enabled addons: storage-provisioner, default-storageclass
+🏄  Done! kubectl is now configured to use &lt;span class=&quot;s2&quot;&gt;&quot;minikube&quot;&lt;/span&gt; cluster and &lt;span class=&quot;s2&quot;&gt;&quot;default&quot;&lt;/span&gt; namespace by default
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;In order to make our interaction with Kubernetes a little easier, we will need to copy some files and update our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.kube/config&lt;/code&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir -p ~/.minikube/profiles/minikube
+sudo cp -r /root/.kube /home/$USER
+sudo cp /root/.minikube/ca.crt /home/$USER/.minikube/ca.crt
+sudo cp /root/.minikube/profiles/minikube/client.crt /home/$USER/.minikube/profiles/minikube
+sudo cp /root/.minikube/profiles/minikube/client.key /home/$USER/.minikube/profiles/minikube
+sudo chown -R $USER:$USER /home/$USER/.kube
+sudo chown -R $USER:$USER /home/$USER/.minikube
+sed -i  &quot;s/root/home\/$USER/&quot; ~/.kube/config
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once the minikube install is complete, validate that everything is working properly.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get nodes
+NAME       STATUS   ROLES                  AGE    VERSION
+kubevirt   Ready    control-plane,master   4m5s   v1.20.2
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;As long as you don’t get any errors, your base Kubernetes cluster is ready to go.&lt;/p&gt;
+
+&lt;h2 id=&quot;install-kubevirt&quot;&gt;Install kubevirt&lt;/h2&gt;
+
+&lt;p&gt;Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. Using the minikube addons manager, we will install kubevirt into our cluster:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;minikube addons &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;kubevirt
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;kubevirt kubevirt &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an &lt;em&gt;mdevNameSelector&lt;/em&gt; to look for, and a &lt;em&gt;resourceName&lt;/em&gt; to assign to it. The &lt;em&gt;mdevNameSelector&lt;/em&gt; comes from the “mdev_type” that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; kubevirt-patch.yaml &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+spec:
+  configuration:
+    developerConfiguration:
+      featureGates:
+      - GPU
+    permittedHostDevices:
+      mediatedDevices:
+      - mdevNameSelector: &quot;i915-GVTg_V5_8&quot;
+        resourceName: &quot;intel.com/U630&quot;
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;kubectl patch kubevirt kubevirt &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nt&quot;&gt;--patch&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cat &lt;/span&gt;kubevirt-patch.yaml&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;merge
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We now need to wait for kubevirt to reload its configuration.&lt;/p&gt;
+
+&lt;h3 id=&quot;validate-vgpu-detection&quot;&gt;Validate vGPU detection&lt;/h3&gt;
+
+&lt;p&gt;Now that kubevirt is installed and running, lets ensure that the vGPU was identified correctly. Describe the minikube node, using the command &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl describe node&lt;/code&gt; and look for the “Capacity” section. If kubevirt properly detected the vGPU you will see an entry for “intel.com/U630” with a capacity value of greater than 0.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl describe node
+Name:               kubevirt
+Roles:              control-plane,master
+Labels:             beta.kubernetes.io/arch&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;amd64
+                    beta.kubernetes.io/os&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;linux
+...
+Capacity:
+  cpu:                            12
+  devices.kubevirt.io/kvm:        110
+  devices.kubevirt.io/tun:        110
+  devices.kubevirt.io/vhost-net:  110
+  ephemeral-storage:              71645Mi
+  hugepages-1Gi:                  0
+  hugepages-2Mi:                  0
+  intel.com/U630:                 2
+  memory:                         11822640Ki
+  pods:                           110
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;There it is, intel.com/U630 - two of them are available.  Now all we need is a virtual machine to consume them.&lt;/p&gt;
+
+&lt;h3 id=&quot;install-containerize-data-importer&quot;&gt;Install Containerize Data Importer&lt;/h3&gt;
+
+&lt;p&gt;In order to install Windows 10, we are going to need to upload a Windows 10 install ISO to the cluster. This can be facilitated through the use of the Containerized Data Importer. The following steps are taken from the &lt;a href=&quot;https://kubevirt.io/labs/kubernetes/lab2.html&quot;&gt;Experiment with the Containerized Data Importer (CDI)&lt;/a&gt; web page:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; https://github.com/kubevirt/containerized-data-importer/releases/latest | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;v[0-9]&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0-9]*&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0-9]*&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/containerized-data-importer/releases/download/&lt;span class=&quot;nv&quot;&gt;$VERSION&lt;/span&gt;/cdi-operator.yaml
+kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/containerized-data-importer/releases/download/&lt;span class=&quot;nv&quot;&gt;$VERSION&lt;/span&gt;/cdi-cr.yaml
+kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;cdi cdi &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Now that our CDI is available, we will expose it for consumption using a nodePort. This will allow us to connect to the cdi-proxy in the next steps.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; cdi-nodeport.yaml &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+apiVersion: v1
+kind: Service
+metadata:
+  name: cdi-proxy-nodeport
+  namespace: cdi
+spec:
+  type: NodePort
+  selector:
+    cdi.kubevirt.io: cdi-uploadproxy
+  ports:
+    - port: 8443
+      nodePort: 30443
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; cdi-nodeport.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;One final step, lets get the latest release of virtctl which we will be using as we install Windows.&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath=&quot;{.status.observedKubeVirtVersion}&quot;)
+curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-linux-amd64
+sudo install virtctl /usr/local/bin
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;install-windows&quot;&gt;Install Windows&lt;/h2&gt;
+
+&lt;p&gt;At this point we can now install a Windows VM in order to test this feature. The steps below are based on &lt;a href=&quot;https://kubevirt.io/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html&quot;&gt;KubeVirt: installing Microsoft Windows from an ISO&lt;/a&gt; however we will be using Windows 10 instead of Windows Server 2012. The commands below assume that you have a Windows 10 ISO file called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;win10-virtio.iso&lt;/code&gt;. If you need a Windows 10 CD, please see &lt;a href=&quot;https://www.microsoft.com/en-us/software-download/windows10&quot;&gt;Download Windows 10 Disk Image&lt;/a&gt; and come back here after you have obtained your install CD.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl image-upload &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--image-path&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;win10-virtio.iso &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;iso-win10 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--access-mode&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ReadWriteOnce &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--pvc-size&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;6G &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--uploadproxy-url&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://127.0.0.1:30443 &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--insecure&lt;/span&gt; &lt;span class=&quot;se&quot;&gt;\&lt;/span&gt;
+   &lt;span class=&quot;nt&quot;&gt;--wait-secs&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;240
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We need a place to store our Windows 10 virtual disk, use the following to create a 40Gb space to store our file. In order to do this within minikube we will manually create a PersistentVolume (PV) as well as a PersistentVolumeClaim (PVC). These steps assume that you have 45+ GiB of free space in “/”.  We will create a “/data” directory as well as a subdirectory for storing our PV. If you do not have at least 45 GiB of free space in “/”, you will need to free up space, or mount storage on “/data” to continue.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; win10-pvc.yaml &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: pvwinhd1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  capacity:
+    storage: 43Gi
+  claimRef:
+    namespace: default
+    name: winhd1
+  hostPath:
+    path: /data/winhd1-pv
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: winhd1
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 40Gi
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; win10-pvc.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;We can now create our Windows 10 virtual machine. Use the following to create a virtual machine definition file that includes a vGPU:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; win10vm1.yaml &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt;
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: win10vm1
+spec:
+  running: false
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        kubevirt.io/domain: win10vm1
+    spec:
+      domain:
+        clock:
+          timer:
+            hpet:
+              present: false
+            hyperv: {}
+            pit:
+              tickPolicy: delay
+            rtc:
+              tickPolicy: catchup
+          utc: {}
+        cpu:
+          cores: 1
+          sockets: 2
+          threads: 1
+        devices:
+          gpus:
+          - deviceName: intel.com/U630
+            name: gpu1
+          disks:
+          - cdrom:
+              bus: sata
+            name: windows-guest-tools
+          - bootOrder: 1
+            cdrom:
+              bus: sata
+            name: cdrom
+          - bootOrder: 2
+            disk:
+              bus: sata
+            name: disk-1
+          inputs:
+          - bus: usb
+            name: tablet
+            type: tablet
+          interfaces:
+          - masquerade: {}
+            model: e1000e
+            name: nic-0
+        features:
+          acpi: {}
+          apic: {}
+          hyperv:
+            relaxed: {}
+            spinlocks:
+              spinlocks: 8191
+            vapic: {}
+        machine:
+          type: pc-q35-rhel8.2.0
+        resources:
+          requests:
+            memory: 8Gi
+      hostname: win10vm1
+      networks:
+      - name: nic-0
+        pod: {}
+      terminationGracePeriodSeconds: 3600
+      volumes:
+        - name: cdrom
+          persistentVolumeClaim:
+            claimName: iso-win10
+        - name: disk-1
+          persistentVolumeClaim:
+            claimName: winhd1
+        - containerDisk:
+            image: quay.io/kubevirt/virtio-container-disk
+          name: windows-guest-tools
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; win10vm1.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;&lt;p&gt;This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;The key piece of information that we have added to this virtual machine definition is this snippet of yaml:&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;na&quot;&gt;gpus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;deviceName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;intel.com/U630&lt;/span&gt;
+            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;gpu1&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Here we are identifying the gpu device that we want to attach to this VM. The deviceName relates back to the name that we gave to kubevirt to identify the Intel GPU resources. It also is the same identifier that shows up in the “Capacity” section of a node when you run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl describe node&lt;/code&gt;.&lt;/p&gt;
+
+&lt;p&gt;We can now start the virtual machine:&lt;/p&gt;
+
+&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl start win10vm1
+kubectl get vmi --watch
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;When the output of shows that the vm is in a “Running” phase you can “CTRL+C” to end the watch command.&lt;/p&gt;
+
+&lt;h2 id=&quot;accessing-the-windows-vm&quot;&gt;Accessing the Windows VM&lt;/h2&gt;
+
+&lt;p&gt;Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl vnc win10vm1
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.&lt;/p&gt;
+
+&lt;p&gt;Once the install is complete you have a Windows 10 VM running with a GPU available. You can test that GPU acceleration is available by opening the Windows 10 task manager, selecting Advanced and then select the “Performance” tab. Note that the first time you start up, Windows is still detecting and installing the appropriate drivers. It may take a minute or two for the GPU information to show up in the Performance tab.&lt;/p&gt;
+
+&lt;p&gt;Try testing out the GPU acceleration. Open a web browser in your VM and navigate to “http://www.fishgl.com” HOWEVER don’t be surprised by the poor performance. The default kubevirt console does not take advantage of the GPU. For that we need to take one final step to use the Windows Remote Desktop Protocol (RDP) which can use the GPU.&lt;/p&gt;
+
+&lt;h2 id=&quot;using-the-gpu&quot;&gt;Using the GPU&lt;/h2&gt;
+
+&lt;p&gt;In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;In the Windows 10 search bar, type “&lt;strong&gt;Remote Desktop Settings&lt;/strong&gt;” and then open the result.&lt;/li&gt;
+  &lt;li&gt;Select “&lt;strong&gt;Enable Remote Desktop&lt;/strong&gt;” and confirm the change.&lt;/li&gt;
+  &lt;li&gt;Select “&lt;strong&gt;Advanced settings&lt;/strong&gt;” and un-check “&lt;strong&gt;Require computers to use Network level Authentication&lt;/strong&gt;”, and confirm this change.&lt;/li&gt;
+  &lt;li&gt;Finally reboot the Windows 10 Virtual machine.&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Now, run the following commands in order to expose the RDP server to outside your Kubernetes cluster:&lt;/p&gt;
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl expose vm win10vm1 &lt;span class=&quot;nt&quot;&gt;--port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;3389 &lt;span class=&quot;nt&quot;&gt;--type&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;NodePort &lt;span class=&quot;nt&quot;&gt;--name&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;win10vm1-rdp
+&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get svc
+NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;S&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;          AGE
+kubernetes     ClusterIP   10.96.0.1        &amp;lt;none&amp;gt;        443/TCP          18h
+win10vm1-rdp   NodePort    10.105.159.184   &amp;lt;none&amp;gt;        3389:30627/TCP   39s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Note the port that was assigned to this service we will use it in the next step. In the above output the port is 30627.&lt;/p&gt;
+
+&lt;p&gt;We can now use the rdesktop tool to connect to our VM and get the full advantages of the vGPU. From a command line run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rdesktop localhost:&amp;lt;port&amp;gt;&lt;/code&gt; being sure to update the port based on the output from above. When prompted by rdesktop accept the certificate. Log into your Windows 10 client. You can now test out the vGPU.&lt;/p&gt;
+
+&lt;p&gt;Let’s try FishGL again. Open a browser and go to &lt;a href=&quot;http://www.fishgl.com&quot;&gt;http://www.fishgl.com&lt;/a&gt;. You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;
+  &lt;figure itemprop=&quot;associatedMedia&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageObject&quot;&gt;
+    &lt;a href=&quot;/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-gpu.png&quot; itemprop=&quot;contentUrl&quot; data-size=&quot;800x530&quot;&gt;
+      &lt;img src=&quot;/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-gpu.png&quot; itemprop=&quot;thumbnail&quot; width=&quot;100%&quot; alt=&quot;FishGL&quot; /&gt;
+    &lt;/a&gt;
+    &lt;figcaption itemprop=&quot;caption description&quot;&gt;&lt;/figcaption&gt;
+  &lt;/figure&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Note that since you are running your Fedora 32 workstation on this same GPU you are already sharing the graphics workload between your primary desktop, and the virtualized Windows Desktop also running on this machine.&lt;/p&gt;
+
+&lt;p&gt;Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.&lt;/p&gt;</content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="vGPU" /><category term="Windows" /><category term="GPU" /><category term="Intel" /><category term="minikube" /><category term="Fedora" /><summary type="html">Introduction Prerequisites Fedora Workstation Prep Preparing the Intel vGPU driver Install Kubernetes with minikube Install kubevirt Validate vGPU detection Install Containerize Data Importer Install Windows Accessing the Windows VM Using the GPU</summary></entry><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
 
 &lt;p&gt;This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with &lt;a href=&quot;https://github.com/tektoncd/pipeline&quot;&gt;Tekton Pipelines&lt;/a&gt;.&lt;/p&gt;
 
@@ -1605,290 +2125,4 @@ v8-terminal
   &lt;li&gt;&lt;a href=&quot;https://developers.redhat.com/blog/2019/05/08/red-hat-enterprise-linux-8-image-builder-building-custom-system-images/&quot;&gt;Image Builder: Building custom system images&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://weldr.io/lorax/composer-cli.html&quot;&gt;Composer-cli information&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://quay.io/repository/alosadag/devstation?tab=tags&quot;&gt;Custom-built images available at quay.io&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html">&lt;h1 id=&quot;monitoring-kubevirt-vms-from-the-inside&quot;&gt;Monitoring KubeVirt VMs from the inside&lt;/h1&gt;
-
-&lt;p&gt;This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt;. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.&lt;/p&gt;
-
-&lt;h2 id=&quot;environment&quot;&gt;Environment&lt;/h2&gt;
-
-&lt;p&gt;This set of tools will be used on this guide:&lt;/p&gt;
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/helm/helm&quot;&gt;Helm v3&lt;/a&gt; - To deploy the Prometheus-Operator.&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/minikube&quot;&gt;minikube&lt;/a&gt; - Will provide us a k8s cluster, you are free to choose any other k8s provider though.&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/kubectl&quot;&gt;kubectl&lt;/a&gt; - To deploy different k8s resources&lt;/li&gt;
-  &lt;li&gt;virtctl - to interact with KubeVirt VirtualMachines, can be downloaded from the &lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases&quot;&gt;KubeVirt repo&lt;/a&gt;.&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;deploy-prometheus-operator&quot;&gt;Deploy Prometheus Operator&lt;/h2&gt;
-
-&lt;p&gt;Once you have your k8s cluster, with minikube or any other provider, the first step will be to deploy the Prometheus Operator. The reason is that the KubeVirt CR, when installed on the cluster, will detect if the ServiceMonitor CR already exists. If it does, then it will create ServiceMonitors configured to monitor all the KubeVirt components (virt-controller, virt-api, and virt-handler) out-of-the-box.&lt;/p&gt;
-
-&lt;p&gt;Although monitoring KubeVirt itself is not covered in this guide, it is a good practice to always deploy the Prometheus Operator before deploying KubeVirt.&lt;/p&gt;
-
-&lt;p&gt;To deploy the Prometheus Operator, you will need to create its namespace first, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitoring&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create ns monitoring
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Then deploy the operator in the new namespace:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;helm fetch stable/prometheus-operator
-tar xzf prometheus-operator*.tgz
-cd prometheus-operator/ &amp;amp;&amp;amp; helm install -n monitoring -f values.yaml kubevirt-prometheus stable/prometheus-operator
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;After everything is deployed, you can delete everything that was downloaded by helm:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ..
-rm -rf prometheus-operator*
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;One thing to keep in mind is the release name we added here: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-prometheus&lt;/code&gt;. The release name will be used when declaring our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; later on..&lt;/p&gt;
-
-&lt;h2 id=&quot;deploy-kubevirt-operators-and-kubevirt-customresources&quot;&gt;Deploy KubeVirt Operators and KubeVirt CustomResources&lt;/h2&gt;
-
-&lt;p&gt;Alright, the next step will be deploying KubeVirt itself. We will start with its operator.&lt;/p&gt;
-
-&lt;p&gt;We will fetch the latest version, then use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl create&lt;/code&gt; to deploy the manifest directly from Github::&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- - | sort -V | tail -1 | awk -F':' '{print $2}' | sed 's/,//' | xargs)
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Before deploying the KubeVirt CR, make sure that all kubevirt-operator replicas are ready, you can do that with:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl rollout status -n kubevirt deployment virt-operator
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;After that, we can deploy KubeVirt and wait for all it’s components to get ready in a similar manner:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
-kubectl rollout status -n kubevirt deployment virt-api
-kubectl rollout status -n kubevirt deployment virt-controller
-kubectl rollout status -n kubevirt daemonset virt-handler
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If we want to monitor VMs that can restart, we want our node-exporter to be persisted and, thus, we need to set up persistent storage for them. &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt; will be the component responsible for that, so we will deploy it’s operator and custom resource as well. As always, waiting for the right components to get ready before proceeding:&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export CDI_VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o &quot;v[0-9]\.[0-9]*\.[0-9]*&quot;)
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml
-kubectl rollout status -n cdi deployment cdi-operator
-
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
-kubectl rollout status -n cdi deployment cdi-apiserver
-kubectl rollout status -n cdi deployment cdi-uploadproxy
-kubectl rollout status -n cdi deployment cdi-deployment
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;deploying-a-virtualmachine-with-persistent-storage&quot;&gt;Deploying a VirtualMachine with persistent storage&lt;/h2&gt;
-
-&lt;p&gt;Alright, cool. We have everything we need now. Let’s setup the VM.&lt;/p&gt;
-
-&lt;p&gt;We will start with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PersistenVolume&lt;/code&gt;’s required by &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md&quot;&gt;CDI’s DataVolume&lt;/a&gt; resources. Since I’m using minikube with no dynamic storage provider, I’ll be creating 2 PVs with a reference to the PVCs that will claim them. Notice &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;claimRef&lt;/code&gt; in each of the PVs.&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolume&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;example-volume&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;claimRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cirros-dv&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2Gi&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;hostPath&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/data/example-volume/&lt;/span&gt;
-&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;PersistentVolume&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;example-volume-scratch&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;claimRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cirros-dv-scratch&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;2Gi&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;hostPath&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;path&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/data/example-volume-scratch/&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;With the persistent storage in place, we can create our VM with the following manifest:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;running&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;memory&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1024Mi&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;disk&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;bus&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;virtio&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;my-data-volume&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;volumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;dataVolume&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cirros-dv&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;my-data-volume&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;dataVolumeTemplates&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;cirros-dv&quot;&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;http&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-             &lt;span class=&quot;na&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;storageClassName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2Gi&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Notice that KubeVirt’s VirtualMachine resource has a VirtualMachine template and a dataVolumeTemplate. On the VirtualMachine template, it is important noticing that we named our VM &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitorable-vm&lt;/code&gt;, and we will use this name to connect to its console with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; later on. The label we’ve added, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, is also important, since we’ll use it when &lt;a href=&quot;#configuring-prometheus-to-scrape-the-vms-node-exporter&quot;&gt;configuring Prometheus to scrape the VM’s node-exporter&lt;/a&gt;&lt;/p&gt;
-
-&lt;p&gt;On dataVolumeTemplate, it is important noticing that we named the PVC &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv&lt;/code&gt; and the DataVolume resource will create 2 PVCs with that, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv-scratch&lt;/code&gt;. Notice that &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-dv-scratch&lt;/code&gt; are the names referenced on our PersistentVolume manifests. The names must match for this to work.&lt;/p&gt;
-
-&lt;h2 id=&quot;installing-the-node-exporter-inside-the-vm&quot;&gt;Installing the node-exporter inside the VM&lt;/h2&gt;
-
-&lt;p&gt;Once the VirtualMachineInstance is running, we can connect to its console using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl console monitorable-vm&lt;/code&gt;. If user and password are required, provide your credentials accordingly. If you are using the same disk image from this guide, the user and password are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gocubsgo&lt;/code&gt; respectively.&lt;/p&gt;
-
-&lt;p&gt;The following script will install node-exporter and configure the VM to always start the exporter when booting:&lt;/p&gt;
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-LO&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-k&lt;/span&gt; https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
-&lt;span class=&quot;nb&quot;&gt;gunzip&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; node_exporter-1.0.1.linux-amd64.tar.gz | &lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;xopf -
-./node_exporter-1.0.1.linux-amd64/node_exporter &amp;amp;
-
-&lt;span class=&quot;nb&quot;&gt;sudo&lt;/span&gt; /bin/sh &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'cat &amp;gt; /etc/rc.local &amp;lt;&amp;lt;EOF
-#!/bin/sh
-echo &quot;Starting up node_exporter at :9100!&quot;
-
-/home/cirros/node_exporter-1.0.1.linux-amd64/node_exporter 2&amp;gt;&amp;amp;1 &amp;gt; /dev/null &amp;amp;
-EOF'&lt;/span&gt;
-&lt;span class=&quot;nb&quot;&gt;sudo chmod&lt;/span&gt; +x /etc/rc.local
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;em&gt;P.S.: If you are using a different base image, please configure node-exporter to start at boot time accordingly&lt;/em&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;configuring-prometheus-to-scrape-the-vms-node-exporter&quot;&gt;Configuring Prometheus to scrape the VM’s node-exporter&lt;/h2&gt;
-
-&lt;p&gt;To configure Prometheus to scrape the node-exporter (or other applications) is really simple. All we need is to create a new &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt; and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt;:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Service&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm-node-exporter&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;targetPort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;TCP&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitoring.coreos.com/v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ServiceMonitor&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt-node-exporters-servicemonitor&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitoring&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;release&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitoring&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespaceSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;endpoints&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15s&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Let’s break this down just to make sure we set up everything right. Starting with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;targetPort&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;m&quot;&gt;9100&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;protocol&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;TCP&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;On the specification, we are creating a new port named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metrics&lt;/code&gt; that will be redirected to every pod labeled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, at port 9100, which is the default port number for the node-exporter.&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Service&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;monitorable-vm-node-exporter&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;We are also labeling the Service itself with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, that will be used by the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; object.&lt;/p&gt;
-
-&lt;p&gt;Now let’s take a look at our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; specification:&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespaceSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;matchLabels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;endpoints&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15s&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;Since our ServiceMonitor will be deployed at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitoring&lt;/code&gt; namespace, but our service is at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;default&lt;/code&gt; namespace, we need &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;namespaceSelector.any=true&lt;/code&gt;.&lt;/p&gt;
-
-&lt;p&gt;We are also telling our ServiceMonitor that Prometheus needs to scrape endpoints from services labeled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt; and which ports are named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metrics&lt;/code&gt;. Luckily, that’s exactly what we did with our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt;!&lt;/p&gt;
-
-&lt;p&gt;One last thing to keep an eye on. Prometheus configuration can be set up to watch multiple ServiceMonitors. We can see which ServiceMonitors our Prometheus is watching with the following command:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Look for Service Monitor Selector
-kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Make sure our ServiceMonitor has all labels required by Prometheus’ &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service Monitor Selector&lt;/code&gt;. One common selector is the release name that we’ve set when deploying our Prometheus with helm!&lt;/p&gt;
-
-&lt;h2 id=&quot;testing&quot;&gt;Testing&lt;/h2&gt;
-
-&lt;p&gt;You can do a quick test by port-forwarding Prometheus web UI and executing some PromQL:&lt;/p&gt;
-
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl port-forward -n monitoring prometheus-monitoring-prometheus-oper-prometheus-0 9090:9090
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;To make sure everything is working, access &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;localhost:9090/graph&lt;/code&gt; and execute the PromQL &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;}&lt;/code&gt;. Prometheus should return data that is being collected from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitorable-vm&lt;/code&gt;’s node-exporter.&lt;/p&gt;
-
-&lt;p&gt;You can play around with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt;, stop and starting the VM to see how the metrics behave. You will notice that when stopping the VM with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl stop monitorable-vm&lt;/code&gt;, the VirtualMachineInstance is killed and, thus, so is it’s pod. This will result with our service not being able to find the pod’s endpoint and then it will be removed from Prometheus’ targets.&lt;/p&gt;
-
-&lt;p&gt;With this behavior, alerts like the one below won’t work since our target is literally gone, not down.&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirtVMDown&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;expr&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;} == &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1m&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;severity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;warning&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;summary&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirt VM {{ $labels.pod }} is down.&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;&lt;strong&gt;BUT&lt;/strong&gt;, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:&lt;/p&gt;
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirtVMCrashing&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;expr&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;} == &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5m&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;severity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;critical&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;summary&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirt VM {{ $labels.pod }} is constantly crashing before node-exporter starts at boot.&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h2 id=&quot;conclusion&quot;&gt;Conclusion&lt;/h2&gt;
-
-&lt;p&gt;In this blog post we used &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt; to expose metrics out of a KubeVirt VM. We also configured &lt;a href=&quot;https://github.com/prometheus-operator/prometheus-operator&quot;&gt;Prometheus Operator&lt;/a&gt; to collect these metrics. This illustrates how to bring Kubernetes monitoring best practices with applications running inside KubeVirt VMs.&lt;/p&gt;</content><author><name>arthursens</name></author><category term="uncategorized" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="prometheus" /><category term="prometheus-operator" /><category term="node-exporter" /><category term="monitoring" /><summary type="html">Monitoring KubeVirt VMs from the inside</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry></feed>

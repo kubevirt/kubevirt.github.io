@@ -577,6 +577,10 @@
 <lastmod>2021-04-21T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2021/intel-vgpu-kubevirt.html</loc>
+<lastmod>2021-04-30T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1292,6 +1296,15 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/kubevirt-tekton-tasks.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/vgpu.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/intel.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/fedora.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
