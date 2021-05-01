@@ -2,7 +2,7 @@
 layout: post
 author: Mark DeNeve
 title: Using Intel vGPUs with Kubevirt
-description: Excerpt of the Blog Post
+description: This blog post guides users on how to improve VM graphics performance using Intel Core processors, GPU Virtualization and Kubevirt.
 navbar_active: Blogs
 pub-date: April 30
 pub-year: 2021
