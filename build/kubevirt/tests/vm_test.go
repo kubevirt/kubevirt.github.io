@@ -141,7 +141,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				}
 			})
 
-			It("[owner:@sig-storage][test_id:4643]should NOT be rejected when VM template lists a DataVolume, but VM lists PVC VolumeSource", func() {
+			It("[sig-storage][test_id:4643]should NOT be rejected when VM template lists a DataVolume, but VM lists PVC VolumeSource", func() {
 
 				dv := tests.NewRandomDataVolumeWithHttpImportInStorageClass(tests.GetUrl(tests.AlpineHttpUrl), tests.NamespaceTestDefault, storageClass.Name, k8sv1.ReadWriteOnce)
 				_, err = virtClient.CdiClient().CdiV1alpha1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
@@ -1787,7 +1787,12 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			})
 
 			It("[test_id:4659]should succeed", func() {
-				err := cli.Rename(vm1.Name, &v1.RenameOptions{NewName: vm1.Name + "new"})
+				shouldSkip, err := isKubemacpoolDeployed(virtClient)
+				Expect(err).ToNot(HaveOccurred())
+				if shouldSkip {
+					Skip("rename VM is broken when Kubemacpool is deployed. Tracking issue: https://bugzilla.redhat.com/show_bug.cgi?id=1954014")
+				}
+				err = cli.Rename(vm1.Name, &v1.RenameOptions{NewName: vm1.Name + "new"})
 				Expect(err).ToNot(HaveOccurred())
 
 				Eventually(func() error {
@@ -1806,6 +1811,14 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 		})
 	})
 })
+
+func isKubemacpoolDeployed(virtClient kubecli.KubevirtClient) (bool, error) {
+	podList, err := virtClient.CoreV1().Pods(k8smetav1.NamespaceAll).List(context.Background(), k8smetav1.ListOptions{LabelSelector: "app=kubemacpool"})
+	if err != nil {
+		return false, err
+	}
+	return len(podList.Items) > 0, nil
+}
 
 func getExpectedPodName(vm *v1.VirtualMachine) string {
 	maxNameLength := 63
