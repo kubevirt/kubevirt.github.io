@@ -4935,27 +4935,34 @@ func FormatIPForURL(ip string) string {
 	return ip
 }
 
+func getClusterDnsServiceIP(virtClient kubecli.KubevirtClient) (string, error) {
+	dnsServiceName := "kube-dns"
+	dnsNamespace := "kube-system"
+	if IsOpenShift() {
+		dnsServiceName = "dns-default"
+		dnsNamespace = "openshift-dns"
+	}
+	kubeDNSService, err := virtClient.CoreV1().Services(dnsNamespace).Get(context.Background(), dnsServiceName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+	return kubeDNSService.Spec.ClusterIP, nil
+}
+
+func GetKubernetesApiServiceIp(virtClient kubecli.KubevirtClient) (string, error) {
+	kubernetesServiceName := "kubernetes"
+	kubernetesServiceNamespace := "default"
+
+	kubernetesService, err := virtClient.CoreV1().Services(kubernetesServiceNamespace).Get(context.Background(), kubernetesServiceName, metav1.GetOptions{})
+	if err != nil {
+		return "", err
+	}
+	return kubernetesService.Spec.ClusterIP, nil
+}
+
 func IsRunningOnKindInfra() bool {
 	provider := os.Getenv("KUBEVIRT_PROVIDER")
 	return strings.HasPrefix(provider, "kind")
-}
-
-func SkipPVCTestIfRunnigOnKindInfra() {
-	if IsRunningOnKindInfra() {
-		Skip("Skip PVC tests till PR https://github.com/kubevirt/kubevirt/pull/3171 is merged")
-	}
-}
-
-func SkipNFSTestIfRunnigOnKindInfra() {
-	if IsRunningOnKindInfra() {
-		Skip("Skip NFS tests till issue https://github.com/kubevirt/kubevirt/issues/3322 is fixed")
-	}
-}
-
-func SkipSELinuxTestIfRunnigOnKindInfra() {
-	if IsRunningOnKindInfra() {
-		Skip("Skip SELinux tests till issue https://github.com/kubevirt/kubevirt/issues/3780 is fixed")
-	}
 }
 
 func IsUsingBuiltinNodeDrainKey() bool {

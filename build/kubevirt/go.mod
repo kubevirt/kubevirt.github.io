@@ -35,6 +35,7 @@ require (
 	github.com/kubernetes-csi/external-snapshotter/v2 v2.1.1
 	github.com/mitchellh/go-ps v0.0.0-20190716172923-621e5597135b
 	github.com/mitchellh/go-vnc v0.0.0-20150629162542-723ed9867aed
+	github.com/moby/sys/mountinfo v0.4.1
 	github.com/onsi/ginkgo v1.12.1
 	github.com/onsi/gomega v1.10.1
 	github.com/opencontainers/runc v1.0.0-rc92
@@ -72,7 +73,7 @@ require (
 	kubevirt.io/containerized-data-importer v1.31.0
 	kubevirt.io/controller-lifecycle-operator-sdk v0.1.2
 	kubevirt.io/qe-tools v0.1.6
-	libvirt.org/libvirt-go v6.6.0+incompatible
+	libvirt.org/libvirt-go v7.0.0+incompatible
 	mvdan.cc/sh/v3 v3.1.1
 	sigs.k8s.io/yaml v1.2.0
 )
