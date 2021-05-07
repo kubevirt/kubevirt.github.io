@@ -23,7 +23,6 @@ import (
 	"context"
 	"fmt"
 	"reflect"
-	"sync"
 	"time"
 
 	"github.com/pborman/uuid"
@@ -50,8 +49,8 @@ type CloneAuthFunc func(pvcNamespace, pvcName, saNamespace, saName string) (bool
 
 // Repeating info / error messages
 const (
-	stoppingVmiMsg                        = "Stopping VMI"
-	startingVmiMsg                        = "Starting VMI"
+	stoppingVmMsg                         = "Stopping VM"
+	startingVmMsg                         = "Starting VM"
 	failedExtractVmkeyFromVmErrMsg        = "Failed to extract vmKey from VirtualMachine."
 	failedProcessDeleteNotificationErrMsg = "Failed to process delete notification"
 	failureDeletingVmiErrFormat           = "Failure attempting to delete VMI: %v"
@@ -284,16 +283,6 @@ func (c *VMController) execute(key string) error {
 		}
 	}
 
-	// If the controller is going to be deleted and the orphan finalizer is the next one, release the VMIs. Don't update the status
-	// TODO: Workaround for https://github.com/kubernetes/kubernetes/issues/56348, remove it once it is fixed
-	if vm.ObjectMeta.DeletionTimestamp != nil && controller.HasFinalizer(vm, v1.FinalizerOrphanDependents) {
-		err = c.orphan(cm, vmi)
-		if err != nil {
-			return err
-		}
-		return c.orphanDataVolumes(cm, dataVolumes)
-	}
-
 	if createErr != nil {
 		logger.Reason(err).Error("Creating the VirtualMachine failed.")
 	}
@@ -309,70 +298,6 @@ func (c *VMController) execute(key string) error {
 	}
 
 	return nil
-}
-
-// Handles VM rename requests
-// First return value is a boolean indicating if the controller should retry the request
-func (c *VMController) handleVMRenameRequest(vm *virtv1.VirtualMachine, newName string) (bool, error) {
-	err := c.clientset.VirtualMachine(vm.Namespace).Delete(newName, &v1.DeleteOptions{})
-
-	if err != nil && !errors.IsNotFound(err) {
-		// VM existence could not be determined, retry
-		return true, err
-	}
-
-	// Create the copy of this VM with the new name
-	newVM := vm.DeepCopy()
-
-	newVM.ResourceVersion = ""
-	newVM.Name = newName
-
-	// Update the VM label if it exists
-	if newVM.Labels != nil {
-		_, hasVMLabel := newVM.Labels[virtv1.VirtualMachineLabel]
-
-		if hasVMLabel {
-			newVM.Labels[virtv1.VirtualMachineLabel] = newName
-		}
-	}
-
-	// Update the VMI spec VM label if it exists
-	if newVM.Spec.Template.ObjectMeta.Labels != nil {
-		_, hasVMLabel := newVM.Spec.Template.ObjectMeta.Labels[virtv1.VirtualMachineLabel]
-
-		if hasVMLabel {
-			newVM.Spec.Template.ObjectMeta.Labels[virtv1.VirtualMachineLabel] = newName
-		}
-	}
-
-	// Clear VM status
-	newVM.Status = virtv1.VirtualMachineStatus{}
-
-	// Add a condition to the new VM to tell the user it was renamed
-	newVM.Status.Conditions = []virtv1.VirtualMachineCondition{
-		{
-			Type:    virtv1.RenameConditionType,
-			Status:  k8score.ConditionTrue,
-			Reason:  vm.Name,
-			Message: fmt.Sprintf("This VM was renamed, the old name was %s", vm.Name),
-		},
-	}
-
-	// Attempt creation of the new VM
-	_, err = c.clientset.VirtualMachine(vm.Namespace).Create(newVM)
-
-	if err != nil {
-		return true, err
-	}
-
-	// Delete this VM because a copy of it with the desired new name was created
-	err = c.clientset.VirtualMachine(vm.Namespace).Delete(vm.Name, &v1.DeleteOptions{})
-
-	if err != nil {
-		return true, err
-	}
-
-	return false, nil
 }
 
 func (c *VMController) listDataVolumesForVM(vm *virtv1.VirtualMachine) ([]*cdiv1.DataVolume, error) {
@@ -396,50 +321,6 @@ func (c *VMController) listDataVolumesForVM(vm *virtv1.VirtualMachine) ([]*cdiv1
 		dataVolumes = append(dataVolumes, obj.(*cdiv1.DataVolume))
 	}
 	return dataVolumes, nil
-}
-
-// orphan removes the owner reference of all VMIs which are owned by the controller instance.
-// Workaround for https://github.com/kubernetes/kubernetes/issues/56348 to make no-cascading deletes possible
-// We don't have to remove the finalizer. This part of the gc is not affected by the mentioned bug
-// TODO +pkotas unify with replicasets. This function can be the same
-func (c *VMController) orphan(cm *controller.VirtualMachineControllerRefManager, vmi *virtv1.VirtualMachineInstance) error {
-	if vmi == nil {
-		return nil
-	}
-
-	err := cm.ReleaseVirtualMachine(vmi)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func (c *VMController) orphanDataVolumes(cm *controller.VirtualMachineControllerRefManager, dataVolumes []*cdiv1.DataVolume) error {
-
-	if len(dataVolumes) == 0 {
-		return nil
-	}
-
-	var wg sync.WaitGroup
-	errChan := make(chan error, len(dataVolumes))
-	wg.Add(len(dataVolumes))
-
-	for _, dataVolume := range dataVolumes {
-		go func(dataVolume *cdiv1.DataVolume) {
-			defer wg.Done()
-			err := cm.ReleaseDataVolume(dataVolume)
-			if err != nil {
-				errChan <- err
-			}
-		}(dataVolume)
-	}
-	wg.Wait()
-	select {
-	case err := <-errChan:
-		return err
-	default:
-	}
-	return nil
 }
 
 func createDataVolumeManifest(dataVolumeTemplate *virtv1.DataVolumeTemplateSpec, vm *virtv1.VirtualMachine) *cdiv1.DataVolume {
@@ -612,16 +493,18 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 				if stateChange.Action == virtv1.StopRequest &&
 					stateChange.UID != nil &&
 					*stateChange.UID == vmi.UID {
-					log.Log.Object(vm).V(4).Info("VMI should be restarted")
 					forceRestart = true
+					log.Log.Object(vm).Infof("processing forced restart request for VMI with phase %s and VM runStrategy: %s", vmi.Status.Phase, runStrategy)
 				}
 			}
 
 			if forceRestart || vmi.IsFinal() {
+				log.Log.Object(vm).Infof("%s with VMI in phase %s and VM runStrategy: %s", stoppingVmMsg, vmi.Status.Phase, runStrategy)
+
 				// The VirtualMachineInstance can fail or be finished. The job of this controller
 				// is keep the VirtualMachineInstance running, therefore it restarts it.
 				// restarting VirtualMachineInstance by stopping it and letting it start in next step
-				log.Log.Object(vm).V(4).Info(stoppingVmiMsg)
+				log.Log.Object(vm).V(4).Info(stoppingVmMsg)
 				err := c.stopVMI(vm, vmi)
 				if err != nil {
 					log.Log.Object(vm).Errorf(failureDeletingVmiErrFormat, err)
@@ -633,7 +516,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 			return nil
 		}
 
-		log.Log.Object(vm).V(4).Info(startingVmiMsg)
+		log.Log.Object(vm).Infof("%s due to runStrategy: %s", startingVmMsg, runStrategy)
 		err := c.startVMI(vm)
 		if err != nil {
 			return err
@@ -651,7 +534,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 				if stateChange.Action == virtv1.StopRequest &&
 					stateChange.UID != nil &&
 					*stateChange.UID == vmi.UID {
-					log.Log.Object(vm).V(4).Info("VMI should be stopped")
+					log.Log.Object(vm).Infof("processing stop request for VMI with phase %s and VM runStrategy: %s", vmi.Status.Phase, runStrategy)
 					forceStop = true
 				}
 			}
@@ -659,7 +542,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 			if forceStop || vmi.Status.Phase == virtv1.Failed {
 				// For RerunOnFailure, this controller should only restart the VirtualMachineInstance
 				// if it failed.
-				log.Log.Object(vm).V(4).Info(stoppingVmiMsg)
+				log.Log.Object(vm).Infof("%s with VMI in phase %s and VM runStrategy: %s", stoppingVmMsg, vmi.Status.Phase, runStrategy)
 				err := c.stopVMI(vm, vmi)
 				if err != nil {
 					log.Log.Object(vm).Errorf(failureDeletingVmiErrFormat, err)
@@ -671,7 +554,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 			return nil
 		}
 
-		log.Log.Object(vm).V(4).Info(startingVmiMsg)
+		log.Log.Object(vm).Infof("%s due to runStrategy: %s", startingVmMsg, runStrategy)
 		err := c.startVMI(vm)
 		if err != nil {
 			return err
@@ -688,12 +571,11 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 				if stateChange.Action == virtv1.StopRequest &&
 					stateChange.UID != nil &&
 					*stateChange.UID == vmi.UID {
-					log.Log.Object(vm).V(4).Info("VMI should be stopped")
 					forceStop = true
 				}
 			}
 			if forceStop {
-				log.Log.Object(vm).V(4).Info(stoppingVmiMsg)
+				log.Log.Object(vm).Infof("%s with VMI in phase %s due to stop request and VM runStrategy: %s", vmi.Status.Phase, stoppingVmMsg, runStrategy)
 				err := c.stopVMI(vm, vmi)
 				if err != nil {
 					log.Log.Object(vm).Errorf(failureDeletingVmiErrFormat, err)
@@ -707,12 +589,11 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 			if len(vm.Status.StateChangeRequests) != 0 {
 				stateChange := vm.Status.StateChangeRequests[0]
 				if stateChange.Action == virtv1.StartRequest {
-					log.Log.Object(vm).V(4).Info("VMI should be started")
+					log.Log.Object(vm).Infof("%s due to start request and runStrategy: %s", startingVmMsg, runStrategy)
 					forceStart = true
 				}
 			}
 			if forceStart {
-				log.Log.Object(vm).V(4).Info(startingVmiMsg)
 				err := c.startVMI(vm)
 				if err != nil {
 					return err
@@ -723,10 +604,10 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 
 	case virtv1.RunStrategyHalted:
 		// For this runStrategy, no VMI should be running under any circumstances.
-		log.Log.Object(vm).V(4).Info("VMI should be deleted")
 		if vmi == nil {
 			return nil
 		}
+		log.Log.Object(vm).Infof("%s with VMI in phase %s due to runStrategy: %s", stoppingVmMsg, vmi.Status.Phase, runStrategy)
 		err := c.stopVMI(vm, vmi)
 		return err
 	default:
@@ -753,6 +634,7 @@ func (c *VMController) startVMI(vm *virtv1.VirtualMachine) error {
 		c.recorder.Eventf(vm, k8score.EventTypeWarning, FailedCreateVirtualMachineReason, "Error creating virtual machine instance: %v", err)
 		return err
 	}
+	log.Log.Object(vm).Infof("Started VM by creating the new virtual machine instance %s", vmi.Name)
 	c.recorder.Eventf(vm, k8score.EventTypeNormal, SuccessfulCreateVirtualMachineReason, "Started the virtual machine by creating the new virtual machine instance %v", vmi.ObjectMeta.Name)
 
 	return nil
@@ -784,7 +666,7 @@ func (c *VMController) stopVMI(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMac
 	}
 
 	c.recorder.Eventf(vm, k8score.EventTypeNormal, SuccessfulDeleteVirtualMachineReason, "Stopped the virtual machine by deleting the virtual machine instance %v", vmi.ObjectMeta.UID)
-	log.Log.Object(vm).Info("Dispatching delete event")
+	log.Log.Object(vm).Infof("Dispatching delete event for vmi %s/%s with phase %s", vmi.Namespace, vmi.Name, vmi.Status.Phase)
 
 	return nil
 }
@@ -1191,7 +1073,6 @@ func (c *VMController) updateStatus(vmOrig *virtv1.VirtualMachine, vmi *virtv1.V
 		log.Log.Object(vm).Errorf("Error getting RunStrategy: %v", err)
 	}
 	clearChangeRequest := false
-	vmRenamedAndDeleted := false
 	if len(vm.Status.StateChangeRequests) != 0 {
 		// Only consider one stateChangeRequest at a time. The second and subsequent change
 		// requests have not been acted upon by this controller yet!
@@ -1232,22 +1113,6 @@ func (c *VMController) updateStatus(vmOrig *virtv1.VirtualMachine, vmi *virtv1.V
 			if runStrategy == virtv1.RunStrategyHalted {
 				log.Log.Object(vm).Errorf("Start request shouldn't be honored for RunStrategyHalted.")
 				clearChangeRequest = true
-			}
-		case virtv1.RenameRequest:
-			newName, hasNewName := stateChange.Data["newName"]
-
-			if !hasNewName {
-				log.Log.Object(vm).V(4).Errorf("Rename request is missing 'newName' field")
-				clearChangeRequest = true
-			} else {
-				retry, err := c.handleVMRenameRequest(vm, newName)
-
-				if err != nil {
-					log.Log.Object(vm).V(4).
-						Errorf("Rename request for vm %s failed: %v", vm.Name, err)
-				} else {
-					vmRenamedAndDeleted = !retry
-				}
 			}
 		}
 	}
@@ -1293,10 +1158,6 @@ func (c *VMController) updateStatus(vmOrig *virtv1.VirtualMachine, vmi *virtv1.V
 			}
 		}
 		vm.Status.VolumeRequests = tmpVolRequests
-	}
-
-	if vmRenamedAndDeleted {
-		return nil
 	}
 
 	if clearChangeRequest {
