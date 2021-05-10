@@ -86,14 +86,6 @@ endif
 endif
 	@echo
 
-ifndef REPOPATH
-	@$(eval export REPOPATH=https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io)
-endif
-
-ifndef YESPERLLER_PATH
-	@$(eval export YESPERLLER_PATH=https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json)
-endif
-
 ifndef IMGTAG
 	@$(eval export IMGTAG=localhost/kubevirt-kubevirt.github.io)
 else
@@ -111,7 +103,7 @@ build_img: | envvar
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
 	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
 	  IMAGE="`echo $${IMGTAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`";  \
-	  if [ "`curl $${REPOPATH}/Dockerfile -o ./Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
+	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/kubevirt-kubevirt.github.io/Dockerfile -o ./Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
 	    echo "curl Dockerfile failed... exitting!"; \
 	    exit 2; \
 	  else \
@@ -126,15 +118,15 @@ build_img: | envvar
 	${CONTAINER_ENGINE} rmi ${IMGTAG} 2> /dev/null || echo -n; \
 	${BUILD_ENGINE} ${IMGTAG}; \
 	if [ "$${REMOTE}" ]; then rm -f Dockerfile > /dev/null 2>&1; fi
-	
 
 
 ## Check external, internal links and links/selectors to userguide on website content
 check_links: | envvar stop
-	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv/jekyll; rake -- -u' # ? check internal external links
+	@echo "${GREEN}Makefile: Check external and internal links${RESET}"
+	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake -- -u'
 #BEGIN BIG SHELL SCRIPT
 	${DEBUG}export IFS=$$'\n'; \
-	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv/jekyll; rake --trace links:userguide_selectors'`; \
+	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors'`; \
 	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
 	  echo "$${OUTPUT}"; \
 	  exit 1; \
@@ -149,7 +141,7 @@ check_links: | envvar stop
 	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
 	    echo; \
 	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/jekyll/_site ${IMGTAG} /bin/bash -c "casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
+	    ${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site ${IMGTAG} /bin/bash -c "OPENSSL_CONF=/etc/ssl casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
 	    echo; \
 	  fi; \
 	done; \
@@ -162,26 +154,35 @@ check_links: | envvar stop
 ## Check spelling on content
 check_spelling: | envvar stop
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	@echo "${GREEN}Downloading Dictionary file: ${YESPERLLER_PATH} ${RESET}"
-	${DEBUG}echo ${YESPERLLER_PATH}; if [ "`curl ${YESPERLLER_PATH} -o .yaspeller -w '%{http_code}\n' -s`" != "200" ]; then \
-		echo "${RED}ERROR: Unable to curl yaspeller dictionary file ${RESET}"; \
-		rm -f .yaspeller; \
-     	exit 1; \
+	${DEBUG}if [ ! -e "./yaspeller.json" ]; then \
+		echo "${WHITE}Downloading Dictionary file: https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json${RESET}"; \
+		if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json -o yaspeller.json -w '%{http_code}\n' -s`" != "200" ]; then \
+			echo "${RED}ERROR: Unable to curl yaspeller dictionary file ${RESET}"; \
+			exit 2; \
+		else \
+			echo "${WHITE}yaspeller updated ${RESET}"; \
+			echo; \
+			REMOTE=1; \
+		fi; \
+	else \
+		echo "YASPELLER file: ./yaspeller.json"; \
+		echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/yaspeller/.yaspeller.json"; \
+		echo; \
 	fi; \
-	if `cat .yaspeller 2>&1 | jq > /dev/null 2>&1`; then \
-			echo "${GREEN}yaspeller updated ${RESET}"; \
-			${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --workdir=/ ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/.yaspeller --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv' || { rm -rf .yaspeller; exit 1; }; \
+	if `jq -C  . yaspeller.json > /dev/null 2>&1`; then \
+			${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v ${PWD}/yaspeller.json:/srv/yaspeller.json:ro${SELINUX_ENABLED} --workdir=/srv ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv' | sed -e 's/\/srv/./g'; \
 	else \
 		echo "${RED}ERROR: yaspeller dictionary file does not exist or is invalid json ${RESET}"; \
-		rm -f .yaspeller; \
 		exit 1; \
-	fi
+	fi; \
+	if [ "$${REMOTE}" ]; then rm -f yaspeller.json > /dev/null 2>&1; fi
+
 
 ## Run site.  App available @ http://0.0.0.0:4000
 run: | envvar stop
 	@echo "${GREEN}Makefile: Run site${RESET}"
 	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv/jekyll:ro${SELINUX_ENABLED} -v /dev/null:/srv/jekyll/Gemfile.lock --mount type=tmpfs,destination=/srv/jekyll/_site --mount type=tmpfs,destination=/srv/jekyll/.jekyll-cache --workdir=/srv/jekyll ${IMGTAG} /bin/bash -c "jekyll serve --host=0.0.0.0 --trace --force_polling --future"
+	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock:rw${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache --workdir=/srv ${IMGTAG} /bin/bash -c "jekyll serve --host=0.0.0.0 --trace --force_polling --future"
 	@echo
 
 
@@ -197,5 +198,3 @@ stop: | envvar
 	@echo "${GREEN}Makefile: Stop running container${RESET}"
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
-
-	
