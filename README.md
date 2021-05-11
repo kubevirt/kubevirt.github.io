@@ -113,10 +113,18 @@ Targets:
 * `status`: Basically `${BUILD_ENGINE} ps` for an easy way to see what's running.
 * `stop`: Stop container and app
 * `stop_yaspeller`: Sometimes yaspeller goes bonkers.  Stop it here.
- 
+
+<<<<<<< HEAD
 
 
+## Getting Help
+=======
+<<<<<<< HEAD
+=======
+
+>>>>>>> d15a6afe9... Adjusted wording (#733)
 ## Getting Help 
+>>>>>>> 50e0415fc... Adjusted wording (#733)
 
 * Slack: https://kubernetes.slack.com/messages/virtualization
 * Twitter: https://twitter.com/kubevirt
