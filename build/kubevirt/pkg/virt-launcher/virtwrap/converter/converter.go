@@ -491,7 +491,7 @@ func FormatDeviceName(prefix string, index int) string {
 	name := ""
 
 	for index >= 0 {
-		name = string('a'+(index%base)) + name
+		name = string(rune('a'+(index%base))) + name
 		index = (index / base) - 1
 	}
 	return prefix + name
@@ -560,6 +560,9 @@ func Convert_v1_Volume_To_api_Disk(source *v1.Volume, disk *api.Disk, c *Convert
 	}
 	if source.ServiceAccount != nil {
 		return Convert_v1_Config_To_api_Disk(source.Name, disk, config.ServiceAccount)
+	}
+	if source.DownwardMetrics != nil {
+		return Convert_v1_DownwardMetricSource_To_api_Disk(disk, c)
 	}
 
 	return fmt.Errorf("disk %s references an unsupported source", disk.Alias.GetName())
@@ -739,6 +742,21 @@ func Convert_v1_CloudInitSource_To_api_Disk(source v1.VolumeSource, disk *api.Di
 	disk.Type = "file"
 	disk.Driver.Type = "raw"
 	disk.Driver.ErrorPolicy = "stop"
+	return nil
+}
+
+func Convert_v1_DownwardMetricSource_To_api_Disk(disk *api.Disk, c *ConverterContext) error {
+	disk.Type = "file"
+	disk.ReadOnly = toApiReadOnly(true)
+	disk.Driver = &api.DiskDriver{
+		Type: "raw",
+		Name: "qemu",
+	}
+	// This disk always needs `virtio`. Validation ensures that bus is unset or is already virtio
+	disk.Model = translateModel(c, "virtio")
+	disk.Source = api.DiskSource{
+		File: config.DownwardMetricDisk,
+	}
 	return nil
 }
 
@@ -945,12 +963,6 @@ func Convert_v1_Features_To_api_Features(source *v1.Features, features *api.Feat
 			State: boolToOnOff(source.Pvspinlock.Enabled, true),
 		}
 	}
-	return nil
-}
-
-func Convert_v1_Machine_To_api_OSType(source *v1.Machine, ost *api.OSType) error {
-	ost.Machine = source.Type
-
 	return nil
 }
 
@@ -1490,10 +1502,9 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 			return err
 		}
 	}
-	apiOst := &vmi.Spec.Domain.Machine
-	err = Convert_v1_Machine_To_api_OSType(apiOst, &domain.Spec.OS.Type)
-	if err != nil {
-		return err
+
+	if machine := vmi.Spec.Domain.Machine; machine != nil {
+		domain.Spec.OS.Type.Machine = machine.Type
 	}
 
 	if vmi.Spec.Domain.CPU != nil {
