@@ -36,6 +36,7 @@ import (
 	kubevirtv1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
+	utiltype "kubevirt.io/kubevirt/pkg/util/types"
 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
 	"kubevirt.io/kubevirt/pkg/virt-handler/node-labeller/api"
 	"kubevirt.io/kubevirt/pkg/virt-handler/node-labeller/util"
@@ -170,6 +171,10 @@ func (n *NodeLabeller) run() error {
 
 	node := originalNode.DeepCopy()
 
+	if skipNode(node) {
+		return nil
+	}
+
 	//prepare new labels
 	newLabels := n.prepareLabels(cpuModels, cpuFeatures)
 	//remove old labeller labels
@@ -182,20 +187,19 @@ func (n *NodeLabeller) run() error {
 	return err
 }
 
-func (n *NodeLabeller) patchNode(originalNode, node *v1.Node) error {
-	type payload struct {
-		Op    string            `json:"op"`
-		Path  string            `json:"path"`
-		Value map[string]string `json:"value"`
-	}
+func skipNode(node *v1.Node) bool {
+	_, exists := node.Annotations[kubevirtv1.LabellerSkipNodeAnnotation]
+	return exists
+}
 
-	p := make([]payload, 0)
+func (n *NodeLabeller) patchNode(originalNode, node *v1.Node) error {
+	p := make([]utiltype.PatchOperation, 0)
 	if !reflect.DeepEqual(originalNode.Labels, node.Labels) {
-		p = append(p, payload{
+		p = append(p, utiltype.PatchOperation{
 			Op:    "test",
 			Path:  "/metadata/labels",
 			Value: originalNode.Labels,
-		}, payload{
+		}, utiltype.PatchOperation{
 			Op:    "replace",
 			Path:  "/metadata/labels",
 			Value: node.Labels,
@@ -203,11 +207,11 @@ func (n *NodeLabeller) patchNode(originalNode, node *v1.Node) error {
 	}
 
 	if !reflect.DeepEqual(originalNode.Annotations, node.Annotations) {
-		p = append(p, payload{
+		p = append(p, utiltype.PatchOperation{
 			Op:    "test",
 			Path:  "/metadata/annotations",
 			Value: originalNode.Annotations,
-		}, payload{
+		}, utiltype.PatchOperation{
 			Op:    "replace",
 			Path:  "/metadata/annotations",
 			Value: node.Annotations,
