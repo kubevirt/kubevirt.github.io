@@ -127,6 +127,7 @@ const (
 	AlpineHttpUrl = iota
 	DummyFileHttpUrl
 	CirrosHttpUrl
+	FedoraHttpUrl
 	VirtWhatCpuidHelperHttpUrl
 )
 
@@ -3198,6 +3199,25 @@ func NewRepeatableVirtctlCommand(args ...string) func() error {
 	}
 }
 
+func ExecuteCommandOnCephToolbox(virtCli kubecli.KubevirtClient, command []string) (string, error) {
+	pods, err := virtCli.CoreV1().Pods("rook-ceph").List(context.Background(), metav1.ListOptions{LabelSelector: "app=rook-ceph-tools"})
+	if err != nil {
+		return "", err
+	}
+
+	stdout, stderr, err := ExecuteCommandOnPodV2(virtCli, &pods.Items[0], "rook-ceph-tools", command)
+
+	if err != nil {
+		return "", fmt.Errorf("failed executing command on pod: %v: stderr %v: stdout: %v", err, stderr, stdout)
+	}
+
+	if len(stderr) > 0 {
+		return "", fmt.Errorf("stderr: %v", stderr)
+	}
+
+	return stdout, nil
+}
+
 func ExecuteCommandOnPod(virtCli kubecli.KubevirtClient, pod *k8sv1.Pod, containerName string, command []string) (string, error) {
 	stdout, stderr, err := ExecuteCommandOnPodV2(virtCli, pod, containerName, command)
 
@@ -4564,33 +4584,37 @@ func waitForConfigToBePropagated(resourceVersion string) {
 func WaitForConfigToBePropagatedToComponent(podLabel string, resourceVersion string, compareResourceVersions compare) {
 	virtClient, err := kubecli.GetKubevirtClient()
 	PanicOnError(err)
+	errAdditionalInfo := fmt.Sprintf("component: \"%s\"", strings.TrimPrefix(podLabel, "kubevirt.io="))
 
-	EventuallyWithOffset(3, func() bool {
+	EventuallyWithOffset(3, func() error {
 		pods, err := virtClient.CoreV1().Pods(flags.KubeVirtInstallNamespace).List(context.Background(), metav1.ListOptions{LabelSelector: podLabel})
+
 		if err != nil {
-			log.DefaultLogger().Reason(err).Infof("Failed to fetch pods.")
-			return false
+			return fmt.Errorf("failed to fetch pods. %s", errAdditionalInfo)
 		}
 		for _, pod := range pods.Items {
+			errAdditionalInfo += fmt.Sprintf(", pod: \"%s\"", pod.Name)
+
 			if pod.DeletionTimestamp != nil {
 				continue
 			}
 			body, err := CallUrlOnPod(&pod, "8443", "/healthz")
 			if err != nil {
-				log.DefaultLogger().Reason(err).Errorf("Failed to call healthz endpoint on %s", pod.Name)
-				return false
+				return fmt.Errorf("failed to call healthz endpoint. %s", errAdditionalInfo)
 			}
 			result := map[string]interface{}{}
 			err = json.Unmarshal(body, &result)
 			if err != nil {
-				log.DefaultLogger().Reason(err).Errorf("Failed to parse response from healthz endpoint on %s", pod.Name)
-				return false
+				return fmt.Errorf("failed to parse response from healthz endpoint. %s", errAdditionalInfo)
 			}
 
-			return compareResourceVersions(resourceVersion, result["config-resource-version"].(string))
+			if configVersion := result["config-resource-version"].(string); !compareResourceVersions(resourceVersion, configVersion) {
+				return fmt.Errorf("resource & config versions (%s and %s respectively) are not as expected. %s ",
+					resourceVersion, configVersion, errAdditionalInfo)
+			}
 		}
-		return true
-	}, 10*time.Second, 1*time.Second).Should(BeTrue(), "Not all kubevirt components picked up the kubevirt config successfully")
+		return nil
+	}, 10*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
 }
 
 func WaitAgentConnected(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance) {
@@ -4744,6 +4768,8 @@ func GetUrl(urlIndex int) string {
 		str = fmt.Sprintf("http://cdi-http-import-server.%s/dummy.file", flags.KubeVirtInstallNamespace)
 	case CirrosHttpUrl:
 		str = fmt.Sprintf("http://cdi-http-import-server.%s/images/cirros.img", flags.KubeVirtInstallNamespace)
+	case FedoraHttpUrl:
+		str = fmt.Sprintf("http://cdi-http-import-server.%s/images/fedora.img", flags.KubeVirtInstallNamespace)
 	case VirtWhatCpuidHelperHttpUrl:
 		str = fmt.Sprintf("http://cdi-http-import-server.%s/virt-what-cpuid-helper", flags.KubeVirtInstallNamespace)
 	default:
