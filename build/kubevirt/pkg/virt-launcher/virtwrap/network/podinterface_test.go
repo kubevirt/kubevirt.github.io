@@ -286,6 +286,23 @@ var _ = Describe("Pod Network", func() {
 				"DNAT",
 				"--to-destination",
 				GetMasqueradeVmIp(proto)).Return(nil)
+			mockNetwork.EXPECT().IptablesAppendRule(proto, "nat",
+				"KUBEVIRT_POSTINBOUND",
+				"--source",
+				getLoopbackAdrress(proto),
+				"-j",
+				"SNAT",
+				"--to-source",
+				GetMasqueradeGwIp(proto)).Return(nil)
+			mockNetwork.EXPECT().IptablesAppendRule(proto, "nat",
+				"OUTPUT",
+				"--destination",
+				getLoopbackAdrress(proto),
+				"-j",
+				"DNAT",
+				"--to-destination",
+				GetMasqueradeVmIp(proto)).Return(nil)
+
 			//Global net rules using nftable
 			mockNetwork.EXPECT().NftablesNewChain(proto, "nat", "KUBEVIRT_PREINBOUND").Return(nil)
 			mockNetwork.EXPECT().NftablesNewChain(proto, "nat", "KUBEVIRT_POSTINBOUND").Return(nil)
@@ -296,7 +313,8 @@ var _ = Describe("Pod Network", func() {
 				mockNetwork.EXPECT().NftablesAppendRule(proto, "nat", chain, "tcp", "dport", fmt.Sprintf("{ %s }", strings.Join(portsUsedByLiveMigration(), ", ")), GetNFTIPString(proto), "saddr", getLoopbackAdrress(proto), "counter", "return").Return(nil)
 			}
 			mockNetwork.EXPECT().NftablesAppendRule(proto, "nat", "KUBEVIRT_PREINBOUND", "counter", "dnat", "to", GetMasqueradeVmIp(proto)).Return(nil)
-
+			mockNetwork.EXPECT().NftablesAppendRule(proto, "nat", "KUBEVIRT_POSTINBOUND", GetNFTIPString(proto), "saddr", getLoopbackAdrress(proto), "counter", "snat", "to", GetMasqueradeGwIp(proto)).Return(nil)
+			mockNetwork.EXPECT().NftablesAppendRule(proto, "nat", "output", GetNFTIPString(proto), "daddr", getLoopbackAdrress(proto), "counter", "dnat", "to", GetMasqueradeVmIp(proto)).Return(nil)
 		}
 		mockNetwork.EXPECT().CreateTapDevice(tapDeviceName, queueNumber, pid, mtu, libvirtUser).Return(nil)
 		mockNetwork.EXPECT().BindTapDeviceToBridge(tapDeviceName, "k6t-eth0").Return(nil)
@@ -314,8 +332,8 @@ var _ = Describe("Pod Network", func() {
 		Expect(err).To(BeNil())
 	}
 
-	TestRunPlug := func(driver BindMechanism) {
-		err := driver.discoverPodNetworkInterface()
+	TestRunPlug := func(driver BindMechanism, ifaceName string) {
+		err := driver.discoverPodNetworkInterface(ifaceName)
 		Expect(err).ToNot(HaveOccurred())
 
 		Expect(driver.preparePodNetworkInterface()).To(Succeed())
@@ -432,6 +450,7 @@ var _ = Describe("Pod Network", func() {
 					bridgeBinding, ok := driver.(*BridgeBindMechanism)
 					Expect(ok).To(BeTrue())
 					bridgeBinding.ipamEnabled = true
+					bridgeBinding.podNicLink = primaryPodInterface
 					Expect(driver.generateDhcpConfig().MAC.String()).To(Equal("de:ad:00:00:be:af"))
 				})
 			})
@@ -579,7 +598,7 @@ var _ = Describe("Pod Network", func() {
 				podnic := createDefaultPodNIC(vmi)
 				driver, err := podnic.getPhase2Binding(domain)
 				Expect(err).ToNot(HaveOccurred())
-				TestRunPlug(driver)
+				TestRunPlug(driver, podnic.podInterfaceName)
 				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(0))
 				Expect(len(domain.Spec.QEMUCmd.QEMUArg)).To(Equal(2))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[0]).To(Equal(api.Arg{Value: "-device"}))
@@ -594,7 +613,7 @@ var _ = Describe("Pod Network", func() {
 				podnic := createDefaultPodNIC(vmi)
 				driver, err := podnic.getPhase2Binding(domain)
 				Expect(err).ToNot(HaveOccurred())
-				TestRunPlug(driver)
+				TestRunPlug(driver, podnic.podInterfaceName)
 				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(0))
 				Expect(len(domain.Spec.QEMUCmd.QEMUArg)).To(Equal(2))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[0]).To(Equal(api.Arg{Value: "-device"}))
@@ -620,7 +639,7 @@ var _ = Describe("Pod Network", func() {
 				podnic.launcherPID = &pid
 				driver, err := podnic.getPhase2Binding(domain)
 				Expect(err).ToNot(HaveOccurred())
-				TestRunPlug(driver)
+				TestRunPlug(driver, podnic.podInterfaceName)
 				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(1))
 				Expect(len(domain.Spec.QEMUCmd.QEMUArg)).To(Equal(2))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[0]).To(Equal(api.Arg{Value: "-device"}))
@@ -646,7 +665,7 @@ var _ = Describe("Pod Network", func() {
 				driver, err := podnic.getPhase2Binding(domain)
 				mockNetwork.EXPECT().LinkByName(ifaceName).Return(macvtapInterface, nil)
 				Expect(err).ToNot(HaveOccurred(), "should have identified the correct binding mechanism")
-				TestRunPlug(driver)
+				TestRunPlug(driver, podnic.podInterfaceName)
 				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(1), "should have a single interface")
 				Expect(domain.Spec.Devices.Interfaces[0].Target).To(Equal(&api.InterfaceTarget{Device: ifaceName, Managed: "no"}), "should have an unmanaged interface")
 				Expect(domain.Spec.Devices.Interfaces[0].MAC).To(Equal(&api.MAC{MAC: fakeMac.String()}), "should have the expected MAC address")
