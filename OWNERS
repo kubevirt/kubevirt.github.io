@@ -1,15 +1,15 @@
 filters:
   ".*":
     reviewers:
-      - codificat
       - mazzystr
-      - hroyrh
     approvers:
-      - codificat
-      - fabiand
       - mazzystr
-      - hroyrh
+      - fabiand
+      - davidvossel
+      - stu-gott
     emeritus_approvers:
+      - codificat # 09 June 2021
+      - hroyrh # 09 June 2021
       - iranzo # 20 May 2020
       - ptrnull # 20 May 2020
       - alosadagrande # 20 May 2020
