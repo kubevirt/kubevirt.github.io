@@ -129,7 +129,7 @@ check_links: | envvar stop
 	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors'`; \
 	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
 	  echo "$${OUTPUT}"; \
-	  exit 1; \
+	  exit 2; \
 	fi; \
 	for i in `echo "$${OUTPUT}" | egrep "https?://.*,.*"`; do \
 	  /bin/echo -n "${AQUA}"; \
@@ -156,8 +156,8 @@ check_spelling: | envvar stop
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
 	${DEBUG}if [ ! -e "./yaspeller.json" ]; then \
 		echo "${WHITE}Downloading Dictionary file: https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json${RESET}"; \
-		if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json -o yaspeller.json -w '%{http_code}\n' -s`" != "200" ]; then \
-			echo "${RED}ERROR: Unable to curl yaspeller dictionary file ${RESET}"; \
+		if ! `curl -fs https://raw.githubusercontent.com/kubevirt/project-infra/master/images/yaspeller/.yaspeller.json -o yaspeller.json`; then \
+			echo "${RED}ERROR: Unable to curl yaspeller dictionary file${RESET}"; \
 			exit 2; \
 		else \
 			echo "${WHITE}yaspeller updated ${RESET}"; \
@@ -169,13 +169,22 @@ check_spelling: | envvar stop
 		echo "Be sure to add changes to upstream: kubevirt/project-infra/master/images/yaspeller/.yaspeller.json"; \
 		echo; \
 	fi; \
-	if `jq -C  . yaspeller.json > /dev/null 2>&1`; then \
-			${CONTAINER_ENGINE} run -it --rm --name website -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v ${PWD}/yaspeller.json:/srv/yaspeller.json:ro${SELINUX_ENABLED} --workdir=/srv ${IMGTAG} /bin/bash -c 'yaspeller -c /srv/yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv' | sed -e 's/\/srv/./g'; \
+	export IFS=$$'\n'; \
+	if `cat ./yaspeller.json 2>&1 | jq > /dev/null 2>&1`; then \
+		for i in `${CONTAINER_ENGINE} run -it --rm --name yaspeller -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock -v ./yaspeller.json:/srv/yaspeller.json:ro${SELINUX_ENABLED} ${IMGTAG} /bin/bash -c 'echo; yaspeller -c /srv/yaspeller.json --only-errors --ignore-tags iframe,img,code,kbd,object,samp,script,style,var /srv'`; do \
+			if [[ "$${i}" =~ "✗" ]]; then \
+				RETVAL=2; \
+			fi; \
+		echo "$${i}" | sed -e 's/\/srv\//\.\//g'; \
+		done; \
 	else \
-		echo "${RED}ERROR: yaspeller dictionary file does not exist or is invalid json ${RESET}"; \
-		exit 1; \
+		echo "${RED}ERROR: yaspeller dictionary file does not exist or is invalid json${RESET}"; \
+		RETVAL=1; \
 	fi; \
-	if [ "$${REMOTE}" ]; then rm -f yaspeller.json > /dev/null 2>&1; fi
+	if [ "$${REMOTE}" ]; then \
+		rm -rf yaspeller.json > /dev/null 2>&1; \
+	fi; \
+	if [ "$${RETVAL}" ]; then exit 2; else echo "Complete!"; fi
 
 
 ## Run site.  App available @ http://0.0.0.0:4000
