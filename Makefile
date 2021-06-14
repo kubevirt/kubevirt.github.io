@@ -122,9 +122,13 @@ build_img: | envvar
 
 ## Check external, internal links and links/selectors to userguide on website content
 check_links: | envvar stop
-	@echo "${GREEN}Makefile: Check external and internal links${RESET}"
-	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake -- -u'
+	@echo -n "${GREEN}Makefile: Check external and internal links${RESET}"
+	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake -- -u'
+	@echo
+	@echo
+	@echo "${GREEN}Makefile: Check url selectors to user-guide${RESET}"
 #BEGIN BIG SHELL SCRIPT
+<<<<<<< HEAD
 	${DEBUG}export IFS=$$'\n'; \
 	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors'`; \
 	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
@@ -147,9 +151,24 @@ check_links: | envvar stop
 	done; \
 	if [ "$${RETVAL}" ]; then exit 1; fi; \
 	echo "Complete!"
+=======
+	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors' | sed -n -e '/HTML-Proofer finished successfully./,$$p' | grep -v 'HTML-Proofer finished successfully.' > links 2> /dev/null; \
+	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site --workdir=/srv ${IMGTAG} /bin/bash -c \
+	  "for i in \`cat ./links\`; do \
+			echo -n 'File: ' && echo \"\$${i}\" | cut -d',' -f 2; \
+			echo -n 'Link: ' && echo \"\$${i}\" | cut -d',' -f 1; \
+			OPENSSL_CONF=/etc/ssl casperjs test --concise --arg=\"\$${i}\" /src/check_selectors.js; \
+			if [ \"\$$?\" != 0 ]; then break; fi; \
+			echo; \
+		done" > RETVAL; \
+	echo && cat RETVAL; \
+	if `egrep "FAIL 1 test executed" RETVAL > /dev/null`; then rm -rf RETVAL links && exit 2; \
+	else \
+		rm -rf RETVAL links; \
+		echo "Complete!"; \
+	fi
+>>>>>>> 0005a16dd... Fix check_spelling exit codes, speed plus cosmetics
 #END BIG SHELL SCRIPT
-	@echo
-
 
 ## Check spelling on content
 check_spelling: | envvar stop
