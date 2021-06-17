@@ -509,7 +509,7 @@ A new VNC Viewer window will open and you should now see the Windows 10 install 
 
 Once the install is complete you have a Windows 10 VM running with a GPU available. You can test that GPU acceleration is available by opening the Windows 10 task manager, selecting Advanced and then select the "Performance" tab. Note that the first time you start up, Windows is still detecting and installing the appropriate drivers. It may take a minute or two for the GPU information to show up in the Performance tab.
 
-Try testing out the GPU acceleration. Open a web browser in your VM and navigate to "http://www.fishgl.com" HOWEVER don't be surprised by the poor performance. The default kubevirt console does not take advantage of the GPU. For that we need to take one final step to use the Windows Remote Desktop Protocol (RDP) which can use the GPU.
+Try testing out the GPU acceleration. Open a web browser in your VM and navigate to "https://webglsamples.org/fishtank/fishtank.html" HOWEVER don't be surprised by the poor performance. The default kubevirt console does not take advantage of the GPU. For that we need to take one final step to use the Windows Remote Desktop Protocol (RDP) which can use the GPU.
 
 ## Using the GPU
 
@@ -533,7 +533,7 @@ Note the port that was assigned to this service we will use it in the next step.
 
 We can now use the rdesktop tool to connect to our VM and get the full advantages of the vGPU. From a command line run `rdesktop localhost:<port>` being sure to update the port based on the output from above. When prompted by rdesktop accept the certificate. Log into your Windows 10 client. You can now test out the vGPU.
 
-Let's try FishGL again. Open a browser and go to [http://www.fishgl.com](http://www.fishgl.com). You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
+Let's try FishGL again. Open a browser and go to [https://webglsamples.org/fishtank/fishtank.html](https://webglsamples.org/fishtank/fishtank.html). You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
 <br>
 
 <div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
