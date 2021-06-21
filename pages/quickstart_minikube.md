@@ -103,6 +103,16 @@ kubectl logs pod/kubevirt-install-manager -n kube-system
 ```
 <br>
 
+{% include quickstarts/multi_node_minikube.md %}
+
+> warning "Core DNS race condition"
+> An issue has been
+> [reported](https://github.com/kubernetes/minikube/issues/11608) where the
+> `coredns` pod in multi-node minikube comes up with the wrong IP address. If
+> this happens, kubevirt will fail to install properly. To work around, delete
+> the `coredns` pod from the kube-system namespace and disable/enable the
+> kubevirt addon in minikube.
+
 {% include quickstarts/virtctl.md %}
 
 {% include labs-description.md %}
