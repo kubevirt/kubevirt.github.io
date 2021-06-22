@@ -8,14 +8,14 @@ Contributions to the KubeVirt website are very much welcomed! Please reach out w
 
 ## Getting Started
 
-### Git semantics
+### Git workflow
 
 A semi standard process is followed to move code from development to production.
 
 The basic process is ...
 
 ```bash
-Fork -> Clone -> Branch -> Commit -> Push -> Pull Request -> Approve -> Merge
+Fork -> Clone -> Branch -> Work -> Test -> Commit & Push -> Pull Request -> Approve & Merge
 ```
 
 #### Fork
@@ -31,22 +31,23 @@ To clone the forked repository locally, browse to your fork at https://www.githu
 git clone *clipboard paste url*
 ```
 
-#### Remotes
+| :exclamation: Be sure to set up the remotes! |
+| - |
 
-By default the local git repo will have a remote alias called `origin` that points to your fork in GitHub. KubeVirt repositories have many contributors so work needs to be done periodically to synchronize local and origin branches with upstream branches. To enable this work flow on your local clone, add a new remote to the repository. By convention, this remote is named `upstream`.
+By default the local repo will have a remote alias called `origin` that points to your fork in GitHub. KubeVirt project repositories have many contributors so work needs to be done periodically to synchronize local and origin branches with branches from the main repo of the project. To enable this work flow on your local clone, add a new remote to the repository. By convention, this remote is named `upstream`.
 
-To add an additional remote perform the following command...
+To add an additional remote perform the following command ...
 
 ```bash
-git remote add upstream http/ssh url
+git remote add upstream <url>
 ```
 
-And then you should see something like...
+To view the remotes perform the following command ...
 
 ```bash
 $ git remote -v
-origin	git@github.com:mazzystr/kubevirt.github.io.git (fetch)
-origin	git@github.com:mazzystr/kubevirt.github.io.git (push)
+origin	git@github.com:github_name/kubevirt.github.io.git (fetch)
+origin	git@github.com:github_name/kubevirt.github.io.git (push)
 upstream	git@github.com:kubevirt/kubevirt.github.io.git (fetch)
 upstream	git@github.com:kubevirt/kubevirt.github.io.git (push)
 ```
@@ -57,38 +58,38 @@ To sync the master branch from the upstream repository, perform the following ..
 git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f
 ```
 
-*Note* Master branch is purely cosmetic for this repo. Merges to master **ARE NOT ACCEPTED**.
+#### Branch
 
+All work is encouraged to be conducted within a feature branch. The feature branch must be created against branch `source` ... at this time (we're working as we speak to resolve this problem).
 
-All work must be branched from `source` branch at this time. Perform the following to sync from upstream ...
-
-```bash
-git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f
-```
-
-#### Feature branch
-
-Even though changes from a local `source` branch are accepted it is inadvisable, can cause confusion and possibly data loss. Please use feature branches branched from `source` by running the following ...
+Perform the following to create a feature branch ...
 
 ```bash
-git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git branch feat_branch; git checkout feat_branch; git push --set-upstream origin feat_branch
+git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git branch feature_branch; git checkout feature_branch; git push --set-upstream origin feature_branch
 ```
 
-#### Rebase
+| :no_entry: Master branch is purely cosmetic for kubevirt/kubevirt.github.io. Merges to master branch ARE NOT ACCEPTED. |
+| - |
 
-Periodically a feature branch will need to be rebased as the local and origin fall behind upstream. Perform the following to rebase ...
+<br>
+
+Periodically a feature branch will need to be rebased. This is the term used to insert commits and logs into the current branch log to prevent conflicts when merging code with upstream.
+
+Perform the following to rebase ...
 
 ```bash
-git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git checkout feat_branch; git rebase origin/source; git push -f
+git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git checkout feature_branch; git rebase origin/source; git push -f
 ```
 
-There is always a strong possibility for merge conflicts. Proceed with caution in resolving. Each conflict must be hand edited. Perform the following to resolve each conflict ...
+| :warning: There is always a strong possibility for merge conflicts when performing a rebase. Each conflict must be hand edited and resolved before proceeding. |
+| - |
+
+Perform the following to resolve each conflict ...
 
 ```bash
 # Modify and save the filename
 git add filename; git rebase --continue
 ```
-
 
 #### Work
 
@@ -110,28 +111,22 @@ The **BLOG_POST_TITLE** should match the name of the markdown file created under
 
 If you are a UI/UX developer, the structure and layout of the website would greatly benefit from your attention. Feel free to browse [website issues](https://github.com/kubevirt/kubevirt.github.io/issues?q=is%3Aopen+is%3Aissue+label%3Akind%2Fwebsite) or contribute other ideas.
 
+#### Test work
 
-## Test work
+This repository employs CI to test and validate proposed changes to the website. The CI process can be slow and may need to run multiple times before a change is ready for human review. To speed up this process, a Makefile is provided to run the same CI tests locally.
 
-The Makefile at the base of this repository provides editors the ability to locally run the same tests CI uses to validate changes. This saves time over waiting for online CI resources to spin up just to find out a pull request has a problem that prevents merge.
-
-1) Build the test image locally
+1) Build the container image locally
 ```bash
 $ make build_img
 ```
 
-**NOTE** If you use `docker` you may need to set `CONTAINER_ENGINE` and `BUILD_ENGINE`:
+| :warning: If you use `docker` user-space tool and runtime you may need to set `CONTAINER_ENGINE` and `BUILD_ENGINE` |
+| - |
+| ```$ export CONTAINER_ENGINE=docker```</p><p>```$ export BUILD_ENGINE=docker```</p> |
 
-```bash
-$ export CONTAINER_ENGINE=docker
-$ export BUILD_ENGINE=docker
-```
-
-**NOTE** If you are in an SELinux enabled OS you need to set `SELINUX_ENABLED`:
-
-```bash
-$ export SELINUX_ENABLED=True
-```
+| :warning: If you are in an SELinux enabled OS you need to set `SELINUX_ENABLED` |
+| - |
+| ```$ export SELINUX_ENABLED=True``` |
 
 2) Validate page rendering
 ```bash
@@ -139,7 +134,7 @@ make run
 ```
 Open your web browser to http://0.0.0.0:4000
 
-3) Test all hyperlinks
+3) Test hyperlinks
 ```bash
 make test_links
 ```
@@ -151,22 +146,26 @@ make test_spelling
 
 If you discover a flagged spelling error that you believe is not a mistake, feel free to add the offending word to the dictionary file located at GitHub repo `kubevirt/project-infra/images/yaspeller/.yaspeller.json`. Try to keep the dictionary file well ordered and employ regular expressions to handle common patterns.
 
-#### Make sure all tests pass before committing!
+| :no_entry: Make sure all tests pass before committing! |
+| - |
 
-#### Submitting your code
+#### Commit & Push
 
-1) Commit your code and sign your commits!
+1) Sign and commit your code!
+
 ```bash
 git commit -s -m "The commit message" file1 file 2 file3 ...
 ```
 
-**Signature verification on commits are required! No exceptions!**
+| :no_entry: Signature verification on commits is strictly enforced! |
+| - |
 
 You will see the following in the transaction log
+
 ```bash
 git log
-commit hashbrowns (HEAD -> feat_branch, upstream/source, origin/source, source)
-Author: KubeVirt contributer <kubevirt_contributer@kubevirt.io>
+commit hashbrowns (HEAD -> feature_branch, upstream/source, origin/source, source)
+Author: KubeVirt Contributor <kubevirt_contributor@kubevirt.io>
 Date:   Mon Jan 01 00:00:00 2021 -0700
 
 <your commit message>
@@ -174,16 +173,35 @@ Date:   Mon Jan 01 00:00:00 2021 -0700
 Signed-off-by: <your configured git identity>
 ```
 
-2) Browse to `https://www.github.com/*you*/kubevirt.github.io`
+2) Push the branch to the origin remote
 
-3) Often you will see a `Compare & Pull Request` button ... Click on that
+```bash
+$ git push origin
+```
 
-4) Ensure your base branch is `source`, your compare branch is `feat_branch`, and the file diff's are correct.
+#### Pull request
 
-5) Create a nice subject and body for the pull request. Be sure to tag related issues, people of interest, and click the "Create pull request" button.
+1) Browse to `https://www.github.com/*github_name*/kubevirt.github.io`
 
-**Maintainers will automatically be notified a pull request has been created and will give further instruction on getting contribution merged.**
+2) Often you will see a `Compare & Pull Request` button ... Click on that
 
+3) The base branch must be set to `source`. The compare branch should be the `feature_branch`. Take a look at the file diff's and ensure they are correct.
+
+4) Create a nice subject and body for the pull request. Be sure to tag related issues, people of interest, and then click the `Create pull request` button.
+
+| :warning: CI continuously monitors the repository for changes. When a change is detected a series of jobs will trigger to validate the code of the pull request. Please monitor them and ensure they successfully complete. Maintainers and/or other contributors may request changes before proceeding to approve and merge. |
+| - |
+
+#### Approve & Merge
+
+The maintainers will add comments `/lgtm` and `/approve` to the pull request. Once again CI runs a job that monitors the comments section for key words. When the tags are detected the merge job will trigger and run.
+
+The merge job performs the following functions ...
+* Code from the feature branch is merged to `source` branch
+* Code from `source` branch is checked out
+* Code is compiled
+* Code is merged to master branch
+* GitHub serves code from `master` branch per Github Pages settings
 
 ## Makefile Help
 

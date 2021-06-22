@@ -74,11 +74,11 @@ Once the execution has finished, if the final status is `ok`, the status is repo
 The jobs executed and the logs are available on the Prow instance we use, for example:
 
 - <https://KubeVirt.io>
-  - Pre-submit link checker: <https://prow.apps.ovirt.org/?job=kubevirt-io-presubmit-link-checker>
-  - Periodical link checker: <https://prow.apps.ovirt.org/?job=kubevirt-io-periodic-link-checker>
+  - Pre-submit link checker: <https://prow.ci.kubevirt.io/?job=kubevirt-io-presubmit-link-checker>
+  - Periodical link checker: <https://prow.ci.kubevirt.io/?job=kubevirt-io-periodic-link-checker>
 - [KubeVirt Tutorial](https://github.com/kubevirt/kubevirt-tutorial)
-  - Pre-submit: <https://prow.apps.ovirt.org/?job=kubevirt-tutorial-presubmit-lab-testing-k8s-1.13.3>
-  - Periodical: <https://prow.apps.ovirt.org/?job=periodic-kubevirt-tutorial-lab-testing>
+  - Pre-submit: <https://prow.ci.kubevirt.io/?job=kubevirt-tutorial-presubmit-lab-testing-k8s-1.13.3>
+  - Periodical: <https://prow.ci.kubevirt.io/?job=periodic-kubevirt-tutorial-lab-testing>
 
 ## Wrap-up
 
