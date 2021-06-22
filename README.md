@@ -1,73 +1,189 @@
-# KubeVirt.io Website
+# Contributing to KubeVirt.io
 
 [![Build Status](https://travis-ci.org/kubevirt/kubevirt.github.io.svg?branch=master)](https://travis-ci.org/kubevirt/kubevirt.github.io)
 
-## Contributing contents
+The [kubevirt.io](https://kubevirt.io) website is a [Jekyll](https://jekyllrb.com/) driven site hosted by GitHub Pages.
 
-We gladly welcome contributions to the KubeVirt website. Please reach out if you happen to have an idea or find an issue with our contents! [Here's our guidelines for contents](GUIDELINES.md).
+Contributions to the KubeVirt website are very much welcomed! Please reach out with ideas for new content or issues with existing content!
+
+## Getting Started
+
+### Git semantics
+
+A semi standard process is followed to move code from development to production.
+
+The basic process is ...
+
+```bash
+Fork -> Clone -> Branch -> Commit -> Push -> Pull Request -> Approve -> Merge
+```
+
+#### Fork
+
+Create a forked copy of the repository to your  account by pressing the `Fork` button at the top of the repository page. This should be the only time a fork needs to be created as long as the fork is properly maintained by performing branch sync and rebase with upstream periodically.
 
 
-## Get Started
+#### Clone
 
-### Make changes to Your fork
+To clone the forked repository locally, browse to your fork at https://www.github.com/*github_name*/kubevirt.github.io. Click the `Code` button. Select a clone method and copy the url to clipboard. Open a terminal window and  ...
 
-The KubeVirt.io website is a Jekyll site, hosted with GitHub Pages.
+```bash
+git clone *clipboard paste url*
+```
 
-You can find the markdown that power the site under `./pages`.
+#### Remotes
+
+By default the local git repo will have a remote alias called `origin` that points to your fork in GitHub. KubeVirt repositories have many contributors so work needs to be done periodically to synchronize local and origin branches with upstream branches. To enable this work flow on your local clone, add a new remote to the repository. By convention, this remote is named `upstream`.
+
+To add an additional remote perform the following command...
+
+```bash
+git remote add upstream http/ssh url
+```
+
+And then you should see something like...
+
+```bash
+$ git remote -v
+origin	git@github.com:mazzystr/kubevirt.github.io.git (fetch)
+origin	git@github.com:mazzystr/kubevirt.github.io.git (push)
+upstream	git@github.com:kubevirt/kubevirt.github.io.git (fetch)
+upstream	git@github.com:kubevirt/kubevirt.github.io.git (push)
+```
+
+To sync the master branch from the upstream repository, perform the following ...
+
+```bash
+git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f
+```
+
+*Note* Master branch is purely cosmetic for this repo. Merges to master **ARE NOT ACCEPTED**.
+
+
+All work must be branched from `source` branch at this time. Perform the following to sync from upstream ...
+
+```bash
+git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f
+```
+
+#### Feature branch
+
+Even though changes from a local `source` branch are accepted it is inadvisable, can cause confusion and possibly data loss. Please use feature branches branched from `source` by running the following ...
+
+```bash
+git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git branch feat_branch; git checkout feat_branch; git push --set-upstream origin feat_branch
+```
+
+#### Rebase
+
+Periodically a feature branch will need to be rebased as the local and origin fall behind upstream. Perform the following to rebase ...
+
+```bash
+git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git checkout feat_branch; git rebase origin/source; git push -f
+```
+
+There is always a strong possibility for merge conflicts. Proceed with caution in resolving. Each conflict must be hand edited. Perform the following to resolve each conflict ...
+
+```bash
+# Modify and save the filename
+git add filename; git rebase --continue
+```
+
+
+#### Work
+
+[Here is our guidelines for content contribution](GUIDELINES.md).
+
 Each section of the site is broken out into their respective folders.
 
-* `./blogs` for the various Blog pages.
-* `./docs` for the Documentation.
-* `./videos` for the videos that are shared.
+* `./pages` : website
+* `./blogs` : blog posts
+* `./docs` : documentation.
+* `./videos` : videos
 
 All site images are located under `./assets/images`. Please do not edit these images.
 
-Images that relate to blog entries are located under `./assets/images/BLOG_POST_TITLE`.  
-The **BLOG_POST_TITLE** should match the name of the markdown file that you added under `/_posts`.
+Markdown for blog posts are located under `./posts`. Please follow the existing filename scheme.
+
+Images related to blog entries get placed under `./assets/images/BLOG_POST_TITLE`.
+The **BLOG_POST_TITLE** should match the name of the markdown file created under `/_posts`.
+
+If you are a UI/UX developer, the structure and layout of the website would greatly benefit from your attention. Feel free to browse [website issues](https://github.com/kubevirt/kubevirt.github.io/issues?q=is%3Aopen+is%3Aissue+label%3Akind%2Fwebsite) or contribute other ideas.
 
 
-#### sign your commits
+## Test work
 
-Signature verification on commits are required -- you may sign your commits by running:
+The Makefile at the base of this repository provides editors the ability to locally run the same tests CI uses to validate changes. This saves time over waiting for online CI resources to spin up just to find out a pull request has a problem that prevents merge.
 
-```console
-$ git commit -s -m "The commit message" file1 file 2 ...
+1) Build the test image locally
+```bash
+$ make build_img
 ```
 
-Signed commit messages generally take the following form:
+**NOTE** If you use `docker` you may need to set `CONTAINER_ENGINE` and `BUILD_ENGINE`:
 
+```bash
+$ export CONTAINER_ENGINE=docker
+$ export BUILD_ENGINE=docker
 ```
+
+**NOTE** If you are in an SELinux enabled OS you need to set `SELINUX_ENABLED`:
+
+```bash
+$ export SELINUX_ENABLED=True
+```
+
+2) Validate page rendering
+```bash
+make run
+```
+Open your web browser to http://0.0.0.0:4000
+
+3) Test all hyperlinks
+```bash
+make test_links
+```
+
+4) Test spelling
+```bash
+make test_spelling
+```
+
+If you discover a flagged spelling error that you believe is not a mistake, feel free to add the offending word to the dictionary file located at GitHub repo `kubevirt/project-infra/images/yaspeller/.yaspeller.json`. Try to keep the dictionary file well ordered and employ regular expressions to handle common patterns.
+
+#### Make sure all tests pass before committing!
+
+#### Submitting your code
+
+1) Commit your code and sign your commits!
+```bash
+git commit -s -m "The commit message" file1 file 2 file3 ...
+```
+
+**Signature verification on commits are required! No exceptions!**
+
+You will see the following in the transaction log
+```bash
+git log
+commit hashbrowns (HEAD -> feat_branch, upstream/source, origin/source, source)
+Author: KubeVirt contributer <kubevirt_contributer@kubevirt.io>
+Date:   Mon Jan 01 00:00:00 2021 -0700
+
 <your commit message>
 
 Signed-off-by: <your configured git identity>
 ```
 
-## Test your changes in a local container
+2) Browse to `https://www.github.com/*you*/kubevirt.github.io`
 
+3) Often you will see a `Compare & Pull Request` button ... Click on that
 
-```bash
-$ make run
-```
+4) Ensure your base branch is `source`, your compare branch is `feat_branch`, and the file diff's are correct.
 
-**NOTE** If you use `docker` you may need to set `CONTAINER_ENGINE` and `BUILD_ENGINE`:
+5) Create a nice subject and body for the pull request. Be sure to tag related issues, people of interest, and click the "Create pull request" button.
 
-```console
-$ export CONTAINER_ENGINE=docker
-$ export BUILD_ENGINE=docker
-$ make run
-```
+**Maintainers will automatically be notified a pull request has been created and will give further instruction on getting contribution merged.**
 
-**NOTE** If you are in an SELinux enabled OS you need to set `SELINUX_ENABLED`:
-
-```console
-$ export SELINUX_ENABLED=True
-```
-
-Open your web browser to http://0.0.0.0:4000 and validate page rendering
-
-### Create a pull request to `kubevirt/kubevirt.github.io`
-
-After you have vetted your changes, `kubevirt/kubevirt.github.io` so that others can review.
 
 ## Makefile Help
 
@@ -86,43 +202,38 @@ Env Variables:
 
 Targets:
   help                	 Show help
+  build_img              Build image localhost/kubevirt-kubevirt.github.io
   check_links         	 Check external, internal links and links/selectors to userguide on website content
   check_spelling      	 Check spelling on content
-  build_image_casperjs	 Build image: casperjs
-  build_image_yaspeller	 Build image: yaspeller
-  run                 	 Run site.  App available @ http://0.0.0.0:4000
+  run                 	 Run site. App available @ http://0.0.0.0:4000
   status              	 Container status
   stop                	 Stop site
-  stop_casperjs       	 Stop casperjs image
-  stop_yaspeller      	 Stop yaspeller image
-
 ```
+
 ### Environment Variables
 
 * `CONTAINER_ENGINE`: Some of us use `docker`. Some of us use `podman` (default: `podman`).
-* `BUILD_ENGINE`:	Some of us use `docker`. Some of us use `podman` (default: `podman`).
-* `SELINUX_ENABLED`:	Some of us run SELinux enabled. Set to `True` to enable container mount labelling.
+* `BUILD_ENGINE`:	Some of us use `docker`. Some of us use `podman` (default: `podman`)
+* `SELINUX_ENABLED`:	Some of us run SELinux enabled. Set to `True` to enable container mount labelling
 
 
 ### Targets:
 
-* `check_links`: HTMLProofer is used to check any links to external websites as we as any cross-page links.
+* `build_img`: Use this target to build an image packed with Jekyll, casperjs, yaspeller and HTMLProofer.
+* `check_links`: HTMLProofer is used to check any links to external websites as well as any cross-page links. Casperjs is used to dissect user-guide urls containing markdown selectors and ensure they exist.
 * `check_spelling`: yaspeller is used to check spelling. Feel free to update to the dictionary file as needed (kubevirt/project-infra/images/yaspeller/.yaspeller.json).
-* `build_image_casperjs`: casperjs project does not provide a container image.  Use this target to build an image packed with with nodejs. casperjs will verify all site links in `/_site`.
-* 'build_image_yaspeller': yaspeller project does not provide a container image.  User this target to Build an image packed with nodejs and yaspeller app. yaspeller will check content for spelling and other bad forms of English.
 * `status`: Basically `${BUILD_ENGINE} ps` for an easy way to see what's running.
 * `stop`: Stop container and app
-* `stop_yaspeller`: Sometimes yaspeller goes bonkers.  Stop it here.
 
-## Getting Help 
+## Getting Help
 
+* Mailing list: https://groups.google.com/g/kubevirt-dev
 * Slack: https://kubernetes.slack.com/messages/virtualization
 * Twitter: https://twitter.com/kubevirt
 
-
 ## Developer
 
-* Github Projects: https://github.com/kubevirt
+* Github project: https://github.com/kubevirt
 * Community meetings: [Google Calendar](https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT)
 
 ## Privacy
