@@ -22,41 +22,34 @@ tags:
 supported by KubeVirt where virtual machines running on one cluster node move
 to another cluster node without shutting down the guest OS or its applications.
 
-To experiment with KubeVirt live migration in a Minikube test environment, some
+To experiment with KubeVirt live migration in a Kubernetes test environment, some
 setup is required.
 
-Start a minikube
-cluster with the following requirements:
+Start a Kubernetes cluster with the following requirements:
 
   * Two or more nodes
-  * Flannel CNI plugin
-  * Nested or Emulated virtualization (see the [Minikube Quickstart](/quickstart_minikube/)
-  * The kubevirt addon for minikube
+  * CNI plugin: [Flannel](https://github.com/flannel-io/flannel#flannel) is a good pick for proof on concept environments.
+  * Nested or emulated virtualization 
+  * KubeVirt
 
-### Check the status of minikube and kubevirt
+For a simple test environment using Minikube, refer to the [Minikube Quickstart](/quickstart_minikube/) on this site.
 
-To check on minikube node statuses, run:
+### Check the status of nodes and kubevirt
+
+To check on the nodes and their IP ranges run:
 ```bash
-minikube status
+kubectl get nodes -o wide
 ```
 
-This will return a report like this (two KVM2 nodes in this example):
+This will return a report like 
 
 ```bash
-minikube
-type: Control Plane
-host: Running
-kubelet: Running
-apiserver: Running
-kubeconfig: Configured
-
-minikube-m02
-type: Worker
-host: Running
-kubelet: Running
+NAME           STATUS   ROLES                  AGE     VERSION   INTERNAL-IP      EXTERNAL-IP   OS-IMAGE               KERNEL-VERSION   CONTAINER-RUNTIME
+minikube       Ready    control-plane,master   2m43s   v1.20.7   192.168.39.240   <none>        Buildroot 2020.02.12   4.19.182         docker://20.10.6
+minikube-m02   Ready    <none>                 118s    v1.20.7   192.168.39.245   <none>        Buildroot 2020.02.12   4.19.182         docker://20.10.6
 ```
 
-Check that kubevirt fully deployed:
+Check that kubevirt has fully deployed:
 
 ```bash
 kubectl -n kubevirt get kubevirt
@@ -74,15 +67,11 @@ Live migration is, at the time of writing, not a standard feature in KubeVirt. T
 
 ## Create a Virtual Machine
 
-Next, create a VM. This lab uses the ["testvm"](/labs/manifests/vm.yaml) from [lab1](/labs/kubernetes/lab1.html), with an important edit.
-
-Under `spec.template.spec.domain.devices.interfaces` instead of the default
-network interface having a `bridge` type, this must be a `masquerade` type in
-order to allow migration within minikube. A new YAML of `testvm` is provided
-below.
+Next, create a VM. This lab uses the ["testvm"](/labs/manifests/vm.yaml) from [lab1](/labs/kubernetes/lab1.html).
 
 ```bash
-{% include scriptlets/migration/02_create_testvm_masq.sh -%}
+{% include scriptlets/lab1/02_create_testvm.sh -%}
+{% include scriptlets/lab1/04_start_testvm.sh -%}
 ```
 
 In a multi-node environment, it is helpful to know on which node a pod is running.

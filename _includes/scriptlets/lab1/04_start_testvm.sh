@@ -1,1 +1,1 @@
-./virtctl start testvm
+virtctl start testvm

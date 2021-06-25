@@ -1,1 +1,1 @@
-./virtctl console testvm
+virtctl console testvm
