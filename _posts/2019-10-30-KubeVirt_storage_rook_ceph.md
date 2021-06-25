@@ -23,7 +23,7 @@ Quoting [Wikipedia](<https://en.wikipedia.org/wiki/Persistence_(computer_science
 > Programs have to transfer data to and from storage devices and have to provide mappings from the
 > native programming-language data structures to the storage device data structures.
 
-In this post, we are going to show how to set up a persistence system to store VM images with the help of [Ceph](https://ceph.io) and the automation of [Rook](https://rook.io).
+In this post, we are going to show how to set up a persistence system to store VM images with the help of [Ceph](https://ceph.io/en/) and the automation of [Rook](https://rook.io).
 
 ## Pre-requisites
 
@@ -718,7 +718,7 @@ sh-4.2# ceph status                                                             
 
 - [Kubernetes getting started](https://kubernetes.io/docs/setup/)
 - [KubeVirt Containerized Data Importer](https://github.com/kubevirt/containerized-data-importer)
-- [Ceph: free-software storage platform](https://ceph.io)
+- [Ceph: free-software storage platform](https://ceph.io/en/)
 - [Ceph hardware recommendations](https://docs.ceph.com/en/latest/start/hardware-recommendations/)
 - [Rook: Open-Source,Cloud-Native Storage for Kubernetes](https://rook.io/)
 - [KubeVirt User Guide](https://kubevirt.io/user-guide)
