@@ -92,7 +92,7 @@ pod/virt-handler-1b4n3z4674b9-sf1rl condition met
 And proceed with the VM creation:
 
 ```sh
-$ kubectl apply -f https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+$ kubectl apply -f https://kubevirt.io/labs/manifests/vm.yaml
 virtualmachine.kubevirt.io/testvm created
 ```
 
@@ -109,7 +109,7 @@ Notice from the output that the VM is not running yet.
 To start a VM, `virtctl`~~~` should be used:
 
 ```sh
-$ ./virtctl start testvm
+$ virtctl start testvm
 VM testvm was scheduled to start
 ```
 
@@ -220,7 +220,7 @@ $ echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.sp
 Shutting down a VM works by either using `virtctl` or editing the VM.
 
 ```sh
-$ ./virtctl stop testvm
+$ virtctl stop testvm
 VM testvm was scheduled to stop
 ```
 

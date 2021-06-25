@@ -1,1 +1,1 @@
-./virtctl stop testvm
+virtctl stop testvm
