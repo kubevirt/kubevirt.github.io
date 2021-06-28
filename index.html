@@ -30,12 +30,44 @@ layout: homepage
 
 <section class="kv-recent-posts">
   <h2>Recent posts</h2>
-  {% for post in site.posts limit:5 %}
+  {% for post in site.posts limit:7 %}
   <article class="kv-blog__snippet">
     <a href="{{ post.url }}" class="kv-blog__snippet__link">
       <h4 class="">{{ post.title }}</h4>
       <time datetime="1999-12-23" class="">{{ post.date | date: "%a, %-d/%m/%y" }}</time>
   </a>
   </article>
-{% endfor %}
+  {% endfor %}
+</section>
+
+<br>
+
+<section class="kv-endusers">
+    <h2 class="kv-what__title">End Users</h2>
+    <p>
+    {% for enduser in site.data.adopters.adopters.endusers %}
+    <a href="{{ enduser.url }}" class="kv-endusers" data-toggle="tooltip" data-placement="top" title="{{ enduser.name }}">
+    <img src="./../assets/images/adopters/{{ enduser.logo }}" alt="{{ enduser.name }}">
+    </a>
+    {% endfor %}</p>
+</section>
+
+<section class="kv-vendors">
+    <h2 class="kv-what__title">Vendors</h2>
+    <p>
+    {% for vendors in site.data.adopters.adopters.vendors %}
+    <a href="{{ vendors.url }}" class="kv-vendors" data-toggle="tooltip" data-placement="top" title="{{ vendors.name }}">
+    <img src="./../assets/images/adopters/{{ vendors.logo }}" alt="{{ vendors.name }}">
+    </a>
+    {% endfor %}</p>
+</section>
+
+<section class="kv-integrations">
+    <h2 class="kv-what__title">Integrations</h2>
+    <p>
+    {% for integrations in site.data.adopters.adopters.integrations %}
+    <a href="{{ integrations.url }}" class="kv-integrations" data-toggle="tooltip" data-placement="top" title="{{ integrations.name }}">
+    <img src="./../assets/images/adopters/{{ integrations.logo }}" alt="{{ integrations.name }}">
+    </a>
+    {% endfor %}</p>
 </section>

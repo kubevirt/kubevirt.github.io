@@ -1,0 +1,49 @@
+adopters:
+  endusers:
+    # - name: CLOUDFLARE
+    #   logo: CLOUDFLARE.png
+    #   url: https://www.cloudflare.com
+    - name: CIVO
+      logo: CIVO.png
+      url: https://www.civo.com
+    - name: CoreWeave
+      logo: CoreWeave.png
+      url: https://www.coreweave.com
+    - name: NVIDIA
+      logo: NVIDIA.jpg
+      url: https://www.nvidia.com
+  vendors:
+    - name: EQUINIX
+      logo: EQUINIX.png
+      url: https://metal.equinix.com
+    # - name: H3C
+    #   logo: H3C.png
+    #   url: https://www.h3c.com/en
+    - name: KUBERMATIC
+      logo: KUBERMATIC.png
+      url: https://www.kubermatic.com
+    - name: PLATFORM9
+      logo: PLATFORM9.png
+      url: https://www.PLATFORM9.com
+    # - name: RANCHER
+    #   logo: RANCHER.png
+    #   url: https://rancher.com
+    - name: Red Hat, Inc.
+      logo: 'Red Hat.png'
+      url: https://www.redhat.com
+    # - name: STACKPATH
+    #   logo: STACKPATH.png
+    #   url: https://www.stackpath.com
+    - name: SUSE
+      logo: SUSE.png
+      url: https://www.suse.com
+  integrations:
+    - name: minikube
+      logo: minikube.png
+      url: https://minikube.sigs.k8s.io
+    - name: oVirt
+      logo: oVirt.png
+      url: https://www.ovirt.org
+    - name: okd
+      logo: okd.png
+      url: https://www.okd.io
