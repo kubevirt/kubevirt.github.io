@@ -60,18 +60,18 @@ git checkout master; git fetch upstream; git reset --hard upstream/master; git p
 *Note* Master branch is purely cosmetic for this repo. Merges to master **ARE NOT ACCEPTED**.
 
 
-All work must be branched from `source` branch at this time. Perform the following to sync from upstream ...
+All work must be branched from `maaster` branch. Perform the following to sync from upstream ...
 
 ```bash
-git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f
+git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f
 ```
 
 #### Feature branch
 
-Even though changes from a local `source` branch are accepted it is inadvisable, can cause confusion and possibly data loss. Please use feature branches branched from `source` by running the following ...
+Even though changes from a local `master` branch are accepted it is inadvisable, can cause confusion and possibly data loss. Please use feature branches branched from `master` by running the following ...
 
 ```bash
-git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git branch feat_branch; git checkout feat_branch; git push --set-upstream origin feat_branch
+git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f; git branch feat_branch; git checkout feat_branch; git push --set-upstream origin feat_branch
 ```
 
 #### Rebase
@@ -79,7 +79,7 @@ git checkout source; git fetch upstream; git reset --hard upstream/source; git p
 Periodically a feature branch will need to be rebased as the local and origin fall behind upstream. Perform the following to rebase ...
 
 ```bash
-git checkout source; git fetch upstream; git reset --hard upstream/source; git push origin source -f; git checkout feat_branch; git rebase origin/source; git push -f
+git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f; git checkout feat_branch; git rebase origin/master; git push -f
 ```
 
 There is always a strong possibility for merge conflicts. Proceed with caution in resolving. Each conflict must be hand edited. Perform the following to resolve each conflict ...
@@ -165,7 +165,7 @@ git commit -s -m "The commit message" file1 file 2 file3 ...
 You will see the following in the transaction log
 ```bash
 git log
-commit hashbrowns (HEAD -> feat_branch, upstream/source, origin/source, source)
+commit hashbrowns (HEAD -> feat_branch, upstream/master, origin/master, master)
 Author: KubeVirt contributer <kubevirt_contributer@kubevirt.io>
 Date:   Mon Jan 01 00:00:00 2021 -0700
 
@@ -178,7 +178,7 @@ Signed-off-by: <your configured git identity>
 
 3) Often you will see a `Compare & Pull Request` button ... Click on that
 
-4) Ensure your base branch is `source`, your compare branch is `feat_branch`, and the file diff's are correct.
+4) Ensure your base branch is `master`, your compare branch is `feat_branch`, and the file diff's are correct.
 
 5) Create a nice subject and body for the pull request. Be sure to tag related issues, people of interest, and click the "Create pull request" button.
 
