@@ -1,12 +1,15 @@
 .kv-homepage-grid {
-  padding: 4rem 1rem 0 1rem;
+  padding: 5rem 5rem 0 5rem;
   @media (min-width: 900px) {
     display: grid;
-    gap: 4rem;
+    gap: 5rem;
     grid-template-columns: 3fr 1fr;
-    grid-template-areas: 
+    grid-template-areas:
     "why posts"
-    "what posts";  
+    "what posts"
+    "endusers endusers"
+    "vendors vendors"
+    "integrations integrations";
   }
 }
 
@@ -18,7 +21,7 @@
   grid-area: what;
   @media (min-width: 700px) {
     display: grid;
-    gap: 2rem;
+    gap: 5rem;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: min-content min-content min-content;
     grid-template-areas:
@@ -55,13 +58,12 @@
       }
     }
   }
-
-&__img, &__text {
-  margin: .5rem auto;
-  display: block;
-  text-align: center;
-  max-width: 75vw;
-}
+  &__img, &__text {
+    margin: .5rem auto;
+    display: block;
+    text-align: center;
+    max-width: 75vw;
+  }
 }
 
 .kv-recent-posts {
@@ -69,6 +71,27 @@
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
+}
+
+.kv-endusers {
+  grid-area: endusers;
+  padding: 5rem;
+  text-align: center;
+  img { width: 200px; margin: 2rem; }
+}
+
+.kv-vendors {
+  grid-area: vendors;
+  padding: 5rem;
+  text-align: center;
+  img { width: 200px; margin: 2rem; }
+}
+
+.kv-integrations {
+  grid-area: integrations;
+  padding: 5rem;
+  text-align: center;
+  img { width: 200px; margin: 2rem; }
 }
 
 .kv-blog__snippet {
@@ -94,7 +117,6 @@
   }
 }
 
-
 .row-community {
   &-title {
     min-height: 10vh;
@@ -113,6 +135,7 @@
     }
   }
 }
+
 .page-title {
   padding-top: 60px;
   margin-bottom: 40px;
@@ -121,15 +144,19 @@
     padding-left: 15px;
   }
 }
+
 .page-subtitle--spacer_top {
   margin-top: 60px;
 }
+
 .page-subtitle--spacer_bottom {
   margin-bottom: 40px;
 }
+
 .page-paragraph--spacer_bottom {
   margin-bottom: 60px;
 }
+
 .pagination {
   margin: 0 auto;
   .btn.btn-outline-light {
@@ -141,6 +168,7 @@
     }
   }
 }
+
 .community-page {
   .page-title {
     margin-bottom: 0;
@@ -150,12 +178,14 @@
     }
   }
 }
+
 .doc-intro-text {
   max-width: 85%;
   height: 7.8rem;
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .kubevirt-can-do {
   .card {
     border: none;
