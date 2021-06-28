@@ -54,6 +54,7 @@ elif [[ $TARGET =~ sig-network ]]; then
   fi
 elif [[ $TARGET =~ sig-storage ]]; then
   export KUBEVIRT_PROVIDER=${TARGET/-sig-storage/}
+  export KUBEVIRT_STORAGE="rook-ceph-default"
 elif [[ $TARGET =~ sig-compute ]]; then
   export KUBEVIRT_PROVIDER=${TARGET/-sig-compute/}
 else
@@ -160,7 +161,7 @@ if [[ $TARGET =~ windows.* ]]; then
   safe_download "$WINDOWS_LOCK_PATH" "$win_image_url" "$win_image" || exit 1
 fi
 
-kubectl() { cluster-up/kubectl.sh "$@"; }
+kubectl() { KUBEVIRTCI_VERBOSE=false cluster-up/kubectl.sh "$@"; }
 cli() { cluster-up/cli.sh "$@"; }
 
 collect_debug_logs() {
@@ -225,8 +226,6 @@ echo "Nodes are ready:"
 kubectl get nodes
 
 make cluster-sync
-
-hack/dockerized bazel shutdown
 
 # OpenShift is running important containers under default namespace
 namespaces=(kubevirt default)
@@ -312,7 +311,7 @@ if [[ -z ${KUBEVIRT_E2E_FOCUS} && -z ${KUBEVIRT_E2E_SKIP} ]]; then
   elif [[ $TARGET =~ sig-network ]]; then
     export KUBEVIRT_E2E_FOCUS="\\[sig-network\\]"
   elif [[ $TARGET =~ sig-storage ]]; then
-    export KUBEVIRT_E2E_FOCUS="\\[sig-storage\\]"
+    export KUBEVIRT_E2E_FOCUS="\\[sig-storage\\]|\\[rook-ceph\\]"
   elif [[ $TARGET =~ sig-compute ]]; then
     export KUBEVIRT_E2E_FOCUS="\\[sig-compute\\]"
     export KUBEVIRT_E2E_SKIP="GPU"
@@ -326,8 +325,10 @@ if [[ -z ${KUBEVIRT_E2E_FOCUS} && -z ${KUBEVIRT_E2E_SKIP} ]]; then
     export KUBEVIRT_E2E_SKIP="Multus|SRIOV|GPU|Macvtap"
   fi
 
-  if [[ "$KUBEVIRT_STORAGE" == "rook-ceph" || "$KUBEVIRT_STORAGE" == "rook-ceph-default" ]]; then
-    export KUBEVIRT_E2E_FOCUS=rook-ceph
+  if ! [[ $TARGET =~ sig-storage ]]; then
+    if [[ "$KUBEVIRT_STORAGE" == "rook-ceph" || "$KUBEVIRT_STORAGE" == "rook-ceph-default" ]]; then
+        export KUBEVIRT_E2E_FOCUS=rook-ceph
+    fi
   fi
 fi
 

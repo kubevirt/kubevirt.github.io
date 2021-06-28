@@ -40,7 +40,8 @@ import (
 
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
-	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/network"
+	"kubevirt.io/kubevirt/pkg/network/consts"
+	"kubevirt.io/kubevirt/pkg/network/infraconfigurators"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
 	"kubevirt.io/kubevirt/tests/libnet"
@@ -48,14 +49,13 @@ import (
 )
 
 const (
-	istioInjectSidecarAnnotation = "sidecar.istio.io/inject"
-	istioDeployedEnvVariable     = "KUBEVIRT_DEPLOY_ISTIO"
-	vmiAppSelector               = "istio-vmi-app"
-	svcDeclaredTestPort          = 1500
-	svcUndeclaredTestPort        = 1501
+	istioDeployedEnvVariable = "KUBEVIRT_DEPLOY_ISTIO"
+	vmiAppSelector           = "istio-vmi-app"
+	svcDeclaredTestPort      = 1500
+	svcUndeclaredTestPort    = 1501
 	// Istio uses certain ports for it's own purposes, this port server to verify that traffic is not routed
 	// into the VMI for these ports. https://istio.io/latest/docs/ops/deployment/requirements/
-	istioRestrictedPort = network.EnvoyTunnelPort
+	istioRestrictedPort = infraconfigurators.EnvoyTunnelPort
 )
 
 var _ = SIGDescribe("[Serial] Istio", func() {
@@ -124,6 +124,50 @@ var _ = SIGDescribe("[Serial] Istio", func() {
 
 			By("Waiting for VMI to be ready")
 			tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
+		})
+		Describe("Live Migration", func() {
+			var (
+				sourcePodName string
+			)
+			migrationCompleted := func(migration *v1.VirtualMachineInstanceMigration) error {
+				migration, err := virtClient.VirtualMachineInstanceMigration(migration.Namespace).Get(migration.Name, &metav1.GetOptions{})
+				if err != nil {
+					return err
+				}
+				if migration.Status.Phase == v1.MigrationSucceeded {
+					return nil
+				}
+				return fmt.Errorf("migration is in phase %s", migration.Status.Phase)
+			}
+			allContainersCompleted := func(podName string) error {
+				pod, err := virtClient.CoreV1().Pods(vmi.Namespace).Get(context.TODO(), podName, metav1.GetOptions{})
+				if err != nil {
+					return err
+				}
+				for _, containerStatus := range pod.Status.ContainerStatuses {
+					if containerStatus.State.Terminated == nil {
+						return fmt.Errorf("container %s is not terminated, state: %s", containerStatus.Name, containerStatus.State.String())
+					}
+				}
+				return nil
+			}
+			BeforeEach(func() {
+				tests.SkipIfMigrationIsNotPossible()
+			})
+			JustBeforeEach(func() {
+				sourcePodName = tests.GetVmPodName(virtClient, vmi)
+				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				Expect(err).NotTo(HaveOccurred())
+				Eventually(func() error {
+					return migrationCompleted(migration)
+				}, tests.MigrationWaitTime, time.Second).Should(Succeed(), fmt.Sprintf(" migration should succeed"))
+			})
+			It("All containers should complete in source virt-launcher pod after migration", func() {
+				Eventually(func() error {
+					return allContainersCompleted(sourcePodName)
+				}, tests.ContainerCompletionWaitTime, time.Second).Should(Succeed(), fmt.Sprintf("all containers should complete in source virt-launcher pod"))
+			})
 		})
 		Describe("Inbound traffic", func() {
 			checkVMIReachability := func(vmi *v1.VirtualMachineInstance, targetPort int) error {
@@ -330,10 +374,8 @@ func newVMIWithIstioSidecar(ports []v1.Port) *v1.VirtualMachineInstance {
 		libvmi.WithNetwork(v1.DefaultPodNetwork()),
 		libvmi.WithInterface(libvmi.InterfaceDeviceWithMasqueradeBinding(ports...)),
 		libvmi.WithLabel("app", vmiAppSelector),
-		libvmi.WithAnnotation(istioInjectSidecarAnnotation, "true"),
+		libvmi.WithAnnotation(consts.ISTIO_INJECT_ANNOTATION, "true"),
 	)
-	// Istio-proxy requires service account token to be mounted
-	tests.AddServiceAccountDisk(vmi, "default")
 	return vmi
 }
 

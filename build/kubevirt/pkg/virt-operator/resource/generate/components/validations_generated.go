@@ -538,6 +538,14 @@ var CRDsValidation map[string]string = map[string]string{
                   type: object
                 memoryOvercommit:
                   type: integer
+                minimumClusterTSCFrequency:
+                  description: Allow overriding the automatically determined minimum
+                    TSC frequency of the cluster and fixate the minimum to this frequency.
+                  format: int64
+                  type: integer
+                minimumReservePVCBytes:
+                  format: int64
+                  type: integer
                 nodeSelectors:
                   additionalProperties:
                     type: string
@@ -576,6 +584,8 @@ var CRDsValidation map[string]string = map[string]string{
                 completionTimeoutPerGiB:
                   format: int64
                   type: integer
+                disableTLS:
+                  type: boolean
                 nodeDrainTaintKey:
                   type: string
                 parallelMigrationsPerCluster:
@@ -635,10 +645,19 @@ var CRDsValidation map[string]string = map[string]string{
                       for passthrough
                     properties:
                       externalResourceProvider:
+                        description: If true, KubeVirt will leave the allocation and
+                          monitoring to an external device plugin
                         type: boolean
                       pciVendorSelector:
+                        description: The vendor_id:product_id tupple of the PCI device
                         type: string
                       resourceName:
+                        description: The name of the resource that is representing
+                          the device. Exposed by a device plugin and requested by
+                          VMs. Typically of the form vendor.com/product_nameThe name
+                          of the resource that is representing the device. Exposed
+                          by a device plugin and requested by VMs. Typically of the
+                          form vendor.com/product_name
                         type: string
                     required:
                     - pciVendorSelector
@@ -7719,6 +7738,10 @@ var CRDsValidation map[string]string = map[string]string{
             meant to be used by KubeVirt core components only and can't be set or
             modified by users.
           type: string
+        fsFreezeStatus:
+          description: FSFreezeStatus is the state of the fs of the guest it can be
+            either frozen or thawed
+          type: string
         guestOSInfo:
           description: Guest OS Information
           properties:
@@ -7845,6 +7868,26 @@ var CRDsValidation map[string]string = map[string]string{
             world. It is not the VirtualMachineInstance status, but partially correlates
             to it.
           type: string
+        phaseTransitionTimestamps:
+          description: PhaseTransitionTimestamp is the timestamp of when the last
+            phase change occurred
+          items:
+            description: VirtualMachineInstancePhaseTransitionTimestamp gives a timestamp
+              in relation to when a phase is set on a vmi
+            properties:
+              phase:
+                description: Phase is the status of the VirtualMachineInstance in
+                  kubernetes world. It is not the VirtualMachineInstance status, but
+                  partially correlates to it.
+                type: string
+              phaseTransitionTimestamp:
+                description: PhaseTransitionTimestamp is the timestamp of when the
+                  phase change occurred
+                format: date-time
+                type: string
+            type: object
+          type: array
+          x-kubernetes-list-type: atomic
         qosClass:
           description: 'The Quality of Service (QOS) classification assigned to the
             virtual machine instance based on resource requirements See PodQOSClass
@@ -7854,6 +7897,12 @@ var CRDsValidation map[string]string = map[string]string{
           description: A brief CamelCase message indicating details about why the
             VMI is in this state. e.g. 'NodeUnresponsive'
           type: string
+        topologyHints:
+          properties:
+            tscFrequency:
+              format: int64
+              type: integer
+          type: object
         volumeStatus:
           description: VolumeStatus contains the statuses of all the volumes
           items:

@@ -186,6 +186,7 @@ func defaultClusterConfig() *v1.KubeVirtConfiguration {
 			UseEmulation:           DefaultUseEmulation,
 			MemoryOvercommit:       DefaultMemoryOvercommit,
 			LessPVCSpaceToleration: DefaultLessPVCSpaceToleration,
+			MinimumReservePVCBytes: DefaultMinimumReservePVCBytes,
 			NodeSelectors:          nodeSelectorsDefault,
 			CPUAllocationRatio:     DefaultCPUAllocationRatio,
 			LogVerbosity: &v1.LogVerbosity{
@@ -256,6 +257,7 @@ type migrationConfiguration struct {
 	ProgressTimeout                   *int64             `json:"progressTimeout,string,omitempty"`
 	UnsafeMigrationOverride           *bool              `json:"unsafeMigrationOverride,string,omitempty"`
 	AllowPostCopy                     *bool              `json:"allowPostCopy,string,omitempty"`
+	DisableTLS                        *bool              `json:"disableTLS,omitempty"`
 }
 
 // setConfigFromConfigMap parses the provided config map and updates the provided config.

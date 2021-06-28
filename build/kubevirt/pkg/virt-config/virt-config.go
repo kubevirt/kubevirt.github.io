@@ -49,6 +49,7 @@ const (
 	DefaultPPC64LEEmulatedMachines                  = "pseries*"
 	DefaultAARCH64EmulatedMachines                  = "virt*"
 	DefaultLessPVCSpaceToleration                   = 10
+	DefaultMinimumReservePVCBytes                   = 131072
 	DefaultNodeSelectors                            = ""
 	DefaultNetworkInterface                         = "bridge"
 	DefaultImagePullPolicy                          = k8sv1.PullIfNotPresent
@@ -163,6 +164,10 @@ func (c *ClusterConfig) GetLessPVCSpaceToleration() int {
 	return c.GetConfig().DeveloperConfiguration.LessPVCSpaceToleration
 }
 
+func (c *ClusterConfig) GetMinimumReservePVCBytes() uint64 {
+	return c.GetConfig().DeveloperConfiguration.MinimumReservePVCBytes
+}
+
 func (c *ClusterConfig) GetNodeSelectors() map[string]string {
 	return c.GetConfig().DeveloperConfiguration.NodeSelectors
 }
@@ -201,6 +206,10 @@ func (c *ClusterConfig) GetOVMFPath() string {
 
 func (c *ClusterConfig) GetCPUAllocationRatio() int {
 	return c.GetConfig().DeveloperConfiguration.CPUAllocationRatio
+}
+
+func (c *ClusterConfig) GetMinimumClusterTSCFrequency() *int64 {
+	return c.GetConfig().DeveloperConfiguration.MinimumClusterTSCFrequency
 }
 
 func (c *ClusterConfig) GetPermittedHostDevices() *v1.PermittedHostDevices {

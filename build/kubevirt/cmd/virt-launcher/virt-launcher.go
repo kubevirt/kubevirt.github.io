@@ -22,6 +22,7 @@ package main
 import (
 	goflag "flag"
 	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
 	"os/signal"
@@ -47,6 +48,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/hooks"
 	hotplugdisk "kubevirt.io/kubevirt/pkg/hotplug-disk"
 	"kubevirt.io/kubevirt/pkg/ignition"
+	"kubevirt.io/kubevirt/pkg/network/infraconfigurators"
 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
 	virtlauncher "kubevirt.io/kubevirt/pkg/virt-launcher"
 	notifyclient "kubevirt.io/kubevirt/pkg/virt-launcher/notify-client"
@@ -130,6 +132,7 @@ func startDomainEventMonitoring(
 	qemuAgentFileInterval time.Duration,
 	qemuAgentUserInterval time.Duration,
 	qemuAgentVersionInterval time.Duration,
+	qemuAgentFSFreezeStatusInterval time.Duration,
 ) {
 	go func() {
 		for {
@@ -140,7 +143,7 @@ func startDomainEventMonitoring(
 		}
 	}()
 
-	err := notifier.StartDomainNotifier(domainConn, deleteNotificationSent, vmi, domainName, agentStore, qemuAgentSysInterval, qemuAgentFileInterval, qemuAgentUserInterval, qemuAgentVersionInterval)
+	err := notifier.StartDomainNotifier(domainConn, deleteNotificationSent, vmi, domainName, agentStore, qemuAgentSysInterval, qemuAgentFileInterval, qemuAgentUserInterval, qemuAgentVersionInterval, qemuAgentFSFreezeStatusInterval)
 	if err != nil {
 		panic(err)
 	}
@@ -338,11 +341,13 @@ func main() {
 	hookSidecars := pflag.Uint("hook-sidecars", 0, "Number of requested hook sidecars, virt-launcher will wait for all of them to become available")
 	noFork := pflag.Bool("no-fork", false, "Fork and let virt-launcher watch itself to react to crashes if set to false")
 	lessPVCSpaceToleration := pflag.Int("less-pvc-space-toleration", 0, "Toleration in percent when PVs' available space is smaller than requested")
+	minimumPVCReserveBytes := pflag.Uint64("minimum-pvc-reserve-bytes", 131072, "Minimum reserve to keep empty on PVC during auto-provision of disk.img")
 	ovmfPath := pflag.String("ovmf-path", "/usr/share/OVMF", "The directory that contains the EFI roms (like OVMF_CODE.fd)")
 	qemuAgentSysInterval := pflag.Duration("qemu-agent-sys-interval", 120, "Interval in seconds between consecutive qemu agent calls for sys commands")
 	qemuAgentFileInterval := pflag.Duration("qemu-agent-file-interval", 300, "Interval in seconds between consecutive qemu agent calls for file command")
 	qemuAgentUserInterval := pflag.Duration("qemu-agent-user-interval", 10, "Interval in seconds between consecutive qemu agent calls for user command")
 	qemuAgentVersionInterval := pflag.Duration("qemu-agent-version-interval", 300, "Interval in seconds between consecutive qemu agent calls for version command")
+	qemuAgentFSFreezeStatusInterval := pflag.Duration("qemu-fsfreeze-status-interval", 5, "Interval in seconds between consecutive qemu agent calls for fsfreeze status command")
 	// set new default verbosity, was set to 0 by glog
 	goflag.Set("v", "2")
 
@@ -406,7 +411,7 @@ func main() {
 	notifier := notifyclient.NewNotifier(*virtShareDir)
 	defer notifier.Close()
 
-	domainManager, err := virtwrap.NewLibvirtDomainManager(domainConn, *virtShareDir, notifier, *lessPVCSpaceToleration, &agentStore, *ovmfPath, ephemeralDiskCreator)
+	domainManager, err := virtwrap.NewLibvirtDomainManager(domainConn, *virtShareDir, notifier, *lessPVCSpaceToleration, *minimumPVCReserveBytes, &agentStore, *ovmfPath, ephemeralDiskCreator)
 	if err != nil {
 		panic(err)
 	}
@@ -446,7 +451,7 @@ func main() {
 
 	events := make(chan watch.Event, 2)
 	// Send domain notifications to virt-handler
-	startDomainEventMonitoring(notifier, *virtShareDir, domainConn, events, vmi, domainName, &agentStore, *qemuAgentSysInterval, *qemuAgentFileInterval, *qemuAgentUserInterval, *qemuAgentVersionInterval)
+	startDomainEventMonitoring(notifier, *virtShareDir, domainConn, events, vmi, domainName, &agentStore, *qemuAgentSysInterval, *qemuAgentFileInterval, *qemuAgentUserInterval, *qemuAgentVersionInterval, *qemuAgentFSFreezeStatusInterval)
 
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt,
@@ -495,6 +500,7 @@ func main() {
 // in case of virt-launcher crashes
 func ForkAndMonitor(containerDiskDir string) (int, error) {
 	defer cleanupContainerDiskDirectory(containerDiskDir)
+	defer terminateIstioProxy()
 	cmd := exec.Command(os.Args[0], append(os.Args[1:], "--no-fork", "true")...)
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
@@ -600,4 +606,24 @@ func RemoveContents(dir string) error {
 		}
 	}
 	return nil
+}
+
+func terminateIstioProxy() {
+	if istioProxyPresent() {
+		resp, err := http.Post(fmt.Sprintf("http://localhost:%d/quitquitquit", infraconfigurators.EnvoyMergedPrometheusTelemetryPort), "", nil)
+		if err != nil || resp.StatusCode != http.StatusOK {
+			log.Log.Error("Failed to request Istio proxy termination")
+		}
+	}
+}
+
+func istioProxyPresent() bool {
+	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/healthz/ready", infraconfigurators.EnvoyHealthCheckPort))
+	if err != nil {
+		return false
+	}
+	if resp.Header.Get("server") == "envoy" {
+		return true
+	}
+	return false
 }

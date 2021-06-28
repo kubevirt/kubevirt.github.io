@@ -10,13 +10,16 @@ all:
 	    hack/bazel-fmt.sh && hack/bazel-build.sh"
 
 go-all:
-	hack/dockerized "KUBEVIRT_VERSION=${KUBEVIRT_VERSION} ./hack/build-go.sh install ${WHAT} && ./hack/build-copy-artifacts.sh ${WHAT} && DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} IMAGE_PULL_POLICY=${IMAGE_PULL_POLICY} VERBOSITY=${VERBOSITY} ./hack/build-manifests.sh"
+	hack/dockerized "KUBEVIRT_VERSION=${KUBEVIRT_VERSION} ./hack/build-go.sh install ${WHAT} && ./hack/build-copy-artifacts.sh ${WHAT} && DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} IMAGE_PULL_POLICY=${IMAGE_PULL_POLICY} VERBOSITY=${VERBOSITY} GO_BUILD=true ./hack/build-manifests.sh"
 
 bazel-generate:
 	SYNC_VENDOR=true hack/dockerized "./hack/bazel-generate.sh"
 
 bazel-build:
 	hack/dockerized "export BUILD_ARCH=${BUILD_ARCH} && hack/bazel-fmt.sh && hack/bazel-build.sh"
+
+bazel-build-image-bundle:
+	hack/dockerized "export BUILD_ARCH=${BUILD_ARCH} && hack/bazel-fmt.sh && DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} IMAGE_PREFIX=${IMAGE_PREFIX} hack/bazel-build-image-bundle.sh"
 
 bazel-build-verify: bazel-build
 	./hack/dockerized "hack/bazel-fmt.sh"
@@ -34,6 +37,9 @@ push: bazel-push-images
 
 bazel-test:
 	hack/dockerized "hack/bazel-fmt.sh && CI=${CI} ARTIFACTS=${ARTIFACTS} hack/bazel-test.sh"
+
+gen-proto:
+	hack/dockerized "DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} IMAGE_PULL_POLICY=${IMAGE_PULL_POLICY} VERBOSITY=${VERBOSITY} ./hack/gen-proto.sh"
 
 generate:
 	hack/dockerized "DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} IMAGE_PULL_POLICY=${IMAGE_PULL_POLICY} VERBOSITY=${VERBOSITY} ./hack/generate.sh"
@@ -93,6 +99,10 @@ clean:
 distclean: clean
 	hack/dockerized "rm -rf vendor/ && rm -f go.sum && GO111MODULE=on go clean -modcache"
 	rm -rf vendor/
+
+cluster-patch:
+	hack/dockerized "export BUILD_ARCH=${BUILD_ARCH} && hack/bazel-fmt.sh && DOCKER_PREFIX=${DOCKER_PREFIX} DOCKER_TAG=${DOCKER_TAG} DOCKER_TAG_ALT=${DOCKER_TAG_ALT} IMAGE_PREFIX=${IMAGE_PREFIX} IMAGE_PREFIX_ALT=${IMAGE_PREFIX_ALT} KUBEVIRT_PROVIDER=${KUBEVIRT_PROVIDER} PUSH_TARGETS='virt-api virt-controller virt-handler virt-launcher' ./hack/bazel-push-images.sh"
+	hack/cluster-patch.sh
 
 deps-update-patch:
 	SYNC_VENDOR=true hack/dockerized " ./hack/dep-update.sh -- -u=patch && ./hack/dep-prune.sh && ./hack/bazel-generate.sh"
@@ -174,6 +184,7 @@ bump-kubevirtci:
 	go-all \
 	bazel-generate \
 	bazel-build \
+	bazel-build-image-bundle \
 	bazel-build-images \
 	bazel-push-images \
 	bazel-test \

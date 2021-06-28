@@ -44,7 +44,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-06-14 18:15:22 +0000" >
+    <meta property="og:article:published_time" content="2021-06-28 19:23:34 +0000" >
     <meta name="twitter:title" content="Use KubeVirt | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -311,6 +311,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                 
               </li>
             
+              <!-- <h3 class="labs-title">
+                <a href="/labs/kubernetes/migration.html"  class="labs-title--item" >Live Migration</a>
+              </h3> -->
+              <li class="blogs-navigation--item">
+                <a href="/labs/kubernetes/migration.html"  class="blogs-navigation--item_link" >
+                  Live Migration
+                </a>
+                
+              </li>
+            
           </ul>
           
         
@@ -414,6 +424,10 @@ autocomplete(document.getElementById("search-input"), mykeywords);
                         <a href="/labs/kubernetes/lab3.html"  class="labs-title--item" >KubeVirt Upgrades</a>
                       </h3>
                     
+                      <h3 class="labs-title">
+                        <a href="/labs/kubernetes/migration.html"  class="labs-title--item" >Live Migration</a>
+                      </h3>
+                    
                   
                 
               
@@ -431,13 +445,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Download the VM manifest and explore it. Note it uses a <a href="https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk">container disk</a> and as such doesn’t persist data. Such container disks currently exist for alpine, cirros and fedora.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://kubevirt.io/labs/manifests/vm.yaml
 less vm.yaml
 </code></pre></div></div>
 
 <p>Apply the manifest to Kubernetes.</p>
 
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://kubevirt.io/labs/manifests/vm.yaml
 virtualmachine.kubevirt.io <span class="s2">"testvm"</span> created
   virtualmachineinstancepreset.kubevirt.io <span class="s2">"small"</span> created
 </code></pre></div></div>
@@ -452,7 +466,7 @@ kubectl get vms -o yaml testvm
 
 <p>To start a Virtual Machine you can use:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl start testvm
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl start testvm
 </code></pre></div></div>
 
 <p>If you installed virtctl via krew, you can use <code class="language-plaintext highlighter-rouge">kubectl virt</code>:</p>
@@ -485,7 +499,7 @@ kubectl get vmis -o yaml testvm
 
 <p>Connect to the serial console of the Cirros VM. Hit return / enter a few times and login with the displayed username and password.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl console testvm
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl console testvm
 </code></pre></div></div>
 
 <p>Disconnect from the virtual machine console by typing: <code class="language-plaintext highlighter-rouge">ctrl+]</code>.</p>
@@ -494,7 +508,7 @@ kubectl get vmis -o yaml testvm
 
 <p>To shut it down:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./virtctl stop testvm
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl stop testvm
 </code></pre></div></div>
 
 <p>To delete a Virtual Machine:</p>

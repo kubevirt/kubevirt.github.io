@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-06-14T18:15:22+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.42.0</title><link href="https://kubevirt.io//2021/changelog-v0.42.0.html" rel="alternate" type="text/html" title="KubeVirt v0.42.0" /><published>2021-06-08T00:00:00+00:00</published><updated>2021-06-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.42.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.42.0.html">&lt;h2 id=&quot;v0420&quot;&gt;v0.42.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-06-28T19:23:34+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.42.0</title><link href="https://kubevirt.io//2021/changelog-v0.42.0.html" rel="alternate" type="text/html" title="KubeVirt v0.42.0" /><published>2021-06-08T00:00:00+00:00</published><updated>2021-06-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.42.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.42.0.html">&lt;h2 id=&quot;v0420&quot;&gt;v0.42.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Tue Jun 8 12:09:49 2021 +0000&lt;/p&gt;
 
@@ -546,7 +546,7 @@ kubectl get vmi --watch
 
 &lt;p&gt;Once the install is complete you have a Windows 10 VM running with a GPU available. You can test that GPU acceleration is available by opening the Windows 10 task manager, selecting Advanced and then select the “Performance” tab. Note that the first time you start up, Windows is still detecting and installing the appropriate drivers. It may take a minute or two for the GPU information to show up in the Performance tab.&lt;/p&gt;
 
-&lt;p&gt;Try testing out the GPU acceleration. Open a web browser in your VM and navigate to “http://www.fishgl.com” HOWEVER don’t be surprised by the poor performance. The default kubevirt console does not take advantage of the GPU. For that we need to take one final step to use the Windows Remote Desktop Protocol (RDP) which can use the GPU.&lt;/p&gt;
+&lt;p&gt;Try testing out the GPU acceleration. Open a web browser in your VM and navigate to “https://webglsamples.org/fishtank/fishtank.html” HOWEVER don’t be surprised by the poor performance. The default kubevirt console does not take advantage of the GPU. For that we need to take one final step to use the Windows Remote Desktop Protocol (RDP) which can use the GPU.&lt;/p&gt;
 
 &lt;h2 id=&quot;using-the-gpu&quot;&gt;Using the GPU&lt;/h2&gt;
 
@@ -571,7 +571,7 @@ win10vm1-rdp   NodePort    10.105.159.184   &amp;lt;none&amp;gt;        3389:306
 
 &lt;p&gt;We can now use the rdesktop tool to connect to our VM and get the full advantages of the vGPU. From a command line run &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;rdesktop localhost:&amp;lt;port&amp;gt;&lt;/code&gt; being sure to update the port based on the output from above. When prompted by rdesktop accept the certificate. Log into your Windows 10 client. You can now test out the vGPU.&lt;/p&gt;
 
-&lt;p&gt;Let’s try FishGL again. Open a browser and go to &lt;a href=&quot;http://www.fishgl.com&quot;&gt;http://www.fishgl.com&lt;/a&gt;. You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
+&lt;p&gt;Let’s try FishGL again. Open a browser and go to &lt;a href=&quot;https://webglsamples.org/fishtank/fishtank.html&quot;&gt;https://webglsamples.org/fishtank/fishtank.html&lt;/a&gt;. You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
 &lt;br /&gt;&lt;/p&gt;
 
 &lt;div class=&quot;my-gallery&quot; itemscope=&quot;&quot; itemtype=&quot;http://schema.org/ImageGallery&quot;&gt;

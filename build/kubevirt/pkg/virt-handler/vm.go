@@ -1129,6 +1129,14 @@ func (d *VirtualMachineController) updateVMIStatus(origVMI *v1.VirtualMachineIns
 		condManager.RemoveCondition(vmi, v1.VirtualMachineInstancePaused)
 	}
 
+	if domain != nil && domain.Status.FSFreezeStatus.Status != "" {
+		if domain.Status.FSFreezeStatus.Status == api.FSThawed {
+			vmi.Status.FSFreezeStatus = ""
+		} else {
+			vmi.Status.FSFreezeStatus = domain.Status.FSFreezeStatus.Status
+		}
+	}
+
 	if _, ok := syncError.(*virtLauncherCriticalNetworkError); ok {
 		log.Log.Errorf("virt-launcher crashed due to a network error. Updating VMI %s status to Failed", vmi.Name)
 		vmi.Status.Phase = v1.Failed
@@ -1138,6 +1146,8 @@ func (d *VirtualMachineController) updateVMIStatus(origVMI *v1.VirtualMachineIns
 		vmi.Status.Phase = v1.Failed
 	}
 	condManager.CheckFailure(vmi, syncError, "Synchronizing with the Domain failed.")
+
+	controller.SetVMIPhaseTransitionTimestamp(origVMI, vmi)
 
 	if !reflect.DeepEqual(oldStatus, vmi.Status) {
 		_, err = d.clientset.VirtualMachineInstance(vmi.ObjectMeta.Namespace).Update(vmi)
@@ -1247,38 +1257,42 @@ func calculatePausedCondition(vmi *v1.VirtualMachineInstance, reason api.StateCh
 	}
 }
 
-func (d *VirtualMachineController) calculateLiveMigrationCondition(vmi *v1.VirtualMachineInstance, hasHotplug bool) (*v1.VirtualMachineInstanceCondition, bool) {
-	liveMigrationCondition := v1.VirtualMachineInstanceCondition{
-		Type:   v1.VirtualMachineInstanceIsMigratable,
-		Status: k8sv1.ConditionTrue,
+func newNonMigratableCondition(msg string, reason string) *v1.VirtualMachineInstanceCondition {
+	return &v1.VirtualMachineInstanceCondition{
+		Type:    v1.VirtualMachineInstanceIsMigratable,
+		Status:  k8sv1.ConditionFalse,
+		Message: msg,
+		Reason:  reason,
 	}
+}
+
+func (d *VirtualMachineController) calculateLiveMigrationCondition(vmi *v1.VirtualMachineInstance, hasHotplug bool) (*v1.VirtualMachineInstanceCondition, bool) {
 	isBlockMigration, err := d.checkVolumesForMigration(vmi)
 	if err != nil {
-		liveMigrationCondition.Status = k8sv1.ConditionFalse
-		liveMigrationCondition.Message = err.Error()
-		liveMigrationCondition.Reason = v1.VirtualMachineInstanceReasonDisksNotMigratable
-		return &liveMigrationCondition, isBlockMigration
+		return newNonMigratableCondition(err.Error(), v1.VirtualMachineInstanceReasonDisksNotMigratable), isBlockMigration
 	}
+
 	err = d.checkNetworkInterfacesForMigration(vmi)
 	if err != nil {
-		liveMigrationCondition = v1.VirtualMachineInstanceCondition{
-			Type:    v1.VirtualMachineInstanceIsMigratable,
-			Status:  k8sv1.ConditionFalse,
-			Message: err.Error(),
-			Reason:  v1.VirtualMachineInstanceReasonInterfaceNotMigratable,
-		}
-		return &liveMigrationCondition, isBlockMigration
+		return newNonMigratableCondition(err.Error(), v1.VirtualMachineInstanceReasonInterfaceNotMigratable), isBlockMigration
 	}
+
 	if hasHotplug {
-		liveMigrationCondition = v1.VirtualMachineInstanceCondition{
-			Type:    v1.VirtualMachineInstanceIsMigratable,
-			Status:  k8sv1.ConditionFalse,
-			Message: "VMI has hotplugged disks",
-			Reason:  v1.VirtualMachineInstanceReasonHotplugNotMigratable,
-		}
-		return &liveMigrationCondition, isBlockMigration
+		return newNonMigratableCondition("VMI has hotplugged disks", v1.VirtualMachineInstanceReasonHotplugNotMigratable), isBlockMigration
 	}
-	return &liveMigrationCondition, isBlockMigration
+
+	if err := d.isHostModelMigratable(vmi); err != nil {
+		return newNonMigratableCondition(err.Error(), v1.VirtualMachineInstanceReasonCPUModeNotMigratable), isBlockMigration
+	}
+
+	if util.IsVMIVirtiofsEnabled(vmi) {
+		return newNonMigratableCondition("VMI uses virtiofs", v1.VirtualMachineInstanceReasonVirtIOFSNotMigratable), isBlockMigration
+	}
+
+	return &v1.VirtualMachineInstanceCondition{
+		Type:   v1.VirtualMachineInstanceIsMigratable,
+		Status: k8sv1.ConditionTrue,
+	}, isBlockMigration
 }
 
 func (c *VirtualMachineController) Run(threadiness int, stopCh chan struct{}) {
@@ -2292,7 +2306,7 @@ func (d *VirtualMachineController) handleSourceMigrationProxy(vmi *v1.VirtualMac
 	return nil
 }
 
-func (d *VirtualMachineController) getLauncherClinetInfo(vmi *v1.VirtualMachineInstance) *launcherClientInfo {
+func (d *VirtualMachineController) getLauncherClientInfo(vmi *v1.VirtualMachineInstance) *launcherClientInfo {
 	d.launcherClientLock.Lock()
 	defer d.launcherClientLock.Unlock()
 	return d.launcherClients[vmi.UID]
@@ -2374,7 +2388,7 @@ func (d *VirtualMachineController) vmUpdateHelperMigrationTarget(origVMI *v1.Vir
 	}
 
 	// give containerDisks some time to become ready before throwing errors on retries
-	info := d.getLauncherClinetInfo(vmi)
+	info := d.getLauncherClientInfo(vmi)
 	if ready, err := d.containerDiskMounter.ContainerDisksReady(vmi, info.notInitializedSince); !ready {
 		if err != nil {
 			return err
@@ -2451,7 +2465,7 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 	if !vmi.IsRunning() && !vmi.IsFinal() {
 
 		// give containerDisks some time to become ready before throwing errors on retries
-		info := d.getLauncherClinetInfo(vmi)
+		info := d.getLauncherClientInfo(vmi)
 		if ready, err := d.containerDiskMounter.ContainerDisksReady(vmi, info.notInitializedSince); !ready {
 			if err != nil {
 				return err
@@ -2691,9 +2705,20 @@ func (d *VirtualMachineController) finalizeMigration(vmi *v1.VirtualMachineInsta
 	return nil
 }
 
+func vmiHasTerminationGracePeriod(vmi *v1.VirtualMachineInstance) bool {
+	// if not set we use the default graceperiod
+	return vmi.Spec.TerminationGracePeriodSeconds == nil ||
+		(vmi.Spec.TerminationGracePeriodSeconds != nil && *vmi.Spec.TerminationGracePeriodSeconds != 0)
+}
+
+func domainHasGracePeriod(domain *api.Domain) bool {
+	return domain != nil &&
+		domain.Spec.Metadata.KubeVirt.GracePeriod != nil &&
+		domain.Spec.Metadata.KubeVirt.GracePeriod.DeletionGracePeriodSeconds != 0
+}
+
 func isACPIEnabled(vmi *v1.VirtualMachineInstance, domain *api.Domain) bool {
-	zero := int64(0)
-	return vmi.Spec.TerminationGracePeriodSeconds != &zero &&
+	return (vmiHasTerminationGracePeriod(vmi) || (vmi.Spec.TerminationGracePeriodSeconds == nil && domainHasGracePeriod(domain))) &&
 		domain != nil &&
 		domain.Spec.Features != nil &&
 		domain.Spec.Features.ACPI != nil
@@ -2709,4 +2734,30 @@ func setMissingSRIOVInterfacesNames(interfacesSpecByName map[string]v1.Interface
 			interfacesStatusByMac[ifaceSpec.MacAddress] = domainIfaceStatus
 		}
 	}
+}
+
+func (d *VirtualMachineController) isHostModelMigratable(vmi *v1.VirtualMachineInstance) error {
+	if cpu := vmi.Spec.Domain.CPU; cpu != nil && cpu.Model == v1.CPUModeHostModel {
+		node, err := d.clientset.CoreV1().Nodes().Get(context.Background(), vmi.Status.NodeName, metav1.GetOptions{})
+		if err != nil {
+			return err
+		}
+
+		if !nodeHasHostModelLabel(node) {
+			err = fmt.Errorf("the node \"%s\" has no (%s/...) label to allow migration with host-model", node.Name, v1.HostModelCPULabel)
+			log.Log.Object(vmi).Errorf(err.Error())
+			return err
+		}
+	}
+
+	return nil
+}
+
+func nodeHasHostModelLabel(node *k8sv1.Node) bool {
+	for key, _ := range node.Labels {
+		if strings.HasPrefix(key, v1.HostModelCPULabel) {
+			return true
+		}
+	}
+	return false
 }

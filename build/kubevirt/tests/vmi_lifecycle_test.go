@@ -103,7 +103,7 @@ var _ = Describe("[rfe_id:273][crit:high][vendor:cnv-qe@redhat.com][level:compon
 	})
 
 	Context("when virt-handler is deleted", func() {
-		It("[QUARANTINE][Serial][test_id:4716]should label the node with kubevirt.io/schedulable=false", func() {
+		It("[Serial][test_id:4716]should label the node with kubevirt.io/schedulable=false", func() {
 			pods, err := virtClient.CoreV1().Pods("").List(context.Background(), metav1.ListOptions{
 				LabelSelector: fmt.Sprintf("%s=%s", v1.AppLabel, "virt-handler"),
 			})
@@ -1461,31 +1461,6 @@ var _ = Describe("[rfe_id:273][crit:high][vendor:cnv-qe@redhat.com][level:compon
 					return len(pods.Items)
 				}, 75, 0.5).Should(Equal(0), "There should be no pods")
 
-			})
-		})
-		Context("with ACPI and 0 grace period seconds", func() {
-			It("[test_id:1652]should result in vmi status failed", func() {
-
-				vmi = newCirrosVMI()
-				gracePeriod := int64(0)
-				vmi.Spec.TerminationGracePeriodSeconds = &gracePeriod
-
-				By("Creating the VirtualMachineInstance")
-				obj, err := virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Create(vmi)
-				Expect(err).ToNot(HaveOccurred(), "Should create VMI")
-
-				// wait until booted
-				vmi = tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
-
-				By("Deleting the VirtualMachineInstance")
-				Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(obj.Name, &metav1.DeleteOptions{})).To(Succeed(), "Should delete VMI")
-
-				By("Verifying VirtualMachineInstance's status is Failed")
-				Eventually(func() v1.VirtualMachineInstancePhase {
-					currVMI, err := virtClient.VirtualMachineInstance(tests.NamespaceTestDefault).Get(vmi.Name, &metav1.GetOptions{})
-					Expect(err).ToNot(HaveOccurred(), "Should get VMI")
-					return currVMI.Status.Phase
-				}, 5, 0.5).Should(Equal(v1.Failed), "VMI should be failed")
 			})
 		})
 		Context("with ACPI and some grace period seconds", func() {

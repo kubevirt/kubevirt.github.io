@@ -2,7 +2,7 @@
 
 KubeVirt provides a mechanism for assigning host devices to a virtual machine. This mechanism is generic and allows various types of PCI devices, such as GPU or any other devices attached to a PCI bus, to be assigned. It also allows Mediated devices, such as pre-configured virtual GPUs to be assigned using the same mechanism.
 
-NOTE: This document doesn't cover KubeVirt's [SR-IOV Support](https://github.com/kubevirt/kubevirt/blob/master/docs/sriov.md).
+NOTE: This document doesn't cover KubeVirt's [SR-IOV Support](https://github.com/kubevirt/kubevirt/blob/main/docs/sriov.md).
 ### Permitting Host Devices to be used in the cluster:
 
 Administrators can control which host devices will be permitted for use in the cluster.
@@ -40,7 +40,7 @@ Here is an example of an expected naming of the variables:
 ```
 PCI_RESOURCE_NVIDIA_COM_TU104GL_Tesla_T4=PCIADDRESS1
 ```
-This encodes a PCI device with its resource name (provided in the Kubevirt CR) "nvidia.com/TU104GL_Tesla_T4"
+This encodes a PCI device with its resource name (provided in the KubeVirt CR) "nvidia.com/TU104GL_Tesla_T4"
 ```
 PCI_RESOURCE_INTEL_QAT=PCIADDRESS2,PCIADDRESS3,...
 MDEV_PCI_RESOURCE_NVIDIA_COM_GRID_T4-1Q=UUID1,UUID2,UUID3,...

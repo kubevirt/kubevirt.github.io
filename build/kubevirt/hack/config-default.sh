@@ -1,4 +1,4 @@
-binaries="cmd/virt-operator cmd/virt-controller cmd/virt-launcher cmd/virt-handler cmd/virtctl cmd/fake-qemu-process cmd/virt-api cmd/subresource-access-test cmd/example-hook-sidecar cmd/example-cloudinit-hook-sidecar"
+binaries="cmd/virt-operator cmd/virt-controller cmd/virt-launcher cmd/virt-handler cmd/virtctl cmd/fake-qemu-process cmd/virt-api cmd/subresource-access-test cmd/example-hook-sidecar cmd/example-cloudinit-hook-sidecar cmd/virt-chroot"
 docker_images="cmd/virt-operator cmd/virt-controller cmd/virt-launcher cmd/virt-handler cmd/virt-api images/disks-images-provider images/vm-killer images/nfs-server cmd/subresource-access-test images/winrmcli cmd/example-hook-sidecar cmd/example-cloudinit-hook-sidecar images/cdi-http-import-server tests/conformance"
 docker_tag=${DOCKER_TAG:-latest}
 docker_tag_alt=${DOCKER_TAG_ALT}
@@ -11,7 +11,7 @@ cdi_namespace=cdi
 image_pull_policy=${IMAGE_PULL_POLICY:-IfNotPresent}
 verbosity=${VERBOSITY:-2}
 package_name=${PACKAGE_NAME:-kubevirt-dev}
-kubevirtci_git_hash="2106100828-77d783c"
+kubevirtci_git_hash="2106251941-023e78e"
 conn_check_ipv4_address=${CONN_CHECK_IPV4_ADDRESS:-""}
 conn_check_ipv6_address=${CONN_CHECK_IPV6_ADDRESS:-""}
 conn_check_dns=${CONN_CHECK_DNS:-""}

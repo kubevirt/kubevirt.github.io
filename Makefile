@@ -98,6 +98,15 @@ endif
 endif
 
 
+## Build site. This target should only be used by Netlify and Prow
+build: envvar
+	@echo "${GREEN}Makefile: Build jekyll site${RESET}"
+#	which $(RUBY)
+	scripts/update_changelog.sh
+	rake
+	touch _site/.nojekyll
+
+
 ## Build image localhost/kubevirt-kubevirt.github.io
 build_img: | envvar
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
@@ -128,30 +137,6 @@ check_links: | envvar stop
 	@echo
 	@echo "${GREEN}Makefile: Check url selectors to user-guide${RESET}"
 #BEGIN BIG SHELL SCRIPT
-<<<<<<< HEAD
-	${DEBUG}export IFS=$$'\n'; \
-	OUTPUT=`${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors'`; \
-	if [ `echo "$${OUTPUT}" | egrep "HTML-Proofer found [0-9]+ failure(s)?" > /dev/null 2>&1` ]; then \
-	  echo "$${OUTPUT}"; \
-	  exit 2; \
-	fi; \
-	for i in `echo "$${OUTPUT}" | egrep "https?://.*,.*"`; do \
-	  /bin/echo -n "${AQUA}"; \
-	  echo -n "File: " && echo "$${i}" | cut -d"," -f 2; \
-	  echo -n "Link: " && echo "$${i}" | cut -d"," -f 1; \
-	  /bin/echo -n "${RESET}"; \
-	  if `egrep -q "/user-guide/#.*(\?id=)?" <<< "$${i}"`; then \
-	    RETVAL=1; \
-	    echo "  ${RED}* FAILED ... Docsify /user-guide/#.*(\?id=)? links need to be migrated to mkdocs${RESET}"; \
-	    echo; \
-	  else \
-	    ${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site ${IMGTAG} /bin/bash -c "OPENSSL_CONF=/etc/ssl casperjs test --fail-fast --concise --arg=\"$${i}\" /src/check_selectors.js"; \
-	    echo; \
-	  fi; \
-	done; \
-	if [ "$${RETVAL}" ]; then exit 1; fi; \
-	echo "Complete!"
-=======
 	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors' | sed -n -e '/HTML-Proofer finished successfully./,$$p' | grep -v 'HTML-Proofer finished successfully.' > links 2> /dev/null; \
 	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site --workdir=/srv ${IMGTAG} /bin/bash -c \
 	  "for i in \`cat ./links\`; do \
@@ -167,8 +152,8 @@ check_links: | envvar stop
 		rm -rf RETVAL links; \
 		echo "Complete!"; \
 	fi
->>>>>>> 0005a16dd... Fix check_spelling exit codes, speed plus cosmetics
 #END BIG SHELL SCRIPT
+
 
 ## Check spelling on content
 check_spelling: | envvar stop

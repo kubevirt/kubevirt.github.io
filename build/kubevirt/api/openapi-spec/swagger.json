@@ -6934,6 +6934,15 @@
     "put": {
      "description": "Stop a VirtualMachine object.",
      "operationId": "v1Stop",
+     "parameters": [
+      {
+       "name": "body",
+       "in": "body",
+       "schema": {
+        "$ref": "#/definitions/v1.StopOptions"
+       }
+      }
+     ],
      "responses": {
       "200": {
        "description": "OK",
@@ -7671,6 +7680,15 @@
     "put": {
      "description": "Stop a VirtualMachine object.",
      "operationId": "v1alpha3Stop",
+     "parameters": [
+      {
+       "name": "body",
+       "in": "body",
+       "schema": {
+        "$ref": "#/definitions/v1.StopOptions"
+       }
+      }
+     ],
      "responses": {
       "200": {
        "description": "OK",
@@ -9409,6 +9427,15 @@
       "type": "integer",
       "format": "int32"
      },
+     "minimumClusterTSCFrequency": {
+      "description": "Allow overriding the automatically determined minimum TSC frequency of the cluster and fixate the minimum to this frequency.",
+      "type": "integer",
+      "format": "int64"
+     },
+     "minimumReservePVCBytes": {
+      "type": "integer",
+      "format": "int64"
+     },
      "nodeSelectors": {
       "type": "object",
       "additionalProperties": {
@@ -10670,6 +10697,9 @@
       "type": "integer",
       "format": "int64"
      },
+     "disableTLS": {
+      "type": "boolean"
+     },
      "nodeDrainTaintKey": {
       "type": "string"
      },
@@ -10787,12 +10817,15 @@
     ],
     "properties": {
      "externalResourceProvider": {
+      "description": "If true, KubeVirt will leave the allocation and monitoring to an external device plugin",
       "type": "boolean"
      },
      "pciVendorSelector": {
+      "description": "The vendor_id:product_id tupple of the PCI device",
       "type": "string"
      },
      "resourceName": {
+      "description": "The name of the resource that is representing the device. Exposed by a device plugin and requested by VMs. Typically of the form vendor.com/product_nameThe name of the resource that is representing the device. Exposed by a device plugin and requested by VMs. Typically of the form vendor.com/product_name",
       "type": "string"
      }
     }
@@ -11075,6 +11108,25 @@
      }
     }
    },
+   "v1.StopOptions": {
+    "description": "StopOptions may be provided when deleting an API object.",
+    "type": "object",
+    "properties": {
+     "apiVersion": {
+      "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+     },
+     "gracePeriod": {
+      "description": "this updates the VMIs terminationGracePeriodSeconds during shutdown",
+      "type": "integer",
+      "format": "int64"
+     },
+     "kind": {
+      "description": "Kind is a string value representing the REST resource this object represents. Servers may infer this from the endpoint the client submits requests to. Cannot be updated. In CamelCase. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds",
+      "type": "string"
+     }
+    }
+   },
    "v1.SyNICTimer": {
     "type": "object",
     "properties": {
@@ -11123,6 +11175,15 @@
      "rtc": {
       "description": "RTC (Real Time Clock) - a continuously running timer with periodic interrupts.",
       "$ref": "#/definitions/v1.RTCTimer"
+     }
+    }
+   },
+   "v1.TopologyHints": {
+    "type": "object",
+    "properties": {
+     "tscFrequency": {
+      "type": "integer",
+      "format": "int64"
      }
     }
    },
@@ -11364,6 +11425,10 @@
     "properties": {
      "apiVersion": {
       "description": "APIVersion defines the versioned schema of this representation of an object. Servers should convert recognized schemas to the latest internal value, and may reject unrecognized values. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources",
+      "type": "string"
+     },
+     "fsFreezeStatus": {
+      "description": "FSFreezeStatus is the state of the fs of the guest it can be either frozen or thawed",
       "type": "string"
      },
      "fsInfo": {
@@ -11718,6 +11783,20 @@
      }
     }
    },
+   "v1.VirtualMachineInstancePhaseTransitionTimestamp": {
+    "description": "VirtualMachineInstancePhaseTransitionTimestamp gives a timestamp in relation to when a phase is set on a vmi",
+    "type": "object",
+    "properties": {
+     "phase": {
+      "description": "Phase is the status of the VirtualMachineInstance in kubernetes world. It is not the VirtualMachineInstance status, but partially correlates to it.",
+      "type": "string"
+     },
+     "phaseTransitionTimestamp": {
+      "description": "PhaseTransitionTimestamp is the timestamp of when the phase change occurred",
+      "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Time"
+     }
+    }
+   },
    "v1.VirtualMachineInstancePreset": {
     "description": "VirtualMachineInstancePreset defines a VMI spec.domain to be applied to all VMIs that match the provided label selector More info: https://kubevirt.io/user-guide/virtual_machines/presets/#overrides",
     "type": "object",
@@ -12041,6 +12120,10 @@
       "description": "EvacuationNodeName is used to track the eviction process of a VMI. It stores the name of the node that we want to evacuate. It is meant to be used by KubeVirt core components only and can't be set or modified by users.",
       "type": "string"
      },
+     "fsFreezeStatus": {
+      "description": "FSFreezeStatus is the state of the fs of the guest it can be either frozen or thawed",
+      "type": "string"
+     },
      "guestOSInfo": {
       "description": "Guest OS Information",
       "$ref": "#/definitions/v1.VirtualMachineInstanceGuestOSInfo"
@@ -12072,6 +12155,14 @@
       "description": "Phase is the status of the VirtualMachineInstance in kubernetes world. It is not the VirtualMachineInstance status, but partially correlates to it.",
       "type": "string"
      },
+     "phaseTransitionTimestamps": {
+      "description": "PhaseTransitionTimestamp is the timestamp of when the last phase change occurred",
+      "type": "array",
+      "items": {
+       "$ref": "#/definitions/v1.VirtualMachineInstancePhaseTransitionTimestamp"
+      },
+      "x-kubernetes-list-type": "atomic"
+     },
      "qosClass": {
       "description": "The Quality of Service (QOS) classification assigned to the virtual machine instance based on resource requirements See PodQOSClass type for available QOS classes More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md",
       "type": "string"
@@ -12079,6 +12170,9 @@
      "reason": {
       "description": "A brief CamelCase message indicating details about why the VMI is in this state. e.g. 'NodeUnresponsive'",
       "type": "string"
+     },
+     "topologyHints": {
+      "$ref": "#/definitions/v1.TopologyHints"
      },
      "volumeStatus": {
       "description": "VolumeStatus contains the statuses of all the volumes",
