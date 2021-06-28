@@ -98,6 +98,15 @@ endif
 endif
 
 
+## Build site. This target should only be used by Netlify and Prow
+build: envvar
+	@echo "${GREEN}Makefile: Build jekyll site${RESET}"
+#	which $(RUBY)
+	scripts/update_changelog.sh
+	rake
+	touch _site/.nojekyll
+
+
 ## Build image localhost/kubevirt-kubevirt.github.io
 build_img: | envvar
 	@echo "${GREEN}Makefile: Building Image ${RESET}"

@@ -5,7 +5,7 @@
 TARGET='build'
 mkdir -p build/artifacts || continue
 [[ -e build/kubevirt ]] || git clone https://github.com/kubevirt/kubevirt.git build/kubevirt/
-git -C build/kubevirt checkout master
+git -C build/kubevirt checkout main
 git -C build/kubevirt pull --tags
 
 releases() {
