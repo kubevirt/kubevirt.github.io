@@ -1,6 +1,6 @@
 # Contributing to KubeVirt.io
 
-[![Build Status](https://travis-ci.org/kubevirt/kubevirt.github.io.svg?branch=master)](https://travis-ci.org/kubevirt/kubevirt.github.io)
+[![Build Status](https://prow.ci.kubevirt.io/badge.svg?jobs=push-kubevirt.github.io-master-build-and-push-to-gh-pages)](https://prow.ci.kubevirt.io/?repo=kubevirt%2Fkubevirt.github.io&type=postsubmit&job=push-kubevirt.github.io-master-build-and-push-to-gh-pages)
 
 The [kubevirt.io](https://kubevirt.io) website is a [Jekyll](https://jekyllrb.com/) driven site hosted by GitHub Pages.
 
