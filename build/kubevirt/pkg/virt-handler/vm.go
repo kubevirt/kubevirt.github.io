@@ -36,6 +36,8 @@ import (
 
 	"github.com/opencontainers/runc/libcontainer/cgroups"
 
+	nodelabellerapi "kubevirt.io/kubevirt/pkg/virt-handler/node-labeller/api"
+
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -61,7 +63,6 @@ import (
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/controller"
 	diskutils "kubevirt.io/kubevirt/pkg/ephemeral-disk-utils"
-	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 	hostdisk "kubevirt.io/kubevirt/pkg/host-disk"
 	neterrors "kubevirt.io/kubevirt/pkg/network/errors"
 	pvcutils "kubevirt.io/kubevirt/pkg/util/types"
@@ -156,6 +157,7 @@ func NewController(
 	clusterConfig *virtconfig.ClusterConfig,
 	podIsolationDetector isolation.PodIsolationDetector,
 	migrationProxy migrationproxy.ProxyManager,
+	capabilities *nodelabellerapi.Capabilities,
 ) *VirtualMachineController {
 
 	queue := workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter())
@@ -180,6 +182,7 @@ func NewController(
 		clusterConfig:               clusterConfig,
 		networkCacheStoreFactory:    netcache.NewInterfaceCacheFactory(),
 		virtLauncherFSRunDirPattern: "/proc/%d/root/var/run",
+		capabilities:                capabilities,
 	}
 
 	vmiSourceInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -269,6 +272,7 @@ type VirtualMachineController struct {
 	networkCacheStoreFactory    netcache.InterfaceCacheFactory
 	virtLauncherFSRunDirPattern string
 	heartBeat                   *heartbeat.HeartBeat
+	capabilities                *nodelabellerapi.Capabilities
 }
 
 type virtLauncherCriticalNetworkError struct {
@@ -459,7 +463,7 @@ func (d *VirtualMachineController) hasTargetDetectedDomain(vmi *v1.VirtualMachin
 	}
 
 	// re-enqueue the key to ensure it gets processed again within the right time.
-	d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Duration(enqueueTime)*time.Second)
+	d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Duration(enqueueTime)*time.Second)
 
 	return false, timeLeft
 }
@@ -821,7 +825,7 @@ func (d *VirtualMachineController) updateVolumeStatusesFromDomain(vmi *v1.Virtua
 			return strings.Compare(newStatuses[i].Name, newStatuses[j].Name) == -1
 		})
 		if needsRefresh {
-			d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second)
+			d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second)
 		}
 		d.generateEventsForVolumeStatusChange(vmi, newStatusMap)
 		vmi.Status.VolumeStatus = newStatuses
@@ -1312,7 +1316,7 @@ func (c *VirtualMachineController) Run(threadiness int, stopCh chan struct{}) {
 			d.ObjectMeta.Name,
 			d.Spec.Metadata.KubeVirt.UID)
 
-		key := controller.VirtualMachineKey(vmiRef)
+		key := controller.VirtualMachineInstanceKey(vmiRef)
 
 		_, exists, _ := c.vmiSourceInformer.GetStore().GetByKey(key)
 		if !exists {
@@ -1473,7 +1477,7 @@ func (d *VirtualMachineController) migrationTargetExecute(vmi *v1.VirtualMachine
 
 		// if we're still the migration target, we need to keep trying until the migration fails.
 		// it's possible we're simply waiting for another target pod to come online.
-		d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*1)
+		d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*1)
 
 	} else if shouldUpdate {
 		log.Log.Object(vmi).Info("Processing vmi migration target update")
@@ -1751,7 +1755,7 @@ func (d *VirtualMachineController) execute(key string) error {
 		}
 		// If we found an outdated domain which is also not alive anymore, clean up
 		if !initialized {
-			d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*1)
+			d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*1)
 			return nil
 		} else if expired {
 			log.Log.Object(oldVMI).Infof("Detected stale vmi %s that still needs cleanup before new vmi %s with identical name/namespace can be processed", oldVMI.UID, vmi.UID)
@@ -1761,7 +1765,7 @@ func (d *VirtualMachineController) execute(key string) error {
 			}
 			// Make sure we re-enqueue the key to ensure this new VMI is processed
 			// after the stale domain is removed
-			d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*5)
+			d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*5)
 		}
 
 		return nil
@@ -2034,7 +2038,7 @@ func (d *VirtualMachineController) processVmShutdown(vmi *v1.VirtualMachineInsta
 				}
 
 				// pending graceful shutdown.
-				d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Duration(timeLeft)*time.Second)
+				d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Duration(timeLeft)*time.Second)
 				d.recorder.Event(vmi, k8sv1.EventTypeNormal, v1.ShuttingDown.String(), VMIGracefulShutdown)
 			} else {
 				log.Log.V(4).Object(vmi).Infof("%s is already shutting down.", vmi.GetObjectMeta().GetName())
@@ -2393,7 +2397,7 @@ func (d *VirtualMachineController) vmUpdateHelperMigrationTarget(origVMI *v1.Vir
 		if err != nil {
 			return err
 		}
-		d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*1)
+		d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*1)
 		return nil
 	}
 
@@ -2470,7 +2474,7 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 			if err != nil {
 				return err
 			}
-			d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*1)
+			d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*1)
 			return nil
 		}
 
@@ -2506,17 +2510,7 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 	smbios := d.clusterConfig.GetSMBIOS()
 	period := d.clusterConfig.GetMemBalloonStatsPeriod()
 
-	options := &cmdv1.VirtualMachineOptions{
-		VirtualMachineSMBios: &cmdv1.SMBios{
-			Family:       smbios.Family,
-			Product:      smbios.Product,
-			Manufacturer: smbios.Manufacturer,
-			Sku:          smbios.Sku,
-			Version:      smbios.Version,
-		},
-		MemBalloonStatsPeriod: period,
-		PreallocatedVolumes:   preallocatedVolumes,
-	}
+	options := virtualMachineOptions(smbios, period, preallocatedVolumes, d.capabilities)
 
 	err = client.SyncVirtualMachine(vmi, options)
 	if err != nil {
@@ -2543,7 +2537,7 @@ func (d *VirtualMachineController) processVmUpdate(vmi *v1.VirtualMachineInstanc
 		return err
 	}
 	if !isInitialized {
-		d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*1)
+		d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*1)
 		return nil
 	} else if isUnresponsive {
 		return goerror.New(fmt.Sprintf("Can not update a VirtualMachineInstance with unresponsive command server."))
@@ -2579,7 +2573,7 @@ func (d *VirtualMachineController) calculateVmPhaseForStatusReason(domain *api.D
 				return vmi.Status.Phase, err
 			}
 			if !isInitialized {
-				d.Queue.AddAfter(controller.VirtualMachineKey(vmi), time.Second*1)
+				d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Second*1)
 				return vmi.Status.Phase, err
 			} else if isUnresponsive {
 				// virt-launcher is gone and VirtualMachineInstance never transitioned
