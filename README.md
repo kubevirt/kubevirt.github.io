@@ -60,7 +60,7 @@ git checkout master; git fetch upstream; git reset --hard upstream/master; git p
 *Note* Master branch is purely cosmetic for this repo. Merges to master **ARE NOT ACCEPTED**.
 
 
-All work must be branched from `maaster` branch. Perform the following to sync from upstream ...
+All work must be branched from `master` branch. Perform the following to sync from upstream ...
 
 ```bash
 git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f
@@ -141,12 +141,12 @@ Open your web browser to http://0.0.0.0:4000
 
 3) Test all hyperlinks
 ```bash
-make test_links
+make check_links
 ```
 
 4) Test spelling
 ```bash
-make test_spelling
+make check_spelling
 ```
 
 If you discover a flagged spelling error that you believe is not a mistake, feel free to add the offending word to the dictionary file located at GitHub repo `kubevirt/project-infra/images/yaspeller/.yaspeller.json`. Try to keep the dictionary file well ordered and employ regular expressions to handle common patterns.
