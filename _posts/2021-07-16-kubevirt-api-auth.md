@@ -1,8 +1,8 @@
 ---
 layout: post
 author: Mark DeNeve
-title: Kubernetes Authentication Options using Kubevirt Client Library
-description: This blog post discusses authentication methods that can be used with the kubevirt client-go library.
+title: Kubernetes Authentication Options using KubeVirt Client Library
+description: This blog post discusses authentication methods that can be used with the KubeVirt client-go library.
 navbar_active: Blogs
 pub-date: July 16
 pub-year: 2021
@@ -168,11 +168,11 @@ Success! Our application is now using the service account that we created for au
 
 ## Running in a Kubernetes Cluster
 
-So all of this is great if you want to run the application outside of your cluster ... but what if you want your application to run INSIDE you cluster. You could create a kubeconfig file, and add it to your namespace as a secret and then mount that secret as a volume inside your pod, but there is an easier way that continues to leverage the service account that we created. By default Kubernetes creates a few environment variables for every pod that indicate that the container is running within Kubernetes, and it makes a Kubernetes auth token for the service account that the container is running as available at /var/run/secrets/kubernetes.io/serviceaccount/token. The client-go KubeVirt library can detect that it is running inside a Kubernetes hosted container and will transparently use the auth token provided with no additional configuration needed.
+So all of this is great if you want to run the application outside of your cluster ... but what if you want your application to run INSIDE you cluster. You could create a kubeconfig file, and add it to your namespace as a secret and then mount that secret as a volume inside your pod, but there is an easier way that continues to leverage the service account that we created. By default Kubernetes creates a few environment variables for every pod that indicate that the container is running within Kubernetes, and it makes a Kubernetes authentication token for the service account that the container is running as available at /var/run/secrets/kubernetes.io/serviceaccount/token. The client-go KubeVirt library can detect that it is running inside a Kubernetes hosted container and will transparently use the authentication token provided with no additional configuration needed.
 
 A container image with the listvms binary is available at **quay.io/markd/listvms**. We can start a copy of this container using the deployment yaml file located in the 'listvms/listvms_deployment.yaml' file.
 
-Switch back to your orignal terminal window that is using your primary kubeconfig file, and using the "_kubectl_" command deploy one instance of the test pod, and then check the logs of the pod:
+Switch back to your original terminal window that is using your primary kubeconfig file, and using the "_kubectl_" command deploy one instance of the test pod, and then check the logs of the pod:
 
 ```shell
 $ kubectl create -f listvms/listvms_deployment.yaml
@@ -213,7 +213,7 @@ awaiting signal
 
 ## Extending RBAC Role across Namespaces
 
-As currently configured, the mykubevirtrunner service account can only "view" KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add add the view role for other namespaces to the mykubevirtrunner serviceAccount.
+As currently configured, the mykubevirtrunner service account can only "view" KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.
 
 ```shell
 $ kubectl create namespace myvms
