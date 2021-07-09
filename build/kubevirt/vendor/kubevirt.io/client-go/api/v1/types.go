@@ -22,7 +22,7 @@ package v1
 //go:generate swagger-doc
 //go:generate deepcopy-gen -i . --go-header-file ../../../../../../hack/boilerplate/boilerplate.go.txt
 //go:generate defaulter-gen -i . --go-header-file ../../../../../../hack/boilerplate/boilerplate.go.txt
-//go:generate openapi-gen -i kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1,k8s.io/apimachinery/pkg/util/intstr,k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/api/core/v1,kubevirt.io/client-go/api/v1,github.com/openshift/api/operator/v1 --output-package=kubevirt.io/kubevirt/staging/src/kubevirt.io/client-go/api/v1  --go-header-file ../../../../../../hack/boilerplate/boilerplate.go.txt
+//go:generate openapi-gen -i kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1,k8s.io/apimachinery/pkg/util/intstr,k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/api/core/v1,kubevirt.io/client-go/api/v1,github.com/openshift/api/operator/v1 --output-package=kubevirt.io/kubevirt/staging/src/kubevirt.io/client-go/api/v1  --go-header-file ../../../../../../hack/boilerplate/boilerplate.go.txt
 
 /*
  ATTENTION: Rerun code generators when comments on structs or fields are modified.
@@ -38,7 +38,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1"
 )
 
 const DefaultGracePeriodSeconds int64 = 30
@@ -335,6 +335,11 @@ func (v *VirtualMachineInstance) IsUnprocessed() bool {
 // Checks if CPU pinning has been requested
 func (v *VirtualMachineInstance) IsCPUDedicated() bool {
 	return v.Spec.Domain.CPU != nil && v.Spec.Domain.CPU.DedicatedCPUPlacement
+}
+
+func (v *VirtualMachineInstance) IsBootloaderEFI() bool {
+	return v.Spec.Domain.Firmware != nil && v.Spec.Domain.Firmware.Bootloader != nil &&
+		v.Spec.Domain.Firmware.Bootloader.EFI != nil
 }
 
 // WantsToHaveQOSGuaranteed checks if cpu and memoyr limits and requests are identical on the VMI.
@@ -1848,6 +1853,7 @@ type KubeVirtConfiguration struct {
 	NetworkConfiguration   *NetworkConfiguration   `json:"network,omitempty"`
 	OVMFPath               string                  `json:"ovmfPath,omitempty"`
 	SELinuxLauncherType    string                  `json:"selinuxLauncherType,omitempty"`
+	DefaultRuntimeClass    string                  `json:"defaultRuntimeClass,omitempty"`
 	SMBIOSConfig           *SMBiosConfiguration    `json:"smbios,omitempty"`
 	// deprecated
 	SupportedGuestAgentVersions []string              `json:"supportedGuestAgentVersions,omitempty"`

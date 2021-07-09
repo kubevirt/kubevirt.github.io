@@ -851,6 +851,8 @@ spec:
                   value: 
                 - name: VIRT_LAUNCHER_SHASUM
                   value: 
+                - name: GS_SHASUM
+                  value: 
                 image: /virt-operator@:
                 imagePullPolicy: 
                 name: virt-operator

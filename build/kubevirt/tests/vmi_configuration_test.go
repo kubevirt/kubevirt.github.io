@@ -380,7 +380,7 @@ var _ = Describe("[sig-compute]Configurations", func() {
 				}
 				vmi.Spec.Domain.Resources = v1.ResourceRequirements{
 					Requests: kubev1.ResourceList{
-						kubev1.ResourceMemory: resource.MustParse("64M"),
+						kubev1.ResourceMemory: resource.MustParse("128M"),
 					},
 				}
 
@@ -1589,6 +1589,51 @@ var _ = Describe("[sig-compute]Configurations", func() {
 			})
 
 		})
+
+		Context("[Serial]using defaultRuntimeClass configuration", func() {
+			runtimeClassName := "custom-runtime-class"
+
+			BeforeEach(func() {
+				By("Creating a runtime class")
+				tests.CreateRuntimeClass(runtimeClassName, "custom-handler")
+			})
+
+			AfterEach(func() {
+				By("Cleaning up runtime class")
+				err = tests.DeleteRuntimeClass(runtimeClassName)
+				Expect(err).NotTo(HaveOccurred())
+			})
+
+			It("should apply runtimeClassName to pod when set", func() {
+				By("Configuring a default runtime class")
+				config := util.GetCurrentKv(virtClient).Spec.Configuration.DeepCopy()
+				config.DefaultRuntimeClass = runtimeClassName
+				tests.UpdateKubeVirtConfigValueAndWait(*config)
+
+				By("Creating a new VMI")
+				var vmi = tests.NewRandomVMI()
+				vmi = tests.RunVMIAndExpectScheduling(vmi, 30)
+				Expect(err).NotTo(HaveOccurred())
+
+				By("Checking for presence of runtimeClassName")
+				pod := tests.GetPodByVirtualMachineInstance(vmi)
+				Expect(*pod.Spec.RuntimeClassName).To(BeEquivalentTo(runtimeClassName))
+			})
+
+			It("should not apply runtimeClassName to pod when not set", func() {
+				By("Creating a VMI")
+				var vmi = tests.NewRandomVMI()
+				vmi, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
+				Expect(err).NotTo(HaveOccurred())
+
+				By("Waiting for successful start of VMI")
+				tests.WaitForSuccessfulVMIStart(vmi)
+
+				By("Checking for absence of runtimeClassName")
+				pod := tests.GetRunningPodByVirtualMachineInstance(vmi, util.NamespaceTestDefault)
+				Expect(pod.Spec.RuntimeClassName).To(BeNil())
+			})
+		})
 	})
 
 	Context("[rfe_id:140][crit:medium][vendor:cnv-qe@redhat.com][level:component]with CPU spec", func() {
@@ -1832,20 +1877,14 @@ var _ = Describe("[sig-compute]Configurations", func() {
 	})
 
 	Context("[Serial][rfe_id:904][crit:medium][vendor:cnv-qe@redhat.com][level:component]with driver cache and io settings and PVC", func() {
-		var originalConfig v1.KubeVirtConfiguration
 
 		BeforeEach(func() {
-			kv := util.GetCurrentKv(virtClient)
-			originalConfig = kv.Spec.Configuration
-
-			tests.EnableFeatureGate(virtconfig.HostDiskGate)
+			if !checks.HasFeature(virtconfig.HostDiskGate) {
+				Skip("Cluster has the HostDisk featuregate disabled, skipping  the tests")
+			}
 			// create a new PV and PVC (PVs can't be reused)
 			tests.CreateBlockVolumePvAndPvc("1Gi")
 		}, 60)
-
-		AfterEach(func() {
-			tests.UpdateKubeVirtConfigValueAndWait(originalConfig)
-		})
 
 		It("[test_id:1681]should set appropriate cache modes", func() {
 			vmi := tests.NewRandomVMI()
@@ -2017,9 +2056,9 @@ var _ = Describe("[sig-compute]Configurations", func() {
 		})
 
 		It("Should set BlockIO when set to match volume block sizes on files", func() {
-			originalConfig := util.GetCurrentKv(virtClient).Spec.Configuration
-			tests.EnableFeatureGate(virtconfig.HostDiskGate)
-			defer tests.UpdateKubeVirtConfigValueAndWait(originalConfig)
+			if !checks.HasFeature(virtconfig.HostDiskGate) {
+				Skip("Cluster has the HostDisk featuregate disabled, skipping  the tests")
+			}
 
 			By("creating a disk image")
 			var nodeName string

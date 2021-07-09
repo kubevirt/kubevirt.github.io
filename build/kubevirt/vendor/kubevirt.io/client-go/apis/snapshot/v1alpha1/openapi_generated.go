@@ -14667,7 +14667,7 @@ func schema_kubevirtio_client_go_api_v1_DataVolumeTemplateSpec(ref common.Refere
 					"spec": {
 						SchemaProps: spec.SchemaProps{
 							Description: "DataVolumeSpec contains the DataVolume specification.",
-							Ref:         ref("kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1.DataVolumeSpec"),
+							Ref:         ref("kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1.DataVolumeSpec"),
 						},
 					},
 					"status": {
@@ -14681,7 +14681,7 @@ func schema_kubevirtio_client_go_api_v1_DataVolumeTemplateSpec(ref common.Refere
 			},
 		},
 		Dependencies: []string{
-			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "kubevirt.io/client-go/api/v1.DataVolumeTemplateDummyStatus", "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1.DataVolumeSpec"},
+			"k8s.io/apimachinery/pkg/apis/meta/v1.ObjectMeta", "kubevirt.io/client-go/api/v1.DataVolumeTemplateDummyStatus", "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1.DataVolumeSpec"},
 	}
 }
 
@@ -16535,6 +16535,12 @@ func schema_kubevirtio_client_go_api_v1_KubeVirtConfiguration(ref common.Referen
 						},
 					},
 					"selinuxLauncherType": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"defaultRuntimeClass": {
 						SchemaProps: spec.SchemaProps{
 							Type:   []string{"string"},
 							Format: "",

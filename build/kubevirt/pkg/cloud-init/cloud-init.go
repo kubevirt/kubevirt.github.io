@@ -428,8 +428,14 @@ func SetLocalDirectory(dir string) error {
 		return fmt.Errorf("CloudInit local cache directory (%s) does not exist or is inaccessible", dir)
 	}
 
-	cloudInitLocalDir = dir
+	SetLocalDirectoryOnly(dir)
 	return nil
+}
+
+// XXX refactor this whole package
+// This is just a cheap workaround to make e2e tests pass
+func SetLocalDirectoryOnly(dir string) {
+	cloudInitLocalDir = dir
 }
 
 func getDomainBasePath(domain string, namespace string) string {
@@ -444,6 +450,10 @@ func GetIsoFilePath(source DataSourceType, domain, namespace string) string {
 		return fmt.Sprintf("%s/%s", getDomainBasePath(domain, namespace), configDriveFile)
 	}
 	return fmt.Sprintf("%s/%s", getDomainBasePath(domain, namespace), noCloudFile)
+}
+
+func PrepareLocalPath(vmiName string, namespace string) error {
+	return util.MkdirAllWithNosec(getDomainBasePath(vmiName, namespace))
 }
 
 func removeLocalData(domain string, namespace string) error {

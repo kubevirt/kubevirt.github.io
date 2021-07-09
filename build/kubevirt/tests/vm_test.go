@@ -48,7 +48,7 @@ import (
 
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/pkg/controller"
 	"kubevirt.io/kubevirt/pkg/virtctl/vm"
 	"kubevirt.io/kubevirt/tests"
@@ -192,7 +192,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 		deleteDataVolume := func(dv *cdiv1.DataVolume) {
 			if dv != nil {
 				By("Deleting the DataVolume")
-				ExpectWithOffset(1, virtClient.CdiClient().CdiV1alpha1().DataVolumes(dv.Namespace).Delete(context.Background(), dv.Name, metav1.DeleteOptions{})).To(Succeed(), metav1.DeleteOptions{})
+				ExpectWithOffset(1, virtClient.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Delete(context.Background(), dv.Name, metav1.DeleteOptions{})).To(Succeed(), metav1.DeleteOptions{})
 			}
 		}
 
@@ -418,8 +418,8 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			}, 300*time.Second, 1*time.Second).Should(BeTrue())
 		},
 			table.Entry("with ContainerDisk", newVirtualMachineInstanceWithContainerDisk),
-			table.Entry("[Serial]with OCS Filesystem Disk", newVirtualMachineInstanceWithOCSFileDisk),
-			table.Entry("[Serial]with OCS Block Disk", newVirtualMachineInstanceWithOCSBlockDisk),
+			table.Entry("[Serial][rook-ceph]with OCS Filesystem Disk", newVirtualMachineInstanceWithOCSFileDisk),
+			table.Entry("[Serial][rook-ceph]with OCS Block Disk", newVirtualMachineInstanceWithOCSBlockDisk),
 		)
 
 		table.DescribeTable("[test_id:1521]should remove VirtualMachineInstance once the VM is marked for deletion", func(createTemplate vmiBuilder) {
@@ -436,8 +436,8 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			}, 300*time.Second, 2*time.Second).Should(BeZero(), "The VirtualMachineInstance did not disappear")
 		},
 			table.Entry("with ContainerDisk", newVirtualMachineInstanceWithContainerDisk),
-			table.Entry("[Serial]with OCS Filesystem Disk", newVirtualMachineInstanceWithOCSFileDisk),
-			table.Entry("[Serial]with OCS Block Disk", newVirtualMachineInstanceWithOCSBlockDisk),
+			table.Entry("[Serial][rook-ceph]with OCS Filesystem Disk", newVirtualMachineInstanceWithOCSFileDisk),
+			table.Entry("[Serial][rook-ceph]with OCS Block Disk", newVirtualMachineInstanceWithOCSBlockDisk),
 		)
 
 		It("[test_id:1522]should remove owner references on the VirtualMachineInstance if it is orphan deleted", func() {
@@ -564,8 +564,8 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			stopVM(vm)
 		},
 			table.Entry("with ContainerDisk", newVirtualMachineInstanceWithContainerDisk),
-			table.Entry("[Serial]with OCS Filesystem Disk", newVirtualMachineInstanceWithOCSFileDisk),
-			table.Entry("[Serial]with OCS Block Disk", newVirtualMachineInstanceWithOCSBlockDisk),
+			table.Entry("[Serial][rook-ceph]with OCS Filesystem Disk", newVirtualMachineInstanceWithOCSFileDisk),
+			table.Entry("[Serial][rook-ceph]with OCS Block Disk", newVirtualMachineInstanceWithOCSBlockDisk),
 		)
 
 		It("[test_id:1526]should start and stop VirtualMachineInstance multiple times", func() {
@@ -752,7 +752,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				By("Ensuring a second invocation should fail")
 				err = stopCommand()
 				Expect(err).ToNot(Succeed())
-				Expect(err.Error()).To(Equal(fmt.Sprintf(`Error stopping VirtualMachine Operation cannot be fulfilled on virtualmachine.kubevirt.io "%s": VM is not running`, newVM.Name)))
+				Expect(err.Error()).To(Equal(fmt.Sprintf(`Error stopping VirtualMachine Operation cannot be fulfilled on virtualmachine.kubevirt.io "%s": VM has no associated VMI running`, newVM.Name)))
 			})
 
 			It("[test_id:6310]should start a VirtualMachineInstance in paused state", func() {

@@ -55,6 +55,7 @@ import (
 	"golang.org/x/crypto/ssh"
 	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	k8sv1 "k8s.io/api/core/v1"
+	nodev1 "k8s.io/api/node/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	extclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
@@ -93,7 +94,7 @@ import (
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
-	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1alpha1"
+	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/pkg/controller"
 	"kubevirt.io/kubevirt/pkg/util/cluster"
 	"kubevirt.io/kubevirt/pkg/util/net/ip"
@@ -224,8 +225,9 @@ const (
 )
 
 const (
-	capNetRaw  k8sv1.Capability = "NET_RAW"
-	capSysNice k8sv1.Capability = "SYS_NICE"
+	capNetRaw         k8sv1.Capability = "NET_RAW"
+	capSysNice        k8sv1.Capability = "SYS_NICE"
+	capNetBindService k8sv1.Capability = "NET_BIND_SERVICE"
 )
 
 const MigrationWaitTime = 240
@@ -996,6 +998,31 @@ func CreatePVC(os, size, storageClass string, recycledPV bool) {
 	}
 }
 
+func CreateRuntimeClass(name, handler string) (*nodev1.RuntimeClass, error) {
+	virtCli, err := kubecli.GetKubevirtClient()
+	if err != nil {
+		return nil, err
+	}
+
+	return virtCli.NodeV1beta1().RuntimeClasses().Create(
+		context.Background(),
+		&nodev1.RuntimeClass{
+			ObjectMeta: metav1.ObjectMeta{Name: name},
+			Handler:    handler,
+		},
+		metav1.CreateOptions{},
+	)
+}
+
+func DeleteRuntimeClass(name string) error {
+	virtCli, err := kubecli.GetKubevirtClient()
+	if err != nil {
+		return err
+	}
+
+	return virtCli.NodeV1beta1().RuntimeClasses().Delete(context.Background(), name, metav1.DeleteOptions{})
+}
+
 func newPVC(os, size, storageClass string, recycledPV bool) *k8sv1.PersistentVolumeClaim {
 	quantity, err := resource.ParseQuantity(size)
 	util2.PanicOnError(err)
@@ -1556,6 +1583,35 @@ func GetRunningPodByVirtualMachineInstance(vmi *v1.VirtualMachineInstance, names
 	return pod
 }
 
+func GetPodByVirtualMachineInstance(vmi *v1.VirtualMachineInstance) *k8sv1.Pod {
+	pods, err := getPodsByLabel(string(vmi.GetUID()), v1.CreatedByLabel, vmi.Namespace)
+	util2.PanicOnError(err)
+
+	if len(pods.Items) != 1 {
+		util2.PanicOnError(fmt.Errorf("found wrong number of pods for VMI '%v', count: %d", vmi, len(pods.Items)))
+	}
+
+	return &pods.Items[0]
+}
+
+func getPodsByLabel(label, labelType, namespace string) (*k8sv1.PodList, error) {
+	virtCli, err := kubecli.GetKubevirtClient()
+	if err != nil {
+		return nil, err
+	}
+
+	labelSelector := fmt.Sprintf("%s=%s", labelType, label)
+
+	pods, err := virtCli.CoreV1().Pods(namespace).List(context.Background(),
+		metav1.ListOptions{LabelSelector: labelSelector},
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return pods, nil
+}
+
 func GetRunningPodByLabel(label string, labelType string, namespace string, node string) (*k8sv1.Pod, error) {
 	virtCli, err := kubecli.GetKubevirtClient()
 	if err != nil {
@@ -1686,7 +1742,7 @@ func cleanNamespaces() {
 		util2.PanicOnError(virtCli.CoreV1().RESTClient().Delete().Namespace(namespace).Resource("persistentvolumeclaims").Do(context.Background()).Error())
 		if HasCDI() {
 			// Remove DataVolumes
-			util2.PanicOnError(virtCli.CdiClient().CdiV1alpha1().RESTClient().Delete().Namespace(namespace).Resource("datavolumes").Do(context.Background()).Error())
+			util2.PanicOnError(virtCli.CdiClient().CdiV1beta1().RESTClient().Delete().Namespace(namespace).Resource("datavolumes").Do(context.Background()).Error())
 		}
 		// Remove PVs
 		pvs, err := virtCli.CoreV1().PersistentVolumes().List(context.Background(), metav1.ListOptions{
@@ -1848,7 +1904,7 @@ func NewRandomVirtualMachineInstanceWithOCSDisk(imageUrl, namespace string, acce
 
 	dv := newRandomDataVolumeWithHttpImport(imageUrl, namespace, sc, accessMode)
 	dv.Spec.PVC.VolumeMode = &volMode
-	_, err = virtCli.CdiClient().CdiV1alpha1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
+	_, err = virtCli.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
 	Expect(err).ToNot(HaveOccurred())
 	WaitForSuccessfulDataVolumeImport(dv, 240)
 	return NewRandomVMIWithDataVolume(dv.Name), dv
@@ -2888,7 +2944,7 @@ func waitForDataVolumePhase(namespace, name string, seconds int, phase ...cdiv1.
 
 	EventuallyWithOffset(2,
 		func() cdiv1.DataVolumePhase {
-			dv, err := virtClient.CdiClient().CdiV1alpha1().DataVolumes(namespace).Get(context.Background(), name, metav1.GetOptions{})
+			dv, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(namespace).Get(context.Background(), name, metav1.GetOptions{})
 			if apierrors.IsNotFound(err) {
 				return cdiv1.PhaseUnset
 			}
@@ -5060,6 +5116,7 @@ func DetectLatestUpstreamOfficialTag() (string, error) {
 func IsLauncherCapabilityValid(capability k8sv1.Capability) bool {
 	switch capability {
 	case
+		capNetBindService,
 		capSysNice:
 		return true
 	}

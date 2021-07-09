@@ -19,6 +19,12 @@
 
 package converter
 
+//go:generate mockgen -source $GOFILE -package=$GOPACKAGE -destination=generated_mock_$GOFILE
+
+/*
+ ATTENTION: Rerun code generators when interface signatures are modified.
+*/
+
 import (
 	"encoding/json"
 	"fmt"
@@ -60,16 +66,10 @@ type HostDeviceType string
 
 // The location of uefi boot loader on ARM64 is different from that on x86
 const (
-	defaultIOThread                  = uint(1)
-	EFICode                          = "OVMF_CODE.fd"
-	EFIVars                          = "OVMF_VARS.fd"
-	EFICodeAARCH64                   = "AAVMF_CODE.fd"
-	EFIVarsAARCH64                   = "AAVMF_VARS.fd"
-	EFICodeSecureBoot                = "OVMF_CODE.secboot.fd"
-	EFIVarsSecureBoot                = "OVMF_VARS.secboot.fd"
-	HostDevicePCI     HostDeviceType = "pci"
-	HostDeviceMDEV    HostDeviceType = "mdev"
-	resolvConf                       = "/etc/resolv.conf"
+	defaultIOThread                = uint(1)
+	HostDevicePCI   HostDeviceType = "pci"
+	HostDeviceMDEV  HostDeviceType = "mdev"
+	resolvConf                     = "/etc/resolv.conf"
 )
 
 const (
@@ -85,6 +85,12 @@ type deviceNamer struct {
 type HostDevicesList struct {
 	Type     HostDeviceType
 	AddrList []string
+}
+
+type EFIConfiguration struct {
+	EFICode      string
+	EFIVars      string
+	SecureLoader bool
 }
 
 type ConverterContext struct {
@@ -104,7 +110,7 @@ type ConverterContext struct {
 	VgpuDevices           []string
 	HostDevices           map[string]HostDevicesList
 	EmulatorThreadCpu     *int
-	OVMFPath              string
+	EFIConfiguration      *EFIConfiguration
 	MemBalloonStatsPeriod uint
 	UseVirtioTransitional bool
 	EphemeraldiskCreator  ephemeraldisk.EphemeralDiskCreatorInterface
@@ -258,16 +264,49 @@ func Convert_v1_Disk_To_api_Disk(c *ConverterContext, diskDevice *v1.Disk, disk 
 	return nil
 }
 
-func checkDirectIOFlag(path string) bool {
-	// check if fs where disk.img file is located or block device
-	// support direct i/o
-	// #nosec No risk for path injection. No information can be exposed to attacker
-	f, err := os.OpenFile(path, syscall.O_RDONLY|syscall.O_DIRECT, 0)
-	if err != nil && !os.IsNotExist(err) {
-		return false
+type DirectIOChecker interface {
+	CheckBlockDevice(path string) (bool, error)
+	CheckFile(path string) (bool, error)
+}
+
+type directIOChecker struct{}
+
+func NewDirectIOChecker() DirectIOChecker {
+	return &directIOChecker{}
+}
+
+func (c *directIOChecker) CheckBlockDevice(path string) (bool, error) {
+	return c.check(path, syscall.O_RDONLY)
+}
+
+func (c *directIOChecker) CheckFile(path string) (bool, error) {
+	flags := syscall.O_RDONLY
+	if _, err := os.Stat(path); os.IsNotExist(err) {
+		// try to create the file and perform the check
+		flags = flags | syscall.O_CREAT
+		defer os.Remove(path)
+	}
+	return c.check(path, flags)
+}
+
+// based on https://gitlab.com/qemu-project/qemu/-/blob/master/util/osdep.c#L344
+func (c *directIOChecker) check(path string, flags int) (bool, error) {
+	// #nosec No risk for path injection as we only open the file, not read from it. The function leaks only whether the directory to `path` exists.
+	f, err := os.OpenFile(path, flags|syscall.O_DIRECT, 0600)
+	if err != nil {
+		// EINVAL is returned if the filesystem does not support the O_DIRECT flag
+		if err, ok := err.(*os.PathError); ok && err.Err == syscall.EINVAL {
+			// #nosec No risk for path injection as we only open the file, not read from it. The function leaks only whether the directory to `path` exists.
+			f, err := os.OpenFile(path, flags & ^syscall.O_DIRECT, 0600)
+			if err == nil {
+				defer util.CloseIOAndCheckErr(f, nil)
+				return false, nil
+			}
+		}
+		return false, err
 	}
 	defer util.CloseIOAndCheckErr(f, nil)
-	return true
+	return true, nil
 }
 
 func Convert_v1_BlockSize_To_api_BlockIO(source *v1.Disk, disk *api.Disk) error {
@@ -352,30 +391,41 @@ func getOptimalBlockIOForFile(path string) (*api.BlockIO, error) {
 	}, nil
 }
 
-func SetDriverCacheMode(disk *api.Disk) error {
+func SetDriverCacheMode(disk *api.Disk, directIOChecker DirectIOChecker) error {
 	var path string
+	var err error
 	supportDirectIO := true
 	mode := v1.DriverCache(disk.Driver.Cache)
+	isBlockDev := false
 
 	if disk.Source.File != "" {
 		path = disk.Source.File
 	} else if disk.Source.Dev != "" {
 		path = disk.Source.Dev
+		isBlockDev = true
 	} else {
 		return fmt.Errorf("Unable to set a driver cache mode, disk is neither a block device nor a file")
 	}
 
 	if mode == "" || mode == v1.CacheNone {
-		supportDirectIO = checkDirectIOFlag(path)
-		if !supportDirectIO {
+		if isBlockDev {
+			supportDirectIO, err = directIOChecker.CheckBlockDevice(path)
+		} else {
+			supportDirectIO, err = directIOChecker.CheckFile(path)
+		}
+		if err != nil {
+			log.Log.Reason(err).Errorf("Direct IO check failed for %s", path)
+		} else if !supportDirectIO {
 			log.Log.Infof("%s file system does not support direct I/O", path)
 		}
 		// when the disk is backed-up by another file, we need to also check if that
 		// file sits on a file system that supports direct I/O
 		if backingFile := disk.BackingStore; backingFile != nil {
 			backingFilePath := backingFile.Source.File
-			backFileDirectIOSupport := checkDirectIOFlag(backingFilePath)
-			if !backFileDirectIOSupport {
+			backFileDirectIOSupport, err := directIOChecker.CheckFile(backingFilePath)
+			if err != nil {
+				log.Log.Reason(err).Errorf("Direct IO check failed for %s", backingFilePath)
+			} else if !backFileDirectIOSupport {
 				log.Log.Infof("%s backing file system does not support direct I/O", backingFilePath)
 			}
 			supportDirectIO = supportDirectIO && backFileDirectIOSupport
@@ -1107,25 +1157,16 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 		}
 
 		if vmi.Spec.Domain.Firmware.Bootloader != nil && vmi.Spec.Domain.Firmware.Bootloader.EFI != nil {
-			secureBoot := vmi.Spec.Domain.Firmware.Bootloader.EFI.SecureBoot == nil || *vmi.Spec.Domain.Firmware.Bootloader.EFI.SecureBoot
-			efiCode, _ := detectEFICodeRom(c, secureBoot)
-			efiVars, _ := detectEFIVarsRom(c, secureBoot)
-
-			secureLoader := "yes"
-			if !secureBoot {
-				secureLoader = "no"
-			}
-
 			domain.Spec.OS.BootLoader = &api.Loader{
-				Path:     filepath.Join(c.OVMFPath, efiCode),
+				Path:     c.EFIConfiguration.EFICode,
 				ReadOnly: "yes",
-				Secure:   secureLoader,
+				Secure:   boolToYesNo(&c.EFIConfiguration.SecureLoader, false),
 				Type:     "pflash",
 			}
 
 			domain.Spec.OS.NVRam = &api.NVRam{
 				NVRam:    filepath.Join("/tmp", domain.Spec.Name),
-				Template: filepath.Join(c.OVMFPath, efiVars),
+				Template: c.EFIConfiguration.EFIVars,
 			}
 		}
 
@@ -1699,65 +1740,6 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 			api.Arg{Value: "isa-debugcon,iobase=0x402,chardev=firmwarelog"})
 	}
 
-	return nil
-}
-
-func detectEFICodeRom(c *ConverterContext, secureBoot bool) (string, error) {
-	efiCode := EFICode
-
-	if secureBoot {
-		efiCode = EFICodeSecureBoot
-	} else if isARM64(c.Architecture) {
-		efiCode = EFICodeAARCH64
-	}
-
-	_, err := os.Stat(filepath.Join(c.OVMFPath, efiCode))
-	if os.IsNotExist(err) && efiCode == EFICode {
-		// The combination (EFICodeSecureBoot + EFIVars) is valid
-		// for booting in EFI mode with SecureBoot disabled
-		efiCode = EFICodeSecureBoot
-		_, err = os.Stat(filepath.Join(c.OVMFPath, efiCode))
-	}
-
-	if os.IsNotExist(err) {
-		log.Log.Reason(err).Errorf("'%s' EFI OVMF rom missing for booting in EFI mode with SecureBoot=%v", efiCode, secureBoot)
-		return "", fmt.Errorf("'%s' EFI OVMF rom missing for booting in EFI mode with SecureBoot=%v", efiCode, secureBoot)
-	}
-	return efiCode, nil
-}
-
-func detectEFIVarsRom(c *ConverterContext, secureBoot bool) (string, error) {
-	efiVars := EFIVars
-
-	if secureBoot {
-		efiVars = EFIVarsSecureBoot
-	} else if isARM64(c.Architecture) {
-		efiVars = EFIVarsAARCH64
-	}
-
-	_, err := os.Stat(filepath.Join(c.OVMFPath, efiVars))
-	if os.IsNotExist(err) {
-		log.Log.Reason(err).Errorf("'%s' EFI OVMF rom missing for booting in EFI mode with SecureBoot=%v", efiVars, secureBoot)
-		return "", fmt.Errorf("'%s' EFI OVMF rom missing for booting in EFI mode with SecureBoot=%v", efiVars, secureBoot)
-	}
-	return efiVars, nil
-}
-
-func CheckEFI_OVMFRoms(vmi *v1.VirtualMachineInstance, c *ConverterContext) (err error) {
-	if vmi.Spec.Domain.Firmware != nil {
-		if vmi.Spec.Domain.Firmware.Bootloader != nil && vmi.Spec.Domain.Firmware.Bootloader.EFI != nil {
-			secureBoot := vmi.Spec.Domain.Firmware.Bootloader.EFI.SecureBoot == nil || *vmi.Spec.Domain.Firmware.Bootloader.EFI.SecureBoot
-			_, errCode := detectEFICodeRom(c, secureBoot)
-			_, errVars := detectEFIVarsRom(c, secureBoot)
-
-			if errCode != nil {
-				return errCode
-			}
-			if errVars != nil {
-				return errVars
-			}
-		}
-	}
 	return nil
 }
 

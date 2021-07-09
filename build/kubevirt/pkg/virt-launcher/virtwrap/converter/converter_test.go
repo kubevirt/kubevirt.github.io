@@ -22,14 +22,17 @@ package converter
 import (
 	"encoding/xml"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
+	"path/filepath"
 	"reflect"
 	"strconv"
 	"strings"
 
 	"kubevirt.io/kubevirt/pkg/virt-controller/services"
 
+	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
@@ -2801,18 +2804,6 @@ var _ = Describe("Converter", func() {
 		var vmi *v1.VirtualMachineInstance
 		var c *ConverterContext
 
-		createEFIRoms := func(createNoSBCodeROM bool) {
-			roms := []string{"OVMF_CODE.secboot.fd", "OVMF_VARS.fd", "OVMF_VARS.secboot.fd"}
-			if createNoSBCodeROM {
-				roms = append(roms, "OVMF_CODE.fd")
-			}
-
-			for i := range roms {
-				_, err := os.Create(path.Join(c.OVMFPath, roms[i]))
-				Expect(err).To(BeNil())
-			}
-		}
-
 		BeforeEach(func() {
 			vmi = &v1.VirtualMachineInstance{
 				ObjectMeta: k8smeta.ObjectMeta{
@@ -2823,18 +2814,10 @@ var _ = Describe("Converter", func() {
 
 			v1.SetObjectDefaults_VirtualMachineInstance(vmi)
 
-			ovmfPath, err := os.MkdirTemp("", "kubevirt-ovmf")
-			Expect(err).To(BeNil())
-
 			c = &ConverterContext{
 				VirtualMachine: vmi,
 				UseEmulation:   true,
-				OVMFPath:       ovmfPath,
 			}
-		})
-
-		AfterEach(func() {
-			os.RemoveAll(c.OVMFPath)
 		})
 
 		Context("when bootloader is not set", func() {
@@ -2866,38 +2849,40 @@ var _ = Describe("Converter", func() {
 				Expect(domainSpec.OS.BootLoader).To(BeNil())
 				Expect(domainSpec.OS.NVRam).To(BeNil())
 			})
-
-			table.DescribeTable("EFI bootloader",
-				func(secureBoot *bool, createNoSBCodeROM bool, efiCode string, efiVars string) {
-					secure := "yes"
-					if secureBoot != nil && !*secureBoot {
-						secure = "no"
-					}
-
-					createEFIRoms(createNoSBCodeROM)
-
-					vmi.Spec.Domain.Firmware = &v1.Firmware{
-						Bootloader: &v1.Bootloader{
-							EFI: &v1.EFI{
-								SecureBoot: secureBoot,
-							},
-						},
-					}
-					domainSpec := vmiToDomainXMLToDomainSpec(vmi, c)
-					Expect(domainSpec.OS.BootLoader.ReadOnly).To(Equal("yes"))
-					Expect(domainSpec.OS.BootLoader.Type).To(Equal("pflash"))
-					Expect(domainSpec.OS.BootLoader.Secure).To(Equal(secure))
-					Expect(path.Base(domainSpec.OS.BootLoader.Path)).To(Equal(efiCode))
-					Expect(path.Base(domainSpec.OS.NVRam.Template)).To(Equal(efiVars))
-					Expect(domainSpec.OS.NVRam.NVRam).To(Equal("/tmp/mynamespace_testvmi"))
-				},
-				table.Entry("should use SecureBoot", True(), true, EFICodeSecureBoot, EFIVarsSecureBoot),
-				table.Entry("should use SecureBoot when SB not defined", nil, true, EFICodeSecureBoot, EFIVarsSecureBoot),
-				table.Entry("should use SecureBoot when OVMF_CODE.fd does not exist", True(), false, EFICodeSecureBoot, EFIVarsSecureBoot),
-				table.Entry("should not use SecureBoot", False(), true, EFICode, EFIVars),
-				table.Entry("should not use SecureBoot when OVMF_CODE.fd does not exist", False(), false, EFICodeSecureBoot, EFIVars),
-			)
 		})
+
+		table.DescribeTable("EFI bootloader", func(secureBoot *bool, efiCode, efiVars string) {
+			c.EFIConfiguration = &EFIConfiguration{
+				EFICode:      efiCode,
+				EFIVars:      efiVars,
+				SecureLoader: secureBoot == nil || *secureBoot,
+			}
+
+			secureLoader := "yes"
+			if secureBoot != nil && !*secureBoot {
+				secureLoader = "no"
+			}
+
+			vmi.Spec.Domain.Firmware = &v1.Firmware{
+				Bootloader: &v1.Bootloader{
+					EFI: &v1.EFI{
+						SecureBoot: secureBoot,
+					},
+				},
+			}
+			domainSpec := vmiToDomainXMLToDomainSpec(vmi, c)
+			Expect(domainSpec.OS.BootLoader.ReadOnly).To(Equal("yes"))
+			Expect(domainSpec.OS.BootLoader.Type).To(Equal("pflash"))
+			Expect(domainSpec.OS.BootLoader.Secure).To(Equal(secureLoader))
+			Expect(path.Base(domainSpec.OS.BootLoader.Path)).To(Equal(efiCode))
+			Expect(path.Base(domainSpec.OS.NVRam.Template)).To(Equal(efiVars))
+			Expect(domainSpec.OS.NVRam.NVRam).To(Equal("/tmp/mynamespace_testvmi"))
+		},
+			table.Entry("should use SecureBoot", True(), "OVMF_CODE.secboot.fd", "OVMF_VARS.secboot.fd"),
+			table.Entry("should use SecureBoot when SB not defined", nil, "OVMF_CODE.secboot.fd", "OVMF_VARS.secboot.fd"),
+			table.Entry("should not use SecureBoot", False(), "OVMF_CODE.fd", "OVMF_VARS.fd"),
+			table.Entry("should not use SecureBoot when OVMF_CODE.fd not present", True(), "OVMF_CODE.secboot.fd", "OVMF_VARS.fd"),
+		)
 	})
 
 	Context("Kernel Boot", func() {
@@ -3327,6 +3312,124 @@ var _ = Describe("disk device naming", func() {
 		Expect(res).To(Equal("sda"))
 		Expect(index).To(Equal(0))
 	})
+})
+
+var _ = Describe("direct IO checker", func() {
+	var directIOChecker DirectIOChecker
+	var tmpDir string
+	var existingFile string
+	var nonExistingFile string
+	var err error
+
+	BeforeEach(func() {
+		directIOChecker = NewDirectIOChecker()
+		tmpDir, err = os.MkdirTemp("", "direct-io-checker")
+		Expect(err).ToNot(HaveOccurred())
+		existingFile = filepath.Join(tmpDir, "disk.img")
+		err = ioutil.WriteFile(existingFile, []byte("test"), 0644)
+		Expect(err).ToNot(HaveOccurred())
+		nonExistingFile = filepath.Join(tmpDir, "non-existing-file")
+	})
+
+	AfterEach(func() {
+		err = os.RemoveAll(tmpDir)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	It("should not fail when file/device exists", func() {
+		_, err = directIOChecker.CheckFile(existingFile)
+		Expect(err).ToNot(HaveOccurred())
+		_, err = directIOChecker.CheckBlockDevice(existingFile)
+		Expect(err).ToNot(HaveOccurred())
+	})
+
+	It("should not fail when file does not exist", func() {
+		_, err := directIOChecker.CheckFile(nonExistingFile)
+		Expect(err).ToNot(HaveOccurred())
+		_, err = os.Stat(nonExistingFile)
+		Expect(err).To(HaveOccurred())
+		Expect(os.IsNotExist(err)).To(BeTrue())
+	})
+
+	It("should fail when device does not exist", func() {
+		_, err := directIOChecker.CheckBlockDevice(nonExistingFile)
+		Expect(err).To(HaveOccurred())
+		_, err = os.Stat(nonExistingFile)
+		Expect(err).To(HaveOccurred())
+		Expect(os.IsNotExist(err)).To(BeTrue())
+	})
+
+	It("should fail when the path does not exist", func() {
+		nonExistingPath := "/non/existing/path/disk.img"
+		_, err = directIOChecker.CheckFile(nonExistingPath)
+		Expect(err).To(HaveOccurred())
+		Expect(os.IsNotExist(err)).To(BeTrue())
+		_, err = directIOChecker.CheckBlockDevice(nonExistingPath)
+		Expect(err).To(HaveOccurred())
+		Expect(os.IsNotExist(err)).To(BeTrue())
+		_, err = os.Stat(nonExistingPath)
+		Expect(err).To(HaveOccurred())
+		Expect(os.IsNotExist(err)).To(BeTrue())
+	})
+})
+
+var _ = Describe("SetDriverCacheMode", func() {
+	var ctrl *gomock.Controller
+	var mockDirectIOChecker *MockDirectIOChecker
+
+	BeforeEach(func() {
+		ctrl = gomock.NewController(GinkgoT())
+		mockDirectIOChecker = NewMockDirectIOChecker(ctrl)
+	})
+
+	AfterEach(func() {
+		ctrl.Finish()
+	})
+
+	expectCheckTrue := func() {
+		mockDirectIOChecker.EXPECT().CheckBlockDevice(gomock.Any()).AnyTimes().Return(true, nil)
+		mockDirectIOChecker.EXPECT().CheckFile(gomock.Any()).AnyTimes().Return(true, nil)
+	}
+
+	expectCheckFalse := func() {
+		mockDirectIOChecker.EXPECT().CheckBlockDevice(gomock.Any()).AnyTimes().Return(false, nil)
+		mockDirectIOChecker.EXPECT().CheckFile(gomock.Any()).AnyTimes().Return(false, nil)
+	}
+
+	expectCheckError := func() {
+		checkerError := fmt.Errorf("DirectIOChecker error")
+		mockDirectIOChecker.EXPECT().CheckBlockDevice(gomock.Any()).AnyTimes().Return(false, checkerError)
+		mockDirectIOChecker.EXPECT().CheckFile(gomock.Any()).AnyTimes().Return(false, checkerError)
+	}
+
+	table.DescribeTable("should correctly set driver cache mode", func(cache, expectedCache string, setExpectations func()) {
+		disk := &api.Disk{
+			Driver: &api.DiskDriver{
+				Cache: cache,
+			},
+			Source: api.DiskSource{
+				File: "file",
+			},
+		}
+		setExpectations()
+		err := SetDriverCacheMode(disk, mockDirectIOChecker)
+		if expectedCache == "" {
+			Expect(err).To(HaveOccurred())
+		} else {
+			Expect(err).ToNot(HaveOccurred())
+			Expect(disk.Driver.Cache).To(Equal(expectedCache))
+		}
+	},
+		table.Entry("detect 'none' with direct io", string(""), string(v1.CacheNone), expectCheckTrue),
+		table.Entry("detect 'writethrough' without direct io", string(""), string(v1.CacheWriteThrough), expectCheckFalse),
+		table.Entry("fallback to 'writethrough' on error", string(""), string(v1.CacheWriteThrough), expectCheckError),
+		table.Entry("keep 'none' with direct io", string(v1.CacheNone), string(v1.CacheNone), expectCheckTrue),
+		table.Entry("return error without direct io", string(v1.CacheNone), string(""), expectCheckFalse),
+		table.Entry("return error on error", string(v1.CacheNone), string(""), expectCheckError),
+		table.Entry("'writethrough' with direct io", string(v1.CacheWriteThrough), string(v1.CacheWriteThrough), expectCheckTrue),
+		table.Entry("'writethrough' without direct io", string(v1.CacheWriteThrough), string(v1.CacheWriteThrough), expectCheckFalse),
+		table.Entry("'writethrough' on error", string(v1.CacheWriteThrough), string(v1.CacheWriteThrough), expectCheckError),
+	)
 })
 
 func diskToDiskXML(disk *v1.Disk) string {
