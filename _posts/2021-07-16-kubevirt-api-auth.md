@@ -237,7 +237,7 @@ You can see that now, the ServiceAccount can view the vm and vmi that are in bot
 
 ## Creating Custom RBAC Roles
 
-In this demo we used RBAC roles created as part of the KubeVirt install. You can also create custom RBAC roles for KubeVirt. Documentation on how this can be done is available in the KubeVirt documentation [Creating Customer RBAC Roles](https://kubevirt.io/user-guide/operations/authorization/#creating-custom-rbac-roles)
+In this demo we used RBAC roles created as part of the KubeVirt install. You can also create custom RBAC roles for KubeVirt. Documentation on how this can be done is available in the KubeVirt documentation [Creating Custom RBAC Roles](https://kubevirt.io/user-guide/operations/authorization/#creating-custom-rbac-roles)
 
 ## Conclusion
 
