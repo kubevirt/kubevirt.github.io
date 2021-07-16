@@ -91,7 +91,7 @@ var _ = Describe("VirtualMachine", func() {
 
 		})
 
-		shouldExpectDataVolumeCreation := func(uid types.UID, labels map[string]string, annotations map[string]string, idx *int) {
+		shouldExpectDataVolumeCreationPriorityClass := func(uid types.UID, labels map[string]string, annotations map[string]string, priorityClassName string, idx *int) {
 			cdiClient.Fake.PrependReactor("create", "datavolumes", func(action testing.Action) (handled bool, obj runtime.Object, err error) {
 				update, ok := action.(testing.CreateAction)
 				Expect(ok).To(BeTrue())
@@ -100,8 +100,13 @@ var _ = Describe("VirtualMachine", func() {
 				Expect(dataVolume.ObjectMeta.OwnerReferences[0].UID).To(Equal(uid))
 				Expect(dataVolume.ObjectMeta.Labels).To(Equal(labels))
 				Expect(dataVolume.ObjectMeta.Annotations).To(Equal(annotations))
+				Expect(dataVolume.Spec.PriorityClassName).To(Equal(priorityClassName))
 				return true, update.GetObject(), nil
 			})
+		}
+
+		shouldExpectDataVolumeCreation := func(uid types.UID, labels map[string]string, annotations map[string]string, idx *int) {
+			shouldExpectDataVolumeCreationPriorityClass(uid, labels, annotations, "", idx)
 		}
 
 		shouldExpectDataVolumeDeletion := func(uid types.UID, idx *int) {
@@ -632,6 +637,42 @@ var _ = Describe("VirtualMachine", func() {
 			testutils.ExpectEvent(recorder, SuccessfulDataVolumeCreateReason)
 		})
 
+		table.DescribeTable("should properly set priority class", func(dvPriorityClass, vmPriorityClass, expectedPriorityClass string) {
+			vm, _ := DefaultVirtualMachine(true)
+			vm.Spec.Template.Spec.Volumes = append(vm.Spec.Template.Spec.Volumes, v1.Volume{
+				Name: "test1",
+				VolumeSource: v1.VolumeSource{
+					DataVolume: &v1.DataVolumeSource{
+						Name: "dv1",
+					},
+				},
+			})
+
+			vm.Spec.DataVolumeTemplates = append(vm.Spec.DataVolumeTemplates, v1.DataVolumeTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Name: "dv1",
+				},
+				Spec: cdiv1.DataVolumeSpec{
+					PriorityClassName: dvPriorityClass,
+				},
+			})
+			vm.Spec.Template.Spec.PriorityClassName = vmPriorityClass
+			vm.Status.PrintableStatus = v1.VirtualMachineStatusProvisioning
+			addVirtualMachine(vm)
+
+			createCount := 0
+			shouldExpectDataVolumeCreationPriorityClass(vm.UID, map[string]string{"kubevirt.io/created-by": ""}, map[string]string{}, expectedPriorityClass, &createCount)
+
+			controller.Execute()
+			Expect(createCount).To(Equal(1))
+			testutils.ExpectEvent(recorder, SuccessfulDataVolumeCreateReason)
+		},
+			table.Entry("when dv priorityclass is not defined and VM priorityclass is defined", "", "vmpriority", "vmpriority"),
+			table.Entry("when dv priorityclass is defined and VM priorityclass is defined", "dvpriority", "vmpriority", "dvpriority"),
+			table.Entry("when dv priorityclass is defined and VM priorityclass is not defined", "dvpriority", "", "dvpriority"),
+			table.Entry("when dv priorityclass is not defined and VM priorityclass is not defined", "", "", ""),
+		)
+
 		Context("clone authorization tests", func() {
 			dv1 := &v1.DataVolumeTemplateSpec{
 				ObjectMeta: metav1.ObjectMeta{
@@ -960,8 +1001,8 @@ var _ = Describe("VirtualMachine", func() {
 			// We should see the failed condition, replicas should stay at 0
 			vmInterface.EXPECT().UpdateStatus(gomock.Any()).Do(func(obj interface{}) {
 				objVM := obj.(*v1.VirtualMachine)
-				Expect(objVM.Status.Conditions).To(HaveLen(1))
-				cond := objVM.Status.Conditions[0]
+				cond := virtcontroller.NewVirtualMachineConditionManager().GetCondition(objVM, v1.VirtualMachineFailure)
+				Expect(cond).To(Not(BeNil()))
 				Expect(cond.Type).To(Equal(v1.VirtualMachineFailure))
 				Expect(cond.Reason).To(Equal("FailedCreate"))
 				Expect(cond.Message).To(Equal("failure"))
@@ -983,8 +1024,8 @@ var _ = Describe("VirtualMachine", func() {
 
 			vmInterface.EXPECT().UpdateStatus(gomock.Any()).Do(func(obj interface{}) {
 				objVM := obj.(*v1.VirtualMachine)
-				Expect(objVM.Status.Conditions).To(HaveLen(1))
-				cond := objVM.Status.Conditions[0]
+				cond := virtcontroller.NewVirtualMachineConditionManager().GetCondition(objVM, v1.VirtualMachineFailure)
+				Expect(cond).To(Not(BeNil()))
 				Expect(cond.Type).To(Equal(v1.VirtualMachineFailure))
 				Expect(cond.Reason).To(Equal("FailedDelete"))
 				Expect(cond.Message).To(Equal("failure"))
@@ -996,8 +1037,9 @@ var _ = Describe("VirtualMachine", func() {
 			testutils.ExpectEvents(recorder, FailedDeleteVirtualMachineReason)
 		})
 
-		table.DescribeTable("should add ready condition", func(setup func(vmi *v1.VirtualMachineInstance), status k8sv1.ConditionStatus) {
+		table.DescribeTable("should add ready condition when VMI exists", func(setup func(vmi *v1.VirtualMachineInstance), status k8sv1.ConditionStatus) {
 			vm, vmi := DefaultVirtualMachine(true)
+			virtcontroller.NewVirtualMachineConditionManager().RemoveCondition(vm, v1.VirtualMachineReady)
 			addVirtualMachine(vm)
 
 			setup(vmi)
@@ -1013,9 +1055,28 @@ var _ = Describe("VirtualMachine", func() {
 
 			controller.Execute()
 		},
-			table.Entry("True", markAsReady, k8sv1.ConditionTrue),
-			table.Entry("False", markAsNonReady, k8sv1.ConditionFalse),
+			table.Entry("VMI Ready condition is True", markAsReady, k8sv1.ConditionTrue),
+			table.Entry("VMI Ready condition is False", markAsNonReady, k8sv1.ConditionFalse),
+			table.Entry("VMI Ready condition doesn't exist", unmarkReady, k8sv1.ConditionFalse),
 		)
+
+		It("should add ready condition when VMI doesn't exists", func() {
+			vm, vmi := DefaultVirtualMachine(true)
+			virtcontroller.NewVirtualMachineConditionManager().RemoveCondition(vm, v1.VirtualMachineReady)
+			addVirtualMachine(vm)
+
+			vmInterface.EXPECT().UpdateStatus(gomock.Any()).Do(func(obj interface{}) {
+				objVM := obj.(*v1.VirtualMachine)
+				cond := virtcontroller.NewVirtualMachineConditionManager().
+					GetCondition(objVM, v1.VirtualMachineReady)
+				Expect(cond).ToNot(BeNil())
+				Expect(cond.Status).To(Equal(k8sv1.ConditionFalse))
+			}).Return(vm, nil)
+
+			vmiInterface.EXPECT().Create(gomock.Any()).Return(vmi, nil)
+
+			controller.Execute()
+		})
 
 		It("should add paused condition", func() {
 			vm, vmi := DefaultVirtualMachine(true)
@@ -1070,8 +1131,8 @@ var _ = Describe("VirtualMachine", func() {
 
 			vmInterface.EXPECT().UpdateStatus(gomock.Any()).Do(func(obj interface{}) {
 				objVM := obj.(*v1.VirtualMachine)
-				Expect(objVM.Status.Conditions).To(HaveLen(1))
-				cond := objVM.Status.Conditions[0]
+				cond := virtcontroller.NewVirtualMachineConditionManager().GetCondition(objVM, v1.VirtualMachineFailure)
+				Expect(cond).To(Not(BeNil()))
 				Expect(cond.Type).To(Equal(v1.VirtualMachineFailure))
 				Expect(cond.Reason).To(Equal("FailedDelete"))
 				Expect(cond.Message).To(Equal("failure"))
@@ -1542,6 +1603,15 @@ func VirtualMachineFromVMI(name string, vmi *v1.VirtualMachineInstance, started 
 					Labels: vmi.ObjectMeta.Labels,
 				},
 				Spec: vmi.Spec,
+			},
+		},
+		Status: v1.VirtualMachineStatus{
+			Conditions: []v1.VirtualMachineCondition{
+				{
+					Type:   v1.VirtualMachineReady,
+					Status: k8sv1.ConditionFalse,
+					Reason: "VMINotExists",
+				},
 			},
 		},
 	}

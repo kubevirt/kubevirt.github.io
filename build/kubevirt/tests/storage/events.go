@@ -68,7 +68,7 @@ var _ = SIGDescribe("[Serial]K8s IO events", func() {
 
 		nodeName = tests.NodeNameWithHandler()
 		tests.CreateFaultyDisk(nodeName, deviceName)
-		pv, pvc, err = tests.CreatePVandPVCwithFaultyDisk(nodeName, deviceName, util.NamespaceTestDefault)
+		pv, pvc, err = tests.CreatePVandPVCwithFaultyDisk(nodeName, "/dev/mapper/"+deviceName, util.NamespaceTestDefault)
 		Expect(err).NotTo(HaveOccurred(), "Failed to create PV and PVC for faulty disk")
 	})
 	AfterEach(func() {
@@ -77,7 +77,7 @@ var _ = SIGDescribe("[Serial]K8s IO events", func() {
 		err := virtClient.CoreV1().PersistentVolumes().Delete(context.Background(), pv.Name, metav1.DeleteOptions{})
 		Expect(err).ToNot(HaveOccurred())
 	})
-	It("[test_id:6225]Should catch the IO error event", func() {
+	It("[QUARANTINE][test_id:6225]Should catch the IO error event", func() {
 		By("Creating VMI with faulty disk")
 		vmi := tests.NewRandomVMIWithPVC(pvc.Name)
 		vmi, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)

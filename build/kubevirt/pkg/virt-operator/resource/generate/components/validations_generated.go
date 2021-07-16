@@ -514,6 +514,19 @@ var CRDsValidation map[string]string = map[string]string{
               properties:
                 cpuAllocationRatio:
                   type: integer
+                diskVerification:
+                  description: DiskVerification holds container disks verification
+                    limits
+                  properties:
+                    memoryLimit:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                  required:
+                  - memoryLimit
+                  type: object
                 featureGates:
                   items:
                     type: string
@@ -4426,6 +4439,10 @@ var CRDsValidation map[string]string = map[string]string{
                         value is 1.
                       format: int32
                       type: integer
+                    guestAgentPing:
+                      description: GuestAgentPing contacts the qemu-guest-agent for
+                        availability checks.
+                      type: object
                     httpGet:
                       description: HTTPGet specifies the http request to perform.
                       properties:
@@ -4601,6 +4618,10 @@ var CRDsValidation map[string]string = map[string]string{
                         value is 1.
                       format: int32
                       type: integer
+                    guestAgentPing:
+                      description: GuestAgentPing contacts the qemu-guest-agent for
+                        availability checks.
+                      type: object
                     httpGet:
                       description: HTTPGet specifies the http request to perform.
                       properties:
@@ -7047,6 +7068,10 @@ var CRDsValidation map[string]string = map[string]string{
                 failed after having succeeded. Defaults to 3. Minimum value is 1.
               format: int32
               type: integer
+            guestAgentPing:
+              description: GuestAgentPing contacts the qemu-guest-agent for availability
+                checks.
+              type: object
             httpGet:
               description: HTTPGet specifies the http request to perform.
               properties:
@@ -7213,6 +7238,10 @@ var CRDsValidation map[string]string = map[string]string{
                 failed after having succeeded. Defaults to 3. Minimum value is 1.
               format: int32
               type: integer
+            guestAgentPing:
+              description: GuestAgentPing contacts the qemu-guest-agent for availability
+                checks.
+              type: object
             httpGet:
               description: HTTPGet specifies the http request to perform.
               properties:
@@ -10777,6 +10806,10 @@ var CRDsValidation map[string]string = map[string]string{
                         value is 1.
                       format: int32
                       type: integer
+                    guestAgentPing:
+                      description: GuestAgentPing contacts the qemu-guest-agent for
+                        availability checks.
+                      type: object
                     httpGet:
                       description: HTTPGet specifies the http request to perform.
                       properties:
@@ -10952,6 +10985,10 @@ var CRDsValidation map[string]string = map[string]string{
                         value is 1.
                       format: int32
                       type: integer
+                    guestAgentPing:
+                      description: GuestAgentPing contacts the qemu-guest-agent for
+                        availability checks.
+                      type: object
                     httpGet:
                       description: HTTPGet specifies the http request to perform.
                       properties:
@@ -14252,6 +14289,10 @@ var CRDsValidation map[string]string = map[string]string{
                                     Defaults to 3. Minimum value is 1.
                                   format: int32
                                   type: integer
+                                guestAgentPing:
+                                  description: GuestAgentPing contacts the qemu-guest-agent
+                                    for availability checks.
+                                  type: object
                                 httpGet:
                                   description: HTTPGet specifies the http request
                                     to perform.
@@ -14440,6 +14481,10 @@ var CRDsValidation map[string]string = map[string]string{
                                     Defaults to 3. Minimum value is 1.
                                   format: int32
                                   type: integer
+                                guestAgentPing:
+                                  description: GuestAgentPing contacts the qemu-guest-agent
+                                    for availability checks.
+                                  type: object
                                 httpGet:
                                   description: HTTPGet specifies the http request
                                     to perform.

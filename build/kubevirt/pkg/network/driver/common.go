@@ -65,11 +65,10 @@ type NetworkHandler interface {
 	LinkAdd(link netlink.Link) error
 	LinkSetLearningOff(link netlink.Link) error
 	ParseAddr(s string) (*netlink.Addr, error)
-	GetHostAndGwAddressesFromCIDR(s string) (string, string, error)
 	SetRandomMac(iface string) (net.HardwareAddr, error)
 	GetMacDetails(iface string) (net.HardwareAddr, error)
 	LinkSetMaster(link netlink.Link, master *netlink.Bridge) error
-	StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceName string, dhcpOptions *v1.DHCPOptions, filterByMAC bool) error
+	StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceName string, dhcpOptions *v1.DHCPOptions) error
 	HasNatIptables(proto iptables.Protocol) bool
 	IsIpv6Enabled(interfaceName string) (bool, error)
 	IsIpv4Primary() (bool, error)
@@ -291,35 +290,6 @@ func (h *NetworkUtilsHandler) ReadIPAddressesFromLink(interfaceName string) (str
 	return ipv4, ipv6, nil
 }
 
-func (h *NetworkUtilsHandler) GetHostAndGwAddressesFromCIDR(s string) (string, string, error) {
-	ip, ipnet, err := net.ParseCIDR(s)
-	if err != nil {
-		return "", "", err
-	}
-
-	subnet, _ := ipnet.Mask.Size()
-	var ips []string
-	for ip := ip.Mask(ipnet.Mask); ipnet.Contains(ip); inc(ip) {
-		ips = append(ips, fmt.Sprintf("%s/%d", ip.String(), subnet))
-
-		if len(ips) == 4 {
-			// remove network address and broadcast address
-			return ips[1], ips[2], nil
-		}
-	}
-
-	return "", "", fmt.Errorf("less than 4 addresses on network")
-}
-
-func inc(ip net.IP) {
-	for j := len(ip) - 1; j >= 0; j-- {
-		ip[j]++
-		if ip[j] > 0 {
-			break
-		}
-	}
-}
-
 // GetMacDetails from an interface
 func (h *NetworkUtilsHandler) GetMacDetails(iface string) (net.HardwareAddr, error) {
 	currentMac, err := lmf.GetCurrentMac(iface)
@@ -365,7 +335,7 @@ func (h *NetworkUtilsHandler) SetRandomMac(iface string) (net.HardwareAddr, erro
 	return currentMac, nil
 }
 
-func (h *NetworkUtilsHandler) StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceName string, dhcpOptions *v1.DHCPOptions, filterByMAC bool) error {
+func (h *NetworkUtilsHandler) StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceName string, dhcpOptions *v1.DHCPOptions) error {
 	log.Log.V(4).Infof("StartDHCP network Nic: %+v", nic)
 	nameservers, searchDomains, err := converter.GetResolvConfDetailsFromPod()
 	if err != nil {
@@ -377,7 +347,6 @@ func (h *NetworkUtilsHandler) StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceNa
 	go func() {
 		if err = DHCPServer(
 			nic.MAC,
-			filterByMAC,
 			nic.IP.IP,
 			nic.IP.Mask,
 			bridgeInterfaceName,

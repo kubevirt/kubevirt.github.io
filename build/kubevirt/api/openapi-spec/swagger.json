@@ -6524,6 +6524,88 @@
      }
     ]
    },
+   "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic to the specified VirtualMachineInstance and port.",
+     "operationId": "v1vmi-PortForward",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}/{protocol:tcp|udp}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic of the specified protocol (either tcp or udp) to the specified VirtualMachineInstance and port.",
+     "operationId": "v1vmi-PortForwardWithProtocol",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The protocol for portforward on the VirtualMachineInstance.",
+      "name": "protocol",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
    "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/removevolume": {
     "put": {
      "description": "Removes a volume and disk from a running Virtual Machine Instance",
@@ -6796,6 +6878,88 @@
       "type": "string",
       "description": "Object name and auth scope, such as for teams and projects",
       "name": "namespace",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachines/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic to the running VMI for the specified VirtualMachine and port.",
+     "operationId": "v1vm-PortForward",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachines/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}/{protocol:tcp|udp}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic of the specified protocol (either tcp or udp) to the specified VirtualMachine and port.",
+     "operationId": "v1vm-PortForwardWithProtocol",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The protocol for portforward on the VirtualMachineInstance.",
+      "name": "protocol",
       "in": "path",
       "required": true
      }
@@ -7295,6 +7459,88 @@
      }
     ]
    },
+   "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic to the specified VirtualMachineInstance and port.",
+     "operationId": "v1alpha3vmi-PortForward",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}/{protocol:tcp|udp}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic of the specified protocol (either tcp or udp) to the specified VirtualMachineInstance and port.",
+     "operationId": "v1alpha3vmi-PortForwardWithProtocol",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The protocol for portforward on the VirtualMachineInstance.",
+      "name": "protocol",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
    "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/removevolume": {
     "put": {
      "description": "Removes a volume and disk from a running Virtual Machine Instance",
@@ -7567,6 +7813,88 @@
       "type": "string",
       "description": "Object name and auth scope, such as for teams and projects",
       "name": "namespace",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachines/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic to the running VMI for the specified VirtualMachine and port.",
+     "operationId": "v1alpha3vm-PortForward",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachines/{name:[a-z0-9][a-z0-9\\-]*}/portforward/{port:[0-9]+}/{protocol:tcp|udp}": {
+    "get": {
+     "description": "Open a websocket connection forwarding traffic of the specified protocol (either tcp or udp) to the specified VirtualMachine and port.",
+     "operationId": "v1alpha3vm-PortForwardWithProtocol",
+     "responses": {
+      "401": {
+       "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The target port for portforward on the VirtualMachineInstance.",
+      "name": "port",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "The protocol for portforward on the VirtualMachineInstance.",
+      "name": "protocol",
       "in": "path",
       "required": true
      }
@@ -9468,6 +9796,9 @@
       "type": "integer",
       "format": "int32"
      },
+     "diskVerification": {
+      "$ref": "#/definitions/v1.DiskVerification"
+     },
      "featureGates": {
       "type": "array",
       "items": {
@@ -9666,6 +9997,18 @@
      "readonly": {
       "description": "ReadOnly. Defaults to false.",
       "type": "boolean"
+     }
+    }
+   },
+   "v1.DiskVerification": {
+    "description": "DiskVerification holds container disks verification limits",
+    "type": "object",
+    "required": [
+     "memoryLimit"
+    ],
+    "properties": {
+     "memoryLimit": {
+      "$ref": "#/definitions/k8s.io.apimachinery.pkg.api.resource.Quantity"
      }
     }
    },
@@ -10065,6 +10408,10 @@
       "type": "string"
      }
     }
+   },
+   "v1.GuestAgentPing": {
+    "description": "GuestAgentPing configures the guest-agent based ping probe",
+    "type": "object"
    },
    "v1.HPETTimer": {
     "type": "object",
@@ -10968,6 +11315,10 @@
       "description": "Minimum consecutive failures for the probe to be considered failed after having succeeded. Defaults to 3. Minimum value is 1.",
       "type": "integer",
       "format": "int32"
+     },
+     "guestAgentPing": {
+      "description": "GuestAgentPing contacts the qemu-guest-agent for availability checks.",
+      "$ref": "#/definitions/v1.GuestAgentPing"
      },
      "httpGet": {
       "description": "HTTPGet specifies the http request to perform.",

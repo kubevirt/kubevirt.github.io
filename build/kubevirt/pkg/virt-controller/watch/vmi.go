@@ -128,13 +128,14 @@ func NewVMIController(templateService services.TemplateService,
 
 	c := &VMIController{
 		templateService:    templateService,
-		Queue:              workqueue.NewRateLimitingQueue(workqueue.DefaultControllerRateLimiter()),
+		Queue:              workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "virt-controller-vmi"),
 		vmiInformer:        vmiInformer,
 		podInformer:        podInformer,
 		pvcInformer:        pvcInformer,
 		recorder:           recorder,
 		clientset:          clientset,
 		podExpectations:    controller.NewUIDTrackingControllerExpectations(controller.NewControllerExpectations()),
+		vmiExpectations:    controller.NewUIDTrackingControllerExpectations(controller.NewControllerExpectations()),
 		dataVolumeInformer: dataVolumeInformer,
 		topologyHinter:     topologyHinter,
 	}
@@ -188,6 +189,7 @@ type VMIController struct {
 	topologyHinter     topology.Hinter
 	recorder           record.EventRecorder
 	podExpectations    *controller.UIDTrackingControllerExpectations
+	vmiExpectations    *controller.UIDTrackingControllerExpectations
 	dataVolumeInformer cache.SharedIndexInformer
 }
 
@@ -243,6 +245,7 @@ func (c *VMIController) execute(key string) error {
 	// Once all finalizers are removed the vmi gets deleted and we can clean all expectations
 	if !exists {
 		c.podExpectations.DeleteExpectations(key)
+		c.vmiExpectations.DeleteExpectations(key)
 		return nil
 	}
 	vmi := obj.(*virtv1.VirtualMachineInstance)
@@ -254,8 +257,21 @@ func (c *VMIController) execute(key string) error {
 	if !controller.ObservedLatestApiVersionAnnotation(vmi) {
 		vmi := vmi.DeepCopy()
 		controller.SetLatestApiVersionAnnotation(vmi)
+		key := controller.VirtualMachineInstanceKey(vmi)
+		c.vmiExpectations.SetExpectations(key, 1, 0)
 		_, err = c.clientset.VirtualMachineInstance(vmi.ObjectMeta.Namespace).Update(vmi)
-		return err
+		if err != nil {
+			c.vmiExpectations.LowerExpectations(key, 1, 0)
+			return err
+		}
+		return nil
+	}
+
+	// If needsSync is true (expectations fulfilled) we can make save assumptions if virt-handler or virt-controller owns the pod
+	needsSync := c.podExpectations.SatisfiedExpectations(key) && c.vmiExpectations.SatisfiedExpectations(key)
+
+	if !needsSync {
+		return nil
 	}
 
 	// Only consider pods which belong to this vmi
@@ -273,13 +289,8 @@ func (c *VMIController) execute(key string) error {
 		return err
 	}
 
-	// If needsSync is true (expectations fulfilled) we can make save assumptions if virt-handler or virt-controller owns the pod
-	needsSync := c.podExpectations.SatisfiedExpectations(key)
+	syncErr := c.sync(vmi, pod, dataVolumes)
 
-	var syncErr syncError = nil
-	if needsSync {
-		syncErr = c.sync(vmi, pod, dataVolumes)
-	}
 	err = c.updateStatus(vmi, pod, dataVolumes, syncErr)
 	if err != nil {
 		return err
@@ -364,6 +375,8 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 	if err != nil {
 		return fmt.Errorf("Error detecting vmi pods: %v", err)
 	}
+
+	c.syncReadyConditionFromPod(vmiCopy, pod)
 
 	switch {
 	case vmi.IsUnprocessed():
@@ -477,158 +490,46 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 			vmiCopy.Status.LauncherContainerImageVersion = ""
 		}
 
-		conditionManager.RemoveCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodReady))
-
 	case vmi.IsRunning():
-		// Keep PodReady condition in sync with the VMI
 		if !vmiPodExists {
-			// Remove PodScheduling condition from the VM
-			conditionManager.RemoveCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodReady))
-		} else if isPodDownOrGoingDown(pod) {
-			cond := conditionManager.GetPodCondition(pod, k8sv1.PodReady)
-			if cond == nil || cond.Reason != virtv1.PodTerminatingReason {
-				conditionManager.RemoveCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodReady))
-				conditionManager.AddPodCondition(vmiCopy, &k8sv1.PodCondition{
-					Type:               k8sv1.PodReady,
-					Status:             k8sv1.ConditionFalse,
-					LastProbeTime:      v1.Now(),
-					LastTransitionTime: v1.Now(),
-					Reason:             virtv1.PodTerminatingReason,
-					Message:            "The Pod is terminating",
-				})
-				c.recorder.Eventf(vmi, k8sv1.EventTypeNormal, virtv1.PodTerminatingReason, "Pod %s is terminating, marking VMI as not ready.", pod.Name)
-				log.Log.Object(vmi).Infof("Pod %s is terminating, marking VMI as not ready.", pod.Name)
-			}
-		} else if cond := conditionManager.GetPodCondition(pod, k8sv1.PodReady); cond != nil {
-			conditionManager.RemoveCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodReady))
-			conditionManager.AddPodCondition(vmiCopy, cond)
-		} else if conditionManager.HasCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodReady)) {
-			// Remove PodScheduling condition from the VM
-			conditionManager.RemoveCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodReady))
+			break
 		}
 
-		patchOps := []string{}
-		if vmiPodExists {
-			c.updateVolumeStatus(vmiCopy, pod)
-		}
-		if !reflect.DeepEqual(vmiCopy.Status.VolumeStatus, vmi.Status.VolumeStatus) {
-			// VolumeStatus changed which means either removed or added volumes.
-			newVolumeStatus, err := json.Marshal(vmiCopy.Status.VolumeStatus)
-			if err != nil {
-				return err
-			}
-			oldVolumeStatus, err := json.Marshal(vmi.Status.VolumeStatus)
-			if err != nil {
-				return err
-			}
-			if string(oldVolumeStatus) == "null" {
-				patchOps = append(patchOps, fmt.Sprintf(`{ "op": "add", "path": "/status/volumeStatus", "value": %s }`, string(newVolumeStatus)))
-			} else {
-				patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/volumeStatus", "value": %s }`, string(oldVolumeStatus)))
-				patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/volumeStatus", "value": %s }`, string(newVolumeStatus)))
-			}
-			log.Log.V(3).Object(vmi).Infof("Patching Volume Status")
-		}
-		// We don't own the object anymore, so patch instead of update
-		if !conditionsEqual(vmiCopy.Status.Conditions, vmi.Status.Conditions) {
+		c.updateVolumeStatus(vmiCopy, pod)
 
-			newConditions, err := json.Marshal(vmiCopy.Status.Conditions)
-			if err != nil {
-				return err
-			}
-			oldConditions, err := json.Marshal(vmi.Status.Conditions)
-			if err != nil {
-				return err
-			}
-
-			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/conditions", "value": %s }`, string(oldConditions)))
-			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/conditions", "value": %s }`, string(newConditions)))
-
-			log.Log.V(3).Object(vmi).Infof("Patching VMI conditions")
-		}
-
-		if !reflect.DeepEqual(vmiCopy.Status.ActivePods, vmi.Status.ActivePods) {
-			newPods, err := json.Marshal(vmiCopy.Status.ActivePods)
-			if err != nil {
-				return err
-			}
-			oldPods, err := json.Marshal(vmi.Status.ActivePods)
-			if err != nil {
-				return err
-			}
-
-			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/activePods", "value": %s }`, string(oldPods)))
-			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/activePods", "value": %s }`, string(newPods)))
-
-			log.Log.V(3).Object(vmi).Infof("Patching VMI activePods")
-		}
-
-		if vmiPodExists {
-			var foundImage string
-
-			for _, container := range pod.Spec.Containers {
-				if container.Name == "compute" {
-					foundImage = container.Image
-					break
-				}
-			}
-
-			vmiCopy = c.setLauncherContainerInfo(vmiCopy, foundImage)
-
-			if vmiCopy.Status.LauncherContainerImageVersion != vmi.Status.LauncherContainerImageVersion {
-				if vmi.Status.LauncherContainerImageVersion == "" {
-					patchOps = append(patchOps, fmt.Sprintf(`{ "op": "add", "path": "/status/launcherContainerImageVersion", "value": "%s" }`, vmiCopy.Status.LauncherContainerImageVersion))
-				} else {
-					patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/launcherContainerImageVersion", "value": "%s" }`, vmi.Status.LauncherContainerImageVersion))
-					patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/launcherContainerImageVersion", "value": "%s" }`, vmiCopy.Status.LauncherContainerImageVersion))
-				}
-			}
-
-			if !reflect.DeepEqual(vmi.Labels, vmiCopy.Labels) {
-				labelBytes, err := json.Marshal(vmiCopy.Labels)
-				if err != nil {
-					return err
-				}
-				origLabelBytes, err := json.Marshal(vmi.Labels)
-				if err != nil {
-					return err
-				}
-
-				if vmi.Labels == nil {
-					patchOps = append(patchOps, fmt.Sprintf(`{ "op": "add", "path": "/metadata/labels", "value": %s }`, string(labelBytes)))
-				} else {
-					patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/metadata/labels", "value": %s }`, string(origLabelBytes)))
-					patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/metadata/labels", "value": %s }`, string(labelBytes)))
-
-				}
+		var foundImage string
+		for _, container := range pod.Spec.Containers {
+			if container.Name == "compute" {
+				foundImage = container.Image
+				break
 			}
 		}
+		vmiCopy = c.setLauncherContainerInfo(vmiCopy, foundImage)
 
-		if len(patchOps) > 0 {
-			patch := "[ "
-			for i, entry := range patchOps {
-				patch += entry
+	case vmi.IsScheduled():
+		// Nothing here
+		break
+	default:
+		return fmt.Errorf("unknown vmi phase %v", vmi.Status.Phase)
+	}
 
-				if i == len(patchOps)-1 {
-					patch += " ]"
-				} else {
-					patch += ", "
-				}
-			}
+	// VMI is owned by virt-handler, so patch instead of update
+	if vmi.IsRunning() || vmi.IsScheduled() {
+		patchBytes, err := preparePatch(vmi, vmiCopy)
+		if err != nil {
+			return fmt.Errorf("error preparing VMI patch: %v", err)
+		}
 
-			_, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte(patch))
+		if len(patchBytes) > 0 {
+			_, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte(patchBytes))
 			// We could not retry if the "test" fails but we have no sane way to detect that right now: https://github.com/kubernetes/kubernetes/issues/68202 for details
 			// So just retry like with any other errors
 			if err != nil {
-				return fmt.Errorf("patching of vmi conditions and activePods failed: %v, %v", err, patchOps)
+				return fmt.Errorf("patching of vmi conditions and activePods failed: %v", err)
 			}
 		}
+
 		return nil
-	case vmi.IsScheduled():
-		// Don't process states where the vmi is clearly owned by virt-handler
-		return nil
-	default:
-		return fmt.Errorf("unknown vmi phase %v", vmi.Status.Phase)
 	}
 
 	reason := ""
@@ -643,13 +544,162 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 	// If we detect a change on the vmi we update the vmi
 	vmiChanged := !reflect.DeepEqual(vmi.Status, vmiCopy.Status) || !reflect.DeepEqual(vmi.Finalizers, vmiCopy.Finalizers) || !reflect.DeepEqual(vmi.Annotations, vmiCopy.Annotations) || !reflect.DeepEqual(vmi.Labels, vmiCopy.Labels)
 	if vmiChanged {
+		key := controller.VirtualMachineInstanceKey(vmi)
+		c.vmiExpectations.SetExpectations(key, 1, 0)
 		_, err := c.clientset.VirtualMachineInstance(vmi.Namespace).Update(vmiCopy)
 		if err != nil {
+			c.vmiExpectations.LowerExpectations(key, 1, 0)
 			return err
 		}
 	}
 
 	return nil
+}
+
+func preparePatch(oldVMI, newVMI *virtv1.VirtualMachineInstance) ([]byte, error) {
+	var patchOps []string
+
+	if !reflect.DeepEqual(newVMI.Status.VolumeStatus, oldVMI.Status.VolumeStatus) {
+		// VolumeStatus changed which means either removed or added volumes.
+		newVolumeStatus, err := json.Marshal(newVMI.Status.VolumeStatus)
+		if err != nil {
+			return nil, err
+		}
+		oldVolumeStatus, err := json.Marshal(oldVMI.Status.VolumeStatus)
+		if err != nil {
+			return nil, err
+		}
+		if string(oldVolumeStatus) == "null" {
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "add", "path": "/status/volumeStatus", "value": %s }`, string(newVolumeStatus)))
+		} else {
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/volumeStatus", "value": %s }`, string(oldVolumeStatus)))
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/volumeStatus", "value": %s }`, string(newVolumeStatus)))
+		}
+		log.Log.V(3).Object(oldVMI).Infof("Patching Volume Status")
+	}
+	// We don't own the object anymore, so patch instead of update
+	if !conditionsEqual(newVMI.Status.Conditions, oldVMI.Status.Conditions) {
+
+		newConditions, err := json.Marshal(newVMI.Status.Conditions)
+		if err != nil {
+			return nil, err
+		}
+		oldConditions, err := json.Marshal(oldVMI.Status.Conditions)
+		if err != nil {
+			return nil, err
+		}
+
+		patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/conditions", "value": %s }`, string(oldConditions)))
+		patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/conditions", "value": %s }`, string(newConditions)))
+
+		log.Log.V(3).Object(oldVMI).Infof("Patching VMI conditions")
+	}
+
+	if !reflect.DeepEqual(newVMI.Status.ActivePods, oldVMI.Status.ActivePods) {
+		newPods, err := json.Marshal(newVMI.Status.ActivePods)
+		if err != nil {
+			return nil, err
+		}
+		oldPods, err := json.Marshal(oldVMI.Status.ActivePods)
+		if err != nil {
+			return nil, err
+		}
+
+		patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/activePods", "value": %s }`, string(oldPods)))
+		patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/activePods", "value": %s }`, string(newPods)))
+
+		log.Log.V(3).Object(oldVMI).Infof("Patching VMI activePods")
+	}
+
+	if newVMI.Status.LauncherContainerImageVersion != oldVMI.Status.LauncherContainerImageVersion {
+		if oldVMI.Status.LauncherContainerImageVersion == "" {
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "add", "path": "/status/launcherContainerImageVersion", "value": "%s" }`, newVMI.Status.LauncherContainerImageVersion))
+		} else {
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/status/launcherContainerImageVersion", "value": "%s" }`, oldVMI.Status.LauncherContainerImageVersion))
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/status/launcherContainerImageVersion", "value": "%s" }`, newVMI.Status.LauncherContainerImageVersion))
+		}
+	}
+
+	if !reflect.DeepEqual(oldVMI.Labels, newVMI.Labels) {
+		newLabelBytes, err := json.Marshal(newVMI.Labels)
+		if err != nil {
+			return nil, err
+		}
+		oldLabelBytes, err := json.Marshal(oldVMI.Labels)
+		if err != nil {
+			return nil, err
+		}
+
+		if oldVMI.Labels == nil {
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "add", "path": "/metadata/labels", "value": %s }`, string(newLabelBytes)))
+		} else {
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "test", "path": "/metadata/labels", "value": %s }`, string(oldLabelBytes)))
+			patchOps = append(patchOps, fmt.Sprintf(`{ "op": "replace", "path": "/metadata/labels", "value": %s }`, string(newLabelBytes)))
+
+		}
+	}
+
+	if len(patchOps) == 0 {
+		return nil, nil
+	}
+
+	return controller.GeneratePatchBytes(patchOps), nil
+}
+
+func (c *VMIController) syncReadyConditionFromPod(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod) {
+	conditionManager := controller.NewVirtualMachineInstanceConditionManager()
+
+	now := v1.Now()
+	if pod == nil || isTempPod(pod) {
+		conditionManager.UpdateCondition(vmi, &virtv1.VirtualMachineInstanceCondition{
+			Type:               virtv1.VirtualMachineInstanceReady,
+			Status:             k8sv1.ConditionFalse,
+			Reason:             virtv1.PodNotExistsReason,
+			Message:            "virt-launcher pod has not yet been scheduled",
+			LastProbeTime:      now,
+			LastTransitionTime: now,
+		})
+
+	} else if isPodDownOrGoingDown(pod) {
+		conditionManager.UpdateCondition(vmi, &virtv1.VirtualMachineInstanceCondition{
+			Type:               virtv1.VirtualMachineInstanceReady,
+			Status:             k8sv1.ConditionFalse,
+			Reason:             virtv1.PodTerminatingReason,
+			Message:            "virt-launcher pod is terminating",
+			LastProbeTime:      now,
+			LastTransitionTime: now,
+		})
+
+	} else if !vmi.IsRunning() {
+		conditionManager.UpdateCondition(vmi, &virtv1.VirtualMachineInstanceCondition{
+			Type:               virtv1.VirtualMachineInstanceReady,
+			Status:             k8sv1.ConditionFalse,
+			Reason:             virtv1.GuestNotRunningReason,
+			Message:            "Guest VM is not reported as running",
+			LastProbeTime:      now,
+			LastTransitionTime: now,
+		})
+
+	} else if podReadyCond := conditionManager.GetPodCondition(pod, k8sv1.PodReady); podReadyCond != nil {
+		conditionManager.UpdateCondition(vmi, &virtv1.VirtualMachineInstanceCondition{
+			Type:               virtv1.VirtualMachineInstanceReady,
+			Status:             podReadyCond.Status,
+			Reason:             podReadyCond.Reason,
+			Message:            podReadyCond.Message,
+			LastProbeTime:      podReadyCond.LastProbeTime,
+			LastTransitionTime: podReadyCond.LastTransitionTime,
+		})
+
+	} else {
+		conditionManager.UpdateCondition(vmi, &virtv1.VirtualMachineInstanceCondition{
+			Type:               virtv1.VirtualMachineInstanceReady,
+			Status:             k8sv1.ConditionFalse,
+			Reason:             virtv1.PodConditionMissingReason,
+			Message:            "virt-launcher pod is missing the Ready condition",
+			LastProbeTime:      now,
+			LastTransitionTime: now,
+		})
+	}
 }
 
 // isPodReady treats the pod as ready to be handed over to virt-handler, as soon as all pods except
@@ -740,6 +790,7 @@ func (c *VMIController) sync(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod,
 	if syncErr != nil {
 		return syncErr
 	}
+
 	if !podExists(pod) {
 		// If we came ever that far to detect that we already created a pod, we don't create it again
 		if !vmi.IsUnprocessed() {
@@ -784,7 +835,7 @@ func (c *VMIController) sync(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod,
 	}
 
 	if !isWaitForFirstConsumer {
-		err := c.cleanupWaitForFirstConsumerTemporaryPods(vmi)
+		err := c.cleanupWaitForFirstConsumerTemporaryPods(vmi, pod)
 		if err != nil {
 			return &syncErrorImpl{fmt.Errorf("failed to clean up temporary pods: %v", err), FailedHotplugSyncReason}
 		}
@@ -1034,15 +1085,26 @@ func (c *VMIController) deletePod(obj interface{}) {
 }
 
 func (c *VMIController) addVirtualMachineInstance(obj interface{}) {
+	c.lowerVMIExpectation(obj)
 	c.enqueueVirtualMachine(obj)
 }
 
 func (c *VMIController) deleteVirtualMachineInstance(obj interface{}) {
+	c.lowerVMIExpectation(obj)
 	c.enqueueVirtualMachine(obj)
 }
 
 func (c *VMIController) updateVirtualMachineInstance(_, curr interface{}) {
+	c.lowerVMIExpectation(curr)
 	c.enqueueVirtualMachine(curr)
+}
+
+func (c *VMIController) lowerVMIExpectation(curr interface{}) {
+	key, err := controller.KeyFunc(curr)
+	if err != nil {
+		return
+	}
+	c.vmiExpectations.LowerExpectations(key, 1, 0)
 }
 
 func (c *VMIController) enqueueVirtualMachine(obj interface{}) {
@@ -1262,17 +1324,10 @@ func (c *VMIController) getHotplugVolumes(vmi *virtv1.VirtualMachineInstance, vi
 	return hotplugVolumes
 }
 
-func (c *VMIController) cleanupWaitForFirstConsumerTemporaryPods(vmi *virtv1.VirtualMachineInstance) error {
-	// Get all pods from the namespace
-	pods, err := c.listPodsFromNamespace(vmi.Namespace)
+func (c *VMIController) cleanupWaitForFirstConsumerTemporaryPods(vmi *virtv1.VirtualMachineInstance, virtLauncherPod *k8sv1.Pod) error {
+	triggerPods, err := c.waitForFirstConsumerTemporaryPods(vmi, virtLauncherPod)
 	if err != nil {
 		return err
-	}
-	triggerPods := make([]*k8sv1.Pod, 0)
-	for _, pod := range pods {
-		if isTempPod(pod) {
-			triggerPods = append(triggerPods, pod)
-		}
 	}
 
 	return c.deleteRunningOrFinishedWFFCPods(vmi, triggerPods...)
@@ -1316,14 +1371,40 @@ func (c *VMIController) virtlauncherAttachmentPods(virtlauncherPod *k8sv1.Pod) (
 	}
 
 	for _, pod := range pods {
-		ownerRef := controller.GetControllerOf(pod)
-		if ownerRef == nil || ownerRef.UID != virtlauncherPod.UID {
+		if ownerRef := controller.GetControllerOf(pod); ownerRef == nil || ownerRef.UID != virtlauncherPod.UID {
 			continue
 		}
 		attachmentPods = append(attachmentPods, pod)
 	}
 
 	return attachmentPods, nil
+}
+
+func (c *VMIController) waitForFirstConsumerTemporaryPods(vmi *virtv1.VirtualMachineInstance, virtLauncherPod *k8sv1.Pod) ([]*k8sv1.Pod, error) {
+	var temporaryPods []*k8sv1.Pod
+
+	// Get all pods from the namespace
+	pods, err := c.listPodsFromNamespace(vmi.Namespace)
+	if err != nil {
+		return temporaryPods, err
+	}
+
+	for _, pod := range pods {
+		// Cleanup candidates are temporary pods that are either controlled by the VMI or the virt launcher pod
+		if !isTempPod(pod) {
+			continue
+		}
+
+		if controller.IsControlledBy(pod, vmi) {
+			temporaryPods = append(temporaryPods, pod)
+		}
+
+		if ownerRef := controller.GetControllerOf(pod); ownerRef != nil && ownerRef.UID == virtLauncherPod.UID {
+			temporaryPods = append(temporaryPods, pod)
+		}
+	}
+
+	return temporaryPods, nil
 }
 
 func (c *VMIController) needsHandleHotplug(hotplugVolumes []*virtv1.Volume, hotplugAttachmentPods []*k8sv1.Pod) bool {

@@ -13,7 +13,6 @@ import (
 
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/kubevirt/pkg/network/cache"
-	"kubevirt.io/kubevirt/pkg/network/cache/fake"
 	netdriver "kubevirt.io/kubevirt/pkg/network/driver"
 )
 
@@ -36,44 +35,17 @@ var _ = Describe("DHCP configurator", func() {
 		Expect(os.RemoveAll(fakeDhcpStartedDir)).To(Succeed())
 	})
 
-	newConfiguratorWithClientFilter := func(launcherPID string, advertisingIfaceName string) *Configurator {
-		configurator := NewConfiguratorWithClientFilter(fake.NewFakeInMemoryNetworkCacheFactory(), launcherPID, advertisingIfaceName, netdriver.NewMockNetworkHandler(gomock.NewController(GinkgoT())))
+	newBridgeConfigurator := func(launcherPID string, advertisingIfaceName string) Configurator {
+		configurator := NewBridgeConfigurator(cache.NewInterfaceCacheFactoryWithBasePath(fakeDhcpStartedDir), launcherPID, advertisingIfaceName, netdriver.NewMockNetworkHandler(gomock.NewController(GinkgoT())), "", nil, nil)
 		configurator.dhcpStartedDirectory = fakeDhcpStartedDir
 		return configurator
 	}
 
-	newConfigurator := func(launcherPID string, advertisingIfaceName string) *Configurator {
-		configurator := NewConfigurator(fake.NewFakeInMemoryNetworkCacheFactory(), launcherPID, advertisingIfaceName, netdriver.NewMockNetworkHandler(gomock.NewController(GinkgoT())))
+	newMasqueradeConfigurator := func(advertisingIfaceName string) Configurator {
+		configurator := NewMasqueradeConfigurator(advertisingIfaceName, netdriver.NewMockNetworkHandler(gomock.NewController(GinkgoT())), nil, nil, "")
 		configurator.dhcpStartedDirectory = fakeDhcpStartedDir
 		return configurator
 	}
-
-	Context("importing / exporting configuration", func() {
-		table.DescribeTable("should fail when nothing to load", func(configurator *Configurator) {
-			_, err := configurator.ImportConfiguration(ifaceName)
-			Expect(err).To(HaveOccurred())
-		},
-			table.Entry("with active client filtering", newConfiguratorWithClientFilter(launcherPID, bridgeName)),
-			table.Entry("without client filtering", newConfigurator(launcherPID, bridgeName)),
-		)
-
-		table.DescribeTable("should succeed when cache file present", func(configurator *Configurator) {
-			dhcpConfig := cache.DHCPConfig{
-				Name:         ifaceName,
-				IP:           netlink.Addr{},
-				Mtu:          1400,
-				IPAMDisabled: false,
-			}
-			Expect(configurator.ExportConfiguration(dhcpConfig)).To(Succeed())
-
-			readConfig, err := configurator.ImportConfiguration(ifaceName)
-			Expect(err).NotTo(HaveOccurred())
-			Expect(*readConfig).To(Equal(dhcpConfig))
-		},
-			table.Entry("with active client filtering", newConfiguratorWithClientFilter(launcherPID, bridgeName)),
-			table.Entry("without client filtering", newConfigurator(launcherPID, bridgeName)),
-		)
-	})
 
 	Context("start DHCP function", func() {
 		var advertisingAddr netlink.Addr
@@ -96,32 +68,32 @@ var _ = Describe("DHCP configurator", func() {
 			}
 		})
 
-		table.DescribeTable("should succeed when DHCP server started", func(configurator *Configurator) {
-			configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil, configurator.filterByMac).Return(nil)
+		table.DescribeTable("should succeed when DHCP server started", func(configurator *configurator) {
+			configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil).Return(nil)
 
 			Expect(configurator.EnsureDHCPServerStarted(ifaceName, dhcpConfig, dhcpOptions)).To(Succeed())
 		},
-			table.Entry("with active client filtering", newConfiguratorWithClientFilter(launcherPID, bridgeName)),
-			table.Entry("without client filtering", newConfigurator(launcherPID, bridgeName)),
+			table.Entry("with bridge configurator", newBridgeConfigurator(launcherPID, bridgeName)),
+			table.Entry("with masquerade configurator", newMasqueradeConfigurator(bridgeName)),
 		)
 
-		table.DescribeTable("should succeed when DHCP server is started multiple times", func(configurator *Configurator) {
-			configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil, configurator.filterByMac).Return(nil)
+		table.DescribeTable("should succeed when DHCP server is started multiple times", func(configurator *configurator) {
+			configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil).Return(nil)
 
 			Expect(configurator.EnsureDHCPServerStarted(ifaceName, dhcpConfig, dhcpOptions)).To(Succeed())
 			Expect(configurator.EnsureDHCPServerStarted(ifaceName, dhcpConfig, dhcpOptions)).To(Succeed())
 		},
-			table.Entry("with active client filtering", newConfiguratorWithClientFilter(launcherPID, bridgeName)),
-			table.Entry("without client filtering", newConfigurator(launcherPID, bridgeName)),
+			table.Entry("with bridge configurator", newBridgeConfigurator(launcherPID, bridgeName)),
+			table.Entry("with masquerade configurator", newMasqueradeConfigurator(bridgeName)),
 		)
 
-		table.DescribeTable("should fail when DHCP server failed", func(configurator *Configurator) {
-			configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil, configurator.filterByMac).Return(fmt.Errorf("failed to start DHCP server"))
+		table.DescribeTable("should fail when DHCP server failed", func(configurator *configurator) {
+			configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil).Return(fmt.Errorf("failed to start DHCP server"))
 
 			Expect(configurator.EnsureDHCPServerStarted(ifaceName, dhcpConfig, dhcpOptions)).To(HaveOccurred())
 		},
-			table.Entry("with active client filtering", newConfiguratorWithClientFilter(launcherPID, bridgeName)),
-			table.Entry("without client filtering", newConfigurator(launcherPID, bridgeName)),
+			table.Entry("with bridge configurator", newBridgeConfigurator(launcherPID, bridgeName)),
+			table.Entry("with masquerade configurator", newMasqueradeConfigurator(bridgeName)),
 		)
 
 		When("IPAM is disabled on the DHCPConfig", func() {
@@ -135,13 +107,13 @@ var _ = Describe("DHCP configurator", func() {
 				}
 			})
 
-			table.DescribeTable("should fail when DHCP server failed", func(configurator *Configurator) {
-				configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil, configurator.filterByMac).Return(nil).Times(0)
+			table.DescribeTable("shouldn't fail when DHCP server failed", func(configurator *configurator) {
+				configurator.handler.(*netdriver.MockNetworkHandler).EXPECT().StartDHCP(&dhcpConfig, bridgeName, nil).Return(nil).Times(0)
 
 				Expect(configurator.EnsureDHCPServerStarted(ifaceName, dhcpConfig, dhcpOptions)).To(Succeed())
 			},
-				table.Entry("with active client filtering", newConfiguratorWithClientFilter(launcherPID, bridgeName)),
-				table.Entry("without client filtering", newConfigurator(launcherPID, bridgeName)),
+				table.Entry("with bridge configurator", newBridgeConfigurator(launcherPID, bridgeName)),
+				table.Entry("with masquerade", newMasqueradeConfigurator(bridgeName)),
 			)
 		})
 	})

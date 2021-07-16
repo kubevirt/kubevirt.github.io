@@ -91,6 +91,9 @@ functest-image-push: functest-image-build
 conformance:
 	hack/dockerized "export SKIP_OUTSIDE_CONN_TESTS=${SKIP_OUTSIDE_CONN_TESTS} && hack/conformance.sh"
 
+perftest: build-functests
+	hack/perftests.sh
+
 clean:
 	hack/dockerized "./hack/build-go.sh clean ${WHAT} && rm _out/* -rf"
 	hack/dockerized "bazel clean --expunge"
@@ -118,9 +121,6 @@ rpm-deps:
 
 verify-rpm-deps:
 	SYNC_VENDOR=true hack/dockerized " ./hack/verify-rpm-deps.sh"
-
-verify-deps:
-	SYNC_VENDOR=true hack/dockerized " ./hack/verify-deps.sh"
 
 build-verify:
 	hack/build-verify.sh

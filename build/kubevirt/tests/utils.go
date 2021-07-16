@@ -53,7 +53,6 @@ import (
 	. "github.com/onsi/gomega"
 	"github.com/spf13/cobra"
 	"golang.org/x/crypto/ssh"
-	autoscalingv1 "k8s.io/api/autoscaling/v1"
 	k8sv1 "k8s.io/api/core/v1"
 	nodev1 "k8s.io/api/node/v1beta1"
 	rbacv1 "k8s.io/api/rbac/v1"
@@ -183,6 +182,7 @@ const (
 const (
 	osAlpineHostPath = "alpine-host-path"
 	OSWindows        = "windows"
+	OSWindowsSysprep = "windows-sysprep" // This is for sysprep tests, they run on a syspreped image of windows of a different version.
 	OSRhel           = "rhel"
 	CustomHostPath   = "custom-host-path"
 	HostPathBase     = "/tmp/hostImages"
@@ -197,6 +197,7 @@ var (
 const (
 	DiskAlpineHostPath = "disk-alpine-host-path"
 	DiskWindows        = "disk-windows"
+	DiskWindowsSysprep = "disk-windows-sysprep"
 	DiskRhel           = "disk-rhel"
 	DiskCustomHostPath = "disk-custom-host-path"
 )
@@ -436,41 +437,6 @@ func (w *ObjectEventWatcher) WaitNotFor(ctx context.Context, eventType EventType
 		return false
 	}, fmt.Sprintf("not happen event type %s, reason = %s", string(eventType), reflect.ValueOf(reason).String()))
 	return
-}
-
-// Do scale and returns error, replicas-before.
-func DoScaleDeployment(namespace string, name string, desired int32) (error, int32) {
-	virtCli, err := kubecli.GetKubevirtClient()
-	util2.PanicOnError(err)
-
-	deployment, err := virtCli.AppsV1().Deployments(namespace).Get(context.Background(), name, metav1.GetOptions{})
-	if err != nil {
-		return err, -1
-	}
-	scale := &autoscalingv1.Scale{Spec: autoscalingv1.ScaleSpec{Replicas: desired}, ObjectMeta: metav1.ObjectMeta{Name: name, Namespace: namespace}}
-	_, err = virtCli.AppsV1().Deployments(namespace).UpdateScale(context.Background(), name, scale, metav1.UpdateOptions{})
-	if err != nil {
-		return err, -1
-	}
-	return nil, *deployment.Spec.Replicas
-}
-
-func DoScaleVirtHandler(namespace string, name string, selector map[string]string) (int32, map[string]string, int64, error) {
-	virtCli, err := kubecli.GetKubevirtClient()
-	util2.PanicOnError(err)
-
-	d, err := virtCli.AppsV1().DaemonSets(namespace).Get(context.Background(), name, metav1.GetOptions{})
-	if err != nil {
-		return 0, nil, 0, err
-	}
-	sel := d.Spec.Template.Spec.NodeSelector
-	ready := d.Status.DesiredNumberScheduled
-	d.Spec.Template.Spec.NodeSelector = selector
-	d, err = virtCli.AppsV1().DaemonSets(namespace).Update(context.Background(), d, metav1.UpdateOptions{})
-	if err != nil {
-		return 0, nil, 0, err
-	}
-	return ready, sel, d.ObjectMeta.Generation, nil
 }
 
 func WaitForAllPodsReady(timeout time.Duration, listOptions metav1.ListOptions) {
@@ -3426,10 +3392,10 @@ func BeforeAll(fn func()) {
 	})
 }
 
-func SkipIfNoWindowsImage(virtClient kubecli.KubevirtClient) {
-	windowsPv, err := virtClient.CoreV1().PersistentVolumes().Get(context.Background(), DiskWindows, metav1.GetOptions{})
+func SkipIfMissingRequiredImage(virtClient kubecli.KubevirtClient, imageName string) {
+	windowsPv, err := virtClient.CoreV1().PersistentVolumes().Get(context.Background(), imageName, metav1.GetOptions{})
 	if err != nil || windowsPv.Status.Phase == k8sv1.VolumePending || windowsPv.Status.Phase == k8sv1.VolumeFailed {
-		Skip(fmt.Sprintf("Skip Windows tests that requires PVC %s", DiskWindows))
+		Skip(fmt.Sprintf("Skip tests that requires PV %s", imageName))
 	} else if windowsPv.Status.Phase == k8sv1.VolumeReleased {
 		windowsPv.Spec.ClaimRef = nil
 		_, err = virtClient.CoreV1().PersistentVolumes().Update(context.Background(), windowsPv, metav1.UpdateOptions{})

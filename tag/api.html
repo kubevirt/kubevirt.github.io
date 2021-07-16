@@ -44,7 +44,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-07-09 21:44:47 +0000" >
+    <meta property="og:article:published_time" content="2021-07-16 18:22:48 +0000" >
     <meta name="twitter:title" content="KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -219,7 +219,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -233,6 +233,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <article class="post-content">
     <h2>Articles tagged with api</h2>
 <ul>
+
+  <li><a href="/2021/kubevirt-api-auth.html">Kubernetes Authentication Options using KubeVirt Client Library</a> (16 Jul 2021 | <a href="/tag/kubevirt.html" rel="tag">kubevirt</a>, <a href="/tag/go.html" rel="tag">go</a>, <a href="/tag/api.html" rel="tag">api</a>, <a href="/tag/authentication.html" rel="tag">authentication</a>)</li>
 
   <li><a href="/2018/KubeVirt-API-Access-Control.html">Kubevirt Api Access Control</a> (16 May 2018 | <a href="/tag/api.html" rel="tag">api</a>, <a href="/tag/rbac.html" rel="tag">rbac</a>, <a href="/tag/roles.html" rel="tag">roles</a>)</li>
 
@@ -282,8 +284,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/admin-operations">admin operations</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/affinity">affinity</a></div>
 <div class="tagcloud-tag tagcloud-tag-s"><a href="/tag/ansible">ansible</a></div>
-<div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/api">api</a></div>
+<div class="tagcloud-tag tagcloud-tag-s"><a href="/tag/api">api</a></div>
 <div class="tagcloud-tag tagcloud-tag-s"><a href="/tag/architecture">architecture</a></div>
+<div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/authentication">authentication</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/autodeployer">autodeployer</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/basic-operations">basic operations</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/bridge">bridge</a></div>
@@ -332,6 +335,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/gathering">gathering</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/gcp">gcp</a></div>
 <div class="tagcloud-tag tagcloud-tag-s"><a href="/tag/glusterfs">glusterfs</a></div>
+<div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/go">go</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/grafana">grafana</a></div>
 <div class="tagcloud-tag tagcloud-tag-xs"><a href="/tag/heketi">heketi</a></div>
 <div class="tagcloud-tag tagcloud-tag-s"><a href="/tag/hilights">hilights</a></div>

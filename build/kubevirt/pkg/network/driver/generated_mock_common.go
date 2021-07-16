@@ -171,18 +171,6 @@ func (_mr *_MockNetworkHandlerRecorder) ParseAddr(arg0 interface{}) *gomock.Call
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "ParseAddr", arg0)
 }
 
-func (_m *MockNetworkHandler) GetHostAndGwAddressesFromCIDR(s string) (string, string, error) {
-	ret := _m.ctrl.Call(_m, "GetHostAndGwAddressesFromCIDR", s)
-	ret0, _ := ret[0].(string)
-	ret1, _ := ret[1].(string)
-	ret2, _ := ret[2].(error)
-	return ret0, ret1, ret2
-}
-
-func (_mr *_MockNetworkHandlerRecorder) GetHostAndGwAddressesFromCIDR(arg0 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "GetHostAndGwAddressesFromCIDR", arg0)
-}
-
 func (_m *MockNetworkHandler) SetRandomMac(iface string) (net.HardwareAddr, error) {
 	ret := _m.ctrl.Call(_m, "SetRandomMac", iface)
 	ret0, _ := ret[0].(net.HardwareAddr)
@@ -215,14 +203,14 @@ func (_mr *_MockNetworkHandlerRecorder) LinkSetMaster(arg0, arg1 interface{}) *g
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "LinkSetMaster", arg0, arg1)
 }
 
-func (_m *MockNetworkHandler) StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceName string, dhcpOptions *v1.DHCPOptions, filterByMAC bool) error {
-	ret := _m.ctrl.Call(_m, "StartDHCP", nic, bridgeInterfaceName, dhcpOptions, filterByMAC)
+func (_m *MockNetworkHandler) StartDHCP(nic *cache.DHCPConfig, bridgeInterfaceName string, dhcpOptions *v1.DHCPOptions) error {
+	ret := _m.ctrl.Call(_m, "StartDHCP", nic, bridgeInterfaceName, dhcpOptions)
 	ret0, _ := ret[0].(error)
 	return ret0
 }
 
-func (_mr *_MockNetworkHandlerRecorder) StartDHCP(arg0, arg1, arg2, arg3 interface{}) *gomock.Call {
-	return _mr.mock.ctrl.RecordCall(_mr.mock, "StartDHCP", arg0, arg1, arg2, arg3)
+func (_mr *_MockNetworkHandlerRecorder) StartDHCP(arg0, arg1, arg2 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "StartDHCP", arg0, arg1, arg2)
 }
 
 func (_m *MockNetworkHandler) HasNatIptables(proto iptables.Protocol) bool {
