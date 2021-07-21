@@ -45,6 +45,7 @@ import (
 	cdiclone "kubevirt.io/containerized-data-importer/pkg/clone"
 	"kubevirt.io/kubevirt/pkg/controller"
 	"kubevirt.io/kubevirt/pkg/util/status"
+	typesutil "kubevirt.io/kubevirt/pkg/util/types"
 )
 
 type CloneAuthFunc func(pvcNamespace, pvcName, saNamespace, saName string) (bool, string, error)
@@ -357,16 +358,10 @@ func createDataVolumeManifest(dataVolumeTemplate *virtv1.DataVolumeTemplateSpec,
 }
 
 func (c *VMController) authorizeDataVolume(vm *virtv1.VirtualMachine, dataVolume *cdiv1.DataVolume) error {
-	if dataVolume.Spec.Source.PVC == nil {
-		return nil
+	cloneSource, err := typesutil.GetCloneSource(context.TODO(), c.clientset, vm, &dataVolume.Spec)
+	if cloneSource == nil || err != nil {
+		return err
 	}
-
-	pvcNamespace := dataVolume.Spec.Source.PVC.Namespace
-	if pvcNamespace == "" {
-		pvcNamespace = vm.Namespace
-	}
-
-	pvcName := dataVolume.Spec.Source.PVC.Name
 
 	serviceAccount := "default"
 	for _, vol := range vm.Spec.Template.Spec.Volumes {
@@ -375,7 +370,7 @@ func (c *VMController) authorizeDataVolume(vm *virtv1.VirtualMachine, dataVolume
 		}
 	}
 
-	allowed, reason, err := c.cloneAuthFunc(pvcNamespace, pvcName, vm.Namespace, serviceAccount)
+	allowed, reason, err := c.cloneAuthFunc(cloneSource.Namespace, cloneSource.Name, vm.Namespace, serviceAccount)
 	if err != nil {
 		return err
 	}
@@ -543,20 +538,26 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 	}
 	log.Log.Object(vm).V(4).Infof("VirtualMachine RunStrategy: %s", runStrategy)
 
+	isStopRequestForVMI := func(vm *virtv1.VirtualMachine) bool {
+		if len(vm.Status.StateChangeRequests) != 0 {
+			stateChange := vm.Status.StateChangeRequests[0]
+			if stateChange.Action == virtv1.StopRequest &&
+				stateChange.UID != nil &&
+				*stateChange.UID == vmi.UID {
+				return true
+			}
+		}
+		return false
+	}
+
 	switch runStrategy {
 	case virtv1.RunStrategyAlways:
 		// For this RunStrategy, a VMI should always be running. If a StateChangeRequest
 		// asks to stop a VMI, a new one must be immediately re-started.
 		if vmi != nil {
-			forceRestart := false
-			if len(vm.Status.StateChangeRequests) != 0 {
-				stateChange := vm.Status.StateChangeRequests[0]
-				if stateChange.Action == virtv1.StopRequest &&
-					stateChange.UID != nil &&
-					*stateChange.UID == vmi.UID {
-					forceRestart = true
-					log.Log.Object(vm).Infof("processing forced restart request for VMI with phase %s and VM runStrategy: %s", vmi.Status.Phase, runStrategy)
-				}
+			var forceRestart bool
+			if forceRestart = isStopRequestForVMI(vm); forceRestart {
+				log.Log.Object(vm).Infof("processing forced restart request for VMI with phase %s and VM runStrategy: %s", vmi.Status.Phase, runStrategy)
 			}
 
 			if forceRestart || vmi.IsFinal() {
@@ -588,16 +589,10 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 		// For this RunStrategy, a VMI should only be restarted if it failed.
 		// If a VMI enters the Succeeded phase, it should not be restarted.
 		if vmi != nil {
-			forceStop := false
-			// If there's a stop request that matches the existing VMI's UUID
-			if len(vm.Status.StateChangeRequests) != 0 {
-				stateChange := vm.Status.StateChangeRequests[0]
-				if stateChange.Action == virtv1.StopRequest &&
-					stateChange.UID != nil &&
-					*stateChange.UID == vmi.UID {
-					log.Log.Object(vm).Infof("processing stop request for VMI with phase %s and VM runStrategy: %s", vmi.Status.Phase, runStrategy)
-					forceStop = true
-				}
+			var forceStop bool
+			if forceStop = isStopRequestForVMI(vm); forceStop {
+				log.Log.Object(vm).Infof("processing stop request for VMI with phase %s and VM runStrategy: %s", vmi.Status.Phase, runStrategy)
+
 			}
 
 			if forceStop || vmi.Status.Phase == virtv1.Failed {
@@ -626,16 +621,8 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 		// For this RunStrategy, VMI's will be started/stopped/restarted using api endpoints only
 		if vmi != nil {
 			log.Log.Object(vm).V(4).Info("VMI exists")
-			forceStop := false
-			if len(vm.Status.StateChangeRequests) != 0 {
-				stateChange := vm.Status.StateChangeRequests[0]
-				if stateChange.Action == virtv1.StopRequest &&
-					stateChange.UID != nil &&
-					*stateChange.UID == vmi.UID {
-					forceStop = true
-				}
-			}
-			if forceStop {
+
+			if forceStop := isStopRequestForVMI(vm); forceStop {
 				log.Log.Object(vm).Infof("%s with VMI in phase %s due to stop request and VM runStrategy: %s", vmi.Status.Phase, stoppingVmMsg, runStrategy)
 				err := c.stopVMI(vm, vmi)
 				if err != nil {

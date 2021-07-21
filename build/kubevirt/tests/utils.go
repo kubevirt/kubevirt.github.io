@@ -95,6 +95,7 @@ import (
 	"kubevirt.io/client-go/log"
 	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/pkg/controller"
+	kutil "kubevirt.io/kubevirt/pkg/util"
 	"kubevirt.io/kubevirt/pkg/util/cluster"
 	"kubevirt.io/kubevirt/pkg/util/net/ip"
 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
@@ -1886,7 +1887,7 @@ func newRandomDataVolumeWithRegistryImport(imageUrl, namespace, storageClass str
 			Namespace: namespace,
 		},
 		Spec: cdiv1.DataVolumeSpec{
-			Source: cdiv1.DataVolumeSource{
+			Source: &cdiv1.DataVolumeSource{
 				Registry: &cdiv1.DataVolumeSourceRegistry{
 					URL: imageUrl,
 				},
@@ -1921,7 +1922,7 @@ func newRandomDataVolumeWithHttpImport(imageUrl, namespace, storageClass string,
 			Namespace: namespace,
 		},
 		Spec: cdiv1.DataVolumeSpec{
-			Source: cdiv1.DataVolumeSource{
+			Source: &cdiv1.DataVolumeSource{
 				HTTP: &cdiv1.DataVolumeSourceHTTP{
 					URL: imageUrl,
 				},
@@ -1956,7 +1957,7 @@ func newRandomBlankDataVolume(namespace, storageClass, size string, accessMode k
 			Namespace: namespace,
 		},
 		Spec: cdiv1.DataVolumeSpec{
-			Source: cdiv1.DataVolumeSource{
+			Source: &cdiv1.DataVolumeSource{
 				Blank: &cdiv1.DataVolumeBlankImage{},
 			},
 			PVC: &k8sv1.PersistentVolumeClaimSpec{
@@ -1994,7 +1995,7 @@ func NewRandomDataVolumeWithPVCSourceWithStorageClass(sourceNamespace, sourceNam
 			Namespace: targetNamespace,
 		},
 		Spec: cdiv1.DataVolumeSpec{
-			Source: cdiv1.DataVolumeSource{
+			Source: &cdiv1.DataVolumeSource{
 				PVC: &cdiv1.DataVolumeSourcePVC{
 					Namespace: sourceNamespace,
 					Name:      sourceName,
@@ -3310,11 +3311,24 @@ func GetRunningVirtualMachineInstanceDomainXML(virtClient kubecli.KubevirtClient
 		return "", fmt.Errorf("could not find compute container for pod")
 	}
 
+	// get current vmi
+	freshVMI, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
+	if err != nil {
+		return "", fmt.Errorf("Failed to get vmi, %s", err)
+	}
+
+	command := []string{"virsh"}
+	if kutil.IsNonRootVMI(freshVMI) {
+		command = append(command, "-c")
+		command = append(command, "qemu+unix:///session?socket=/var/run/libvirt/libvirt-sock")
+	}
+	command = append(command, []string{"dumpxml", vmi.Namespace + "_" + vmi.Name}...)
+
 	stdout, stderr, err := ExecuteCommandOnPodV2(
 		virtClient,
 		vmiPod,
 		vmiPod.Spec.Containers[containerIdx].Name,
-		[]string{"virsh", "dumpxml", vmi.Namespace + "_" + vmi.Name},
+		command,
 	)
 	if err != nil {
 		return "", fmt.Errorf("could not dump libvirt domxml (remotely on pod): %v: %s", err, stderr)
@@ -3390,6 +3404,12 @@ func BeforeAll(fn func()) {
 			first = false
 		}
 	})
+}
+
+func SkipIfNonRoot(virtClient kubecli.KubevirtClient, feature string) {
+	if checks.HasFeature(virtconfig.NonRoot) {
+		Skip(fmt.Sprintf("NonRoot implementation doesn't support %s", feature))
+	}
 }
 
 func SkipIfMissingRequiredImage(virtClient kubecli.KubevirtClient, imageName string) {
@@ -3959,7 +3979,12 @@ func CreateHostDiskImage(diskPath string) *k8sv1.Pod {
 	hostPathType := k8sv1.HostPathDirectoryOrCreate
 	dir := filepath.Dir(diskPath)
 
-	args := []string{fmt.Sprintf(`dd if=/dev/zero of=%s bs=1 count=0 seek=1G && ls -l %s`, diskPath, dir)}
+	command := fmt.Sprintf(`dd if=/dev/zero of=%s bs=1 count=0 seek=1G && ls -l %s`, diskPath, dir)
+	if checks.HasFeature(virtconfig.NonRoot) {
+		command = command + fmt.Sprintf(" && chown 107:107 %s", diskPath)
+	}
+
+	args := []string{command}
 	pod := RenderHostPathPod("hostdisk-create-job", dir, hostPathType, k8sv1.MountPropagationNone, []string{"/bin/bash", "-c"}, args)
 
 	return pod

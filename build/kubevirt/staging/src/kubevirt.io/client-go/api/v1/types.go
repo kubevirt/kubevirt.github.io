@@ -723,6 +723,12 @@ const (
 	MemfdMemoryBackend         string = "kubevirt.io/memfd"
 
 	MigrationSelectorLabel = "kubevirt.io/vmi-name"
+
+	// This annotation represents vmi running nonroot implementation
+	NonRootVMIAnnotation = "kubevirt.io/nonroot"
+
+	// This annotation is to keep virt launcher container alive when an VMI encounters a failure for debugging purpose
+	KeepLauncherAfterFailureAnnotation string = "kubevirt.io/keep-launcher-alive-after-failure"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {

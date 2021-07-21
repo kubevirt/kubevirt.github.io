@@ -46,24 +46,25 @@ var _ = SIGDescribe("Control Plane Performance Density Testing", func() {
 	)
 
 	BeforeEach(func() {
+		if !RunPerfTests {
+			Skip("Performance tests are not enabled.")
+		}
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
 		tests.BeforeTestCleanup()
 	})
 
 	AfterEach(func() {
-		// ensure the metrics get scraped and collected  till the end
+		// ensure the metrics get scraped by Prometheus till the end, since the default Prometheus scrape interval is 30s
 		time.Sleep(30 * time.Second)
 	})
 
 	Describe("Density test", func() {
 		vmCount := 100
-		vmBatchStartupLimit := 300 * time.Second
+		vmBatchStartupLimit := 5 * time.Minute
 
 		Context(fmt.Sprintf("[small] create a batch of %d VMIs", vmCount), func() {
-
 			It("should sucessfully create all VMIS", func() {
-
 				By("Creating a batch of VMIs")
 				createBatchVMIWithRateControl(virtClient, vmCount)
 

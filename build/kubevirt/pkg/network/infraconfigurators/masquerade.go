@@ -16,6 +16,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/network/consts"
 	netdriver "kubevirt.io/kubevirt/pkg/network/driver"
 	virtnetlink "kubevirt.io/kubevirt/pkg/network/link"
+	"kubevirt.io/kubevirt/pkg/util"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 )
 
@@ -117,8 +118,12 @@ func (b *MasqueradePodNetworkConfigurator) PreparePodNetworkInterface() error {
 		return err
 	}
 
+	tapOwner := netdriver.LibvirtUserAndGroupId
+	if util.IsNonRootVMI(b.vmi) {
+		tapOwner = strconv.Itoa(util.NonRootUID)
+	}
 	tapDeviceName := virtnetlink.GenerateTapDeviceName(b.podNicLink.Attrs().Name)
-	err := createAndBindTapToBridge(b.handler, tapDeviceName, b.bridgeInterfaceName, b.launcherPID, b.podNicLink.Attrs().MTU, netdriver.LibvirtUserAndGroupId, b.vmi)
+	err := createAndBindTapToBridge(b.handler, tapDeviceName, b.bridgeInterfaceName, b.launcherPID, b.podNicLink.Attrs().MTU, tapOwner, b.vmi)
 	if err != nil {
 		log.Log.Reason(err).Errorf("failed to create tap device named %s", tapDeviceName)
 		return err
@@ -195,21 +200,6 @@ func (b *MasqueradePodNetworkConfigurator) createBridge() error {
 		return err
 	}
 
-	return nil
-}
-
-func (b *MasqueradePodNetworkConfigurator) skipForwardingForReservedPortsUsingNftables(proto iptables.Protocol) error {
-	chainWhereDnatIsPerformed := "output"
-	chainWhereSnatIsPerformed := "KUBEVIRT_POSTINBOUND"
-	for _, chain := range []string{chainWhereDnatIsPerformed, chainWhereSnatIsPerformed} {
-		err := b.handler.NftablesAppendRule(proto, "nat", chain,
-			"tcp", "dport", fmt.Sprintf("{ %s }", strings.Join(PortsUsedByLiveMigration(), ", ")),
-			b.handler.GetNFTIPString(proto), "saddr", GetLoopbackAdrress(proto),
-			"counter", "return")
-		if err != nil {
-			return err
-		}
-	}
 	return nil
 }
 

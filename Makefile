@@ -97,6 +97,9 @@ else
 endif
 endif
 
+ifndef LINT_IMAGE
+	@$(eval export LINT_IMAGE=quay.io/tauerbec/markdownlint-cli:latest)
+endif
 
 ## Build site. This target should only be used by Netlify and Prow
 build: envvar
@@ -211,3 +214,9 @@ stop: | envvar
 	@echo "${GREEN}Makefile: Stop running container${RESET}"
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
+
+check_lint: | envvar
+	@echo "${GREEN}Makefile: Linting Markdown files using ${LINT_IMAGE}${RESET}"
+	${CONTAINER_ENGINE} run -it --rm -v ${PWD}:/src:ro${SELINUX_ENABLED} --workdir /src ${LINT_IMAGE} **/*.md
+	@echo
+

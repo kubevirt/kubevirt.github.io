@@ -37,19 +37,9 @@ func init() {
 }
 
 func SIGDescribe(text string, body func()) bool {
-	BeforeEach(func() {
-		if !RunPerfTests {
-			Skip("Performance tests are not enabled.")
-		}
-	})
 	return Describe("[sig-performance][Serial] "+text, body)
 }
 
 func FSIGDescribe(text string, body func()) bool {
-	BeforeEach(func() {
-		if !RunPerfTests {
-			Skip("Performance tests are not enabled.")
-		}
-	})
 	return FDescribe("[sig-performance][Serial] "+text, body)
 }

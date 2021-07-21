@@ -107,7 +107,6 @@ type TemplateService interface {
 	RenderHotplugAttachmentTriggerPodTemplate(volume *v1.Volume, ownerPod *k8sv1.Pod, vmi *v1.VirtualMachineInstance, pvcName string, isBlock bool, tempPod bool) (*k8sv1.Pod, error)
 	RenderLaunchManifestNoVm(*v1.VirtualMachineInstance) (*k8sv1.Pod, error)
 	GetLauncherImage() string
-	GetCpuArch() string
 	IsPPC64() bool
 	IsARM64() bool
 }
@@ -124,7 +123,6 @@ type templateService struct {
 	virtClient                 kubecli.KubevirtClient
 	clusterConfig              *virtconfig.ClusterConfig
 	launcherSubGid             int64
-	cpuArch                    string
 }
 
 type PvcNotFoundError error
@@ -374,26 +372,12 @@ func (t *templateService) RenderLaunchManifest(vmi *v1.VirtualMachineInstance) (
 	return t.renderLaunchManifest(vmi, false)
 }
 
-func (t *templateService) GetCpuArch() string {
-	return t.getCpuArch()
-}
-
-func (t *templateService) getCpuArch() string {
-	return t.cpuArch
-}
-
 func (t *templateService) IsPPC64() bool {
-	if t.cpuArch == "ppc64le" {
-		return true
-	}
-	return false
+	return t.clusterConfig.GetClusterCPUArch() == "ppc64le"
 }
 
 func (t *templateService) IsARM64() bool {
-	if t.cpuArch == "arm64" {
-		return true
-	}
-	return false
+	return t.clusterConfig.GetClusterCPUArch() == "arm64"
 }
 
 func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, tempPod bool) (*k8sv1.Pod, error) {
@@ -404,10 +388,38 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 
 	var volumes []k8sv1.Volume
 	var volumeDevices []k8sv1.VolumeDevice
-	var userId int64 = 0
-	var privileged = false
 	var volumeMounts []k8sv1.VolumeMount
 	var imagePullSecrets []k8sv1.LocalObjectReference
+
+	var userId int64 = util.RootUser
+	var privileged bool = false
+
+	nonRoot := util.IsNonRootVMI(vmi)
+	if nonRoot {
+		userId = util.NonRootUID
+	}
+
+	volumeMounts = append(volumeMounts, k8sv1.VolumeMount{
+		Name:      "private",
+		MountPath: util.VirtPrivateDir,
+	})
+	volumes = append(volumes, k8sv1.Volume{
+		Name: "private",
+		VolumeSource: k8sv1.VolumeSource{
+			EmptyDir: &k8sv1.EmptyDirVolumeSource{},
+		},
+	})
+
+	volumeMounts = append(volumeMounts, k8sv1.VolumeMount{
+		Name:      "public",
+		MountPath: util.VirtShareDir,
+	})
+	volumes = append(volumes, k8sv1.Volume{
+		Name: "public",
+		VolumeSource: k8sv1.VolumeSource{
+			EmptyDir: &k8sv1.EmptyDirVolumeSource{},
+		},
+	})
 
 	// Need to run in privileged mode in Power or libvirt will fail to lock memory for VMI
 	if t.IsPPC64() {
@@ -793,7 +805,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 	gracePeriodKillAfter := gracePeriodSeconds + int64(15)
 
 	// Get memory overhead
-	memoryOverhead := getMemoryOverhead(vmi, t.cpuArch)
+	memoryOverhead := getMemoryOverhead(vmi, t.clusterConfig.GetClusterCPUArch())
 
 	// Consider CPU and memory requests and limits for pod scheduling
 	resources := k8sv1.ResourceRequirements{}
@@ -842,7 +854,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 	}
 
 	// Consider hugepages resource for pod scheduling
-	if vmi.Spec.Domain.Memory != nil && vmi.Spec.Domain.Memory.Hugepages != nil {
+	if util.HasHugePages(vmi) {
 		hugepageType := k8sv1.ResourceName(k8sv1.ResourceHugePagesPrefix + vmi.Spec.Domain.Memory.Hugepages.PageSize)
 		hugepagesMemReq := vmi.Spec.Domain.Resources.Requests.Memory()
 
@@ -946,12 +958,12 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 		}
 		// allocate 1 more pcpu if IsolateEmulatorThread request
 		if vmi.Spec.Domain.CPU.IsolateEmulatorThread {
-			emulatorThreadCpu := resource.NewQuantity(1, resource.BinarySI)
+			emulatorThreadCPU := resource.NewQuantity(1, resource.BinarySI)
 			limits := resources.Limits[k8sv1.ResourceCPU]
-			limits.Add(*emulatorThreadCpu)
+			limits.Add(*emulatorThreadCPU)
 			resources.Limits[k8sv1.ResourceCPU] = limits
 			if cpuRequest, ok := resources.Requests[k8sv1.ResourceCPU]; ok {
-				cpuRequest.Add(*emulatorThreadCpu)
+				cpuRequest.Add(*emulatorThreadCPU)
 				resources.Requests[k8sv1.ResourceCPU] = cpuRequest
 			}
 		}
@@ -985,6 +997,9 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			"--minimum-pvc-reserve-bytes", strconv.FormatUint(reservePVCBytes, 10),
 			"--ovmf-path", ovmfPath,
 		}
+		if nonRoot {
+			command = append(command, "--run-as-nonroot")
+		}
 	}
 
 	useEmulation := t.clusterConfig.IsUseEmulation()
@@ -1003,6 +1018,10 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 		command = append(command, "--use-emulation")
 	} else {
 		resources.Limits[KvmDevice] = resource.MustParse("1")
+	}
+
+	if checkForKeepLauncherAfterFailure(vmi) {
+		command = append(command, "--keep-after-failure")
 	}
 
 	// Add ports from interfaces to the pod manifest
@@ -1052,6 +1071,24 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 		VolumeMounts:  volumeMounts,
 		Resources:     resources,
 		Ports:         ports,
+	}
+	if nonRoot {
+		compute.SecurityContext.RunAsGroup = &userId
+		compute.SecurityContext.RunAsNonRoot = &nonRoot
+		compute.Env = append(compute.Env,
+			k8sv1.EnvVar{
+				Name:  "XDG_CACHE_HOME",
+				Value: "/var/run",
+			},
+			k8sv1.EnvVar{
+				Name:  "XDG_CONFIG_HOME",
+				Value: "/var/run",
+			},
+			k8sv1.EnvVar{
+				Name:  "XDG_RUNTIME_DIR",
+				Value: "/var/run",
+			},
+		)
 	}
 
 	if vmi.Spec.ReadinessProbe != nil {
@@ -1202,12 +1239,20 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			Command:         requestedHookSidecar.Command,
 			Args:            requestedHookSidecar.Args,
 			Resources:       resources,
+			SecurityContext: &k8sv1.SecurityContext{
+				RunAsUser:  &userId,
+				Privileged: &privileged,
+			},
 			VolumeMounts: []k8sv1.VolumeMount{
 				{
 					Name:      "hook-sidecar-sockets",
 					MountPath: hooks.HookSocketsSharedDirectory,
 				},
 			},
+		}
+		if nonRoot {
+			sidecar.SecurityContext.RunAsGroup = &userId
+			sidecar.SecurityContext.RunAsNonRoot = &nonRoot
 		}
 		containers = append(containers, sidecar)
 	}
@@ -1258,9 +1303,17 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			Name:            "container-disk-binary",
 			Image:           t.launcherImage,
 			ImagePullPolicy: imagePullPolicy,
-			Command:         initContainerCommand,
-			VolumeMounts:    initContainerVolumeMounts,
-			Resources:       initContainerResources,
+			SecurityContext: &k8sv1.SecurityContext{
+				RunAsUser:  &userId,
+				Privileged: &privileged,
+			},
+			Command:      initContainerCommand,
+			VolumeMounts: initContainerVolumeMounts,
+			Resources:    initContainerResources,
+		}
+		if nonRoot {
+			cpInitContainer.SecurityContext.RunAsGroup = &userId
+			cpInitContainer.SecurityContext.RunAsNonRoot = &nonRoot
 		}
 
 		initContainers = append(initContainers, cpInitContainer)
@@ -1295,6 +1348,14 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			DNSConfig:                     vmi.Spec.DNSConfig,
 			DNSPolicy:                     vmi.Spec.DNSPolicy,
 		},
+	}
+
+	if nonRoot {
+		if util.HasHugePages(vmi) {
+			pod.Spec.SecurityContext.FSGroup = &userId
+		}
+		pod.Spec.SecurityContext.RunAsGroup = &userId
+		pod.Spec.SecurityContext.RunAsNonRoot = &nonRoot
 	}
 
 	// If an SELinux type was specified, use that--otherwise don't set an SELinux type
@@ -1625,13 +1686,15 @@ func haveSlirp(vmi *v1.VirtualMachineInstance) bool {
 }
 
 func getRequiredCapabilities(vmi *v1.VirtualMachineInstance, config *virtconfig.ClusterConfig) []k8sv1.Capability {
+	if util.IsNonRootVMI(vmi) {
+		return []k8sv1.Capability{CAP_NET_BIND_SERVICE}
+	}
 	capabilities := []k8sv1.Capability{}
 	if requireDHCP(vmi) || haveSlirp(vmi) {
 		capabilities = append(capabilities, CAP_NET_BIND_SERVICE)
 	}
 	// add a CAP_SYS_NICE capability to allow setting cpu affinity
 	capabilities = append(capabilities, CAP_SYS_NICE)
-
 	// add CAP_SYS_ADMIN capability to allow virtiofs
 	if util.IsVMIVirtiofsEnabled(vmi) {
 		capabilities = append(capabilities, CAP_SYS_ADMIN)
@@ -1648,14 +1711,13 @@ func getRequiredResources(vmi *v1.VirtualMachineInstance, useEmulation bool) k8s
 		(*vmi.Spec.Domain.Devices.AutoattachPodInterface == true) {
 		res[TunDevice] = resource.MustParse("1")
 	}
-	for _, iface := range vmi.Spec.Domain.Devices.Interfaces {
-		if !useEmulation && (iface.Model == "" || iface.Model == "virtio") {
-			// Note that about network interface, useEmulation does not make
-			// any difference on eventual Domain xml, but uniformly making
-			// /dev/vhost-net unavailable and libvirt implicitly fallback
-			// to use QEMU userland NIC emulation.
-			res[VhostNetDevice] = resource.MustParse("1")
-		}
+	if util.NeedVirtioNetDevice(vmi, useEmulation) {
+		// Note that about network interface, useEmulation does not make
+		// any difference on eventual Domain xml, but uniformly making
+		// /dev/vhost-net unavailable and libvirt implicitly fallback
+		// to use QEMU userland NIC emulation.
+		res[VhostNetDevice] = resource.MustParse("1")
+
 	}
 	return res
 }
@@ -1883,8 +1945,7 @@ func NewTemplateService(launcherImage string,
 	persistentVolumeClaimCache cache.Store,
 	virtClient kubecli.KubevirtClient,
 	clusterConfig *virtconfig.ClusterConfig,
-	launcherSubGid int64,
-	cpuArch string) TemplateService {
+	launcherSubGid int64) TemplateService {
 
 	precond.MustNotBeEmpty(launcherImage)
 	svc := templateService{
@@ -1899,7 +1960,6 @@ func NewTemplateService(launcherImage string,
 		virtClient:                 virtClient,
 		clusterConfig:              clusterConfig,
 		launcherSubGid:             launcherSubGid,
-		cpuArch:                    cpuArch,
 	}
 	return &svc
 }
@@ -1968,18 +2028,20 @@ func alignPodMultiCategorySecurity(pod *k8sv1.Pod, selinuxType string) {
 	for i := range pod.Spec.Containers {
 		container := &pod.Spec.Containers[i]
 		if container.Name != "compute" {
-			container.SecurityContext = generateContainerSecurityContext(selinuxType)
+			generateContainerSecurityContext(selinuxType, container)
 		}
 	}
 }
 
-func generateContainerSecurityContext(selinuxType string) *k8sv1.SecurityContext {
-	return &k8sv1.SecurityContext{
-		SELinuxOptions: &k8sv1.SELinuxOptions{
-			Type:  selinuxType,
-			Level: "s0",
-		},
+func generateContainerSecurityContext(selinuxType string, container *k8sv1.Container) {
+	if container.SecurityContext == nil {
+		container.SecurityContext = &k8sv1.SecurityContext{}
 	}
+	if container.SecurityContext.SELinuxOptions == nil {
+		container.SecurityContext.SELinuxOptions = &k8sv1.SELinuxOptions{}
+	}
+	container.SecurityContext.SELinuxOptions.Type = selinuxType
+	container.SecurityContext.SELinuxOptions.Level = "s0"
 }
 
 func generatePodAnnotations(vmi *v1.VirtualMachineInstance) (map[string]string, error) {
@@ -2028,4 +2090,17 @@ func filterVMIAnnotationsForPod(vmiAnnotations map[string]string) map[string]str
 		annotationsList[k] = v
 	}
 	return annotationsList
+}
+
+func checkForKeepLauncherAfterFailure(vmi *v1.VirtualMachineInstance) bool {
+	keepLauncherAfterFailure := false
+	for k, v := range vmi.Annotations {
+		if strings.HasPrefix(k, v1.KeepLauncherAfterFailureAnnotation) {
+			if v == "" || strings.HasPrefix(v, "true") {
+				keepLauncherAfterFailure = true
+				break
+			}
+		}
+	}
+	return keepLauncherAfterFailure
 }

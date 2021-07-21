@@ -320,10 +320,8 @@ func Execute() {
 	app.initWorkloadUpdaterController()
 	go app.Run()
 
-	select {
-	case <-app.reInitChan:
-		cancel()
-	}
+	<-app.reInitChan
+	cancel()
 }
 
 // Detects if a config has been applied that requires
@@ -464,7 +462,6 @@ func (vca *VirtControllerApp) initCommon() {
 		virtClient,
 		vca.clusterConfig,
 		vca.launcherSubGid,
-		runtime.GOARCH,
 	)
 
 	topologyHinter := topology.NewTopologyHinter(vca.nodeInformer.GetStore(), vca.vmiInformer.GetStore(), runtime.GOARCH, vca.clusterConfig)
