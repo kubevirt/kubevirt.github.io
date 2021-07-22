@@ -6,7 +6,7 @@ order: 20
 tags: [privacy, cookies, hosting]
 ---
 
-# Privacy Statement for the KubeVirt Project
+## Privacy Statement for the KubeVirt Project
 
 As Kubevirt.io and most of the infrastructure of the Kubevirt Project are currently hosted by Red Hat Inc., this site falls under the [Red Hat Privacy Policy](https://www.redhat.com/en/about/privacy-policy){:target="\_blank"}. All terms of that privacy policy apply to this site. Should we change our hosting in the future, this Privacy Policy will be updated.
 

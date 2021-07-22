@@ -16,8 +16,8 @@ Many thanks to everyone who contributed to the event!
 
 The event took place online during two half-days (5 hours each day):
 
-  - Dates: February 9 and 10, 2021.
-  - Time: 14:00 – 19:00 UTC (09:00–14:00 EST, 15:00–20:00 CET)
+- Dates: February 9 and 10, 2021.
+- Time: 14:00 – 19:00 UTC (09:00–14:00 EST, 15:00–20:00 CET)
 
 ## Program
 
@@ -51,6 +51,7 @@ The event consisted of 20 sessions with the following schedule (all times in UTC
 Here is a list of all the sessions with a short abstract, presenter information and links to the session's recording and slides.
 
 <a name="welcome"></a>
+
 ### Welcome to the KubeVirt Summit! Introduction and history
 
 [Recording](https://youtu.be/BX0k5jnyNag) / [Slides](https://drive.google.com/file/d/1CCnemQ1CntxskcOlgkTieFb2omR-GQ_I/view)
@@ -58,6 +59,7 @@ Here is a list of all the sessions with a short abstract, presenter information 
 In the first session of the KubeVirt Summit, Fabian Deutsch ([@dummdida](https://twitter.com/dummdida)) talks about the project's history.
 
 <a name="automated-migration"></a>
+
 ### Automated Migration of VMs from VMware or Openstack to KubeVirt
 
 [Recording](https://youtu.be/2Fm8IJ7gyRg) / [Slides](https://drive.google.com/file/d/1gOteQvEwU2vR4dPAxNLC0iAZ0UwlUcYE/view?usp=sharing)
@@ -69,10 +71,12 @@ Coriolis performs automated migrations among most common clouds and virtualizati
 During this session we will perform a live demo showing how to migrate a VM from VMware vSphere to KubeVirt and a separate demo showing the migration of a VM from OpenStack to KubeVirt.
 
 Presenters:
-  - Alessandro Pilotti, CEO/CTO, Cloudbase Solutions, [@cloudbaseit](https://twitter.com/cloudbaseit), <https://github.com/alexpilotti/>
-  - Gabriel Samfira, Cloud Architect, Cloudbase Solutions, [@gabriel_samfira](https://twitter.com/gabriel_samfira), <https://github.com/gabriel-samfira>
+
+- Alessandro Pilotti, CEO/CTO, Cloudbase Solutions, [@cloudbaseit](https://twitter.com/cloudbaseit), <https://github.com/alexpilotti/>
+- Gabriel Samfira, Cloud Architect, Cloudbase Solutions, [@gabriel_samfira](https://twitter.com/gabriel_samfira), <https://github.com/gabriel-samfira>
 
 <a name="prow"></a>
+
 ### Avoid merging broken code with Prow
 
 [Recording](https://youtu.be/4JV7YJbini0) / [Slides](https://drive.google.com/file/d/14A-pKmSwMZCDghATnOTHcAkt84TPu_AD/view?usp=sharing)
@@ -86,13 +90,15 @@ Attendants will be able to know what job types are available, which one to use f
 Presenter: Daniel Hiller, Senior Software Engineer OpenShift Virtualization, Red Hat. [@dhill3r](https://twitter.com/dhill3r), <https://github.com/dhiller>
 
 <a name="templates"></a>
+
 ### Building great VMs with common templates
 
 [Recording](https://youtu.be/C0zTKrMSQXE)
 
-Common templates are covering most of the nowadays operating systems. Users can easily create e.g. Windows VMs, without complicated settings. 
+Common templates are covering most of the nowadays operating systems. Users can easily create e.g. Windows VMs, without complicated settings.
 
 The presentation covers:
+
 - What are common templates
 - Which operating systems are supported
 - How common templates work
@@ -103,6 +109,7 @@ Attendants will be able to know what are common templates and how to use them.
 Presenter: Karel Simon, Software Engineer, Red Hat
 
 <a name="tekton"></a>
+
 ### Automating KubeVirt with Tekton Pipelines
 
 [Recording](https://youtu.be/ZA4fN_ogpY0) / [Slides](https://drive.google.com/file/d/1baGeO-iPsI2HPzS8pq1b4My3hRQDSfw5/view?usp=sharing)
@@ -118,6 +125,7 @@ are the plans for the future.
 Presenter: Filip Křepinský, Senior Software Engineer, Red Hat, <https://github.com/suomiy>
 
 <a name="snapshots"></a>
+
 ### KubeVirt data protection and forensics forum
 
 [Recording](https://youtu.be/qRw2cLVqJ3c) / [Slides](https://drive.google.com/file/d/1QQijYPFVQx7Ki2VVaQtNObSjJdeno0iS/view?usp=sharing)
@@ -125,10 +133,12 @@ Presenter: Filip Křepinský, Senior Software Engineer, Red Hat, <https://github
 Let's get together to discuss plans/ideas to extend KubeVirt's data protection and forensics functionality.
 
 Presenters:
-  - Michael Henriksen, Red Hat, <https://github.com/mhenriks>
-  - Ryan Hallisey, NVIDIA, [@rthallisey](https://twitter.com/rthallisey), <https://github.com/rthallisey>
+
+- Michael Henriksen, Red Hat, <https://github.com/mhenriks>
+- Ryan Hallisey, NVIDIA, [@rthallisey](https://twitter.com/rthallisey), <https://github.com/rthallisey>
 
 <a name="upgrades"></a>
+
 ### Zero downtime KubeVirt updates
 
 [Recording](https://youtu.be/UZCFmrVFSz8) / [Slides](https://drive.google.com/file/d/1MYPo8rp1SGPNJnVhothDBFYccxxLtX65/view?usp=sharing)
@@ -142,6 +152,7 @@ Attendees will come away with an understanding of how KubeVirt's update process 
 Presenter: David Vossel, Senior Principal Software Engineer, Red Hat, <https://github.com/davidvossel>
 
 <a name="hotplug"></a>
+
 ### Introducing Volume Hotplug in KubeVirt
 
 [Recording](https://youtu.be/4OxcqF4Lmh0) / [Slides](https://drive.google.com/file/d/18-BpnpAwDbmvWtJ63_tWTzF98XDTFVM7/view?usp=sharing)
@@ -151,6 +162,7 @@ Introduction into the current state of volume hotplugging in KubeVirt, what is p
 Presenter: Alexander Wels, Principal Software Engineer, Red Hat
 
 <a name="pci-passthrough"></a>
+
 ### Accelerating VNF and CNF with PCI passthrough and KubeVirt
 
 [Recording](https://youtu.be/PJ4D2NqMO2A) / [Slides](https://drive.google.com/file/d/17QJDZQj8zkoyCLjKwDz97vz4Wjw8CH3s/view?usp=sharing)
@@ -160,10 +172,12 @@ This session introduces PCI device passthrough to containers and VMs managed by 
 An overview of PCI passthrough and the Generic Device API is provided, illustrated with a specific practical use case that uses Intel QAT to accelerate VNF/CNF in edge computing.
 
 Presenters:
-  - Vladik Romanovsky, Principal Software Engineer, Red Hat
-  - Le Yao, Intel SSE/CSE
+
+- Vladik Romanovsky, Principal Software Engineer, Red Hat
+- Le Yao, Intel SSE/CSE
 
 <a name="harvester"></a>
+
 ### Harvester: an OSS HCI solution built on Kubernetes and KubeVirt
 
 [Recording](https://youtu.be/Kp_xs4bfUXI) / [Slides](https://drive.google.com/file/d/1DeCgnDF4aFFMq3tVeWtrO5LuxbjMYPo2/view?usp=sharing)
@@ -175,19 +189,21 @@ In this talk, we will talk about why we decide to build Harvester, how did we in
 Presenter: Sheng Yang: Senior Engineering Manager, SUSE, [@yasker](https://twitter.com/yasker), <https://github.com/yasker>
 
 <a name="sriov"></a>
+
 ### Kubevirt Live migration and SRIOV
 
 [Recording](https://youtu.be/PxsVU95vLp8) / [Slides](https://drive.google.com/file/d/1DeCgnDF4aFFMq3tVeWtrO5LuxbjMYPo2/view?usp=sharing)
 
 KubeVirt Live Migration now supports VM's connected to SRIOV NIC's.
 
-On virtualized environments, Live Migration is a tool you want to have in your toolbox especially on production. It enables you to improve your services availability and reduce the recovery time drastically. 
+On virtualized environments, Live Migration is a tool you want to have in your toolbox especially on production. It enables you to improve your services availability and reduce the recovery time drastically.
 
 In this session we will discuss why and how to use this feature for VM's with SRIOV NIC's.
 
 Presenter: Or Mergi, Software Engineer, Red Hat, <https://github.com/ormergi>
 
 <a name="forklift"></a>
+
 ### Moving oVirt and VMware VMs to KubeVirt with VM Import Operator and Forklift
 
 [Recording](https://youtu.be/S7hVcv2Fu6I) / [Slides](https://drive.google.com/file/d/1JS0xugQvXB_yXsISbLQlnjhRCq85dLTR/view?usp=sharing)
@@ -206,14 +222,17 @@ The attendees will:
 - know how to import their VMware or oVirt workloads to Kubernetes with VMIO or Forklift
 
 Presenters:
+
 - Jakub Dzon, Senior Software Engineer, Red Hat
 - Fabien Dupont, Senior Principal Engineer & Engineering Manager, Red Hat
 
 References:
+
 - [VM Import Operator](https://github.com/kubevirt/vm-import-operator) (VMIO).
 - Konveyor's [Forklift](https://docs.konveyor.io/).
 
 <a name="hco"></a>
+
 ### KubeVirt opinionated deployment via Hyperconverged Cluster Operator
 
 [Recording](https://youtu.be/6Jxbt1SzLRE) / [Slides](https://drive.google.com/file/d/1zO3B0IWe4jxJlOrHBu5I4nvt6pvvqHNc/view?usp=sharing)
@@ -238,13 +257,16 @@ An attendee will learn:
 - ongoing development and how to contribute
 
 Presenters:
+
 - Nahshon Unna-Tsametet, Senior Software Engineer, Red Hat, <https://github.com/nunnatsa>
 - Oren Cohen, Software Engineer, Red Hat, <https://github.com/orenc1>
 
 References:
+
 - [HyperConverged Cluster operator](https://github.com/kubevirt/hyperconverged-cluster-operator) (HCO).
 
 <a name="capabilities"></a>
+
 ### Privilege dropping, one capability at a time
 
 [Recording](https://youtu.be/7qVcDraf_DI) / [Slides](https://drive.google.com/file/d/1m-oRtZYiMEasr6ICSDc3ShHGEqm0IFsM/view?usp=sharing)
@@ -260,6 +282,7 @@ This talk will encompass changes in KubeVirt and Libvirt, and requires some gene
 Presenter: Miguel Duarte Barroso, Software Developer, Red Hat
 
 <a name="molecule"></a>
+
 ### Introducing the new KubeVirt driver for Ansible Molecule
 
 [Recording](https://youtu.be/oCk6hzk7lAM) / [Slides](https://drive.google.com/file/d/1jvoat_XT16YX5wwA7AwBMo3p3vs2r2xF/view?usp=sharing)
@@ -271,6 +294,7 @@ In this session I will introduce quickly why it may be better than actual driver
 Presenter: Joël Séguillon, Senior DevOps Consultant in mission at [www.ateme.com](https://www.ateme.com) - <https://github.com/jseguillon> ([LinkedIn](https://www.linkedin.com/in/jo%C3%ABl-s%C3%A9guillon-91a55814/))
 
 <a name="batch-api"></a>
+
 ### Virtual Machine Batch API
 
 [Recording](https://youtu.be/BbzFMcksMlU) / [Slides](https://drive.google.com/file/d/1z6t70wiaF6WukOTauY0ZPiAF33J6d6oT/view?usp=sharing)
@@ -280,10 +304,12 @@ KubeVirt extends the Kubernetes ReplicaSets API to provide Virtual Machines with
 In this session, we’d like to share ideas, discuss use cases, and consider possible solutions to bulk Virtual Machine scheduling.
 
 Presenters:
+
 - Huy Pham, NVIDIA. <https://github.com/huypham21>
 - Ryan Hallisey, NVIDIA, [@rthallisey](https://twitter.com/rthallisey), <https://github.com/rthallisey>
 
 <a name="cpu-pinning"></a>
+
 ### CPU Pinning with custom policies
 
 [Recording](https://youtu.be/xSMFQR_Uh1M) / [Slides](https://drive.google.com/file/d/16Wy8s-uCr_B6GdQgWBB1_EIX2awUTFDu/view?usp=sharing)
@@ -297,10 +323,12 @@ An important requirement for us is to do away with the shared pool and let kubel
 In this session we’d like to discuss the workarounds we use for supporting a custom CPU pinning using a dedicated CPU device plugin and integrating it with KubeVirt and discuss use cases.
 
 Presenters:
+
 - Sowmya Seetharaman, NVIDIA, <https://github.com/sseetharaman6>
 - Dhanya Bhat, NVIDIA, <https://github.com/dbbhat>
 
 <a name="road-v1"></a>
+
 ### The Road to Version 1
 
 [Recording](https://youtu.be/Qcci8U1J05w)
@@ -319,6 +347,7 @@ In summary, this session is another step in the journey towards the release of K
 Session lead: David Vossel, Senior Principal Software Engineer, Red Hat
 
 <a name="vfx"></a>
+
 ### Moving a Visual Effects Studio to the cloud with Kubernetes and KubeVirt
 
 [Recording](https://youtu.be/me25mlhgERI)
@@ -332,6 +361,7 @@ We will be discussing our experience integrating KubeVirt under a strict deadlin
 Presenter: Peter Salanki, Director of Engineering, CoreWeave, Inc, <https://github.com/salanki>
 
 <a name="office-hours"></a>
+
 ### Office Hours: Q&A with KubeVirt maintainers
 
 [Recording](https://youtu.be/cWNxJHiLPek)
@@ -339,6 +369,7 @@ Presenter: Peter Salanki, Director of Engineering, CoreWeave, Inc, <https://gith
 Our final session is an opportunity for you to ask all your KubeVirt questions, whether they're about the project, or they are about using KubeVirt in production. Maintainers and experts will be on hand.
 
 Panelists:
+
 - David Vossel, Senior Principal Software Engineer, Red Hat
 - Adam Litke, Engineering Manager, Red Hat
 - Petr Horacek, Engineering Manager, Red Hat
