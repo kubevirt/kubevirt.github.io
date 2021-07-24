@@ -191,7 +191,7 @@ Kubernetes and KubeVirt on a Fedora Linux host.  Yes!  It can be done!</p>
     <br><br>
 </ol>
 
-### SUCCESS!
+### SUCCESS
 
 <p>Here we have successfully demonstrated how simple it can be to migrate an
 existing MS Windows platform and application to Kubernetes control. For
@@ -199,7 +199,7 @@ questions feel free to join the conversation via one of the project forums.</p>
 
 <br>
 
-##### Footnotes
+#### Footnotes
 
 <div class="footnotes" role="doc-noteref">
   <ol>

@@ -19,13 +19,14 @@ pub-date: July 20
 pub-year: 2020
 ---
 
-## Deploying KubeVirt has just gotten easier!
+## Deploying KubeVirt has just gotten easier
+
 With the latest release (v1.12) of
 [minikube](https://minikube.sigs.k8s.io/docs/) we can now deploy KubeVirt with
 a one-liner.
 
-
 ## Deploy minikube
+
 <ol>
   <li>Start minikube.  Since my host is Fedora 32 I will use --driver=kvm2 and
   I will also use --container-runtime=crio<br>
@@ -79,7 +80,7 @@ a one-liner.
   </li>
 </ol>
 
-### SUCCESS!
+### SUCCESS
 
 From here a user can proceed on to the
 [Kubevirt Laboratory 1: Use KubeVirt]({% link labs/kubernetes/lab1.md %})

@@ -67,13 +67,13 @@ You can reproduce this work on any Kubernetes cluster running kubevirt v0.40.0 o
 
 Before we begin you will need a few things to make use of the Intel GPU:
 
-* A workstation or server with a 5th Generation or higher Intel Core Processor, or E3_v4 or higher Xeon Processor and enough memory to virtualize one or more VMs
-* A preinstalled Fedora 32 Workstation with at least 50Gb of free space in the "/" filesystem
-* The following software:
-  * minikube - See [minikube start](https://minikube.sigs.k8s.io/docs/start/)
-  * virtctl - See [kubevirt releases](https://github.com/kubevirt/kubevirt/releases)
-  * kubectl - See [Install and Set Up kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
-* A Windows 10 Install ISO Image - See [Download Windows 10 Disk Image](https://www.microsoft.com/en-us/software-download/windows10)
+- A workstation or server with a 5th Generation or higher Intel Core Processor, or E3_v4 or higher Xeon Processor and enough memory to virtualize one or more VMs
+- A preinstalled Fedora 32 Workstation with at least 50Gb of free space in the "/" filesystem
+- The following software:
+  - minikube - See [minikube start](https://minikube.sigs.k8s.io/docs/start/)
+  - virtctl - See [kubevirt releases](https://github.com/kubevirt/kubevirt/releases)
+  - kubectl - See [Install and Set Up kubectl on Linux](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+- A Windows 10 Install ISO Image - See [Download Windows 10 Disk Image](https://www.microsoft.com/en-us/software-download/windows10)
 
 ### Fedora Workstation Prep
 
@@ -82,7 +82,7 @@ In order to use minikube on Fedora 32 we will be installing multiple application
 > note "Note"
 > This post assumes that we are starting with a fresh install of Fedora 32. If you are using an existing configured Fedora 32 Workstation, you may have some software conflicts.
 
-```
+```shell
 sudo dnf update -y
 sudo dnf install -y pciutils podman podman-docker conntrack tigervnc rdesktop
 sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
@@ -106,7 +106,7 @@ sudo systemctl enable sshd --now
 
 We will now install the CRIO runtime:
 
-```
+```shell
 sudo dnf module enable -y cri-o:1.18
 sudo dnf install -y cri-o cri-tools
 sudo systemctl enable --now crio
@@ -117,9 +117,10 @@ sudo systemctl enable --now crio
 In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.
 
 The following commands will do the following:
-* load the kvmgt module to enable support within kvm
-* enable gvt in the i915 module
-* update the Linux kernel to enable Intel IOMMU
+
+- load the kvmgt module to enable support within kvm
+- enable gvt in the i915 module
+- update the Linux kernel to enable Intel IOMMU
 
 ```shell
 sudo sh -c "echo kvmgt > /etc/modules-load.d/gpu-kvmgt.conf"
@@ -173,7 +174,6 @@ sudo systemctl enable gvtg-enable --now
 > note "Note"
 > The above systemd service will create two vGPU devices, you can repeat the commands with additional unique GUIDs up to a maximum of 8 vGPU if your particular hardware supports it.
 
-
 We can validate that the vGPU devices were created by looking in the `/sys/devices/pci0000:00/0000:00:02.0/` directory.
 
 ```shell
@@ -225,7 +225,7 @@ $ sudo minikube start --driver=none --container-runtime=crio
 
 In order to make our interaction with Kubernetes a little easier, we will need to copy some files and update our `.kube/config`
 
-```
+```shell
 mkdir -p ~/.minikube/profiles/minikube
 sudo cp -r /root/.kube /home/$USER
 sudo cp /root/.minikube/ca.crt /home/$USER/.minikube/ca.crt
@@ -251,8 +251,8 @@ As long as you don't get any errors, your base Kubernetes cluster is ready to go
 Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. Using the minikube addons manager, we will install kubevirt into our cluster:
 
 ```shell
-$ sudo minikube addons enable kubevirt
-$ kubectl -n kubevirt wait kubevirt kubevirt --for condition=Available --timeout=300s
+sudo minikube addons enable kubevirt
+kubectl -n kubevirt wait kubevirt kubevirt --for condition=Available --timeout=300s
 ```
 
 At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an _mdevNameSelector_ to look for, and a _resourceName_ to assign to it. The _mdevNameSelector_ comes from the "mdev_type" that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.
@@ -333,7 +333,7 @@ kubectl create -f cdi-nodeport.yaml
 
 One final step, lets get the latest release of virtctl which we will be using as we install Windows.
 
-```
+```shell
 VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.observedKubeVirtVersion}")
 curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-linux-amd64
 sudo install virtctl /usr/local/bin
@@ -474,6 +474,7 @@ spec:
 EOF
 kubectl create -f win10vm1.yaml
 ```
+
 > note "NOTE"
 > This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.
 
@@ -490,7 +491,7 @@ Here we are identifying the gpu device that we want to attach to this VM. The de
 
 We can now start the virtual machine:
 
-```
+```shell
 virtctl start win10vm1
 kubectl get vmi --watch
 ```
@@ -502,7 +503,7 @@ When the output of shows that the vm is in a "Running" phase you can "CTRL+C" to
 Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.
 
 ```shell
-$ virtctl vnc win10vm1
+virtctl vnc win10vm1
 ```
 
 A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.
@@ -514,6 +515,7 @@ Try testing out the GPU acceleration. Open a web browser in your VM and navigate
 ## Using the GPU
 
 In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:
+
 1. In the Windows 10 search bar, type "**Remote Desktop Settings**" and then open the result.
 2. Select "**Enable Remote Desktop**" and confirm the change.
 3. Select "**Advanced settings**" and un-check "**Require computers to use Network level Authentication**", and confirm this change.

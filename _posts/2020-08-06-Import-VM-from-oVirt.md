@@ -20,9 +20,11 @@ pub-year: 2020
 ---
 
 ## About vm-import-operator
+
 Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the [CDI](https://github.com/kubevirt/containerized-data-importer), so in order to have the vm import working you must have both KubeVirt and CDI installed.
 
 ### Import rules
+
 Before the import process is initiated we run validation of the source VM, to be sure the KubeVirt will run the source VM smoothly. We have many [rules](https://github.com/kubevirt/vm-import-operator/blob/master/docs/rules.md) defined including storage, network and the VM. You will see all warning messages in the conditions field. For example:
 
 ```yaml
@@ -35,6 +37,7 @@ Before the import process is initiated we run validation of the source VM, to be
 ```
 
 ### Supported Guest Operating Systems
+
 We support following guest operating systems:
 
 * Red Hat Enterprise Linux 6
@@ -52,25 +55,27 @@ We support following guest operating systems:
 * openSUSE
 
 ## Setup vm-import-operator
+
 Source code for virtual machine import operator is hosted on github under [KubeVirt](https://github.com/kubevirt) organization. You can very easily deploy it on your Kubernetes by running following commands:
 
 ```bash
-$ kubectl apply -f https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
-$ kubectl apply -f https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
-$ kubectl apply -f https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
+kubectl apply -f https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
+kubectl apply -f https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
+kubectl apply -f https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
 ```
 
 By default the operator is deployed to `kubevirt-hyperconverged` namespace,
 you can verify that the operator is deployed and running by running:
 
 ```bash
-$ kubectl get deploy vm-import-controller -n kubevirt-hyperconverged
+kubectl get deploy vm-import-controller -n kubevirt-hyperconverged
 ```
 
 If you are using [HCO](https://github.com/kubevirt/hyperconverged-cluster-operator/), you don't have to install it manually,
 because the HCO takes care of that.
 
 ## Importing virtual machine from oVirt
+
 In order to import a virtual machine from oVirt user must obtain credentials for the oVirt environment. oVirt environment is usually accessed using username, password and http URL. Note that you must provide CA certificate of your oVirt environment. If you have those - create a secret out of them:
 
 ```yaml
@@ -210,4 +215,5 @@ The import process goes through different stages. The first stage is the validat
 The others are for processing and reporting to provide VM and disks ready status.
 
 ## Future
+
 For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.
