@@ -33,6 +33,7 @@ Policies are based on statically defined types, that can be assigned to files, p
 A simple policy example would be to allow a `/bin/test` program to read its `/etc/test.conf` configuration file.
 
 The policy for that would include directives to:
+
 * Assign types to files and processes, like `test_bin_t` for `/bin/test`, `test_conf_t` for `/etc/test.conf`, and `test_t` for instances of the test program
 * Configure a *transition* from `test_bin_t` to `test_t`
 * Allow `test_t` processes to read `test_conf_t` files.
@@ -60,6 +61,7 @@ Multi-Category Security, or MCS, provides the ability to dynamically add numeric
 Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It's important to note that categories have no order, so `c42,c42` is equivalent to `c42`, and `c1,c2` is equivalent to `c2,c1`.
 
 In the example above, we can now:
+
 * Dynamically compute a unique random category for each VM
 * Assign the corresponding categories to all VM resources, like qemu instance and disk files
 * Only allow access when all the involved resources have the same category number.

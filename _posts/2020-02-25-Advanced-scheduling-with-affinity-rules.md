@@ -468,9 +468,9 @@ Here, the modified deployment is applied. As expected the VMI is scheduled as ex
 $ kubectl get pods,vmi -o wide
 
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          172m    10.244.4.5   kni-worker5   <none>           <none>
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          172m    10.244.3.5   kni-worker3   <none>           <none>
-pod/varnish-cache-54489f9fc9-dflzs	 1/1     Running   0          172m    10.244.6.5   kni-worker    <none>           <none>
+pod/varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          172m    10.244.4.5   kni-worker5   <none>           <none>
+pod/varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          172m    10.244.3.5   kni-worker3   <none>           <none>
+pod/varnish-cache-54489f9fc9-dflzs       1/1     Running   0          172m    10.244.6.5   kni-worker    <none>           <none>
 pod/virt-launcher-blackboxtk49x-nw45s    2/2     Running   0          2m31s   10.244.6.6   kni-worker    <none>           <none>
 pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          2m31s   10.244.4.9   kni-worker5   <none>           <none>
 pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          2m31s   10.244.3.6   kni-worker3   <none>           <none>
@@ -478,7 +478,7 @@ pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h1m    10
 pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h22m   10.244.2.5   kni-worker2   <none>           <none>
 pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h1m    10.244.5.4   kni-worker6   <none>           <none>
 
-NAME                                                AGE     PHASE     IP           NODENAME	 LIVE-MIGRATABLE
+NAME                                                AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 virtualmachineinstance.kubevirt.io/blackboxtk49x    2m31s   Running   10.244.6.6   kni-worker    False
 virtualmachineinstance.kubevirt.io/blackboxxt829    2m31s   Running   10.244.4.9   kni-worker5   False
 virtualmachineinstance.kubevirt.io/blackboxzf9kt    2m31s   Running   10.244.3.6   kni-worker3   False
@@ -501,9 +501,9 @@ As it is depicted, once the `kni-worker` is marked as unschedulable and drained,
 
 ```sh
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h8m    10.244.4.5   kni-worker5   <none>           <none>
-pod/varnish-cache-54489f9fc9-9s5sr	 1/1     Running   0          2m32s   10.244.2.7   kni-worker2   <none>           <none>
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h8m    10.244.3.5   kni-worker3   <none>           <none>
+pod/varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          3h8m    10.244.4.5   kni-worker5   <none>           <none>
+pod/varnish-cache-54489f9fc9-9s5sr       1/1     Running   0          2m32s   10.244.2.7   kni-worker2   <none>           <none>
+pod/varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          3h8m    10.244.3.5   kni-worker3   <none>           <none>
 pod/virt-launcher-blackboxxh5tg-g7hns    2/2     Running   0          13m     10.244.2.8   kni-worker2   <none>           <none>
 pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          18m     10.244.4.9   kni-worker5   <none>           <none>
 pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          18m     10.244.3.6   kni-worker3   <none>           <none>
@@ -513,11 +513,11 @@ pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h17m   10
 
 NAME                                                AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 virtualmachineinstance.kubevirt.io/blackboxxh5tg    13m     Running   10.244.2.8   kni-worker2   False
-virtualmachineinstance.kubevirt.io/blackboxxt829    18m     Running	 10.244.4.9   kni-worker5   False
-virtualmachineinstance.kubevirt.io/blackboxzf9kt    18m     Running	 10.244.3.6   kni-worker3   False
-virtualmachineinstance.kubevirt.io/mssql2016p948r   4h17m   Running	 10.244.1.4   kni-worker4   False
-virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h37m   Running	 10.244.2.5   kni-worker2   False
-virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h17m   Running	 10.244.5.4   kni-worker6   False
+virtualmachineinstance.kubevirt.io/blackboxxt829    18m     Running   10.244.4.9   kni-worker5   False
+virtualmachineinstance.kubevirt.io/blackboxzf9kt    18m     Running   10.244.3.6   kni-worker3   False
+virtualmachineinstance.kubevirt.io/mssql2016p948r   4h17m   Running   10.244.1.4   kni-worker4   False
+virtualmachineinstance.kubevirt.io/mssql2016tpj6n   3h37m   Running   10.244.2.5   kni-worker2   False
+virtualmachineinstance.kubevirt.io/mssql2016z2qnw   4h17m   Running   10.244.5.4   kni-worker6   False
 ```
 
 Remember that this is happening because:
@@ -534,9 +534,9 @@ $ kubectl uncordon kni-worker
 node/kni-worker uncordoned
 
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h10m   10.244.4.5   kni-worker5   <none>           <none>
-pod/varnish-cache-54489f9fc9-9s5sr	 1/1     Running   0          5m29s   10.244.2.7   kni-worker2   <none>           <none>
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h10m   10.244.3.5   kni-worker3   <none>           <none>
+pod/varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          3h10m   10.244.4.5   kni-worker5   <none>           <none>
+pod/varnish-cache-54489f9fc9-9s5sr       1/1     Running   0          5m29s   10.244.2.7   kni-worker2   <none>           <none>
+pod/varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          3h10m   10.244.3.5   kni-worker3   <none>           <none>
 pod/virt-launcher-blackboxxh5tg-g7hns    2/2     Running   0          16m     10.244.2.8   kni-worker2   <none>           <none>
 pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          21m     10.244.4.9   kni-worker5   <none>           <none>
 pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          21m     10.244.3.6   kni-worker3   <none>           <none>
@@ -562,9 +562,9 @@ Once done, the scheduling process is run again for both applications and the app
 
 ```sh
 NAME                                     READY   STATUS    RESTARTS   AGE     IP           NODE          NOMINATED NODE   READINESS GATES
-pod/varnish-cache-54489f9fc9-5pbr2	 1/1     Running   0          3h13m   10.244.4.5   kni-worker5   <none>           <none>
-pod/varnish-cache-54489f9fc9-9s9tm	 1/1     Running   0          3h13m   10.244.3.5   kni-worker3   <none>           <none>
-pod/varnish-cache-54489f9fc9-fldhc	 1/1     Running   0          2m7s    10.244.6.7   kni-worker    <none>           <none>
+pod/varnish-cache-54489f9fc9-5pbr2       1/1     Running   0          3h13m   10.244.4.5   kni-worker5   <none>           <none>
+pod/varnish-cache-54489f9fc9-9s9tm       1/1     Running   0          3h13m   10.244.3.5   kni-worker3   <none>           <none>
+pod/varnish-cache-54489f9fc9-fldhc       1/1     Running   0          2m7s    10.244.6.7   kni-worker    <none>           <none>
 pod/virt-launcher-blackbox54l7t-4c6wh    2/2     Running   0          23s     10.244.6.8   kni-worker    <none>           <none>
 pod/virt-launcher-blackboxxt829-snjth    2/2     Running   0          23m     10.244.4.9   kni-worker5   <none>           <none>
 pod/virt-launcher-blackboxzf9kt-6mh56    2/2     Running   0          23m     10.244.3.6   kni-worker3   <none>           <none>
@@ -572,7 +572,7 @@ pod/virt-launcher-mssql2016p948r-257pn   2/2     Running   0          4h23m   10
 pod/virt-launcher-mssql2016tpj6n-l2fnf   2/2     Running   0          3h43m   10.244.2.5   kni-worker2   <none>           <none>
 pod/virt-launcher-mssql2016z2qnw-t924b   2/2     Running   0          4h23m   10.244.5.4   kni-worker6   <none>           <none>
 
-NAME                                                AGE     PHASE     IP           NODENAME	 LIVE-MIGRATABLE
+NAME                                                AGE     PHASE     IP           NODENAME      LIVE-MIGRATABLE
 virtualmachineinstance.kubevirt.io/blackbox54l7t    23s     Running   10.244.6.8   kni-worker    False
 virtualmachineinstance.kubevirt.io/blackboxxt829    23m     Running   10.244.4.9   kni-worker5   False
 virtualmachineinstance.kubevirt.io/blackboxzf9kt    23m     Running   10.244.3.6   kni-worker3   False
@@ -679,8 +679,6 @@ spec:
 
 > info "Information"
 > It is worth mentioning that DaemonSets internally also uses advanced scheduling rules. Basically, they are `nodeAffinity` rules in order to place each replica in each Kubernetes node of the cluster.
-
-> info "Information"
 > A DaemonSet ensures that all (or some) Nodes run a copy of a Pod. As nodes are added to the cluster, Pods are added to them. As nodes are removed from the cluster, those Pods are garbage collected. Deleting a DaemonSet will clean up the Pods it created.
 
 ```sh

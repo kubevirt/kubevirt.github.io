@@ -30,7 +30,6 @@ This is the last blogpost of the series of 3, in this case KubeVirt is going to 
 What is KubeVirt? if you navigate to the [KubeVirt webpage](https://kubevirt.io) you can read:
 
 > KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.
-
 > Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.
 
 In this example there is a Kubernetes cluster compose of one master, for it to be schedulable to host the KubeVirt pods, a little modification has to be done:
@@ -210,7 +209,7 @@ k8s-test.local# kubectl virt stop testvm
 VM testvm was scheduled to stop
 ```
 
-# Troubleshooting
+## Troubleshooting
 
 Each step of this guide has a place where to look for possible issues, in general, the [troubleshooting guide of kubernetes](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can be checked. The following list tries to ease the possible troubleshooting in case of problems during each step of this guide:
 

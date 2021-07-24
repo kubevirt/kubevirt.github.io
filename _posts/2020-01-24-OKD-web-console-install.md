@@ -127,7 +127,7 @@ Done in 215.91s.
 The result of the process is a binary file called **bridge** inside the bin folder. Prior to run the _"bridge"_, it has to be verified that the port where the OKD web console is expecting connections is not blocked.
 
 ```sh
-$ iptables -A INPUT -p tcp --dport 9000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
+iptables -A INPUT -p tcp --dport 9000 -m conntrack --ctstate NEW,ESTABLISHED -j ACCEPT
 ```
 
 Then, the artifact can be executed:
@@ -151,8 +151,8 @@ There are two options to fix the issue: one is granting cluster-admin permission
 The other option is create a new service account called **console**, grant cluster-admin permissions to it and configure the web console to run with this new service account:
 
 ```sh
-$ kubectl create serviceaccount console -n kube-system
-$ kubectl create clusterrolebinding console --clusterrole=cluster-admin --serviceaccount=kube-system:console -n kube-system
+kubectl create serviceaccount console -n kube-system
+kubectl create clusterrolebinding console --clusterrole=cluster-admin --serviceaccount=kube-system:console -n kube-system
 ```
 
 Once created, modify the `environment.sh` file and change the line that starts with `secretname` as shown below:
@@ -165,7 +165,7 @@ secretname=$(kubectl get serviceaccount **console** --namespace=kube-system -o j
 Now, variables configured in the `environment.sh` file have to be exported again and the connection to the console must be reloaded.
 
 ```sh
-$ source ./contrib/environment.sh
+source ./contrib/environment.sh
 ```
 
 ## Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)
@@ -304,8 +304,8 @@ A YAML file containing a deployment and service objects that mimic the binary in
 Then, create a specific service account (**console**) for running the OpenShift web console in case it is not created [previously](#compiling-okd-web-console) and grant cluster-admin permissions:
 
 ```sh
-$ kubectl create serviceaccount console -n kube-system
-$ kubectl create clusterrolebinding console --clusterrole=cluster-admin --serviceaccount=kube-system:console -n kube-system
+kubectl create serviceaccount console -n kube-system
+kubectl create clusterrolebinding console --clusterrole=cluster-admin --serviceaccount=kube-system:console -n kube-system
 ```
 
 Next, extract the **token secret name** associated with the console service account:

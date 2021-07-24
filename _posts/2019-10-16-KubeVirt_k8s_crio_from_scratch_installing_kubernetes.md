@@ -68,7 +68,7 @@ k8s-test.local# kubeadm init --pod-network-cidr=10.244.0.0/16
 
 When the installation finishes the command will print a similar message like this one:
 
-```
+```sh
 Your Kubernetes control-plane has initialized successfully!
 
 To start using your cluster, you need to run the following as a regular user:

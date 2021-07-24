@@ -6,3 +6,6 @@ MD024: false
 
 # allow inline HTML
 MD033: false
+
+# disable emphasis as heading warning
+MD036: false

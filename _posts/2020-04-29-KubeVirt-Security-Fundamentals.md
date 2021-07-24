@@ -22,7 +22,7 @@ pub-year: 2020
 
 ## Security Guidelines
 
-In KubeVirt, our approach to security can be summed up by adhering to the following guidelines. 
+In KubeVirt, our approach to security can be summed up by adhering to the following guidelines.
 
 1. Maintain the **principle of least privilege** for all our components, meaning each component only has access to exactly the minimum privileges required to operate.
 
@@ -40,7 +40,7 @@ Here’s a simple and rather obvious example. If a component needs access to a s
 
 For KubeVirt, the principle of least privilege can be broken into two categories.
 
-**Cluster Level Access:** The resources and APIs a component is permitted to access on the cluster. 
+**Cluster Level Access:** The resources and APIs a component is permitted to access on the cluster.
 
 **Host Level Access:** The local resources a component is permitted to access on the host it is running on.
 
@@ -80,7 +80,7 @@ For KubeVirt, the separation between trusted and untrusted components comes when
 
 ![Trusted vs Untrusted Boundary](/assets/2020-04-29-KubeVirt-Security-Fundamentals/trusted-v-untrusted-boundary.png)
 
-**The virt-launcher pod is an untrusted environment.** The third party code executed within this environment is the user’s kvm virtual machine. KubeVirt has no control over what is executing within this virtual machine guest, so if there is a security vulnerability that allows breaking out of the kvm hypervisor, we want to make sure the environment that’s broken into is as limited as possible. This is why the virt-launcher’s pod has such restricted cluster and host access. 
+**The virt-launcher pod is an untrusted environment.** The third party code executed within this environment is the user’s kvm virtual machine. KubeVirt has no control over what is executing within this virtual machine guest, so if there is a security vulnerability that allows breaking out of the kvm hypervisor, we want to make sure the environment that’s broken into is as limited as possible. This is why the virt-launcher’s pod has such restricted cluster and host access.
 
 The **virt-handler pod, on the other hand, is a trusted environment** that does not involve executing any third party code. During the virtual machine startup flow, there are privileged tasks that need to take place on the host in order to prepare the virtual machine for starting. This ranges from performing the Device Plugin logic that injects a host device into a pod’s environment, to setting up network bridges and interfaces within a pod’s environment. To accomplish this, we use the trusted virt-handler component to reach into the untrusted virt-launcher environment to perform privileged tasks.
 
@@ -98,13 +98,12 @@ To counter this, when designing communication channels between trusted and untru
 
 There is a built in trust that components have for interacting with one another. For example, virt-api is allowed to establish virtual machine Console/VNC streams with virt-handler, and live migration is performed by streaming information between two virt-handler instances.
 
-However for these types of interactions to work, we have to have a strong guarantee that the endpoints we’re talking to are in fact who they present themselves to be. Otherwise we could live migrate a virtual machine to an untrusted location, or provide VNC access to a virtual machine to an unauthorized endpoint. 
+However for these types of interactions to work, we have to have a strong guarantee that the endpoints we’re talking to are in fact who they present themselves to be. Otherwise we could live migrate a virtual machine to an untrusted location, or provide VNC access to a virtual machine to an unauthorized endpoint.
 
 In KubeVirt we solve this issue of inter-component communication trust in the same way Kubernetes solves it. Each component receives a unique TLS certificate signed by a cluster Certificate Authority which is used to guarantee the component is who they say they are. The certificate and CA information is injected into each component using a secret passed in as a Pod volume. Whenever a component acts as a client establishing a new connection with another component, it uses its unique certificate to prove its identify. Likewise, the server accepting the clients connection also presents its certificate to the client. This mutual peer certificate authentication allows both the client and server to establish trust.
 
-So, when virt-api attempts to establish a VNC console stream with a virt-handler component, virt-handler is configured to only allow that stream to be opened by an endpoint providing a valid virt-api certificate, and virt-api will only talk to a server that presents the expected virt-handler certificate. 
+So, when virt-api attempts to establish a VNC console stream with a virt-handler component, virt-handler is configured to only allow that stream to be opened by an endpoint providing a valid virt-api certificate, and virt-api will only talk to a server that presents the expected virt-handler certificate.
 
 ## CA and Certificate Rotation
 
 In KubeVirt both our CA and certificates are rotated on a user defined recurring interval. In the event that either the CA key or a certificate is compromised, this information will eventually be rendered stale and unusable regardless if the compromise is known or not. If the compromise is known, a forced CA and certificate rotation can be invoked by the cluster admin simply by deleting the corresponding secrets in the KubeVirt install namespace.
-

@@ -19,7 +19,7 @@ pub-date: May 12
 pub-year: 2020
 ---
 
-# Building a VM Image Repository
+## Building a VM Image Repository
 
 You know what I hear a lot from new KubeVirt users?
 
@@ -30,6 +30,7 @@ And I agree. It’s not obvious. There are a million ways to use and manipulate 
 So, that’s what I’m going to attempt to do. I’ll show you how to make your images accessible in the cluster. I’ll show you how to make a custom VM image repository for use within the cluster. And I’ll show you how to use this at scale using the same patterns you may have used in AWS or GCP.
 
 The pattern we’ll use here is...
+
 1. Import a base VM image into the cluster as an PVC
 2. Use KubeVirt to create a new immutable custom image with application assets
 3. Scale out as many VMIs as we’d like using the pre-provisioned immutable custom image.
@@ -49,7 +50,7 @@ I’m not covering this. Use our documentation linked to below. Understand that 
 [Installing KubeVirt](https://kubevirt.io/user-guide/operations/installation)
 [Installing CDI](https://kubevirt.io/user-guide/operations/containerized_data_importer)
 
-### Step 1. Create a namespace for our immutable VM images.
+### Step 1. Create a namespace for our immutable VM images
 
 We’ll give users the ability to clone VM images living on PVCs from this namespace to their own namespace, but not directly create VMIs within this namespace.
 
@@ -270,6 +271,7 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            l
 ```
 
 ## Understanding the VM Image Repository
+
 At this point we have a namespace, vm-images, that contains PVCs with our VM images on them. Those PVCs represent VM images in the same way AWS's AMIs represent VM images and this **vm-images namespace is our VM image repository.**
 
 Using CDI's i[cross namespace cloning feature](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one), VM's can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository". Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined [here](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/RBAC.md#pvc-cloning).
@@ -301,11 +303,11 @@ roleRef:
   apiGroup: rbac.authorization.k8s.io
 ```
 
-# Horizontally Scaling VMs Using Custom Image
+## Horizontally Scaling VMs Using Custom Image
 
 Now that we have our immutable custom VM image, we can create as many VMs as we want using that custom image.
 
-## Example: Scale out VMI instances using the custom VM image.
+### Example: Scale out VMI instances using the custom VM image
 
 Clone the custom VM image from the vm-images namespace into the namespace the VMI instances will be running in as a **ReadOnlyMany** PVC. This will allow concurrent access to a single PVC.
 
@@ -431,7 +433,7 @@ spec:
           name: fedora-nginx
 ```
 
-# Other Custom Creation Image Tools
+## Other Custom Creation Image Tools
 
 In my example I imported a VM base image into the cluster and used KubeVirt to provision a custom image with a technique that used cloud-init. This may or may not make sense for your use case. It’s possible you need to pre-provision the VM image before importing into the cluster at all.
 

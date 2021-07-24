@@ -39,16 +39,19 @@ As a result, our goal from day one has always been to make installing KubeVirt a
 We’ve maintained this simplicity today. Installing KubeVirt v0.27.0 is as simple as…
 
 **Step 1:** posting the KubeVirt operator manifest
+
 ```sh
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-operator.yaml
 ```
 
 **Step 2:** posting the KubeVirt install object, which you can use to define exactly what version you want to install using the KubeVirt operator. In our example here, this custom resource defaults to the release that matches the installed operator.
+
 ```sh
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-cr.yaml
 ```
 
 **Step 3:** and then optionally waiting for the KubeVirt install object’s “Available” condition, which indicates installation has succeeded.
+
 ```sh
 kubectl -n kubevirt wait kv kubevirt --for condition=Available
 ```
@@ -64,11 +67,13 @@ If you go back and look at the installation steps in the previous section, you�
 Using our default installation instructions, zero downtime updates are as simple as posting a new virt-operator deployment.
 
 **Step 1.** Update virt-operator from our original install of v0.27.0 to v0.28.0 by applying a new virt-operator manifest.
+
 ```sh
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v0.28.0/kubevirt-operator.yaml
 ```
 
 **Step 2:** Watch the install object to see when the installation completes. Eventually it will report v0.28.0 as the observed version which indicates the update has completed.
+
 ```sh
 kubectl get kv -o yaml -n kubevirt | grep observedKubeVirtVersion
 ```
@@ -76,4 +81,3 @@ kubectl get kv -o yaml -n kubevirt | grep observedKubeVirtVersion
 Behind the scenes, virt-operator is coordinating the roll out of all the new KubeVirt components in a way that ensures existing virtual machine workloads are not disrupted.
 
 The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.
-

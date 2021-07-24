@@ -44,7 +44,7 @@ In this guide the system will be named k8s-test.local and the IP address is 192.
 
 Ensure the VM system is updated to the latest versions of the software and also ensure that the epel repository is installed:
 
-```
+```sh
 k8s-test.local# yum install epel-release -y
 
 k8s-test.local# yum update -y
@@ -54,7 +54,7 @@ k8s-test.local# yum install vim jq -y
 
 The following kernel parameters have to be configured:
 
-```
+```sh
 k8s-test.local# cat > /etc/sysctl.d/99-kubernetes-cri.conf <<EOF
 net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
@@ -64,7 +64,7 @@ EOF
 
 And also the following kernel modules have to be installed:
 
-```
+```sh
 k8s-test.local# modprobe br_netfilter
 k8s-test.local# echo br_netfilter > /etc/modules-load.d/br_netfilter.conf
 
@@ -74,13 +74,13 @@ k8s-test.local# echo overlay > /etc/modules-load.d/overlay.conf
 
 The new sysctl parameters have to be loaded in the system with the following command:
 
-```
+```sh
 k8s-test.local# sysctl -p/etc/sysctl.d/99-kubernetes-cri.conf
 ```
 
 The next step is to disable SELinux:
 
-```
+```sh
 k8s-test.local# setenforce 0
 
 k8s-test.local# sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
@@ -97,7 +97,7 @@ To install Kubernetes and CRI-O several ways can be used, in this guide there is
 > note ""
 > we are waiting for the [PR](https://github.com/cri-o/cri-o-ansible/pull/25) to be merged in the official cri-o-ansible repository, meantime a fork in an alternative repository would be used. Also, note that the following commands are executed from a different place, in this case from a computer called `laptop`:
 
-```
+```sh
 laptop$ sudo yum install ansible -y
 
 laptop# git clone https://github.com/ptrnull/cri-o-ansible
@@ -117,7 +117,7 @@ If the ansible way was chosen, you may want to skip this section. Otherwise, let
 
 The required packages may be installed in the system running the following command:
 
-```
+```sh
 k8s-test.local# yum install btrfs-progs-devel container-selinux device-mapper-devel gcc git glib2-devel glibc-devel glibc-static gpgme-devel json-glib-devel libassuan-devel libgpg-error-devel libseccomp-devel make pkgconfig skopeo-containers tar wget -y
 ```
 
@@ -126,7 +126,7 @@ Install golang and the md2man packages:
 > info ""
 > depending on the operating system running in your VM, it may be needed to change the name of the md2man golang package.
 
-```
+```sh
 k8s-test.local# yum install golang-github-cpuguy83-go-md2man golang -y
 ```
 
@@ -137,31 +137,31 @@ The following directories have to be created:
 - /var/lib/etcd
 - /etc/cni/net.d
 
-```
+```sh
 k8s-test.local# for d in "/usr/local/go /etc/systemd/system/kubelet.service.d/ /var/lib/etcd /etc/cni/net.d /etc/containers"; do mkdir -p $d; done
 ```
 
 Clone the runc repository:
 
-```
+```sh
 k8s-test.local# git clone https://github.com/opencontainers/runc /root/src/github.com/opencontainers/runc
 ```
 
 Clone the CRI-O repository:
 
-```
+```sh
 k8s-test.local# git clone https://github.com/cri-o/cri-o /root/src/github.com/cri-o/cri-o
 ```
 
 Clone the CNI repository:
 
-```
+```sh
 k8s-test.local# git clone https://github.com/containernetworking/plugins /root/src/github.com/containernetworking/plugins
 ```
 
 To build each part, a series of commands have to be executed, first building runc:
 
-```
+```sh
 k8s-test.local# cd /root/src/github.com/opencontainers/runc
 
 k8s-test.local# export GOPATH=/root
@@ -173,13 +173,13 @@ k8s-test.local# make install
 
 And also runc has to be linked in the correct path:
 
-```
+```sh
 k8s-test.local# ln -sf /usr/local/sbin/runc /usr/bin/runc
 ```
 
 Now building CRI-O (special focus on switching the branch):
 
-```
+```sh
 k8s-test.local# export GOPATH=/root
 
 k8s-test.local# export GOBIN=/usr/local/go/bin
@@ -201,7 +201,7 @@ k8s-test.local# make install.config
 
 CRI-O also needs the conmon software as a dependency:
 
-```
+```sh
 k8s-test.local# git clone http://github.com/containers/conmon /root/src/github.com/conmon
 
 k8s-test.local# cd /root/src/github.com/conmon
@@ -213,7 +213,7 @@ k8s-test.local# make install
 
 Now, the ContainerNetworking plugins have to be built and installed:
 
-```
+```sh
 k8s-test.local# cd /root/src/github.com/containernetworking/plugins
 
 k8s-test.local# ./build_linux.sh
@@ -225,7 +225,7 @@ k8s-test.local# cp bin/* /opt/cni/bin/
 
 The cgroup manager has to be changed in the CRI-O configuration from the value of `systemd` to `cgroupfs`, to get it done, the file `/etc/crio/crio.conf` has to be edited and the variable `cgroup_manager` has to be replaced from its original value of `systemd` to `cgroupfs` (it could be already set it up to that value, in that case this step can be skipped):
 
-```
+```sh
 k8s-test.local# vim /etc/crio/crio.conf
 # group_manager = "systemd"
 group_manager = "cgroupfs"
@@ -233,7 +233,7 @@ group_manager = "cgroupfs"
 
 In the same file, the storage_driver is not configured, the variable `storage_driver` has to be uncommented and the value has to be changed from `overlay` to `overlay2`:
 
-```
+```sh
 k8s-test.local# vim /etc/crio/crio.conf
 #storage_driver = "overlay"
 storage_driver = "overlay2"
@@ -241,7 +241,7 @@ storage_driver = "overlay2"
 
 Also related with the storage, the `storage_option` has to be configured to have the following value:
 
-```
+```sh
 k8s-test.local# vim /etc/crio/crio.conf
 storage_option = [ "overlay2.override_kernel_check=1" ]
 ```
@@ -251,12 +251,11 @@ storage_option = [ "overlay2.override_kernel_check=1" ]
 CRI-O is the lightweight container runtime for Kubernetes. As it is pointed in the [CRI-O Website](https://cri-o.io):
 
 > CRI-O is an implementation of the Kubernetes CRI (Container Runtime Interface) to enable using OCI (Open Container Initiative) compatible runtimes. It is a lightweight alternative to using Docker as the runtime for Kubernetes. It allows Kubernetes to use any OCI-compliant runtime as the container runtime for running pods. Today it supports runc and Kata Containers as the container runtimes but any OCI-conformant runtime can be plugged in principle.
-
 > CRI-O supports OCI container images and can pull from any container registry. It is a lightweight alternative to using Docker, Moby or rkt as the runtime for Kubernetes.
 
 The first step is to change the configuration of the `network_dir` parameter in the CRI-O configuration file, for doing so, the `network_dir` parameter in the `/etc/crio/crio.conf` file has to be changed to point to `/etc/crio/net.d`
 
-```
+```sh
 k8s-test.local$ vim /etc/crio/crio.conf
 [crio.network]
 # Path to the directory where CNI configuration files are located.
@@ -265,7 +264,7 @@ network_dir = "/etc/crio/net.d/"
 
 Also that directory has to be created:
 
-```
+```sh
 k8s-test.local$ mkdir /etc/crio/net.d
 ```
 
@@ -273,19 +272,19 @@ The reason behind that change is because CRI-O and `kubeadm reset` don't play we
 
 Now Kubernetes has to be configured to be able to talk to CRI-O, to proceed, a new file has to be created in `/etc/default/kubelet` with the following content:
 
-```
+```sh
 KUBELET_EXTRA_ARGS=--feature-gates="AllAlpha=false,RunAsGroup=true" --container-runtime=remote --cgroup-driver=cgroupfs --container-runtime-endpoint='unix:///var/run/crio/crio.sock' --runtime-request-timeout=5m
 ```
 
 Now the systemd has to be reloaded:
 
-```
+```sh
 k8s-test.local# systemctl daemon-reload
 ```
 
 CRI-O will use flannel network as it is recommended for multus so the following file has to be downloaded and configured:
 
-```
+```sh
 k8s-test.local# cd /etc/crio/net.d/
 
 k8s-test.local# wget https://raw.githubusercontent.com/cri-o/cri-o/master/contrib/cni/10-crio-bridge.conf
@@ -296,7 +295,7 @@ k8s-test.local# sed -i 's/10.88.0.0/10.244.0.0/g' 10-crio-bridge.conf
 
 As the previous code block has shown, the network used is `10.244.0.0`, now the crio service can be started and enabled:
 
-```
+```sh
 k8s-test.local# systemctl enable crio
 k8s-test.local# systemctl start crio
 k8s-test.local# systemctl status crio
