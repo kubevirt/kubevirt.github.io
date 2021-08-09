@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
+	"time"
 
 	jsonpatch "github.com/evanphx/json-patch"
 	"github.com/golang/mock/gomock"
@@ -62,8 +63,10 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 	var ctrl *gomock.Controller
 	var vmiInterface *kubecli.MockVirtualMachineInstanceInterface
 	var vmiSource *framework.FakeControllerSource
+	var vmSource *framework.FakeControllerSource
 	var podSource *framework.FakeControllerSource
 	var vmiInformer cache.SharedIndexInformer
+	var vmInformer cache.SharedIndexInformer
 	var podInformer cache.SharedIndexInformer
 	var stop chan struct{}
 	var controller *VMIController
@@ -180,12 +183,14 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 
 	syncCaches := func(stop chan struct{}) {
 		go vmiInformer.Run(stop)
+		go vmInformer.Run(stop)
 		go podInformer.Run(stop)
 		go pvcInformer.Run(stop)
 
 		go dataVolumeInformer.Run(stop)
 		Expect(cache.WaitForCacheSync(stop,
 			vmiInformer.HasSynced,
+			vmInformer.HasSynced,
 			podInformer.HasSynced,
 			pvcInformer.HasSynced,
 			dataVolumeInformer.HasSynced)).To(BeTrue())
@@ -198,6 +203,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 		vmiInterface = kubecli.NewMockVirtualMachineInstanceInterface(ctrl)
 
 		vmiInformer, vmiSource = testutils.NewFakeInformerFor(&v1.VirtualMachineInstance{})
+		vmInformer, vmSource = testutils.NewFakeInformerFor(&v1.VirtualMachine{})
 		podInformer, podSource = testutils.NewFakeInformerFor(&k8sv1.Pod{})
 		dataVolumeInformer, dataVolumeSource = testutils.NewFakeInformerFor(&cdiv1.DataVolume{})
 		recorder = record.NewFakeRecorder(100)
@@ -206,8 +212,9 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 		config, _, _, _ := testutils.NewFakeClusterConfig(&k8sv1.ConfigMap{})
 		pvcInformer, _ = testutils.NewFakeInformerFor(&k8sv1.PersistentVolumeClaim{})
 		controller = NewVMIController(
-			services.NewTemplateService("a", "b", "c", "d", "e", "f", "g", pvcInformer.GetStore(), virtClient, config, qemuGid),
+			services.NewTemplateService("a", 240, "b", "c", "d", "e", "f", "g", pvcInformer.GetStore(), virtClient, config, qemuGid),
 			vmiInformer,
+			vmInformer,
 			podInformer,
 			pvcInformer,
 			recorder,
@@ -1294,7 +1301,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 
 			controller.Execute()
 		})
-		table.DescribeTable("should remove the finalizer if no pod is present and the vmi is in ", func(phase v1.VirtualMachineInstancePhase) {
+		table.DescribeTable("should remove the fore ground finalizer if no pod is present and the vmi is in ", func(phase v1.VirtualMachineInstancePhase) {
 			vmi := NewPendingVirtualMachine("testvmi")
 			vmi.Status.Phase = phase
 			vmi.Status.LauncherContainerImageVersion = "madeup"
@@ -1321,6 +1328,53 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			table.Entry("succeeded state", v1.Succeeded),
 			table.Entry("failed state", v1.Failed),
 		)
+
+		table.DescribeTable("VM controller finalizer", func(hasOwner, vmExists, expectFinalizer bool) {
+			vmi := NewPendingVirtualMachine("testvmi")
+			vmi.Finalizers = append(vmi.Finalizers, v1.VirtualMachineControllerFinalizer, v1.VirtualMachineInstanceFinalizer)
+			vmi.Status.Phase = v1.Succeeded
+			Expect(vmi.Finalizers).To(ContainElement(v1.VirtualMachineControllerFinalizer))
+
+			vm := VirtualMachineFromVMI(vmi.Name, vmi, true)
+			vm.UID = "123"
+			if hasOwner {
+				t := true
+				vmi.OwnerReferences = []metav1.OwnerReference{{
+					APIVersion:         v1.VirtualMachineGroupVersionKind.GroupVersion().String(),
+					Kind:               v1.VirtualMachineGroupVersionKind.Kind,
+					Name:               vm.ObjectMeta.Name,
+					UID:                vm.ObjectMeta.UID,
+					Controller:         &t,
+					BlockOwnerDeletion: &t,
+				}}
+			}
+
+			if vmExists {
+				vmSource.Add(vm)
+				// the controller isn't using informer callbacks for the VM informer
+				// so add a sleep here to ensure the informer has time to cache up before
+				// we call Execute()
+				time.Sleep(1 * time.Second)
+			}
+
+			addVirtualMachine(vmi)
+
+			vmiInterface.EXPECT().Update(gomock.Any()).Do(func(arg interface{}) {
+				if !expectFinalizer {
+					Expect(arg.(*v1.VirtualMachineInstance).Finalizers).ToNot(ContainElement(v1.VirtualMachineControllerFinalizer))
+				} else {
+					Expect(arg.(*v1.VirtualMachineInstance).Finalizers).To(ContainElement(v1.VirtualMachineControllerFinalizer))
+				}
+				Expect(arg.(*v1.VirtualMachineInstance).Finalizers).ToNot(ContainElement(v1.VirtualMachineInstanceFinalizer))
+			}).Return(vmi, nil)
+
+			controller.Execute()
+		},
+			table.Entry("should be removed if no owner exists", false, false, false),
+			table.Entry("should be removed if VM owner is set but VM is deleted", false, true, false),
+			table.Entry("should be left if VM owner is present", true, true, true),
+		)
+
 		table.DescribeTable("should do nothing if pod is handed to virt-handler", func(phase k8sv1.PodPhase) {
 			vmi := NewPendingVirtualMachine("testvmi")
 			vmi.Status.Phase = v1.Scheduled
@@ -1506,6 +1560,79 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			table.Entry("and in succeeded state", k8sv1.PodSucceeded),
 			table.Entry("and in failed state", k8sv1.PodFailed),
 		)
+
+		table.DescribeTable("should set a Synchronized=False condition when pod runs into image pull errors", func(initContainer bool, containerWaitingReason string) {
+			vmi := NewPendingVirtualMachine("testvmi")
+			vmi.Status.Phase = v1.Scheduling
+			pod := NewPodForVirtualMachine(vmi, k8sv1.PodPending)
+
+			containerStatus := &pod.Status.ContainerStatuses[0]
+			if initContainer {
+				pod.Status.InitContainerStatuses = []k8sv1.ContainerStatus{{}}
+				containerStatus = &pod.Status.InitContainerStatuses[0]
+			}
+			containerStatus.State.Waiting = &k8sv1.ContainerStateWaiting{
+				Reason: containerWaitingReason,
+			}
+
+			addVirtualMachine(vmi)
+			podFeeder.Add(pod)
+
+			vmiInterface.EXPECT().Update(gomock.Any()).Do(func(arg interface{}) {
+				Expect(arg.(*v1.VirtualMachineInstance).Status.Conditions).To(ContainElement(MatchFields(IgnoreExtras,
+					Fields{
+						"Type":   Equal(v1.VirtualMachineInstanceSynchronized),
+						"Status": Equal(k8sv1.ConditionFalse),
+						"Reason": Equal(containerWaitingReason),
+					})))
+			})
+
+			controller.Execute()
+		},
+			table.Entry("ErrImagePull in init container", true, ErrImagePullReason),
+			table.Entry("ImagePullBackOff in init container", true, ImagePullBackOffReason),
+			table.Entry("ErrImagePull in compute container", false, ErrImagePullReason),
+			table.Entry("ImagePullBackOff in compute container", false, ImagePullBackOffReason),
+		)
+
+		table.DescribeTable("should override Synchronized=False condition reason when it's already set", func(prevReason, newReason string) {
+			vmi := NewPendingVirtualMachine("testvmi")
+			vmi.Status.Phase = v1.Scheduling
+			pod := NewPodForVirtualMachine(vmi, k8sv1.PodPending)
+
+			vmi.Status.Conditions = []v1.VirtualMachineInstanceCondition{
+				{
+					Type:   v1.VirtualMachineInstanceSynchronized,
+					Status: k8sv1.ConditionFalse,
+					Reason: prevReason,
+				},
+			}
+
+			pod.Status.InitContainerStatuses = []k8sv1.ContainerStatus{{
+				State: k8sv1.ContainerState{
+					Waiting: &k8sv1.ContainerStateWaiting{
+						Reason: newReason,
+					},
+				},
+			}}
+
+			addVirtualMachine(vmi)
+			podFeeder.Add(pod)
+
+			vmiInterface.EXPECT().Update(gomock.Any()).Do(func(arg interface{}) {
+				Expect(arg.(*v1.VirtualMachineInstance).Status.Conditions).To(ContainElement(MatchFields(IgnoreExtras,
+					Fields{
+						"Type":   Equal(v1.VirtualMachineInstanceSynchronized),
+						"Status": Equal(k8sv1.ConditionFalse),
+						"Reason": Equal(newReason),
+					})))
+			})
+
+			controller.Execute()
+		},
+			table.Entry("ErrImagePull --> ImagePullBackOff", ErrImagePullReason, ImagePullBackOffReason),
+			table.Entry("ImagePullBackOff --> ErrImagePull", ImagePullBackOffReason, ErrImagePullReason),
+		)
 	})
 
 	Context("hotplug volume", func() {
@@ -1581,10 +1708,10 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			}
 			pod, err := controller.createAttachmentPodTemplate(vmi, virtlauncherPod, []*virtv1.Volume{invalidVolume})
 			Expect(pod).To(BeNil())
-			Expect(err).To(BeNil())
+			Expect(err).To(HaveOccurred())
 		})
 
-		It("CreateAttachmentPodTemplate should return nil if volume has PVC that doesn't exist", func() {
+		It("CreateAttachmentPodTemplate should return error if volume has PVC that doesn't exist", func() {
 			kubeClient.Fake.PrependReactor("get", "persistentvolumeclaims", func(action testing.Action) (handled bool, obj k8sruntime.Object, err error) {
 				return true, nil, k8serrors.NewNotFound(k8sv1.Resource("persistentvolumeclaim"), "noclaim")
 			})
@@ -1602,7 +1729,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			}
 			pod, err := controller.createAttachmentPodTemplate(vmi, virtlauncherPod, []*virtv1.Volume{nopvcVolume})
 			Expect(pod).To(BeNil())
-			Expect(err).To(BeNil())
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("CreateAttachmentPodTemplate should return nil pod if only one DV exists and owning PVC doesn't exist", func() {
@@ -1630,7 +1757,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			}
 			pod, err := controller.createAttachmentPodTemplate(vmi, virtlauncherPod, []*virtv1.Volume{volume})
 			Expect(pod).To(BeNil())
-			Expect(err).To(BeNil())
+			Expect(err).To(HaveOccurred())
 		})
 
 		It("CreateAttachmentPodTemplate should set status to pending if DV owning PVC is not ready", func() {
@@ -1979,7 +2106,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 				podInformer.GetIndexer().Add(attachmentPod)
 			}
 
-			res, err := controller.virtlauncherAttachmentPods(virtlauncherPod)
+			res, err := kvcontroller.AttachmentPods(virtlauncherPod, podInformer)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(len(res)).To(Equal(podCount))
 		},
@@ -1995,7 +2122,7 @@ var _ = Describe("VirtualMachineInstance watcher", func() {
 			}
 			virtlauncherPod := NewPodForVirtualMachine(vmi, k8sv1.PodRunning)
 			virtlauncherPod.Spec.Volumes = virtlauncherVolumes
-			res := controller.getHotplugVolumes(vmi, virtlauncherPod)
+			res := getHotplugVolumes(vmi, virtlauncherPod)
 			Expect(len(res)).To(Equal(len(expectedIndexes)))
 			for _, index := range expectedIndexes {
 				found := false

@@ -35,9 +35,12 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"libvirt.org/go/libvirt"
 
+	k8serrors "k8s.io/apimachinery/pkg/api/errors"
+	"k8s.io/apimachinery/pkg/util/net"
 	"k8s.io/apimachinery/pkg/util/wait"
 	utilwait "k8s.io/apimachinery/pkg/util/wait"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/client-go/util/retry"
 
 	v1 "kubevirt.io/client-go/api/v1"
 	"kubevirt.io/client-go/log"
@@ -48,7 +51,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/hooks"
 	hotplugdisk "kubevirt.io/kubevirt/pkg/hotplug-disk"
 	"kubevirt.io/kubevirt/pkg/ignition"
-	"kubevirt.io/kubevirt/pkg/network/infraconfigurators"
+	"kubevirt.io/kubevirt/pkg/network/istio"
 	putil "kubevirt.io/kubevirt/pkg/util"
 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
 	virtlauncher "kubevirt.io/kubevirt/pkg/virt-launcher"
@@ -62,6 +65,7 @@ import (
 )
 
 const defaultStartTimeout = 3 * time.Minute
+const httpRequestTimeout = 10 * time.Second
 
 func init() {
 	// must registry the event impl before doing anything else.
@@ -356,6 +360,7 @@ func main() {
 	qemuAgentVersionInterval := pflag.Duration("qemu-agent-version-interval", 300, "Interval in seconds between consecutive qemu agent calls for version command")
 	qemuAgentFSFreezeStatusInterval := pflag.Duration("qemu-fsfreeze-status-interval", 5, "Interval in seconds between consecutive qemu agent calls for fsfreeze status command")
 	keepAfterFailure := pflag.Bool("keep-after-failure", false, "virt-launcher will be kept alive after failure for debugging if set to true")
+	simulateCrash := pflag.Bool("simulate-crash", false, "Causes virt-launcher to immediately crash. This is used by functional tests to simulate crash loop scenarios.")
 
 	// set new default verbosity, was set to 0 by glog
 	goflag.Set("v", "2")
@@ -386,6 +391,10 @@ func main() {
 			os.Exit(1)
 		}
 		os.Exit(exitCode)
+	}
+
+	if *simulateCrash {
+		panic(fmt.Errorf("Simulated virt-launcher crash"))
 	}
 
 	// Block until all requested hookSidecars are ready
@@ -526,7 +535,7 @@ func ForkAndMonitor(containerDiskDir string) (int, error) {
 		return 1, err
 	}
 
-	exitStatus := make(chan syscall.WaitStatus, 10)
+	exitStatus := make(chan int, 10)
 	sigs := make(chan os.Signal, 10)
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGCHLD)
 	go func() {
@@ -539,12 +548,9 @@ func ForkAndMonitor(containerDiskDir string) (int, error) {
 					log.Log.Reason(err).Errorf("Failed to reap process %d", wpid)
 				}
 
-				// there's a race between cmd.Wait() and syscall.Wait4 when
-				// cleaning up the cmd's pid after it exits. This allows us
-				// to detect the correct exit code regardless of which wait
-				// wins the race.
+				log.Log.Infof("Reaped pid %d with status %d", wpid, int(wstatus))
 				if wpid == cmd.Process.Pid {
-					exitStatus <- wstatus
+					exitStatus <- wstatus.ExitStatus()
 				}
 
 			default:
@@ -558,22 +564,9 @@ func ForkAndMonitor(containerDiskDir string) (int, error) {
 		}
 	}()
 
-	// wait for virt-launcher and collect the exit code
-	exitCode := 0
-	if err := cmd.Wait(); err != nil {
-		select {
-		case status := <-exitStatus:
-			exitCode = int(status)
-		default:
-			exitCode = 1
-			if exiterr, ok := err.(*exec.ExitError); ok {
-				if status, ok := exiterr.Sys().(syscall.WaitStatus); ok {
-					exitCode = status.ExitStatus()
-				}
-			}
-			log.Log.Reason(err).Error("dirty virt-launcher shutdown")
-		}
-
+	exitCode := <-exitStatus
+	if exitCode != 0 {
+		log.Log.Errorf("dirty virt-launcher shutdown: exit-code %d", exitCode)
 	}
 
 	// give qemu some time to shut down in case it survived virt-handler
@@ -626,21 +619,54 @@ func RemoveContents(dir string) error {
 }
 
 func terminateIstioProxy() {
-	if istioProxyPresent() {
-		resp, err := http.Post(fmt.Sprintf("http://localhost:%d/quitquitquit", infraconfigurators.EnvoyMergedPrometheusTelemetryPort), "", nil)
-		if err != nil || resp.StatusCode != http.StatusOK {
-			log.Log.Error("Failed to request Istio proxy termination")
+	httpClient := &http.Client{Timeout: httpRequestTimeout}
+	if istioProxyPresent(httpClient) {
+		isRetriable := func(err error) bool {
+			if net.IsConnectionReset(err) || net.IsConnectionRefused(err) || k8serrors.IsServiceUnavailable(err) {
+				return true
+			}
+			return false
+		}
+		err := retry.OnError(retry.DefaultBackoff, isRetriable, func() error {
+			resp, err := httpClient.Post(fmt.Sprintf("http://localhost:%d/quitquitquit", istio.EnvoyMergedPrometheusTelemetryPort), "", nil)
+			if err != nil {
+				log.Log.Reason(err).Error("failed to request istio-proxy termination, retrying...")
+				return err
+			}
+			defer resp.Body.Close()
+			if resp.StatusCode != http.StatusOK {
+				log.Log.Errorf("status code received: %d", resp.StatusCode)
+				return err
+			}
+			return nil
+		})
+		if err != nil {
+			log.Log.Reason(err).Error("all attempts to terminate istio-proxy failed")
 		}
 	}
 }
 
-func istioProxyPresent() bool {
-	resp, err := http.Get(fmt.Sprintf("http://localhost:%d/healthz/ready", infraconfigurators.EnvoyHealthCheckPort))
+func istioProxyPresent(httpClient *http.Client) bool {
+	isRetriable := func(err error) bool {
+		if net.IsConnectionReset(err) || net.IsConnectionRefused(err) {
+			return true
+		}
+		return false
+	}
+	err := retry.OnError(retry.DefaultBackoff, isRetriable, func() error {
+		resp, err := httpClient.Get(fmt.Sprintf("http://localhost:%d/healthz/ready", istio.EnvoyHealthCheckPort))
+		if err != nil {
+			log.Log.Reason(err).Error("error when checking for istio-proxy presence")
+			return err
+		}
+		defer resp.Body.Close()
+		if resp.Header.Get("server") == "envoy" {
+			return nil
+		}
+		return fmt.Errorf("received response from non-istio health server: %s", resp.Header.Get("server"))
+	})
 	if err != nil {
 		return false
 	}
-	if resp.Header.Get("server") == "envoy" {
-		return true
-	}
-	return false
+	return true
 }

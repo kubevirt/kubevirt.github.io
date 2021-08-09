@@ -79,7 +79,9 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 		Eventually(func() bool {
 			s, err = virtClient.VirtualMachineSnapshot(s.Namespace).Get(context.Background(), s.Name, metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			return s.Status != nil && s.Status.ReadyToUse != nil && *s.Status.ReadyToUse
+			vm, err = virtClient.VirtualMachine(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
+			Expect(err).ToNot(HaveOccurred())
+			return s.Status != nil && s.Status.ReadyToUse != nil && *s.Status.ReadyToUse && vm.Status.SnapshotInProgress == nil
 		}, 180*time.Second, time.Second).Should(BeTrue())
 
 		return s
@@ -228,6 +230,10 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 					var updatedVM *v1.VirtualMachine
 					vm, err = virtClient.VirtualMachine(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
+
+					if vm.Status.SnapshotInProgress != nil {
+						return false
+					}
 
 					origSpec = vm.Spec.DeepCopy()
 					Expect(origSpec.Template.Spec.Domain.Resources.Requests[corev1.ResourceMemory]).To(Equal(resource.MustParse("128Mi")))
@@ -383,9 +389,9 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 				}
 			})
 
-			doRestore := func(device string, onlineSnapshot bool) {
+			doRestore := func(device string, login console.LoginToFactory, onlineSnapshot bool) {
 				By("creating 'message with initial value")
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(libnet.WithIPv6(login)(vmi)).To(Succeed())
 
 				var batch []expect.Batcher
 				if device != "" {
@@ -434,28 +440,28 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 				By("creating snapshot")
 				snapshot = createSnapshot(vm)
 
+				batch = nil
 				if !onlineSnapshot {
 					By("Starting VM")
 					vm = tests.StartVirtualMachine(vm)
+					vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
+					Expect(err).ToNot(HaveOccurred())
+
+					Expect(libnet.WithIPv6(login)(vmi)).To(Succeed())
+
+					if device != "" {
+						batch = append(batch, []expect.Batcher{
+							&expect.BSnd{S: "sudo mkdir -p /test\n"},
+							&expect.BExp{R: console.PromptExpression},
+							&expect.BSnd{S: fmt.Sprintf("sudo mount %s /test \n", device)},
+							&expect.BExp{R: console.PromptExpression},
+							&expect.BSnd{S: "echo $?\n"},
+							&expect.BExp{R: console.RetValue("0")},
+						}...)
+					}
 				}
-				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
 
 				By("updating message")
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
-
-				batch = nil
-
-				if device != "" {
-					batch = append(batch, []expect.Batcher{
-						&expect.BSnd{S: "sudo mkdir -p /test\n"},
-						&expect.BExp{R: console.PromptExpression},
-						&expect.BSnd{S: fmt.Sprintf("sudo mount %s /test \n", device)},
-						&expect.BExp{R: console.PromptExpression},
-						&expect.BSnd{S: "echo $?\n"},
-						&expect.BExp{R: console.RetValue("0")},
-					}...)
-				}
 
 				batch = append(batch, []expect.Batcher{
 					&expect.BSnd{S: "sudo mkdir -p /test/data\n"},
@@ -499,7 +505,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Verifying original file contents")
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(libnet.WithIPv6(login)(vmi)).To(Succeed())
 
 				batch = nil
 
@@ -569,7 +575,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 
 				originalDVName := vm.Spec.DataVolumeTemplates[0].Name
 
-				doRestore("", false)
+				doRestore("", console.LoginToCirros, false)
 				Expect(restore.Status.DeletedDataVolumes).To(HaveLen(1))
 				Expect(restore.Status.DeletedDataVolumes).To(ContainElement(originalDVName))
 
@@ -577,7 +583,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 				Expect(errors.IsNotFound(err)).To(BeTrue())
 			})
 
-			It("[test_id:5261]should restore a vm that boots from a datavolume (not template)", func() {
+			It("[QUARANTINE][test_id:5261]should restore a vm that boots from a datavolume (not template)", func() {
 				vm = tests.NewRandomVMWithDataVolumeAndUserDataInStorageClass(
 					tests.GetUrl(tests.CirrosHttpUrl),
 					util.NamespaceTestDefault,
@@ -601,7 +607,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 
 				vm, vmi = createAndStartVM(vm)
 
-				doRestore("", false)
+				doRestore("", console.LoginToCirros, false)
 
 				Expect(restore.Status.DeletedDataVolumes).To(BeEmpty())
 
@@ -624,7 +630,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 				}
 			})
 
-			It("[test_id:5262]should restore a vm that boots from a PVC", func() {
+			It("[QUARANTINE][test_id:5262]should restore a vm that boots from a PVC", func() {
 				quantity, err := resource.ParseQuantity("1Gi")
 				Expect(err).ToNot(HaveOccurred())
 				pvc := &corev1.PersistentVolumeClaim{
@@ -658,7 +664,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 
 				vm, vmi = createAndStartVM(vm)
 
-				doRestore("", false)
+				doRestore("", console.LoginToCirros, false)
 
 				Expect(restore.Status.DeletedDataVolumes).To(BeEmpty())
 				_, err = virtClient.CoreV1().PersistentVolumeClaims(vm.Namespace).Get(context.Background(), originalPVCName, metav1.GetOptions{})
@@ -726,7 +732,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 
 				vm, vmi = createAndStartVM(vm)
 
-				doRestore("/dev/vdc", false)
+				doRestore("/dev/vdc", console.LoginToCirros, false)
 
 				Expect(restore.Status.DeletedDataVolumes).To(HaveLen(1))
 				Expect(restore.Status.DeletedDataVolumes).To(ContainElement(dvName))
@@ -742,8 +748,102 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 					snapshotStorageClass,
 				))
 
-				doRestore("", true)
+				doRestore("", console.LoginToCirros, true)
 
+			})
+
+			It("[test_id:6766]should restore a vm from an online snapshot with guest agent", func() {
+				quantity, err := resource.ParseQuantity("1Gi")
+				Expect(err).ToNot(HaveOccurred())
+				vmi = tests.NewRandomFedoraVMIWithGuestAgent()
+				vmi.Namespace = util.NamespaceTestDefault
+				vm = tests.NewRandomVirtualMachine(vmi, false)
+				dvName := "dv-" + vm.Name
+				vm.Spec.DataVolumeTemplates = []v1.DataVolumeTemplateSpec{
+					{
+						ObjectMeta: metav1.ObjectMeta{
+							Name: dvName,
+						},
+						Spec: cdiv1.DataVolumeSpec{
+							Source: &cdiv1.DataVolumeSource{
+								Blank: &cdiv1.DataVolumeBlankImage{},
+							},
+							PVC: &corev1.PersistentVolumeClaimSpec{
+								AccessModes: []corev1.PersistentVolumeAccessMode{corev1.ReadWriteOnce},
+								Resources: corev1.ResourceRequirements{
+									Requests: corev1.ResourceList{
+										"storage": quantity,
+									},
+								},
+								StorageClassName: &snapshotStorageClass,
+							},
+						},
+					},
+				}
+				vm.Spec.Template.Spec.Domain.Devices.Disks = append(vm.Spec.Template.Spec.Domain.Devices.Disks, v1.Disk{
+					Name: "blank",
+					DiskDevice: v1.DiskDevice{
+						Disk: &v1.DiskTarget{
+							Bus: "virtio",
+						},
+					},
+				})
+				vm.Spec.Template.Spec.Volumes = append(vm.Spec.Template.Spec.Volumes, v1.Volume{
+					Name: "blank",
+					VolumeSource: v1.VolumeSource{
+						DataVolume: &v1.DataVolumeSource{
+							Name: "dv-" + vm.Name,
+						},
+					},
+				})
+
+				vm, vmi = createAndStartVM(vm)
+				tests.WaitForSuccessfulVMIStartWithTimeout(vmi, 300)
+				tests.WaitAgentConnected(virtClient, vmi)
+
+				doRestore("/dev/vdc", console.LoginToFedora, true)
+
+			})
+
+			It("[test_id:6836]should restore an online vm snapshot that boots from a datavolumetemplate with guest agent", func() {
+				dataVolume := tests.NewRandomDataVolumeWithHttpImportInStorageClass(
+					tests.GetUrl(tests.FedoraHttpUrl),
+					util.NamespaceTestDefault,
+					snapshotStorageClass,
+					corev1.ReadWriteOnce)
+				dataVolume.Spec.PVC.Resources.Requests[corev1.ResourceStorage] = resource.MustParse("6Gi")
+				vm, vmi = createAndStartVM(tests.NewRandomVMWithDataVolumeAndUserData(
+					dataVolume,
+					"#cloud-config\npassword: fedora\nchpasswd: { expire: False }\npackages:\n qemu-guest-agent",
+				))
+				Expect(libnet.WithIPv6(console.LoginToFedora)(vmi)).To(Succeed())
+				Eventually(func() error {
+					var batch []expect.Batcher
+					batch = append(batch, []expect.Batcher{
+						&expect.BSnd{S: "\n"},
+						&expect.BExp{R: console.PromptExpression},
+						&expect.BSnd{S: "sudo systemctl start qemu-guest-agent\n"},
+						&expect.BExp{R: console.PromptExpression},
+						&expect.BSnd{S: "echo $?\n"},
+						&expect.BExp{R: console.RetValue("0")},
+						&expect.BSnd{S: "sudo systemctl enable qemu-guest-agent\n"},
+						&expect.BExp{R: console.PromptExpression},
+						&expect.BSnd{S: "echo $?\n"},
+						&expect.BExp{R: console.RetValue("0")},
+					}...)
+
+					return console.SafeExpectBatch(vmi, batch, 120)
+				}, 720*time.Second, 1*time.Second).Should(Succeed())
+				tests.WaitAgentConnected(virtClient, vmi)
+
+				originalDVName := vm.Spec.DataVolumeTemplates[0].Name
+
+				doRestore("", console.LoginToFedora, true)
+				Expect(restore.Status.DeletedDataVolumes).To(HaveLen(1))
+				Expect(restore.Status.DeletedDataVolumes).To(ContainElement(originalDVName))
+
+				_, err = virtClient.CdiClient().CdiV1beta1().DataVolumes(vm.Namespace).Get(context.Background(), originalDVName, metav1.GetOptions{})
+				Expect(errors.IsNotFound(err)).To(BeTrue())
 			})
 
 		})

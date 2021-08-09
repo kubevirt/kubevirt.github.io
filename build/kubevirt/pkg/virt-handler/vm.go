@@ -48,6 +48,7 @@ import (
 	"k8s.io/client-go/util/workqueue"
 
 	netcache "kubevirt.io/kubevirt/pkg/network/cache"
+	netsetup "kubevirt.io/kubevirt/pkg/network/setup"
 	"kubevirt.io/kubevirt/pkg/util"
 
 	"kubevirt.io/kubevirt/pkg/virt-handler/heartbeat"
@@ -73,7 +74,6 @@ import (
 	"kubevirt.io/kubevirt/pkg/virt-handler/isolation"
 	migrationproxy "kubevirt.io/kubevirt/pkg/virt-handler/migration-proxy"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
-	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/network"
 	"kubevirt.io/kubevirt/pkg/watchdog"
 )
 
@@ -283,24 +283,29 @@ func handleDomainNotifyPipe(domainPipeStopChan chan struct{}, ln net.Listener, v
 
 	fdChan := make(chan net.Conn, 100)
 
-	// Listen for new connections,
 	// Close listener and exit when stop encountered
+	go func() {
+		<-domainPipeStopChan
+		log.Log.Object(vmi).Infof("closing notify pipe listener for vmi")
+		if err := ln.Close(); err != nil {
+			log.Log.Object(vmi).Infof("failed closing notify pipe listener for vmi: %v", err)
+		}
+	}()
+
+	// Listen for new connections,
 	go func(vmi *v1.VirtualMachineInstance, ln net.Listener, domainPipeStopChan chan struct{}) {
 		for {
-			select {
-			case <-domainPipeStopChan:
-				log.Log.Object(vmi).Infof("closing notify pipe listener for vmi")
-				ln.Close()
-				return
-			default:
-				fd, err := ln.Accept()
-				if err != nil {
-					log.Log.Reason(err).Error("Domain pipe accept error encountered.")
-					// keep listening until stop invoked
-					time.Sleep(1)
-				} else {
-					fdChan <- fd
+			fd, err := ln.Accept()
+			if err != nil {
+				if goerror.Is(err, net.ErrClosed) {
+					// As Accept blocks, closing it is our mechanism to exit this loop
+					return
 				}
+				log.Log.Reason(err).Error("Domain pipe accept error encountered.")
+				// keep listening until stop invoked
+				time.Sleep(1 * time.Second)
+			} else {
+				fdChan <- fd
 			}
 		}
 	}(vmi, ln, domainPipeStopChan)
@@ -514,7 +519,7 @@ func (d *VirtualMachineController) setPodNetworkPhase1(vmi *v1.VirtualMachineIns
 	}
 
 	err = res.DoNetNS(func() error {
-		return network.NewVMNetworkConfigurator(vmi, d.networkCacheStoreFactory).SetupPodNetworkPhase1(pid)
+		return netsetup.NewVMNetworkConfigurator(vmi, d.networkCacheStoreFactory).SetupPodNetworkPhase1(pid)
 	})
 
 	if err != nil {
@@ -831,7 +836,6 @@ func (d *VirtualMachineController) updateVolumeStatusesFromDomain(vmi *v1.Virtua
 
 func (d *VirtualMachineController) updateVMIStatus(origVMI *v1.VirtualMachineInstance, domain *api.Domain, syncError error) (err error) {
 	condManager := controller.NewVirtualMachineInstanceConditionManager()
-	hasHotplug := false
 
 	// Don't update the VirtualMachineInstance if it is already in a final state
 	if origVMI.IsFinal() {
@@ -869,16 +873,17 @@ func (d *VirtualMachineController) updateVMIStatus(origVMI *v1.VirtualMachineIns
 			}
 		}
 
-		hasHotplug = d.updateVolumeStatusesFromDomain(vmi, domain)
+		_ = d.updateVolumeStatusesFromDomain(vmi, domain)
 		if len(vmi.Status.Interfaces) == 0 {
 			// Set Pod Interface
 			interfaces := make([]v1.VirtualMachineInstanceNetworkInterface, 0)
 			for _, network := range vmi.Spec.Networks {
-				if network.NetworkSource.Pod != nil {
-					podIface, err := d.getPodInterfacefromFileCache(vmi, network.Name)
-					if err != nil {
-						return err
-					}
+				podIface, err := d.getPodInterfacefromFileCache(vmi, network.Name)
+				if err != nil {
+					return err
+				}
+
+				if podIface != nil {
 					ifc := v1.VirtualMachineInstanceNetworkInterface{
 						Name: network.Name,
 						IP:   podIface.PodIP,
@@ -1031,7 +1036,7 @@ func (d *VirtualMachineController) updateVMIStatus(origVMI *v1.VirtualMachineIns
 	}
 
 	// Cacluate whether the VM is migratable
-	liveMigrationCondition, isBlockMigration := d.calculateLiveMigrationCondition(vmi, hasHotplug)
+	liveMigrationCondition, isBlockMigration := d.calculateLiveMigrationCondition(vmi)
 	if !condManager.HasCondition(vmi, v1.VirtualMachineInstanceIsMigratable) {
 		vmi.Status.Conditions = append(vmi.Status.Conditions, *liveMigrationCondition)
 		// Set VMI Migration Method
@@ -1269,7 +1274,7 @@ func newNonMigratableCondition(msg string, reason string) *v1.VirtualMachineInst
 	}
 }
 
-func (d *VirtualMachineController) calculateLiveMigrationCondition(vmi *v1.VirtualMachineInstance, hasHotplug bool) (*v1.VirtualMachineInstanceCondition, bool) {
+func (d *VirtualMachineController) calculateLiveMigrationCondition(vmi *v1.VirtualMachineInstance) (*v1.VirtualMachineInstanceCondition, bool) {
 	isBlockMigration, err := d.checkVolumesForMigration(vmi)
 	if err != nil {
 		return newNonMigratableCondition(err.Error(), v1.VirtualMachineInstanceReasonDisksNotMigratable), isBlockMigration
@@ -1278,10 +1283,6 @@ func (d *VirtualMachineController) calculateLiveMigrationCondition(vmi *v1.Virtu
 	err = d.checkNetworkInterfacesForMigration(vmi)
 	if err != nil {
 		return newNonMigratableCondition(err.Error(), v1.VirtualMachineInstanceReasonInterfaceNotMigratable), isBlockMigration
-	}
-
-	if hasHotplug {
-		return newNonMigratableCondition("VMI has hotplugged disks", v1.VirtualMachineInstanceReasonHotplugNotMigratable), isBlockMigration
 	}
 
 	if err := d.isHostModelMigratable(vmi); err != nil {
@@ -2398,6 +2399,13 @@ func (d *VirtualMachineController) vmUpdateHelperMigrationTarget(origVMI *v1.Vir
 
 	if err := d.containerDiskMounter.MountKernelArtifacts(vmi, false); err != nil {
 		return fmt.Errorf("failed to mount kernel artifacts: %v", err)
+	}
+
+	// Mount hotplug disks
+	if attachmentPodUID := vmi.Status.MigrationState.TargetAttachmentPodUID; attachmentPodUID != types.UID("") {
+		if err := d.hotplugVolumeMounter.MountFromPod(vmi, attachmentPodUID); err != nil {
+			return fmt.Errorf("failed to mount hotplug volumes: %v", err)
+		}
 	}
 
 	// configure network inside virt-launcher compute container

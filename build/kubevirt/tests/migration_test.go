@@ -431,7 +431,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 
 				durationLowBandwidth := repeatedlyMigrateWithBandwidthLimitation(vmi, "10Mi", 3)
 				durationHighBandwidth := repeatedlyMigrateWithBandwidthLimitation(vmi, "128Mi", 3)
-				Expect(durationHighBandwidth.Seconds() * 3).To(BeNumerically("<", durationLowBandwidth.Seconds()))
+				Expect(durationHighBandwidth.Seconds() * 2).To(BeNumerically("<", durationLowBandwidth.Seconds()))
 			})
 		})
 		Context("with a Cirros disk", func() {
@@ -1232,6 +1232,10 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				By("create a new NFS PV and PVC")
 				os := string(cd.ContainerDiskFedora)
 				tests.CreateNFSPvAndPvc(pvName, util.NamespaceTestDefault, "5Gi", nfsIP, os)
+
+				cfg := getCurrentKv()
+				cfg.MigrationConfiguration.BandwidthPerMigration = resource.NewMilliQuantity(1, resource.BinarySI)
+				tests.UpdateKubeVirtConfigValueAndWait(cfg)
 			})
 
 			AfterEach(func() {

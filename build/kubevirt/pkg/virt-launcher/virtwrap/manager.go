@@ -61,6 +61,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/hooks"
 	hostdisk "kubevirt.io/kubevirt/pkg/host-disk"
 	"kubevirt.io/kubevirt/pkg/ignition"
+	netsetup "kubevirt.io/kubevirt/pkg/network/setup"
 	kutil "kubevirt.io/kubevirt/pkg/util"
 	accesscredentials "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/access-credentials"
 	agentpoller "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/agent-poller"
@@ -68,17 +69,15 @@ import (
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/cli"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/sriov"
 	domainerrors "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/errors"
-	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/network"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/stats"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/util"
 )
 
 const (
-	LibvirtLocalConnectionPort = 22222
-	gpuEnvPrefix               = "GPU_PASSTHROUGH_DEVICES"
-	vgpuEnvPrefix              = "VGPU_PASSTHROUGH_DEVICES"
-	PCI_RESOURCE_PREFIX        = "PCI_RESOURCE"
-	MDEV_RESOURCE_PREFIX       = "MDEV_PCI_RESOURCE"
+	gpuEnvPrefix         = "GPU_PASSTHROUGH_DEVICES"
+	vgpuEnvPrefix        = "VGPU_PASSTHROUGH_DEVICES"
+	PCI_RESOURCE_PREFIX  = "PCI_RESOURCE"
+	MDEV_RESOURCE_PREFIX = "MDEV_PCI_RESOURCE"
 )
 
 type contextStore struct {
@@ -90,6 +89,8 @@ type DomainManager interface {
 	SyncVMI(*v1.VirtualMachineInstance, bool, *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error)
 	PauseVMI(*v1.VirtualMachineInstance) error
 	UnpauseVMI(*v1.VirtualMachineInstance) error
+	FreezeVMI(*v1.VirtualMachineInstance) error
+	UnfreezeVMI(*v1.VirtualMachineInstance) error
 	KillVMI(*v1.VirtualMachineInstance) error
 	DeleteVMI(*v1.VirtualMachineInstance) error
 	SignalShutdownVMI(*v1.VirtualMachineInstance) error
@@ -467,7 +468,7 @@ func (l *LibvirtDomainManager) preStartHook(vmi *v1.VirtualMachineInstance, doma
 		}
 	}
 
-	err = network.NewVMNetworkConfigurator(vmi, l.networkCacheStoreFactory).SetupPodNetworkPhase2(domain)
+	err = netsetup.NewVMNetworkConfigurator(vmi, l.networkCacheStoreFactory).SetupPodNetworkPhase2(domain)
 	if err != nil {
 		return domain, fmt.Errorf("preparing the pod network failed: %v", err)
 	}
@@ -1111,6 +1112,42 @@ func (l *LibvirtDomainManager) UnpauseVMI(vmi *v1.VirtualMachineInstance) error 
 		logger.Infof("Domain is not paused for %s", vmi.GetObjectMeta().GetName())
 	}
 
+	return nil
+}
+
+func (l *LibvirtDomainManager) FreezeVMI(vmi *v1.VirtualMachineInstance) error {
+	domainName := api.VMINamespaceKeyFunc(vmi)
+
+	cmdResult, err := l.virConn.QemuAgentCommand(`{"execute":"`+string(agentpoller.GET_FSFREEZE_STATUS)+`"}`, domainName)
+	if err != nil {
+		log.Log.Errorf("Failed to get status before freeze vmi, %s", err.Error())
+		return err
+	}
+	fsfreezeStatus, err := agentpoller.ParseFSFreezeStatus(cmdResult)
+	if err != nil {
+		log.Log.Errorf("Failed to parse status before freeze vmi, %s", err.Error())
+		return err
+	}
+	// idempotent - prevent failuer in case fs is already frozen
+	if fsfreezeStatus.Status == api.FSFrozen {
+		return nil
+	}
+	_, err = l.virConn.QemuAgentCommand(`{"execute":"guest-fsfreeze-freeze"}`, domainName)
+	if err != nil {
+		log.Log.Errorf("Failed to freeze vmi, %s", err.Error())
+		return err
+	}
+	return nil
+}
+
+func (l *LibvirtDomainManager) UnfreezeVMI(vmi *v1.VirtualMachineInstance) error {
+	domainName := api.VMINamespaceKeyFunc(vmi)
+	// fs thaw is idempotent by itself
+	_, err := l.virConn.QemuAgentCommand(`{"execute":"guest-fsfreeze-thaw"}`, domainName)
+	if err != nil {
+		log.Log.Errorf("Failed to unfreeze vmi, %s", err.Error())
+		return err
+	}
 	return nil
 }
 

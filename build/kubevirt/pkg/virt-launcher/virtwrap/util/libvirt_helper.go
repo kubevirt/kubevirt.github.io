@@ -32,9 +32,10 @@ import (
 
 const QEMUSeaBiosDebugPipe = converter.QEMUSeaBiosDebugPipe
 const (
-	qemuConfPath       = "/etc/libvirt/qemu.conf"
-	libvirdConfPath    = "/etc/libvirt/libvirtd.conf"
-	libvirtRuntimePath = "/var/run/libvirt"
+	qemuConfPath        = "/etc/libvirt/qemu.conf"
+	libvirdConfPath     = "/etc/libvirt/libvirtd.conf"
+	libvirtRuntimePath  = "/var/run/libvirt"
+	qemuNonRootConfPath = libvirtRuntimePath + "/qemu.conf"
 )
 
 var LifeCycleTranslationMap = map[libvirt.DomainState]api.LifeCycle{
@@ -86,17 +87,17 @@ var PausedReasonTranslationMap = map[libvirt.DomainPausedReason]api.StateChangeR
 	libvirt.DOMAIN_PAUSED_POSTCOPY_FAILED: api.ReasonPausedPostcopyFailed,
 }
 
-type LibvirtWraper struct {
+type LibvirtWrapper struct {
 	user uint32
 }
 
-func NewLibvirtWrapper(nonRoot bool) *LibvirtWraper {
+func NewLibvirtWrapper(nonRoot bool) *LibvirtWrapper {
 	if nonRoot {
-		return &LibvirtWraper{
+		return &LibvirtWrapper{
 			user: util.NonRootUID,
 		}
 	}
-	return &LibvirtWraper{
+	return &LibvirtWrapper{
 		user: util.RootUser,
 	}
 }
@@ -221,7 +222,7 @@ func GetDomainSpecWithFlags(dom cli.VirDomain, flags libvirt.DomainXMLFlags) (*a
 	return domain, nil
 }
 
-func (l LibvirtWraper) StartLibvirt(stopChan chan struct{}) {
+func (l LibvirtWrapper) StartLibvirt(stopChan chan struct{}) {
 	// we spawn libvirt from virt-launcher in order to ensure the libvirtd+qemu process
 	// doesn't exit until virt-launcher is ready for it to. Virt-launcher traps signals
 	// to perform special shutdown logic. These processes need to live in the same
@@ -450,12 +451,6 @@ func configureQemuConf(qemuFilename string) (err error) {
 	}
 	defer util.CloseIOAndCheckErr(qemuConf, &err)
 
-	// We are in a container, don't try to stuff qemu inside special cgroups
-	_, err = qemuConf.WriteString("cgroup_controllers = [ ]\n")
-	if err != nil {
-		return err
-	}
-
 	// If hugepages exist, tell libvirt about them
 	_, err = os.Stat("/dev/hugepages")
 	if err == nil {
@@ -490,10 +485,14 @@ func copyFile(from, to string) error {
 	return err
 }
 
-func (l LibvirtWraper) SetupLibvirt() (err error) {
-	runtimeQemuConfPath := path.Join(libvirtRuntimePath, "qemu.conf")
-	if err := copyFile(qemuConfPath, runtimeQemuConfPath); err != nil {
-		return err
+func (l LibvirtWrapper) SetupLibvirt() (err error) {
+	runtimeQemuConfPath := qemuConfPath
+	if !l.root() {
+		runtimeQemuConfPath = qemuNonRootConfPath
+
+		if err := copyFile(qemuConfPath, runtimeQemuConfPath); err != nil {
+			return err
+		}
 	}
 
 	if err := configureQemuConf(runtimeQemuConfPath); err != nil {
@@ -505,16 +504,13 @@ func (l LibvirtWraper) SetupLibvirt() (err error) {
 		return err
 	}
 
-	libvirdDConf, err := os.OpenFile(runtimeLibvirtdConfPath, os.O_APPEND|os.O_WRONLY, 0644)
-	if err != nil {
-		return err
-	}
-	defer util.CloseIOAndCheckErr(libvirdDConf, &err)
-
-	// Let libvirt log to stderr
-	_, err = libvirdDConf.WriteString("log_outputs = \"1:stderr\"\n")
-
 	if envVarValue, ok := os.LookupEnv("LIBVIRT_DEBUG_LOGS"); ok && (envVarValue == "1") {
+		libvirdDConf, err := os.OpenFile(runtimeLibvirtdConfPath, os.O_APPEND|os.O_WRONLY, 0644)
+		if err != nil {
+			return err
+		}
+		defer util.CloseIOAndCheckErr(libvirdDConf, &err)
+
 		// see https://libvirt.org/kbase/debuglogs.html for details
 		_, err = libvirdDConf.WriteString("log_filters=\"3:remote 4:event 3:util.json 3:util.object 3:util.dbus 3:util.netlink 3:node_device 3:rpc 3:access 1:*\"\n")
 		if err != nil {
@@ -539,6 +535,6 @@ func getDomainModificationImpactFlag(dom cli.VirDomain) (libvirt.DomainModificat
 	return libvirt.DOMAIN_AFFECT_CONFIG, nil
 }
 
-func (l LibvirtWraper) root() bool {
+func (l LibvirtWrapper) root() bool {
 	return l.user == 0
 }

@@ -22,6 +22,7 @@ package services
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -47,7 +48,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/config"
 	containerdisk "kubevirt.io/kubevirt/pkg/container-disk"
 	"kubevirt.io/kubevirt/pkg/hooks"
-	"kubevirt.io/kubevirt/pkg/network/consts"
+	"kubevirt.io/kubevirt/pkg/network/istio"
 	"kubevirt.io/kubevirt/pkg/util"
 	"kubevirt.io/kubevirt/pkg/util/hardware"
 	"kubevirt.io/kubevirt/pkg/util/net/dns"
@@ -65,6 +66,8 @@ const logVerbosity = "logVerbosity"
 const virtiofsDebugLogs = "virtiofsdDebugLogs"
 
 const MultusNetworksAnnotation = "k8s.v1.cni.cncf.io/networks"
+
+const qemuTimeoutJitterRange = 120
 
 const (
 	CAP_NET_BIND_SERVICE = "NET_BIND_SERVICE"
@@ -90,6 +93,11 @@ const MULTUS_DEFAULT_NETWORK_CNI_ANNOTATION = "v1.multus-cni.io/default-network"
 // Istio list of virtual interfaces whose inbound traffic (from VM) will be treated as outbound traffic in envoy
 const ISTIO_KUBEVIRT_ANNOTATION = "traffic.sidecar.istio.io/kubevirtInterfaces"
 
+const VELERO_PREBACKUP_HOOK_CONTAINER_ANNOTATION = "pre.hook.backup.velero.io/container"
+const VELERO_PREBACKUP_HOOK_COMMAND_ANNOTATION = "pre.hook.backup.velero.io/command"
+const VELERO_POSTBACKUP_HOOK_CONTAINER_ANNOTATION = "post.hook.backup.velero.io/container"
+const VELERO_POSTBACKUP_HOOK_COMMAND_ANNOTATION = "post.hook.backup.velero.io/command"
+
 const ENV_VAR_LIBVIRT_DEBUG_LOGS = "LIBVIRT_DEBUG_LOGS"
 const ENV_VAR_VIRTIOFSD_DEBUG_LOGS = "VIRTIOFSD_DEBUG_LOGS"
 const ENV_VAR_VIRT_LAUNCHER_LOG_VERBOSITY = "VIRT_LAUNCHER_LOG_VERBOSITY"
@@ -113,6 +121,7 @@ type TemplateService interface {
 
 type templateService struct {
 	launcherImage              string
+	launcherQemuTimeout        int
 	virtShareDir               string
 	virtLibDir                 string
 	ephemeralDiskDir           string
@@ -380,6 +389,12 @@ func (t *templateService) IsARM64() bool {
 	return t.clusterConfig.GetClusterCPUArch() == "arm64"
 }
 
+func generateQemuTimeoutWithJitter(qemuTimeoutBaseSeconds int) string {
+	timeout := rand.Intn(qemuTimeoutJitterRange) + qemuTimeoutBaseSeconds
+
+	return fmt.Sprintf("%ds", timeout)
+}
+
 func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, tempPod bool) (*k8sv1.Pod, error) {
 	precond.MustNotBeNil(vmi)
 	domain := precond.MustNotBeEmpty(vmi.GetObjectMeta().GetName())
@@ -420,6 +435,13 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			EmptyDir: &k8sv1.EmptyDirVolumeSource{},
 		},
 	})
+
+	hotplugVolumes := make(map[string]bool)
+	for _, volumeStatus := range vmi.Status.VolumeStatus {
+		if volumeStatus.HotplugVolume != nil {
+			hotplugVolumes[volumeStatus.Name] = true
+		}
+	}
 
 	// Need to run in privileged mode in Power or libvirt will fail to lock memory for VMI
 	if t.IsPPC64() {
@@ -470,6 +492,9 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 	serviceAccountName := ""
 
 	for _, volume := range vmi.Spec.Volumes {
+		if hotplugVolumes[volume.Name] {
+			continue
+		}
 		volumeMount := k8sv1.VolumeMount{
 			Name:      volume.Name,
 			MountPath: hostdisk.GetMountedHostDiskDir(volume.Name),
@@ -984,7 +1009,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 			"echo", "bound PVCs"}
 	} else {
 		command = []string{"/usr/bin/virt-launcher",
-			"--qemu-timeout", "5m",
+			"--qemu-timeout", generateQemuTimeoutWithJitter(t.launcherQemuTimeout),
 			"--name", domain,
 			"--uid", string(vmi.UID),
 			"--namespace", namespace,
@@ -1022,6 +1047,11 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 
 	if checkForKeepLauncherAfterFailure(vmi) {
 		command = append(command, "--keep-after-failure")
+	}
+
+	_, ok := vmi.Annotations[v1.FuncTestLauncherFailFastAnnotation]
+	if ok {
+		command = append(command, "--simulate-crash")
 	}
 
 	// Add ports from interfaces to the pod manifest
@@ -1393,7 +1423,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, t
 		pod.Spec.ServiceAccountName = serviceAccountName
 		automount := true
 		pod.Spec.AutomountServiceAccountToken = &automount
-	} else if val, ok := vmi.GetAnnotations()[consts.ISTIO_INJECT_ANNOTATION]; ok && strings.ToLower(val) == "true" {
+	} else if istio.ProxyInjectionEnabled(vmi) {
 		automount := true
 		pod.Spec.AutomountServiceAccountToken = &automount
 	} else {
@@ -1491,13 +1521,7 @@ func (t *templateService) RenderHotplugAttachmentPodTemplate(volumes []*v1.Volum
 		}
 	}
 	for _, volume := range volumes {
-		claimName := ""
-		if volume.DataVolume != nil {
-			// TODO, look up the correct PVC name based on the datavolume, right now they match, but that will not always be true.
-			claimName = volume.DataVolume.Name
-		} else if volume.PersistentVolumeClaim != nil {
-			claimName = volume.PersistentVolumeClaim.ClaimName
-		}
+		claimName := types.PVCNameFromVirtVolume(volume)
 		if claimName == "" {
 			continue
 		}
@@ -1936,6 +1960,7 @@ func getNetworkToResourceMap(virtClient kubecli.KubevirtClient, vmi *v1.VirtualM
 }
 
 func NewTemplateService(launcherImage string,
+	launcherQemuTimeout int,
 	virtShareDir string,
 	virtLibDir string,
 	ephemeralDiskDir string,
@@ -1950,6 +1975,7 @@ func NewTemplateService(launcherImage string,
 	precond.MustNotBeEmpty(launcherImage)
 	svc := templateService{
 		launcherImage:              launcherImage,
+		launcherQemuTimeout:        launcherQemuTimeout,
 		virtShareDir:               virtShareDir,
 		virtLibDir:                 virtLibDir,
 		ephemeralDiskDir:           ephemeralDiskDir,
@@ -2067,6 +2093,17 @@ func generatePodAnnotations(vmi *v1.VirtualMachineInstance) (map[string]string, 
 	if HaveMasqueradeInterface(vmi.Spec.Domain.Devices.Interfaces) {
 		annotationsSet[ISTIO_KUBEVIRT_ANNOTATION] = "k6t-eth0"
 	}
+	annotationsSet[VELERO_PREBACKUP_HOOK_CONTAINER_ANNOTATION] = "compute"
+	annotationsSet[VELERO_PREBACKUP_HOOK_COMMAND_ANNOTATION] = fmt.Sprintf(
+		"[\"/usr/bin/virt-freezer\", \"--freeze\", \"--name\", \"%s\", \"--namespace\", \"%s\"]",
+		vmi.GetObjectMeta().GetName(),
+		vmi.GetObjectMeta().GetNamespace())
+	annotationsSet[VELERO_POSTBACKUP_HOOK_CONTAINER_ANNOTATION] = "compute"
+	annotationsSet[VELERO_POSTBACKUP_HOOK_COMMAND_ANNOTATION] = fmt.Sprintf(
+		"[\"/usr/bin/virt-freezer\", \"--unfreeze\", \"--name\", \"%s\", \"--namespace\", \"%s\"]",
+		vmi.GetObjectMeta().GetName(),
+		vmi.GetObjectMeta().GetNamespace())
+
 	return annotationsSet, nil
 }
 

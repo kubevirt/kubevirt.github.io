@@ -163,7 +163,7 @@ const (
 	ISCSITargetName = "test-isci-target"
 )
 
-var testNamespaces = []string{util2.NamespaceTestDefault, NamespaceTestAlternative, NamespaceTestOperator}
+var TestNamespaces = []string{util2.NamespaceTestDefault, NamespaceTestAlternative, NamespaceTestOperator}
 var schedulableNode = ""
 
 type startType string
@@ -641,7 +641,7 @@ func CalculateNamespaces() {
 	// TODO, that is not needed, just a shortcut to not have to treat this namespace
 	// differently when running in parallel
 	NamespaceTestOperator = fmt.Sprintf("%s%d", NamespaceTestOperator, worker)
-	testNamespaces = []string{util2.NamespaceTestDefault, NamespaceTestAlternative, NamespaceTestOperator}
+	TestNamespaces = []string{util2.NamespaceTestDefault, NamespaceTestAlternative, NamespaceTestOperator}
 }
 
 func SynchronizedBeforeTestSetup() []byte {
@@ -1651,7 +1651,7 @@ func cleanNamespaces() {
 	virtCli, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
 
-	for _, namespace := range testNamespaces {
+	for _, namespace := range TestNamespaces {
 
 		_, err := virtCli.CoreV1().Namespaces().Get(context.Background(), namespace, metav1.GetOptions{})
 		if err != nil {
@@ -1757,8 +1757,10 @@ func cleanNamespaces() {
 			util2.PanicOnError(virtCli.NetworkClient().K8sCniCncfIoV1().NetworkAttachmentDefinitions(namespace).Delete(context.Background(), netDef.GetName(), metav1.DeleteOptions{}))
 		}
 
-		// Remove all Istio Sidecars
-		util2.PanicOnError(removeAllGroupVersionResourceFromNamespace(schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1beta1", Resource: "sidecars"}, namespace))
+		// Remove all Istio Sidecars, VirtualServices, DestinationRules and Gateways
+		for _, res := range []string{"sidecars", "virtualservices", "destinationrules", "gateways"} {
+			util2.PanicOnError(removeAllGroupVersionResourceFromNamespace(schema.GroupVersionResource{Group: "networking.istio.io", Version: "v1beta1", Resource: res}, namespace))
+		}
 
 		// Remove all Istio PeerAuthentications
 		util2.PanicOnError(removeAllGroupVersionResourceFromNamespace(schema.GroupVersionResource{Group: "security.istio.io", Version: "v1beta1", Resource: "peerauthentications"}, namespace))
@@ -1770,7 +1772,7 @@ func removeNamespaces() {
 	util2.PanicOnError(err)
 
 	// First send an initial delete to every namespace
-	for _, namespace := range testNamespaces {
+	for _, namespace := range TestNamespaces {
 		err := virtCli.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
 		if !errors.IsNotFound(err) {
 			util2.PanicOnError(err)
@@ -1779,7 +1781,7 @@ func removeNamespaces() {
 
 	// Wait until the namespaces are terminated
 	fmt.Println("")
-	for _, namespace := range testNamespaces {
+	for _, namespace := range TestNamespaces {
 		fmt.Printf("Waiting for namespace %s to be removed, this can take a while ...\n", namespace)
 		EventuallyWithOffset(1, func() error {
 			return virtCli.CoreV1().Namespaces().Delete(context.Background(), namespace, metav1.DeleteOptions{})
@@ -1829,7 +1831,7 @@ func createNamespaces() {
 	util2.PanicOnError(err)
 
 	// Create a Test Namespaces
-	for _, namespace := range testNamespaces {
+	for _, namespace := range TestNamespaces {
 		ns := &k8sv1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: namespace,
@@ -2065,7 +2067,7 @@ func NewRandomVMIWithDataVolume(dataVolumeName string) *v1.VirtualMachineInstanc
 		},
 	})
 
-	vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("512M")
+	vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("1Gi")
 	return vmi
 }
 
@@ -2112,7 +2114,7 @@ func NewRandomVMWithDataVolumeInStorageClass(imageUrl, namespace, storageClass s
 	return vm
 }
 
-func newRandomVMWithDataVolumeAndUserDataInStorageClass(dataVolume *cdiv1.DataVolume, userData string) *v1.VirtualMachine {
+func NewRandomVMWithDataVolumeAndUserData(dataVolume *cdiv1.DataVolume, userData string) *v1.VirtualMachine {
 	vmi := NewRandomVMIWithDataVolume(dataVolume.Name)
 	AddUserData(vmi, "cloud-init", userData)
 	vm := NewRandomVirtualMachine(vmi, false)
@@ -2125,12 +2127,12 @@ func NewRandomVMWithBlockDataVolumeAndUserDataInStorageClass(imageUrl, namespace
 	dataVolume := NewRandomDataVolumeWithHttpImportInStorageClass(imageUrl, namespace, storageClass, k8sv1.ReadWriteOnce)
 	volumeMode := k8sv1.PersistentVolumeBlock
 	dataVolume.Spec.PVC.VolumeMode = &volumeMode
-	return newRandomVMWithDataVolumeAndUserDataInStorageClass(dataVolume, userData)
+	return NewRandomVMWithDataVolumeAndUserData(dataVolume, userData)
 }
 
 func NewRandomVMWithDataVolumeAndUserDataInStorageClass(imageUrl, namespace, userData, storageClass string) *v1.VirtualMachine {
 	dataVolume := NewRandomDataVolumeWithHttpImportInStorageClass(imageUrl, namespace, storageClass, k8sv1.ReadWriteOnce)
-	return newRandomVMWithDataVolumeAndUserDataInStorageClass(dataVolume, userData)
+	return NewRandomVMWithDataVolumeAndUserData(dataVolume, userData)
 }
 
 func NewRandomVMWithCloneDataVolume(sourceNamespace, sourceName, targetNamespace string) *v1.VirtualMachine {

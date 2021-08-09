@@ -73,7 +73,8 @@ const (
 
 	defaultHost = "0.0.0.0"
 
-	launcherImage = "virt-launcher"
+	launcherImage       = "virt-launcher"
+	launcherQemuTimeout = 240
 
 	imagePullSecret = ""
 
@@ -81,8 +82,9 @@ const (
 
 	ephemeralDiskDir = virtShareDir + "-ephemeral-disks"
 
-	defaultControllerThreads    = 3
-	defaultVMIControllerThreads = 10
+	defaultControllerThreads         = 3
+	defaultSnapshotControllerThreads = 6
+	defaultVMIControllerThreads      = 10
 
 	defaultLauncherSubGid                 = 107
 	defaultSnapshotControllerResyncPeriod = 5 * time.Minute
@@ -163,6 +165,7 @@ type VirtControllerApp struct {
 	LeaderElection leaderelectionconfig.Configuration
 
 	launcherImage              string
+	launcherQemuTimeout        int
 	imagePullSecret            string
 	virtShareDir               string
 	virtLibDir                 string
@@ -452,6 +455,7 @@ func (vca *VirtControllerApp) initCommon() {
 
 	containerdisk.SetLocalDirectory(vca.ephemeralDiskDir + "/container-disk-data")
 	vca.templateService = services.NewTemplateService(vca.launcherImage,
+		vca.launcherQemuTimeout,
 		vca.virtShareDir,
 		vca.virtLibDir,
 		vca.ephemeralDiskDir,
@@ -466,9 +470,9 @@ func (vca *VirtControllerApp) initCommon() {
 
 	topologyHinter := topology.NewTopologyHinter(vca.nodeInformer.GetStore(), vca.vmiInformer.GetStore(), runtime.GOARCH, vca.clusterConfig)
 
-	vca.vmiController = NewVMIController(
-		vca.templateService,
+	vca.vmiController = NewVMIController(vca.templateService,
 		vca.vmiInformer,
+		vca.vmInformer,
 		vca.kvPodInformer,
 		vca.persistentVolumeClaimInformer,
 		vca.vmiRecorder,
@@ -476,6 +480,7 @@ func (vca *VirtControllerApp) initCommon() {
 		vca.dataVolumeInformer,
 		topologyHinter,
 	)
+
 	recorder := vca.getNewRecorder(k8sv1.NamespaceAll, "node-controller")
 	vca.nodeController = NewNodeController(vca.clientSet, vca.nodeInformer, vca.vmiInformer, recorder)
 	vca.migrationController = NewMigrationController(
@@ -484,6 +489,7 @@ func (vca *VirtControllerApp) initCommon() {
 		vca.kvPodInformer,
 		vca.migrationInformer,
 		vca.nodeInformer,
+		vca.persistentVolumeClaimInformer,
 		vca.vmiRecorder,
 		vca.clientSet,
 		vca.clusterConfig,
@@ -613,6 +619,9 @@ func (vca *VirtControllerApp) AddFlags() {
 	flag.StringVar(&vca.launcherImage, "launcher-image", launcherImage,
 		"Shim container for containerized VMIs")
 
+	flag.IntVar(&vca.launcherQemuTimeout, "launcher-qemu-timeout", launcherQemuTimeout,
+		"Amount of time to wait for qemu")
+
 	flag.StringVar(&vca.imagePullSecret, "image-pull-secret", imagePullSecret,
 		"Secret to use for pulling virt-launcher and/or registry disks")
 
@@ -656,7 +665,7 @@ func (vca *VirtControllerApp) AddFlags() {
 	flag.Int64Var(&vca.launcherSubGid, "launcher-subgid", defaultLauncherSubGid,
 		"ID of subgroup to virt-launcher")
 
-	flag.IntVar(&vca.snapshotControllerThreads, "snapshot-controller-threads", defaultControllerThreads,
+	flag.IntVar(&vca.snapshotControllerThreads, "snapshot-controller-threads", defaultSnapshotControllerThreads,
 		"Number of goroutines to run for snapshot controller")
 
 	flag.IntVar(&vca.restoreControllerThreads, "restore-controller-threads", defaultControllerThreads,

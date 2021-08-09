@@ -22,8 +22,6 @@
 package infraconfigurators
 
 import (
-	"fmt"
-
 	"kubevirt.io/kubevirt/pkg/network/cache"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 
@@ -35,7 +33,7 @@ import (
 type PodNetworkInfraConfigurator interface {
 	DiscoverPodNetworkInterface(podIfaceName string) error
 	PreparePodNetworkInterface() error
-	GenerateDomainIfaceSpec() api.Interface
+	GenerateNonRecoverableDomainIfaceSpec() *api.Interface
 	// The method should return dhcp configuration that cannot be calculated in virt-launcher's phase2
 	GenerateNonRecoverableDHCPConfig() *cache.DHCPConfig
 }
@@ -46,13 +44,6 @@ func createAndBindTapToBridge(handler netdriver.NetworkHandler, deviceName strin
 		return err
 	}
 	return handler.BindTapDeviceToBridge(deviceName, bridgeIfaceName)
-}
-
-func validateMTU(mtu int) error {
-	if mtu < 0 || mtu > 65535 {
-		return fmt.Errorf("MTU value out of range ")
-	}
-	return nil
 }
 
 func calculateNetworkQueues(vmi *v1.VirtualMachineInstance) uint32 {

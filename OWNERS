@@ -1,8 +1,11 @@
 filters:
   ".*":
     reviewers:
+      - cwilkers
+      - jobbler
       - mazzystr
     approvers:
+      - cwilkers
       - mazzystr
       - fabiand
       - davidvossel

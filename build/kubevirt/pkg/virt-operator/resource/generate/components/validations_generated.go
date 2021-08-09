@@ -678,7 +678,7 @@ var CRDsValidation map[string]string = map[string]string{
                           monitoring to an external device plugin
                         type: boolean
                       pciVendorSelector:
-                        description: The vendor_id:product_id tupple of the PCI device
+                        description: The vendor_id:product_id tuple of the PCI device
                         type: string
                       resourceName:
                         description: The name of the resource that is representing
@@ -715,6 +715,8 @@ var CRDsValidation map[string]string = map[string]string{
               items:
                 type: string
               type: array
+            virtualMachineInstancesPerNode:
+              type: integer
           type: object
         customizeComponents:
           properties:
@@ -5238,6 +5240,23 @@ var CRDsValidation map[string]string = map[string]string{
           description: SnapshotInProgress is the name of the VirtualMachineSnapshot
             currently executing
           type: string
+        startFailure:
+          description: StartFailure tracks consecutive VMI startup failures for the
+            purposes of crash loop backoffs
+          nullable: true
+          properties:
+            consecutiveFailCount:
+              type: integer
+            lastFailedVMIUID:
+              description: UID is a type that holds unique ID values, including UUIDs.  Because
+                we don't ONLY use UUIDs, this is an alias to string.  Being a type
+                captures intent and helps make sure that UIDs and names do not get
+                conflated.
+              type: string
+            retryAfterTimestamp:
+              format: date-time
+              type: string
+          type: object
         stateChangeRequests:
           description: StateChangeRequests indicates a list of actions that should
             be taken on a VMI e.g. stop a specific VMI then start a new one.
@@ -7929,6 +7948,9 @@ var CRDsValidation map[string]string = map[string]string{
               description: The time the migration action began
               format: date-time
               nullable: true
+              type: string
+            targetAttachmentPodUID:
+              description: The UID of the target attachment pod for hotplug volumes
               type: string
             targetDirectMigrationNodePorts:
               additionalProperties:
@@ -11746,6 +11768,11 @@ var CRDsValidation map[string]string = map[string]string{
           description: DeletionPolicy defines that to do with VirtualMachineSnapshot
             when VirtualMachineSnapshot is deleted
           type: string
+        failureDeadline:
+          description: This time represents the number of seconds we permit the vm
+            snapshot to take. In case we pass this deadline we mark this snapshot
+            as failed. Defaults to DefaultFailureDeadline - 5min
+          type: string
         source:
           description: TypedLocalObjectReference contains enough information to let
             you locate the typed referenced object inside the same namespace.
@@ -11818,6 +11845,9 @@ var CRDsValidation map[string]string = map[string]string{
             type: string
           type: array
           x-kubernetes-list-type: set
+        phase:
+          description: VirtualMachineSnapshotPhase is the current phase of the VirtualMachineSnapshot
+          type: string
         readyToUse:
           type: boolean
         sourceUID:
@@ -15187,6 +15217,23 @@ var CRDsValidation map[string]string = map[string]string{
                       description: SnapshotInProgress is the name of the VirtualMachineSnapshot
                         currently executing
                       type: string
+                    startFailure:
+                      description: StartFailure tracks consecutive VMI startup failures
+                        for the purposes of crash loop backoffs
+                      nullable: true
+                      properties:
+                        consecutiveFailCount:
+                          type: integer
+                        lastFailedVMIUID:
+                          description: UID is a type that holds unique ID values,
+                            including UUIDs.  Because we don't ONLY use UUIDs, this
+                            is an alias to string.  Being a type captures intent and
+                            helps make sure that UIDs and names do not get conflated.
+                          type: string
+                        retryAfterTimestamp:
+                          format: date-time
+                          type: string
+                      type: object
                     stateChangeRequests:
                       description: StateChangeRequests indicates a list of actions
                         that should be taken on a VMI e.g. stop a specific VMI then

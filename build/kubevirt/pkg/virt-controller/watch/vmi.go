@@ -112,12 +112,18 @@ const (
 	PVCNotReadyReason = "PVCNotReady"
 	// FailedHotplugSyncReason is set when a hotplug specific failure occurs during sync
 	FailedHotplugSyncReason = "FailedHotplugSync"
+	// ErrImagePullReason is set when an error has occured while pulling an image for a containerDisk VM volume.
+	ErrImagePullReason = "ErrImagePull"
+	// ImagePullBackOffReason is set when an error has occured while pulling an image for a containerDisk VM volume,
+	// and that kubelet is backing off before retrying.
+	ImagePullBackOffReason = "ImagePullBackOff"
 )
 
 const failedToRenderLaunchManifestErrFormat = "failed to render launch manifest: %v"
 
 func NewVMIController(templateService services.TemplateService,
 	vmiInformer cache.SharedIndexInformer,
+	vmInformer cache.SharedIndexInformer,
 	podInformer cache.SharedIndexInformer,
 	pvcInformer cache.SharedIndexInformer,
 	recorder record.EventRecorder,
@@ -130,6 +136,7 @@ func NewVMIController(templateService services.TemplateService,
 		templateService:    templateService,
 		Queue:              workqueue.NewNamedRateLimitingQueue(workqueue.DefaultControllerRateLimiter(), "virt-controller-vmi"),
 		vmiInformer:        vmiInformer,
+		vmInformer:         vmInformer,
 		podInformer:        podInformer,
 		pvcInformer:        pvcInformer,
 		recorder:           recorder,
@@ -184,6 +191,7 @@ type VMIController struct {
 	clientset          kubecli.KubevirtClient
 	Queue              workqueue.RateLimitingInterface
 	vmiInformer        cache.SharedIndexInformer
+	vmInformer         cache.SharedIndexInformer
 	podInformer        cache.SharedIndexInformer
 	pvcInformer        cache.SharedIndexInformer
 	topologyHinter     topology.Hinter
@@ -199,7 +207,7 @@ func (c *VMIController) Run(threadiness int, stopCh <-chan struct{}) {
 	log.Log.Info("Starting vmi controller.")
 
 	// Wait for cache sync before we start the pod controller
-	cache.WaitForCacheSync(stopCh, c.vmiInformer.HasSynced, c.podInformer.HasSynced, c.dataVolumeInformer.HasSynced)
+	cache.WaitForCacheSync(stopCh, c.vmInformer.HasSynced, c.vmiInformer.HasSynced, c.podInformer.HasSynced, c.dataVolumeInformer.HasSynced)
 
 	// Start the actual work
 	for i := 0; i < threadiness; i++ {
@@ -347,6 +355,25 @@ func (c *VMIController) setLauncherContainerInfo(vmi *virtv1.VirtualMachineInsta
 
 }
 
+func (c *VMIController) hasOwnerVM(vmi *virtv1.VirtualMachineInstance) bool {
+	controllerRef := v1.GetControllerOf(vmi)
+	if controllerRef == nil || controllerRef.Kind != virtv1.VirtualMachineGroupVersionKind.Kind {
+		return false
+	}
+
+	obj, exists, _ := c.vmInformer.GetStore().GetByKey(vmi.Namespace + "/" + controllerRef.Name)
+	if !exists {
+		return false
+	}
+
+	ownerVM := obj.(*virtv1.VirtualMachine)
+	if controllerRef.UID == ownerVM.UID {
+		return true
+	}
+
+	return false
+}
+
 func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod, dataVolumes []*cdiv1.DataVolume, syncErr syncError) error {
 
 	hasFailedDataVolume := false
@@ -451,6 +478,11 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 				conditionManager.RemoveCondition(vmiCopy, virtv1.VirtualMachineInstanceConditionType(k8sv1.PodScheduled))
 			}
 
+			if imageErr := checkForContainerImageError(pod); imageErr != nil {
+				// only overwrite syncErr if imageErr != nil
+				syncErr = imageErr
+			}
+
 			if isPodReady(pod) && vmi.DeletionTimestamp == nil {
 				// fail vmi creation if CPU pinning has been requested but the Pod QOS is not Guaranteed
 				podQosClass := pod.Status.QOSClass
@@ -488,6 +520,11 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 				delete(vmiCopy.Labels, virtv1.OutdatedLauncherImageLabel)
 			}
 			vmiCopy.Status.LauncherContainerImageVersion = ""
+		}
+
+		if !c.hasOwnerVM(vmi) && len(vmiCopy.Finalizers) > 0 {
+			// if there's no owner VM around still, then remove the VM controller's finalizer if it exists
+			controller.RemoveFinalizer(vmiCopy, virtv1.VirtualMachineControllerFinalizer)
 		}
 
 	case vmi.IsRunning():
@@ -702,6 +739,30 @@ func (c *VMIController) syncReadyConditionFromPod(vmi *virtv1.VirtualMachineInst
 	}
 }
 
+// checkForContainerImageError checks if an error has occured while handling the image of any of the pod's containers
+// (including init containers), and returns a syncErr with the details of the error, or nil otherwise.
+func checkForContainerImageError(pod *k8sv1.Pod) syncError {
+	containerStatuses := append(append([]k8sv1.ContainerStatus{},
+		pod.Status.InitContainerStatuses...),
+		pod.Status.ContainerStatuses...)
+
+	for _, containerStatus := range containerStatuses {
+		if containerStatus.State.Waiting == nil {
+			continue
+		}
+
+		reason := containerStatus.State.Waiting.Reason
+		if reason == ErrImagePullReason || reason == ImagePullBackOffReason {
+			return &syncErrorImpl{
+				reason: reason,
+				err:    fmt.Errorf(containerStatus.State.Waiting.Message),
+			}
+		}
+	}
+
+	return nil
+}
+
 // isPodReady treats the pod as ready to be handed over to virt-handler, as soon as all pods except
 // the compute pod are ready.
 func isPodReady(pod *k8sv1.Pod) bool {
@@ -786,6 +847,11 @@ func (c *VMIController) sync(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod,
 		return nil
 	}
 
+	if err := c.deleteOrphanedAttachmentPods(vmi); err != nil {
+		log.Log.Reason(err).Errorf("failed to delete orphaned attachment pods %s: %v", controller.VirtualMachineInstanceKey(vmi), err)
+		// do not return; just log the error
+	}
+
 	dataVolumesReady, isWaitForFirstConsumer, syncErr := c.handleSyncDataVolumes(vmi, dataVolumes)
 	if syncErr != nil {
 		return syncErr
@@ -842,8 +908,8 @@ func (c *VMIController) sync(vmi *virtv1.VirtualMachineInstance, pod *k8sv1.Pod,
 	}
 
 	if !isTempPod(pod) {
-		hotplugVolumes := c.getHotplugVolumes(vmi, pod)
-		hotplugAttachmentPods, err := c.virtlauncherAttachmentPods(pod)
+		hotplugVolumes := getHotplugVolumes(vmi, pod)
+		hotplugAttachmentPods, err := controller.AttachmentPods(pod, c.podInformer)
 		if err != nil {
 			return &syncErrorImpl{fmt.Errorf("failed to get attachment pods: %v", err), FailedHotplugSyncReason}
 		}
@@ -1307,7 +1373,7 @@ func isTempPod(pod *k8sv1.Pod) bool {
 	return ok
 }
 
-func (c *VMIController) getHotplugVolumes(vmi *virtv1.VirtualMachineInstance, virtlauncherPod *k8sv1.Pod) []*virtv1.Volume {
+func getHotplugVolumes(vmi *virtv1.VirtualMachineInstance, virtlauncherPod *k8sv1.Pod) []*virtv1.Volume {
 	hotplugVolumes := make([]*virtv1.Volume, 0)
 	podVolumes := virtlauncherPod.Spec.Volumes
 	vmiVolumes := vmi.Spec.Volumes
@@ -1359,25 +1425,6 @@ func (c *VMIController) deleteRunningFinishedOrFailedPod(vmi *virtv1.VirtualMach
 		}
 	}
 	return nil
-}
-
-func (c *VMIController) virtlauncherAttachmentPods(virtlauncherPod *k8sv1.Pod) ([]*k8sv1.Pod, error) {
-	var attachmentPods []*k8sv1.Pod
-
-	// Get all pods from the namespace
-	pods, err := c.listPodsFromNamespace(virtlauncherPod.Namespace)
-	if err != nil {
-		return attachmentPods, err
-	}
-
-	for _, pod := range pods {
-		if ownerRef := controller.GetControllerOf(pod); ownerRef == nil || ownerRef.UID != virtlauncherPod.UID {
-			continue
-		}
-		attachmentPods = append(attachmentPods, pod)
-	}
-
-	return attachmentPods, nil
 }
 
 func (c *VMIController) waitForFirstConsumerTemporaryPods(vmi *virtv1.VirtualMachineInstance, virtLauncherPod *k8sv1.Pod) ([]*k8sv1.Pod, error) {
@@ -1631,27 +1678,11 @@ func (c *VMIController) createAttachmentPodTemplate(vmi *virtv1.VirtualMachineIn
 	var pod *k8sv1.Pod
 	var err error
 
-	volumeNamesPVCMap := make(map[string]*k8sv1.PersistentVolumeClaim)
-	for _, volume := range volumes {
-		claimName := ""
-		if volume.DataVolume != nil {
-			// TODO, look up the correct PVC name based on the datavolume, right now they match, but that will not always be true.
-			claimName = volume.DataVolume.Name
-		} else if volume.PersistentVolumeClaim != nil {
-			claimName = volume.PersistentVolumeClaim.ClaimName
-		}
-		if claimName == "" {
-			logger.Infof("Unable to hotplug, volume %s not PVC or Datavolume", volume.Name)
-			continue
-		}
-		pvc, exists, _, err := kubevirttypes.IsPVCBlockFromStore(c.pvcInformer.GetStore(), virtlauncherPod.Namespace, claimName)
-		if err != nil {
-			return nil, err
-		}
-		if !exists {
-			logger.Infof("Unable to hotplug, claim %s not found", claimName)
-			continue
-		}
+	volumeNamesPVCMap, err := kubevirttypes.VirtVolumesToPVCMap(volumes, c.pvcInformer.GetStore(), virtlauncherPod.Namespace)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get PVC map: %v", err)
+	}
+	for volumeName, pvc := range volumeNamesPVCMap {
 		//Verify the PVC is ready to be used.
 		populated, err := cdiv1.IsPopulated(pvc, func(name, namespace string) (*cdiv1.DataVolume, error) {
 			dv, exists, _ := c.dataVolumeInformer.GetStore().GetByKey(fmt.Sprintf("%s/%s", namespace, name))
@@ -1663,10 +1694,9 @@ func (c *VMIController) createAttachmentPodTemplate(vmi *virtv1.VirtualMachineIn
 		if err != nil {
 			return nil, err
 		}
-		if populated {
-			volumeNamesPVCMap[volume.Name] = pvc
-		} else {
-			logger.Infof("Unable to hotplug, claim %s found, but not ready", claimName)
+		if !populated {
+			logger.Infof("Unable to hotplug, claim %s found, but not ready", pvc.Name)
+			delete(volumeNamesPVCMap, volumeName)
 		}
 	}
 
@@ -1677,13 +1707,7 @@ func (c *VMIController) createAttachmentPodTemplate(vmi *virtv1.VirtualMachineIn
 }
 
 func (c *VMIController) createAttachmentPopulateTriggerPodTemplate(volume *virtv1.Volume, virtlauncherPod *k8sv1.Pod, vmi *virtv1.VirtualMachineInstance) (*k8sv1.Pod, error) {
-	var claimName string
-	if volume.DataVolume != nil {
-		// TODO, look up the correct PVC name based on the datavolume, right now they match, but that will not always be true.
-		claimName = volume.DataVolume.Name
-	} else if volume.PersistentVolumeClaim != nil {
-		claimName = volume.PersistentVolumeClaim.ClaimName
-	}
+	claimName := kubevirttypes.PVCNameFromVirtVolume(volume)
 	if claimName == "" {
 		return nil, errors.New("Unable to hotplug, claim not PVC or Datavolume")
 	}
@@ -1705,7 +1729,7 @@ func (c *VMIController) deleteAllAttachmentPods(vmi *virtv1.VirtualMachineInstan
 		return err
 	}
 	if virtlauncherPod != nil {
-		attachmentPods, err := c.virtlauncherAttachmentPods(virtlauncherPod)
+		attachmentPods, err := controller.AttachmentPods(virtlauncherPod, c.podInformer)
 		if err != nil {
 			return err
 		}
@@ -1719,6 +1743,39 @@ func (c *VMIController) deleteAllAttachmentPods(vmi *virtv1.VirtualMachineInstan
 	return nil
 }
 
+func (c *VMIController) deleteOrphanedAttachmentPods(vmi *virtv1.VirtualMachineInstance) error {
+	pods, err := c.listPodsFromNamespace(vmi.Namespace)
+	if err != nil {
+		return fmt.Errorf("failed to list pods from namespace %s: %v", vmi.Namespace, err)
+	}
+
+	for _, pod := range pods {
+		if !controller.IsControlledBy(pod, vmi) {
+			continue
+		}
+
+		if !podIsDown(pod) {
+			continue
+		}
+
+		attachmentPods, err := controller.AttachmentPods(pod, c.podInformer)
+		if err != nil {
+			log.Log.Reason(err).Errorf("failed to get attachment pods %s: %v", controller.PodKey(pod), err)
+			// do not return; continue the cleanup...
+			continue
+		}
+
+		for _, attachmentPod := range attachmentPods {
+			if err := c.deleteAttachmentPodForVolume(vmi, attachmentPod); err != nil {
+				log.Log.Reason(err).Errorf("failed to delete attachment pod %s: %v", controller.PodKey(attachmentPod), err)
+				// do not return; continue the cleanup...
+			}
+		}
+	}
+
+	return nil
+}
+
 func (c *VMIController) updateVolumeStatus(vmi *virtv1.VirtualMachineInstance, virtlauncherPod *k8sv1.Pod) error {
 	oldStatus := vmi.Status.DeepCopy().VolumeStatus
 	oldStatusMap := make(map[string]virtv1.VolumeStatus)
@@ -1726,13 +1783,13 @@ func (c *VMIController) updateVolumeStatus(vmi *virtv1.VirtualMachineInstance, v
 		oldStatusMap[status.Name] = status
 	}
 
-	hotplugVolumes := c.getHotplugVolumes(vmi, virtlauncherPod)
+	hotplugVolumes := getHotplugVolumes(vmi, virtlauncherPod)
 	hotplugVolumesMap := make(map[string]*virtv1.Volume)
 	for _, volume := range hotplugVolumes {
 		hotplugVolumesMap[volume.Name] = volume
 	}
 
-	attachmentPods, err := c.virtlauncherAttachmentPods(virtlauncherPod)
+	attachmentPods, err := controller.AttachmentPods(virtlauncherPod, c.podInformer)
 	if err != nil {
 		return err
 	}

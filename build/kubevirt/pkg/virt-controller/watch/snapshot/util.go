@@ -40,15 +40,13 @@ var currentTime = func() *metav1.Time {
 	return &t
 }
 
-func cacheKeyFunc(namespace, name string) string {
-	return fmt.Sprintf("%s/%s", namespace, name)
+func timeTrack(start time.Time, name string) {
+	elapsed := time.Since(start)
+	log.Log.Infof("%s took %s", name, elapsed)
 }
 
-func newError(message string) *snapshotv1.Error {
-	return &snapshotv1.Error{
-		Message: &message,
-		Time:    currentTime(),
-	}
+func cacheKeyFunc(namespace, name string) string {
+	return fmt.Sprintf("%s/%s", namespace, name)
 }
 
 func newReadyCondition(status corev1.ConditionStatus, reason string) snapshotv1.Condition {
@@ -63,6 +61,15 @@ func newReadyCondition(status corev1.ConditionStatus, reason string) snapshotv1.
 func newProgressingCondition(status corev1.ConditionStatus, reason string) snapshotv1.Condition {
 	return snapshotv1.Condition{
 		Type:               snapshotv1.ConditionProgressing,
+		Status:             status,
+		Reason:             reason,
+		LastTransitionTime: *currentTime(),
+	}
+}
+
+func newFailureCondition(status corev1.ConditionStatus, reason string) snapshotv1.Condition {
+	return snapshotv1.Condition{
+		Type:               snapshotv1.ConditionFailure,
 		Status:             status,
 		Reason:             reason,
 		LastTransitionTime: *currentTime(),
@@ -156,4 +163,23 @@ func podsUsingPVCs(podInformer cache.SharedIndexInformer, namespace string, pvcN
 	}
 
 	return pods, nil
+}
+
+func getFailureDeadline(vmSnapshot *snapshotv1.VirtualMachineSnapshot) time.Duration {
+	failureDeadline := snapshotv1.DefaultFailureDeadline
+	if vmSnapshot.Spec.FailureDeadline != nil {
+		failureDeadline = vmSnapshot.Spec.FailureDeadline.Duration
+	}
+
+	return failureDeadline
+}
+
+func timeUntilDeadline(vmSnapshot *snapshotv1.VirtualMachineSnapshot) time.Duration {
+	failureDeadline := getFailureDeadline(vmSnapshot)
+	// No Deadline set by user
+	if failureDeadline == 0 {
+		return failureDeadline
+	}
+	deadline := vmSnapshot.CreationTimestamp.Add(failureDeadline)
+	return time.Until(deadline)
 }

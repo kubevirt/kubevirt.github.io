@@ -6436,6 +6436,47 @@
      }
     }
    },
+   "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/freeze": {
+    "put": {
+     "description": "Freeze a VirtualMachineInstance object.",
+     "operationId": "v1Freeze",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "schema": {
+        "type": "string"
+       }
+      },
+      "401": {
+       "description": "Unauthorized"
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "schema": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
    "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/guestosinfo": {
     "get": {
      "description": "Get guest agent os information",
@@ -6664,6 +6705,47 @@
      "responses": {
       "401": {
        "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/unfreeze": {
+    "put": {
+     "description": "Unfreeze a VirtualMachineInstance object.",
+     "operationId": "v1Unfreeze",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "schema": {
+        "type": "string"
+       }
+      },
+      "401": {
+       "description": "Unauthorized"
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "schema": {
+        "type": "string"
+       }
       }
      }
     },
@@ -7400,6 +7482,47 @@
      }
     }
    },
+   "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/freeze": {
+    "put": {
+     "description": "Freeze a VirtualMachineInstance object.",
+     "operationId": "v1alpha3Freeze",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "schema": {
+        "type": "string"
+       }
+      },
+      "401": {
+       "description": "Unauthorized"
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "schema": {
+        "type": "string"
+       }
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
    "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/guestosinfo": {
     "get": {
      "description": "Get guest agent os information",
@@ -7628,6 +7751,47 @@
      "responses": {
       "401": {
        "description": "Unauthorized"
+      }
+     }
+    },
+    "parameters": [
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Name of the resource",
+      "name": "name",
+      "in": "path",
+      "required": true
+     },
+     {
+      "uniqueItems": true,
+      "type": "string",
+      "description": "Object name and auth scope, such as for teams and projects",
+      "name": "namespace",
+      "in": "path",
+      "required": true
+     }
+    ]
+   },
+   "/apis/subresources.kubevirt.io/v1alpha3/namespaces/{namespace:[a-z0-9][a-z0-9\\-]*}/virtualmachineinstances/{name:[a-z0-9][a-z0-9\\-]*}/unfreeze": {
+    "put": {
+     "description": "Unfreeze a VirtualMachineInstance object.",
+     "operationId": "v1alpha3Unfreeze",
+     "responses": {
+      "200": {
+       "description": "OK",
+       "schema": {
+        "type": "string"
+       }
+      },
+      "401": {
+       "description": "Unauthorized"
+      },
+      "500": {
+       "description": "Internal Server Error",
+       "schema": {
+        "type": "string"
+       }
       }
      }
     },
@@ -10871,6 +11035,10 @@
       "items": {
        "type": "string"
       }
+     },
+     "virtualMachineInstancesPerNode": {
+      "type": "integer",
+      "format": "int32"
      }
     }
    },
@@ -11304,7 +11472,7 @@
       "type": "boolean"
      },
      "pciVendorSelector": {
-      "description": "The vendor_id:product_id tupple of the PCI device",
+      "description": "The vendor_id:product_id tuple of the PCI device",
       "type": "string"
      },
      "resourceName": {
@@ -12200,6 +12368,10 @@
       "description": "The time the migration action began",
       "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Time"
      },
+     "targetAttachmentPodUID": {
+      "description": "The UID of the target attachment pod for hotplug volumes",
+      "type": "string"
+     },
      "targetDirectMigrationNodePorts": {
       "description": "The list of ports opened for live migration on the destination node",
       "type": "object",
@@ -12737,6 +12909,22 @@
      }
     }
    },
+   "v1.VirtualMachineStartFailure": {
+    "description": "VirtualMachineStartFailure tracks VMIs which failed to transition successfully to running using the VM status",
+    "type": "object",
+    "properties": {
+     "consecutiveFailCount": {
+      "type": "integer",
+      "format": "int32"
+     },
+     "lastFailedVMIUID": {
+      "type": "string"
+     },
+     "retryAfterTimestamp": {
+      "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Time"
+     }
+    }
+   },
    "v1.VirtualMachineStateChangeRequest": {
     "type": "object",
     "required": [
@@ -12787,6 +12975,10 @@
      "snapshotInProgress": {
       "description": "SnapshotInProgress is the name of the VirtualMachineSnapshot currently executing",
       "type": "string"
+     },
+     "startFailure": {
+      "description": "StartFailure tracks consecutive VMI startup failures for the purposes of crash loop backoffs",
+      "$ref": "#/definitions/v1.VirtualMachineStartFailure"
      },
      "stateChangeRequests": {
       "description": "StateChangeRequests indicates a list of actions that should be taken on a VMI e.g. stop a specific VMI then start a new one.",
@@ -13294,6 +13486,10 @@
      "deletionPolicy": {
       "type": "string"
      },
+     "failureDeadline": {
+      "description": "This time represents the number of seconds we permit the vm snapshot to take. In case we pass this deadline we mark this snapshot as failed. Defaults to DefaultFailureDeadline - 5min",
+      "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Duration"
+     },
      "source": {
       "$ref": "#/definitions/k8s.io.api.core.v1.TypedLocalObjectReference"
      }
@@ -13322,6 +13518,9 @@
        "type": "string"
       },
       "x-kubernetes-list-type": "set"
+     },
+     "phase": {
+      "type": "string"
      },
      "readyToUse": {
       "type": "boolean"
