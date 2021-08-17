@@ -4,7 +4,7 @@ author: Radim Hrazdil
 title: Running virtual machines in Istio service mesh
 description: This blog post demonstrates running virtual machines in Istio service mesh.
 navbar_active: Blogs
-pub-date: August 13
+pub-date: August 23
 pub-year: 2021
 category: news
 tags: [kubevirt, istio, virtual machine, VM, service mesh, mesh]
@@ -16,8 +16,10 @@ comments: true
 This blog post demonstrates running virtual machines in [Istio](https://istio.io/) service mesh. 
 
 Istio service mesh allows to monitor, visualize, and manage traffic between pods and external services by
-injecting a proxy container, a so called sidecar, which forwards traffic that goes in and out of a pod/virtual machine.
-This allows the sidecar to not only collect metadata about the proxied traffic but also actively interfere with it if so configured. 
+injecting a proxy container - a sidecar - which forwards inbound and outbound traffic of a pod/virtual machine.
+This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it.
+For example, the sidecar may inject faulty HTTP responses or delay them, load balance traffic between different versions of an application or mirror traffic for testing/debugging purposes.
+Visit [Istio documentation](https://istio.io/latest/docs/tasks/) to learn about all its features.
 
 ## Prerequisites
 
@@ -43,9 +45,11 @@ Follow these steps to deploy a local cluster with pre-installed Istio service me
 ```bash
 git clone https://github.com/kubevirt/kubevirtci
 cd kubevirtci
+export KUBEVIRTCI_TAG=2108222252-0007793
 # Pin to version used in this blog post in case
 # k8s-1.21 provider version disappears in the future
-git reset 656b60bc114d592b77b5a25b42dbec2801f9b882 --hard
+git checkout $KUBEVIRTCI_TAG
+export KUBEVIRT_NUM_NODES=2
 export KUBEVIRT_PROVIDER=k8s-1.21
 export KUBEVIRT_DEPLOY_ISTIO=true
 export KUBEVIRT_WITH_CNAO=true
@@ -53,8 +57,7 @@ make cluster-up
 export KUBECONFIG=$(./cluster-up/kubeconfig.sh)
 ```
 
-Istio is configured to install with CNI plugin in our ephemeral k8s cluster, which allows running the sidecar without NET_ADMIN and NET_RAW capabilities.
-If you want to see exact Istio configuration, follow [this link](https://github.com/kubevirt/kubevirtci/blob/2108081530-91f55e3/cluster-provision/k8s/1.21/istio.sh).
+For details about Istio configuration, see Istio kubevirtci [install script](https://github.com/kubevirt/kubevirtci/blob/2108081530-91f55e3/cluster-provision/k8s/1.21/istio.sh).
 
 
 ### Install Kubevirt
@@ -65,7 +68,7 @@ Following KubeVirt [user guide](https://kubevirt.io/user-guide/operations/instal
 export RELEASE=v0.43.0
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
 kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-cr.yaml
-kubectl -n kubevirt wait kv kubevirt --for condition=Available
+kubectl -n kubevirt wait kv kubevirt --timeout=180s --for condition=Available
 ```
 
 ### Install Istio addons
@@ -73,15 +76,16 @@ kubectl -n kubevirt wait kv kubevirt --for condition=Available
 While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
 Download istio manifests and client binary by running the following command:
 ```bash
-curl -L https://istio.io/downloadIstio | ISTIO_VERSION=1.10.0 sh -
+export ISTIO_VERSION=1.10.0
+curl -L https://istio.io/downloadIstio | sh -
 ```
 and export path to the istioctl binary by following the output of the above command.
 
 Finally, deploy kiali, jaeger and prometheus addons:
 ```bash
-kubectl create -f istio-1.10.0/samples/addons/kiali.yaml
-kubectl create -f istio-1.10.0/samples/addons/jaeger.yaml
-kubectl create -f istio-1.10.0/samples/addons/prometheus.yaml
+kubectl create -f istio-${ISTIO_VERSION}/samples/addons/kiali.yaml
+kubectl create -f istio-${ISTIO_VERSION}/samples/addons/jaeger.yaml
+kubectl create -f istio-${ISTIO_VERSION}/samples/addons/prometheus.yaml
 ```
 
 **Note:** If there are errors when installing the addons, try running the command again. There may be timing issues which will be resolved when the command is run again.
@@ -93,9 +97,7 @@ This involves adding a label and creating a NetworkAttachmentDefinition in the t
 
 #### Istio sidecar injection
 
-Istio supports two ways of [injecting](https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/) a sidecar to a pod - automatic and manual.
-
-Enable automatic sidecar injection by adding `istio-injection=enabled` label to target namespace:
+Istio supports [two ways of injecting](https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/) a sidecar to a pod - automatic and manual. For simplicity, we will only consider automatic sidecar injection in this demo, which is enabled by adding `istio-injection=enabled` label to target namespace:
 
 ```bash
 kubectl label namespace default istio-injection=enabled
@@ -103,8 +105,7 @@ kubectl label namespace default istio-injection=enabled
 
 #### Network attachment definiton
 
-
-Since our ephemeral k8s cluster has multus installed, there needs to be NetworkAttachmentDefinition called `istio-cni` created in each namespace where Istio sidecar containers are to be used:
+When multus is installed in k8s cluster, a `NetworkAttachmentDefinition` called `istio-cni` **must** be created in **each** namespace where Istio sidecar containers are to be used:
 ```bash
 cat <<EOF | kubectl create -f -
 apiVersion: "k8s.cni.cncf.io/v1"
@@ -114,20 +115,20 @@ metadata:
 EOF
 ```
 
-The NetworkAttachmentDefinition spec is empty, as the only purpose of it is to invoke the istio-cni binary, which handles configuration of the in-pod traffic routing.
-
+The `NetworkAttachmentDefinition` spec is empty, as its only purpose is to trigger the `istio-cni` binary, which configures the in-pod traffic routing.
 
 ### Topology
 
-To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh: istio-vmi and cirros-vmi.
-`istio-vmi` repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080.
-`Cirros-vmi` repeatedly request the HTTP service running on the `istio-vmi` VMI. With this topology setup, both inbound and outbound
-traffic metrics can be observed in Kiali dashboard for `istio-vmi`.
+To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh:
+- `istio-vmi` repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080,
+- `cirros-vmi` repeatedly request the HTTP service running on the `istio-vmi` VMI.
 
+With this setup, both inbound and outbound
+traffic metrics can be observed in Kiali dashboard for `istio-vmi`.
 
 ### Create VMI resources
 
-To create an Istio aware virtual machine the `sidecar.istio.io/inject: "true"` annotation needs to be specified.
+An Istio aware virtual machine **must** be annotated with `sidecar.istio.io/inject: "true"`, regardless of used Istio injection mechanism.
 Without this annotation, traffic would not be properly routed through the istio proxy sidecar.
 Additonally, Istio uses `app` label for adding contextual information to the collected telemetry.
 Both, the annotation and label can be seen in the following virtual machine example: 
@@ -162,6 +163,14 @@ spec:
   networks:
     - name: default
       pod: {}
+  readinessProbe:
+    httpGet:
+      port: 8080
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 3
   terminationGracePeriodSeconds: 0
   volumes:
     - name: containerdisk
@@ -181,24 +190,7 @@ EOF
 ```
 The cloud init section of the VMI runs two loops requesting `kubevirt.io` website every second to generate outbound traffic (from the VMI) and serving simple HTTP server on port `8080`, which will be used for monitoring of inbound traffic (to the VMI).
 
-After creating the VMI, similar output to the following snippet should be displayed when listing pods:
-```bash
-kubectl get pods
-NAME                             READY   STATUS    RESTARTS   AGE
-virt-launcher-istio-vmi-XYZ      3/3     Running   0          25s
-```
-
-Notice the virt-launcher pod having 3/3 containers. The extra container is the istio proxy.
-`Istioctl proxy-status` should report that the sidecar proxy running inside the virt-launcher pod
-has synced with Istio control plane:
-
-```bash
-istioctl proxy-status
-NAME                                                   CDS        LDS        EDS        RDS          ISTIOD                      VERSION
-virt-launcher-istio-vmi-99t8t.default                  SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
-```
-
-Let's create a service for the VMI that will be used to access the http server in `istio-vmi`:
+Let's also create a service for the VMI that will be used to access the http server in `istio-vmi`:
 
 ```bash
 cat <<EOF | kubectl create -f-
@@ -258,6 +250,28 @@ spec:
 EOF
 ```
 
+Wait for the `istio-vmi` to be ready:
+```bash
+kubectl wait --for=condition=ready --timeout=180s pod -l app=istio-vmi
+```
+
+After creating the VMIs, the corresponding virt-launcher pods should have 3 ready containers, as shown in the snippet below:
+```bash
+kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+virt-launcher-istio-vmi-XYZ      3/3     Running   0          4m13s
+virt-launcher-cirros-vmi-XYZ     3/3     Running   0          2m21s
+```
+
+`Istioctl proxy-status` should report that the sidecar proxies running inside the virt-launcher pods have synced with Istio control plane:
+
+```bash
+istioctl proxy-status
+NAME                                                   CDS        LDS        EDS        RDS          ISTIOD                      VERSION
+virt-launcher-cirros-vmi-9f765.default                 SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-5d79g     1.10.0
+virt-launcher-istio-vmi-99t8t.default                  SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
+```
+
 ### Monitor traffic in Kiali dashboard
 
 With both VMIs up and running, we can open the Kiali dashboard and observe the traffic metrics.
@@ -265,9 +279,6 @@ Run the following command, to access Kiali dashboard:
 ```bash
 istioctl dashboard kiali
 ```
-
-**Note:** it may take a few moments for the VMs to be fully booted up and the traffic picked up in Kiali dashboard.
-
 
 #### Topology graph
 
@@ -336,7 +347,6 @@ In Request volume chart we can see that number of requests stabilizes at around 
 Remaining two charts provide information about Request duration and size.
 
 The same metrics are collected for outbound traffic as well, which can be seen in Outbound Metrics tab.
-
 
 ## Cluster teardown
 
