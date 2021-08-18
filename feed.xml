@@ -1,4 +1,39 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-09T11:01:37+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Kubernetes Authentication Options using KubeVirt Client Library</title><link href="https://kubevirt.io//2021/kubevirt-api-auth.html" rel="alternate" type="text/html" title="Kubernetes Authentication Options using KubeVirt Client Library" /><published>2021-07-16T00:00:00+00:00</published><updated>2021-07-16T00:00:00+00:00</updated><id>https://kubevirt.io//2021/kubevirt-api-auth</id><content type="html" xml:base="https://kubevirt.io//2021/kubevirt-api-auth.html">&lt;ul&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-18T12:58:13+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html">&lt;h2 id=&quot;v0440&quot;&gt;v0.44.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Mon Aug 9 14:20:14 2021 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #6058][acardace] Fix virt-launcher exit pod race condition&lt;/li&gt;
+  &lt;li&gt;[PR #6035][davidvossel] Addition of perfscale-audit tool for auditing performance of control plane during stress tests&lt;/li&gt;
+  &lt;li&gt;[PR #6145][acardace] virt-launcher: disable unencrypted TCP socket for libvirtd.&lt;/li&gt;
+  &lt;li&gt;[PR #6163][davidvossel] Handle qemu processes in defunc (zombie) state&lt;/li&gt;
+  &lt;li&gt;[PR #6105][ashleyschuett] Add VirtualMachineInstancesPerNode to KubeVirt CR under Spec.Configuration&lt;/li&gt;
+  &lt;li&gt;[PR #6104][zcahana] Report FailedUnschedulable VM status when scheduling errors occur&lt;/li&gt;
+  &lt;li&gt;[PR #5905][davidvossel] VM CrashLoop detection and Exponential Backoff&lt;/li&gt;
+  &lt;li&gt;[PR #6070][acardace] Initiate Live-Migration using a unix socket (exposed by virt-handler) instead of an additional TCP&amp;lt;-&amp;gt;Unix migration proxy started by virt-launcher&lt;/li&gt;
+  &lt;li&gt;[PR #5728][vasiliy-ul] Live migration of VMs with hotplug volumes is now enabled&lt;/li&gt;
+  &lt;li&gt;[PR #6109][rmohr] Fix virt-controller SCC: Reflect the need for NET_BIND_SERVICE in the virt-controller SCC.&lt;/li&gt;
+  &lt;li&gt;[PR #5942][ShellyKa13] Integrate guest agent to online VM snapshot&lt;/li&gt;
+  &lt;li&gt;[PR #6034][ashleyschuett] Go version updated to version 1.16.6&lt;/li&gt;
+  &lt;li&gt;[PR #6040][yuhaohaoyu] Improved debuggability by keeping the environment of a failed VMI alive.&lt;/li&gt;
+  &lt;li&gt;[PR #6068][dhiller] Add check that not all tests have been skipped&lt;/li&gt;
+  &lt;li&gt;[PR #6041][xpivarc] [Experimental] Virt-launcher can run as non-root user&lt;/li&gt;
+  &lt;li&gt;[PR #6062][iholder-redhat] replace dead “stress” binary with new, maintained, “stress-ng” binary&lt;/li&gt;
+  &lt;li&gt;[PR #6029][mhenriks] CDI to 1.36.0 with DataSource support&lt;/li&gt;
+  &lt;li&gt;[PR #4089][victortoso] Add support to USB Redirection with usbredir&lt;/li&gt;
+  &lt;li&gt;[PR #5946][vatsalparekh] Add guest-agent based ping probe&lt;/li&gt;
+  &lt;li&gt;[PR #6005][acardace] make containerDisk validation memory usage limit configurable&lt;/li&gt;
+  &lt;li&gt;[PR #5791][zcahana] Added a READY column to the tabular output of “kubectl get vm/vmi”&lt;/li&gt;
+  &lt;li&gt;[PR #6006][awels] DataVolumes created by DataVolumeTemplates will follow the associated VMs priority class.&lt;/li&gt;
+  &lt;li&gt;[PR #5982][davidvossel] Reduce vmi Update collisions (http code 409) during startup&lt;/li&gt;
+  &lt;li&gt;[PR #5891][akalenyu] BugFix: Pending VMIs when creating concurrent bulk of VMs backed by WFFC DVs&lt;/li&gt;
+  &lt;li&gt;[PR #5925][rhrazdil] Fix issue with Windows VMs not being assigned IP address configured in network-attachment-definition IPAM.&lt;/li&gt;
+  &lt;li&gt;[PR #6007][rmohr] Fix: The bandwidth limitation on migrations is no longer ignored. Caution: The default bandwidth limitation of 64Mi is changed to “unlimited” to not break existing installations.&lt;/li&gt;
+  &lt;li&gt;[PR #4944][kwiesmueller] Add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/portforward&lt;/code&gt; subresource to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachine&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;VirtualMachineInstance&lt;/code&gt; that can tunnel TCP traffic through the API Server using a websocket stream.&lt;/li&gt;
+  &lt;li&gt;[PR #5402][alicefr] Integration of libguestfs-tools and added new command &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;guestfs&lt;/code&gt; to virtctl&lt;/li&gt;
+  &lt;li&gt;[PR #5953][ashleyschuett] Allow Failed VMs to be stopped when using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;--force --gracePeriod 0&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;[PR #5876][mlsorensen] KubeVirt CR supports specifying a runtime class for virt-launcher pods via ‘launcherRuntimeClass’.&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.44.0</summary></entry><entry><title type="html">Kubernetes Authentication Options using KubeVirt Client Library</title><link href="https://kubevirt.io//2021/kubevirt-api-auth.html" rel="alternate" type="text/html" title="Kubernetes Authentication Options using KubeVirt Client Library" /><published>2021-07-16T00:00:00+00:00</published><updated>2021-07-16T00:00:00+00:00</updated><id>https://kubevirt.io//2021/kubevirt-api-auth</id><content type="html" xml:base="https://kubevirt.io//2021/kubevirt-api-auth.html">&lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#requirements&quot;&gt;Requirements&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#setup&quot;&gt;Setup&lt;/a&gt;
@@ -1499,21 +1534,4 @@ bit early to say when/where how.&lt;/p&gt;
   &lt;li&gt;Our &lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&amp;amp;ctz=Etc%2FGMT&quot;&gt;community meetings&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;The &lt;a href=&quot;https://github.com/kubevirt&quot;&gt;github repositories&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;Twitter: &lt;a href=&quot;https://twitter.com/kubevirt&quot;&gt;@kubevirt&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html">Just a few weeks ago, the KubeVirt community had their first ever dedicated online event, the KubeVirt Summit!</summary></entry><entry><title type="html">KubeVirt v0.38.0</title><link href="https://kubevirt.io//2021/changelog-v0.38.0.html" rel="alternate" type="text/html" title="KubeVirt v0.38.0" /><published>2021-02-08T00:00:00+00:00</published><updated>2021-02-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.38.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.38.0.html">&lt;h2 id=&quot;v0380&quot;&gt;v0.38.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Mon Feb 8 13:15:32 2021 +0000&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[PR #4870][qinqon] Bump k8s deps to 0.20.2&lt;/li&gt;
-  &lt;li&gt;[PR #4571][yuvalturg] Added os, workflow and flavor labels to the kubevirt_vmi_phase_count metric&lt;/li&gt;
-  &lt;li&gt;[PR #4659][salanki] Fixed an issue where non-root users inside a guest could not write to a Virtio-FS mount.&lt;/li&gt;
-  &lt;li&gt;[PR #4844][xpivarc] Fixed limits/requests to accept int again&lt;/li&gt;
-  &lt;li&gt;[PR #4850][rmohr] virtio-scsi now respects the useTransitionalVirtio flag instead of assigning a virtio version depending on the machine layout&lt;/li&gt;
-  &lt;li&gt;[PR #4672][vladikr] allow increasing logging verbosity of infra components in KubeVirt CR&lt;/li&gt;
-  &lt;li&gt;[PR #4838][rmohr] Fix an issue where it may not be able to update the KubeVirt CR after creation for up to minutes due to certificate propagation delays&lt;/li&gt;
-  &lt;li&gt;[PR #4806][rmohr] Make the mutating webhooks for VMIs and VMs  required to avoid letting entities into the cluster which are not properly defaulted&lt;/li&gt;
-  &lt;li&gt;[PR #4779][brybacki] Error messsge on virtctl image-upload to WaitForFirstConsumer DV&lt;/li&gt;
-  &lt;li&gt;[PR #4749][davidvossel] KUBEVIRT_CLIENT_GO_SCHEME_REGISTRATION_VERSION env var for specifying exactly what client-go scheme version is registered&lt;/li&gt;
-  &lt;li&gt;[PR #4772][jean-edouard] Faster VMI phase transitions thanks to an increased number of VMI watch threads in virt-controller&lt;/li&gt;
-  &lt;li&gt;[PR #4730][rmohr] Add spec.domain.devices.useVirtioTransitional boolean to support virtio-transitional for old guests&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.38.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html">Just a few weeks ago, the KubeVirt community had their first ever dedicated online event, the KubeVirt Summit!</summary></entry></feed>

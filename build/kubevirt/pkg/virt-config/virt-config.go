@@ -70,6 +70,16 @@ const (
 	DefaultVirtHandlerLogVerbosity                  = 2
 	DefaultVirtLauncherLogVerbosity                 = 2
 	DefaultVirtOperatorLogVerbosity                 = 2
+
+	// Default REST configuration settings
+	DefaultVirtHandlerQPS         float32 = 5
+	DefaultVirtHandlerBurst               = 10
+	DefaultVirtControllerQPS      float32 = 20
+	DefaultVirtControllerBurst            = 30
+	DefaultVirtAPIQPS             float32 = 5
+	DefaultVirtAPIBurst                   = 10
+	DefaultVirtWebhookClientQPS           = 200
+	DefaultVirtWebhookClientBurst         = 400
 )
 
 func IsAMD64(arch string) bool {
@@ -197,6 +207,14 @@ func (c *ClusterConfig) GetMinimumClusterTSCFrequency() *int64 {
 
 func (c *ClusterConfig) GetPermittedHostDevices() *v1.PermittedHostDevices {
 	return c.GetConfig().PermittedHostDevices
+}
+
+func (c *ClusterConfig) GetDesiredMDEVTypes(nodeName string) []string {
+	mdevTypesConf := c.GetConfig().MediatedDevicesConfiguration
+	if mdevTypesConf == nil {
+		return []string{}
+	}
+	return mdevTypesConf.MediatedDevicesTypes
 }
 
 func (c *ClusterConfig) GetVirtHandlerVerbosity(nodeName string) uint {

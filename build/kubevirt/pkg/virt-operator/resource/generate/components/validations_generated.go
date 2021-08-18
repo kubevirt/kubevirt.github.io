@@ -513,6 +513,68 @@ var CRDsValidation map[string]string = map[string]string{
         configuration:
           description: holds kubevirt configurations. same as the virt-configMap
           properties:
+            apiConfiguration:
+              description: ReloadableComponentConfiguration holds all generic k8s
+                configuration options which can be reloaded by components without
+                requiring a restart.
+              properties:
+                restClient:
+                  description: RestClient can be used to tune certain aspects of the
+                    k8s client in use.
+                  properties:
+                    rateLimiter:
+                      description: RateLimiter allows selecting and configuring different
+                        rate limiters for the k8s client.
+                      properties:
+                        tokenBucketRateLimiter:
+                          properties:
+                            burst:
+                              description: Maximum burst for throttle. If it's zero,
+                                the component default will be used
+                              type: integer
+                            qps:
+                              description: QPS indicates the maximum QPS to the apiserver
+                                from this client. If it's zero, the component default
+                                will be used
+                              type: number
+                          required:
+                          - burst
+                          - qps
+                          type: object
+                      type: object
+                  type: object
+              type: object
+            controllerConfiguration:
+              description: ReloadableComponentConfiguration holds all generic k8s
+                configuration options which can be reloaded by components without
+                requiring a restart.
+              properties:
+                restClient:
+                  description: RestClient can be used to tune certain aspects of the
+                    k8s client in use.
+                  properties:
+                    rateLimiter:
+                      description: RateLimiter allows selecting and configuring different
+                        rate limiters for the k8s client.
+                      properties:
+                        tokenBucketRateLimiter:
+                          properties:
+                            burst:
+                              description: Maximum burst for throttle. If it's zero,
+                                the component default will be used
+                              type: integer
+                            qps:
+                              description: QPS indicates the maximum QPS to the apiserver
+                                from this client. If it's zero, the component default
+                                will be used
+                              type: number
+                          required:
+                          - burst
+                          - qps
+                          type: object
+                      type: object
+                  type: object
+              type: object
             cpuModel:
               type: string
             cpuRequest:
@@ -588,12 +650,53 @@ var CRDsValidation map[string]string = map[string]string{
               items:
                 type: string
               type: array
+            handlerConfiguration:
+              description: ReloadableComponentConfiguration holds all generic k8s
+                configuration options which can be reloaded by components without
+                requiring a restart.
+              properties:
+                restClient:
+                  description: RestClient can be used to tune certain aspects of the
+                    k8s client in use.
+                  properties:
+                    rateLimiter:
+                      description: RateLimiter allows selecting and configuring different
+                        rate limiters for the k8s client.
+                      properties:
+                        tokenBucketRateLimiter:
+                          properties:
+                            burst:
+                              description: Maximum burst for throttle. If it's zero,
+                                the component default will be used
+                              type: integer
+                            qps:
+                              description: QPS indicates the maximum QPS to the apiserver
+                                from this client. If it's zero, the component default
+                                will be used
+                              type: number
+                          required:
+                          - burst
+                          - qps
+                          type: object
+                      type: object
+                  type: object
+              type: object
             imagePullPolicy:
               description: PullPolicy describes a policy for if/when to pull a container
                 image
               type: string
             machineType:
               type: string
+            mediatedDevicesConfiguration:
+              description: MediatedDevicesConfiguration holds inforamtion about MDEV
+                types to be defined, if available
+              properties:
+                mediatedDevicesTypes:
+                  items:
+                    type: string
+                  type: array
+                  x-kubernetes-list-type: atomic
+              type: object
             memBalloonStatsPeriod:
               format: int32
               type: integer
@@ -717,6 +820,37 @@ var CRDsValidation map[string]string = map[string]string{
               type: array
             virtualMachineInstancesPerNode:
               type: integer
+            webhookConfiguration:
+              description: ReloadableComponentConfiguration holds all generic k8s
+                configuration options which can be reloaded by components without
+                requiring a restart.
+              properties:
+                restClient:
+                  description: RestClient can be used to tune certain aspects of the
+                    k8s client in use.
+                  properties:
+                    rateLimiter:
+                      description: RateLimiter allows selecting and configuring different
+                        rate limiters for the k8s client.
+                      properties:
+                        tokenBucketRateLimiter:
+                          properties:
+                            burst:
+                              description: Maximum burst for throttle. If it's zero,
+                                the component default will be used
+                              type: integer
+                            qps:
+                              description: QPS indicates the maximum QPS to the apiserver
+                                from this client. If it's zero, the component default
+                                will be used
+                              type: number
+                          required:
+                          - burst
+                          - qps
+                          type: object
+                      type: object
+                  type: object
+              type: object
           type: object
         customizeComponents:
           properties:
@@ -8041,6 +8175,37 @@ var CRDsValidation map[string]string = map[string]string{
               name:
                 description: Name is the name of the volume
                 type: string
+              persistentVolumeClaimInfo:
+                description: PersistentVolumeClaimInfo is information about the PVC
+                  that handler requires during start flow
+                properties:
+                  accessModes:
+                    description: 'AccessModes contains the desired access modes the
+                      volume should have. More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1'
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: atomic
+                  capacity:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: Capacity represents the capacity set on the corresponding
+                      PVC spec
+                    type: object
+                  preallocated:
+                    description: Preallocated indicates if the PVC's storage is preallocated
+                      or not
+                    type: boolean
+                  volumeMode:
+                    description: VolumeMode defines what type of volume is required
+                      by the claim. Value of Filesystem is implied when not included
+                      in claim spec.
+                    type: string
+                type: object
               phase:
                 description: Phase is the phase
                 type: string
