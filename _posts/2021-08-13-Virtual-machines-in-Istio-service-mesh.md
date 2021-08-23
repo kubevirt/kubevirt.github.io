@@ -18,8 +18,10 @@ This blog post demonstrates running virtual machines in [Istio](https://istio.io
 Istio service mesh allows to monitor, visualize, and manage traffic between pods and external services by
 injecting a proxy container - a sidecar - which forwards inbound and outbound traffic of a pod/virtual machine.
 This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it.
-For example, the sidecar may inject faulty HTTP responses or delay them, load balance traffic between different versions of an application or mirror traffic for testing/debugging purposes.
+The main features of Istio are traffic shifting (migrating traffic from an old to new version of a service), dynamic request routing, fault injection or traffic mirroring for testing/debugging purposes, and more.
 Visit [Istio documentation](https://istio.io/latest/docs/tasks/) to learn about all its features.
+Istio featureset may be further extended by installing addons. Kiali, for example, is a UI dashboard that provides traffic information
+of all microservices in a mesh, capable of composing communication graph between all microservices. 
 
 ## Prerequisites
 
@@ -34,7 +36,6 @@ Istio is only supported with masquerade network binding and pod network over IPv
 
 This section covers deployment of a local cluster with Istio service mesh, KubeVirt installation and creation of an Istio-enabled virtual machine.
 Finally, Kiali dashboard is used to examine both inbound and outbound traffic of the created virtual machine.
-
 
 ### Run k8s cluster
 
@@ -66,15 +67,15 @@ Following KubeVirt [user guide](https://kubevirt.io/user-guide/operations/instal
 
 ```bash
 export RELEASE=v0.43.0
-kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml
-kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-cr.yaml
+kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-operator.yaml"
+kubectl apply -f "https://github.com/kubevirt/kubevirt/releases/download/${RELEASE}/kubevirt-cr.yaml"
 kubectl -n kubevirt wait kv kubevirt --timeout=180s --for condition=Available
 ```
 
 ### Install Istio addons
 
 While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
-Download istio manifests and client binary by running the following command:
+Download Istio manifests and client binary by running the following command:
 ```bash
 export ISTIO_VERSION=1.10.0
 curl -L https://istio.io/downloadIstio | sh -
@@ -267,10 +268,12 @@ virt-launcher-cirros-vmi-XYZ     3/3     Running   0          2m21s
 
 ```bash
 istioctl proxy-status
-NAME                                                   CDS        LDS        EDS        RDS          ISTIOD                      VERSION
-virt-launcher-cirros-vmi-9f765.default                 SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-5d79g     1.10.0
-virt-launcher-istio-vmi-99t8t.default                  SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
+NAME                                          CDS        LDS        EDS        RDS          ISTIOD                      VERSION
+virt-launcher-cirros-vmi-9f765.default        SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-5d79g     1.10.0
+virt-launcher-istio-vmi-99t8t.default         SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
 ```
+
+**Note:** Displaying only relevant VMI entities. 
 
 ### Monitor traffic in Kiali dashboard
 
@@ -308,7 +311,7 @@ Let's start by navigating to the topology graph by clicking the Graph menu item.
 </div>
 
 In the topology graph, we can observe the following traffic flows:
-- requests from `cirros-vmi` to `istio-vmi` via `istio-vmi-svc`service,
+- requests from `cirros-vmi` to `istio-vmi` via `istio-vmi-svc` service,
 - requests from `istio-vmi` to `PasstroughCluster`. The `PastroughCluster` marks  destinations external to our service mesh.
 
 #### Workloads
@@ -358,6 +361,6 @@ make cluster-down
 
 ## Conclusion
 
-KubeVirt introduced support for Istio, allowing virtual machines to be part of a service mesh.
+KubeVirt introduced [support for Istio](https://kubevirt.io/user-guide/virtual_machines/istio_service_mesh/), allowing virtual machines to be part of a service mesh.
 
 This blog post covered running KubeVirt virtual machine in Istio service mesh using an ephemeral kubevirtci cluster. Kiali dashboard was used to observe inbound and outbound traffic of a virtual machine.
