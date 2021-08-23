@@ -37,7 +37,7 @@ Istio is only supported with masquerade network binding and pod network over IPv
 This section covers deployment of a local cluster with Istio service mesh, KubeVirt installation and creation of an Istio-enabled virtual machine.
 Finally, Kiali dashboard is used to examine both inbound and outbound traffic of the created virtual machine.
 
-### Run k8s cluster
+### Run Kubernetes cluster
 
 In this blog post, we are going to use [kubevirtci](https://github.com/kubevirt/kubevirtci) as our Kubernetes ephemeral cluster provider.
 
@@ -82,7 +82,7 @@ curl -L https://istio.io/downloadIstio | sh -
 ```
 and export path to the istioctl binary by following the output of the above command.
 
-Finally, deploy kiali, jaeger and prometheus addons:
+Finally, deploy Kiali, Jaeger and Prometheus addons:
 ```bash
 kubectl create -f istio-${ISTIO_VERSION}/samples/addons/kiali.yaml
 kubectl create -f istio-${ISTIO_VERSION}/samples/addons/jaeger.yaml
@@ -94,7 +94,7 @@ kubectl create -f istio-${ISTIO_VERSION}/samples/addons/prometheus.yaml
 ### Prepare target namespace
 
 Before creating virtual machines, the target namespace needs to be configured for the Istio sidecar to be injected and working properly.
-This involves adding a label and creating a NetworkAttachmentDefinition in the target namespace.
+This involves adding a label and creating a `NetworkAttachmentDefinition` in the target namespace.
 
 #### Istio sidecar injection
 
@@ -106,7 +106,7 @@ kubectl label namespace default istio-injection=enabled
 
 #### Network attachment definiton
 
-When multus is installed in k8s cluster, a `NetworkAttachmentDefinition` called `istio-cni` **must** be created in **each** namespace where Istio sidecar containers are to be used:
+When Multus is installed in k8s cluster, a `NetworkAttachmentDefinition` called `istio-cni` **must** be created in **each** namespace where Istio sidecar containers are to be used:
 ```bash
 cat <<EOF | kubectl create -f -
 apiVersion: "k8s.cni.cncf.io/v1"
