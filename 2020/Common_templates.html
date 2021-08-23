@@ -256,7 +256,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
         <article class="post-content">
           <h2 id="what-is-a-virtual-machine-template">What is a virtual machine template?</h2>
 
-<p>The KubeVirt project provides a set of templates (https://github.com/kubevirt/common-templates) to create VMS to handle common usage scenarios. These templates provide a combination of some key factors that could be further customized and processed to have a Virtual Machine object. With common templates you can easily start in a few minutes many VMS with predefined hardware resources (e.g. number of CPUs, requested memory, etc.).</p>
+<p>The KubeVirt project provides a set of templates <a href="https://github.com/kubevirt/common-templates">https://github.com/kubevirt/common-template</a> to create VMS to handle common usage scenarios. These templates provide a combination of some key factors that could be further customized and processed to have a Virtual Machine object. With common templates you can easily start in a few minutes many VMS with predefined hardware resources (e.g. number of CPUs, requested memory, etc.).</p>
 
 <div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Beware</p><p>common templates work only on OpenShift. Kubernetes doesn’t have support for templates.</p>
 
@@ -265,6 +265,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <h2 id="what-does-a-vm-template-cover">What does a VM template cover?</h2>
 
 <p>The key factors which define a template are</p>
+
 <ul>
   <li>Guest Operating System (OS) This allows to ensure that the emulated hardware is compatible with the guest OS. Furthermore, it allows to maximize the stability of the VM, and allows performance optimizations. Currently common templates support RHEL 6, 7, 8, Centos 6, 7, 8, Fedora 31 and newer, Windows 10, Windows server 2008, 2012 R2, 2016, 2019. The <a href="https://docs.ansible.com/ansible/latest/user_guide/playbooks.html">Ansible playbook</a> <a href="https://github.com/kubevirt/common-templates/blob/master/generate-templates.yaml">generate-templates.yaml</a> describes all combinations of templates that should be generated.</li>
   <li>Workload type of most virtual machines should be server or desktop to have maximum flexibility; the highperformance workload trades some of this flexibility (ioThreadsPolicy is set to shared) to provide better performances (e.g. IO threads).</li>
@@ -276,20 +277,24 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </div>
 
 <h2 id="accessing-the-virtual-machine-templates">Accessing the virtual machine templates</h2>
+
 <p>If you installed KubeVirt using a <a href="https://github.com/kubevirt/hyperconverged-cluster-operator">supported method</a>, you should find the common templates preinstalled in the cluster. If you want to upgrade the templates, or install them from scratch, you can use one of the <a href="https://github.com/kubevirt/common-templates/releases">supported releases</a>
 There are two ways to install and configure templates:</p>
 
-<h2 id="via-cli">Via CLI:</h2>
+<h2 id="via-cli">Via CLI</h2>
 
-<h6 id="to-install-the-templates">To install the templates:</h6>
+<h3 id="to-install-the-templates">To install the templates</h3>
+
 <p><code class="language-plaintext highlighter-rouge">$ export VERSION="v0.11.2"</code></p>
 
 <p><code class="language-plaintext highlighter-rouge">$ oc create -f https://github.com/kubevirt/common-templates/releases/download/$VERSION/common-templates-$VERSION.yaml</code></p>
 
-<h6 id="to-create-vm-from-template">To create VM from template:</h6>
+<h4 id="to-create-vm-from-template">To create VM from template</h4>
+
 <p><code class="language-plaintext highlighter-rouge">$ oc process rhel8-server-tiny PVCNAME=mydisk NAME=rheltinyvm | oc apply -f -</code></p>
 
-<h6 id="to-start-vm-from-created-object">To start VM from created object:</h6>
+<h5 id="to-start-vm-from-created-object">To start VM from created object</h5>
+
 <p>The created object is now a regular VirtualMachine object and from now it can be controlled by accessing Kubernetes API resources. The preferred way to do this is to use virtctl tool.</p>
 
 <p><code class="language-plaintext highlighter-rouge">$ virtctl start rheltinyvm</code></p>
@@ -300,10 +305,11 @@ There are two ways to install and configure templates:</p>
 
 <p>As soon as VM starts, openshift creates a new type of object - <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code>. It has a similar name to VirtualMachine.</p>
 
-<h2 id="via-ui">Via UI:</h2>
+<h2 id="via-ui">Via UI</h2>
+
 <p>The Kubevirt project has an official plugin in OpenShift Cluster Console Web UI. This UI supports the creation of VMS using templates and template features - flavors and workload profiles.</p>
 
-<h6 id="to-install-the-templates-1">To install the templates:</h6>
+<h3 id="to-install-the-templates-1">To install the templates</h3>
 
 <p>Install OpenShift virtualization operator from <code class="language-plaintext highlighter-rouge">Operators</code> &gt; <code class="language-plaintext highlighter-rouge">OperatorHub</code>. The operator-based deployment takes care of installing various components, including the common templates.</p>
 
@@ -311,7 +317,8 @@ There are two ways to install and configure templates:</p>
   <img src="/assets/2020-07-01-Common_templates/operator.jpg" width="100" height="60" itemprop="thumbnail" alt="Install operator" />
 </div>
 
-<h6 id="to-create-vm-from-template-1">To create VM from template:</h6>
+<h4 id="to-create-vm-from-template-1">To create VM from template</h4>
+
 <p>To create a VM from a template, choose <code class="language-plaintext highlighter-rouge">Workloads</code> in the left panel » press <code class="language-plaintext highlighter-rouge">Virtualization</code> » press <code class="language-plaintext highlighter-rouge">Create Virtual Machine</code> blue button » choose <code class="language-plaintext highlighter-rouge">New with Wizard</code>. Next, you have to see <code class="language-plaintext highlighter-rouge">Create Virtual Machine</code> window</p>
 
 <div class="zoom">

@@ -1,10 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-18T12:58:13+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html">&lt;h1 id=&quot;monitoring-kubevirt-vms-from-the-inside&quot;&gt;Monitoring KubeVirt VMs from the inside&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-23T17:09:08+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html">&lt;h2 id=&quot;monitoring-kubevirt-vms-from-the-inside&quot;&gt;Monitoring KubeVirt VMs from the inside&lt;/h2&gt;
 
 &lt;p&gt;This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus &lt;a href=&quot;https://github.com/prometheus/node_exporter&quot;&gt;node-exporter&lt;/a&gt;. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.&lt;/p&gt;
 
 &lt;h2 id=&quot;environment&quot;&gt;Environment&lt;/h2&gt;
 
 &lt;p&gt;This set of tools will be used on this guide:&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/helm/helm&quot;&gt;Helm v3&lt;/a&gt; - To deploy the Prometheus-Operator.&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubernetes/minikube&quot;&gt;minikube&lt;/a&gt; - Will provide us a k8s cluster, you are free to choose any other k8s provider though.&lt;/li&gt;
@@ -19,16 +20,21 @@
 &lt;p&gt;Although monitoring KubeVirt itself is not covered in this guide, it is a good practice to always deploy the Prometheus Operator before deploying KubeVirt.&lt;/p&gt;
 
 &lt;p&gt;To deploy the Prometheus Operator, you will need to create its namespace first, e.g. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitoring&lt;/code&gt;:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create ns monitoring
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create ns monitoring
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;Then deploy the operator in the new namespace:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;helm fetch stable/prometheus-operator
-tar xzf prometheus-operator*.tgz
-cd prometheus-operator/ &amp;amp;&amp;amp; helm install -n monitoring -f values.yaml kubevirt-prometheus stable/prometheus-operator
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;helm fetch stable/prometheus-operator
+&lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;xzf prometheus-operator&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;.tgz
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;prometheus-operator/ &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; helm &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; monitoring &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; values.yaml kubevirt-prometheus stable/prometheus-operator
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;After everything is deployed, you can delete everything that was downloaded by helm:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd ..
-rm -rf prometheus-operator*
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cd&lt;/span&gt; ..
+&lt;span class=&quot;nb&quot;&gt;rm&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-rf&lt;/span&gt; prometheus-operator&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;One thing to keep in mind is the release name we added here: &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-prometheus&lt;/code&gt;. The release name will be used when declaring our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; later on..&lt;/p&gt;
@@ -38,31 +44,34 @@ rm -rf prometheus-operator*
 &lt;p&gt;Alright, the next step will be deploying KubeVirt itself. We will start with its operator.&lt;/p&gt;
 
 &lt;p&gt;We will fetch the latest version, then use &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl create&lt;/code&gt; to deploy the manifest directly from Github::&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- - | sort -V | tail -1 | awk -F':' '{print $2}' | sed 's/,//' | xargs)
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; https://api.github.com/repos/kubevirt/kubevirt/releases | &lt;span class=&quot;nb&quot;&gt;grep &lt;/span&gt;tag_name | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-v&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt; - | &lt;span class=&quot;nb&quot;&gt;sort&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-V&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;tail&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-1&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;awk&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-F&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;':'&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'{print $2}'&lt;/span&gt; | &lt;span class=&quot;nb&quot;&gt;sed&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'s/,//'&lt;/span&gt; | xargs&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/kubevirt-operator.yaml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Before deploying the KubeVirt CR, make sure that all kubevirt-operator replicas are ready, you can do that with:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl rollout status -n kubevirt deployment virt-operator
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt deployment virt-operator
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;After that, we can deploy KubeVirt and wait for all it’s components to get ready in a similar manner:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
-kubectl rollout status -n kubevirt deployment virt-api
-kubectl rollout status -n kubevirt deployment virt-controller
-kubectl rollout status -n kubevirt daemonset virt-handler
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBEVIRT_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/kubevirt-cr.yaml
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt deployment virt-api
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt deployment virt-controller
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt daemonset virt-handler
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;If we want to monitor VMs that can restart, we want our node-exporter to be persisted and, thus, we need to set up persistent storage for them. &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt; will be the component responsible for that, so we will deploy it’s operator and custom resource as well. As always, waiting for the right components to get ready before proceeding:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export CDI_VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o &quot;v[0-9]\.[0-9]*\.[0-9]*&quot;)
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml
-kubectl rollout status -n cdi deployment cdi-operator
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;CDI_VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-s&lt;/span&gt; https://github.com/kubevirt/containerized-data-importer/releases/latest | &lt;span class=&quot;nb&quot;&gt;grep&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;v[0-9]&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0-9]*&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\.&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;[0-9]*&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/containerized-data-importer/releases/download/&lt;span class=&quot;nv&quot;&gt;$CDI_VERSION&lt;/span&gt;/cdi-operator.yaml
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi deployment cdi-operator
 
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
-kubectl rollout status -n cdi deployment cdi-apiserver
-kubectl rollout status -n cdi deployment cdi-uploadproxy
-kubectl rollout status -n cdi deployment cdi-deployment
+kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/containerized-data-importer/releases/download/&lt;span class=&quot;nv&quot;&gt;$CDI_VERSION&lt;/span&gt;/cdi-cr.yaml
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi deployment cdi-apiserver
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi deployment cdi-uploadproxy
+kubectl rollout status &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; cdi deployment cdi-deployment
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;deploying-a-virtualmachine-with-persistent-storage&quot;&gt;Deploying a VirtualMachine with persistent storage&lt;/h2&gt;
@@ -156,6 +165,7 @@ kubectl rollout status -n cdi deployment cdi-deployment
 &lt;p&gt;Once the VirtualMachineInstance is running, we can connect to its console using &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl console monitorable-vm&lt;/code&gt;. If user and password are required, provide your credentials accordingly. If you are using the same disk image from this guide, the user and password are &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros&lt;/code&gt; and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;gocubsgo&lt;/code&gt; respectively.&lt;/p&gt;
 
 &lt;p&gt;The following script will install node-exporter and configure the VM to always start the exporter when booting:&lt;/p&gt;
+
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-LO&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-k&lt;/span&gt; https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
 &lt;span class=&quot;nb&quot;&gt;gunzip&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-c&lt;/span&gt; node_exporter-1.0.1.linux-amd64.tar.gz | &lt;span class=&quot;nb&quot;&gt;tar &lt;/span&gt;xopf -
 ./node_exporter-1.0.1.linux-amd64/node_exporter &amp;amp;
@@ -168,8 +178,11 @@ echo &quot;Starting up node_exporter at :9100!&quot;
 EOF'&lt;/span&gt;
 &lt;span class=&quot;nb&quot;&gt;sudo chmod&lt;/span&gt; +x /etc/rc.local
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;em&gt;P.S.: If you are using a different base image, please configure node-exporter to start at boot time accordingly&lt;/em&gt;&lt;/p&gt;
 
+&lt;div class=&quot;premonition info&quot;&gt;&lt;div class=&quot;fa fa-info-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p&gt;P.S.: If you are using a different base image, please configure node-exporter to start at boot time accordingly&lt;/p&gt;
+
+
+&lt;/div&gt;&lt;/div&gt;
 &lt;h2 id=&quot;configuring-prometheus-to-scrape-the-vms-node-exporter&quot;&gt;Configuring Prometheus to scrape the VM’s node-exporter&lt;/h2&gt;
 
 &lt;p&gt;To configure Prometheus to scrape the node-exporter (or other applications) is really simple. All we need is to create a new &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt; and a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt;:&lt;/p&gt;
@@ -209,6 +222,7 @@ EOF'&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Let’s break this down just to make sure we set up everything right. Starting with the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt;:&lt;/p&gt;
+
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;ports&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
@@ -218,6 +232,7 @@ EOF'&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;selector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;On the specification, we are creating a new port named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metrics&lt;/code&gt; that will be redirected to every pod labeled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, at port 9100, which is the default port number for the node-exporter.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
@@ -227,9 +242,11 @@ EOF'&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;prometheus.kubevirt.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;node-exporter&quot;&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;We are also labeling the Service itself with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt;, that will be used by the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; object.&lt;/p&gt;
 
 &lt;p&gt;Now let’s take a look at our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ServiceMonitor&lt;/code&gt; specification:&lt;/p&gt;
+
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;namespaceSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;any&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;true&lt;/span&gt;
@@ -240,13 +257,15 @@ EOF'&lt;/span&gt;
   &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;port&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;metrics&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;interval&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;15s&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;Since our ServiceMonitor will be deployed at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitoring&lt;/code&gt; namespace, but our service is at the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;default&lt;/code&gt; namespace, we need &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;namespaceSelector.any=true&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;We are also telling our ServiceMonitor that Prometheus needs to scrape endpoints from services labeled with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;prometheus.kubevirt.io: &quot;node-exporter&quot;&lt;/code&gt; and which ports are named &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;metrics&lt;/code&gt;. Luckily, that’s exactly what we did with our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service&lt;/code&gt;!&lt;/p&gt;
 
 &lt;p&gt;One last thing to keep an eye on. Prometheus configuration can be set up to watch multiple ServiceMonitors. We can see which ServiceMonitors our Prometheus is watching with the following command:&lt;/p&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;# Look for Service Monitor Selector
-kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
+
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;c&quot;&gt;# Look for Service Monitor Selector&lt;/span&gt;
+kubectl describe &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Make sure our ServiceMonitor has all labels required by Prometheus’ &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Service Monitor Selector&lt;/code&gt;. One common selector is the release name that we’ve set when deploying our Prometheus with helm!&lt;/p&gt;
@@ -255,7 +274,7 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 
 &lt;p&gt;You can do a quick test by port-forwarding Prometheus web UI and executing some PromQL:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl port-forward -n monitoring prometheus-monitoring-prometheus-oper-prometheus-0 9090:9090
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl port-forward &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; monitoring prometheus-monitoring-prometheus-oper-prometheus-0 9090:9090
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;To make sure everything is working, access &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;localhost:9090/graph&lt;/code&gt; and execute the PromQL &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;}&lt;/code&gt;. Prometheus should return data that is being collected from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;monitorable-vm&lt;/code&gt;’s node-exporter.&lt;/p&gt;
@@ -263,6 +282,7 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 &lt;p&gt;You can play around with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt;, stop and starting the VM to see how the metrics behave. You will notice that when stopping the VM with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl stop monitorable-vm&lt;/code&gt;, the VirtualMachineInstance is killed and, thus, so is it’s pod. This will result with our service not being able to find the pod’s endpoint and then it will be removed from Prometheus’ targets.&lt;/p&gt;
 
 &lt;p&gt;With this behavior, alerts like the one below won’t work since our target is literally gone, not down.&lt;/p&gt;
+
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirtVMDown&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;expr&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;} == &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1m&lt;/span&gt;
@@ -273,6 +293,7 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;strong&gt;BUT&lt;/strong&gt;, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:&lt;/p&gt;
+
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;alert&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;KubeVirtVMCrashing&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;expr&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;up{pod=~&quot;virt-launcher.*&quot;} == &lt;/span&gt;&lt;span class=&quot;m&quot;&gt;0&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;for&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;5m&lt;/span&gt;

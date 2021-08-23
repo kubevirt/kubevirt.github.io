@@ -275,11 +275,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>What is KubeVirt? if you navigate to the <a href="https://kubevirt.io">KubeVirt webpage</a> you can read:</p>
 
 <blockquote>
-  <p>KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.</p>
-</blockquote>
-
-<blockquote>
-  <p>Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.</p>
+  <p>KubeVirt technology addresses the needs of development teams that have adopted or want to adopt Kubernetes but possess existing Virtual Machine-based workloads that cannot be easily containerized. More specifically, the technology provides a unified development platform where developers can build, modify, and deploy applications residing in both Application Containers as well as Virtual Machines in a common, shared environment.
+Benefits are broad and significant. Teams with a reliance on existing virtual machine-based workloads are empowered to rapidly containerize applications. With virtualized workloads placed directly in development workflows, teams can decompose them over time while still leveraging remaining virtualized components as is comfortably desired.</p>
 </blockquote>
 
 <p>In this example there is a Kubernetes cluster compose of one master, for it to be schedulable to host the KubeVirt pods, a little modification has to be done:</p>
@@ -445,7 +442,7 @@ k8s-test.local# kubectl virt stop testvm
 VM testvm was scheduled to stop
 </code></pre></div></div>
 
-<h1 id="troubleshooting">Troubleshooting</h1>
+<h2 id="troubleshooting">Troubleshooting</h2>
 
 <p>Each step of this guide has a place where to look for possible issues, in general, the <a href="https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/">troubleshooting guide of kubernetes</a> can be checked. The following list tries to ease the possible troubleshooting in case of problems during each step of this guide:</p>
 

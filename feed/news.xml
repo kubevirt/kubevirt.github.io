@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-18T12:58:13+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Kubernetes Authentication Options using KubeVirt Client Library</title><link href="https://kubevirt.io//2021/kubevirt-api-auth.html" rel="alternate" type="text/html" title="Kubernetes Authentication Options using KubeVirt Client Library" /><published>2021-07-16T00:00:00+00:00</published><updated>2021-07-16T00:00:00+00:00</updated><id>https://kubevirt.io//2021/kubevirt-api-auth</id><content type="html" xml:base="https://kubevirt.io//2021/kubevirt-api-auth.html">&lt;ul&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-23T17:09:08+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Kubernetes Authentication Options using KubeVirt Client Library</title><link href="https://kubevirt.io//2021/kubevirt-api-auth.html" rel="alternate" type="text/html" title="Kubernetes Authentication Options using KubeVirt Client Library" /><published>2021-07-16T00:00:00+00:00</published><updated>2021-07-16T00:00:00+00:00</updated><id>https://kubevirt.io//2021/kubevirt-api-auth</id><content type="html" xml:base="https://kubevirt.io//2021/kubevirt-api-auth.html">&lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;#introduction&quot;&gt;Introduction&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#requirements&quot;&gt;Requirements&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;#setup&quot;&gt;Setup&lt;/a&gt;
@@ -39,9 +39,9 @@
 
 &lt;p&gt;Start by cloning the example application repo &lt;a href=&quot;https://github.com/xphyr/kubevirt-apiauth&quot;&gt;https://github.com/xphyr/kubevirt-apiauth&lt;/a&gt; and compiling our test application:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/xphyr/kubevirt-apiauth.git
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirt-apiauth/listvms
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;go build
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/xphyr/kubevirt-apiauth.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirt-apiauth/listvms
+go build
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Once the program compiles, test to ensure that the application compiled correctly. If you have a working Kubernetes context, running this command may return some values. If you do not have a current context, you will get an error. This is OK, we will discuss authentication next.&lt;/p&gt;
@@ -116,11 +116,11 @@ ca.crt:     1111 bytes
 
 &lt;p&gt;We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the “&lt;em&gt;kubectl&lt;/em&gt;” command to log in with the new token. Open a NEW terminal window. This will be the window we use for the service account. In this new terminal window start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the “&lt;em&gt;kubectl&lt;/em&gt;” command to generate a new kubeconfig file:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/sa-kubeconfig
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-cluster minikube &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://&amp;lt;update IP address&amp;gt;:8443 &lt;span class=&quot;nt&quot;&gt;--insecure-skip-tls-verify&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-credentials mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;--token&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&amp;lt;&lt;span class=&quot;nb&quot;&gt;paste &lt;/span&gt;token from last step here&amp;gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-context minikube &lt;span class=&quot;nt&quot;&gt;--cluster&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;minikube &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;mykubevirtrunner
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config use-context minikube
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/sa-kubeconfig
+kubectl config set-cluster minikube &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://&amp;lt;update IP address&amp;gt;:8443 &lt;span class=&quot;nt&quot;&gt;--insecure-skip-tls-verify&lt;/span&gt;
+kubectl config set-credentials mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;--token&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&amp;lt;&lt;span class=&quot;nb&quot;&gt;paste &lt;/span&gt;token from last step here&amp;gt;
+kubectl config set-context minikube &lt;span class=&quot;nt&quot;&gt;--cluster&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;minikube &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;mykubevirtrunner
+kubectl config use-context minikube
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We can test that the new kubeconfig file is working by running a kubectl command:&lt;/p&gt;
@@ -198,20 +198,20 @@ awaiting signal
 
 &lt;p&gt;As currently configured, the mykubevirtrunner service account can only “view” KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create namespace myvms
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&amp;lt;launch an addition vm here&amp;gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create clusterrolebinding kubevirt-viewer &lt;span class=&quot;nt&quot;&gt;--clusterrole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io:view &lt;span class=&quot;nt&quot;&gt;--serviceaccount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default:mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; myvms
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create namespace myvms
+&amp;lt;launch an addition vm here&amp;gt;
+kubectl create clusterrolebinding kubevirt-viewer &lt;span class=&quot;nt&quot;&gt;--clusterrole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io:view &lt;span class=&quot;nt&quot;&gt;--serviceaccount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default:mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; myvms
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We can test that the ServiceAccount has been updated to also have permissions to view in the “myvms” namespace by running our listvms command one more time, this time passing in the optional flag &lt;em&gt;–namespaces&lt;/em&gt;. Switch to your terminal window that is using the service account kubeconfig file and run the following command:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ listvms/listvms --namespaces myvms
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;listvms/listvms &lt;span class=&quot;nt&quot;&gt;--namespaces&lt;/span&gt; myvms
 additional namespaces to check are:  myvms
-Checking the following namespaces:  [default myvms]
+Checking the following namespaces:  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;default myvms]
 Type                       Name       Namespace     Status
-VirtualMachine             testvm     default       false
-VirtualMachineInstance     testvm     default       Scheduled
-VirtualMachine             testvm     myvms         false
+VirtualMachine             testvm     default       &lt;span class=&quot;nb&quot;&gt;false
+&lt;/span&gt;VirtualMachineInstance     testvm     default       Scheduled
+VirtualMachine             testvm     myvms         &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;You can see that now, the ServiceAccount can view the vm and vmi that are in both the default namespace as well as the &lt;em&gt;myvms&lt;/em&gt; namespace.&lt;/p&gt;
@@ -303,32 +303,32 @@ VirtualMachine             testvm     myvms         false
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo dnf update -y
-sudo dnf install -y pciutils podman podman-docker conntrack tigervnc rdesktop
-sudo grubby --update-kernel=ALL --args=&quot;systemd.unified_cgroup_hierarchy=0&quot;
-# Setup firewall rules to allow inbound and outbound connections from your minikube cluster
-sudo firewall-cmd --add-port=30000-65535/tcp --permanent
-sudo firewall-cmd --add-port=30000-65535/udp --permanent
-sudo firewall-cmd --add-port=10250-10252/tcp --permanent
-sudo firewall-cmd --add-port=10248/tcp --permanent
-sudo firewall-cmd --add-port=2379-2380/tcp --permanent
-sudo firewall-cmd --add-port=6443/tcp --permanent
-sudo firewall-cmd --add-port=8443/tcp --permanent
-sudo firewall-cmd --add-port=9153/tcp --permanent
-sudo firewall-cmd --add-service=dns --permanent
-sudo firewall-cmd --add-interface=cni-podman0 --permanent
-sudo firewall-cmd --add-masquerade --permanent
-sudo vi /etc/selinux/config
-# change the &quot;SELINUX=enforcing&quot; to &quot;SELINUX=permissive&quot;
-sudo setenforce 0
-sudo systemctl enable sshd --now
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf update &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; pciutils podman podman-docker conntrack tigervnc rdesktop
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;grubby &lt;span class=&quot;nt&quot;&gt;--update-kernel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ALL &lt;span class=&quot;nt&quot;&gt;--args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;systemd.unified_cgroup_hierarchy=0&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Setup firewall rules to allow inbound and outbound connections from your minikube cluster&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;30000-65535/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;30000-65535/udp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10250-10252/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10248/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2379-2380/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;6443/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;8443/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;9153/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;dns &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-interface&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cni-podman0 &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-masquerade&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;vi /etc/selinux/config
+&lt;span class=&quot;c&quot;&gt;# change the &quot;SELINUX=enforcing&quot; to &quot;SELINUX=permissive&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;setenforce 0
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;sshd &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We will now install the CRIO runtime:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo dnf module enable -y cri-o:1.18
-sudo dnf install -y cri-o cri-tools
-sudo systemctl enable --now crio
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf module &lt;span class=&quot;nb&quot;&gt;enable&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; cri-o:1.18
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; cri-o cri-tools
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt; crio
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;preparing-the-intel-vgpu-driver&quot;&gt;Preparing the Intel vGPU driver&lt;/h3&gt;
@@ -336,6 +336,7 @@ sudo systemctl enable --now crio
 &lt;p&gt;In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.&lt;/p&gt;
 
 &lt;p&gt;The following commands will do the following:&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;load the kvmgt module to enable support within kvm&lt;/li&gt;
   &lt;li&gt;enable gvt in the i915 module&lt;/li&gt;
@@ -391,7 +392,6 @@ WantedBy=multi-user.target
 
 
 &lt;/div&gt;&lt;/div&gt;
-
 &lt;p&gt;We can validate that the vGPU devices were created by looking in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/sys/devices/pci0000:00/0000:00:02.0/&lt;/code&gt; directory.&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-lsa&lt;/span&gt; /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d
@@ -440,14 +440,14 @@ lrwxrwxrwx. 1 root root    0 Apr 20 13:56 subsystem -&amp;gt; ../../../../bus/md
 
 &lt;p&gt;In order to make our interaction with Kubernetes a little easier, we will need to copy some files and update our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.kube/config&lt;/code&gt;&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir -p ~/.minikube/profiles/minikube
-sudo cp -r /root/.kube /home/$USER
-sudo cp /root/.minikube/ca.crt /home/$USER/.minikube/ca.crt
-sudo cp /root/.minikube/profiles/minikube/client.crt /home/$USER/.minikube/profiles/minikube
-sudo cp /root/.minikube/profiles/minikube/client.key /home/$USER/.minikube/profiles/minikube
-sudo chown -R $USER:$USER /home/$USER/.kube
-sudo chown -R $USER:$USER /home/$USER/.minikube
-sed -i  &quot;s/root/home\/$USER/&quot; ~/.kube/config
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ~/.minikube/profiles/minikube
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; /root/.kube /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; /root/.minikube/ca.crt /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube/ca.crt
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; /root/.minikube/profiles/minikube/client.crt /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube/profiles/minikube
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; /root/.minikube/profiles/minikube/client.key /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube/profiles/minikube
+&lt;span class=&quot;nb&quot;&gt;sudo chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;:&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt; /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.kube
+&lt;span class=&quot;nb&quot;&gt;sudo chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;:&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt; /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube
+&lt;span class=&quot;nb&quot;&gt;sed&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt;  &lt;span class=&quot;s2&quot;&gt;&quot;s/root/home&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&quot;&lt;/span&gt; ~/.kube/config
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Once the minikube install is complete, validate that everything is working properly.&lt;/p&gt;
@@ -463,8 +463,8 @@ kubevirt   Ready    control-plane,master   4m5s   v1.20.2
 
 &lt;p&gt;Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. Using the minikube addons manager, we will install kubevirt into our cluster:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;minikube addons &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;kubevirt
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;kubevirt kubevirt &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;minikube addons &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;kubevirt
+kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;kubevirt kubevirt &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an &lt;em&gt;mdevNameSelector&lt;/em&gt; to look for, and a &lt;em&gt;resourceName&lt;/em&gt; to assign to it. The &lt;em&gt;mdevNameSelector&lt;/em&gt; comes from the “mdev_type” that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.&lt;/p&gt;
@@ -541,9 +541,9 @@ spec:
 
 &lt;p&gt;One final step, lets get the latest release of virtctl which we will be using as we install Windows.&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath=&quot;{.status.observedKubeVirtVersion}&quot;)
-curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-linux-amd64
-sudo install virtctl /usr/local/bin
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;kubectl get kubevirt.kubevirt.io/kubevirt &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{.status.observedKubeVirtVersion}&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+curl &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; virtctl https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/virtctl-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;-linux-amd64&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo install &lt;/span&gt;virtctl /usr/local/bin
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;install-windows&quot;&gt;Install Windows&lt;/h2&gt;
@@ -678,6 +678,7 @@ spec:
 &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
 &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; win10vm1.yaml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;&lt;p&gt;This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.&lt;/p&gt;
 
 
@@ -694,8 +695,8 @@ spec:
 
 &lt;p&gt;We can now start the virtual machine:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl start win10vm1
-kubectl get vmi --watch
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl start win10vm1
+kubectl get vmi &lt;span class=&quot;nt&quot;&gt;--watch&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;When the output of shows that the vm is in a “Running” phase you can “CTRL+C” to end the watch command.&lt;/p&gt;
@@ -704,7 +705,7 @@ kubectl get vmi --watch
 
 &lt;p&gt;Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl vnc win10vm1
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl vnc win10vm1
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.&lt;/p&gt;
@@ -716,6 +717,7 @@ kubectl get vmi --watch
 &lt;h2 id=&quot;using-the-gpu&quot;&gt;Using the GPU&lt;/h2&gt;
 
 &lt;p&gt;In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:&lt;/p&gt;
+
 &lt;ol&gt;
   &lt;li&gt;In the Windows 10 search bar, type “&lt;strong&gt;Remote Desktop Settings&lt;/strong&gt;” and then open the result.&lt;/li&gt;
   &lt;li&gt;Select “&lt;strong&gt;Enable Remote Desktop&lt;/strong&gt;” and confirm the change.&lt;/li&gt;
@@ -750,11 +752,11 @@ win10vm1-rdp   NodePort    10.105.159.184   &amp;lt;none&amp;gt;        3389:306
 
 &lt;p&gt;Note that since you are running your Fedora 32 workstation on this same GPU you are already sharing the graphics workload between your primary desktop, and the virtualized Windows Desktop also running on this machine.&lt;/p&gt;
 
-&lt;p&gt;Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.&lt;/p&gt;</content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="vGPU" /><category term="Windows" /><category term="GPU" /><category term="Intel" /><category term="minikube" /><category term="Fedora" /><summary type="html">Introduction Prerequisites Fedora Workstation Prep Preparing the Intel vGPU driver Install Kubernetes with minikube Install kubevirt Validate vGPU detection Install Containerize Data Importer Install Windows Accessing the Windows VM Using the GPU</summary></entry><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.&lt;/p&gt;</content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="vGPU" /><category term="Windows" /><category term="GPU" /><category term="Intel" /><category term="minikube" /><category term="Fedora" /><summary type="html">Introduction Prerequisites Fedora Workstation Prep Preparing the Intel vGPU driver Install Kubernetes with minikube Install kubevirt Validate vGPU detection Install Containerize Data Importer Install Windows Accessing the Windows VM Using the GPU</summary></entry><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with &lt;a href=&quot;https://github.com/tektoncd/pipeline&quot;&gt;Tekton Pipelines&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Tekton Pipelines can be used to create a single &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt; that encapsulates the installation process which can be run and replicated with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRuns&lt;/code&gt;. 
+&lt;p&gt;Tekton Pipelines can be used to create a single &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt; that encapsulates the installation process which can be run and replicated with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRuns&lt;/code&gt;.
 The pipeline will be built with &lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks&quot;&gt;KubeVirt Tekton Tasks&lt;/a&gt;, which includes all the necessary tasks for this example.&lt;/p&gt;
 
 &lt;h2 id=&quot;pipeline-description&quot;&gt;Pipeline Description&lt;/h2&gt;
@@ -763,7 +765,8 @@ The pipeline will be built with &lt;a href=&quot;https://github.com/kubevirt/kub
 It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
 Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
 You can later use the artifact PVC as a base image and copy it for new VMs.&lt;/p&gt;
-&lt;h1 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h1&gt;
+
+&lt;h2 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;KubeVirt &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.39.0&lt;/code&gt;&lt;/li&gt;
@@ -771,14 +774,14 @@ You can later use the artifact PVC as a base image and copy it for new VMs.&lt;/
   &lt;li&gt;KubeVirt Tekton Tasks &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.3.0&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&quot;running-windows-installer-pipeline&quot;&gt;Running Windows Installer Pipeline&lt;/h1&gt;
+&lt;h2 id=&quot;running-windows-installer-pipeline&quot;&gt;Running Windows Installer Pipeline&lt;/h2&gt;
 
 &lt;h2 id=&quot;obtaining-a-url-of-windows-source-iso&quot;&gt;Obtaining a URL of Windows Source ISO&lt;/h2&gt;
 
 &lt;p&gt;First we have to obtain a Download URL of Windows Source ISO.&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Go to https://www.microsoft.com/en-us/software-download/windows10ISO. You can also obtain a server edition for evaluation at https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019.&lt;/li&gt;
+  &lt;li&gt;Go to &lt;a href=&quot;https://www.microsoft.com/en-us/software-download/windows10ISO&quot;&gt;https://www.microsoft.com/en-us/software-download/windows10ISO&lt;/a&gt;. You can also obtain a server edition for evaluation at &lt;a href=&quot;https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019&quot;&gt;https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019&lt;/a&gt;.&lt;/li&gt;
   &lt;li&gt;Fill in the edition and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;English&lt;/code&gt; language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.&lt;/li&gt;
   &lt;li&gt;Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.&lt;/li&gt;
 &lt;/ol&gt;
@@ -792,8 +795,8 @@ or it can be specified manually according to &lt;a href=&quot;https://docs.micro
 and &lt;a href=&quot;https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend&quot;&gt;Answer File Components Reference&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;The following config map includes the required drivers and guest disk configuration.
-It also specifies how the installation should proceed and what users should be created. 
-In our case it is an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Administrator&lt;/code&gt; user with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;changepassword&lt;/code&gt; password. 
+It also specifies how the installation should proceed and what users should be created.
+In our case it is an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Administrator&lt;/code&gt; user with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;changepassword&lt;/code&gt; password.
 You can also change the Answer File according to your needs by consulting the already mentioned documentation.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
@@ -993,9 +996,9 @@ You can also change the Answer File according to your needs by consulting the al
 
 &lt;p&gt;Let’s create a pipeline which consists of the following tasks.&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  create-source-dv --- create-vm-from-manifest --- wait-for-vmi-status --- cleanup-vm
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  create-source-dv &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; create-vm-from-manifest &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; wait-for-vmi-status &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; cleanup-vm
                     |
-    create-base-dv --
+    create-base-dv &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;ol&gt;
@@ -1172,7 +1175,7 @@ from the empty PVC and with the &lt;code class=&quot;language-plaintext highligh
 
 &lt;h2 id=&quot;running-the-pipeline&quot;&gt;Running the Pipeline&lt;/h2&gt;
 
-&lt;p&gt;To run the pipeline we need to create the following &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; which references our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;. 
+&lt;p&gt;To run the pipeline we need to create the following &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; which references our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;.
 Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.&lt;/p&gt;
 
 &lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;.
@@ -1300,7 +1303,7 @@ You need to replace PVC_NAME with &lt;code class=&quot;language-plaintext highli
   &lt;img src=&quot;/assets/2021-04-21-Automated-Windows-Installation-With-Tekton-Pipelines/win-started.png&quot; width=&quot;100&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Started Windows VM&quot; /&gt;
 &lt;/div&gt;
 
-&lt;h1 id=&quot;resources&quot;&gt;Resources&lt;/h1&gt;
+&lt;h2 id=&quot;resources&quot;&gt;Resources&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer&quot;&gt;YAML files used in this example&lt;/a&gt;&lt;/li&gt;
@@ -1322,7 +1325,7 @@ contains a detailed list of all the sessions, with information about the
 contents, presenters, and direct links to each session recording and slides
 (where available).&lt;/p&gt;
 
-&lt;h2 id=&quot;thanks&quot;&gt;Thanks!&lt;/h2&gt;
+&lt;h2 id=&quot;thanks&quot;&gt;Thanks&lt;/h2&gt;
 
 &lt;p&gt;We would like to thank everyone who contributed to make this event happen: all
 the presenters / session leads, everyone who proposed a session, the various
@@ -1330,7 +1333,7 @@ community members who contributed to the organization, all the attendees, and
 the &lt;a href=&quot;https://cncf.io/&quot;&gt;Container-native Computing Foundation&lt;/a&gt; who sponsored the
 event.&lt;/p&gt;
 
-&lt;h2 id=&quot;i-want-more&quot;&gt;I want more!&lt;/h2&gt;
+&lt;h2 id=&quot;i-want-more&quot;&gt;I want more&lt;/h2&gt;
 
 &lt;p&gt;We are just wrapping up this first edition. Based on this experience, we really
 hope to have more community events of this type in the future, but it is still a
@@ -1346,7 +1349,7 @@ bit early to say when/where how.&lt;/p&gt;
   &lt;li&gt;Twitter: &lt;a href=&quot;https://twitter.com/kubevirt&quot;&gt;@kubevirt&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html">Just a few weeks ago, the KubeVirt community had their first ever dedicated online event, the KubeVirt Summit!</summary></entry><entry><title type="html">KubeVirt Summit is coming!</title><link href="https://kubevirt.io//2021/KubeVirt-Summit-announce.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming!" /><published>2021-01-12T00:00:00+00:00</published><updated>2021-01-12T00:00:00+00:00</updated><id>https://kubevirt.io//2021/KubeVirt-Summit-announce</id><content type="html" xml:base="https://kubevirt.io//2021/KubeVirt-Summit-announce.html">&lt;p&gt;Exciting news! The KubeVirt community are in the process of planning the first ever &lt;strong&gt;KubeVirt Summit&lt;/strong&gt;!&lt;/p&gt;
 
-&lt;h2 id=&quot;save-the-dates&quot;&gt;Save the dates!&lt;/h2&gt;
+&lt;h2 id=&quot;save-the-dates&quot;&gt;Save the dates&lt;/h2&gt;
 
 &lt;p&gt;The event will take place online during two half-days:&lt;/p&gt;
 
@@ -1372,7 +1375,7 @@ session, and submit your proposal as a Pull Request.&lt;/p&gt;
 
 &lt;p&gt;Reach out through any of these channels to get involved.&lt;/p&gt;
 
-&lt;p&gt;Looking forward to meeting you there!&lt;/p&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html">Exciting news! The KubeVirt community are in the process of planning the first ever KubeVirt Summit!</summary></entry><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;strong&gt;Table of contents&lt;/strong&gt;&lt;/p&gt;
+&lt;p&gt;Looking forward to meeting you there!&lt;/p&gt;</content><author><name>Pep Turró Mauri</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html">Exciting news! The KubeVirt community are in the process of planning the first ever KubeVirt Summit!</summary></entry><entry><title type="html">Customizing images for containerized VMs part I</title><link href="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html" rel="alternate" type="text/html" title="Customizing images for containerized VMs part I" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Customizing-images-for-containerized-vms</id><content type="html" xml:base="https://kubevirt.io//2020/Customizing-images-for-containerized-vms.html">&lt;p&gt;&lt;b&gt;Table of contents&lt;/b&gt;&lt;/p&gt;
 
 &lt;!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true --&gt;
 
@@ -1514,57 +1517,35 @@ session, and submit your proposal as a Pull Request.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
-
-&lt;table&gt;
-  &lt;thead&gt;
-    &lt;tr&gt;
-      &lt;th&gt;Component&lt;/th&gt;
-      &lt;th&gt;Version&lt;/th&gt;
-    &lt;/tr&gt;
-  &lt;/thead&gt;
-  &lt;tbody&gt;
-    &lt;tr&gt;
-      &lt;td&gt;Operating System&lt;/td&gt;
-      &lt;td&gt;CentOS Linux release 8.2.2004 (Core)&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;Libvirt&lt;/td&gt;
-      &lt;td&gt;libvirtd (libvirt) 4.5.0&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;virt-customize&lt;/td&gt;
-      &lt;td&gt;virt-customize 1.38.4rhel=8,release=14.module_el8.1.0+248+298dec18,libvirt&lt;/td&gt;
-    &lt;/tr&gt;
-    &lt;tr&gt;
-      &lt;td&gt;Image Builder&lt;/td&gt;
-      &lt;td&gt;lorax-composer (28.14.42-2), composer-cli (composer-cli-28.14.42-2), cockpit-composer (cockpit-composer-12.1-1.el8.noarch)&lt;/td&gt;
-    &lt;/tr&gt;
-  &lt;/tbody&gt;
-&lt;/table&gt;
+&lt;p&gt;| Component     | Version                                                                                            |
+| ——— | ———————————————————————————————– |
+| Operating System  | CentOS Linux release 8.2.2004 (Core) |
+| Libvirt | libvirtd (libvirt) 4.5.0                               |
+| virt-customize | virt-customize 1.38.4rhel=8,release=14.module_el8.1.0+248+298dec18,libvirt |
+| Image Builder | lorax-composer (28.14.42-2), composer-cli (composer-cli-28.14.42-2), cockpit-composer (cockpit-composer-12.1-1.el8.noarch) |&lt;/p&gt;
 
 &lt;p&gt;Once the builder image server is provisioned with latest CentOS 8, the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Virtualization Host&lt;/code&gt; group package is installed. It will be required to test our customized images locally before containerizing and pushing them to the OKD registry.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;yum groupinstall &lt;span class=&quot;s2&quot;&gt;&quot;Virtualization Host&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;libvirtd &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;yum groupinstall &lt;span class=&quot;s2&quot;&gt;&quot;Virtualization Host&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;libvirtd &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Next, &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-customize&lt;/code&gt; is installed from the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;libguestfs-tools&lt;/code&gt; package along with the Image Builder. The latest is composed by lorax-composer, the Cockpit composer plugin and the composer-cli, which will be used to interact directly with Composer using command-line.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; libguestfs-tools lorax-composer composer-cli cockpit-composer
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;lorax-composer.socket
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;lorax-composer &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;systemctl start cockpit
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; libguestfs-tools lorax-composer composer-cli cockpit-composer
+systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;lorax-composer.socket
+systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;lorax-composer &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
+systemctl start cockpit
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Then, the local firewall is configured so that we can connect to the Cockpit web user interface from our workstation.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cockpit &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cockpit &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cockpit &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cockpit &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Finally, connect to the Cockpit user interface by typing the IP or name of the Builder image server and port &lt;em&gt;TCP/9090&lt;/em&gt; (Cockpit’s default) in your favourite web browser. Then, log in with a local administrator account.&lt;/p&gt;
 
@@ -1589,11 +1570,11 @@ session, and submit your proposal as a Pull Request.&lt;/p&gt;
 &lt;/div&gt;
 
 &lt;div class=&quot;premonition error&quot;&gt;&lt;div class=&quot;fa fa-exclamation-triangle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Error&lt;/p&gt;&lt;p&gt;If Cockpit’s web UI is not working, take a look at the output of the lorax service with the command:&lt;/p&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;journalctl &lt;span class=&quot;nt&quot;&gt;-fu&lt;/span&gt; lorax-composer
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;journalctl &lt;span class=&quot;nt&quot;&gt;-fu&lt;/span&gt; lorax-composer
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;building-standard-centos-8-image&quot;&gt;Building standard CentOS 8 image&lt;/h2&gt;
 
@@ -1835,11 +1816,8 @@ Format specific information:
     corrupt: &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;Virtual size of the image is 4.3G, since we agreed 10G the disk must be resized and root filesystem expanded before being containerized. Currently, there is no way to specify disk capacity in containerDisk as it can be done with &lt;a href=&quot;https://github.com/kubevirt/kubevirt/blob/master/docs/container-empty-disks.md#implementation&quot;&gt;emptyDisks&lt;/a&gt;. The size of the root filesystem and disk when running in KubeVirt is driven by the image.&lt;/p&gt;
-
-
-&lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;It is recommended to save the QCOW2 images under /var/lib/libvirt/images/ so that qemu user have permissions to expand or resize them.&lt;/p&gt;
+&lt;div class=&quot;premonition warning&quot;&gt;&lt;div class=&quot;fa fa-exclamation-circle&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;Warning&lt;/p&gt;&lt;p&gt;Virtual size of the image is 4.3G, since we agreed 10G the disk must be resized and root filesystem expanded before being containerized. Currently, there is no way to specify disk capacity in containerDisk as it can be done with &lt;a href=&quot;https://github.com/kubevirt/kubevirt/blob/master/docs/container-empty-disks.md#implementation&quot;&gt;emptyDisks&lt;/a&gt;. The size of the root filesystem and disk when running in KubeVirt is driven by the image.
+It is recommended to save the QCOW2 images under /var/lib/libvirt/images/ so that qemu user have permissions to expand or resize them.&lt;/p&gt;
 
 
 &lt;/div&gt;&lt;/div&gt;
@@ -1998,9 +1976,9 @@ Please contact us at sysadmin@corporate.com
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos8-disk-10G.qcow2 golden-devstation-centos8-disk-10G-gui.qcow2
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G-gui.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; @graphical-server-environment,cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;systemctl set-default graphical.target&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos8-disk-10G.qcow2 golden-devstation-centos8-disk-10G-gui.qcow2
+virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
+virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos8-disk-10G-gui.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; @graphical-server-environment,cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;systemctl set-default graphical.target&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;&lt;br /&gt;&lt;/p&gt;
@@ -2027,9 +2005,8 @@ Please contact us at sysadmin@corporate.com
 
 &lt;p&gt;The process to create the golden CentOS 7 image is quite similar to the CentOS 8 one. However, in this case, the customize procedure is entirely done with &lt;em&gt;virt-customize&lt;/em&gt;. The first step is to download the cloud image.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;curl &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk.qcow2 https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;curl &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk.qcow2 https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;
 
 &lt;p&gt;Then, it is required to resize and expand the image to meet the agreed size of 10GB. The details are the same explained in the &lt;a href=&quot;#image-creation-with-builder-tool&quot;&gt;previous section&lt;/a&gt;&lt;/p&gt;
 
@@ -2085,9 +2062,9 @@ Image resized.
 &lt;/div&gt;&lt;/div&gt;
 &lt;p&gt;Next, we need to create the graphical user interface image in a similar way as we did previously with CentOS 8 image.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos7-disk-10G.qcow2 golden-devstation-centos7-disk-10G-gui.qcow2
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cp &lt;/span&gt;golden-devstation-centos7-disk-10G.qcow2 golden-devstation-centos7-disk-10G-gui.qcow2
 
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk-10G-gui.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;yum groupinstall 'GNOME Desktop' -y&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;systemctl set-default graphical.target&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
+virt-customize &lt;span class=&quot;nt&quot;&gt;--format&lt;/span&gt; qcow2 &lt;span class=&quot;nt&quot;&gt;-a&lt;/span&gt; /var/lib/libvirt/images/golden-devstation-centos7-disk-10G-gui.qcow2 &lt;span class=&quot;nt&quot;&gt;--install&lt;/span&gt; cloud-init &lt;span class=&quot;nt&quot;&gt;--memsize&lt;/span&gt; 4096 &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;yum groupinstall 'GNOME Desktop' -y&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--run-command&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;systemctl set-default graphical.target&quot;&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--selinux-relabel&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;At this point we built:&lt;/p&gt;
@@ -2181,26 +2158,26 @@ Login Succeeded!
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman tag localhost/openshift/devstation-centos8:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;podman tag localhost/openshift/devstation-centos8:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal
+podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman tag localhost/openshift/devstation-centos:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;podman tag localhost/openshift/devstation-centos:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui
+podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui &lt;span class=&quot;nt&quot;&gt;--tls-verify&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Verify that the images are stored correctly in the OKD container registry by checking the &lt;a href=&quot;https://docs.openshift.com/container-platform/4.6/openshift_images/image-streams-manage.html#working-with-imagestreams&quot;&gt;imageStream&lt;/a&gt;. As shown below, both images were uploaded successfully since the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;devstation&lt;/code&gt; imageStream contains two images with v8-gui and v8-terminal tags respectively.&lt;/p&gt;
 
-&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;oc describe imageStream devstation &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; openshift
-Name:			devstation
-Namespace:		openshift
-Created:		23 hours ago
-Labels:			&amp;lt;none&amp;gt;
-Annotations:		&amp;lt;none&amp;gt;
-Image Repository:	default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation
-Image Lookup:		&lt;span class=&quot;nb&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false
-&lt;/span&gt;Unique Images:		2
-Tags:			2
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;oc describe imageStream devstation &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; openshift
+Name:                   devstation
+Namespace:              openshift
+Created:                23 hours ago
+Labels:                 &amp;lt;none&amp;gt;
+Annotations:            &amp;lt;none&amp;gt;
+Image Repository:       default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation
+Image Lookup:           &lt;span class=&quot;nb&quot;&gt;local&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;false
+&lt;/span&gt;Unique Images:          2
+Tags:                   2
 
 v8-gui
   no spec tag
@@ -2248,23 +2225,23 @@ v8-terminal
   &lt;li&gt;&lt;a href=&quot;https://developers.redhat.com/blog/2019/05/08/red-hat-enterprise-linux-8-image-builder-building-custom-system-images/&quot;&gt;Image Builder: Building custom system images&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://weldr.io/lorax/composer-cli.html&quot;&gt;Composer-cli information&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://quay.io/repository/alosadag/devstation?tab=tags&quot;&gt;Custom-built images available at quay.io&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h1 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h1&gt;
+&lt;/ul&gt;</content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html">Table of contents</summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html">&lt;h2 id=&quot;why-isnt-my-vm-running&quot;&gt;Why Isn’t My VM Running?&lt;/h2&gt;
 
 &lt;p&gt;There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.&lt;/p&gt;
 
-&lt;h1 id=&quot;spec-vs-status&quot;&gt;Spec vs Status&lt;/h1&gt;
+&lt;h2 id=&quot;spec-vs-status&quot;&gt;Spec vs Status&lt;/h2&gt;
 
 &lt;p&gt;KubeVirt objects follow Kubernetes convention in that they generally have Spec and Status stanzas. The Spec is user configurable and allows the user to indicate the desired state of the cluster in a declarative manner. Meanwhile status sections are not user configurable and reflect the actual state of things in the cluster. In short, users edit the Spec and controllers edit the Status.&lt;/p&gt;
 
 &lt;p&gt;So back to the Running field. In this case the Running field is in the VM’s Spec. In other words it’s the user’s intent that the VM is running. It doesn’t reflect the actual running state of the VM.&lt;/p&gt;
 
-&lt;h1 id=&quot;runstrategy&quot;&gt;RunStrategy&lt;/h1&gt;
+&lt;h2 id=&quot;runstrategy&quot;&gt;RunStrategy&lt;/h2&gt;
 
 &lt;p&gt;There’s a flip side to the above, equally as confusing: “Running” isn’t always what the user wants. If a user logs into a VM and shuts it down from inside the guest, KubeVirt will dutifully re-spawn it! There certainly exist high availability use cases where that’s exactly the correct reaction, but in most cases that’s just plain confusing. Shutdown is not restart!&lt;/p&gt;
 
 &lt;p&gt;We decided to tackle both issues at the same time–by deprecating the “Running” field. As already noted, we could have picked a better name to begin with. By using the name “RunStrategy”, it should hopefully be more clear to the end user that they’re asking for a state, which is of course completely separate from what the system can actually provide. While RunStrategy helps address the nomenclature confusion, it also happens to be an enumerated value. Since Running is a boolean, it can only be true or false. We’re now able to create more meaningful states to accommodate different use cases.&lt;/p&gt;
 
-&lt;h2 id=&quot;four-runstrategies-currently-exist&quot;&gt;Four RunStrategies currently exist:&lt;/h2&gt;
+&lt;h3 id=&quot;four-runstrategies-currently-exist&quot;&gt;Four RunStrategies currently exist&lt;/h3&gt;
 
 &lt;ul&gt;
   &lt;li&gt;Always: If a VM is stopped for any reason, a new instance will be spawned.&lt;/li&gt;
@@ -2275,7 +2252,7 @@ v8-terminal
 
 &lt;p&gt;An example using the RerunOnFailure RunStrategy was presented in &lt;a href=&quot;/2020/KubeVirt-VM-Image-Usage-Patterns.html&quot;&gt;KubeVirt VM Image Usage Patterns&lt;/a&gt;&lt;/p&gt;
 
-&lt;h1 id=&quot;high-availability&quot;&gt;High Availability&lt;/h1&gt;
+&lt;h2 id=&quot;high-availability&quot;&gt;High Availability&lt;/h2&gt;
 
 &lt;p&gt;No discussion of RunStrategies is complete without mentioning High Availability. After all, the implication behind the RerunOnFailure and Always RunStrategies is that your VM should always be available. For the most part this is completely true, but there’s one important scenario where there’s a gap to be aware of: if a node fails completely, e.g. loss of networking or power. Without some means of automatic detection that the node is no longer active, KubeVirt won’t know that the VM has failed. On OpenShift clusters installed using Installer Provisioned Infrastructure (IPI) with MachineHealthCheck enabled can detect failed nodes and reschedule workloads running there.&lt;/p&gt;
 
@@ -2965,9 +2942,11 @@ round-trip min/avg/max &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 357.040/38
 &lt;p&gt;In this blog post we used network components from KubeVirt project to connect two VMs on different nodes
 through a linux bridge connected to a secondary NIC. This illustrates how VM traffic can be directed to a specific NIC
 on a node using a secondary NIC on a VM.&lt;/p&gt;</content><author><name>ellorent</name></author><category term="news" /><category term="kubevirt-hyperconverged" /><category term="cnao" /><category term="cluster-network-addons-operator" /><category term="kubernetes-nmstate" /><category term="nmstate" /><category term="bridge" /><category term="multus" /><category term="networking" /><category term="CNI" /><category term="multiple networks" /><summary type="html">Introduction</summary></entry><entry><title type="html">Import virtual machine from oVirt</title><link href="https://kubevirt.io//2020/Import-VM-from-oVirt.html" rel="alternate" type="text/html" title="Import virtual machine from oVirt" /><published>2020-08-06T00:00:00+00:00</published><updated>2020-08-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Import-VM-from-oVirt</id><content type="html" xml:base="https://kubevirt.io//2020/Import-VM-from-oVirt.html">&lt;h2 id=&quot;about-vm-import-operator&quot;&gt;About vm-import-operator&lt;/h2&gt;
+
 &lt;p&gt;Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt;, so in order to have the vm import working you must have both KubeVirt and CDI installed.&lt;/p&gt;
 
 &lt;h3 id=&quot;import-rules&quot;&gt;Import rules&lt;/h3&gt;
+
 &lt;p&gt;Before the import process is initiated we run validation of the source VM, to be sure the KubeVirt will run the source VM smoothly. We have many &lt;a href=&quot;https://github.com/kubevirt/vm-import-operator/blob/master/docs/rules.md&quot;&gt;rules&lt;/a&gt; defined including storage, network and the VM. You will see all warning messages in the conditions field. For example:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-11T11:13:31Z&quot;&lt;/span&gt;
@@ -2979,6 +2958,7 @@ on a node using a secondary NIC on a VM.&lt;/p&gt;</content><author><name>ellore
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;supported-guest-operating-systems&quot;&gt;Supported Guest Operating Systems&lt;/h3&gt;
+
 &lt;p&gt;We support following guest operating systems:&lt;/p&gt;
 
 &lt;ul&gt;
@@ -2998,23 +2978,25 @@ on a node using a secondary NIC on a VM.&lt;/p&gt;</content><author><name>ellore
 &lt;/ul&gt;
 
 &lt;h2 id=&quot;setup-vm-import-operator&quot;&gt;Setup vm-import-operator&lt;/h2&gt;
+
 &lt;p&gt;Source code for virtual machine import operator is hosted on github under &lt;a href=&quot;https://github.com/kubevirt&quot;&gt;KubeVirt&lt;/a&gt; organization. You can very easily deploy it on your Kubernetes by running following commands:&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
+kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
+kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;By default the operator is deployed to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-hyperconverged&lt;/code&gt; namespace,
 you can verify that the operator is deployed and running by running:&lt;/p&gt;
 
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get deploy vm-import-controller &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get deploy vm-import-controller &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;If you are using &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator/&quot;&gt;HCO&lt;/a&gt;, you don’t have to install it manually,
 because the HCO takes care of that.&lt;/p&gt;
 
 &lt;h2 id=&quot;importing-virtual-machine-from-ovirt&quot;&gt;Importing virtual machine from oVirt&lt;/h2&gt;
+
 &lt;p&gt;In order to import a virtual machine from oVirt user must obtain credentials for the oVirt environment. oVirt environment is usually accessed using username, password and http URL. Note that you must provide CA certificate of your oVirt environment. If you have those - create a secret out of them:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
@@ -3149,12 +3131,15 @@ because the HCO takes care of that.&lt;/p&gt;
 The others are for processing and reporting to provide VM and disks ready status.&lt;/p&gt;
 
 &lt;h2 id=&quot;future&quot;&gt;Future&lt;/h2&gt;
-&lt;p&gt;For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.&lt;/p&gt;</content><author><name>Ondra Machacek</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="import" /><category term="oVirt" /><summary type="html">About vm-import-operator Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the CDI, so in order to have the vm import working you must have both KubeVirt and CDI installed.</summary></entry><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier!&lt;/h2&gt;
+
+&lt;p&gt;For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.&lt;/p&gt;</content><author><name>Ondra Machacek</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="import" /><category term="oVirt" /><summary type="html">About vm-import-operator</summary></entry><entry><title type="html">Minikube KubeVirt addon</title><link href="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html" rel="alternate" type="text/html" title="Minikube KubeVirt addon" /><published>2020-07-20T00:00:00+00:00</published><updated>2020-07-20T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Minikube_KubeVirt_Addon</id><content type="html" xml:base="https://kubevirt.io//2020/Minikube_KubeVirt_Addon.html">&lt;h2 id=&quot;deploying-kubevirt-has-just-gotten-easier&quot;&gt;Deploying KubeVirt has just gotten easier&lt;/h2&gt;
+
 &lt;p&gt;With the latest release (v1.12) of
 &lt;a href=&quot;https://minikube.sigs.k8s.io/docs/&quot;&gt;minikube&lt;/a&gt; we can now deploy KubeVirt with
 a one-liner.&lt;/p&gt;
 
 &lt;h2 id=&quot;deploy-minikube&quot;&gt;Deploy minikube&lt;/h2&gt;
+
 &lt;ol&gt;
   &lt;li&gt;Start minikube.  Since my host is Fedora 32 I will use --driver=kvm2 and
   I will also use --container-runtime=crio&lt;br /&gt;
@@ -3188,7 +3173,7 @@ a one-liner.&lt;/p&gt;
   &lt;/li&gt;
 &lt;/ol&gt;
 
-&lt;h3 id=&quot;success&quot;&gt;SUCCESS!&lt;/h3&gt;
+&lt;h3 id=&quot;success&quot;&gt;SUCCESS&lt;/h3&gt;
 
 &lt;p&gt;From here a user can proceed on to the
 &lt;a href=&quot;/labs/kubernetes/lab1&quot;&gt;Kubevirt Laboratory 1: Use KubeVirt&lt;/a&gt;&lt;/p&gt;
@@ -3198,4 +3183,4 @@ a one-liner.&lt;/p&gt;
 &lt;p&gt;As you can see it is now much easier to deploy KubeVirt in a minikube
 Kubernetes environment.&lt;/p&gt;
 
-&lt;p&gt;&lt;br /&gt;&lt;/p&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="minikube" /><category term="addons" /><summary type="html">Deploying KubeVirt has just gotten easier! With the latest release (v1.12) of minikube we can now deploy KubeVirt with a one-liner.</summary></entry></feed>
+&lt;p&gt;&lt;br /&gt;&lt;/p&gt;</content><author><name>Chris Callegari</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="minikube" /><category term="addons" /><summary type="html">Deploying KubeVirt has just gotten easier</summary></entry></feed>

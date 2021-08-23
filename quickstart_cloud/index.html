@@ -44,7 +44,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-08-18 12:58:13 +0000" >
+    <meta property="og:article:published_time" content="2021-08-23 17:09:08 +0000" >
     <meta name="twitter:title" content="KubeVirt quickstart with cloud providers | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -437,7 +437,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       </div>
     </div> -->
     <div class="col-sm-12 col-md-9 docs">
-      <h1 id="easy-install-using-cloud-providers">Easy install using cloud providers</h1>
+      <h2 id="easy-install-using-cloud-providers">Easy install using cloud providers</h2>
 
 <p>KubeVirt can be used on cloud computing providers such as AWS, Azure, GCP, AliCloud.</p>
 
@@ -458,6 +458,7 @@ To install kubectl client please follow the official documentation for your syst
 
 
 </div></div>
+<p><a></a></p>
 <div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p>Future labs will require at least 30 GiB of disk space.</p>
 
 
@@ -467,25 +468,29 @@ To install kubectl client please follow the official documentation for your syst
 <p>KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components.</p>
 
 <ul>
-  <li>Use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt operator:
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- '-rc' | sort -r | head -1 | awk -F': ' '{print $2}' | sed 's/,//' | xargs)
-echo $VERSION
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml
+  <li>
+    <p>Use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt operator:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> <span class="s1">'-rc'</span> | <span class="nb">sort</span> <span class="nt">-r</span> | <span class="nb">head</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">': '</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
+<span class="nb">echo</span> <span class="nv">$VERSION</span>
+kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 </code></pre></div>    </div>
   </li>
 </ul>
 
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Nested virtualization</p><p>If the minikube cluster runs on a virtual machine consider enabling nested virtualization.  Follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="\_blank">here</a>.</p>
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Nested virtualization</p><p>If the minikube cluster runs on a virtual machine consider enabling nested virtualization.  Follow the instructions described <a href="https://docs.fedoraproject.org/en-US/quick-docs/using-nested-virtualization-in-kvm/index.html" target="\_blank">here</a>.
+If for any reason nested virtualization cannot be enabled do enable KubeVirt emulation as follows:</p>
 
-<p>If for any reason nested virtualization cannot be enabled do enable KubeVirt emulation as follows:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true</span>
 </code></pre></div></div>
 
 
 </div></div>
 <ul>
-  <li>Again use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt custom resource definitions:
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
+  <li>
+    <p>Again use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt custom resource definitions:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
 </code></pre></div>    </div>
   </li>
 </ul>
@@ -495,14 +500,17 @@ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSI
 <p>By default KubeVirt will deploy 7 pods, 3 services, 1 daemonset, 3 deployment apps, 3 replica sets.</p>
 
 <ul>
-  <li>Check the deployment:
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.phase}"
+  <li>
+    <p>Check the deployment:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get kubevirt.kubevirt.io/kubevirt <span class="nt">-n</span> kubevirt <span class="nt">-o</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.status.phase}"</span>
 </code></pre></div>    </div>
   </li>
-  <li>Check the components:
-    <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get all -n kubevirt
+  <li>
+    <p>Check the components:</p>
+
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get all <span class="nt">-n</span> kubevirt
 </code></pre></div>    </div>
-    <p><br /></p>
   </li>
 </ul>
 

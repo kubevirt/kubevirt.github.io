@@ -295,9 +295,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>Start by cloning the example application repo <a href="https://github.com/xphyr/kubevirt-apiauth">https://github.com/xphyr/kubevirt-apiauth</a> and compiling our test application:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/xphyr/kubevirt-apiauth.git
-<span class="nv">$ </span><span class="nb">cd </span>kubevirt-apiauth/listvms
-<span class="nv">$ </span>go build
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/xphyr/kubevirt-apiauth.git
+<span class="nb">cd </span>kubevirt-apiauth/listvms
+go build
 </code></pre></div></div>
 
 <p>Once the program compiles, test to ensure that the application compiled correctly. If you have a working Kubernetes context, running this command may return some values. If you do not have a current context, you will get an error. This is OK, we will discuss authentication next.</p>
@@ -372,11 +372,11 @@ ca.crt:     1111 bytes
 
 <p>We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the “<em>kubectl</em>” command to log in with the new token. Open a NEW terminal window. This will be the window we use for the service account. In this new terminal window start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the “<em>kubectl</em>” command to generate a new kubeconfig file:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/sa-kubeconfig
-<span class="nv">$ </span>kubectl config set-cluster minikube <span class="nt">--server</span><span class="o">=</span>https://&lt;update IP address&gt;:8443 <span class="nt">--insecure-skip-tls-verify</span>
-<span class="nv">$ </span>kubectl config set-credentials mykubevirtrunner <span class="nt">--token</span><span class="o">=</span>&lt;<span class="nb">paste </span>token from last step here&gt;
-<span class="nv">$ </span>kubectl config set-context minikube <span class="nt">--cluster</span><span class="o">=</span>minikube <span class="nt">--namespace</span><span class="o">=</span>default <span class="nt">--user</span><span class="o">=</span>mykubevirtrunner
-<span class="nv">$ </span>kubectl config use-context minikube
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/sa-kubeconfig
+kubectl config set-cluster minikube <span class="nt">--server</span><span class="o">=</span>https://&lt;update IP address&gt;:8443 <span class="nt">--insecure-skip-tls-verify</span>
+kubectl config set-credentials mykubevirtrunner <span class="nt">--token</span><span class="o">=</span>&lt;<span class="nb">paste </span>token from last step here&gt;
+kubectl config set-context minikube <span class="nt">--cluster</span><span class="o">=</span>minikube <span class="nt">--namespace</span><span class="o">=</span>default <span class="nt">--user</span><span class="o">=</span>mykubevirtrunner
+kubectl config use-context minikube
 </code></pre></div></div>
 
 <p>We can test that the new kubeconfig file is working by running a kubectl command:</p>
@@ -454,20 +454,20 @@ awaiting signal
 
 <p>As currently configured, the mykubevirtrunner service account can only “view” KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create namespace myvms
-<span class="nv">$ </span>&lt;launch an addition vm here&gt;
-<span class="nv">$ </span>kubectl create clusterrolebinding kubevirt-viewer <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:view <span class="nt">--serviceaccount</span><span class="o">=</span>default:mykubevirtrunner <span class="nt">-n</span> myvms
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create namespace myvms
+&lt;launch an addition vm here&gt;
+kubectl create clusterrolebinding kubevirt-viewer <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:view <span class="nt">--serviceaccount</span><span class="o">=</span>default:mykubevirtrunner <span class="nt">-n</span> myvms
 </code></pre></div></div>
 
 <p>We can test that the ServiceAccount has been updated to also have permissions to view in the “myvms” namespace by running our listvms command one more time, this time passing in the optional flag <em>–namespaces</em>. Switch to your terminal window that is using the service account kubeconfig file and run the following command:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>$ listvms/listvms --namespaces myvms
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>listvms/listvms <span class="nt">--namespaces</span> myvms
 additional namespaces to check are:  myvms
-Checking the following namespaces:  [default myvms]
+Checking the following namespaces:  <span class="o">[</span>default myvms]
 Type                       Name       Namespace     Status
-VirtualMachine             testvm     default       false
-VirtualMachineInstance     testvm     default       Scheduled
-VirtualMachine             testvm     myvms         false
+VirtualMachine             testvm     default       <span class="nb">false
+</span>VirtualMachineInstance     testvm     default       Scheduled
+VirtualMachine             testvm     myvms         <span class="nb">false</span>
 </code></pre></div></div>
 
 <p>You can see that now, the ServiceAccount can view the vm and vmi that are in both the default namespace as well as the <em>myvms</em> namespace.</p>

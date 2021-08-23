@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-18T12:58:13+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html">&lt;h2 id=&quot;v0440&quot;&gt;v0.44.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-08-23T17:09:08+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html">&lt;h2 id=&quot;v0440&quot;&gt;v0.44.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Aug 9 14:20:14 2021 +0000&lt;/p&gt;
 
@@ -74,9 +74,9 @@
 
 &lt;p&gt;Start by cloning the example application repo &lt;a href=&quot;https://github.com/xphyr/kubevirt-apiauth&quot;&gt;https://github.com/xphyr/kubevirt-apiauth&lt;/a&gt; and compiling our test application:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;git clone https://github.com/xphyr/kubevirt-apiauth.git
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirt-apiauth/listvms
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;go build
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;git clone https://github.com/xphyr/kubevirt-apiauth.git
+&lt;span class=&quot;nb&quot;&gt;cd &lt;/span&gt;kubevirt-apiauth/listvms
+go build
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Once the program compiles, test to ensure that the application compiled correctly. If you have a working Kubernetes context, running this command may return some values. If you do not have a current context, you will get an error. This is OK, we will discuss authentication next.&lt;/p&gt;
@@ -151,11 +151,11 @@ ca.crt:     1111 bytes
 
 &lt;p&gt;We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the “&lt;em&gt;kubectl&lt;/em&gt;” command to log in with the new token. Open a NEW terminal window. This will be the window we use for the service account. In this new terminal window start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the “&lt;em&gt;kubectl&lt;/em&gt;” command to generate a new kubeconfig file:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/sa-kubeconfig
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-cluster minikube &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://&amp;lt;update IP address&amp;gt;:8443 &lt;span class=&quot;nt&quot;&gt;--insecure-skip-tls-verify&lt;/span&gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-credentials mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;--token&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&amp;lt;&lt;span class=&quot;nb&quot;&gt;paste &lt;/span&gt;token from last step here&amp;gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config set-context minikube &lt;span class=&quot;nt&quot;&gt;--cluster&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;minikube &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;mykubevirtrunner
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl config use-context minikube
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;KUBECONFIG&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;pwd&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;/sa-kubeconfig
+kubectl config set-cluster minikube &lt;span class=&quot;nt&quot;&gt;--server&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;https://&amp;lt;update IP address&amp;gt;:8443 &lt;span class=&quot;nt&quot;&gt;--insecure-skip-tls-verify&lt;/span&gt;
+kubectl config set-credentials mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;--token&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&amp;lt;&lt;span class=&quot;nb&quot;&gt;paste &lt;/span&gt;token from last step here&amp;gt;
+kubectl config set-context minikube &lt;span class=&quot;nt&quot;&gt;--cluster&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;minikube &lt;span class=&quot;nt&quot;&gt;--namespace&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default &lt;span class=&quot;nt&quot;&gt;--user&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;mykubevirtrunner
+kubectl config use-context minikube
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We can test that the new kubeconfig file is working by running a kubectl command:&lt;/p&gt;
@@ -233,20 +233,20 @@ awaiting signal
 
 &lt;p&gt;As currently configured, the mykubevirtrunner service account can only “view” KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create namespace myvms
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&amp;lt;launch an addition vm here&amp;gt;
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl create clusterrolebinding kubevirt-viewer &lt;span class=&quot;nt&quot;&gt;--clusterrole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io:view &lt;span class=&quot;nt&quot;&gt;--serviceaccount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default:mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; myvms
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create namespace myvms
+&amp;lt;launch an addition vm here&amp;gt;
+kubectl create clusterrolebinding kubevirt-viewer &lt;span class=&quot;nt&quot;&gt;--clusterrole&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;kubevirt.io:view &lt;span class=&quot;nt&quot;&gt;--serviceaccount&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;default:mykubevirtrunner &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; myvms
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We can test that the ServiceAccount has been updated to also have permissions to view in the “myvms” namespace by running our listvms command one more time, this time passing in the optional flag &lt;em&gt;–namespaces&lt;/em&gt;. Switch to your terminal window that is using the service account kubeconfig file and run the following command:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ listvms/listvms --namespaces myvms
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;listvms/listvms &lt;span class=&quot;nt&quot;&gt;--namespaces&lt;/span&gt; myvms
 additional namespaces to check are:  myvms
-Checking the following namespaces:  [default myvms]
+Checking the following namespaces:  &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;default myvms]
 Type                       Name       Namespace     Status
-VirtualMachine             testvm     default       false
-VirtualMachineInstance     testvm     default       Scheduled
-VirtualMachine             testvm     myvms         false
+VirtualMachine             testvm     default       &lt;span class=&quot;nb&quot;&gt;false
+&lt;/span&gt;VirtualMachineInstance     testvm     default       Scheduled
+VirtualMachine             testvm     myvms         &lt;span class=&quot;nb&quot;&gt;false&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;You can see that now, the ServiceAccount can view the vm and vmi that are in both the default namespace as well as the &lt;em&gt;myvms&lt;/em&gt; namespace.&lt;/p&gt;
@@ -439,32 +439,32 @@ VirtualMachine             testvm     myvms         false
 
 
 &lt;/div&gt;&lt;/div&gt;
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo dnf update -y
-sudo dnf install -y pciutils podman podman-docker conntrack tigervnc rdesktop
-sudo grubby --update-kernel=ALL --args=&quot;systemd.unified_cgroup_hierarchy=0&quot;
-# Setup firewall rules to allow inbound and outbound connections from your minikube cluster
-sudo firewall-cmd --add-port=30000-65535/tcp --permanent
-sudo firewall-cmd --add-port=30000-65535/udp --permanent
-sudo firewall-cmd --add-port=10250-10252/tcp --permanent
-sudo firewall-cmd --add-port=10248/tcp --permanent
-sudo firewall-cmd --add-port=2379-2380/tcp --permanent
-sudo firewall-cmd --add-port=6443/tcp --permanent
-sudo firewall-cmd --add-port=8443/tcp --permanent
-sudo firewall-cmd --add-port=9153/tcp --permanent
-sudo firewall-cmd --add-service=dns --permanent
-sudo firewall-cmd --add-interface=cni-podman0 --permanent
-sudo firewall-cmd --add-masquerade --permanent
-sudo vi /etc/selinux/config
-# change the &quot;SELINUX=enforcing&quot; to &quot;SELINUX=permissive&quot;
-sudo setenforce 0
-sudo systemctl enable sshd --now
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf update &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; pciutils podman podman-docker conntrack tigervnc rdesktop
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;grubby &lt;span class=&quot;nt&quot;&gt;--update-kernel&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ALL &lt;span class=&quot;nt&quot;&gt;--args&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;systemd.unified_cgroup_hierarchy=0&quot;&lt;/span&gt;
+&lt;span class=&quot;c&quot;&gt;# Setup firewall rules to allow inbound and outbound connections from your minikube cluster&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;30000-65535/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;30000-65535/udp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10250-10252/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;10248/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;2379-2380/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;6443/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;8443/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-port&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;9153/tcp &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-service&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;dns &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-interface&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cni-podman0 &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;firewall-cmd &lt;span class=&quot;nt&quot;&gt;--add-masquerade&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--permanent&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;vi /etc/selinux/config
+&lt;span class=&quot;c&quot;&gt;# change the &quot;SELINUX=enforcing&quot; to &quot;SELINUX=permissive&quot;&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;setenforce 0
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;sshd &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;We will now install the CRIO runtime:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;sudo dnf module enable -y cri-o:1.18
-sudo dnf install -y cri-o cri-tools
-sudo systemctl enable --now crio
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf module &lt;span class=&quot;nb&quot;&gt;enable&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; cri-o:1.18
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;dnf &lt;span class=&quot;nb&quot;&gt;install&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-y&lt;/span&gt; cri-o cri-tools
+&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;systemctl &lt;span class=&quot;nb&quot;&gt;enable&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--now&lt;/span&gt; crio
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h3 id=&quot;preparing-the-intel-vgpu-driver&quot;&gt;Preparing the Intel vGPU driver&lt;/h3&gt;
@@ -472,6 +472,7 @@ sudo systemctl enable --now crio
 &lt;p&gt;In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.&lt;/p&gt;
 
 &lt;p&gt;The following commands will do the following:&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;load the kvmgt module to enable support within kvm&lt;/li&gt;
   &lt;li&gt;enable gvt in the i915 module&lt;/li&gt;
@@ -527,7 +528,6 @@ WantedBy=multi-user.target
 
 
 &lt;/div&gt;&lt;/div&gt;
-
 &lt;p&gt;We can validate that the vGPU devices were created by looking in the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;/sys/devices/pci0000:00/0000:00:02.0/&lt;/code&gt; directory.&lt;/p&gt;
 
 &lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;ls&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-lsa&lt;/span&gt; /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d
@@ -576,14 +576,14 @@ lrwxrwxrwx. 1 root root    0 Apr 20 13:56 subsystem -&amp;gt; ../../../../bus/md
 
 &lt;p&gt;In order to make our interaction with Kubernetes a little easier, we will need to copy some files and update our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.kube/config&lt;/code&gt;&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mkdir -p ~/.minikube/profiles/minikube
-sudo cp -r /root/.kube /home/$USER
-sudo cp /root/.minikube/ca.crt /home/$USER/.minikube/ca.crt
-sudo cp /root/.minikube/profiles/minikube/client.crt /home/$USER/.minikube/profiles/minikube
-sudo cp /root/.minikube/profiles/minikube/client.key /home/$USER/.minikube/profiles/minikube
-sudo chown -R $USER:$USER /home/$USER/.kube
-sudo chown -R $USER:$USER /home/$USER/.minikube
-sed -i  &quot;s/root/home\/$USER/&quot; ~/.kube/config
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;mkdir&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-p&lt;/span&gt; ~/.minikube/profiles/minikube
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; /root/.kube /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; /root/.minikube/ca.crt /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube/ca.crt
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; /root/.minikube/profiles/minikube/client.crt /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube/profiles/minikube
+&lt;span class=&quot;nb&quot;&gt;sudo cp&lt;/span&gt; /root/.minikube/profiles/minikube/client.key /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube/profiles/minikube
+&lt;span class=&quot;nb&quot;&gt;sudo chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;:&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt; /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.kube
+&lt;span class=&quot;nb&quot;&gt;sudo chown&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-R&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;:&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt; /home/&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;/.minikube
+&lt;span class=&quot;nb&quot;&gt;sed&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-i&lt;/span&gt;  &lt;span class=&quot;s2&quot;&gt;&quot;s/root/home&lt;/span&gt;&lt;span class=&quot;se&quot;&gt;\/&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$USER&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/&quot;&lt;/span&gt; ~/.kube/config
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Once the minikube install is complete, validate that everything is working properly.&lt;/p&gt;
@@ -599,8 +599,8 @@ kubevirt   Ready    control-plane,master   4m5s   v1.20.2
 
 &lt;p&gt;Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. Using the minikube addons manager, we will install kubevirt into our cluster:&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;minikube addons &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;kubevirt
-&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;kubevirt kubevirt &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;sudo &lt;/span&gt;minikube addons &lt;span class=&quot;nb&quot;&gt;enable &lt;/span&gt;kubevirt
+kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nb&quot;&gt;wait &lt;/span&gt;kubevirt kubevirt &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;Available &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;300s
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an &lt;em&gt;mdevNameSelector&lt;/em&gt; to look for, and a &lt;em&gt;resourceName&lt;/em&gt; to assign to it. The &lt;em&gt;mdevNameSelector&lt;/em&gt; comes from the “mdev_type” that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.&lt;/p&gt;
@@ -677,9 +677,9 @@ spec:
 
 &lt;p&gt;One final step, lets get the latest release of virtctl which we will be using as we install Windows.&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath=&quot;{.status.observedKubeVirtVersion}&quot;)
-curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-linux-amd64
-sudo install virtctl /usr/local/bin
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;$(&lt;/span&gt;kubectl get kubevirt.kubevirt.io/kubevirt &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;jsonpath&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;{.status.observedKubeVirtVersion}&quot;&lt;/span&gt;&lt;span class=&quot;si&quot;&gt;)&lt;/span&gt;
+curl &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;-o&lt;/span&gt; virtctl https://github.com/kubevirt/kubevirt/releases/download/&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/virtctl-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;-linux-amd64&lt;/span&gt;
+&lt;span class=&quot;nb&quot;&gt;sudo install &lt;/span&gt;virtctl /usr/local/bin
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;install-windows&quot;&gt;Install Windows&lt;/h2&gt;
@@ -814,6 +814,7 @@ spec:
 &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
 &lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; win10vm1.yaml
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;div class=&quot;premonition note&quot;&gt;&lt;div class=&quot;fa fa-check-square&quot;&gt;&lt;/div&gt;&lt;div class=&quot;content&quot;&gt;&lt;p class=&quot;header&quot;&gt;NOTE&lt;/p&gt;&lt;p&gt;This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.&lt;/p&gt;
 
 
@@ -830,8 +831,8 @@ spec:
 
 &lt;p&gt;We can now start the virtual machine:&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl start win10vm1
-kubectl get vmi --watch
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl start win10vm1
+kubectl get vmi &lt;span class=&quot;nt&quot;&gt;--watch&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;When the output of shows that the vm is in a “Running” phase you can “CTRL+C” to end the watch command.&lt;/p&gt;
@@ -840,7 +841,7 @@ kubectl get vmi --watch
 
 &lt;p&gt;Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.&lt;/p&gt;
 
-&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;virtctl vnc win10vm1
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;virtctl vnc win10vm1
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.&lt;/p&gt;
@@ -852,6 +853,7 @@ kubectl get vmi --watch
 &lt;h2 id=&quot;using-the-gpu&quot;&gt;Using the GPU&lt;/h2&gt;
 
 &lt;p&gt;In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:&lt;/p&gt;
+
 &lt;ol&gt;
   &lt;li&gt;In the Windows 10 search bar, type “&lt;strong&gt;Remote Desktop Settings&lt;/strong&gt;” and then open the result.&lt;/li&gt;
   &lt;li&gt;Select “&lt;strong&gt;Enable Remote Desktop&lt;/strong&gt;” and confirm the change.&lt;/li&gt;
@@ -886,11 +888,11 @@ win10vm1-rdp   NodePort    10.105.159.184   &amp;lt;none&amp;gt;        3389:306
 
 &lt;p&gt;Note that since you are running your Fedora 32 workstation on this same GPU you are already sharing the graphics workload between your primary desktop, and the virtualized Windows Desktop also running on this machine.&lt;/p&gt;
 
-&lt;p&gt;Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.&lt;/p&gt;</content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="vGPU" /><category term="Windows" /><category term="GPU" /><category term="Intel" /><category term="minikube" /><category term="Fedora" /><summary type="html">Introduction Prerequisites Fedora Workstation Prep Preparing the Intel vGPU driver Install Kubernetes with minikube Install kubevirt Validate vGPU detection Install Containerize Data Importer Install Windows Accessing the Windows VM Using the GPU</summary></entry><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h1 id=&quot;introduction&quot;&gt;Introduction&lt;/h1&gt;
+&lt;p&gt;Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.&lt;/p&gt;</content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="vGPU" /><category term="Windows" /><category term="GPU" /><category term="Intel" /><category term="minikube" /><category term="Fedora" /><summary type="html">Introduction Prerequisites Fedora Workstation Prep Preparing the Intel vGPU driver Install Kubernetes with minikube Install kubevirt Validate vGPU detection Install Containerize Data Importer Install Windows Accessing the Windows VM Using the GPU</summary></entry><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with &lt;a href=&quot;https://github.com/tektoncd/pipeline&quot;&gt;Tekton Pipelines&lt;/a&gt;.&lt;/p&gt;
 
-&lt;p&gt;Tekton Pipelines can be used to create a single &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt; that encapsulates the installation process which can be run and replicated with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRuns&lt;/code&gt;. 
+&lt;p&gt;Tekton Pipelines can be used to create a single &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt; that encapsulates the installation process which can be run and replicated with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRuns&lt;/code&gt;.
 The pipeline will be built with &lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks&quot;&gt;KubeVirt Tekton Tasks&lt;/a&gt;, which includes all the necessary tasks for this example.&lt;/p&gt;
 
 &lt;h2 id=&quot;pipeline-description&quot;&gt;Pipeline Description&lt;/h2&gt;
@@ -899,7 +901,8 @@ The pipeline will be built with &lt;a href=&quot;https://github.com/kubevirt/kub
 It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
 Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
 You can later use the artifact PVC as a base image and copy it for new VMs.&lt;/p&gt;
-&lt;h1 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h1&gt;
+
+&lt;h2 id=&quot;prerequisites&quot;&gt;Prerequisites&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;KubeVirt &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.39.0&lt;/code&gt;&lt;/li&gt;
@@ -907,14 +910,14 @@ You can later use the artifact PVC as a base image and copy it for new VMs.&lt;/
   &lt;li&gt;KubeVirt Tekton Tasks &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;v0.3.0&lt;/code&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;h1 id=&quot;running-windows-installer-pipeline&quot;&gt;Running Windows Installer Pipeline&lt;/h1&gt;
+&lt;h2 id=&quot;running-windows-installer-pipeline&quot;&gt;Running Windows Installer Pipeline&lt;/h2&gt;
 
 &lt;h2 id=&quot;obtaining-a-url-of-windows-source-iso&quot;&gt;Obtaining a URL of Windows Source ISO&lt;/h2&gt;
 
 &lt;p&gt;First we have to obtain a Download URL of Windows Source ISO.&lt;/p&gt;
 
 &lt;ol&gt;
-  &lt;li&gt;Go to https://www.microsoft.com/en-us/software-download/windows10ISO. You can also obtain a server edition for evaluation at https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019.&lt;/li&gt;
+  &lt;li&gt;Go to &lt;a href=&quot;https://www.microsoft.com/en-us/software-download/windows10ISO&quot;&gt;https://www.microsoft.com/en-us/software-download/windows10ISO&lt;/a&gt;. You can also obtain a server edition for evaluation at &lt;a href=&quot;https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019&quot;&gt;https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019&lt;/a&gt;.&lt;/li&gt;
   &lt;li&gt;Fill in the edition and &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;English&lt;/code&gt; language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.&lt;/li&gt;
   &lt;li&gt;Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.&lt;/li&gt;
 &lt;/ol&gt;
@@ -928,8 +931,8 @@ or it can be specified manually according to &lt;a href=&quot;https://docs.micro
 and &lt;a href=&quot;https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend&quot;&gt;Answer File Components Reference&lt;/a&gt;.&lt;/p&gt;
 
 &lt;p&gt;The following config map includes the required drivers and guest disk configuration.
-It also specifies how the installation should proceed and what users should be created. 
-In our case it is an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Administrator&lt;/code&gt; user with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;changepassword&lt;/code&gt; password. 
+It also specifies how the installation should proceed and what users should be created.
+In our case it is an &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Administrator&lt;/code&gt; user with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;changepassword&lt;/code&gt; password.
 You can also change the Answer File according to your needs by consulting the already mentioned documentation.&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
@@ -1129,9 +1132,9 @@ You can also change the Answer File according to your needs by consulting the al
 
 &lt;p&gt;Let’s create a pipeline which consists of the following tasks.&lt;/p&gt;
 
-&lt;div class=&quot;language-plaintext highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  create-source-dv --- create-vm-from-manifest --- wait-for-vmi-status --- cleanup-vm
+&lt;div class=&quot;language-shell highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;  create-source-dv &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; create-vm-from-manifest &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; wait-for-vmi-status &lt;span class=&quot;nt&quot;&gt;---&lt;/span&gt; cleanup-vm
                     |
-    create-base-dv --
+    create-base-dv &lt;span class=&quot;nt&quot;&gt;--&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;ol&gt;
@@ -1308,7 +1311,7 @@ from the empty PVC and with the &lt;code class=&quot;language-plaintext highligh
 
 &lt;h2 id=&quot;running-the-pipeline&quot;&gt;Running the Pipeline&lt;/h2&gt;
 
-&lt;p&gt;To run the pipeline we need to create the following &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; which references our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;. 
+&lt;p&gt;To run the pipeline we need to create the following &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; which references our &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;.
 Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.&lt;/p&gt;
 
 &lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PipelineRun&lt;/code&gt; also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;Pipeline&lt;/code&gt;.
@@ -1436,7 +1439,7 @@ You need to replace PVC_NAME with &lt;code class=&quot;language-plaintext highli
   &lt;img src=&quot;/assets/2021-04-21-Automated-Windows-Installation-With-Tekton-Pipelines/win-started.png&quot; width=&quot;100&quot; height=&quot;75&quot; itemprop=&quot;thumbnail&quot; alt=&quot;Started Windows VM&quot; /&gt;
 &lt;/div&gt;
 
-&lt;h1 id=&quot;resources&quot;&gt;Resources&lt;/h1&gt;
+&lt;h2 id=&quot;resources&quot;&gt;Resources&lt;/h2&gt;
 
 &lt;ul&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer&quot;&gt;YAML files used in this example&lt;/a&gt;&lt;/li&gt;
@@ -1512,7 +1515,7 @@ contains a detailed list of all the sessions, with information about the
 contents, presenters, and direct links to each session recording and slides
 (where available).&lt;/p&gt;
 
-&lt;h2 id=&quot;thanks&quot;&gt;Thanks!&lt;/h2&gt;
+&lt;h2 id=&quot;thanks&quot;&gt;Thanks&lt;/h2&gt;
 
 &lt;p&gt;We would like to thank everyone who contributed to make this event happen: all
 the presenters / session leads, everyone who proposed a session, the various
@@ -1520,7 +1523,7 @@ community members who contributed to the organization, all the attendees, and
 the &lt;a href=&quot;https://cncf.io/&quot;&gt;Container-native Computing Foundation&lt;/a&gt; who sponsored the
 event.&lt;/p&gt;
 
-&lt;h2 id=&quot;i-want-more&quot;&gt;I want more!&lt;/h2&gt;
+&lt;h2 id=&quot;i-want-more&quot;&gt;I want more&lt;/h2&gt;
 
 &lt;p&gt;We are just wrapping up this first edition. Based on this experience, we really
 hope to have more community events of this type in the future, but it is still a

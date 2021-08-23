@@ -254,7 +254,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <h1 id="building-a-vm-image-repository">Building a VM Image Repository</h1>
+          <h2 id="building-a-vm-image-repository">Building a VM Image Repository</h2>
 
 <p>You know what I hear a lot from new KubeVirt users?</p>
 
@@ -267,6 +267,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>So, that’s what I’m going to attempt to do. I’ll show you how to make your images accessible in the cluster. I’ll show you how to make a custom VM image repository for use within the cluster. And I’ll show you how to use this at scale using the same patterns you may have used in AWS or GCP.</p>
 
 <p>The pattern we’ll use here is…</p>
+
 <ol>
   <li>Import a base VM image into the cluster as an PVC</li>
   <li>Use KubeVirt to create a new immutable custom image with application assets</li>
@@ -288,7 +289,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p><a href="https://kubevirt.io/user-guide/operations/installation">Installing KubeVirt</a>
 <a href="https://kubevirt.io/user-guide/operations/containerized_data_importer">Installing CDI</a></p>
 
-<h3 id="step-1-create-a-namespace-for-our-immutable-vm-images">Step 1. Create a namespace for our immutable VM images.</h3>
+<h3 id="step-1-create-a-namespace-for-our-immutable-vm-images">Step 1. Create a namespace for our immutable VM images</h3>
 
 <p>We’ll give users the ability to clone VM images living on PVCs from this namespace to their own namespace, but not directly create VMIs within this namespace.</p>
 
@@ -498,6 +499,7 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            <
 </code></pre></div></div>
 
 <h2 id="understanding-the-vm-image-repository">Understanding the VM Image Repository</h2>
+
 <p>At this point we have a namespace, vm-images, that contains PVCs with our VM images on them. Those PVCs represent VM images in the same way AWS’s AMIs represent VM images and this <strong>vm-images namespace is our VM image repository.</strong></p>
 
 <p>Using CDI’s i<a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one">cross namespace cloning feature</a>, VM’s can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository”. Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined <a href="https://github.com/kubevirt/containerized-data-importer/blob/master/doc/RBAC.md#pvc-cloning">here</a>.</p>
@@ -528,11 +530,11 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            <
   <span class="na">apiGroup</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io</span>
 </code></pre></div></div>
 
-<h1 id="horizontally-scaling-vms-using-custom-image">Horizontally Scaling VMs Using Custom Image</h1>
+<h2 id="horizontally-scaling-vms-using-custom-image">Horizontally Scaling VMs Using Custom Image</h2>
 
 <p>Now that we have our immutable custom VM image, we can create as many VMs as we want using that custom image.</p>
 
-<h2 id="example-scale-out-vmi-instances-using-the-custom-vm-image">Example: Scale out VMI instances using the custom VM image.</h2>
+<h3 id="example-scale-out-vmi-instances-using-the-custom-vm-image">Example: Scale out VMI instances using the custom VM image</h3>
 
 <p>Clone the custom VM image from the vm-images namespace into the namespace the VMI instances will be running in as a <strong>ReadOnlyMany</strong> PVC. This will allow concurrent access to a single PVC.</p>
 
@@ -655,7 +657,7 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            <
           <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-nginx</span>
 </code></pre></div></div>
 
-<h1 id="other-custom-creation-image-tools">Other Custom Creation Image Tools</h1>
+<h2 id="other-custom-creation-image-tools">Other Custom Creation Image Tools</h2>
 
 <p>In my example I imported a VM base image into the cluster and used KubeVirt to provision a custom image with a technique that used cloud-init. This may or may not make sense for your use case. It’s possible you need to pre-provision the VM image before importing into the cluster at all.</p>
 

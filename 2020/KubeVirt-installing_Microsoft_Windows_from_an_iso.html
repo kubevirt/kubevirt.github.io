@@ -276,7 +276,9 @@ but what if you want to follow the traditional way of installing a VM using an e
 
 </div></div>
 <ol>
-  <li>An empty KubeVirt Virtual Machine
+  <li>
+    <p>An empty KubeVirt Virtual Machine</p>
+
     <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
@@ -378,7 +380,7 @@ the following picture:</p>
     <p>A <a href="https://kubevirt.io/user-guide/virtual_machines/windows_virtio_drivers/#how-to-obtain-virtio-drivers">container with the virtio drivers</a> attached as a CD-ROM to the VM.
 The container image has to be pulled to have it available in the local registry.</p>
 
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker pull kubevirt/virtio-container-disk
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker pull kubevirt/virtio-container-disk
 </code></pre></div>    </div>
 
     <p>And also it has to be referenced in the VM YAML, in this example the name for the <code class="language-plaintext highlighter-rouge">containerDisk</code> is <code class="language-plaintext highlighter-rouge">virtiocontainerdisk</code>.</p>
@@ -515,7 +517,7 @@ win2k12-iso   82s   Running   10.244.0.53   master-00.kubevirt-io
   <li>
     <p>Once the status of the VMI is <code class="language-plaintext highlighter-rouge">RUNNING</code> it’s time to connect using VNC:</p>
 
-    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl vnc win2k12-iso
+    <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl vnc win2k12-iso
 </code></pre></div>    </div>
 
     <p><img src="/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png" alt="windows2k12_install.png" title="KubeVirt Microsoft Windows installation" /></p>

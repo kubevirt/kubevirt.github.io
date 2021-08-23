@@ -254,11 +254,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <h1 id="introduction">Introduction</h1>
+          <h2 id="introduction">Introduction</h2>
 
 <p>This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with <a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a>.</p>
 
-<p>Tekton Pipelines can be used to create a single <code class="language-plaintext highlighter-rouge">Pipeline</code> that encapsulates the installation process which can be run and replicated with <code class="language-plaintext highlighter-rouge">PipelineRuns</code>. 
+<p>Tekton Pipelines can be used to create a single <code class="language-plaintext highlighter-rouge">Pipeline</code> that encapsulates the installation process which can be run and replicated with <code class="language-plaintext highlighter-rouge">PipelineRuns</code>.
 The pipeline will be built with <a href="https://github.com/kubevirt/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a>, which includes all the necessary tasks for this example.</p>
 
 <h2 id="pipeline-description">Pipeline Description</h2>
@@ -267,7 +267,8 @@ The pipeline will be built with <a href="https://github.com/kubevirt/kubevirt-te
 It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
 Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
 You can later use the artifact PVC as a base image and copy it for new VMs.</p>
-<h1 id="prerequisites">Prerequisites</h1>
+
+<h2 id="prerequisites">Prerequisites</h2>
 
 <ul>
   <li>KubeVirt <code class="language-plaintext highlighter-rouge">v0.39.0</code></li>
@@ -275,14 +276,14 @@ You can later use the artifact PVC as a base image and copy it for new VMs.</p>
   <li>KubeVirt Tekton Tasks <code class="language-plaintext highlighter-rouge">v0.3.0</code></li>
 </ul>
 
-<h1 id="running-windows-installer-pipeline">Running Windows Installer Pipeline</h1>
+<h2 id="running-windows-installer-pipeline">Running Windows Installer Pipeline</h2>
 
 <h2 id="obtaining-a-url-of-windows-source-iso">Obtaining a URL of Windows Source ISO</h2>
 
 <p>First we have to obtain a Download URL of Windows Source ISO.</p>
 
 <ol>
-  <li>Go to https://www.microsoft.com/en-us/software-download/windows10ISO. You can also obtain a server edition for evaluation at https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019.</li>
+  <li>Go to <a href="https://www.microsoft.com/en-us/software-download/windows10ISO">https://www.microsoft.com/en-us/software-download/windows10ISO</a>. You can also obtain a server edition for evaluation at <a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019">https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019</a>.</li>
   <li>Fill in the edition and <code class="language-plaintext highlighter-rouge">English</code> language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.</li>
   <li>Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.</li>
 </ol>
@@ -296,8 +297,8 @@ or it can be specified manually according to <a href="https://docs.microsoft.com
 and <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend">Answer File Components Reference</a>.</p>
 
 <p>The following config map includes the required drivers and guest disk configuration.
-It also specifies how the installation should proceed and what users should be created. 
-In our case it is an <code class="language-plaintext highlighter-rouge">Administrator</code> user with <code class="language-plaintext highlighter-rouge">changepassword</code> password. 
+It also specifies how the installation should proceed and what users should be created.
+In our case it is an <code class="language-plaintext highlighter-rouge">Administrator</code> user with <code class="language-plaintext highlighter-rouge">changepassword</code> password.
 You can also change the Answer File according to your needs by consulting the already mentioned documentation.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
@@ -497,9 +498,9 @@ You can also change the Answer File according to your needs by consulting the al
 
 <p>Let’s create a pipeline which consists of the following tasks.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  create-source-dv --- create-vm-from-manifest --- wait-for-vmi-status --- cleanup-vm
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  create-source-dv <span class="nt">---</span> create-vm-from-manifest <span class="nt">---</span> wait-for-vmi-status <span class="nt">---</span> cleanup-vm
                     |
-    create-base-dv --
+    create-base-dv <span class="nt">--</span>
 </code></pre></div></div>
 
 <ol>
@@ -676,7 +677,7 @@ from the empty PVC and with the <code class="language-plaintext highlighter-roug
 
 <h2 id="running-the-pipeline">Running the Pipeline</h2>
 
-<p>To run the pipeline we need to create the following <code class="language-plaintext highlighter-rouge">PipelineRun</code> which references our <code class="language-plaintext highlighter-rouge">Pipeline</code>. 
+<p>To run the pipeline we need to create the following <code class="language-plaintext highlighter-rouge">PipelineRun</code> which references our <code class="language-plaintext highlighter-rouge">Pipeline</code>.
 Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.</p>
 
 <p>The <code class="language-plaintext highlighter-rouge">PipelineRun</code> also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole <code class="language-plaintext highlighter-rouge">Pipeline</code>.
@@ -804,7 +805,7 @@ You need to replace PVC_NAME with <code class="language-plaintext highlighter-ro
   <img src="/assets/2021-04-21-Automated-Windows-Installation-With-Tekton-Pipelines/win-started.png" width="100" height="75" itemprop="thumbnail" alt="Started Windows VM" />
 </div>
 
-<h1 id="resources">Resources</h1>
+<h2 id="resources">Resources</h2>
 
 <ul>
   <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer">YAML files used in this example</a></li>

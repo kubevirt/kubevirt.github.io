@@ -327,32 +327,32 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 
 </div></div>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf update -y
-sudo dnf install -y pciutils podman podman-docker conntrack tigervnc rdesktop
-sudo grubby --update-kernel=ALL --args="systemd.unified_cgroup_hierarchy=0"
-# Setup firewall rules to allow inbound and outbound connections from your minikube cluster
-sudo firewall-cmd --add-port=30000-65535/tcp --permanent
-sudo firewall-cmd --add-port=30000-65535/udp --permanent
-sudo firewall-cmd --add-port=10250-10252/tcp --permanent
-sudo firewall-cmd --add-port=10248/tcp --permanent
-sudo firewall-cmd --add-port=2379-2380/tcp --permanent
-sudo firewall-cmd --add-port=6443/tcp --permanent
-sudo firewall-cmd --add-port=8443/tcp --permanent
-sudo firewall-cmd --add-port=9153/tcp --permanent
-sudo firewall-cmd --add-service=dns --permanent
-sudo firewall-cmd --add-interface=cni-podman0 --permanent
-sudo firewall-cmd --add-masquerade --permanent
-sudo vi /etc/selinux/config
-# change the "SELINUX=enforcing" to "SELINUX=permissive"
-sudo setenforce 0
-sudo systemctl enable sshd --now
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf update <span class="nt">-y</span>
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> pciutils podman podman-docker conntrack tigervnc rdesktop
+<span class="nb">sudo </span>grubby <span class="nt">--update-kernel</span><span class="o">=</span>ALL <span class="nt">--args</span><span class="o">=</span><span class="s2">"systemd.unified_cgroup_hierarchy=0"</span>
+<span class="c"># Setup firewall rules to allow inbound and outbound connections from your minikube cluster</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>30000-65535/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>30000-65535/udp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>10250-10252/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>10248/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>2379-2380/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>6443/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>8443/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>9153/tcp <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-service</span><span class="o">=</span>dns <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-interface</span><span class="o">=</span>cni-podman0 <span class="nt">--permanent</span>
+<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-masquerade</span> <span class="nt">--permanent</span>
+<span class="nb">sudo </span>vi /etc/selinux/config
+<span class="c"># change the "SELINUX=enforcing" to "SELINUX=permissive"</span>
+<span class="nb">sudo </span>setenforce 0
+<span class="nb">sudo </span>systemctl <span class="nb">enable </span>sshd <span class="nt">--now</span>
 </code></pre></div></div>
 
 <p>We will now install the CRIO runtime:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>sudo dnf module enable -y cri-o:1.18
-sudo dnf install -y cri-o cri-tools
-sudo systemctl enable --now crio
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf module <span class="nb">enable</span> <span class="nt">-y</span> cri-o:1.18
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> cri-o cri-tools
+<span class="nb">sudo </span>systemctl <span class="nb">enable</span> <span class="nt">--now</span> crio
 </code></pre></div></div>
 
 <h3 id="preparing-the-intel-vgpu-driver">Preparing the Intel vGPU driver</h3>
@@ -360,6 +360,7 @@ sudo systemctl enable --now crio
 <p>In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.</p>
 
 <p>The following commands will do the following:</p>
+
 <ul>
   <li>load the kvmgt module to enable support within kvm</li>
   <li>enable gvt in the i915 module</li>
@@ -415,7 +416,6 @@ WantedBy=multi-user.target
 
 
 </div></div>
-
 <p>We can validate that the vGPU devices were created by looking in the <code class="language-plaintext highlighter-rouge">/sys/devices/pci0000:00/0000:00:02.0/</code> directory.</p>
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lsa</span> /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d
@@ -464,14 +464,14 @@ lrwxrwxrwx. 1 root root    0 Apr 20 13:56 subsystem -&gt; ../../../../bus/mdev
 
 <p>In order to make our interaction with Kubernetes a little easier, we will need to copy some files and update our <code class="language-plaintext highlighter-rouge">.kube/config</code></p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mkdir -p ~/.minikube/profiles/minikube
-sudo cp -r /root/.kube /home/$USER
-sudo cp /root/.minikube/ca.crt /home/$USER/.minikube/ca.crt
-sudo cp /root/.minikube/profiles/minikube/client.crt /home/$USER/.minikube/profiles/minikube
-sudo cp /root/.minikube/profiles/minikube/client.key /home/$USER/.minikube/profiles/minikube
-sudo chown -R $USER:$USER /home/$USER/.kube
-sudo chown -R $USER:$USER /home/$USER/.minikube
-sed -i  "s/root/home\/$USER/" ~/.kube/config
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> ~/.minikube/profiles/minikube
+<span class="nb">sudo cp</span> <span class="nt">-r</span> /root/.kube /home/<span class="nv">$USER</span>
+<span class="nb">sudo cp</span> /root/.minikube/ca.crt /home/<span class="nv">$USER</span>/.minikube/ca.crt
+<span class="nb">sudo cp</span> /root/.minikube/profiles/minikube/client.crt /home/<span class="nv">$USER</span>/.minikube/profiles/minikube
+<span class="nb">sudo cp</span> /root/.minikube/profiles/minikube/client.key /home/<span class="nv">$USER</span>/.minikube/profiles/minikube
+<span class="nb">sudo chown</span> <span class="nt">-R</span> <span class="nv">$USER</span>:<span class="nv">$USER</span> /home/<span class="nv">$USER</span>/.kube
+<span class="nb">sudo chown</span> <span class="nt">-R</span> <span class="nv">$USER</span>:<span class="nv">$USER</span> /home/<span class="nv">$USER</span>/.minikube
+<span class="nb">sed</span> <span class="nt">-i</span>  <span class="s2">"s/root/home</span><span class="se">\/</span><span class="nv">$USER</span><span class="s2">/"</span> ~/.kube/config
 </code></pre></div></div>
 
 <p>Once the minikube install is complete, validate that everything is working properly.</p>
@@ -487,8 +487,8 @@ kubevirt   Ready    control-plane,master   4m5s   v1.20.2
 
 <p>Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. Using the minikube addons manager, we will install kubevirt into our cluster:</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>minikube addons <span class="nb">enable </span>kubevirt
-<span class="nv">$ </span>kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kubevirt kubevirt <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available <span class="nt">--timeout</span><span class="o">=</span>300s
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>minikube addons <span class="nb">enable </span>kubevirt
+kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kubevirt kubevirt <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available <span class="nt">--timeout</span><span class="o">=</span>300s
 </code></pre></div></div>
 
 <p>At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an <em>mdevNameSelector</em> to look for, and a <em>resourceName</em> to assign to it. The <em>mdevNameSelector</em> comes from the “mdev_type” that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.</p>
@@ -565,9 +565,9 @@ spec:
 
 <p>One final step, lets get the latest release of virtctl which we will be using as we install Windows.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.observedKubeVirtVersion}")
-curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-linux-amd64
-sudo install virtctl /usr/local/bin
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>kubectl get kubevirt.kubevirt.io/kubevirt <span class="nt">-n</span> kubevirt <span class="nt">-o</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.status.observedKubeVirtVersion}"</span><span class="si">)</span>
+curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
+<span class="nb">sudo install </span>virtctl /usr/local/bin
 </code></pre></div></div>
 
 <h2 id="install-windows">Install Windows</h2>
@@ -702,6 +702,7 @@ spec:
 </span><span class="no">EOF
 </span>kubectl create <span class="nt">-f</span> win10vm1.yaml
 </code></pre></div></div>
+
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">NOTE</p><p>This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.</p>
 
 
@@ -718,8 +719,8 @@ spec:
 
 <p>We can now start the virtual machine:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl start win10vm1
-kubectl get vmi --watch
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl start win10vm1
+kubectl get vmi <span class="nt">--watch</span>
 </code></pre></div></div>
 
 <p>When the output of shows that the vm is in a “Running” phase you can “CTRL+C” to end the watch command.</p>
@@ -728,7 +729,7 @@ kubectl get vmi --watch
 
 <p>Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.</p>
 
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl vnc win10vm1
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl vnc win10vm1
 </code></pre></div></div>
 
 <p>A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.</p>
@@ -740,6 +741,7 @@ kubectl get vmi --watch
 <h2 id="using-the-gpu">Using the GPU</h2>
 
 <p>In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:</p>
+
 <ol>
   <li>In the Windows 10 search bar, type “<strong>Remote Desktop Settings</strong>” and then open the result.</li>
   <li>Select “<strong>Enable Remote Desktop</strong>” and confirm the change.</li>

@@ -254,13 +254,14 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           </div>
         </header>
         <article class="post-content">
-          <h1 id="monitoring-kubevirt-vms-from-the-inside">Monitoring KubeVirt VMs from the inside</h1>
+          <h2 id="monitoring-kubevirt-vms-from-the-inside">Monitoring KubeVirt VMs from the inside</h2>
 
 <p>This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus <a href="https://github.com/prometheus/node_exporter">node-exporter</a>. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.</p>
 
 <h2 id="environment">Environment</h2>
 
 <p>This set of tools will be used on this guide:</p>
+
 <ul>
   <li><a href="https://github.com/helm/helm">Helm v3</a> - To deploy the Prometheus-Operator.</li>
   <li><a href="https://github.com/kubernetes/minikube">minikube</a> - Will provide us a k8s cluster, you are free to choose any other k8s provider though.</li>
@@ -275,16 +276,21 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Although monitoring KubeVirt itself is not covered in this guide, it is a good practice to always deploy the Prometheus Operator before deploying KubeVirt.</p>
 
 <p>To deploy the Prometheus Operator, you will need to create its namespace first, e.g. <code class="language-plaintext highlighter-rouge">monitoring</code>:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create ns monitoring
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create ns monitoring
 </code></pre></div></div>
+
 <p>Then deploy the operator in the new namespace:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>helm fetch stable/prometheus-operator
-tar xzf prometheus-operator*.tgz
-cd prometheus-operator/ &amp;&amp; helm install -n monitoring -f values.yaml kubevirt-prometheus stable/prometheus-operator
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>helm fetch stable/prometheus-operator
+<span class="nb">tar </span>xzf prometheus-operator<span class="k">*</span>.tgz
+<span class="nb">cd </span>prometheus-operator/ <span class="o">&amp;&amp;</span> helm <span class="nb">install</span> <span class="nt">-n</span> monitoring <span class="nt">-f</span> values.yaml kubevirt-prometheus stable/prometheus-operator
 </code></pre></div></div>
+
 <p>After everything is deployed, you can delete everything that was downloaded by helm:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>cd ..
-rm -rf prometheus-operator*
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cd</span> ..
+<span class="nb">rm</span> <span class="nt">-rf</span> prometheus-operator<span class="k">*</span>
 </code></pre></div></div>
 
 <p>One thing to keep in mind is the release name we added here: <code class="language-plaintext highlighter-rouge">kubevirt-prometheus</code>. The release name will be used when declaring our <code class="language-plaintext highlighter-rouge">ServiceMonitor</code> later on..</p>
@@ -294,31 +300,34 @@ rm -rf prometheus-operator*
 <p>Alright, the next step will be deploying KubeVirt itself. We will start with its operator.</p>
 
 <p>We will fetch the latest version, then use <code class="language-plaintext highlighter-rouge">kubectl create</code> to deploy the manifest directly from Github::</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export KUBEVIRT_VERSION=$(curl -s https://api.github.com/repos/kubevirt/kubevirt/releases | grep tag_name | grep -v -- - | sort -V | tail -1 | awk -F':' '{print $2}' | sed 's/,//' | xargs)
-kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> - | <span class="nb">sort</span> <span class="nt">-V</span> | <span class="nb">tail</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
+kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 </code></pre></div></div>
 
 <p>Before deploying the KubeVirt CR, make sure that all kubevirt-operator replicas are ready, you can do that with:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl rollout status -n kubevirt deployment virt-operator
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl rollout status <span class="nt">-n</span> kubevirt deployment virt-operator
 </code></pre></div></div>
 
 <p>After that, we can deploy KubeVirt and wait for all it’s components to get ready in a similar manner:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
-kubectl rollout status -n kubevirt deployment virt-api
-kubectl rollout status -n kubevirt deployment virt-controller
-kubectl rollout status -n kubevirt daemonset virt-handler
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
+kubectl rollout status <span class="nt">-n</span> kubevirt deployment virt-api
+kubectl rollout status <span class="nt">-n</span> kubevirt deployment virt-controller
+kubectl rollout status <span class="nt">-n</span> kubevirt daemonset virt-handler
 </code></pre></div></div>
 
 <p>If we want to monitor VMs that can restart, we want our node-exporter to be persisted and, thus, we need to set up persistent storage for them. <a href="https://github.com/kubevirt/containerized-data-importer">CDI</a> will be the component responsible for that, so we will deploy it’s operator and custom resource as well. As always, waiting for the right components to get ready before proceeding:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>export CDI_VERSION=$(curl -s https://github.com/kubevirt/containerized-data-importer/releases/latest | grep -o "v[0-9]\.[0-9]*\.[0-9]*")
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-operator.yaml
-kubectl rollout status -n cdi deployment cdi-operator
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">CDI_VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
+kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VERSION</span>/cdi-operator.yaml
+kubectl rollout status <span class="nt">-n</span> cdi deployment cdi-operator
 
-kubectl create -f https://github.com/kubevirt/containerized-data-importer/releases/download/$CDI_VERSION/cdi-cr.yaml
-kubectl rollout status -n cdi deployment cdi-apiserver
-kubectl rollout status -n cdi deployment cdi-uploadproxy
-kubectl rollout status -n cdi deployment cdi-deployment
+kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$CDI_VERSION</span>/cdi-cr.yaml
+kubectl rollout status <span class="nt">-n</span> cdi deployment cdi-apiserver
+kubectl rollout status <span class="nt">-n</span> cdi deployment cdi-uploadproxy
+kubectl rollout status <span class="nt">-n</span> cdi deployment cdi-deployment
 </code></pre></div></div>
 
 <h2 id="deploying-a-virtualmachine-with-persistent-storage">Deploying a VirtualMachine with persistent storage</h2>
@@ -412,6 +421,7 @@ kubectl rollout status -n cdi deployment cdi-deployment
 <p>Once the VirtualMachineInstance is running, we can connect to its console using <code class="language-plaintext highlighter-rouge">virtctl console monitorable-vm</code>. If user and password are required, provide your credentials accordingly. If you are using the same disk image from this guide, the user and password are <code class="language-plaintext highlighter-rouge">cirros</code> and <code class="language-plaintext highlighter-rouge">gocubsgo</code> respectively.</p>
 
 <p>The following script will install node-exporter and configure the VM to always start the exporter when booting:</p>
+
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-LO</span> <span class="nt">-k</span> https://github.com/prometheus/node_exporter/releases/download/v1.0.1/node_exporter-1.0.1.linux-amd64.tar.gz
 <span class="nb">gunzip</span> <span class="nt">-c</span> node_exporter-1.0.1.linux-amd64.tar.gz | <span class="nb">tar </span>xopf -
 ./node_exporter-1.0.1.linux-amd64/node_exporter &amp;
@@ -424,8 +434,11 @@ echo "Starting up node_exporter at :9100!"
 EOF'</span>
 <span class="nb">sudo chmod</span> +x /etc/rc.local
 </code></pre></div></div>
-<p><em>P.S.: If you are using a different base image, please configure node-exporter to start at boot time accordingly</em></p>
 
+<div class="premonition info"><div class="fa fa-info-circle"></div><div class="content"><p>P.S.: If you are using a different base image, please configure node-exporter to start at boot time accordingly</p>
+
+
+</div></div>
 <h2 id="configuring-prometheus-to-scrape-the-vms-node-exporter">Configuring Prometheus to scrape the VM’s node-exporter</h2>
 
 <p>To configure Prometheus to scrape the node-exporter (or other applications) is really simple. All we need is to create a new <code class="language-plaintext highlighter-rouge">Service</code> and a <code class="language-plaintext highlighter-rouge">ServiceMonitor</code>:</p>
@@ -465,6 +478,7 @@ EOF'</span>
 </code></pre></div></div>
 
 <p>Let’s break this down just to make sure we set up everything right. Starting with the <code class="language-plaintext highlighter-rouge">Service</code>:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
   <span class="na">ports</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">metrics</span>
@@ -474,6 +488,7 @@ EOF'</span>
   <span class="na">selector</span><span class="pi">:</span>
     <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
 </code></pre></div></div>
+
 <p>On the specification, we are creating a new port named <code class="language-plaintext highlighter-rouge">metrics</code> that will be redirected to every pod labeled with <code class="language-plaintext highlighter-rouge">prometheus.kubevirt.io: "node-exporter"</code>, at port 9100, which is the default port number for the node-exporter.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
@@ -483,9 +498,11 @@ EOF'</span>
   <span class="na">labels</span><span class="pi">:</span>
     <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
 </code></pre></div></div>
+
 <p>We are also labeling the Service itself with <code class="language-plaintext highlighter-rouge">prometheus.kubevirt.io: "node-exporter"</code>, that will be used by the <code class="language-plaintext highlighter-rouge">ServiceMonitor</code> object.</p>
 
 <p>Now let’s take a look at our <code class="language-plaintext highlighter-rouge">ServiceMonitor</code> specification:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
   <span class="na">namespaceSelector</span><span class="pi">:</span>
     <span class="na">any</span><span class="pi">:</span> <span class="no">true</span>
@@ -496,13 +513,15 @@ EOF'</span>
   <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="s">metrics</span>
     <span class="na">interval</span><span class="pi">:</span> <span class="s">15s</span>
 </code></pre></div></div>
+
 <p>Since our ServiceMonitor will be deployed at the <code class="language-plaintext highlighter-rouge">monitoring</code> namespace, but our service is at the <code class="language-plaintext highlighter-rouge">default</code> namespace, we need <code class="language-plaintext highlighter-rouge">namespaceSelector.any=true</code>.</p>
 
 <p>We are also telling our ServiceMonitor that Prometheus needs to scrape endpoints from services labeled with <code class="language-plaintext highlighter-rouge">prometheus.kubevirt.io: "node-exporter"</code> and which ports are named <code class="language-plaintext highlighter-rouge">metrics</code>. Luckily, that’s exactly what we did with our <code class="language-plaintext highlighter-rouge">Service</code>!</p>
 
 <p>One last thing to keep an eye on. Prometheus configuration can be set up to watch multiple ServiceMonitors. We can see which ServiceMonitors our Prometheus is watching with the following command:</p>
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Look for Service Monitor Selector
-kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Look for Service Monitor Selector</span>
+kubectl describe <span class="nt">-n</span> monitoring prometheuses.monitoring.coreos.com monitoring-prometheus-oper-prometheus
 </code></pre></div></div>
 
 <p>Make sure our ServiceMonitor has all labels required by Prometheus’ <code class="language-plaintext highlighter-rouge">Service Monitor Selector</code>. One common selector is the release name that we’ve set when deploying our Prometheus with helm!</p>
@@ -511,7 +530,7 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 
 <p>You can do a quick test by port-forwarding Prometheus web UI and executing some PromQL:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl port-forward -n monitoring prometheus-monitoring-prometheus-oper-prometheus-0 9090:9090
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl port-forward <span class="nt">-n</span> monitoring prometheus-monitoring-prometheus-oper-prometheus-0 9090:9090
 </code></pre></div></div>
 
 <p>To make sure everything is working, access <code class="language-plaintext highlighter-rouge">localhost:9090/graph</code> and execute the PromQL <code class="language-plaintext highlighter-rouge">up{pod=~"virt-launcher.*"}</code>. Prometheus should return data that is being collected from <code class="language-plaintext highlighter-rouge">monitorable-vm</code>’s node-exporter.</p>
@@ -519,6 +538,7 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 <p>You can play around with <code class="language-plaintext highlighter-rouge">virtctl</code>, stop and starting the VM to see how the metrics behave. You will notice that when stopping the VM with <code class="language-plaintext highlighter-rouge">virtctl stop monitorable-vm</code>, the VirtualMachineInstance is killed and, thus, so is it’s pod. This will result with our service not being able to find the pod’s endpoint and then it will be removed from Prometheus’ targets.</p>
 
 <p>With this behavior, alerts like the one below won’t work since our target is literally gone, not down.</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">alert</span><span class="pi">:</span> <span class="s">KubeVirtVMDown</span>
     <span class="s">expr</span><span class="pi">:</span> <span class="s">up{pod=~"virt-launcher.*"} == </span><span class="m">0</span>
     <span class="na">for</span><span class="pi">:</span> <span class="s">1m</span>
@@ -529,6 +549,7 @@ kubectl describe -n monitoring prometheuses.monitoring.coreos.com monitoring-pro
 </code></pre></div></div>
 
 <p><strong>BUT</strong>, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">alert</span><span class="pi">:</span> <span class="s">KubeVirtVMCrashing</span>
     <span class="s">expr</span><span class="pi">:</span> <span class="s">up{pod=~"virt-launcher.*"} == </span><span class="m">0</span>
     <span class="na">for</span><span class="pi">:</span> <span class="s">5m</span>

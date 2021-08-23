@@ -266,6 +266,7 @@ For an overview of KubeVirt security, please first read <a href="/2020/KubeVirt-
 <p>A simple policy example would be to allow a <code class="language-plaintext highlighter-rouge">/bin/test</code> program to read its <code class="language-plaintext highlighter-rouge">/etc/test.conf</code> configuration file.</p>
 
 <p>The policy for that would include directives to:</p>
+
 <ul>
   <li>Assign types to files and processes, like <code class="language-plaintext highlighter-rouge">test_bin_t</code> for <code class="language-plaintext highlighter-rouge">/bin/test</code>, <code class="language-plaintext highlighter-rouge">test_conf_t</code> for <code class="language-plaintext highlighter-rouge">/etc/test.conf</code>, and <code class="language-plaintext highlighter-rouge">test_t</code> for instances of the test program</li>
   <li>Configure a <em>transition</em> from <code class="language-plaintext highlighter-rouge">test_bin_t</code> to <code class="language-plaintext highlighter-rouge">test_t</code></li>
@@ -295,6 +296,7 @@ For an overview of KubeVirt security, please first read <a href="/2020/KubeVirt-
 <p>Categories range from 0 to 1023. Since only 1024 unique IDs would be quite limiting, most virtualization-related applications combine 2 categories, which add up to about 500,000 combinations. It’s important to note that categories have no order, so <code class="language-plaintext highlighter-rouge">c42,c42</code> is equivalent to <code class="language-plaintext highlighter-rouge">c42</code>, and <code class="language-plaintext highlighter-rouge">c1,c2</code> is equivalent to <code class="language-plaintext highlighter-rouge">c2,c1</code>.</p>
 
 <p>In the example above, we can now:</p>
+
 <ul>
   <li>Dynamically compute a unique random category for each VM</li>
   <li>Assign the corresponding categories to all VM resources, like qemu instance and disk files</li>

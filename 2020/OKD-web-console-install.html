@@ -383,7 +383,7 @@ Done <span class="k">in </span>215.91s.
 
 <p>The result of the process is a binary file called <strong>bridge</strong> inside the bin folder. Prior to run the <em>“bridge”</em>, it has to be verified that the port where the OKD web console is expecting connections is not blocked.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 9000 <span class="nt">-m</span> conntrack <span class="nt">--ctstate</span> NEW,ESTABLISHED <span class="nt">-j</span> ACCEPT
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 9000 <span class="nt">-m</span> conntrack <span class="nt">--ctstate</span> NEW,ESTABLISHED <span class="nt">-j</span> ACCEPT
 </code></pre></div></div>
 
 <p>Then, the artifact can be executed:</p>
@@ -405,8 +405,8 @@ Done <span class="k">in </span>215.91s.
 
 <p>The other option is create a new service account called <strong>console</strong>, grant cluster-admin permissions to it and configure the web console to run with this new service account:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
-<span class="nv">$ </span>kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
+kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
 </code></pre></div></div>
 
 <p>Once created, modify the <code class="language-plaintext highlighter-rouge">environment.sh</code> file and change the line that starts with <code class="language-plaintext highlighter-rouge">secretname</code> as shown below:</p>
@@ -417,7 +417,7 @@ Done <span class="k">in </span>215.91s.
 
 <p>Now, variables configured in the <code class="language-plaintext highlighter-rouge">environment.sh</code> file have to be exported again and the connection to the console must be reloaded.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> ./contrib/environment.sh
 </code></pre></div></div>
 
 <h2 id="deploy-kubevirt-using-the-hyperconverged-cluster-operator-hco">Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)</h2>
@@ -555,8 +555,8 @@ virt-operator-84f5588df6-zzrsb                        1/1     Running   1       
 
 <p>Then, create a specific service account (<strong>console</strong>) for running the OpenShift web console in case it is not created <a href="#compiling-okd-web-console">previously</a> and grant cluster-admin permissions:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
-<span class="nv">$ </span>kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
+kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
 </code></pre></div></div>
 
 <p>Next, extract the <strong>token secret name</strong> associated with the console service account:</p>

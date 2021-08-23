@@ -273,14 +273,17 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>We’ve maintained this simplicity today. Installing KubeVirt v0.27.0 is as simple as…</p>
 
 <p><strong>Step 1:</strong> posting the KubeVirt operator manifest</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-operator.yaml
 </code></pre></div></div>
 
 <p><strong>Step 2:</strong> posting the KubeVirt install object, which you can use to define exactly what version you want to install using the KubeVirt operator. In our example here, this custom resource defaults to the release that matches the installed operator.</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.27.0/kubevirt-cr.yaml
 </code></pre></div></div>
 
 <p><strong>Step 3:</strong> and then optionally waiting for the KubeVirt install object’s “Available” condition, which indicates installation has succeeded.</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
 </code></pre></div></div>
 
@@ -295,17 +298,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Using our default installation instructions, zero downtime updates are as simple as posting a new virt-operator deployment.</p>
 
 <p><strong>Step 1.</strong> Update virt-operator from our original install of v0.27.0 to v0.28.0 by applying a new virt-operator manifest.</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v0.28.0/kubevirt-operator.yaml
 </code></pre></div></div>
 
 <p><strong>Step 2:</strong> Watch the install object to see when the installation completes. Eventually it will report v0.28.0 as the observed version which indicates the update has completed.</p>
+
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get kv <span class="nt">-o</span> yaml <span class="nt">-n</span> kubevirt | <span class="nb">grep </span>observedKubeVirtVersion
 </code></pre></div></div>
 
 <p>Behind the scenes, virt-operator is coordinating the roll out of all the new KubeVirt components in a way that ensures existing virtual machine workloads are not disrupted.</p>
 
 <p>The KubeVirt community supports and tests the update path between each KubeVirt minor release to ensure workloads remain available both before, during, and after an update has completed. Furthermore, there are a set of functional tests that run on every pull request made to the project that validate the code about to be submitted does not disrupt the update path from the latest KubeVirt release. Our merge process won’t even allow code to enter the code base without first passing these update functional tests on a live cluster.</p>
-
 
         </article>
         

@@ -310,22 +310,22 @@ k8s-test.local# systemctl <span class="nb">enable</span> <span class="nt">--now<
 
 <p>When the installation finishes the command will print a similar message like this one:</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Your Kubernetes control-plane has initialized successfully!
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Your Kubernetes control-plane has initialized successfully!
 
 To start using your cluster, you need to run the following as a regular user:
 
-  mkdir -p $HOME/.kube
-  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
-  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+  <span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/.kube
+  <span class="nb">sudo cp</span> <span class="nt">-i</span> /etc/kubernetes/admin.conf <span class="nv">$HOME</span>/.kube/config
+  <span class="nb">sudo chown</span> <span class="si">$(</span><span class="nb">id</span> <span class="nt">-u</span><span class="si">)</span>:<span class="si">$(</span><span class="nb">id</span> <span class="nt">-g</span><span class="si">)</span> <span class="nv">$HOME</span>/.kube/config
 
 You should now deploy a pod network to the cluster.
-Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+Run <span class="s2">"kubectl apply -f [podnetwork].yaml"</span> with one of the options listed at:
   https://kubernetes.io/docs/concepts/cluster-administration/addons/
 
-Then you can join any number of worker nodes by running the following on each as root:
+Then you can <span class="nb">join </span>any number of worker nodes by running the following on each as root:
 
-kubeadm join 192.168.0.10:6443 --token 6fsrbi.iqsw1girupbwue5o \
-    --discovery-token-ca-cert-hash sha256:c7cf9d9681876856f9b7819067841436831f19004caadab0b5838a9bf7f4126a
+kubeadm <span class="nb">join </span>192.168.0.10:6443 <span class="nt">--token</span> 6fsrbi.iqsw1girupbwue5o <span class="se">\</span>
+    <span class="nt">--discovery-token-ca-cert-hash</span> sha256:c7cf9d9681876856f9b7819067841436831f19004caadab0b5838a9bf7f4126a
 </code></pre></div></div>
 
 <p>Now, it’s time to deploy the pod network. If the reader is curious and want to already check the status of the cluster, the following commands can be executed for getting all the pods running and their status:</p>
