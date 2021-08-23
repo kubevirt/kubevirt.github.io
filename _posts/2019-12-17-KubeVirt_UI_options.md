@@ -71,7 +71,6 @@ With further work and investigation, it could be an option to develop a specific
 As defined in the [official webpage](https://www.okd.io/):
 
 > OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.
-
 > OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.
 
 A few weeks ago Kubernetes distribution [OKD4](https://github.com/openshift/okd) was released as preview. OKD is the official upstream version of Red Hat's OpenShift. Since OpenShift includes KubeVirt (Red Hat calls it [CNV](https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html)) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.
@@ -179,7 +178,7 @@ Octant, although it does not have any specific integration with KubeVirt, looks 
 > note "Note"
 > We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list
 
-## References:
+## References
 
 - [Octant](https://octant.dev)
 - [OKD](https://www.okd.io/)

@@ -195,7 +195,7 @@ Some values can be adjusted (check the [table](#configuring-live-migration) for 
 
 - Increasing the number of VMs that can migrate at once, will reduce the available bandwidth.
 - Increasing the bandwidth could affect applications running on that node (origin and target).
-- Storage migration (check the `Info` note in the [Performing the Live Migration ](#performing-the-live-migration) section on the differences) might also consume bandwidth and resources.
+- Storage migration (check the `Info` note in the [Performing the Live Migration](#performing-the-live-migration) section on the differences) might also consume bandwidth and resources.
 
 ## Node Eviction
 

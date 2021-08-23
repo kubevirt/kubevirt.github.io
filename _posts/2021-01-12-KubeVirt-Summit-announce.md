@@ -18,12 +18,12 @@ pub-year: 2021
 
 Exciting news! The KubeVirt community are in the process of planning the first ever **KubeVirt Summit**!
 
-## Save the dates!
+## Save the dates
 
 The event will take place online during two half-days:
 
-  - Dates: February 9 and 10, 2021.
-  - Time: 15:00 – 19:00 UTC (10:00–14:00 EST, 16:00–20:00 CET)
+- Dates: February 9 and 10, 2021.
+- Time: 15:00 – 19:00 UTC (10:00–14:00 EST, 16:00–20:00 CET)
 
 ## Proposing topics
 

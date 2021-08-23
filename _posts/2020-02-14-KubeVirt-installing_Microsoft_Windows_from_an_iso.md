@@ -38,6 +38,7 @@ To proceed with the Installation steps the different elements involved are liste
 > No need for executing any command until the [Installation](#installation) section.
 
 1. An empty KubeVirt Virtual Machine
+
    ```yaml
    apiVersion: kubevirt.io/v1alpha3
    kind: VirtualMachine
@@ -63,6 +64,7 @@ To proceed with the Installation steps the different elements involved are liste
          volumes:
        ...
    ```
+
 2. A PVC with the Microsoft Windows ISO file attached as CD-ROM to the VM, would be automatically created with the `virtctl` command when uploading the file
 
    First thing here is to download the ISO file of the Microsoft Windows, for that the [Microsoft Evaluation Center](https://www.Microsoft.com/en-us/evalcenter/evaluate-windows-server-2012-r2) offers
@@ -132,7 +134,7 @@ To proceed with the Installation steps the different elements involved are liste
    The container image has to be pulled to have it available in the local registry.
 
    ```sh
-   $ docker pull kubevirt/virtio-container-disk
+   docker pull kubevirt/virtio-container-disk
    ```
 
    And also it has to be referenced in the VM YAML, in this example the name for the `containerDisk` is `virtiocontainerdisk`.
@@ -267,7 +269,7 @@ To proceed with the installation the commands commented above are going to be ex
 5. Once the status of the VMI is `RUNNING` it's time to connect using VNC:
 
    ```sh
-   $ virtctl vnc win2k12-iso
+   virtctl vnc win2k12-iso
    ```
 
    ![windows2k12_install.png](/assets/2020-02-14-KubeVirt-installing_Microsoft_Windows_from_an_iso/windows2k12_install.png "KubeVirt Microsoft Windows installation")

@@ -26,7 +26,7 @@ comments: true
 
 ## Introduction
 
-Most interaction with the KubeVirt service can be handled using the _virtctl_ command, or raw yaml applied to your Kubernetes cluster. But what if you want to have more direct programmatic control over the instantiation and management of those virtual machines? The KubeVirt project supplies a Go client library for interacting with KubeVirt called [client-go](https://github.com/kubevirt/client-go). This library allows you to write your own applications that interact directly with the KubeVirt api quickly and easily. 
+Most interaction with the KubeVirt service can be handled using the _virtctl_ command, or raw yaml applied to your Kubernetes cluster. But what if you want to have more direct programmatic control over the instantiation and management of those virtual machines? The KubeVirt project supplies a Go client library for interacting with KubeVirt called [client-go](https://github.com/kubevirt/client-go). This library allows you to write your own applications that interact directly with the KubeVirt api quickly and easily.
 
 In this post, we will use a simple application to demonstrate how the KubeVirt client library authenticates with your Kubernetes cluster both in and out of your cluster. This application is based on the example application in the "client-go" library with a few small modifications to it, to allow for running both locally and within in the cluster. This tutorial assumes you have some knowledge of Go, and is not meant to be a Go training doc.
 
@@ -45,9 +45,9 @@ The example application we will be using to demonstrate the authentication metho
 Start by cloning the example application repo [https://github.com/xphyr/kubevirt-apiauth](https://github.com/xphyr/kubevirt-apiauth) and compiling our test application:
 
 ```shell
-$ git clone https://github.com/xphyr/kubevirt-apiauth.git
-$ cd kubevirt-apiauth/listvms
-$ go build
+git clone https://github.com/xphyr/kubevirt-apiauth.git
+cd kubevirt-apiauth/listvms
+go build
 ```
 
 Once the program compiles, test to ensure that the application compiled correctly. If you have a working Kubernetes context, running this command may return some values. If you do not have a current context, you will get an error. This is OK, we will discuss authentication next.
@@ -128,11 +128,11 @@ The data listed for the "token" key is the information we will use in the next s
 We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the "_kubectl_" command to log in with the new token. Open a NEW terminal window. This will be the window we use for the service account. In this new terminal window start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the "_kubectl_" command to generate a new kubeconfig file:
 
 ```shell
-$ export KUBECONFIG=$(pwd)/sa-kubeconfig
-$ kubectl config set-cluster minikube --server=https://<update IP address>:8443 --insecure-skip-tls-verify
-$ kubectl config set-credentials mykubevirtrunner --token=<paste token from last step here>
-$ kubectl config set-context minikube --cluster=minikube --namespace=default --user=mykubevirtrunner
-$ kubectl config use-context minikube
+export KUBECONFIG=$(pwd)/sa-kubeconfig
+kubectl config set-cluster minikube --server=https://<update IP address>:8443 --insecure-skip-tls-verify
+kubectl config set-credentials mykubevirtrunner --token=<paste token from last step here>
+kubectl config set-context minikube --cluster=minikube --namespace=default --user=mykubevirtrunner
+kubectl config use-context minikube
 ```
 
 We can test that the new kubeconfig file is working by running a kubectl command:
@@ -216,14 +216,14 @@ awaiting signal
 As currently configured, the mykubevirtrunner service account can only "view" KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.
 
 ```shell
-$ kubectl create namespace myvms
-$ <launch an addition vm here>
-$ kubectl create clusterrolebinding kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=default:mykubevirtrunner -n myvms
+kubectl create namespace myvms
+<launch an addition vm here>
+kubectl create clusterrolebinding kubevirt-viewer --clusterrole=kubevirt.io:view --serviceaccount=default:mykubevirtrunner -n myvms
 ```
 
 We can test that the ServiceAccount has been updated to also have permissions to view in the "myvms" namespace by running our listvms command one more time, this time passing in the optional flag _--namespaces_. Switch to your terminal window that is using the service account kubeconfig file and run the following command:
 
-```
+```shell
 $ listvms/listvms --namespaces myvms
 additional namespaces to check are:  myvms
 Checking the following namespaces:  [default myvms]

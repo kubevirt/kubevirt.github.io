@@ -45,7 +45,6 @@ In this example the following systems names and IP addresses are used:
 For being able to import Virtual Machines, the KubeVirt CDI has to be configured too.
 
 > Containerized-Data-Importer (CDI) is a persistent storage management add-on for Kubernetes. Its primary goal is to provide a declarative way to build Virtual Machine Disks on PVCs for KubeVirt VMs.
-
 > CDI works with standard core Kubernetes resources and is storage device-agnostic, while its primary focus is to build disk images for Kubevirt, it's also useful outside of a KubeVirt context to use for initializing your Kubernetes Volumes with data.
 
 In the case your cluster doesn't have CDI, the following commands will cover CDI operator and the CR setup:

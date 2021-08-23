@@ -20,11 +20,11 @@ pub-date: April 21
 pub-year: 2021
 ---
 
-# Introduction
+## Introduction
 
 This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with [Tekton Pipelines](https://github.com/tektoncd/pipeline).
 
-Tekton Pipelines can be used to create a single `Pipeline` that encapsulates the installation process which can be run and replicated with `PipelineRuns`. 
+Tekton Pipelines can be used to create a single `Pipeline` that encapsulates the installation process which can be run and replicated with `PipelineRuns`.
 The pipeline will be built with [KubeVirt Tekton Tasks](https://github.com/kubevirt/kubevirt-tekton-tasks), which includes all the necessary tasks for this example.
 
 ## Pipeline Description
@@ -33,33 +33,34 @@ The pipeline will prepare an empty Persistent Volume Claim (PVC) and download a 
 It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
 Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
 You can later use the artifact PVC as a base image and copy it for new VMs.
-# Prerequisites
+
+## Prerequisites
 
 - KubeVirt `v0.39.0`
 - Tekton Pipelines `v0.19.0`
 - KubeVirt Tekton Tasks `v0.3.0`
 
-# Running Windows Installer Pipeline 
+## Running Windows Installer Pipeline
 
 ## Obtaining a URL of Windows Source ISO
 
 First we have to obtain a Download URL of Windows Source ISO.
 
-1. Go to https://www.microsoft.com/en-us/software-download/windows10ISO. You can also obtain a server edition for evaluation at https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019.
+1. Go to [https://www.microsoft.com/en-us/software-download/windows10ISO](https://www.microsoft.com/en-us/software-download/windows10ISO). You can also obtain a server edition for evaluation at [https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019](https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019).
 2. Fill in the edition and `English` language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.
 3. Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.
 
 ## Preparing autounattend.xml ConfigMap
 
-Now we have to prepare our autounattend.xml Answer File with the installation instructions. We will store it in a `ConfigMap`, but optionally it can be stored in a `Secret` as well. 
+Now we have to prepare our autounattend.xml Answer File with the installation instructions. We will store it in a `ConfigMap`, but optionally it can be stored in a `Secret` as well.
 
 The configuration file can be generated with [Windows SIM](https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/windows-system-image-manager-overview-topics)
 or it can be specified manually according to [Answer File Reference](https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/answer-files-overview)
 and [Answer File Components Reference](https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend).
 
 The following config map includes the required drivers and guest disk configuration.
-It also specifies how the installation should proceed and what users should be created. 
-In our case it is an `Administrator` user with `changepassword` password. 
+It also specifies how the installation should proceed and what users should be created.
+In our case it is an `Administrator` user with `changepassword` password.
 You can also change the Answer File according to your needs by consulting the already mentioned documentation.
 
 ```yaml
@@ -260,7 +261,7 @@ data:
 
 Let's create a pipeline which consists of the following tasks.
 
-```
+```shell
   create-source-dv --- create-vm-from-manifest --- wait-for-vmi-status --- cleanup-vm
                     |
     create-base-dv --
@@ -272,7 +273,7 @@ Let's create a pipeline which consists of the following tasks.
    from the empty PVC and with the `windows-10-source-*` PVC attached as a CD-ROM.
 4. `wait-for-vmi-status` task waits until the VM shuts down.
 5. `cleanup-vm` deletes the installer VM and ISO PVC.
-6.  The output artifact will be the `windows-10-base-*` PVC with the Windows installation.
+6. The output artifact will be the `windows-10-base-*` PVC with the Windows installation.
 
 ```yaml
 apiVersion: tekton.dev/v1beta1
@@ -439,7 +440,7 @@ spec:
 
 ## Running the Pipeline
 
-To run the pipeline we need to create the following `PipelineRun` which references our `Pipeline`. 
+To run the pipeline we need to create the following `PipelineRun` which references our `Pipeline`.
 Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.
 
 The `PipelineRun` also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole `Pipeline`.
@@ -471,9 +472,7 @@ spec:
       serviceAccountName: cleanup-vm-task
 ```
 
-
 ## Inspecting the output
-
 
 Firstly, you can inspect the progress of the windows-10-source and windows-10-base import:
 
@@ -579,7 +578,7 @@ You can start the VM and login with `Administrator` : `changepassword` credentia
     alt="Started Windows VM">
 </div>
 
-# Resources
+## Resources
 
 - [YAML files used in this example](https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer)
 - [KubeVirt Tekton Tasks](https://github.com/kubevirt/kubevirt-tekton-tasks)

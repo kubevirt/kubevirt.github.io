@@ -22,19 +22,19 @@ pub-date: December 10
 pub-year: 2020
 ---
 
-**Table of contents**
+<b>Table of contents</b>
 
 <!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true -->
 
 - [The vision](#the-vision)
 - [Preparation of the environment](#preparation-of-the-environment)
-    - [Configuration of the Builder image server](#configuration-of-the-builder-image-server)
+  - [Configuration of the Builder image server](#configuration-of-the-builder-image-server)
 - [Building standard CentOS 8 image](#building-standard-centos-8-image)
-    - [Image creation with Builder Tool](#image-creation-with-builder-tool)
-    - [Verify the custom-built image](#verify-the-custom-built-image)
-    - [Image tailoring with virt-customize](#image-tailoring-with-virt-customize)
+  - [Image creation with Builder Tool](#image-creation-with-builder-tool)
+  - [Verify the custom-built image](#verify-the-custom-built-image)
+  - [Image tailoring with virt-customize](#image-tailoring-with-virt-customize)
 - [Building a standard CentOS 7 image from cloud images](#building-a-standard-centos-7-image-from-cloud-images)
-    - [Image creation with virt-customize](#image-creation-with-virt-customize)
+  - [Image creation with virt-customize](#image-creation-with-virt-customize)
 
 <!-- /TOC -->
 
@@ -166,7 +166,6 @@ Here it is a table where the software required to run the builds along with the 
 > note "Note"
 > Operating System is **CentOS 8** since CentOS 7 Image Builder is still an [experimental feature](https://docs.centos.org/en-US/centos/install-guide/Composer/)
 
-
 | Component     | Version                                                                                            |
 | --------- | ----------------------------------------------------------------------------------------------- |
 | Operating System  | CentOS Linux release 8.2.2004 (Core) |
@@ -177,8 +176,8 @@ Here it is a table where the software required to run the builds along with the 
 Once the builder image server is provisioned with latest CentOS 8, the `Virtualization Host` group package is installed. It will be required to test our customized images locally before containerizing and pushing them to the OKD registry.
 
 ```sh
-$ yum groupinstall "Virtualization Host" -y
-$ systemctl enable libvirtd --now
+yum groupinstall "Virtualization Host" -y
+systemctl enable libvirtd --now
 ```
 
 <br>
@@ -186,10 +185,10 @@ $ systemctl enable libvirtd --now
 Next, `virt-customize` is installed from the `libguestfs-tools` package along with the Image Builder. The latest is composed by lorax-composer, the Cockpit composer plugin and the composer-cli, which will be used to interact directly with Composer using command-line.
 
 ```sh
-$ dnf install -y libguestfs-tools lorax-composer composer-cli cockpit-composer
-$ systemctl enable lorax-composer.socket
-$ systemctl enable lorax-composer --now
-$ systemctl start cockpit
+dnf install -y libguestfs-tools lorax-composer composer-cli cockpit-composer
+systemctl enable lorax-composer.socket
+systemctl enable lorax-composer --now
+systemctl start cockpit
 ```
 
 <br>
@@ -197,9 +196,8 @@ $ systemctl start cockpit
 Then, the local firewall is configured so that we can connect to the Cockpit web user interface from our workstation.
 
 ```sh
-$ firewall-cmd --add-service=cockpit && firewall-cmd --add-service=cockpit --permanent
+firewall-cmd --add-service=cockpit && firewall-cmd --add-service=cockpit --permanent
 ```
-<br>
 
 Finally, connect to the Cockpit user interface by typing the IP or name of the Builder image server and port _TCP/9090_ (Cockpit's default) in your favourite web browser. Then, log in with a local administrator account.
 
@@ -251,11 +249,10 @@ The following image shows the Image Build plugin web page. Actually, what it is 
 
 > error "Error"
 > If Cockpit's web UI is not working, take a look at the output of the lorax service with the command:
-> ```sh
-> $ journalctl -fu lorax-composer
-> ```
 
-
+```sh
+journalctl -fu lorax-composer
+```
 
 ## Building standard CentOS 8 image
 
@@ -294,7 +291,6 @@ I would also suggest adding some users and all the packages you want to install 
 | sysadmin  | Privileged user owned by the Systems Engineering team to troubleshoot and have access to the VM |
 | developer | These are the credentials used by the developers to access the VM                               |
 
-
 <div class="my-gallery" itemscope itemtype="http://schema.org/ImageGallery">
   <figure
     itemprop="associatedMedia"
@@ -317,7 +313,6 @@ I would also suggest adding some users and all the packages you want to install 
   </figure>
 </div>
 
-
 Next, select the packages to include. Add the proper version of the package already agreed with the customer.
 
 | Package        | Version |
@@ -327,7 +322,6 @@ Next, select the packages to include. Add the proper version of the package alre
 | php            | 7.2.24  |
 | mariadb-server | 10.3.17 |
 | openssh-server | latest  |
-
 
 At this point, you already have a blueprint template to start working. In addition to using the web console, you can also use the **Image Builder CLI** to create images. When using the CLI, you have access to a few more customization options, such as managing firewall rules or download files from Git. Since we already have installed the composer-cli package in the [Image Builder server](#configuration-of-the-builder-image-server), let’s use it to further customize our golden image.
 
@@ -492,8 +486,6 @@ Format specific information:
 
 > warning "Warning"
 > Virtual size of the image is 4.3G, since we agreed 10G the disk must be resized and root filesystem expanded before being containerized. Currently, there is no way to specify disk capacity in containerDisk as it can be done with [emptyDisks](https://github.com/kubevirt/kubevirt/blob/master/docs/container-empty-disks.md#implementation). The size of the root filesystem and disk when running in KubeVirt is driven by the image.
-
-> warning "Warning"
 > It is recommended to save the QCOW2 images under /var/lib/libvirt/images/ so that qemu user have permissions to expand or resize them.
 
 ```sh
@@ -657,9 +649,9 @@ The result will be **two golden images CentOS 8**, both with cloud-init, but one
 > It is important to set the memsize of the building process to 4096m and have expanded the root filesystem otherwise you will face an out of space or/and out of memory error while installing the GNOME GUI.
 
 ```sh
-$ cp golden-devstation-centos8-disk-10G.qcow2 golden-devstation-centos8-disk-10G-gui.qcow2
-$ virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos8-disk-10G.qcow2 --install cloud-init --memsize 4096 --selinux-relabel
-$ virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos8-disk-10G-gui.qcow2 --install @graphical-server-environment,cloud-init --memsize 4096 --run-command "systemctl set-default graphical.target" --selinux-relabel
+cp golden-devstation-centos8-disk-10G.qcow2 golden-devstation-centos8-disk-10G-gui.qcow2
+virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos8-disk-10G.qcow2 --install cloud-init --memsize 4096 --selinux-relabel
+virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos8-disk-10G-gui.qcow2 --install @graphical-server-environment,cloud-init --memsize 4096 --run-command "systemctl set-default graphical.target" --selinux-relabel
 ```
 
 <br>
@@ -684,9 +676,8 @@ Since the Builder Tool is an [experimental tool in CentOS 7](https://docs.centos
 The process to create the golden CentOS 7 image is quite similar to the CentOS 8 one. However, in this case, the customize procedure is entirely done with _virt-customize_. The first step is to download the cloud image.
 
 ```sh
-$ curl -o /var/lib/libvirt/images/golden-devstation-centos7-disk.qcow2 https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+curl -o /var/lib/libvirt/images/golden-devstation-centos7-disk.qcow2 https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
 ```
-<br>
 
 Then, it is required to resize and expand the image to meet the agreed size of 10GB. The details are the same explained in the [previous section](#image-creation-with-builder-tool)
 
@@ -740,9 +731,9 @@ $ virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-cen
 Next, we need to create the graphical user interface image in a similar way as we did previously with CentOS 8 image.
 
 ```sh
-$ cp golden-devstation-centos7-disk-10G.qcow2 golden-devstation-centos7-disk-10G-gui.qcow2
+cp golden-devstation-centos7-disk-10G.qcow2 golden-devstation-centos7-disk-10G-gui.qcow2
 
-$ virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos7-disk-10G-gui.qcow2 --install cloud-init --memsize 4096 --run-command "yum groupinstall 'GNOME Desktop' -y" --run-command "systemctl set-default graphical.target" --selinux-relabel
+virt-customize --format qcow2 -a /var/lib/libvirt/images/golden-devstation-centos7-disk-10G-gui.qcow2 --install cloud-init --memsize 4096 --run-command "yum groupinstall 'GNOME Desktop' -y" --run-command "systemctl set-default graphical.target" --selinux-relabel
 ```
 
 At this point we built:
@@ -838,28 +829,28 @@ Before pushing the images, adapt container images to the proper name so they can
 > [Understanding containers, images and imageStreams](https://docs.openshift.com/container-platform/4.6/openshift_images/images-understand.html) from OpenShift documentation deeply explains container image naming.
 
 ```sh
-$ podman tag localhost/openshift/devstation-centos8:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal
-$ podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal --tls-verify=false
+podman tag localhost/openshift/devstation-centos8:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal
+podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-terminal --tls-verify=false
 ```
 
 ```sh
-$ podman tag localhost/openshift/devstation-centos:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui
-$ podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui --tls-verify=false
+podman tag localhost/openshift/devstation-centos:gui default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui
+podman push default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation:v8-gui --tls-verify=false
 ```
 
 Verify that the images are stored correctly in the OKD container registry by checking the [imageStream](https://docs.openshift.com/container-platform/4.6/openshift_images/image-streams-manage.html#working-with-imagestreams). As shown below, both images were uploaded successfully since the `devstation` imageStream contains two images with v8-gui and v8-terminal tags respectively.
 
 ```sh
-$ oc describe imageStream devstation -n openshift
-Name:			devstation
-Namespace:		openshift
-Created:		23 hours ago
-Labels:			<none>
-Annotations:		<none>
-Image Repository:	default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation
-Image Lookup:		local=false
-Unique Images:		2
-Tags:			2
+oc describe imageStream devstation -n openshift
+Name:                   devstation
+Namespace:              openshift
+Created:                23 hours ago
+Labels:                 <none>
+Annotations:            <none>
+Image Repository:       default-route-openshift-image-registry.apps.okd.okdlabs.com/openshift/devstation
+Image Lookup:           local=false
+Unique Images:          2
+Tags:                   2
 
 v8-gui
   no spec tag

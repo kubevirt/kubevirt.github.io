@@ -1,0 +1,11 @@
+# disable line length errors
+MD013: false
+
+# enable duplicate headings
+MD024: false
+
+# allow inline HTML
+MD033: false
+
+# disable emphasis as heading warning
+MD036: false
