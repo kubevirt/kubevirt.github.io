@@ -67,10 +67,10 @@ Live migration is, at the time of writing, not a standard feature in KubeVirt. T
 
 ## Create a Virtual Machine
 
-Next, create a VM. This lab uses the ["testvm"](/labs/manifests/vm_migration.yaml).
+Next, create a VM. This lab uses the ["testvm"](/labs/manifests/vm.yaml) from [lab1](/labs/kubernetes/lab1.html).
 
 ```bash
-{% include scriptlets/migration/02_create_testvm.sh -%}
+{% include scriptlets/lab1/02_create_testvm.sh -%}
 {% include scriptlets/lab1/04_start_testvm.sh -%}
 ```
 
