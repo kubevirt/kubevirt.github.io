@@ -1,0 +1,868 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2020/OKD-web-console-install.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Managing KubeVirt with OpenShift Web Console | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="Alberto Losada Grande" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface">
+    <meta name="keywords" content="OpenShift web console, web interface, OKD" >
+    <meta property="og:title" content="Managing KubeVirt with OpenShift Web Console | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2020/OKD-web-console-install.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="Alberto Losada Grande" >
+    <meta property="og:article:published_time" content="2020-01-24 00:00:00 +0000" >
+    <meta name="twitter:title" content="Managing KubeVirt with OpenShift Web Console | KubeVirt.io">
+    <meta name="twitter:description" content="This article focuses on running the OKD web console in a native Kubernetes cluster leveraging the deep integrations with KubeVirt. OKD web console will allow us to create, manage and delete virtual machines from a friendly user interface">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Managing KubeVirt with OpenShift Web Console</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Alberto Losada Grande</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/openshift-web-console">OpenShift web console</a>&nbsp;|&nbsp;<a href="/tag/web-interface">web interface</a>&nbsp;|&nbsp;<a href="/tag/okd">OKD</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: January 24, 2020  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <p>In the previous post, <a href="/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a> were described and showed some features, pros and cons of using OKD console to manage our KubeVirt deployment. This blog post will focus on installing and running the OKD web console in a Kubernetes cluster so that it can leverage the deep integrations between KubeVirt and the OKD web console.</p>
+
+<p>There are two options to run the OKD web console to manage a Kubernetes cluster:</p>
+
+<ul>
+  <li>
+    <p><a href="#binary-installation">Executing the web console as a binary</a>. This installation method is the only one described in the <a href="https://github.com/openshift/console#build-everything">OKD web console repository</a>. Personally, looks like more targetted at developers who want to quickly iterate over the development process while hacking in the web console. This development approach is described in the <a href="https://github.com/openshift/console#native-kubernetes">native Kubernetes</a> section of the OpenShift console code repository.</p>
+  </li>
+  <li>
+    <p><a href="#containerized-installation">Executing the web console as another pod</a>. The idea is leveraging the containerized version available as origin-console in the <a href="https://quay.io/repository/openshift/origin-console?tag=latest&amp;tab=tags">OpenShift container image repository</a> and execute it inside a Kubernetes cluster as a regular application, e.g. as a pod.</p>
+  </li>
+</ul>
+
+<h2 id="what-is-the-okd-web-console">What is the OKD web console</h2>
+
+<blockquote>
+  <p>The <a href="https://github.com/openshift/console">OKD web console</a> is a user interface accessible from a web browser. Developers can use the web console to visualize, browse, and manage the contents of namespaces. It is also referred as a more friendly <code class="language-plaintext highlighter-rouge">kubectl</code> in the form of a single page web application. It integrates with other services like monitoring, chargeback and the <a href="https://github.com/operator-framework/operator-lifecycle-manager">Operator Lifecycle Manager or OLM</a>. Some things that go on behind the scenes include:</p>
+</blockquote>
+
+<ul>
+  <li>Proxying the Kubernetes API under /api/kubernetes</li>
+  <li>Providing additional non-Kubernetes APIs for interacting with the cluster</li>
+  <li>Serving all frontend static assets</li>
+  <li>User Authentication</li>
+</ul>
+
+<p>As it is stated in the official GitHub’s repository, the OKD web console runs as a binary listening in a local port. The static assets required to run the web console are served by the binary itself. It is possible to customize the web console using extensions. The extensions have to be committed to be to the sources of the console directly.</p>
+
+<p>When the web console is accessed from a browser, it first loads all required static assets. Then makes requests to the Kubernetes API using the values defined as environment variables in the host where the console is running. Actually, there is a script called <code class="language-plaintext highlighter-rouge">environment.sh</code> that helps exporting the proper values for these environment variables.</p>
+
+<p>The web console uses WebSockets to maintain a persistent connection with the API server and receive updated information as soon as it is available. Note as well that JavaScript must be enabled to use the web console. For the best experience, use a web browser that supports WebSockets. OKD web console’s developers inform that Google Chrome/Chromium version 76 or greater is used in their integration tests.</p>
+
+<p>Unlike what is explained in the <a href="https://github.com/openshift/console#native-kubernetes">official repository</a>, OKD actually executes the OKD web console in a pod. Therefore, even not officially mentioned, information how to run the OKD web console as a pod in a <em>native Kubernetes</em> cluster will be described later.</p>
+
+<h2 id="binary-installation">Binary installation</h2>
+
+<p><em>This method is suggested to be a development installation since it is mainly used by the OKD web console developers to test new features.</em></p>
+
+<p>In this section the OKD web console will be compiled from the source code and executed as a binary artifact in a <strong>CentOS 8</strong> server which does not belong to any Kubernetes cluster. The following diagram shows the relationship between all the components: user, OKD web console and Kubernetes cluster.</p>
+
+<p><img src="/assets/2020-01-24-OKD-web-console-install/OKD-console-kubevirt.png" alt="Lab diagram" /></p>
+
+<p>Note that it is possible to run the OKD web console in a Kubernetes master, in a regular node or, as shown, in a server outside the cluster. In the latter case, the external server must have access to the master API. <em>Notice also that it can be configured with different security and network settings or even different hardware resources</em>.</p>
+
+<p>The first step when using the binary installation is cloning the <a href="https://github.com/openshift/console">repository</a>.</p>
+
+<h3 id="dependencies">Dependencies</h3>
+
+<p>Below are detailed the dependencies needed to compile the OKD web console artifact:</p>
+
+<ul>
+  <li><strong>Operating System</strong>. CentOS 8 was chosen as our operating system for the server running the OKD web console. Kubernetes cluster is running latest CentOS 7.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">cat</span> /etc/redhat-release
+CentOS Linux release 8.0.1905 <span class="o">(</span>Core<span class="o">)</span>
+</code></pre></div></div>
+
+<ul>
+  <li><strong>Kubernetes</strong>. It has been deployed the latest available version at the moment of writing: <code class="language-plaintext highlighter-rouge">v1.17</code>. Kubernetes cluster is comprised by one master node and one regular node with enough CPU (4vCPUs) and memory (16Gi) to run KubeVirt and a couple of KubeVirt’s <code class="language-plaintext highlighter-rouge">VirtualMachineInstances</code>. No extra storage was needed since the virtual machines will run as container-disk instances.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get nodes <span class="nt">-o</span> wide
+NAME                            STATUS   ROLES    AGE   VERSION   INTERNAL-IP       EXTERNAL-IP   OS-IMAGE                KERNEL-VERSION               CONTAINER-RUNTIME
+blog-master-00.kubevirt.local   Ready    master   29h   v1.17.0   192.168.123.250   &lt;none&gt;        CentOS Linux 7 <span class="o">(</span>Core<span class="o">)</span>   3.10.0-957.27.2.el7.x86_64   docker://1.13.1
+blog-worker-00.kubevirt.local   Ready    &lt;none&gt;   29h   v1.17.0   192.168.123.232   &lt;none&gt;        CentOS Linux 7 <span class="o">(</span>Core<span class="o">)</span>   3.10.0-957.27.2.el7.x86_64   docker://1.13.1
+</code></pre></div></div>
+
+<ul>
+  <li><strong>Node.js &gt;= 8</strong>. Node.js 10 is available as an AppStream module.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>nodejs
+Installed:
+  nodejs-1:10.16.3-2.module_el8.0.0+186+542b25fc.x86_64   npm-1:6.9.0-1.10.16.3.2.module_el8.0.0+186+542b25fc.x86_64
+
+Complete!
+</code></pre></div></div>
+
+<ul>
+  <li><strong>yarn &gt;= 1.3.2</strong>. Yarn is a dependency of Node.js. In this case, the official yarn repository has to be added as a local repositories.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>curl <span class="nt">--silent</span> <span class="nt">--location</span> https://dl.yarnpkg.com/rpm/yarn.repo | <span class="nb">sudo tee</span> /etc/yum.repos.d/yarn.repo
+<span class="nv">$ </span><span class="nb">sudo </span>rpm <span class="nt">--import</span> https://dl.yarnpkg.com/rpm/pubkey.gpg
+<span class="nv">$ </span><span class="nb">sudo </span>yum <span class="nb">install </span>yarn
+
+<span class="nv">$ </span>yarn <span class="nt">--version</span>
+1.21.1
+</code></pre></div></div>
+
+<ul>
+  <li><strong>go &gt;= 1.11+</strong>. Golang is available as an AppStream module in CentOS 8:</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>yum module <span class="nb">install </span>go-toolset
+
+Installed:
+  golang-1.11.6-1.module_el8.0.0+192+8b12aa21.x86_64
+
+</code></pre></div></div>
+
+<ul>
+  <li><strong>jq (for contrib/environment.sh)</strong>. Finally, jq is installed in order to work with JSON data.</li>
+</ul>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nb">install </span>jq
+
+Installed:
+  jq.x86_64 0:1.5-1.el7
+</code></pre></div></div>
+
+<h3 id="compiling-okd-web-console">Compiling OKD web console</h3>
+
+<p>Once all dependencies are met, access the cloned directory and export the correct variables that will be used during the building process. Then, execute <code class="language-plaintext highlighter-rouge">build.sh</code> script which actually calls the build-frontend and build-backend scripts.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/openshift/console.git
+<span class="nv">$ </span><span class="nb">cd </span>console/
+<span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
+<span class="nv">$ </span><span class="nb">source</span> ./contrib/environment.sh
+Using https://192.168.123.250:6443
+
+<span class="nv">$ </span>./build.sh
+...
+Done <span class="k">in </span>215.91s.
+</code></pre></div></div>
+
+<p>The result of the process is a binary file called <strong>bridge</strong> inside the bin folder. Prior to run the <em>“bridge”</em>, it has to be verified that the port where the OKD web console is expecting connections is not blocked.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iptables <span class="nt">-A</span> INPUT <span class="nt">-p</span> tcp <span class="nt">--dport</span> 9000 <span class="nt">-m</span> conntrack <span class="nt">--ctstate</span> NEW,ESTABLISHED <span class="nt">-j</span> ACCEPT
+</code></pre></div></div>
+
+<p>Then, the artifact can be executed:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./bin/bridge
+2020/01/7 10:21:17 cmd/main: cookies are not secure because base-address is not https!
+2020/01/7 10:21:17 cmd/main: running with AUTHENTICATION DISABLED!
+2020/01/7 10:21:17 cmd/main: Binding to 0.0.0.0:9000...
+2020/01/7 10:21:17 cmd/main: not using TLS
+</code></pre></div></div>
+
+<p>At this point, the connection to the OKD web console from your network should be established successfully. Note that by default there is no authentication required to login into the console and the connection is using HTTP protocol. There are variables in the <code class="language-plaintext highlighter-rouge">environment.sh</code> file that can change this default behaviour.</p>
+
+<p>Probably, the following issue will be faced when connecting to the web user interface: <code class="language-plaintext highlighter-rouge">"services is forbidden: User "system:serviceaccount:kube-system:default" cannot list resource "services" in API group "" in the namespace default"</code>. The problem is that the <strong>default service account</strong> does not have enough privileges to show all the cluster objects.</p>
+
+<p><img src="/assets/2020-01-24-OKD-web-console-install/okd-serviceaccount-error.png" alt="OKD sa error" width="1110" height="720" /></p>
+
+<p>There are two options to fix the issue: one is granting cluster-admin permissions to the default service account. That, it is not recommended since default service account is, at its very name indicates, the default service account for all pods if not explicitly configured. This means granting cluster-admin permissions to some applications running in kube-system namespace and even future ones when no service account is configured.</p>
+
+<p>The other option is create a new service account called <strong>console</strong>, grant cluster-admin permissions to it and configure the web console to run with this new service account:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
+kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
+</code></pre></div></div>
+
+<p>Once created, modify the <code class="language-plaintext highlighter-rouge">environment.sh</code> file and change the line that starts with <code class="language-plaintext highlighter-rouge">secretname</code> as shown below:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>vim contrib/environment.sh
+<span class="nv">secretname</span><span class="o">=</span><span class="si">$(</span>kubectl get serviceaccount <span class="k">**</span>console<span class="k">**</span> <span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.secrets[0].name}'</span><span class="si">)</span>
+</code></pre></div></div>
+
+<p>Now, variables configured in the <code class="language-plaintext highlighter-rouge">environment.sh</code> file have to be exported again and the connection to the console must be reloaded.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">source</span> ./contrib/environment.sh
+</code></pre></div></div>
+
+<h2 id="deploy-kubevirt-using-the-hyperconverged-cluster-operator-hco">Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)</h2>
+
+<p>In order to ease the installation of KubeVirt, the unified operator called <strong><a href="https://github.com/kubevirt/hyperconverged-cluster-operator">HCO</a></strong> will be deployed. The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - <a href="https://blog.openshift.com/a-first-look-at-kubevirt/">kubevirt</a>, <a href="http://kubevirt.io/2018/CDI-DataVolumes.html">cdi</a>, <a href="https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md">networking</a>, etc… - where users can deploy and configure them in a single object.</p>
+
+<p>This operator is sometimes referred to as a “meta operator” or an “operator for operators”. Most importantly, this operator doesn’t replace or interfere with OLM. It only creates operator CRs, which is the user’s prerogative. More information about HCO can be found in the post published in this blog by Ryan Hallisey: <a href="https://kubevirt.io/2019/Hyper-Converged-Operator.html">Hyper Converged Operator on OCP 4 and K8s(HCO)</a>.</p>
+
+<p>The HCO repository provides plenty of information on how to install the operator. In this lab, it has been installed as <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">Using the HCO without OLM or Marketplace</a>, which basically executes this deployment script:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
++ kubectl create ns kubevirt-hyperconverged
+namespace/kubevirt-hyperconverged created
++ <span class="nv">namespaces</span><span class="o">=(</span><span class="s2">"openshift"</span><span class="o">)</span>
++ <span class="k">for </span>namespace <span class="k">in</span> <span class="k">${</span><span class="nv">namespaces</span><span class="p">[@]</span><span class="k">}</span>
+++ kubectl get ns openshift
+Error from server <span class="o">(</span>NotFound<span class="o">)</span>: namespaces <span class="s2">"openshift"</span> not found
++ <span class="o">[[</span> <span class="s1">''</span> <span class="o">==</span> <span class="s1">''</span> <span class="o">]]</span>
++ kubectl create ns openshift
+namespace/openshift created
+++ kubectl config current-context
++ kubectl config set-context kubernetes-admin@kubernetes <span class="nt">--namespace</span><span class="o">=</span>kubevirt-hyperconverged
+Context <span class="s2">"kubernetes-admin@kubernetes"</span> modified.
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/cluster-network-addons00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/containerized-data-importer00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/cdis.cdi.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/hco.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/hyperconvergeds.hco.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/kubevirt00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirts.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/node-maintenance00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance00.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirtcommontemplatesbundles.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance01.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirtmetricsaggregations.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance02.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirtnodelabellerbundles.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance03.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/kubevirttemplatevalidators.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/v2vvmware.crd.yaml
+customresourcedefinition.apiextensions.k8s.io/v2vvmwares.kubevirt.io created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role.yaml
+role.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrole.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
+clusterrole.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrole.rbac.authorization.k8s.io/kubevirt-operator created
+clusterrole.rbac.authorization.k8s.io/kubevirt-ssp-operator created
+clusterrole.rbac.authorization.k8s.io/cdi-operator created
+clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/service_account.yaml
+serviceaccount/cdi-operator created
+serviceaccount/cluster-network-addons-operator created
+serviceaccount/hyperconverged-cluster-operator created
+serviceaccount/kubevirt-operator created
+serviceaccount/kubevirt-ssp-operator created
+serviceaccount/node-maintenance-operator created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role_binding.yaml
+rolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrolebinding.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
+clusterrolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
+clusterrolebinding.rbac.authorization.k8s.io/kubevirt-operator created
+clusterrolebinding.rbac.authorization.k8s.io/kubevirt-ssp-operator created
+clusterrolebinding.rbac.authorization.k8s.io/cdi-operator created
+clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/operator.yaml
+deployment.apps/hyperconverged-cluster-operator created
+deployment.apps/cluster-network-addons-operator created
+deployment.apps/virt-operator created
+deployment.apps/kubevirt-ssp-operator created
+deployment.apps/cdi-operator created
+deployment.apps/node-maintenance-operator created
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/hco.cr.yaml
+hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
+</code></pre></div></div>
+
+<p>The result is a new namespace called <code class="language-plaintext highlighter-rouge">kubevirt-hyperconverged</code> with all the operators, Custom Resources (CRs) and objects needed by KubeVirt:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods <span class="nt">-n</span> kubevirt-hyperconverged <span class="nt">-o</span> wide
+NAME                                                  READY   STATUS    RESTARTS   AGE   IP                NODE                            NOMINATED NODE   READINESS GATES
+bridge-marker-bwq6f                                   1/1     Running   0          12m   192.168.123.250   blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+bridge-marker-st7f7                                   1/1     Running   0          12m   192.168.123.232   blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+cdi-apiserver-6f59996849-2hmm9                        1/1     Running   0          12m   10.244.1.17       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+cdi-deployment-57c68dbddc-c4n8l                       1/1     Running   0          12m   10.244.1.22       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+cdi-operator-64bbf595c-48v7k                          1/1     Running   1          24m   10.244.1.12       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+cdi-uploadproxy-5cbf6f4897-95fn5                      1/1     Running   0          12m   10.244.1.16       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+cluster-network-addons-operator-5956598648-5r79l      1/1     Running   0          24m   10.244.1.10       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+hyperconverged-cluster-operator-d567b5dd8-7d8wq       0/1     Running   0          24m   10.244.1.9        blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kube-cni-linux-bridge-plugin-kljvq                    1/1     Running   0          12m   10.244.1.19       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kube-cni-linux-bridge-plugin-p6dkz                    1/1     Running   0          12m   10.244.0.7        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kube-multus-ds-amd64-84gcj                            1/1     Running   1          12m   10.244.1.23       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kube-multus-ds-amd64-flq8s                            1/1     Running   2          12m   10.244.0.10       blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kubemacpool-mac-controller-manager-675ff47587-pb57c   1/1     Running   0          11m   10.244.1.20       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kubemacpool-mac-controller-manager-675ff47587-rf65j   1/1     Running   0          11m   10.244.0.8        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+kubevirt-ssp-operator-7b5dcb45c4-qd54h                1/1     Running   0          24m   10.244.1.11       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+nmstate-handler-8r6d5                                 1/1     Running   0          11m   192.168.123.232   blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+nmstate-handler-cq5vs                                 1/1     Running   0          11m   192.168.123.250   blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+node-maintenance-operator-7f8f78c556-q6flt            1/1     Running   0          24m   10.244.0.5        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+ovs-cni-amd64-4z2qt                                   2/2     Running   0          11m   192.168.123.250   blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+ovs-cni-amd64-w8fzj                                   2/2     Running   0          11m   192.168.123.232   blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-api-7b7d486d88-hg4rd                             1/1     Running   0          11m   10.244.1.21       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-api-7b7d486d88-r9s2d                             1/1     Running   0          11m   10.244.0.9        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-controller-754466fb86-js6r7                      1/1     Running   0          10m   10.244.1.25       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-controller-754466fb86-mcxwd                      1/1     Running   0          10m   10.244.0.11       blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-handler-cz7q2                                    1/1     Running   0          10m   10.244.0.12       blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-handler-k6npr                                    1/1     Running   0          10m   10.244.1.24       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-operator-84f5588df6-2k49b                        1/1     Running   0          24m   10.244.1.14       blog-worker-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+virt-operator-84f5588df6-zzrsb                        1/1     Running   1          24m   10.244.0.4        blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+</code></pre></div></div>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Only once HCO is completely deployed, <code class="language-plaintext highlighter-rouge">VirtualMachines</code> can be managed from the web console. This is because the web console is shipped with an specific plugin that detects a KubeVirt installation by the presence of KubeVirt Custom Resource Definition (CRDs) in the cluster. Once detected, it automatically shows a new option under the Workload left pane menu to manage KubeVirt resources.</p>
+
+
+</div></div>
+<p>It is worth noting that there is an ongoing effort to adapt the OpenShift web console’s user interface in native Kubernetes additionally to OKD or OpenShift as they are expected. <a href="https://github.com/openshift/console/pull/3848">As an example</a>, a few days ago, the non applicable Virtual Machine Templates option from the Workload menu was removed and the VM Wizard was made fully functional when native Kubernetes is detected.</p>
+
+<iframe width="1110" height="650" src="https://www.youtube.com/embed/XQw4GkGHs44" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<h2 id="containerized-installation">Containerized installation</h2>
+
+<p>The OKD web console actually runs as a pod in OKD along with its deployment, services and all objects needed to run properly. The idea is to take advantage of the containerized OKD web console available and execute it in one of the nodes of a native Kubernetes cluster.</p>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p>Note that unlike the binary installation the pod must run in a node inside our Kubernetes cluster</p>
+
+
+</div></div>
+<p>Running the OKD web console as a native Kubernetes application will benefit from all the Kubernetes advantages: rolling deployments, easy upgrades, high availability, scalability, auto-restart in case of failure, liveness and readiness probes… An example of how easy it is to update the OKD web console to a newer version will be presented as well.</p>
+
+<h3 id="deploying-okd-web-console">Deploying OKD web console</h3>
+
+<p>In order to configure the deployment of the OKD web console the proper Kubernetes objects have to be created. As shown in the previously <a href="#compiling-okd-web-console">Compiling OKD web console</a> there are quite a few environment variables that needs to be set. When dealing with Kubernetes objects these variables should be included in the deployment object.</p>
+
+<p>A YAML file containing a deployment and service objects that mimic the binary installation is already prepared. It can be downloaded from <a href="../assets/2020-01-24-OKD-web-console-install/okd-web-console-install.yaml">here</a> and configured depending on the user’s local installation.</p>
+
+<p>Then, create a specific service account (<strong>console</strong>) for running the OpenShift web console in case it is not created <a href="#compiling-okd-web-console">previously</a> and grant cluster-admin permissions:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create serviceaccount console <span class="nt">-n</span> kube-system
+kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><span class="o">=</span>cluster-admin <span class="nt">--serviceaccount</span><span class="o">=</span>kube-system:console <span class="nt">-n</span> kube-system
+</code></pre></div></div>
+
+<p>Next, extract the <strong>token secret name</strong> associated with the console service account:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get serviceaccount console <span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.secrets[0].name}'</span>
+console-token-ppfc2
+</code></pre></div></div>
+
+<p>Finally, the downloaded YAML file must be modified assigning the proper values to the <strong>token</strong> section. The following command may help to extract the token name from the user console, which is a user created by</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">console-deployment</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">console-app</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/openshift/origin-console:4.2</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_USER_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">disabled</span> <span class="c1"># no authentication required</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">off-cluster</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">https://kubernetes.default</span> <span class="c1">#master api</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span> <span class="c1"># no tls enabled</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">bearer-token</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH_BEARER_TOKEN</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">secretKeyRef</span><span class="pi">:</span>
+                  <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span> <span class="c1"># console serviceaccount token</span>
+                  <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
+
+<span class="nn">---</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">console-np-service</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">NodePort</span> <span class="c1"># nodePort configuration</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="m">9000</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">9000</span>
+      <span class="na">nodePort</span><span class="pi">:</span> <span class="m">30036</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+
+<span class="nn">---</span>
+
+</code></pre></div></div>
+
+<p>Finally, the deployment and service objects can be created. The deployment will trigger the download and installation of the OKD web console image.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> okd-web-console-install.yaml
+deployment.apps/console-deployment created
+service/console-service created
+
+<span class="nv">$ </span>kubectl get pods <span class="nt">-o</span> wide <span class="nt">-n</span> kube-system
+NAME                                                    READY   STATUS    RESTARTS   AGE     IP                NODE                            NOMINATED NODE   READINESS GATES
+console-deployment-59d8956db5-td462                     1/1     Running   0          4m49s   10.244.0.13       blog-master-00.kubevirt.local   &lt;none&gt;           &lt;none&gt;
+
+<span class="nv">$ </span>kubectl get svc <span class="nt">-o</span> wide <span class="nt">-n</span> kube-system
+NAME                 TYPE        CLUSTER-IP     EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>                  AGE
+console-np-service   NodePort    10.96.195.45   &lt;none&gt;        9000:30036/TCP           19m
+kube-dns             ClusterIP   10.96.0.10     &lt;none&gt;        53/UDP,53/TCP,9153/TCP   20d
+</code></pre></div></div>
+
+<p>Once running, a connection to the <code class="language-plaintext highlighter-rouge">nodeport</code> defined in the service object can be established. It can be checked that the OKD web console is up and running version 4.2.</p>
+
+<p><img src="/assets/2020-01-24-OKD-web-console-install/okd-pod-4.2.resized.png" alt="OKD 4.2" /></p>
+
+<p>It can be verified that it is possible to see and manage <code class="language-plaintext highlighter-rouge">VirtualMachines</code> running inside of the native Kubernetes cluster.</p>
+
+<p><img src="/assets/2020-01-24-OKD-web-console-install/okd-console-vm.resized.png" alt="OKD vmr" /></p>
+
+<h3 id="upgrade-okd-web-console">Upgrade OKD web console</h3>
+
+<p>The upgrade process is really straightforward. All available image versions of the OpenShift console can be consulted in the <a href="https://quay.io/repository/openshift/origin-console?tab=tags">official OpenShift container image repository</a>. Then, the deployment object must be modified accordingly to run the desired version of the OKD web console.</p>
+
+<p><img src="/assets/2020-01-24-OKD-web-console-install/quay-okd-repo.resized.png" alt="OKD vmr" /></p>
+
+<p>In this case, the we console will be updated to the newest version, which is 4.5.0/4.5. <em>Note that this is not linked with the latest tag, actually <code class="language-plaintext highlighter-rouge">latest</code> tag is the same as version <code class="language-plaintext highlighter-rouge">4.4</code></em>. Upgrading process only involves updating the image value to the desired container image: <code class="language-plaintext highlighter-rouge">quay.io/openshift/origin-console:4.5</code> and save.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">apps/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">console-deployment</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">matchLabels</span><span class="pi">:</span>
+      <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">console</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">console-app</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/openshift/origin-console:4.5</span> <span class="c1">#new image version</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_USER_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">disabled</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">off-cluster</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_ENDPOINT</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">https://kubernetes.default</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_MODE_OFF_CLUSTER_SKIP_VERIFY_TLS</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s">bearer-token</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">BRIDGE_K8S_AUTH_BEARER_TOKEN</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">secretKeyRef</span><span class="pi">:</span>
+                  <span class="na">name</span><span class="pi">:</span> <span class="s">console-token-ppfc2</span>
+                  <span class="na">key</span><span class="pi">:</span> <span class="s">token</span>
+</code></pre></div></div>
+
+<p>Once the deployment has been saved, a new pod with the configured version of the OKD web console is created and eventually will replace the old one.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods <span class="nt">-n</span> kube-system
+NAME                                                    READY   STATUS              RESTARTS   AGE
+console-deployment-5588f98644-bw7jr                     0/1     ContainerCreating   0          5s
+console-deployment-59d8956db5-td462                     1/1     Running             0          16h
+</code></pre></div></div>
+
+<p><img src="/assets/2020-01-24-OKD-web-console-install/okd-console-4.5.resized.png" alt="OKD web console 4.5" /></p>
+
+<p>In the video below, the procedure explained in this section is shown.</p>
+
+<iframe width="1110" height="650" src="https://www.youtube.com/embed/xoL0UFI657I" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""></iframe>
+
+<h2 id="summary">Summary</h2>
+
+<p>In this post <em>two ways to install the OKD web console to manage a KubeVirt deployment in a native Kubernetes cluster have been explored</em>. Running the OKD web console will allow you to create, manage and delete virtual machines running in a native cluster from a friendly user interface. Also you will be able to delegate to the developers or other users the creation and maintenance of their virtual machines without having a deep knowledge of Kubernetes.</p>
+
+<p>Personally, I would like to see more user interfaces to manage and configure KubeVirt deployments and their virtual machines. In a previous post, <a href="https://kubevirt.io/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a>, some options were explored, however only OKD web console was found to be deeply integrated with KubeVirt.</p>
+
+<p>Ping us or feel free to comment this post in case there are some other existing options that we did not notice.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="/2019/KubeVirt_UI_options.html">KubeVirt user interface options</a></li>
+  <li><a href="https://www.youtube.com/watch?v=xoL0UFI657I">Managing KubeVirt with OpenShift web console running as a container application on Youtube</a></li>
+  <li><a href="https://www.youtube.com/watch?v=XQw4GkGHs44&amp;t=37s">Managing KubeVirt with OpenShift web console running as a compiled binary on Youtube</a></li>
+  <li><a href="/2019/KubeVirt_lab1_use_kubevirt.html">Kubevirt Laboratory 1 blogpost: Use Kubevirt</a></li>
+  <li><a href="https://www.youtube.com/watch?v=KC03G60shIc">KubeVirt basic operations video on Youtube</a></li>
+  <li><a href="https://kubevirt.io/user-guide/operations/installation">Kubevirt installation notes</a></li>
+  <li><a href="https://www.katacoda.com/kubevirt/scenarios/kubevirt-101">First steps with KubeVirt - Katacoda scenario</a></li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Managing KubeVirt with OpenShift Web Console&url=https://www.kubevirt.io/2020/OKD-web-console-install.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

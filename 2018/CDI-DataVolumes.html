@@ -1,0 +1,653 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/CDI-DataVolumes.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Cdi Datavolumes | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="tripledes" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="CDI DataVolumes">
+    <meta name="keywords" content="cdi, datavolumes" >
+    <meta property="og:title" content="Cdi Datavolumes | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/CDI-DataVolumes.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="CDI DataVolumes" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="tripledes" >
+    <meta property="og:article:published_time" content="2018-10-10 00:00:00 +0000" >
+    <meta name="twitter:title" content="Cdi Datavolumes | KubeVirt.io">
+    <meta name="twitter:description" content="CDI DataVolumes">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Cdi Datavolumes</h1>
+          <div class="post-info">
+            <span class="post-author">Author: tripledes</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/cdi">cdi</a>&nbsp;|&nbsp;<a href="/tag/datavolumes">datavolumes</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: October 10, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h1 id="cdi-datavolumes">CDI DataVolumes</h1>
+
+<p>Containerized Data Importer (or CDI for short), is a data import service for Kubernetes designed with KubeVirt in mind. Thanks to CDI, we can now enjoy the addition of DataVolumes, which greatly improve the workflow of managing KubeVirt and its storage.</p>
+
+<h2 id="what-it-does">What it does</h2>
+
+<p>DataVolumes are an abstraction of the Kubernetes resource, PVC (Persistent Volume Claim) and it also leverages other CDI features to ease the process of importing data into a Kubernetes cluster.</p>
+
+<p>DataVolumes can be defined by themselves or embedded within a VirtualMachine resource definition, the first method can be used to orchestrate events based on the DataVolume status phases while the second eases the process of providing storage for a VM.</p>
+
+<h2 id="how-does-it-work">How does it work?</h2>
+
+<p>In this blog post, I’d like to focus on the second method, embedding the information within a VirtualMachine definition, which might seem like the most immediate benefit of this feature. Let’s get started!</p>
+
+<h3 id="environment-description">Environment description</h3>
+
+<ul>
+  <li>
+    <p><strong>OpenShift</strong></p>
+
+    <p>For testing DataVolumes, I’ve spawned a new OpenShift cluster, using dynamic provisioning for storage running OpenShift Cloud Storage (GlusterFS), so the Persistent Volumes (PVs for short) are created on-demand. Other than that, it’s a regular OpenShift cluster, running with a single master (also used for infrastructure components) and two compute nodes.</p>
+  </li>
+  <li>
+    <p><strong>CDI</strong></p>
+
+    <p>We also need CDI, of course, CDI can be deployed either together with KubeVirt or independently, the instructions can be found in the project’s <a href="https://github.com/kubevirt/containerized-data-importer">GitHub repo</a>.</p>
+  </li>
+  <li>
+    <p><strong>KubeVirt</strong></p>
+
+    <p>Last but not least, we’ll need KubeVirt to run the VMs that will make use of the DataVolumes.</p>
+  </li>
+</ul>
+
+<h3 id="enabling-datavolumes-feature">Enabling DataVolumes feature</h3>
+
+<p>As of this writing, DataVolumes have to be enabled through a <a href="https://kubernetes.io/docs/reference/command-line-tools-reference/feature-gates/">feature gate</a>, for KubeVirt, this is achieved by creating the <em>kubevirt-config</em> ConfigMap on the namespace where KubeVirt has been deployed, by default <em>kube-system</em>.</p>
+
+<p>Let’s create the ConfigMap with the following definition:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">feature-gates</span><span class="pi">:</span> <span class="s">DataVolumes</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-config</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kube-system</span>
+</code></pre></div></div>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create <span class="nt">-f</span> kubevirt-config-cm.yml
+</code></pre></div></div>
+
+<p>Alternatively, the following one-liner can also be used to achieve the same result:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc create configmap kubevirt-config <span class="nt">--from-literal</span> feature-gates<span class="o">=</span>DataVolumes <span class="nt">-n</span> kube-system
+</code></pre></div></div>
+
+<p>If the ConfigMap was already present on the system, just use <code class="language-plaintext highlighter-rouge">oc edit</code> to add the DataVolumes feature gate under the <em>data</em> field like the YAML above.</p>
+
+<p>If everything went as expected, we should see the following log lines on the <em>virt-controller</em> pods:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>level=info timestamp=2018-10-09T08:16:53.602400Z pos=application.go:173 component=virt-controller msg="DataVolume integration enabled"
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE</strong>: It’s worth noting the values in the ConfigMap are not dynamic, in the sense that <em>virt-controller</em> and <em>virt-api</em> will need to be <em>restarted</em>, scaling their deployments down and back up again, just remember to scale it up to the same number of replicas they previously had.</p>
+</blockquote>
+
+<h2 id="creating-a-virtualmachine-embedding-a-datavolume">Creating a VirtualMachine embedding a DataVolume</h2>
+
+<p>Now that the cluster is ready to use the feature, let’s have a look at our VirtualMachine definition, which includes a DataVolume.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">testvm1</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">testvm1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">metadata</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">centos7-dv</span>
+      <span class="na">spec</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">accessModes</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+          <span class="na">resources</span><span class="pi">:</span>
+            <span class="na">requests</span><span class="pi">:</span>
+              <span class="na">storage</span><span class="pi">:</span> <span class="s">10Gi</span>
+        <span class="na">source</span><span class="pi">:</span>
+          <span class="na">http</span><span class="pi">:</span>
+            <span class="na">url</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">testvm1</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">cpu</span><span class="pi">:</span>
+          <span class="na">cores</span><span class="pi">:</span> <span class="m">1</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">volumeName</span><span class="pi">:</span> <span class="s">test-datavolume</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">disk0</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">volumeName</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+              <span class="na">cdrom</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">8Gi</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">dataVolume</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">centos7-dv</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">test-datavolume</span>
+        <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">hostname: testvm1</span>
+              <span class="s">users:</span>
+                <span class="s">- name: kubevirt</span>
+                  <span class="s">gecos: KubeVirt Project</span>
+                  <span class="s">sudo: ALL=(ALL) NOPASSWD:ALL</span>
+                  <span class="s">passwd: $6$JXbc3063IJir.e5h$ypMlYScNMlUtvQ8Il1ldZi/mat7wXTiRioGx6TQmJjTVMandKqr.jJfe99.QckyfH/JJ.OdvLb5/OrCa8ftLr.</span>
+                  <span class="s">shell: /bin/bash</span>
+                  <span class="s">home: /home/kubevirt</span>
+                  <span class="s">lock_passwd: false</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitvolume</span>
+</code></pre></div></div>
+
+<p>The new addition to a regular VirtualMachine definition is the <em>dataVolumeTemplates</em> block, which will trigger the import of the CentOS-7 cloud image defined on the <em>url</em> field, storing it on a PV, the resulting DataVolume will be named <em>centos7-dv</em>, being referenced on the <em>volumes</em> section, it will serve as the boot disk (disk0) for our VirtualMachine.</p>
+
+<p>Going ahead and applying the above manifest to our cluster results in the following set of events:</p>
+
+<ul>
+  <li>The DataVolume is created, triggering the creation of a PVC and therefore, using the dynamic provisioning configured on the cluster, a PV is provisioned to satisfy the needs of the PVC.</li>
+  <li>An importer pod is started, this pod is the one actually downloading the image defined in the <em>url</em> field and storing it on the provisioned PV.</li>
+  <li>Once the image has been downloaded and stored, the DataVolume status changes to <em>Succeeded</em>, from that point the virt launcher controller will go ahead and schedule the VirtualMachine.</li>
+</ul>
+
+<p>Taking a look to the resources created after applying the VirtualMachine manifest, we can see the following:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc get pods
+NAME                          READY     STATUS      RESTARTS   AGE
+importer-centos7-dv-t9zx2     0/1       Completed   0          11m
+virt-launcher-testvm1-cpt8n   1/1       Running     0          8m
+</code></pre></div></div>
+
+<p>Let’s look at the importer pod logs to understand what it did:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc logs importer-centos7-dv-t9zx2
+I1009 12:37:45.384032       1 importer.go:32] Starting importer
+I1009 12:37:45.393461       1 importer.go:37] begin import process
+I1009 12:37:45.393519       1 dataStream.go:235] copying <span class="s2">"https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"</span> to <span class="s2">"/data/disk.img"</span>...
+I1009 12:37:45.393569       1 dataStream.go:112] IMPORTER_ACCESS_KEY_ID and/or IMPORTER_SECRET_KEY are empty
+I1009 12:37:45.393606       1 dataStream.go:298] create the initial Reader based on the endpoint<span class="s1">'s "https" scheme
+I1009 12:37:45.393665       1 dataStream.go:208] Attempting to get object "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2" via http client
+I1009 12:37:45.762330       1 dataStream.go:314] constructReaders: checking compression and archive formats: /centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+I1009 12:37:45.841564       1 dataStream.go:323] found header of type "qcow2"
+I1009 12:37:45.841618       1 dataStream.go:338] constructReaders: no headers found for file "/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
+I1009 12:37:45.841635       1 dataStream.go:340] done processing "/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2" headers
+I1009 12:37:45.841650       1 dataStream.go:138] NewDataStream: endpoint "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"'</span>s computed byte size: 8589934592
+I1009 12:37:45.841698       1 dataStream.go:566] Validating qcow2 file
+I1009 12:37:46.848736       1 dataStream.go:572] Doing streaming qcow2 to raw conversion
+I1009 12:40:07.546308       1 importer.go:43] import <span class="nb">complete</span>
+</code></pre></div></div>
+
+<p>So, following the events we see, it fetched the image from the defined <em>url</em>, validated its format and converted it to <em>raw</em> for being used by <em>qemu</em>.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc describe dv centos7-dv
+Name:         centos7-dv
+Namespace:    test-dv
+Labels:       kubevirt.io/created-by<span class="o">=</span>1916da5f-cbc0-11e8-b467-c81f666533c3
+Annotations:  kubevirt.io/owned-by<span class="o">=</span>virt-controller
+API Version:  cdi.kubevirt.io/v1alpha1
+Kind:         DataVolume
+Metadata:
+  Creation Timestamp:  2018-10-09T12:37:34Z
+  Generation:          1
+  Owner References:
+    API Version:           kubevirt.io/v1alpha2
+    Block Owner Deletion:  <span class="nb">true
+    </span>Controller:            <span class="nb">true
+    </span>Kind:                  VirtualMachine
+    Name:                  testvm1
+    UID:                   1916da5f-cbc0-11e8-b467-c81f666533c3
+  Resource Version:        2474310
+  Self Link:               /apis/cdi.kubevirt.io/v1alpha1/namespaces/test-dv/datavolumes/centos7-dv
+  UID:                     19186b29-cbc0-11e8-b467-c81f666533c3
+Spec:
+  Pvc:
+    Access Modes:
+      ReadWriteOnce
+    Resources:
+      Requests:
+        Storage:  10Gi
+  Source:
+    Http:
+      URL:  https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+Status:
+  Phase:  Succeeded
+Events:
+  Type    Reason  Age                 From                   Message
+  <span class="nt">----</span>    <span class="nt">------</span>  <span class="nt">----</span>                <span class="nt">----</span>                   <span class="nt">-------</span>
+  Normal  Synced  29s <span class="o">(</span>x13 over 14m<span class="o">)</span>  datavolume-controller  DataVolume synced successfully
+  Normal  Synced  18s                 datavolume-controller  DataVolume synced successfully
+</code></pre></div></div>
+
+<p>The DataVolume description matches what was defined under <em>dataVolumeTemplates</em>. Now, as we know it uses a PV/PVC underneath, let’s have a look:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc describe pvc centos7-dv
+Name:          centos7-dv
+Namespace:     test-dv
+StorageClass:  glusterfs-storage
+Status:        Bound
+Volume:        pvc-191d27c6-cbc0-11e8-b467-c81f666533c3
+Labels:        <span class="nv">app</span><span class="o">=</span>containerized-data-importer
+               cdi-controller<span class="o">=</span>centos7-dv
+Annotations:   cdi.kubevirt.io/storage.import.endpoint<span class="o">=</span>https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2
+               cdi.kubevirt.io/storage.import.importPodName<span class="o">=</span>importer-centos7-dv-t9zx2
+               cdi.kubevirt.io/storage.pod.phase<span class="o">=</span>Succeeded
+               pv.kubernetes.io/bind-completed<span class="o">=</span><span class="nb">yes
+               </span>pv.kubernetes.io/bound-by-controller<span class="o">=</span><span class="nb">yes
+               </span>volume.beta.kubernetes.io/storage-provisioner<span class="o">=</span>kubernetes.io/glusterfs
+Finalizers:    <span class="o">[</span>kubernetes.io/pvc-protection]
+Capacity:      10Gi
+Access Modes:  RWO
+Events:
+  Type    Reason                 Age   From                         Message
+  <span class="nt">----</span>    <span class="nt">------</span>                 <span class="nt">----</span>  <span class="nt">----</span>                         <span class="nt">-------</span>
+  Normal  ProvisioningSucceeded  18m   persistentvolume-controller  Successfully provisioned volume pvc-191d27c6-cbc0-11e8-b467-c81f666533c3 using kubernetes.io/glusterfs
+</code></pre></div></div>
+
+<p>It’s important to pay attention to the annotations, these are monitored/set by CDI. CDI triggers an import when it detects the <em>cdi.kubevirt.io/storage.import.endpoint</em>, assigns a pod as the import task owner and updates the pod phase annotation.</p>
+
+<p>At this point, everything is in place, the DataVolume has its underlying components, the image has been imported so now the VirtualMachine can start the VirtualMachineInstance based on its definition and using the CentOS7 image as boot disk, as users we can connect to its console as usual, for instance running the following command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl console testvm1
+</code></pre></div></div>
+
+<h2 id="cleaning-it-up">Cleaning it up</h2>
+
+<p>Once we’re happy with the results, it’s time to clean up all these tests. The task is easy:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc delete vm testvm1
+</code></pre></div></div>
+
+<p>Once the VM (and its associated VMI) are gone, all the underlying storage resources are removed, there is no trace of the PVC, PV or DataVolume.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc get dv centos7-dv
+<span class="nv">$ </span>oc get pvc centos7-dv
+<span class="nv">$ </span>oc get pv pvc-191d27c6-cbc0-11e8-b467-c81f666533c3
+</code></pre></div></div>
+
+<p>All three commands returned <em>No resources found</em>.</p>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Cdi Datavolumes&url=https://www.kubevirt.io/2018/CDI-DataVolumes.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

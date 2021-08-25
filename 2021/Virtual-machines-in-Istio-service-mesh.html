@@ -1,0 +1,712 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Running virtual machines in Istio service mesh | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="Radim Hrazdil" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This blog post demonstrates running virtual machines in Istio service mesh.">
+    <meta name="keywords" content="kubevirt, istio, virtual machine, VM, service mesh, mesh" >
+    <meta property="og:title" content="Running virtual machines in Istio service mesh | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This blog post demonstrates running virtual machines in Istio service mesh." >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="Radim Hrazdil" >
+    <meta property="og:article:published_time" content="2021-08-13 00:00:00 +0000" >
+    <meta name="twitter:title" content="Running virtual machines in Istio service mesh | KubeVirt.io">
+    <meta name="twitter:description" content="This blog post demonstrates running virtual machines in Istio service mesh.">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Running virtual machines in Istio service mesh</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Radim Hrazdil</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/istio">istio</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>&nbsp;|&nbsp;<a href="/tag/service-mesh">service mesh</a>&nbsp;|&nbsp;<a href="/tag/mesh">mesh</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: August 13, 2021  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="introduction">Introduction</h2>
+
+<p>This blog post demonstrates running virtual machines in <a href="https://istio.io/">Istio</a> service mesh.</p>
+
+<p>Istio service mesh allows to monitor, visualize, and manage traffic between pods and external services by
+injecting a proxy container - a sidecar - which forwards inbound and outbound traffic of a pod/virtual machine.
+This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it. For more in-depth information about the Istio proxy mechanism, see <a href="https://medium.com/open-5g-hypercore/episode-iii-meshville-7f0bb7ca0e3b">this blog post</a> published by Dough Smith et al.</p>
+
+<p>The main features of Istio are traffic shifting (migrating traffic from an old to new version of a service), dynamic request routing, fault injection or traffic mirroring for testing/debugging purposes, and more.
+Visit <a href="https://istio.io/latest/docs/tasks/">Istio documentation</a> to learn about all its features.
+Istio featureset may be further extended by installing addons. Kiali, for example, is a UI dashboard that provides traffic information
+of all microservices in a mesh, capable of composing communication graph between all microservices.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>KubeVirt <code class="language-plaintext highlighter-rouge">v0.43.0</code></li>
+  <li>CRI-O <code class="language-plaintext highlighter-rouge">v1.19.0</code></li>
+</ul>
+
+<h2 id="limitations">Limitations</h2>
+
+<p>Istio is only supported with masquerade network binding and pod network over IPv4.</p>
+
+<h2 id="demo">Demo</h2>
+
+<p>This section covers deployment of a local cluster with Istio service mesh, KubeVirt installation and creation of an Istio-enabled virtual machine.
+Finally, Kiali dashboard is used to examine both inbound and outbound traffic of the created virtual machine.</p>
+
+<h3 id="run-kubernetes-cluster">Run Kubernetes cluster</h3>
+
+<p>In this blog post, we are going to use <a href="https://github.com/kubevirt/kubevirtci">kubevirtci</a> as our Kubernetes ephemeral cluster provider.</p>
+
+<p>Follow these steps to deploy a local cluster with pre-installed Istio service mesh:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/kubevirt/kubevirtci
+<span class="nb">cd </span>kubevirtci
+<span class="nb">export </span><span class="nv">KUBEVIRTCI_TAG</span><span class="o">=</span>2108222252-0007793
+<span class="c"># Pin to version used in this blog post in case</span>
+<span class="c"># k8s-1.21 provider version disappears in the future</span>
+git checkout <span class="nv">$KUBEVIRTCI_TAG</span>
+<span class="nb">export </span><span class="nv">KUBEVIRT_NUM_NODES</span><span class="o">=</span>2
+<span class="nb">export </span><span class="nv">KUBEVIRT_PROVIDER</span><span class="o">=</span>k8s-1.21
+<span class="nb">export </span><span class="nv">KUBEVIRT_DEPLOY_ISTIO</span><span class="o">=</span><span class="nb">true
+export </span><span class="nv">KUBEVIRT_WITH_CNAO</span><span class="o">=</span><span class="nb">true
+</span>make cluster-up
+<span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span>./cluster-up/kubeconfig.sh<span class="si">)</span>
+</code></pre></div></div>
+
+<p>For details about Istio configuration, see Istio kubevirtci <a href="https://github.com/kubevirt/kubevirtci/blob/2108081530-91f55e3/cluster-provision/k8s/1.21/istio.sh">install script</a>.</p>
+
+<h3 id="install-kubevirt">Install Kubevirt</h3>
+
+<p>Following KubeVirt <a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a> to install released version <code class="language-plaintext highlighter-rouge">v0.43.0</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span>v0.43.0
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
+kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>180s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
+</code></pre></div></div>
+
+<h3 id="install-istio-addons">Install Istio addons</h3>
+
+<p>While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
+Download Istio manifests and client binary by running the following command:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span>1.10.0
+curl <span class="nt">-L</span> https://istio.io/downloadIstio | sh -
+</code></pre></div></div>
+<p>and export path to the istioctl binary by following the output of the above command.</p>
+
+<p>Finally, deploy Kiali, Jaeger and Prometheus addons:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/kiali.yaml
+kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/jaeger.yaml
+kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/prometheus.yaml
+</code></pre></div></div>
+
+<p><strong>Note:</strong> If there are errors when installing the addons, try running the command again. There may be timing issues which will be resolved when the command is run again.</p>
+
+<h3 id="prepare-target-namespace">Prepare target namespace</h3>
+
+<p>Before creating virtual machines, the target namespace needs to be configured for the Istio sidecar to be injected and working properly.
+This involves adding a label and creating a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> in the target namespace.</p>
+
+<h4 id="istio-sidecar-injection">Istio sidecar injection</h4>
+
+<p>Istio supports <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/">two ways of injecting</a> a sidecar to a pod - automatic and manual. For simplicity, we will only consider automatic sidecar injection in this demo, which is enabled by adding <code class="language-plaintext highlighter-rouge">istio-injection=enabled</code> label to target namespace:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl label namespace default istio-injection<span class="o">=</span>enabled
+</code></pre></div></div>
+
+<h4 id="network-attachment-definiton">Network attachment definiton</h4>
+
+<p>When Multus is installed in k8s cluster, a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> called <code class="language-plaintext highlighter-rouge">istio-cni</code> <strong>must</strong> be created in <strong>each</strong> namespace where Istio sidecar containers are to be used:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: istio-cni
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> spec is empty, as its only purpose is to trigger the <code class="language-plaintext highlighter-rouge">istio-cni</code> binary, which configures the in-pod traffic routing.</p>
+
+<h3 id="topology">Topology</h3>
+
+<p>To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh:</p>
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">istio-vmi</code> repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080,</li>
+  <li><code class="language-plaintext highlighter-rouge">cirros-vmi</code> repeatedly request the HTTP service running on the <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI.</li>
+</ul>
+
+<p>With this setup, both inbound and outbound
+traffic metrics can be observed in Kiali dashboard for <code class="language-plaintext highlighter-rouge">istio-vmi</code>.</p>
+
+<h3 id="create-vmi-resources">Create VMI resources</h3>
+
+<p>An Istio aware virtual machine <strong>must</strong> be annotated with <code class="language-plaintext highlighter-rouge">sidecar.istio.io/inject: "true"</code>, regardless of used Istio injection mechanism.
+Without this annotation, traffic would not be properly routed through the istio proxy sidecar.
+Additonally, Istio uses <code class="language-plaintext highlighter-rouge">app</code> label for adding contextual information to the collected telemetry.
+Both, the annotation and label can be seen in the following virtual machine example:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  annotations:
+    sidecar.istio.io/inject: "true"
+  labels:
+    app: istio-vmi
+  name: istio-vmi
+spec:
+  domain:
+    devices:
+      interfaces:
+        - name: default
+          masquerade: {}
+          ports:
+            - port: 8080
+      disks:
+        - disk:
+            bus: virtio
+          name: containerdisk
+        - disk:
+            bus: virtio
+          name: cloudinitdisk
+    resources:
+      requests:
+        memory: 1024M
+  networks:
+    - name: default
+      pod: {}
+  readinessProbe:
+    httpGet:
+      port: 8080
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 3
+  terminationGracePeriodSeconds: 0
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: kubevirt/fedora-cloud-container-disk-demo:devel
+    - cloudInitNoCloud:
+        userData: |
+          #cloud-config
+          password: fedora
+          chpasswd: { expire: False }
+          runcmd:
+          - dnf install -y screen nc
+          - while true ; do sh -c "nc -lp 8080 -c  </span><span class="se">\"</span><span class="sh">echo -e 'HTTP/1.1 200 OK</span><span class="se">\n\n</span><span class="sh">Hello'</span><span class="se">\"</span><span class="sh"> " ; done &amp;
+          - while true ; do curl kubevirt.io &gt;out 2&gt;/dev/null ; sleep 1 ; done &amp;
+      name: cloudinitdisk
+</span><span class="no">EOF
+</span></code></pre></div></div>
+<p>The cloud init section of the VMI runs two loops requesting <code class="language-plaintext highlighter-rouge">kubevirt.io</code> website every second to generate outbound traffic (from the VMI) and serving simple HTTP server on port <code class="language-plaintext highlighter-rouge">8080</code>, which will be used for monitoring of inbound traffic (to the VMI).</p>
+
+<p>Let’s also create a service for the VMI that will be used to access the http server in <code class="language-plaintext highlighter-rouge">istio-vmi</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f-
+apiVersion: v1
+kind: Service
+metadata:
+  name: istio-vmi-svc
+spec:
+  selector:
+    app: istio-vmi
+  ports:
+  - port: 8080
+    protocol: TCP
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Finally, create the <code class="language-plaintext highlighter-rouge">cirros-vmi</code> VMI, for the purpose of generating inbound traffic to <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  annotations:
+    sidecar.istio.io/inject: "true"
+  name: cirros-vmi
+  labels:
+    app: cirros-vmi
+spec:
+  domain:
+    devices:
+      interfaces:
+        - name: default
+          masquerade: {}
+      disks:
+        - disk:
+            bus: virtio
+          name: containerdisk
+        - disk:
+            bus: virtio
+          name: cloudinitdisk
+    resources:
+      requests:
+        memory: 128M
+  networks:
+    - name: default
+      pod: {}
+  terminationGracePeriodSeconds: 0
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: kubevirt/cirros-container-disk-demo:devel
+    - name: cloudinitdisk
+      cloudInitNoCloud:
+        userData: |
+          #!/bin/sh
+          while true ; do curl istio-vmi-svc.default.svc.cluster.local:8080 ; sleep 1 ; done
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Wait for the <code class="language-plaintext highlighter-rouge">istio-vmi</code> to be ready:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">condition</span><span class="o">=</span>ready <span class="nt">--timeout</span><span class="o">=</span>180s pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>istio-vmi
+</code></pre></div></div>
+
+<p>After creating the VMIs, the corresponding virt-launcher pods should have 3 ready containers, as shown in the snippet below:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+virt-launcher-istio-vmi-XYZ      3/3     Running   0          4m13s
+virt-launcher-cirros-vmi-XYZ     3/3     Running   0          2m21s
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Istioctl proxy-status</code> should report that the sidecar proxies running inside the virt-launcher pods have synced with Istio control plane:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl proxy-status
+NAME                                          CDS        LDS        EDS        RDS          ISTIOD                      VERSION
+virt-launcher-cirros-vmi-9f765.default        SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-5d79g     1.10.0
+virt-launcher-istio-vmi-99t8t.default         SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
+</code></pre></div></div>
+
+<p><strong>Note:</strong> Displaying only relevant VMI entities.</p>
+
+<h3 id="monitor-traffic-in-kiali-dashboard">Monitor traffic in Kiali dashboard</h3>
+
+<p>With both VMIs up and running, we can open the Kiali dashboard and observe the traffic metrics.
+Run the following command, to access Kiali dashboard:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl dashboard kiali
+</code></pre></div></div>
+
+<h4 id="topology-graph">Topology graph</h4>
+
+<p>Let’s start by navigating to the topology graph by clicking the Graph menu item.</p>
+
+<p><br /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+    <a href="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/topology-graph.png" itemprop="contentUrl" data-size="800x530">
+      <img src="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/topology-graph.png" itemprop="thumbnail" width="100%" alt="Topology graph" />
+    </a>
+    <figcaption itemprop="Topology graph of deployed VMIs showing the traffic flows"></figcaption>
+  </figure>
+</div>
+
+<p>In the topology graph, we can observe the following traffic flows:</p>
+<ul>
+  <li>requests from <code class="language-plaintext highlighter-rouge">cirros-vmi</code> to <code class="language-plaintext highlighter-rouge">istio-vmi</code> via <code class="language-plaintext highlighter-rouge">istio-vmi-svc</code> service,</li>
+  <li>requests from <code class="language-plaintext highlighter-rouge">istio-vmi</code> to <code class="language-plaintext highlighter-rouge">PasstroughCluster</code>. The <code class="language-plaintext highlighter-rouge">PastroughCluster</code> marks  destinations external to our service mesh.</li>
+</ul>
+
+<h4 id="workloads">Workloads</h4>
+
+<p>Navigate to <code class="language-plaintext highlighter-rouge">istio-vmi</code> workload overview by clicking the <code class="language-plaintext highlighter-rouge">Workloads</code> menu item and selecting <code class="language-plaintext highlighter-rouge">istio-vmi</code> from the list.</p>
+
+<p>The overview page presents partial topology graph with traffic related to <code class="language-plaintext highlighter-rouge">istio-vmi</code>. In our case, this graph is the same as the graph of our entire mesh.</p>
+
+<p>Navigate to Inbound Metrics tab to see metrics charts of inbound traffic.</p>
+
+<p><br /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+    <a href="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/istio-blog-vmi-istio-inbound-traffic.png" itemprop="contentUrl" data-size="800x530">
+      <img src="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/istio-blog-vmi-istio-inbound-traffic.png" itemprop="thumbnail" width="100%" alt="Inbound traffic metrics" />
+    </a>
+    <figcaption itemprop="Inbound traffic metrics for `istio-vmi`"></figcaption>
+  </figure>
+</div>
+
+<p>In Request volume chart we can see that number of requests stabilizes at around <code class="language-plaintext highlighter-rouge">1 ops</code>, which matches our loop sending one reqest per second. Request throughput chart reveals that the requests consume around <code class="language-plaintext highlighter-rouge">4 kbit/s</code> of bandwidth.
+Remaining two charts provide information about Request duration and size.</p>
+
+<p>The same metrics are collected for outbound traffic as well, which can be seen in Outbound Metrics tab.</p>
+
+<h2 id="cluster-teardown">Cluster teardown</h2>
+
+<p>Run the following command to deprovision the ephemeral cluster:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make cluster-down
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>KubeVirt introduced <a href="https://kubevirt.io/user-guide/virtual_machines/istio_service_mesh/">support for Istio</a>, allowing virtual machines to be part of a service mesh.</p>
+
+<p>This blog post covered running KubeVirt virtual machine in Istio service mesh using an ephemeral kubevirtci cluster. Kiali dashboard was used to observe inbound and outbound traffic of a virtual machine.</p>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Running virtual machines in Istio service mesh&url=https://www.kubevirt.io/2021/Virtual-machines-in-Istio-service-mesh.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

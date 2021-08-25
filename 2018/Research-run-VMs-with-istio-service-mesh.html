@@ -1,0 +1,1397 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/Research-run-VMs-with-istio-service-mesh.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Research Run Vms With Istio Service Mesh | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="SchSeba" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="In this post we will deploy a vm on top of kubernetes with istio service mesh">
+    <meta name="keywords" content="istio, iptables, libvirt, tproxy, service mesh, ebtables" >
+    <meta property="og:title" content="Research Run Vms With Istio Service Mesh | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/Research-run-VMs-with-istio-service-mesh.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="In this post we will deploy a vm on top of kubernetes with istio service mesh" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="SchSeba" >
+    <meta property="og:article:published_time" content="2018-06-03 00:00:00 +0000" >
+    <meta name="twitter:title" content="Research Run Vms With Istio Service Mesh | KubeVirt.io">
+    <meta name="twitter:description" content="In this post we will deploy a vm on top of kubernetes with istio service mesh">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Research Run Vms With Istio Service Mesh</h1>
+          <div class="post-info">
+            <span class="post-author">Author: SchSeba</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/istio">istio</a>&nbsp;|&nbsp;<a href="/tag/iptables">iptables</a>&nbsp;|&nbsp;<a href="/tag/libvirt">libvirt</a>&nbsp;|&nbsp;<a href="/tag/tproxy">tproxy</a>&nbsp;|&nbsp;<a href="/tag/service-mesh">service mesh</a>&nbsp;|&nbsp;<a href="/tag/ebtables">ebtables</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: June 3, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: uncategorized
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <p>In this blog post we are going to talk about istio and virtual machines on top of Kubernetes. Some of the components we are going to use are <a href="https://istio.io/docs/concepts/what-is-istio/overview/">istio</a>, <a href="https://libvirt.org/index.html">libvirt</a>, <a href="http://ebtables.netfilter.org/">ebtables</a>, <a href="https://en.wikipedia.org/wiki/Iptables">iptables</a>, and <a href="https://github.com/LiamHaworth/go-tproxy">tproxy</a>. Please review the links provided for an overview and deeper dive into each technology</p>
+
+<h1 id="research-explanation">Research explanation</h1>
+
+<p>Our research goal was to give virtual machines running inside pods (KubeVirt project) all the benefits Kubernetes have to offer, one of them is a service mesh like istio.</p>
+
+<h2 id="iptables-only-with-dnat-and-source-nat-configuration">Iptables only with dnat and source nat configuration</h2>
+
+<p><span style="color:red;">This configuration is istio only!</span></p>
+
+<p>For this solution we created the following architecture</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/Iptables-diagram.png" alt="Iptables-Diagram" /></p>
+
+<p>With the following yaml configuration</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">application-devel</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-client-devel</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">16509</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">client-connection</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">5900</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">spice</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">22</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">ssh</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">strategy</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">annotations</span><span class="pi">:</span>
+        <span class="s">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/sebassch/mylibvirtd:devel</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">compute</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">9080</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">16509</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">5900</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">22</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">ALL</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">test-volume</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/host-dev</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/host-sys</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">host-sys</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">LIBVIRTD_DEFAULT_NETWORK_DEVICE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">eth0"</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">proxy</span>
+            <span class="pi">-</span> <span class="s">sidecar</span>
+            <span class="pi">-</span> <span class="s">--configPath</span>
+            <span class="pi">-</span> <span class="s">/etc/istio/proxy</span>
+            <span class="pi">-</span> <span class="s">--binaryPath</span>
+            <span class="pi">-</span> <span class="s">/usr/local/bin/envoy</span>
+            <span class="pi">-</span> <span class="s">--serviceCluster</span>
+            <span class="pi">-</span> <span class="s">productpage</span>
+            <span class="pi">-</span> <span class="s">--drainDuration</span>
+            <span class="pi">-</span> <span class="s">45s</span>
+            <span class="pi">-</span> <span class="s">--parentShutdownDuration</span>
+            <span class="pi">-</span> <span class="s">1m0s</span>
+            <span class="pi">-</span> <span class="s">--discoveryAddress</span>
+            <span class="pi">-</span> <span class="s">istio-pilot.istio-system:15005</span>
+            <span class="pi">-</span> <span class="s">--discoveryRefreshDelay</span>
+            <span class="pi">-</span> <span class="s">1s</span>
+            <span class="pi">-</span> <span class="s">--zipkinAddress</span>
+            <span class="pi">-</span> <span class="s">zipkin.istio-system:9411</span>
+            <span class="pi">-</span> <span class="s">--connectTimeout</span>
+            <span class="pi">-</span> <span class="s">10s</span>
+            <span class="pi">-</span> <span class="s">--statsdUdpAddress</span>
+            <span class="pi">-</span> <span class="s">istio-mixer.istio-system:9125</span>
+            <span class="pi">-</span> <span class="s">--proxyAdminPort</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">15000"</span>
+            <span class="pi">-</span> <span class="s">--controlPlaneAuthPolicy</span>
+            <span class="pi">-</span> <span class="s">MUTUAL_TLS</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POD_NAME</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.name</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POD_NAMESPACE</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.namespace</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">INSTANCE_IP</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">status.podIP</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/istio/proxy:0.7.1</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">initContainers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">-p</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">15001"</span>
+            <span class="pi">-</span> <span class="s">-u</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">1337"</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/istio/proxy_init:0.7.1</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-init</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">-c</span>
+            <span class="pi">-</span> <span class="s">sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t &amp;&amp; ulimit -c</span>
+              <span class="s">unlimited</span>
+          <span class="na">command</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">/bin/sh</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">alpine</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
+            <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
+          <span class="na">secret</span><span class="pi">:</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/dev</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-sys</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/sys</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">test-volume</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="c1"># directory location on host</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/bricks/brick1/volume/Images</span>
+            <span class="c1"># this field is optional</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+<span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
+
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Ingress</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">gateway-devel</span>
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="s">kubernetes.io/ingress.class</span><span class="pi">:</span> <span class="s2">"</span><span class="s">istio"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">rules</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+        <span class="na">paths</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">path</span><span class="pi">:</span> <span class="s">/devel-myvm</span>
+            <span class="na">backend</span><span class="pi">:</span>
+              <span class="na">serviceName</span><span class="pi">:</span> <span class="s">application-devel</span>
+              <span class="na">servicePort</span><span class="pi">:</span> <span class="m">9080</span>
+</code></pre></div></div>
+
+<p>When the my-libvirt container starts it runs an entry point script for iptables configuration.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. iptables <span class="nt">-t</span> nat <span class="nt">-D</span> PREROUTING 1
+2. iptables <span class="nt">-t</span> nat <span class="nt">-A</span> PREROUTING <span class="nt">-p</span> tcp <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"KubeVirt Spice"</span>  <span class="nt">--dport</span> 5900 <span class="nt">-j</span> ACCEPT
+3. iptables <span class="nt">-t</span> nat <span class="nt">-A</span> PREROUTING <span class="nt">-p</span> tcp <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"KubeVirt virt-manager"</span>  <span class="nt">--dport</span> 16509 <span class="nt">-j</span> ACCEPT
+4. iptables <span class="nt">-t</span> nat  <span class="nt">-A</span> PREROUTING <span class="nt">-d</span> 10.96.0.0/12 <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"istio/redirect-ip-range-10.96.0.0/12-service cidr"</span> <span class="nt">-j</span> ISTIO_REDIRECT
+5. iptables <span class="nt">-t</span> nat  <span class="nt">-A</span> PREROUTING <span class="nt">-d</span> 192.168.0.0/16 <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"istio/redirect-ip-range-192.168.0.0/16-Pod cidr"</span> <span class="nt">-j</span> ISTIO_REDIRECT
+6. iptables <span class="nt">-t</span> nat  <span class="nt">-A</span> OUTPUT <span class="nt">-d</span> 127.0.0.1/32 <span class="nt">-p</span> tcp <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"KubeVirt mesh application port"</span> <span class="nt">--dport</span> 9080 <span class="nt">-j</span> DNAT <span class="nt">--to-destination</span> 10.0.0.2
+7. iptables <span class="nt">-t</span> nat  <span class="nt">-A</span> POSTROUTING <span class="nt">-s</span> 127.0.0.1/32 <span class="nt">-d</span> 10.0.0.2/32 <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"KubeVirt VM Forward"</span> <span class="nt">-j</span> SNAT <span class="nt">--to-source</span> <span class="sb">`</span>ifconfig eth0 | <span class="nb">grep </span>inet | <span class="nb">awk</span> <span class="s1">'{print $2}'</span>
+</code></pre></div></div>
+
+<p>Now let’s explain every one of these lines:</p>
+
+<ol>
+  <li>Remove istio ingress connection rule that send all the ingress traffic directly to the envoy proxy (our vm traffic is ingress traffic for our pod)</li>
+  <li>Allow ingress connection with spice port to get our libvirt process running in the pod</li>
+  <li>Allow ingress connection with virt-manager port to get our libvirt process running in the pod</li>
+  <li>Redirect all the traffic that came from the k8s clusters services to the envoy process</li>
+  <li>Redirect all the traffic that came from the k8s clusters pods to the envoy process</li>
+  <li>Send all the traffic that came from envoy process to our vm by changing the destination ip address to ur vm ip address</li>
+  <li>Change the source ip address of the packet send by envoy from localhost to the pod ip address so the virtual machine can return the connection</li>
+</ol>
+
+<h3 id="iptables-configuration-conclusions">Iptables configuration conclusions</h3>
+
+<p>With this configuration all the traffic that exit the virtual machine to a k8s service will pass the envoy process and will enter the istio service mash.
+Also all the traffic that came into the pod will be pass to envoy and after that it will be send to our virtual machine</p>
+
+<p>Egress data flow in this solution:</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/iptables-egress.png" alt="iptables-egress-traffic" /></p>
+
+<p>Ingress data flow in this solution:</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/iptables-ingress.png" alt="iptables-ingress-traffic" /></p>
+
+<p>Pros:</p>
+
+<ul>
+  <li>No external modules needed</li>
+  <li>No external process needed</li>
+  <li>All the traffic is handled by the kernel user space not involved</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul>
+  <li><span style="color:red;">Istio dedicated solution!</span></li>
+  <li>Not other process can change the iptables rules</li>
+</ul>
+
+<h2 id="iptables-with-a-nat-proxy-process">Iptables with a nat-proxy process</h2>
+
+<p>For this solution a created the following architecture</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/nat-proxy.png" alt="nat-proxy-Diagram" /></p>
+
+<p>With the following yaml configuration</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">application-nat-proxt</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-client-nat-proxt</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">16509</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">client-connection</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">5900</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">spice</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">22</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">ssh</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">strategy</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">annotations</span><span class="pi">:</span>
+        <span class="s">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/sebassch/mylibvirtd:devel</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">compute</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">9080</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">16509</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">5900</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">22</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">ALL</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">test-volume</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/host-dev</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/host-sys</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">host-sys</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">LIBVIRTD_DEFAULT_NETWORK_DEVICE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">eth0"</span>
+        <span class="pi">-</span> <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/sebassch/mynatproxy:devel</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">proxy</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">proxy</span>
+            <span class="pi">-</span> <span class="s">sidecar</span>
+            <span class="pi">-</span> <span class="s">--configPath</span>
+            <span class="pi">-</span> <span class="s">/etc/istio/proxy</span>
+            <span class="pi">-</span> <span class="s">--binaryPath</span>
+            <span class="pi">-</span> <span class="s">/usr/local/bin/envoy</span>
+            <span class="pi">-</span> <span class="s">--serviceCluster</span>
+            <span class="pi">-</span> <span class="s">productpage</span>
+            <span class="pi">-</span> <span class="s">--drainDuration</span>
+            <span class="pi">-</span> <span class="s">45s</span>
+            <span class="pi">-</span> <span class="s">--parentShutdownDuration</span>
+            <span class="pi">-</span> <span class="s">1m0s</span>
+            <span class="pi">-</span> <span class="s">--discoveryAddress</span>
+            <span class="pi">-</span> <span class="s">istio-pilot.istio-system:15005</span>
+            <span class="pi">-</span> <span class="s">--discoveryRefreshDelay</span>
+            <span class="pi">-</span> <span class="s">1s</span>
+            <span class="pi">-</span> <span class="s">--zipkinAddress</span>
+            <span class="pi">-</span> <span class="s">zipkin.istio-system:9411</span>
+            <span class="pi">-</span> <span class="s">--connectTimeout</span>
+            <span class="pi">-</span> <span class="s">10s</span>
+            <span class="pi">-</span> <span class="s">--statsdUdpAddress</span>
+            <span class="pi">-</span> <span class="s">istio-mixer.istio-system:9125</span>
+            <span class="pi">-</span> <span class="s">--proxyAdminPort</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">15000"</span>
+            <span class="pi">-</span> <span class="s">--controlPlaneAuthPolicy</span>
+            <span class="pi">-</span> <span class="s">MUTUAL_TLS</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POD_NAME</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.name</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POD_NAMESPACE</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.namespace</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">INSTANCE_IP</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">status.podIP</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/istio/proxy:0.7.1</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">initContainers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">-p</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">15001"</span>
+            <span class="pi">-</span> <span class="s">-u</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">1337"</span>
+            <span class="pi">-</span> <span class="s">-i</span>
+            <span class="pi">-</span> <span class="s">10.96.0.0/12,192.168.0.0/16</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/istio/proxy_init:0.7.1</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-init</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">-c</span>
+            <span class="pi">-</span> <span class="s">sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t &amp;&amp; ulimit -c</span>
+              <span class="s">unlimited</span>
+          <span class="na">command</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">/bin/sh</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">alpine</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
+            <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
+          <span class="na">secret</span><span class="pi">:</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/dev</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-sys</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/sys</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">test-volume</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="c1"># directory location on host</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/bricks/brick1/volume/Images</span>
+            <span class="c1"># this field is optional</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+<span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
+
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Ingress</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">gateway-nat-proxt</span>
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="s">kubernetes.io/ingress.class</span><span class="pi">:</span> <span class="s2">"</span><span class="s">istio"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">rules</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+        <span class="na">paths</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">path</span><span class="pi">:</span> <span class="s">/nat-proxt-myvm</span>
+            <span class="na">backend</span><span class="pi">:</span>
+              <span class="na">serviceName</span><span class="pi">:</span> <span class="s">application-nat-proxt</span>
+              <span class="na">servicePort</span><span class="pi">:</span> <span class="m">9080</span>
+</code></pre></div></div>
+
+<p>When the mynatproxy container starts it runs an entry point script for iptables configuration.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>1. iptables -t nat -I PREROUTING 1 -p tcp -s 10.0.1.2 -m comment --comment "nat-proxy redirect" -j REDIRECT --to-ports 8080
+2. iptables -t nat -I OUTPUT 1 -p tcp -s 10.0.1.2 -j ACCEPT
+3. iptables -t nat -I POSTROUTING 1 -s 10.0.1.2 -p udp -m comment --comment "nat udp connections" -j MASQUERADE
+</code></pre></div></div>
+
+<p>Now let’s explain every one of these lines:</p>
+
+<ol>
+  <li>Redirect all the tcp traffic that came from the virtual machine to our proxy on port 8080</li>
+  <li>Accept all the traffic that go from the pod to the virtual machine</li>
+  <li>Nat all the udp traffic that came from the virtual machine</li>
+</ol>
+
+<p>This solution uses a container I created that has two processes inside, one for the egress traffic of the virtual machine and one for the ingress traffic.
+For the egress traffic I used a program writen in golang, and for the ingress traffic I used haproxy.</p>
+
+<p>The nat-proxy used a system call to get the original destination address and port that it’s being redirected to us from the iptables rules I created.</p>
+
+<p>The extract function:</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">func</span> <span class="n">getOriginalDst</span><span class="p">(</span><span class="n">clientConn</span> <span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">TCPConn</span><span class="p">)</span> <span class="p">(</span><span class="n">ipv4</span> <span class="kt">string</span><span class="p">,</span> <span class="n">port</span> <span class="kt">uint16</span><span class="p">,</span> <span class="n">newTCPConn</span> <span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">TCPConn</span><span class="p">,</span> <span class="n">err</span> <span class="kt">error</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="n">clientConn</span> <span class="o">==</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"copy(): oops, dst is nil!"</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">New</span><span class="p">(</span><span class="s">"ERR: clientConn is nil"</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+
+    <span class="c">// test if the underlying fd is nil</span>
+    <span class="n">remoteAddr</span> <span class="o">:=</span> <span class="n">clientConn</span><span class="o">.</span><span class="n">RemoteAddr</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">remoteAddr</span> <span class="o">==</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"getOriginalDst(): oops, clientConn.fd is nil!"</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">New</span><span class="p">(</span><span class="s">"ERR: clientConn.fd is nil"</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+
+    <span class="n">srcipport</span> <span class="o">:=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"%v"</span><span class="p">,</span> <span class="n">clientConn</span><span class="o">.</span><span class="n">RemoteAddr</span><span class="p">())</span>
+
+    <span class="n">newTCPConn</span> <span class="o">=</span> <span class="no">nil</span>
+    <span class="c">// net.TCPConn.File() will cause the receiver's (clientConn) socket to be placed in blocking mode.</span>
+    <span class="c">// The workaround is to take the File returned by .File(), do getsockopt() to get the original</span>
+    <span class="c">// destination, then create a new *net.TCPConn by calling net.Conn.FileConn().  The new TCPConn</span>
+    <span class="c">// will be in non-blocking mode.  What a pain.</span>
+    <span class="n">clientConnFile</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">clientConn</span><span class="o">.</span><span class="n">File</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"GETORIGINALDST|%v-&gt;?-&gt;FAILEDTOBEDETERMINED|ERR: could not get a copy of the client connection's file object"</span><span class="p">,</span> <span class="n">srcipport</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">clientConn</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+    <span class="p">}</span>
+
+    <span class="c">// Get original destination</span>
+    <span class="c">// this is the only syscall in the Golang libs that I can find that returns 16 bytes</span>
+    <span class="c">// Example result: &amp;{Multiaddr:[2 0 31 144 206 190 36 45 0 0 0 0 0 0 0 0] Interface:0}</span>
+    <span class="c">// port starts at the 3rd byte and is 2 bytes long (31 144 = port 8080)</span>
+    <span class="c">// IPv4 address starts at the 5th byte, 4 bytes long (206 190 36 45)</span>
+    <span class="n">addr</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">syscall</span><span class="o">.</span><span class="n">GetsockoptIPv6Mreq</span><span class="p">(</span><span class="kt">int</span><span class="p">(</span><span class="n">clientConnFile</span><span class="o">.</span><span class="n">Fd</span><span class="p">()),</span> <span class="n">syscall</span><span class="o">.</span><span class="n">IPPROTO_IP</span><span class="p">,</span> <span class="n">SO_ORIGINAL_DST</span><span class="p">)</span>
+    <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"getOriginalDst(): SO_ORIGINAL_DST=%+v</span><span class="se">\n</span><span class="s">"</span><span class="p">,</span> <span class="n">addr</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"GETORIGINALDST|%v-&gt;?-&gt;FAILEDTOBEDETERMINED|ERR: getsocketopt(SO_ORIGINAL_DST) failed: %v"</span><span class="p">,</span> <span class="n">srcipport</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="n">newConn</span><span class="p">,</span> <span class="n">err</span> <span class="o">:=</span> <span class="n">net</span><span class="o">.</span><span class="n">FileConn</span><span class="p">(</span><span class="n">clientConnFile</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">err</span> <span class="o">!=</span> <span class="no">nil</span> <span class="p">{</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"GETORIGINALDST|%v-&gt;?-&gt;%v|ERR: could not create a FileConn fron clientConnFile=%+v: %v"</span><span class="p">,</span> <span class="n">srcipport</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">clientConnFile</span><span class="p">,</span> <span class="n">err</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+    <span class="k">if</span> <span class="n">_</span><span class="p">,</span> <span class="n">ok</span> <span class="o">:=</span> <span class="n">newConn</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">TCPConn</span><span class="p">);</span> <span class="n">ok</span> <span class="p">{</span>
+        <span class="n">newTCPConn</span> <span class="o">=</span> <span class="n">newConn</span><span class="o">.</span><span class="p">(</span><span class="o">*</span><span class="n">net</span><span class="o">.</span><span class="n">TCPConn</span><span class="p">)</span>
+        <span class="n">clientConnFile</span><span class="o">.</span><span class="n">Close</span><span class="p">()</span>
+    <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+        <span class="n">errmsg</span> <span class="o">:=</span> <span class="n">fmt</span><span class="o">.</span><span class="n">Sprintf</span><span class="p">(</span><span class="s">"ERR: newConn is not a *net.TCPConn, instead it is: %T (%v)"</span><span class="p">,</span> <span class="n">newConn</span><span class="p">,</span> <span class="n">newConn</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">Printf</span><span class="p">(</span><span class="s">"GETORIGINALDST|%v-&gt;?-&gt;%v|%s"</span><span class="p">,</span> <span class="n">srcipport</span><span class="p">,</span> <span class="n">addr</span><span class="p">,</span> <span class="n">errmsg</span><span class="p">)</span>
+        <span class="n">err</span> <span class="o">=</span> <span class="n">errors</span><span class="o">.</span><span class="n">New</span><span class="p">(</span><span class="n">errmsg</span><span class="p">)</span>
+        <span class="k">return</span>
+    <span class="p">}</span>
+
+    <span class="n">ipv4</span> <span class="o">=</span> <span class="n">itod</span><span class="p">(</span><span class="kt">uint</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">Multiaddr</span><span class="p">[</span><span class="m">4</span><span class="p">]))</span> <span class="o">+</span> <span class="s">"."</span> <span class="o">+</span>
+        <span class="n">itod</span><span class="p">(</span><span class="kt">uint</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">Multiaddr</span><span class="p">[</span><span class="m">5</span><span class="p">]))</span> <span class="o">+</span> <span class="s">"."</span> <span class="o">+</span>
+        <span class="n">itod</span><span class="p">(</span><span class="kt">uint</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">Multiaddr</span><span class="p">[</span><span class="m">6</span><span class="p">]))</span> <span class="o">+</span> <span class="s">"."</span> <span class="o">+</span>
+        <span class="n">itod</span><span class="p">(</span><span class="kt">uint</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">Multiaddr</span><span class="p">[</span><span class="m">7</span><span class="p">]))</span>
+    <span class="n">port</span> <span class="o">=</span> <span class="kt">uint16</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">Multiaddr</span><span class="p">[</span><span class="m">2</span><span class="p">])</span><span class="o">&lt;&lt;</span><span class="m">8</span> <span class="o">+</span> <span class="kt">uint16</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">Multiaddr</span><span class="p">[</span><span class="m">3</span><span class="p">])</span>
+
+    <span class="k">return</span>
+<span class="p">}</span>
+</code></pre></div></div>
+
+<p>After we get the original destination address and port we start a connection to it and copy all the packets.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span> <span class="n">streamWait</span> <span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span>
+<span class="n">streamWait</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>
+
+<span class="n">streamConn</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">dst</span> <span class="n">io</span><span class="o">.</span><span class="n">Writer</span><span class="p">,</span> <span class="n">src</span> <span class="n">io</span><span class="o">.</span><span class="n">Reader</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">io</span><span class="o">.</span><span class="n">Copy</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+    <span class="n">streamWait</span><span class="o">.</span><span class="n">Done</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">go</span> <span class="n">streamConn</span><span class="p">(</span><span class="n">remoteConn</span><span class="p">,</span> <span class="n">VMconn</span><span class="p">)</span>
+<span class="k">go</span> <span class="n">streamConn</span><span class="p">(</span><span class="n">VMconn</span><span class="p">,</span> <span class="n">remoteConn</span><span class="p">)</span>
+
+<span class="n">streamWait</span><span class="o">.</span><span class="n">Wait</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>The Haproxy help us with the ingress traffic with the follow configuration</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
+  mode tcp
+frontend main
+  bind *:9080
+  default_backend guest
+backend guest
+  server guest 10.0.1.2:9080 maxconn 2048
+</code></pre></div></div>
+
+<p>It sends all the traffic to our virtual machine on the service port the machine is listening.</p>
+
+<p><a href="https://github.com/SchSeba/NatProxy">Code repository</a></p>
+
+<h3 id="nat-proxy-conclusions">nat proxy conclusions</h3>
+
+<p>This solution is a general solution, not a dedicated solution to istio only. Its make the vm traffic look like a regular process inside the pod so it will work with any sidecars projects</p>
+
+<p>Egress data flow in this solution:</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/nat-proxy-egress-traffic.png" alt="nat-proxy-egress-traffic" /></p>
+
+<p>Ingress data flow in this solution:</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/nat-proxy-ingress.png" alt="nat-proxy-ingress-traffic" /></p>
+
+<p>Pros:</p>
+
+<ul>
+  <li>No external modules needed</li>
+  <li>Works with any sidecar solution</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul>
+  <li>Not other process can change the iptables rules</li>
+  <li>External process needed</li>
+  <li>The traffic is passed to user space</li>
+  <li>Only support ingress TCP connection</li>
+</ul>
+
+<h2 id="iptables-with-a-trasperent-proxy-process">Iptables with a trasperent-proxy process</h2>
+
+<p>This is the last solution I used in my research, it use a kernel module named TPROXY The <a href="https://www.kernel.org/doc/Documentation/networking/tproxy.txt">official documentation</a> from the linux kernel documentation.</p>
+
+<p>For this solution I created the following architecture</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/semi-tproxy-diagram.png" alt="semi-tproxy-Diagram" /></p>
+
+<p>With the follow yaml configuration</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">application-devel</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">9080</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">http</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-client-devel</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">16509</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">client-connection</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">5900</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">spice</span>
+    <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="m">22</span>
+      <span class="na">name</span><span class="pi">:</span> <span class="s">ssh</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">strategy</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">annotations</span><span class="pi">:</span>
+        <span class="s">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/sebassch/mylibvirtd:devel</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">compute</span>
+          <span class="na">ports</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">9080</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">16509</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">5900</span>
+            <span class="pi">-</span> <span class="na">containerPort</span><span class="pi">:</span> <span class="m">22</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">ALL</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">test-volume</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/host-dev</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/host-sys</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">host-sys</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">LIBVIRTD_DEFAULT_NETWORK_DEVICE</span>
+              <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">eth0"</span>
+        <span class="pi">-</span> <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/sebassch/mytproxy:devel</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">Always</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">proxy</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">proxy</span>
+            <span class="pi">-</span> <span class="s">sidecar</span>
+            <span class="pi">-</span> <span class="s">--configPath</span>
+            <span class="pi">-</span> <span class="s">/etc/istio/proxy</span>
+            <span class="pi">-</span> <span class="s">--binaryPath</span>
+            <span class="pi">-</span> <span class="s">/usr/local/bin/envoy</span>
+            <span class="pi">-</span> <span class="s">--serviceCluster</span>
+            <span class="pi">-</span> <span class="s">productpage</span>
+            <span class="pi">-</span> <span class="s">--drainDuration</span>
+            <span class="pi">-</span> <span class="s">45s</span>
+            <span class="pi">-</span> <span class="s">--parentShutdownDuration</span>
+            <span class="pi">-</span> <span class="s">1m0s</span>
+            <span class="pi">-</span> <span class="s">--discoveryAddress</span>
+            <span class="pi">-</span> <span class="s">istio-pilot.istio-system:15005</span>
+            <span class="pi">-</span> <span class="s">--discoveryRefreshDelay</span>
+            <span class="pi">-</span> <span class="s">1s</span>
+            <span class="pi">-</span> <span class="s">--zipkinAddress</span>
+            <span class="pi">-</span> <span class="s">zipkin.istio-system:9411</span>
+            <span class="pi">-</span> <span class="s">--connectTimeout</span>
+            <span class="pi">-</span> <span class="s">10s</span>
+            <span class="pi">-</span> <span class="s">--statsdUdpAddress</span>
+            <span class="pi">-</span> <span class="s">istio-mixer.istio-system:9125</span>
+            <span class="pi">-</span> <span class="s">--proxyAdminPort</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">15000"</span>
+            <span class="pi">-</span> <span class="s">--controlPlaneAuthPolicy</span>
+            <span class="pi">-</span> <span class="s">MUTUAL_TLS</span>
+          <span class="na">env</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POD_NAME</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.name</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">POD_NAMESPACE</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">metadata.namespace</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">INSTANCE_IP</span>
+              <span class="na">valueFrom</span><span class="pi">:</span>
+                <span class="na">fieldRef</span><span class="pi">:</span>
+                  <span class="na">fieldPath</span><span class="pi">:</span> <span class="s">status.podIP</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/istio/proxy:0.7.1</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
+          <span class="na">volumeMounts</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
+            <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">initContainers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">-p</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">15001"</span>
+            <span class="pi">-</span> <span class="s">-u</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">1337"</span>
+            <span class="pi">-</span> <span class="s">-i</span>
+            <span class="pi">-</span> <span class="s">10.96.0.0/12,192.168.0.0/16</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">docker.io/istio/proxy_init:0.7.1</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-init</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">capabilities</span><span class="pi">:</span>
+              <span class="na">add</span><span class="pi">:</span>
+                <span class="pi">-</span> <span class="s">NET_ADMIN</span>
+        <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">-c</span>
+            <span class="pi">-</span> <span class="s">sysctl -w kernel.core_pattern=/etc/istio/proxy/core.%e.%p.%t &amp;&amp; ulimit -c</span>
+              <span class="s">unlimited</span>
+          <span class="na">command</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">/bin/sh</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">alpine</span>
+          <span class="na">imagePullPolicy</span><span class="pi">:</span> <span class="s">IfNotPresent</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
+          <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">securityContext</span><span class="pi">:</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
+            <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
+          <span class="na">secret</span><span class="pi">:</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/dev</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-sys</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/sys</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">test-volume</span>
+          <span class="na">hostPath</span><span class="pi">:</span>
+            <span class="c1"># directory location on host</span>
+            <span class="na">path</span><span class="pi">:</span> <span class="s">/bricks/brick1/volume/Images</span>
+            <span class="c1"># this field is optional</span>
+            <span class="na">type</span><span class="pi">:</span> <span class="s">Directory</span>
+<span class="na">status</span><span class="pi">:</span> <span class="pi">{}</span>
+
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Ingress</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">gateway-devel</span>
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="s">kubernetes.io/ingress.class</span><span class="pi">:</span> <span class="s2">"</span><span class="s">istio"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">rules</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">http</span><span class="pi">:</span>
+        <span class="na">paths</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">path</span><span class="pi">:</span> <span class="s">/devel-myvm</span>
+            <span class="na">backend</span><span class="pi">:</span>
+              <span class="na">serviceName</span><span class="pi">:</span> <span class="s">application-devel</span>
+              <span class="na">servicePort</span><span class="pi">:</span> <span class="m">9080</span>
+</code></pre></div></div>
+
+<p>When the tproxy container starts it runs an entry point script for iptables configuration but this time the proxy redirect came in the mangle table and not in the nat table that because TPROXY module avilable only in the mangle table.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>TPROXY
+This target is only valid in the mangle table, in the
+PREROUTING chain and user-defined chains which are only
+called from this chain.  It redirects the packet to a local
+socket without changing the packet header in any way. It can
+also change the mark value which can then be used in
+advanced routing rules.
+</code></pre></div></div>
+
+<p>iptables rules:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>iptables <span class="nt">-t</span> mangle <span class="nt">-vL</span>
+iptables <span class="nt">-t</span> mangle <span class="nt">-N</span> KUBEVIRT_DIVERT
+iptables <span class="nt">-t</span> mangle <span class="nt">-A</span> KUBEVIRT_DIVERT <span class="nt">-j</span> MARK <span class="nt">--set-mark</span> 8
+iptables <span class="nt">-t</span> mangle <span class="nt">-A</span> KUBEVIRT_DIVERT <span class="nt">-j</span> ACCEPT
+
+<span class="nv">table</span><span class="o">=</span>mangle
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-N</span> KUBEVIRT_INBOUND
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-A</span> PREROUTING <span class="nt">-p</span> tcp <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"KubeVirt Spice"</span>  <span class="nt">--dport</span> 5900 <span class="nt">-j</span> RETURN
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-A</span> PREROUTING <span class="nt">-p</span> tcp <span class="nt">-m</span> comment <span class="nt">--comment</span> <span class="s2">"KubeVirt virt-manager"</span>  <span class="nt">--dport</span> 16509 <span class="nt">-j</span> RETURN
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-A</span> PREROUTING <span class="nt">-p</span> tcp <span class="nt">-i</span> vnet0 <span class="nt">-j</span> KUBEVIRT_INBOUND
+
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-N</span> KUBEVIRT_TPROXY
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-A</span> KUBEVIRT_TPROXY <span class="o">!</span> <span class="nt">-d</span> 127.0.0.1/32 <span class="nt">-p</span> tcp <span class="nt">-j</span> TPROXY <span class="nt">--tproxy-mark</span> 8/0xffffffff <span class="nt">--on-port</span> 9401
+<span class="c">#iptables -t mangle -A KUBEVIRT_TPROXY ! -d 127.0.0.1/32 -p udp -j TPROXY --tproxy-mark 8/0xffffffff --on-port 8080</span>
+
+<span class="c"># If an inbound packet belongs to an established socket, route it to the</span>
+<span class="c"># loopback interface.</span>
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-A</span> KUBEVIRT_INBOUND <span class="nt">-p</span> tcp <span class="nt">-m</span> socket <span class="nt">-j</span> KUBEVIRT_DIVERT
+<span class="c">#iptables -t mangle -A KUBEVIRT_INBOUND -p udp -m socket -j KUBEVIRT_DIVERT</span>
+
+<span class="c"># Otherwise, it's a new connection. Redirect it using TPROXY.</span>
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-A</span> KUBEVIRT_INBOUND <span class="nt">-p</span> tcp <span class="nt">-j</span> KUBEVIRT_TPROXY
+<span class="c">#iptables -t mangle -A KUBEVIRT_INBOUND -p udp -j KUBEVIRT_TPROXY</span>
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-I</span> OUTPUT 1 <span class="nt">-d</span> 10.0.1.2 <span class="nt">-j</span> ACCEPT
+
+<span class="nv">table</span><span class="o">=</span>nat
+<span class="c"># Remove vm Connection from iptables rules</span>
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-I</span> PREROUTING 1 <span class="nt">-s</span> 10.0.1.2 <span class="nt">-j</span> ACCEPT
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-I</span> OUTPUT 1 <span class="nt">-d</span> 10.0.1.2 <span class="nt">-j</span> ACCEPT
+
+<span class="c"># Allow guest -&gt; world -- using nat for UDP</span>
+iptables <span class="nt">-t</span> <span class="k">${</span><span class="nv">table</span><span class="k">}</span> <span class="nt">-I</span> POSTROUTING 1 <span class="nt">-s</span> 10.0.1.2 <span class="nt">-p</span> udp <span class="nt">-j</span> MASQUERADE
+</code></pre></div></div>
+
+<p>For this solution we also need to load the bridge kernel module</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>modprobe bridge
+</code></pre></div></div>
+
+<p>And create some ebtables rules so egress and ingress traffict from the virtial machine will exit the l2 rules and pass to the l3 rules:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  ebtables <span class="nt">-t</span> broute <span class="nt">-F</span> <span class="c"># Flush the table</span>
+    <span class="c"># inbound traffic</span>
+    ebtables <span class="nt">-t</span> broute <span class="nt">-A</span> BROUTING <span class="nt">-p</span> IPv4 <span class="nt">--ip-dst</span> 10.0.1.2 <span class="se">\</span>
+    <span class="nt">-j</span> redirect <span class="nt">--redirect-target</span> DROP
+    <span class="c"># returning outbound traffic</span>
+    ebtables <span class="nt">-t</span> broute <span class="nt">-A</span> BROUTING <span class="nt">-p</span> IPv4 <span class="nt">--ip-src</span> 10.0.1.2 <span class="se">\</span>
+    <span class="nt">-j</span> redirect <span class="nt">--redirect-target</span> DROP
+</code></pre></div></div>
+
+<p>We also need to disable rp_filter on the virtual machine interface and the libvirt bridge interface</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo </span>0 <span class="o">&gt;</span> /proc/sys/net/ipv4/conf/virbr0/rp_filter
+<span class="nb">echo </span>0 <span class="o">&gt;</span> /proc/sys/net/ipv4/conf/virbr0-nic/rp_filter
+<span class="nb">echo </span>0 <span class="o">&gt;</span> /proc/sys/net/ipv4/conf/vnet0/rp_filter
+</code></pre></div></div>
+
+<p>After this configuration the container start the semi-tproxy process for egress traffic and the haproxy process for the ingress traffic.</p>
+
+<p>The semi-tproxy program is a golag program,binding a listener socket with the IP_TRANSPARENT socket option
+Preparing a socket to receive connections with TProxy is really no different than what is normally done when setting up a socket to listen for connections. The only difference in the process is before the socket is bound, the IP_TRANSPARENT socket option.</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">syscall</span><span class="o">.</span><span class="n">SetsockoptInt</span><span class="p">(</span><span class="n">fileDescriptor</span><span class="p">,</span> <span class="n">syscall</span><span class="o">.</span><span class="n">SOL_IP</span><span class="p">,</span> <span class="n">syscall</span><span class="o">.</span><span class="n">IP_TRANSPARENT</span><span class="p">,</span> <span class="m">1</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p>About IP_TRANSPARENT</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>IP_TRANSPARENT (since Linux 2.6.24)
+Setting this boolean option enables transparent proxying on
+this socket.  This socket option allows the calling applica‐
+tion to bind to a nonlocal IP address and operate both as a
+client and a server with the foreign address as the local
+end‐point.  NOTE: this requires that routing be set up in
+a way that packets going to the foreign address are routed
+through the TProxy box (i.e., the system hosting the
+application that employs the IP_TRANSPARENT socket option).
+Enabling this socket option requires superuser privileges
+(the CAP_NET_ADMIN capability).
+
+TProxy redirection with the iptables TPROXY target also
+requires that this option be set on the redirected socket.
+</code></pre></div></div>
+
+<p>Then we set the IP_TRANSPARENT socket option on outbound connections
+Same goes for making connections to a remote host pretending to be the client, the IP_TRANSPARENT socket option is set and the Linux kernel will allow the bind so along as a connection was intercepted with those details being used for the bind.</p>
+
+<p>When the process get a new connection we start a connection to the real destination address and copy the traffic between both sockets</p>
+
+<div class="language-go highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">var</span> <span class="n">streamWait</span> <span class="n">sync</span><span class="o">.</span><span class="n">WaitGroup</span>
+<span class="n">streamWait</span><span class="o">.</span><span class="n">Add</span><span class="p">(</span><span class="m">2</span><span class="p">)</span>
+
+<span class="n">streamConn</span> <span class="o">:=</span> <span class="k">func</span><span class="p">(</span><span class="n">dst</span> <span class="n">io</span><span class="o">.</span><span class="n">Writer</span><span class="p">,</span> <span class="n">src</span> <span class="n">io</span><span class="o">.</span><span class="n">Reader</span><span class="p">)</span> <span class="p">{</span>
+    <span class="n">io</span><span class="o">.</span><span class="n">Copy</span><span class="p">(</span><span class="n">dst</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span>
+    <span class="n">streamWait</span><span class="o">.</span><span class="n">Done</span><span class="p">()</span>
+<span class="p">}</span>
+
+<span class="k">go</span> <span class="n">streamConn</span><span class="p">(</span><span class="n">remoteConn</span><span class="p">,</span> <span class="n">VMconn</span><span class="p">)</span>
+<span class="k">go</span> <span class="n">streamConn</span><span class="p">(</span><span class="n">VMconn</span><span class="p">,</span> <span class="n">remoteConn</span><span class="p">)</span>
+
+<span class="n">streamWait</span><span class="o">.</span><span class="n">Wait</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p>The Haproxy helps us with the ingress traffic with the follow configuration</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>defaults
+  mode tcp
+frontend main
+  bind *:9080
+  default_backend guest
+backend guest
+  server guest 10.0.1.2:9080 maxconn 2048
+</code></pre></div></div>
+
+<p>It sends all the traffic to our virtual machine on the service port the machine is listening.</p>
+
+<p><a href="https://github.com/SchSeba/SemiTrasperentProxy">Code repository</a></p>
+
+<h3 id="tproxy-conclusions">tproxy conclusions</h3>
+
+<p>This solution is a general solution, not a dedicated solution to istio only. Its make the vm traffic look like a regular process inside the pod so it will work with any sidecars projects</p>
+
+<p>Egress data flow in this solution:</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/semi-tproxy-egress.png" alt="tproxy-egress-traffic" /></p>
+
+<p>Ingress data flow in this solution:</p>
+
+<p><img src="../assets/2018-06-03-Research-run-VMs-with-istio-service-mesh/nat-proxy-ingress.png" alt="tproxy-ingress-traffic" /></p>
+
+<p>Pros:</p>
+
+<ul>
+  <li>other process can change the nat table (this solution works on the mangle table)</li>
+  <li>better preformance comparing to nat-proxy</li>
+  <li>Works with any sidecar solution</li>
+</ul>
+
+<p>Cons:</p>
+
+<ul>
+  <li>Need NET_ADMIN capability for the docker</li>
+  <li>External process needed</li>
+  <li>The traffic is passed to user space</li>
+  <li>Only support ingress TCP connection</li>
+</ul>
+
+<h1 id="research-conclustion">Research Conclustion</h1>
+
+<p>KubeVirt shows it is possible to run virtual machines inside a kubernetes cluster, and this post shows that the virtual machine can also get the benefit of it.</p>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Research Run Vms With Istio Service Mesh&url=https://www.kubevirt.io/2018/Research-run-VMs-with-istio-service-mesh.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

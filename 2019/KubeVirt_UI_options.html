@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2019/KubeVirt_UI_options.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>KubeVirt user interface options | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="Alberto Losada Grande, Pedro Ibáñez Requena" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Overview of different user interface options to manage KubeVirt">
+    <meta name="keywords" content="octant, okd, openshift console, cockpit, noVNC, user interface, web interface, virtVNC, OKD console" >
+    <meta property="og:title" content="KubeVirt user interface options | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2019/KubeVirt_UI_options.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Overview of different user interface options to manage KubeVirt" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="Alberto Losada Grande, Pedro Ibáñez Requena" >
+    <meta property="og:article:published_time" content="2019-12-17 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt user interface options | KubeVirt.io">
+    <meta name="twitter:description" content="Overview of different user interface options to manage KubeVirt">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt user interface options</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Alberto Losada Grande, Pedro Ibáñez Requena</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/octant">octant</a>&nbsp;|&nbsp;<a href="/tag/okd">okd</a>&nbsp;|&nbsp;<a href="/tag/openshift-console">openshift console</a>&nbsp;|&nbsp;<a href="/tag/cockpit">cockpit</a>&nbsp;|&nbsp;<a href="/tag/novnc">noVNC</a>&nbsp;|&nbsp;<a href="/tag/user-interface">user interface</a>&nbsp;|&nbsp;<a href="/tag/web-interface">web interface</a>&nbsp;|&nbsp;<a href="/tag/virtvnc">virtVNC</a>&nbsp;|&nbsp;<a href="/tag/okd-console">OKD console</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: December 17, 2019  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <blockquote>
+  <p>The user interface (UI), in the industrial design field of human–computer interaction, is the space where interactions between humans and machines occur. The goal of this interaction is to allow effective operation and control of the machine from the human end, whilst the machine simultaneously feeds back information that aids the operators’ decision-making process. <a href="https://en.wikipedia.org/wiki/User_interface">Wikipedia:User Interface</a></p>
+</blockquote>
+
+<p>In this blogpost we show the results of a research about the different options existing in the market to enable KubeVirt with a user interface to manage, access and control the life cycle of the Virtual Machines inside Kubernetes with KubeVirt.</p>
+
+<p>The different UI options available for KubeVirt that we have been checking, at the moment of writing this article, are the following:</p>
+
+<ul>
+  <li><a href="https://github.com/vmware-tanzu/octant">Octant</a></li>
+  <li><a href="https://github.com/openshift/okd">OKD: The Origin Community Distribution of Kubernetes</a></li>
+  <li><a href="https://github.com/openshift/console">OpenShift console</a> running on vanilla Kubernetes</li>
+  <li><a href="https://cockpit-project.org/">Cockpit</a></li>
+  <li><a href="https://novnc.com/info.html">noVNC</a></li>
+</ul>
+
+<h2 id="octant">Octant</h2>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/octant-logo.png" alt="Octant logo" /></p>
+
+<p>As the <a href="https://octant.dev/">Octant webpage</a> claims:</p>
+
+<blockquote>
+  <p>Octant is an open-source developer-centric web interface for Kubernetes that lets you inspect a Kubernetes cluster and its applications. Octant is a tool for developers to understand how applications run on a Kubernetes cluster. It aims to be part of the developer’s toolkit for gaining insight and approaching complexity found in Kubernetes. Octant offers a combination of introspective tooling, cluster navigation, and object management along with a plugin system to further extend its capabilities.</p>
+</blockquote>
+
+<p>Some of the key features of this tool can be checked in their <a href="https://reference.octant.dev/">latest release notes</a>:</p>
+
+<ul>
+  <li><strong>Resource Viewer</strong>: Graphically visualize relationships between objects in a Kubernetes cluster. The status of individual objects is represented by colour to show workload performance.</li>
+  <li><strong>Summary View</strong>: Consolidated status and configuration information in a single page aggregated from output typically found using multiple kubectl commands.</li>
+  <li><strong>Port Forward</strong>: Forward a local port to a running pod with a single button for debugging applications and even port forward multiple pods across namespaces.</li>
+  <li><strong>Log Stream</strong>: View log streams of pod and container activity for troubleshooting or monitoring without holding multiple terminals open.</li>
+  <li><strong>Label Filter</strong>: Organize workloads with label filtering for inspecting clusters with a high volume of objects in a namespace.</li>
+  <li><strong>Cluster Navigation</strong>: Easily change between namespaces or contexts across different clusters. Multiple kubeconfig files are also supported.</li>
+  <li><strong>Plugin System</strong>: Highly extensible plugin system for users to provide additional functionality through gRPC. Plugin authors can add components on top of existing views.</li>
+</ul>
+
+<p>We installed it and found out that:</p>
+
+<ul>
+  <li>Octant provides a very basic dashboard for Kubernetes and it is pretty straightforward to install. It can be installed in your laptop or in a remote server.</li>
+  <li>Regular Kubernetes objects can be seen from the UI. Pod logs can be checked as well. However, mostly everything is in view mode, even the YAML description of the objects. Therefore, as a developer or cluster operator you cannot edit YAML files directly from the UI</li>
+  <li>Custom resources (CRs) and custom resource definitions (CRDs) are automatically detected and shown in the UI. This means that KubeVirt CRs can be viewed from the dashboard. However, VirtualMachines and VirtualMachineInstances cannot be modified from Octant, they can only be deleted.</li>
+  <li>There is an option to extend the functionality adding <a href="https://reference.octant.dev/?path=/docs/docs-plugins-1-getting-started--page">plugins</a> to the dashboard.</li>
+  <li>No specific options to manage KubeVirt workloads have been found.</li>
+</ul>
+
+<video autoplay="" loop="" muted="" playsinline="" src="/assets/2019-12-19-KubeVirt_UI_options/octant.mp4" type="video/mp4" width="1280" height="720"></video>
+
+<p>With further work and investigation, it could be an option to develop a specific plugin to enable remote console or VNC access to KubeVirt workloads.</p>
+
+<h2 id="okd-the-origin-community-distribution-of-kubernetes">OKD: The Origin Community Distribution of Kubernetes</h2>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/okd_logo.png" alt="OKD logo" /></p>
+
+<p>As defined in the <a href="https://www.okd.io/">official webpage</a>:</p>
+
+<blockquote>
+  <p>OKD is a distribution of Kubernetes optimized for continuous application development and multi-tenant deployment. OKD adds developer and operations-centric tools on top of Kubernetes to enable rapid application development, easy deployment and scaling, and long-term lifecycle maintenance for small and large teams. OKD is the upstream Kubernetes distribution embedded in Red Hat OpenShift.
+OKD embeds Kubernetes and extends it with security and other integrated concepts. OKD is also referred to as Origin in github and in the documentation. An OKD release corresponds to the Kubernetes distribution - for example, OKD 1.10 includes Kubernetes 1.10.</p>
+</blockquote>
+
+<p>A few weeks ago Kubernetes distribution <a href="https://github.com/openshift/okd">OKD4</a> was released as preview. OKD is the official upstream version of Red Hat’s OpenShift. Since OpenShift includes KubeVirt (Red Hat calls it <a href="https://docs.openshift.com/container-platform/4.2/cnv/cnv_install/cnv-about-cnv.html">CNV</a>) as a tech-preview feature since a couple of releases, there is already a lot of integration going on between OKD console and KubeVirt.</p>
+
+<p>Note that OKD4 is in preview, which means that only a subset of platforms and functionality will be available until it reaches beta. That being said, we have we found a similar behaviour as testing KubeVirt with OpenShift. We have noticed that from the UI a user can:</p>
+
+<ul>
+  <li>Install the KubeVirt operator from the operator marketplace.</li>
+  <li>Create Virtual Machines by importing YAML files or following a wizard. The wizard prevents you from moving to the next screen until you provide values in the required fields.</li>
+  <li>Modify the status of the Virtual Machine: stop, start, migrate, clone, edit label, edit annotations, edit CD-ROMs and delete</li>
+  <li>Edit network interfaces. It is possible to add multiple network interfaces to the VM.</li>
+  <li>Add disks to the VM</li>
+  <li>Connect to the VM via serial or VNC console.</li>
+  <li>Edit the YAML object files online.</li>
+  <li>Create VM templates. The web console features an interactive wizard that guides you through the Basic Settings, Networking, and Storage screens to simplify the process of creating virtual machine templates.</li>
+  <li>Check VM events in real time.</li>
+  <li>Gather metrics and utilization of the VM.</li>
+  <li>Pretty much everything you can do with KubeVirt from the command line.</li>
+</ul>
+
+<video autoplay="" loop="" muted="" playsinline="" src="/assets/2019-12-19-KubeVirt_UI_options/okd.mp4" type="video/mp4" width="1280" height="720"></video>
+
+<p>One of the drawbacks is that the current <a href="https://operatorhub.io/operator/kubevirt">KubeVirt HCO operator</a> contains KubeVirt version 0.18.1, which is quite outdated. Note that last week version 0.24 of KubeVirt was released. Using such an old release could cause some issues when creating VMs using newer container disk images. For instance, we have not been able to run the latest <a href="https://hub.docker.com/r/kubevirt/fedora-cloud-container-disk-demo">Fedora cloud container disk image</a> and instead we were forced to use the one tagged as v0.18.1 which matches the version of KubeVirt deployed.</p>
+
+<p>If for any reason there is a need to deploy the latest version, it can be done by running the following script which applies directly the HCO operator: <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">unreleased bundles using the hco without marketplace</a>. Note that in this case automatic updates to KubeVirt are not triggered or advised automatically in OKD as it happens with the operator.</p>
+
+<h2 id="openshift-console-bridge">OpenShift console (bridge)</h2>
+
+<p>There is actually a <a href="https://github.com/kubevirt/web-ui">KubeVirt Web User Interface</a>, however the standalone project was deprecated in favor of OpenShift Console where it is included as a plugin.</p>
+
+<p>As we reviewed previously the <a href="https://github.com/openshift/console">OpenShift web console</a> is just another piece inside OKD. It is an independent part and, as it is stated in their official GitHub repository, it can run on top of native Kubernetes. OpenShift Console a.k.a bridge is defined as:</p>
+
+<blockquote>
+  <p>a friendly kubectl in the form of a single page web application. It also integrates with other services like monitoring, chargeback, and OLM. Some things that go on behind the scenes include:</p>
+</blockquote>
+
+<ul>
+  <li>Proxying the Kubernetes API under /api/kubernetes</li>
+  <li>Providing additional non-Kubernetes APIs for interacting with the cluster</li>
+  <li>Serving all frontend static assets</li>
+  <li>User Authentication</li>
+</ul>
+
+<p>Then, as briefly explained in their <a href="https://github.com/openshift/console#native-kubernetes">repository</a>, our Kubernetes cluster can be configured to run the OpenShift Console and leverage its integrations with KubeVirt. Features related to KubeVirt are similar to the ones found in the OKD installation except:</p>
+
+<ul>
+  <li>KubeVirt installation is done using the <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">Hyperconverged Cluster Operator (HCO) without OLM or Marketplace</a> instead of the KubeVirt operator. Therefore, available updates to KubeVirt are not triggered or advised automatically</li>
+  <li>Virtual Machines objects can only be created from YAML. Although the wizard dialog is still available in the console, it does not function properly because it uses specific OpenShift objects under the hood. These objects are not available in our native Kubernetes deployment.</li>
+  <li>Connection to the VM via serial or VNC console is flaky.</li>
+  <li>VM templates can only be created from YAML. The wizard dialog is based on OpenShift templates.</li>
+</ul>
+
+<video autoplay="" loop="" muted="" playsinline="" src="/assets/2019-12-19-KubeVirt_UI_options/bridge-k8s.mp4" type="video/mp4" width="1280" height="720"></video>
+
+<p>Note that the OpenShift console documentation briefly points out how to integrate the OpenShift console with a native Kubernetes deployment. It is uncertain if it can be installed in any other Kubernetes cluster.</p>
+
+<h2 id="cockpit">Cockpit</h2>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit-logo.png" alt="Cockpit logo" /></p>
+
+<p>When testing cockpit in a CentOS 7 server with a Kubernetes cluster and KubeVirt we have realised that some of the containers/k8s features have to be enabled installing extra cockpit packages:</p>
+
+<ul>
+  <li>To see the containers and images the package <code class="language-plaintext highlighter-rouge">cockpit-docker</code> has to be installed, then a new option called containers appears in the menu.</li>
+</ul>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_containers_800.png" alt="Containers" title="cockpit containers" /></p>
+
+<ul>
+  <li>
+    <p>To see the k8s cluster the package <code class="language-plaintext highlighter-rouge">cockpit-kubernetes</code> has to be installed and a new tab appears in the left menu. The new options allow you to:</p>
+
+    <ul>
+      <li><strong>Overview</strong>: filtering by project, it shows Pods, volumes, Nodes, services and resources used.</li>
+    </ul>
+  </li>
+</ul>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_cluster_overview_800.png" alt="Cluster overview" title="cockpit cluster overview" /></p>
+
+<ul>
+  <li><strong>Nodes</strong>: nodes and the resources used are being shown here.</li>
+  <li><strong>Containers</strong>: a full list of containers and some metadata about them is displayed in this option.</li>
+  <li><strong>Topology</strong>: A graph with the pods, services and nodes is shown in this option.</li>
+</ul>
+
+<p><img src="/assets/2019-12-19-KubeVirt_UI_options/cockpit_k8s_topology_800.png" alt="Cluster topology" title="cockpit cluster topology" /></p>
+
+<ul>
+  <li><strong>Details</strong>: allows to filter by project and type of resource and shows some metadata in the results.</li>
+  <li><strong>Volumes</strong>: allows to filter by project and shows the volumes with the type and the status.</li>
+</ul>
+
+<p>In CentOS 7 there are also the following packages:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">cockpit-machines.x86_64</code> : Cockpit user interface for virtual machines. If “virt-install” is installed, you can also create new virtual machines.
+It adds a new option in the main menu called Virtual Machines but it uses libvirt and is not KubeVirt related.</li>
+  <li><code class="language-plaintext highlighter-rouge">cockpit-machines-ovirt.noarch</code> : Cockpit user interface for oVirt virtual machines, like the package above but with support for ovirt.</li>
+</ul>
+
+<p>At the moment none of the cockpit complements has support for KubeVirt Virtual Machine.</p>
+
+<p>KubeVirt support for cockpit was <a href="https://bugzilla.redhat.com/show_bug.cgi?id=1629608">removed from fedora 29</a></p>
+
+<h2 id="novnc">noVNC</h2>
+
+<p>noVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas.
+It just allows you to connect through VNC to the virtual Machine already deployed in KubeVirt.</p>
+
+<p>No VM management or even a dashboard is enabled with this option, it’s a pure DIY code that can embed the VNC access to the VM into HTML in any application or webpage.
+There is a <a href="/2019/Access-Virtual-Machines-graphic-console-using-noVNC.html">noVNC blogpost</a> detailing how to install noVNC.</p>
+
+<p>In this animation you can see the feature of connecting to the Virtual Machine with noVNC:
+<img src="/assets/2019-12-19-KubeVirt_UI_options/virtvnc.gif" alt="noVNC" title="noVNC" /></p>
+
+<h2 id="summary">Summary</h2>
+
+<p>From the different options we have investigated, we can conclude that OpenShift Console along with OKD Kubernetes distribution provides a powerful way to manage and control our KubeVirt objects. From the user interface, a developer or operator can do pretty much everything you do in the command line. Additionally, users can create custom reusable templates to deploy their virtual machines with specific requirements. Wizard dialogs are provided as well in order to guide new users during the creation of their VMs.</p>
+
+<p>OpenShift Console can also be considered as an interesting option in case your KubeVirt installation is running on a native Kubernetes cluster.</p>
+
+<p>On the other hand, noVNC provides a lightweight interface to simply connect to the console of your virtual machine.</p>
+
+<p>Octant, although it does not have any specific integration with KubeVirt, looks like a promising Kubernetes user interface that could be extended to manage our KubeVirt instances in the future.</p>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>We encourage our readers to let us know of user interfaces that can be used to manage our KubeVirt virtual machines. Then, we can include them in this list</p>
+
+
+</div></div>
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://octant.dev">Octant</a></li>
+  <li><a href="https://www.okd.io/">OKD</a></li>
+  <li><a href="https://github.com/openshift/origin-web-console">OKD Console</a></li>
+  <li><a href="https://cockpit-project.org/">Cockpit</a></li>
+  <li><a href="https://github.com/wavezhang/virtVNC/">virtVNC, noVNC for Kubevirt</a></li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt user interface options&url=https://www.kubevirt.io/2019/KubeVirt_UI_options.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

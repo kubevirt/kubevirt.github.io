@@ -1,0 +1,539 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/Non-Dockerized-Build.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Non Dockerized Build | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="yuvalif" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host">
+    <meta name="keywords" content="docker, container, build" >
+    <meta property="og:title" content="Non Dockerized Build | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/Non-Dockerized-Build.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="yuvalif" >
+    <meta property="og:article:published_time" content="2018-06-07 00:00:00 +0000" >
+    <meta name="twitter:title" content="Non Dockerized Build | KubeVirt.io">
+    <meta name="twitter:description" content="This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Non Dockerized Build</h1>
+          <div class="post-info">
+            <span class="post-author">Author: yuvalif</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/docker">docker</a>&nbsp;|&nbsp;<a href="/tag/container">container</a>&nbsp;|&nbsp;<a href="/tag/build">build</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: June 7, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: uncategorized
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <p>In this post we will set up an alternative to the existing containerized build system used in KubeVirt.</p>
+
+<p>A <a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">new makefile</a> will be presented here, which you can for experimenting (if you are brave enough…)</p>
+
+<h1 id="why">Why?</h1>
+
+<p>Current build system for KubeVirt is done inside docker. This ensures a robust and consistent build environment:</p>
+
+<ul>
+  <li>No need to install system dependencies</li>
+  <li>Controlled versions of these dependencies</li>
+  <li>Agnostic of local golang environment</li>
+</ul>
+
+<p>So, in general, <strong>you should just use the dockerized build system</strong>.</p>
+
+<p>Still, there are some drawbacks there:</p>
+
+<ul>
+  <li>Tool integration:
+    <ul>
+      <li>Since your tools are not running in the dockerized environment, they may give different outcome than the ones running in the dockerized environment</li>
+      <li>Invoking any of the dockerized scripts (under <code class="language-plaintext highlighter-rouge">hack</code> directory) may be inconsistent with the outside environment (e.g. file path is different than the one on your machine)</li>
+    </ul>
+  </li>
+  <li>Build time: the dockerized build has some small overheads, and some improvements are still needed to make sure that caching work properly and build is optimized</li>
+  <li>And last, but not least, <em>sometimes it is just hard to resist the tinkering…</em></li>
+</ul>
+
+<h2 id="how">How?</h2>
+
+<p>Currently, the Makefile includes targets that address different things: building, dependencies, cluster management, testing etc. - here I tried to modify the minimum which is required for non-containerized build. Anything not related to it, should just be done using the existing Makefile.</p>
+
+<blockquote>
+  <p>note “Note
+Cross compilation is not covered here (e.g. building <code class="language-plaintext highlighter-rouge">virtctl</code> for mac and windows)</p>
+</blockquote>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>Best place to look for that is in the docker file definition for the build environment: <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/builder/Dockerfile">hack/docker-builder/Dockerfile</a></p>
+
+<p>Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> git
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> libvirt-devel
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> golang
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> docker
+<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> qemu-img
+</code></pre></div></div>
+
+<p><em>Similarly to the containerized case</em>, docker is still needed (e.g. all the cluster stuff is done via docker), and therefore, any docker related preparations are needed as well. This would include running docker on startup and making sure that docker commands does not need root privileges. On Fedora27 this would mean:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>groupadd docker
+<span class="nb">sudo </span>usermod <span class="nt">-aG</span> docker <span class="nv">$USER</span>
+<span class="nb">sudo </span>systemctl <span class="nb">enable </span>docker
+<span class="nb">sudo </span>systemctl start docker
+</code></pre></div></div>
+
+<p>Now, getting the actual code could be done either via <code class="language-plaintext highlighter-rouge">go get</code> (don’t forget to set the <code class="language-plaintext highlighter-rouge">GOPATH</code> environment variable):</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>go get <span class="nt">-d</span> kubevirt.io/kubevirt/...
+
+</code></pre></div></div>
+
+<p>Or <code class="language-plaintext highlighter-rouge">git clone</code>:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/ <span class="o">&amp;&amp;</span> <span class="nb">cd</span> <span class="nv">$GOPATH</span>/src/kubevirt.io/
+git clone https://github.com/kubevirt/kubevirt
+</code></pre></div></div>
+
+<h3 id="makefilenocontainer"><a href="../assets/2018-06-07-Non-Dockerized-Build/Makefile.nocontainer">Makefile.nocontainer</a></h3>
+
+<div class="language-makefile highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nl">all</span><span class="o">:</span> <span class="nf">build</span>
+
+<span class="nl">bootstrap</span><span class="o">:</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">github.com/onsi/ginkgo/ginkgo</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">mvdan.cc/sh/cmd/shfmt</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/deepcopy-gen</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/defaulter-gen</span>
+    <span class="err">go</span> <span class="err">get</span> <span class="err">-u</span> <span class="err">-d</span> <span class="err">k8s.io/code-generator/cmd/openapi-gen</span>
+    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/deepcopy-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
+    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/defaulter-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
+    <span class="err">cd</span> <span class="err">${GOPATH}/src/k8s.io/code-generator/cmd/openapi-gen</span> <span class="err">&amp;&amp;</span> <span class="err">git</span> <span class="err">checkout</span> <span class="err">release-1.9</span> <span class="err">&amp;&amp;</span> <span class="err">go</span> <span class="err">install</span>
+
+<span class="nl">generate</span><span class="o">:</span>
+    <span class="err">./hack/generate.sh</span>
+
+<span class="nl">apidocs</span><span class="o">:</span> <span class="nf">generate</span>
+    <span class="err">./hack/gen-swagger-doc/gen-swagger-docs.sh</span> <span class="err">v1</span> <span class="err">html</span>
+
+<span class="nl">build</span><span class="o">:</span> <span class="nf">check</span>
+    <span class="err">go</span> <span class="err">install</span> <span class="err">-v</span> <span class="err">./cmd/...</span> <span class="err">./pkg/...</span>
+    <span class="err">./hack/copy-cmd.sh</span>
+
+<span class="nl">test</span><span class="o">:</span> <span class="nf">build</span>
+    <span class="err">go</span> <span class="err">test</span> <span class="err">-v</span> <span class="err">-cover</span> <span class="err">./pkg/...</span>
+
+<span class="nl">check</span><span class="o">:</span>
+    <span class="err">./hack/check.sh</span>
+
+<span class="nv">OUT_DIR</span><span class="o">=</span>./_out
+<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="nv">${OUT_DIR}</span>/tests
+
+<span class="nl">functest</span><span class="o">:</span> <span class="nf">build</span>
+    <span class="err">go</span> <span class="err">build</span> <span class="err">-v</span> <span class="err">./tests/...</span>
+    <span class="err">ginkgo</span> <span class="err">build</span> <span class="err">./tests</span>
+    <span class="err">mkdir</span> <span class="err">-p</span> <span class="err">${TESTS_OUT_DIR}/</span>
+    <span class="err">mv</span> <span class="err">./tests/tests.test</span> <span class="err">${TESTS_OUT_DIR}/</span>
+    <span class="err">./hack/functests.sh</span>
+
+<span class="nl">cluster-sync</span><span class="o">:</span> <span class="nf">build</span>
+    <span class="err">./hack/build-copy-artifacts.sh</span>
+    <span class="err">./hack/build-manifests.sh</span>
+    <span class="err">./hack/build-docker.sh</span> <span class="err">build</span>
+    <span class="err">./cluster/clean.sh</span>
+    <span class="err">./cluster/deploy.sh</span>
+
+<span class="nl">.PHONY</span><span class="o">:</span> <span class="nf">bootstrap generate apidocs build test check functest cluster-sync</span>
+</code></pre></div></div>
+
+<h3 id="targets">Targets</h3>
+
+<p>To execute any of the targets use:</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make <span class="nt">-f</span> Makefile.nocontainer &lt;target&gt;
+</code></pre></div></div>
+
+<p>File has the following targets:</p>
+
+<ul>
+  <li><strong>bootstrap</strong>: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
+    <ul>
+      <li>Note that the k8s code generators use specific version</li>
+      <li>Note that these are not code dependencies, as they are handled by using a <code class="language-plaintext highlighter-rouge">vendor</code> directory, as well as the distclean, deps-install and deps-update targets in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
+    </ul>
+  </li>
+  <li><strong>generate</strong>: Calling <a href="https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh">hack/generate.sh</a> script similarly to the <a href="https://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a>. It builds all generators (under the <code class="language-plaintext highlighter-rouge">tools</code> directory) and use them to generate: test mocks, KubeVirt resources and test yamls</li>
+  <li><strong>apidocs</strong>: this is similar to apidocs target in the <a href="ttps://github.com/kubevirt/kubevirt/blob/master/Makefile">standard makefile</a></li>
+  <li><strong>build</strong>: this is building all product binaries, and then using a script (<a href="../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh">copy-cmd.sh</a>, should be placed under: <code class="language-plaintext highlighter-rouge">hack</code>) to copy the binaries from their standard location into the <code class="language-plaintext highlighter-rouge">_out</code> directory, where the cluster management scripts expect them</li>
+  <li><strong>test</strong>: building and running unit tests
+check: using similar code to the one used in the standard makefile: formatting files, fixing package imports and calling go vet</li>
+  <li><strong>functest</strong>: building and running integration tests. After tests are built , they are moved to the <code class="language-plaintext highlighter-rouge">_out</code> directory so that the standard script for running integration tests would find them</li>
+  <li><strong>cluster-sync</strong>: this is the only “cluster management” target that had to be modified from the standard makefile</li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Non Dockerized Build&url=https://www.kubevirt.io/2018/Non-Dockerized-Build.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

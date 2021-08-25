@@ -1,0 +1,952 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Automated Windows Installation With Tekton Pipelines | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="Filip Křepinský" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This blog shows how KubeVirt Tekton Tasks can be utilized to automatically install and setup Windows VMs from scratch">
+    <meta name="keywords" content="kubevirt, Kubernetes, virtual machine, VM, Tekton Pipelines, KubeVirt Tekton Tasks, Windows" >
+    <meta property="og:title" content="Automated Windows Installation With Tekton Pipelines | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This blog shows how KubeVirt Tekton Tasks can be utilized to automatically install and setup Windows VMs from scratch" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="Filip Křepinský" >
+    <meta property="og:article:published_time" content="2021-04-21 00:00:00 +0000" >
+    <meta name="twitter:title" content="Automated Windows Installation With Tekton Pipelines | KubeVirt.io">
+    <meta name="twitter:description" content="This blog shows how KubeVirt Tekton Tasks can be utilized to automatically install and setup Windows VMs from scratch">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Automated Windows Installation With Tekton Pipelines</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Filip Křepinský</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">Kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/vm">VM</a>&nbsp;|&nbsp;<a href="/tag/tekton-pipelines">Tekton Pipelines</a>&nbsp;|&nbsp;<a href="/tag/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a>&nbsp;|&nbsp;<a href="/tag/windows">Windows</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: April 21, 2021  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="introduction">Introduction</h2>
+
+<p>This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with <a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a>.</p>
+
+<p>Tekton Pipelines can be used to create a single <code class="language-plaintext highlighter-rouge">Pipeline</code> that encapsulates the installation process which can be run and replicated with <code class="language-plaintext highlighter-rouge">PipelineRuns</code>.
+The pipeline will be built with <a href="https://github.com/kubevirt/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a>, which includes all the necessary tasks for this example.</p>
+
+<h2 id="pipeline-description">Pipeline Description</h2>
+
+<p>The pipeline will prepare an empty Persistent Volume Claim (PVC) and download a Windows source ISO into another PVC. Both of them will be initialized with Containerized Data Importer (CDI).
+It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
+Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
+You can later use the artifact PVC as a base image and copy it for new VMs.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>KubeVirt <code class="language-plaintext highlighter-rouge">v0.39.0</code></li>
+  <li>Tekton Pipelines <code class="language-plaintext highlighter-rouge">v0.19.0</code></li>
+  <li>KubeVirt Tekton Tasks <code class="language-plaintext highlighter-rouge">v0.3.0</code></li>
+</ul>
+
+<h2 id="running-windows-installer-pipeline">Running Windows Installer Pipeline</h2>
+
+<h2 id="obtaining-a-url-of-windows-source-iso">Obtaining a URL of Windows Source ISO</h2>
+
+<p>First we have to obtain a Download URL of Windows Source ISO.</p>
+
+<ol>
+  <li>Go to <a href="https://www.microsoft.com/en-us/software-download/windows10ISO">https://www.microsoft.com/en-us/software-download/windows10ISO</a>. You can also obtain a server edition for evaluation at <a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019">https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019</a>.</li>
+  <li>Fill in the edition and <code class="language-plaintext highlighter-rouge">English</code> language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.</li>
+  <li>Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.</li>
+</ol>
+
+<h2 id="preparing-autounattendxml-configmap">Preparing autounattend.xml ConfigMap</h2>
+
+<p>Now we have to prepare our autounattend.xml Answer File with the installation instructions. We will store it in a <code class="language-plaintext highlighter-rouge">ConfigMap</code>, but optionally it can be stored in a <code class="language-plaintext highlighter-rouge">Secret</code> as well.</p>
+
+<p>The configuration file can be generated with <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/windows-system-image-manager-overview-topics">Windows SIM</a>
+or it can be specified manually according to <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/answer-files-overview">Answer File Reference</a>
+and <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend">Answer File Components Reference</a>.</p>
+
+<p>The following config map includes the required drivers and guest disk configuration.
+It also specifies how the installation should proceed and what users should be created.
+In our case it is an <code class="language-plaintext highlighter-rouge">Administrator</code> user with <code class="language-plaintext highlighter-rouge">changepassword</code> password.
+You can also change the Answer File according to your needs by consulting the already mentioned documentation.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-autounattend</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="s">Autounattend.xml</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
+    <span class="s">&lt;unattend xmlns="urn:schemas-microsoft-com:unattend"&gt;</span>
+        <span class="s">&lt;settings pass="windowsPE"&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-PnpCustomizationsWinPE" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" processorArchitecture="amd64" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"&gt;</span>
+                <span class="s">&lt;DriverPaths&gt;</span>
+                    <span class="s">&lt;PathAndCredentials wcm:action="add" wcm:keyValue="1"&gt;</span>
+                        <span class="s">&lt;Path&gt;E:\viostor\w10\amd64&lt;/Path&gt;</span>
+                    <span class="s">&lt;/PathAndCredentials&gt;</span>
+                    <span class="s">&lt;PathAndCredentials wcm:action="add" wcm:keyValue="2"&gt;</span>
+                        <span class="s">&lt;Path&gt;E:\NetKVM\w10\amd64&lt;/Path&gt;</span>
+                    <span class="s">&lt;/PathAndCredentials&gt;</span>
+                    <span class="s">&lt;PathAndCredentials wcm:action="add" wcm:keyValue="3"&gt;</span>
+                        <span class="s">&lt;Path&gt;E:\viorng\w10\amd64&lt;/Path&gt;</span>
+                    <span class="s">&lt;/PathAndCredentials&gt;</span>
+                <span class="s">&lt;/DriverPaths&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;SetupUILanguage&gt;</span>
+                    <span class="s">&lt;UILanguage&gt;en-US&lt;/UILanguage&gt;</span>
+                <span class="s">&lt;/SetupUILanguage&gt;</span>
+                <span class="s">&lt;InputLocale&gt;0409:00000409&lt;/InputLocale&gt;</span>
+                <span class="s">&lt;SystemLocale&gt;en-US&lt;/SystemLocale&gt;</span>
+                <span class="s">&lt;UILanguage&gt;en-US&lt;/UILanguage&gt;</span>
+                <span class="s">&lt;UILanguageFallback&gt;en-US&lt;/UILanguageFallback&gt;</span>
+                <span class="s">&lt;UserLocale&gt;en-US&lt;/UserLocale&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;DiskConfiguration&gt;</span>
+                    <span class="s">&lt;Disk wcm:action="add"&gt;</span>
+                        <span class="s">&lt;CreatePartitions&gt;</span>
+                            <span class="s">&lt;CreatePartition wcm:action="add"&gt;</span>
+                                <span class="s">&lt;Order&gt;1&lt;/Order&gt;</span>
+                                <span class="s">&lt;Type&gt;Primary&lt;/Type&gt;</span>
+                                <span class="s">&lt;Size&gt;100&lt;/Size&gt;</span>
+                            <span class="s">&lt;/CreatePartition&gt;</span>
+                            <span class="s">&lt;CreatePartition wcm:action="add"&gt;</span>
+                                <span class="s">&lt;Extend&gt;true&lt;/Extend&gt;</span>
+                                <span class="s">&lt;Order&gt;2&lt;/Order&gt;</span>
+                                <span class="s">&lt;Type&gt;Primary&lt;/Type&gt;</span>
+                            <span class="s">&lt;/CreatePartition&gt;</span>
+                        <span class="s">&lt;/CreatePartitions&gt;</span>
+                        <span class="s">&lt;ModifyPartitions&gt;</span>
+                            <span class="s">&lt;ModifyPartition wcm:action="add"&gt;</span>
+                                <span class="s">&lt;Active&gt;true&lt;/Active&gt;</span>
+                                <span class="s">&lt;Format&gt;NTFS&lt;/Format&gt;</span>
+                                <span class="s">&lt;Label&gt;System Reserved&lt;/Label&gt;</span>
+                                <span class="s">&lt;Order&gt;1&lt;/Order&gt;</span>
+                                <span class="s">&lt;PartitionID&gt;1&lt;/PartitionID&gt;</span>
+                                <span class="s">&lt;TypeID&gt;0x27&lt;/TypeID&gt;</span>
+                            <span class="s">&lt;/ModifyPartition&gt;</span>
+                            <span class="s">&lt;ModifyPartition wcm:action="add"&gt;</span>
+                                <span class="s">&lt;Active&gt;true&lt;/Active&gt;</span>
+                                <span class="s">&lt;Format&gt;NTFS&lt;/Format&gt;</span>
+                                <span class="s">&lt;Label&gt;OS&lt;/Label&gt;</span>
+                                <span class="s">&lt;Letter&gt;C&lt;/Letter&gt;</span>
+                                <span class="s">&lt;Order&gt;2&lt;/Order&gt;</span>
+                                <span class="s">&lt;PartitionID&gt;2&lt;/PartitionID&gt;</span>
+                            <span class="s">&lt;/ModifyPartition&gt;</span>
+                        <span class="s">&lt;/ModifyPartitions&gt;</span>
+                        <span class="s">&lt;DiskID&gt;0&lt;/DiskID&gt;</span>
+                        <span class="s">&lt;WillWipeDisk&gt;true&lt;/WillWipeDisk&gt;</span>
+                    <span class="s">&lt;/Disk&gt;</span>
+                <span class="s">&lt;/DiskConfiguration&gt;</span>
+                <span class="s">&lt;ImageInstall&gt;</span>
+                    <span class="s">&lt;OSImage&gt;</span>
+                        <span class="s">&lt;InstallTo&gt;</span>
+                            <span class="s">&lt;DiskID&gt;0&lt;/DiskID&gt;</span>
+                            <span class="s">&lt;PartitionID&gt;2&lt;/PartitionID&gt;</span>
+                        <span class="s">&lt;/InstallTo&gt;</span>
+                        <span class="s">&lt;InstallToAvailablePartition&gt;false&lt;/InstallToAvailablePartition&gt;</span>
+                    <span class="s">&lt;/OSImage&gt;</span>
+                <span class="s">&lt;/ImageInstall&gt;</span>
+                <span class="s">&lt;UserData&gt;</span>
+                    <span class="s">&lt;AcceptEula&gt;true&lt;/AcceptEula&gt;</span>
+                    <span class="s">&lt;FullName&gt;Administrator&lt;/FullName&gt;</span>
+                    <span class="s">&lt;Organization&gt;&lt;/Organization&gt;</span>
+                    <span class="s">&lt;ProductKey&gt;</span>
+                        <span class="s">&lt;Key&gt;W269N-WFGWX-YVC9B-4J6C9-T83GX&lt;/Key&gt;</span>
+                    <span class="s">&lt;/ProductKey&gt;</span>
+                <span class="s">&lt;/UserData&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+        <span class="s">&lt;/settings&gt;</span>
+        <span class="s">&lt;settings pass="offlineServicing"&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-LUA-Settings" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;EnableLUA&gt;false&lt;/EnableLUA&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+        <span class="s">&lt;/settings&gt;</span>
+        <span class="s">&lt;settings pass="generalize"&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;SkipRearm&gt;1&lt;/SkipRearm&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+        <span class="s">&lt;/settings&gt;</span>
+        <span class="s">&lt;settings pass="specialize"&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;InputLocale&gt;0409:00000409&lt;/InputLocale&gt;</span>
+                <span class="s">&lt;SystemLocale&gt;en-US&lt;/SystemLocale&gt;</span>
+                <span class="s">&lt;UILanguage&gt;en-US&lt;/UILanguage&gt;</span>
+                <span class="s">&lt;UILanguageFallback&gt;en-US&lt;/UILanguageFallback&gt;</span>
+                <span class="s">&lt;UserLocale&gt;en-US&lt;/UserLocale&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;SkipAutoActivation&gt;true&lt;/SkipAutoActivation&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;CEIPEnabled&gt;0&lt;/CEIPEnabled&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;ComputerName&gt;WindowsVM&lt;/ComputerName&gt;</span>
+                <span class="s">&lt;ProductKey&gt;W269N-WFGWX-YVC9B-4J6C9-T83GX&lt;/ProductKey&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+        <span class="s">&lt;/settings&gt;</span>
+        <span class="s">&lt;settings pass="oobeSystem"&gt;</span>
+            <span class="s">&lt;component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
+                <span class="s">&lt;AutoLogon&gt;</span>
+                    <span class="s">&lt;Password&gt;</span>
+                        <span class="s">&lt;Value&gt;changepassword&lt;/Value&gt;</span>
+                        <span class="s">&lt;PlainText&gt;true&lt;/PlainText&gt;</span>
+                    <span class="s">&lt;/Password&gt;</span>
+                    <span class="s">&lt;Enabled&gt;true&lt;/Enabled&gt;</span>
+                    <span class="s">&lt;Username&gt;Administrator&lt;/Username&gt;</span>
+                <span class="s">&lt;/AutoLogon&gt;</span>
+                <span class="s">&lt;OOBE&gt;</span>
+                    <span class="s">&lt;HideEULAPage&gt;true&lt;/HideEULAPage&gt;</span>
+                    <span class="s">&lt;HideOEMRegistrationScreen&gt;true&lt;/HideOEMRegistrationScreen&gt;</span>
+                    <span class="s">&lt;HideOnlineAccountScreens&gt;true&lt;/HideOnlineAccountScreens&gt;</span>
+                    <span class="s">&lt;HideWirelessSetupInOOBE&gt;true&lt;/HideWirelessSetupInOOBE&gt;</span>
+                    <span class="s">&lt;NetworkLocation&gt;Home&lt;/NetworkLocation&gt;</span>
+                    <span class="s">&lt;SkipUserOOBE&gt;true&lt;/SkipUserOOBE&gt;</span>
+                    <span class="s">&lt;SkipMachineOOBE&gt;true&lt;/SkipMachineOOBE&gt;</span>
+                    <span class="s">&lt;ProtectYourPC&gt;3&lt;/ProtectYourPC&gt;</span>
+                <span class="s">&lt;/OOBE&gt;</span>
+                <span class="s">&lt;UserAccounts&gt;</span>
+                    <span class="s">&lt;LocalAccounts&gt;</span>
+                        <span class="s">&lt;LocalAccount wcm:action="add"&gt;</span>
+                            <span class="s">&lt;Password&gt;</span>
+                                <span class="s">&lt;Value&gt;changepassword&lt;/Value&gt;</span>
+                                <span class="s">&lt;PlainText&gt;true&lt;/PlainText&gt;</span>
+                            <span class="s">&lt;/Password&gt;</span>
+                            <span class="s">&lt;Description&gt;&lt;/Description&gt;</span>
+                            <span class="s">&lt;DisplayName&gt;Administrator&lt;/DisplayName&gt;</span>
+                            <span class="s">&lt;Group&gt;Administrators&lt;/Group&gt;</span>
+                            <span class="s">&lt;Name&gt;Administrator&lt;/Name&gt;</span>
+                        <span class="s">&lt;/LocalAccount&gt;</span>
+                    <span class="s">&lt;/LocalAccounts&gt;</span>
+                <span class="s">&lt;/UserAccounts&gt;</span>
+                <span class="s">&lt;RegisteredOrganization&gt;&lt;/RegisteredOrganization&gt;</span>
+                <span class="s">&lt;RegisteredOwner&gt;Administrator&lt;/RegisteredOwner&gt;</span>
+                <span class="s">&lt;DisableAutoDaylightTimeSet&gt;false&lt;/DisableAutoDaylightTimeSet&gt;</span>
+                <span class="s">&lt;FirstLogonCommands&gt;</span>
+                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
+                        <span class="s">&lt;Description&gt;Control Panel View&lt;/Description&gt;</span>
+                        <span class="s">&lt;Order&gt;1&lt;/Order&gt;</span>
+                        <span class="s">&lt;CommandLine&gt;reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel" /v StartupPage /t REG_DWORD /d 1 /f&lt;/CommandLine&gt;</span>
+                        <span class="s">&lt;RequiresUserInput&gt;true&lt;/RequiresUserInput&gt;</span>
+                    <span class="s">&lt;/SynchronousCommand&gt;</span>
+                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
+                        <span class="s">&lt;Order&gt;2&lt;/Order&gt;</span>
+                        <span class="s">&lt;Description&gt;Control Panel Icon Size&lt;/Description&gt;</span>
+                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
+                        <span class="s">&lt;CommandLine&gt;reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel" /v AllItemsIconView /t REG_DWORD /d 0 /f&lt;/CommandLine&gt;</span>
+                    <span class="s">&lt;/SynchronousCommand&gt;</span>
+                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
+                        <span class="s">&lt;Order&gt;3&lt;/Order&gt;</span>
+                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
+                        <span class="s">&lt;CommandLine&gt;cmd /C wmic useraccount where name="Administrator" set PasswordExpires=false&lt;/CommandLine&gt;</span>
+                        <span class="s">&lt;Description&gt;Password Never Expires&lt;/Description&gt;</span>
+                    <span class="s">&lt;/SynchronousCommand&gt;</span>
+                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
+                        <span class="s">&lt;Order&gt;4&lt;/Order&gt;</span>
+                        <span class="s">&lt;Description&gt;Remove AutoAdminLogon&lt;/Description&gt;</span>
+                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
+                        <span class="s">&lt;CommandLine&gt;reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v AutoAdminLogon /t REG_SZ /d 0 /f&lt;/CommandLine&gt;</span>
+                    <span class="s">&lt;/SynchronousCommand&gt;</span>
+                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
+                        <span class="s">&lt;Order&gt;5&lt;/Order&gt;</span>
+                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
+                        <span class="s">&lt;CommandLine&gt;cmd /c shutdown /s /f /t 10&lt;/CommandLine&gt;</span>
+                        <span class="s">&lt;Description&gt;Shuts down the system&lt;/Description&gt;</span>
+                    <span class="s">&lt;/SynchronousCommand&gt;</span>
+                <span class="s">&lt;/FirstLogonCommands&gt;</span>
+                <span class="s">&lt;TimeZone&gt;Alaskan Standard Time&lt;/TimeZone&gt;</span>
+            <span class="s">&lt;/component&gt;</span>
+        <span class="s">&lt;/settings&gt;</span>
+    <span class="s">&lt;/unattend&gt;</span>
+<span class="s">---</span>
+</code></pre></div></div>
+
+<h2 id="creating-the-pipeline">Creating the Pipeline</h2>
+
+<p>Let’s create a pipeline which consists of the following tasks.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  create-source-dv <span class="nt">---</span> create-vm-from-manifest <span class="nt">---</span> wait-for-vmi-status <span class="nt">---</span> cleanup-vm
+                    |
+    create-base-dv <span class="nt">--</span>
+</code></pre></div></div>
+
+<ol>
+  <li><code class="language-plaintext highlighter-rouge">create-source-dv</code> task downloads a Windows source ISO into a PVC called <code class="language-plaintext highlighter-rouge">windows-10-source-*</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">create-base-dv</code> task creates an empty PVC for new windows installation called <code class="language-plaintext highlighter-rouge">windows-10-base-*</code>.</li>
+  <li><code class="language-plaintext highlighter-rouge">create-vm-from-manifest</code> task creates a VM called <code class="language-plaintext highlighter-rouge">windows-installer-*</code>
+from the empty PVC and with the <code class="language-plaintext highlighter-rouge">windows-10-source-*</code> PVC attached as a CD-ROM.</li>
+  <li><code class="language-plaintext highlighter-rouge">wait-for-vmi-status</code> task waits until the VM shuts down.</li>
+  <li><code class="language-plaintext highlighter-rouge">cleanup-vm</code> deletes the installer VM and ISO PVC.</li>
+  <li>The output artifact will be the <code class="language-plaintext highlighter-rouge">windows-10-base-*</code> PVC with the Windows installation.</li>
+</ol>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">tekton.dev/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Pipeline</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">windows-installer</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">params</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winImageDownloadURL</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">autounattendConfigMapName</span>
+      <span class="na">default</span><span class="pi">:</span> <span class="s">windows-10-autounattend</span>
+      <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
+  <span class="na">tasks</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">create-source-dv</span>
+      <span class="na">params</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">manifest</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="pi">|</span>
+            <span class="s">apiVersion: cdi.kubevirt.io/v1beta1</span>
+            <span class="s">kind: DataVolume</span>
+            <span class="s">metadata:</span>
+              <span class="s">generateName: windows-10-source-</span>
+            <span class="s">spec:</span>
+              <span class="s">pvc:</span>
+                <span class="s">accessModes:</span>
+                  <span class="s">- ReadWriteOnce</span>
+                <span class="s">resources:</span>
+                  <span class="s">requests:</span>
+                    <span class="s">storage: 7Gi</span>
+                <span class="s">volumeMode: Filesystem</span>
+              <span class="s">source:</span>
+                <span class="s">http:</span>
+                  <span class="s">url: $(params.winImageDownloadURL)</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">waitForSuccess</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
+      <span class="na">timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2h'</span>
+      <span class="na">taskRef</span><span class="pi">:</span>
+        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">create-base-dv</span>
+      <span class="na">params</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">manifest</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="pi">|</span>
+            <span class="s">apiVersion: cdi.kubevirt.io/v1beta1</span>
+            <span class="s">kind: DataVolume</span>
+            <span class="s">metadata:</span>
+              <span class="s">generateName: windows-10-base-</span>
+            <span class="s">spec:</span>
+              <span class="s">pvc:</span>
+                <span class="s">accessModes:</span>
+                  <span class="s">- ReadWriteOnce</span>
+                <span class="s">resources:</span>
+                  <span class="s">requests:</span>
+                    <span class="s">storage: 20Gi</span>
+                <span class="s">volumeMode: Filesystem</span>
+              <span class="s">source:</span>
+                <span class="s">blank: {}</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">waitForSuccess</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
+      <span class="na">taskRef</span><span class="pi">:</span>
+        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">create-vm-from-manifest</span>
+      <span class="na">params</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">manifest</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="pi">|</span>
+            <span class="s">apiVersion: kubevirt.io/v1alpha3</span>
+            <span class="s">kind: VirtualMachine</span>
+            <span class="s">metadata:</span>
+              <span class="s">generateName: windows-installer-</span>
+              <span class="s">annotation:</span>
+                <span class="s">description: Windows VM generated by windows-installer pipeline</span>
+              <span class="s">labels:</span>
+                <span class="s">app: windows-installer</span>
+            <span class="s">spec:</span>
+              <span class="s">runStrategy: RerunOnFailure</span>
+              <span class="s">template:</span>
+                <span class="s">metadata:</span>
+                  <span class="s">labels:</span>
+                    <span class="s">kubevirt.io/domain: windows-installer</span>
+                <span class="s">spec:</span>
+                  <span class="s">domain:</span>
+                    <span class="s">cpu:</span>
+                      <span class="s">sockets: 2</span>
+                      <span class="s">cores: 1</span>
+                      <span class="s">threads: 1</span>
+                    <span class="s">resources:</span>
+                      <span class="s">requests:</span>
+                        <span class="s">memory: 2Gi</span>
+                    <span class="s">devices:</span>
+                      <span class="s">disks:</span>
+                        <span class="s">- name: installcdrom</span>
+                          <span class="s">cdrom:</span>
+                            <span class="s">bus: sata</span>
+                          <span class="s">bootOrder: 1</span>
+                        <span class="s">- name: rootdisk</span>
+                          <span class="s">bootOrder: 2</span>
+                          <span class="s">disk:</span>
+                            <span class="s">bus: virtio</span>
+                        <span class="s">- name: virtiocontainerdisk</span>
+                          <span class="s">cdrom:</span>
+                            <span class="s">bus: sata</span>
+                        <span class="s">- name: sysprepconfig</span>
+                          <span class="s">cdrom:</span>
+                            <span class="s">bus: sata</span>
+                      <span class="s">interfaces:</span>
+                        <span class="s">- bridge: {}</span>
+                          <span class="s">name: default</span>
+                      <span class="s">inputs:</span>
+                        <span class="s">- type: tablet</span>
+                          <span class="s">bus: usb</span>
+                          <span class="s">name: tablet</span>
+                  <span class="s">networks:</span>
+                    <span class="s">- name: default</span>
+                      <span class="s">pod: {}</span>
+                  <span class="s">volumes:</span>
+                    <span class="s">- name: installcdrom</span>
+                    <span class="s">- name: rootdisk</span>
+                    <span class="s">- name: virtiocontainerdisk</span>
+                      <span class="s">containerDisk:</span>
+                        <span class="s">image: kubevirt/virtio-container-disk</span>
+                    <span class="s">- name: sysprepconfig</span>
+                      <span class="s">sysprep:</span>
+                        <span class="s">configMap:</span>
+                          <span class="s">name: $(params.autounattendConfigMapName)</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">ownDataVolumes</span>
+          <span class="na">value</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">installcdrom:$(tasks.create-source-dv.results.name)"</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">dataVolumes</span>
+          <span class="na">value</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s2">"</span><span class="s">rootdisk:$(tasks.create-base-dv.results.name)"</span>
+      <span class="na">runAfter</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">create-source-dv</span>
+        <span class="pi">-</span> <span class="s">create-base-dv</span>
+      <span class="na">taskRef</span><span class="pi">:</span>
+        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">create-vm-from-manifest</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">wait-for-vmi-status</span>
+      <span class="na">params</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">vmiName</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">$(tasks.create-vm-from-manifest.results.name)"</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">successCondition</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">status.phase</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">Succeeded"</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">failureCondition</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">status.phase</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">(Failed,</span><span class="nv"> </span><span class="s">Unknown)"</span>
+      <span class="na">runAfter</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">create-vm-from-manifest</span>
+      <span class="na">timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2h'</span>
+      <span class="na">taskRef</span><span class="pi">:</span>
+        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">wait-for-vmi-status</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cleanup-vm</span>
+      <span class="na">params</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">vmName</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">$(tasks.create-vm-from-manifest.results.name)"</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">delete</span>
+          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+      <span class="na">runAfter</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">wait-for-vmi-status</span>
+      <span class="na">taskRef</span><span class="pi">:</span>
+        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cleanup-vm</span>
+</code></pre></div></div>
+
+<h2 id="running-the-pipeline">Running the Pipeline</h2>
+
+<p>To run the pipeline we need to create the following <code class="language-plaintext highlighter-rouge">PipelineRun</code> which references our <code class="language-plaintext highlighter-rouge">Pipeline</code>.
+Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.</p>
+
+<p>The <code class="language-plaintext highlighter-rouge">PipelineRun</code> also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole <code class="language-plaintext highlighter-rouge">Pipeline</code>.
+The timeout should be changed appropriately; for example if you have a slow download connection.
+You can also set a timeout for each task in the <code class="language-plaintext highlighter-rouge">Pipeline</code> definition.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">tekton.dev/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PipelineRun</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">generateName</span><span class="pi">:</span> <span class="s">windows-installer-run-</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">params</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winImageDownloadURL</span>
+      <span class="na">value</span><span class="pi">:</span> <span class="s">DOWNLOAD_URL</span>
+  <span class="na">pipelineRef</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">windows-installer</span>
+  <span class="na">timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">5h'</span>
+  <span class="na">serviceAccountNames</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">create-source-dv</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest-task</span>
+    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">create-base-dv</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest-task</span>
+    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">create-vm-from-manifest</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">create-vm-from-manifest-task</span>
+    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">wait-for-vmi-status</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">wait-for-vmi-status-task</span>
+    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">cleanup-vm</span>
+      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">cleanup-vm-task</span>
+</code></pre></div></div>
+
+<h2 id="inspecting-the-output">Inspecting the output</h2>
+
+<p>Firstly, you can inspect the progress of the windows-10-source and windows-10-base import:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get dvs | <span class="nb">grep </span>windows-10-
+
+<span class="o">&gt;</span> windows-10-base-8zxwr     Succeeded          100.0%                21s
+<span class="o">&gt;</span> windows-10-source-jdv64   ImportInProgress   1.01%                 20s
+</code></pre></div></div>
+
+<p>To inspect the status of the pipeline run:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pipelinerun <span class="nt">-l</span> <span class="s2">"tekton.dev/pipeline=windows-installer"</span>
+
+<span class="o">&gt;</span> NAME                          SUCCEEDED   REASON                          STARTTIME   COMPLETIONTIME
+<span class="o">&gt;</span> windows-installer-run-n2mjf   Unknown     Running                         118s
+</code></pre></div></div>
+
+<p>To check the status of each task and its pods:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pipelinerun <span class="nt">-o</span> yaml <span class="nt">-l</span> <span class="s2">"tekton.dev/pipeline=windows-installer"</span>
+kubectl get pods <span class="nt">-l</span> <span class="s2">"tekton.dev/pipeline=windows-installer"</span>
+</code></pre></div></div>
+
+<p>Once the pipeline run completes, you should be left with a <code class="language-plaintext highlighter-rouge">windows-10-base-xxxxx</code> PVC (backed by a DataVolume).
+You can then create a new VM with a copy of this PVC to test it.
+You need to replace PVC_NAME with <code class="language-plaintext highlighter-rouge">windows-10-base-xxxxx</code> (you can use <code class="language-plaintext highlighter-rouge">kubectl get dvs -o name | grep -o "windows-10-base-.*"</code>) and PVC_NAMESPACE with the correct namespace in the following YAML.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-vm</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">cdi.kubevirt.io/v1beta1</span>
+      <span class="na">kind</span><span class="pi">:</span> <span class="s">DataVolume</span>
+      <span class="na">metadata</span><span class="pi">:</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-vm-root</span>
+      <span class="na">spec</span><span class="pi">:</span>
+        <span class="na">pvc</span><span class="pi">:</span>
+          <span class="na">accessModes</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="s">ReadWriteMany</span>
+          <span class="na">resources</span><span class="pi">:</span>
+            <span class="na">requests</span><span class="pi">:</span>
+              <span class="na">storage</span><span class="pi">:</span> <span class="s">20Gi</span>
+        <span class="na">source</span><span class="pi">:</span>
+          <span class="na">pvc</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">PVC_NAME</span>
+            <span class="na">namespace</span><span class="pi">:</span> <span class="s">PVC_NAMESPACE</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="s">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">windows-10-vm</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">cpu</span><span class="pi">:</span>
+          <span class="na">sockets</span><span class="pi">:</span> <span class="m">2</span>
+          <span class="na">cores</span><span class="pi">:</span> <span class="m">1</span>
+          <span class="na">threads</span><span class="pi">:</span> <span class="m">1</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">2Gi</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">rootdisk</span>
+              <span class="na">bootOrder</span><span class="pi">:</span> <span class="m">1</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
+              <span class="na">cdrom</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">inputs</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">tablet</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">usb</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">tablet</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">rootdisk</span>
+          <span class="na">dataVolume</span><span class="pi">:</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-vm-root</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
+</code></pre></div></div>
+
+<p>You can start the VM and login with <code class="language-plaintext highlighter-rouge">Administrator</code> : <code class="language-plaintext highlighter-rouge">changepassword</code> credentials. Then you should be welcomed by your fresh VM.</p>
+
+<div class="zoom">
+  <img src="/assets/2021-04-21-Automated-Windows-Installation-With-Tekton-Pipelines/win-started.png" width="100" height="75" itemprop="thumbnail" alt="Started Windows VM" />
+</div>
+
+<h2 id="resources">Resources</h2>
+
+<ul>
+  <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer">YAML files used in this example</a></li>
+  <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a></li>
+  <li><a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a></li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Automated Windows Installation With Tekton Pipelines&url=https://www.kubevirt.io/2021/Automated-Windows-Installation-With-Tekton-Pipelines.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2018/Deploying-KubeVirt-on-a-Single-oVirt-VM.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>Deploying Kubevirt On A Single Ovirt Vm | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="awels" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="Deploying KubeVirt on a single oVirt VM">
+    <meta name="keywords" content="ovirt, openshift" >
+    <meta property="og:title" content="Deploying Kubevirt On A Single Ovirt Vm | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2018/Deploying-KubeVirt-on-a-Single-oVirt-VM.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="Deploying KubeVirt on a single oVirt VM" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="awels" >
+    <meta property="og:article:published_time" content="2018-05-04 00:00:00 +0000" >
+    <meta name="twitter:title" content="Deploying Kubevirt On A Single Ovirt Vm | KubeVirt.io">
+    <meta name="twitter:description" content="Deploying KubeVirt on a single oVirt VM">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Deploying Kubevirt On A Single Ovirt Vm</h1>
+          <div class="post-info">
+            <span class="post-author">Author: awels</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/ovirt">ovirt</a>&nbsp;|&nbsp;<a href="/tag/openshift">openshift</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: May 4, 2018  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: uncategorized
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <p>In this blog post we are exploring the possibilities of deploying KubeVirt on top of OpenShift which is running inside an oVirt VM. First we must prepare the environment. In my testing I created a VM with 4 cpus, 14G memory and a 100G disk. I then installed CentOS 7.4 minimal on it. I also have nested virtualization
+enabled on my hosts, so any VMs I create can run VMs inside them. These instructions are specific to oVirt, however if you are running another virtualization
+platform that can nested virtualization this will also work.</p>
+
+<p>For this example I chose to use a single VM for everything, but I could have done different VMs for my master/nodes/storage/etc, for simplicity I used a single
+VM.</p>
+
+<h2 id="preparing-the-vm">Preparing the VM</h2>
+
+<p>First we will need to enable epel and install some needed tools, like git to get at the source, and ansible to do the deploy:</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>epel-release
+<span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>ansible git wget
+</code></pre></div></div>
+
+<p><em>optional</em>
+<em>Install ovirt-guest-agent so you can see information in your oVirt admin view.</em></p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>ovirt-guest-agent
+<span class="nv">$ </span>systemctl start ovirt-guest-agent
+<span class="nv">$ </span>systemctl <span class="nb">enable </span>ovirt-guest-agent
+
+</code></pre></div></div>
+
+<p><em>Make a template out of the VM, so if something goes wrong you have a good starting point to try again.</em></p>
+
+<p>Make sure the VM has a fully qualified domain name, using either DNS or editing /etc/hosts.</p>
+
+<p>As we are going to install openshift we will need to install the openshift client tooling from <a href="https://github.com/openshift/origin/releases">openshift github</a>
+in this article I opted to simply copy the oc command into /usr/bin, but anywhere in your path will do. Alternatively you can add oc to your PATH.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>wget https://github.com/openshift/origin/releases/download/v3.9.0/openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
+<span class="nv">$ </span><span class="nb">tar </span>zxvf openshift-origin-client-tools-v3.9.0-191fece-linux-64bit.tar.gz
+<span class="nv">$ </span><span class="nb">cp </span>openshift-origin-client-tools-v3.9.0-191fece-linux-64bit/oc /usr/bin
+</code></pre></div></div>
+
+<p>Next we will install docker and configure it for use with open shift.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>yum <span class="nt">-y</span> <span class="nb">install </span>docker
+</code></pre></div></div>
+
+<p>We need to setup an insecure registry in docker before we can start open shift. To do this we must add:
+<strong>INSECURE_REGISTRY=”–insecure-registry 172.30.0.0/16”</strong>
+to the end of /etc/sysconfig/docker</p>
+
+<p>Now we can start docker.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>systemctl start docker
+<span class="nv">$ </span>systemctl <span class="nb">enable </span>docker
+</code></pre></div></div>
+
+<p>Now we are ready to test if we can bring our cluster to up.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc cluster up
+</code></pre></div></div>
+
+<h2 id="installing-kubevirt-with-ansible">Installing KubeVirt with Ansible</h2>
+
+<p>Now that we have everything configured we can the rest as a regular user. Also note that if you had an existing cluster you can could have skipped the previous section.</p>
+
+<p>Clone the kube-virt ansible repo, and setup the ansible galaxy roles needed to deploy.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>git clone https://github.com/kubevirt/kubevirt-ansible
+<span class="nv">$ </span><span class="nb">cd </span>kubevirt-ansible
+<span class="nv">$ </span><span class="nb">mkdir</span> <span class="nv">$HOME</span>/galaxy-roles
+<span class="nv">$ </span>ansible-galaxy <span class="nb">install</span> <span class="nt">-p</span> <span class="nv">$HOME</span>/galaxy-roles <span class="nt">-r</span> requirements.yml
+<span class="nv">$ </span><span class="nb">export </span><span class="nv">ANSIBLE_ROLES_PATH</span><span class="o">=</span><span class="nv">$HOME</span>/galaxy-roles
+</code></pre></div></div>
+
+<p>Now that we are in the kubevirt-ansible directory, we have to edit the inventory file on where we are going to deploy the different open shift nodes.
+Because we opted to install everything on a single VM the FQDN we enter is the same as the one we defined for our VM. Had we had different nodes we would
+enter the FQDN of each in the inventory file. Lets assume our VMs FQDN is kubevirt.demo, we would changed the inventory file as follows:</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>[masters]
+kubevirt.demo
+[etcd]
+kubevirt.demo
+[nodes]
+kubevirt.demo openshift_node_labels="{'region': 'infra','zone': 'default'}" openshift_schedulable=true
+[nfs]
+kubevirt.demo
+</code></pre></div></div>
+
+<p>In order to allow ansible to ssh into the box using ssh keys instead of a password we will need to generate some, assuming we don’t have these
+configured already:</p>
+
+<p>As <em>root</em>:</p>
+
+<pre><code class="language-base">$ ssh-keygen -t rsa
+</code></pre>
+
+<p>Fill out the information in the questions, which will generate two files in /root/.ssh, id_rsa and id_rsa.pub. The id_rsa.pub is the public key which will allow
+ssh to verify your identify when you ssh into a machine. Since we are doing all of this on the same machine, we can simply append the contents of
+id_rsa.pub to authorized_keys in /root/.ssh. If that file doesn’t exist you can simply copy id_rsa.pub to authorized_keys. If you are deploying to multiple hosts
+you need to append the contents of id_rsa.pub on each host.</p>
+
+<p>Next we need to configure docker storage, one can write a whole book about how to do that, so I will post a link <code class="language-plaintext highlighter-rouge">https://docs.okd.io/1.5/install_config/install/host_preparation.html#configuring-docker-storage</code> to the installation document and for now go with the defaults which are not recommended for production, but since this is an introduction its fine.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>docker-storage-setup
+</code></pre></div></div>
+
+<p>Lets double check the cluster is up before we start running the ansible play books.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc cluster up
+</code></pre></div></div>
+
+<p>Install kubernetes.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ansible-playbook <span class="nt">-i</span> inventory playbooks/cluster/kubernetes/config.yml
+</code></pre></div></div>
+
+<p>Disable selinux on all hosts, this hopefully won’t be needed in the future.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ansible-playbook <span class="nt">-i</span> inventory playbooks/selinux.yml
+</code></pre></div></div>
+
+<p>log in as admin to give developer user rights.</p>
+
+<p>As <em>root</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc login <span class="nt">-u</span> system:admin
+<span class="nv">$ </span>oc adm policy add-cluster-role-to-user cluster-admin developer
+</code></pre></div></div>
+
+<p>Log in as the developer user.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>oc login <span class="nt">-u</span> developer
+</code></pre></div></div>
+
+<p>The password for the developer user is developer. Now finally deploy kubevirt.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>ansible-playbook <span class="nt">-i</span> localhost playbooks/kubevirt.yml <span class="nt">-e</span>@vars/all.yml
+</code></pre></div></div>
+
+<p>Verify that the pods are running, you should be in the kube-system namespace, if not switch with oc project kube-system.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods
+NAME                               READY     STATUS    RESTARTS   AGE
+virt-api-747745669-mswk8           1/1       Running   0          10m
+virt-api-747745669-t9dsp           1/1       Running   0          10m
+virt-controller-648945bbcb-ln7dv   1/1       Running   0          10m
+virt-controller-648945bbcb-nxrj8   0/1       Running   0          10m
+virt-handler-6zh77                 1/1       Running   0          10m
+</code></pre></div></div>
+
+<p>Now that we have KubeVirt up and running we are ready to try to start a VM. Let’s install virtctl to make it easier to
+start and stop VMs. The latest available version while writing this was 0.4.1.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span>v0.4.1
+<span class="nv">$ </span>curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl <span class="se">\</span>
+    https://github.com/kubevirt/kubevirt/releases/download/<span class="nv">$VERSION</span>/virtctl-<span class="nv">$VERSION</span><span class="nt">-linux-amd64</span>
+<span class="nv">$ </span><span class="nb">chmod</span> +x virtctl
+</code></pre></div></div>
+
+<p>Lets grab the demo VM specification from the kubevirt github page.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/demo/master/manifests/vm.yaml
+</code></pre></div></div>
+
+<p>Now we can start the VM.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./virtctl start testvm
+</code></pre></div></div>
+
+<p>Now a new pod will be running that is controlling the VM.</p>
+
+<p>As <em>user</em>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods
+NAME                               READY     STATUS    RESTARTS   AGE
+virt-api-747745669-mswk8           1/1       Running   0          15m
+virt-api-747745669-t9dsp           1/1       Running   0          15m
+virt-controller-648945bbcb-ln7dv   1/1       Running   0          15m
+virt-controller-648945bbcb-nxrj8   0/1       Running   0          15m
+virt-handler-6zh77                 1/1       Running   0          15m
+virt-launcher-testvm-gv5nt         2/2       Running   0          23s
+</code></pre></div></div>
+
+<p>Congratulations you now have a VM running in OpenShift using KubeVirt inside an oVirt VM.</p>
+
+<h2 id="useful-resources">Useful resources</h2>
+
+<ul>
+  <li><a href="https://github.com/kubevirt/kubevirt"><strong>KubeVirt</strong></a></li>
+  <li><a href="https://github.com/kubevirt/kubevirt-ansible"><strong>KubeVirt Ansible</strong></a></li>
+  <li><a href="https://github.com/kubevirt/demo"><strong>Minikube kubevirt Demo</strong></a></li>
+  <li><a href="https://kubernetes.io/docs/tasks/tools/install-kubectl/#install-kubectl-binary-via-native-package-management"><strong>Kubectl installation</strong></a></li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Deploying Kubevirt On A Single Ovirt Vm&url=https://www.kubevirt.io/2018/Deploying-KubeVirt-on-a-Single-oVirt-VM.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io&ctz=GMT" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2021 The KubeVirt Contributors<br>
+      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>
