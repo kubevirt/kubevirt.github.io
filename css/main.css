@@ -100,19 +100,31 @@ pre > code { border: 0; padding-right: 0; padding-left: 0; }
 
 .navbar-brand { padding: 0; }
 
-.kv-homepage-grid { padding: 4rem 1rem 0 1rem; }
+.kv-homepage-grid { padding: 5rem 5rem 0 5rem; }
 
-@media (min-width: 900px) { .kv-homepage-grid { display: grid; gap: 4rem; grid-template-columns: 3fr 1fr; grid-template-areas: "why posts" "what posts"; } }
+@media (min-width: 900px) { .kv-homepage-grid { display: grid; gap: 5rem; grid-template-columns: 3fr 1fr; grid-template-areas: "why posts" "what posts" "endusers endusers" "vendors vendors" "integrations integrations"; } }
 
 .kv-why { grid-area: why; }
 
 .kv-what { grid-area: what; }
 
-@media (min-width: 700px) { .kv-what { display: grid; gap: 2rem; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: min-content min-content min-content; grid-template-areas: "title title title" "img-1 img-2 img-3" "txt-1 txt-2 txt-3"; } .kv-what__title { grid-area: title; } .kv-what__img { align-self: center; justify-self: center; } .kv-what__img:nth-of-type(1) { grid-area: img-1; } .kv-what__img:nth-of-type(2) { grid-area: img-2; } .kv-what__img:nth-of-type(3) { grid-area: img-3; } .kv-what__text { text-align: center; } .kv-what__text:nth-of-type(1) { grid-area: txt-1; } .kv-what__text:nth-of-type(2) { grid-area: txt-2; } .kv-what__text:nth-of-type(3) { grid-area: txt-3; } }
+@media (min-width: 700px) { .kv-what { display: grid; gap: 5rem; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: min-content min-content min-content; grid-template-areas: "title title title" "img-1 img-2 img-3" "txt-1 txt-2 txt-3"; } .kv-what__title { grid-area: title; } .kv-what__img { align-self: center; justify-self: center; } .kv-what__img:nth-of-type(1) { grid-area: img-1; } .kv-what__img:nth-of-type(2) { grid-area: img-2; } .kv-what__img:nth-of-type(3) { grid-area: img-3; } .kv-what__text { text-align: center; } .kv-what__text:nth-of-type(1) { grid-area: txt-1; } .kv-what__text:nth-of-type(2) { grid-area: txt-2; } .kv-what__text:nth-of-type(3) { grid-area: txt-3; } }
 
 .kv-what__img, .kv-what__text { margin: .5rem auto; display: block; text-align: center; max-width: 75vw; }
 
 .kv-recent-posts { grid-area: posts; display: flex; flex-direction: column; justify-content: space-evenly; }
+
+.kv-endusers { grid-area: endusers; padding: 5rem; text-align: center; }
+
+.kv-endusers img { width: 200px; margin: 2rem; }
+
+.kv-vendors { grid-area: vendors; padding: 5rem; text-align: center; }
+
+.kv-vendors img { width: 200px; margin: 2rem; }
+
+.kv-integrations { grid-area: integrations; padding: 5rem; text-align: center; }
+
+.kv-integrations img { width: 200px; margin: 2rem; }
 
 .kv-blog__snippet { border-radius: 5px; font-size: 1rem; background: linear-gradient(to bottom, rgba(0, 170, 178, 0.7), rgba(0, 153, 160, 0.7)); }
 

@@ -42,7 +42,6 @@ import (
 	"kubevirt.io/kubevirt/pkg/downwardmetrics"
 	"kubevirt.io/kubevirt/pkg/network/cache"
 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
-	eventsclient "kubevirt.io/kubevirt/pkg/virt-launcher/notify-client"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/agent"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/converter"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/efi"
@@ -62,7 +61,6 @@ import (
 	ephemeraldisk "kubevirt.io/kubevirt/pkg/ephemeral-disk"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 	"kubevirt.io/kubevirt/pkg/hooks"
-	hostdisk "kubevirt.io/kubevirt/pkg/host-disk"
 	"kubevirt.io/kubevirt/pkg/ignition"
 	netsetup "kubevirt.io/kubevirt/pkg/network/setup"
 	kutil "kubevirt.io/kubevirt/pkg/util"
@@ -123,8 +121,6 @@ type LibvirtDomainManager struct {
 	credManager *accesscredentials.AccessCredentialManager
 
 	virtShareDir             string
-	notifier                 *eventsclient.Notifier
-	lessPVCSpaceToleration   int
 	paused                   pausedVMIs
 	agentData                *agentpoller.AsyncAgentStore
 	cloudInitDataStore       *cloudinit.CloudInitData
@@ -133,7 +129,6 @@ type LibvirtDomainManager struct {
 	ovmfPath                 string
 	networkCacheStoreFactory cache.InterfaceCacheFactory
 	ephemeralDiskCreator     ephemeraldisk.EphemeralDiskCreatorInterface
-	minimumPVCReserveBytes   uint64
 	directIOChecker          converter.DirectIOChecker
 }
 
@@ -165,17 +160,15 @@ func (s pausedVMIs) contains(uid types.UID) bool {
 	return ok
 }
 
-func NewLibvirtDomainManager(connection cli.Connection, virtShareDir string, notifier *eventsclient.Notifier, lessPVCSpaceToleration int, minimumPVCReserveBytes uint64, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface) (DomainManager, error) {
+func NewLibvirtDomainManager(connection cli.Connection, virtShareDir string, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface) (DomainManager, error) {
 	directIOChecker := converter.NewDirectIOChecker()
-	return newLibvirtDomainManager(connection, virtShareDir, notifier, lessPVCSpaceToleration, minimumPVCReserveBytes, agentStore, ovmfPath, ephemeralDiskCreator, directIOChecker)
+	return newLibvirtDomainManager(connection, virtShareDir, agentStore, ovmfPath, ephemeralDiskCreator, directIOChecker)
 }
 
-func newLibvirtDomainManager(connection cli.Connection, virtShareDir string, notifier *eventsclient.Notifier, lessPVCSpaceToleration int, minimumPVCReserveBytes uint64, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface, directIOChecker converter.DirectIOChecker) (DomainManager, error) {
+func newLibvirtDomainManager(connection cli.Connection, virtShareDir string, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface, directIOChecker converter.DirectIOChecker) (DomainManager, error) {
 	manager := LibvirtDomainManager{
-		virConn:                connection,
-		virtShareDir:           virtShareDir,
-		notifier:               notifier,
-		lessPVCSpaceToleration: lessPVCSpaceToleration,
+		virConn:      connection,
+		virtShareDir: virtShareDir,
 		paused: pausedVMIs{
 			paused: make(map[types.UID]bool, 0),
 		},
@@ -183,7 +176,6 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir string, not
 		efiEnvironment:           efi.DetectEFIEnvironment(runtime.GOARCH, ovmfPath),
 		networkCacheStoreFactory: cache.NewInterfaceCacheFactory(),
 		ephemeralDiskCreator:     ephemeralDiskCreator,
-		minimumPVCReserveBytes:   minimumPVCReserveBytes,
 		directIOChecker:          directIOChecker,
 	}
 	manager.credManager = accesscredentials.NewManager(connection, &manager.domainModifyLock)
@@ -296,8 +288,8 @@ func (l *LibvirtDomainManager) getGuestTimeContext() context.Context {
 }
 
 // PrepareMigrationTarget the target pod environment before the migration is initiated
-func (l *LibvirtDomainManager) PrepareMigrationTarget(vmi *v1.VirtualMachineInstance, useEmulation bool) error {
-	return l.prepareMigrationTarget(vmi, useEmulation)
+func (l *LibvirtDomainManager) PrepareMigrationTarget(vmi *v1.VirtualMachineInstance, allowEmulation bool) error {
+	return l.prepareMigrationTarget(vmi, allowEmulation)
 }
 
 // FinalizeVirtualMachineMigration finalized the migration after the migration has completed and vmi is running on target pod.
@@ -475,14 +467,6 @@ func (l *LibvirtDomainManager) preStartHook(vmi *v1.VirtualMachineInstance, doma
 		return domain, fmt.Errorf("preparing the pod network failed: %v", err)
 	}
 
-	// create disks images on the cluster lever
-	// or initialize disks images for empty PVC
-	hostDiskCreator := hostdisk.NewHostDiskCreator(l.notifier, l.lessPVCSpaceToleration, l.minimumPVCReserveBytes)
-	err = hostDiskCreator.Create(vmi)
-	if err != nil {
-		return domain, fmt.Errorf("preparing host-disks failed: %v", err)
-	}
-
 	// Create ephemeral disk for container disks
 	err = containerdisk.CreateEphemeralImages(vmi, l.ephemeralDiskCreator)
 	if err != nil {
@@ -625,7 +609,7 @@ func parseDeviceAddress(addrString string) []string {
 	return addrs
 }
 
-func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineInstance, useEmulation bool, options *cmdv1.VirtualMachineOptions, isMigrationTarget bool) (*converter.ConverterContext, error) {
+func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineInstance, allowEmulation bool, options *cmdv1.VirtualMachineOptions, isMigrationTarget bool) (*converter.ConverterContext, error) {
 
 	logger := log.Log.Object(vmi)
 
@@ -707,7 +691,7 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 	c := &converter.ConverterContext{
 		Architecture:          runtime.GOARCH,
 		VirtualMachine:        vmi,
-		UseEmulation:          useEmulation,
+		AllowEmulation:        allowEmulation,
 		CPUSet:                podCPUSet,
 		IsBlockPVC:            isBlockPVCMap,
 		IsBlockDV:             isBlockDVMap,
@@ -767,7 +751,7 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 	return c, nil
 }
 
-func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulation bool, options *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error) {
+func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmulation bool, options *cmdv1.VirtualMachineOptions) (*api.DomainSpec, error) {
 	l.domainModifyLock.Lock()
 	defer l.domainModifyLock.Unlock()
 
@@ -775,7 +759,7 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, useEmulat
 
 	domain := &api.Domain{}
 
-	c, err := l.generateConverterContext(vmi, useEmulation, options, false)
+	c, err := l.generateConverterContext(vmi, allowEmulation, options, false)
 	if err != nil {
 		logger.Reason(err).Error("failed to generate libvirt domain from VMI spec")
 		return nil, err
