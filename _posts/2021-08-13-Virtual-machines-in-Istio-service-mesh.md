@@ -4,7 +4,7 @@ author: Radim Hrazdil
 title: Running virtual machines in Istio service mesh
 description: This blog post demonstrates running virtual machines in Istio service mesh.
 navbar_active: Blogs
-pub-date: August 23
+pub-date: August 25
 pub-year: 2021
 category: news
 tags: [kubevirt, istio, virtual machine, VM, service mesh, mesh]
@@ -13,15 +13,16 @@ comments: true
 
 ## Introduction
 
-This blog post demonstrates running virtual machines in [Istio](https://istio.io/) service mesh. 
+This blog post demonstrates running virtual machines in [Istio](https://istio.io/) service mesh.
 
 Istio service mesh allows to monitor, visualize, and manage traffic between pods and external services by
 injecting a proxy container - a sidecar - which forwards inbound and outbound traffic of a pod/virtual machine.
-This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it.
+This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it. For more in-depth information about the Istio proxy mechanism, see [this blog post](https://medium.com/open-5g-hypercore/episode-iii-meshville-7f0bb7ca0e3b) published by Dough Smith et al.
+
 The main features of Istio are traffic shifting (migrating traffic from an old to new version of a service), dynamic request routing, fault injection or traffic mirroring for testing/debugging purposes, and more.
 Visit [Istio documentation](https://istio.io/latest/docs/tasks/) to learn about all its features.
 Istio featureset may be further extended by installing addons. Kiali, for example, is a UI dashboard that provides traffic information
-of all microservices in a mesh, capable of composing communication graph between all microservices. 
+of all microservices in a mesh, capable of composing communication graph between all microservices.
 
 ## Prerequisites
 
