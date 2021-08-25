@@ -601,6 +601,10 @@
 <lastmod>2021-08-09T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html</loc>
+<lastmod>2021-08-13T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1334,6 +1338,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/authentication.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/mesh.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
