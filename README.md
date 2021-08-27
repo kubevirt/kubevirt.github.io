@@ -151,6 +151,13 @@ make check_spelling
 
 If you discover a flagged spelling error that you believe is not a mistake, feel free to add the offending word to the dictionary file located at GitHub repo `kubevirt/project-infra/images/yaspeller/.yaspeller.json`. Try to keep the dictionary file well ordered and employ regular expressions to handle common patterns.
 
+5) Lint Markdown
+```bash
+make check_lint
+```
+
+If you discover a markdown error that you believe should be ignored, you should look to add it to the `markdownlint.yaml` configuration file. If there is a file that needs to have linting skipped, it can be added to the `.markdownlintignore` configuration file.
+
 #### Make sure all tests pass before committing!
 
 #### Submitting your code
@@ -204,6 +211,7 @@ Targets:
   help                	 Show help
   build_img              Build image localhost/kubevirt-kubevirt.github.io
   check_links         	 Check external, internal links and links/selectors to userguide on website content
+  check_lint             Check markdown linting
   check_spelling      	 Check spelling on content
   run                 	 Run site. App available @ http://0.0.0.0:4000
   status              	 Container status
@@ -221,6 +229,7 @@ Targets:
 
 * `build_img`: Use this target to build an image packed with Jekyll, casperjs, yaspeller and HTMLProofer.
 * `check_links`: HTMLProofer is used to check any links to external websites as well as any cross-page links. Casperjs is used to dissect user-guide urls containing markdown selectors and ensure they exist.
+* `check_lint`: uses markdownlint to check for markdown linting. Can be configured via the .markdownlint.yaml and .markdownlintignore configuration files.
 * `check_spelling`: yaspeller is used to check spelling. Feel free to update to the dictionary file as needed (kubevirt/project-infra/images/yaspeller/.yaspeller.json).
 * `status`: Basically `${BUILD_ENGINE} ps` for an easy way to see what's running.
 * `stop`: Stop container and app

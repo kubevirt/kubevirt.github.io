@@ -215,6 +215,7 @@ stop: | envvar
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
 
+## Check markdown linting
 check_lint: | envvar
 	@echo "${GREEN}Makefile: Linting Markdown files using ${LINT_IMAGE}${RESET}"
 	${CONTAINER_ENGINE} run -it --rm -v ${PWD}:/src:ro${SELINUX_ENABLED} --workdir /src ${LINT_IMAGE} **/*.md
