@@ -26,7 +26,7 @@ In this blog post we will show you how to deploy a VM as a yaml template and the
 
 - Persistent Volume Claim (PVC) is a request for storage by a user. It is similar to a pod. Pods consume node resources and PVCs consume PV resources. Feel free to check more on [Persistent Volume Claim(PVC)](https://kubernetes.io/docs/concepts/storage/persistent-volumes/#persistentvolumeclaims).
 
-- User is familiar with the concept of [KubeVirt-architecture](https://github.com/kubevirt/kubevirt/blob/master/docs/architecture.md) and [CDI-architecture](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design)
+- User is familiar with the concept of [KubeVirt-architecture](https://github.com/kubevirt/kubevirt/blob/main/docs/architecture.md) and [CDI-architecture](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/design.md#design)
 
 - User has already installed KubeVirt in an available K8s environment, if not please follow the link [Installing KubeVirt](https://kubevirt.io/user-guide/operations/installation/) to further proceed.
 
@@ -54,7 +54,7 @@ The cdi-uploadproxy service must be accessible from outside the cluster. Here ar
 - [Ingress](https://kubernetes.io/docs/concepts/services-networking/ingress/)
 - [Route](https://docs.openshift.com/container-platform/3.9/architecture/networking/routes.html)
 
-We can take a look at example manifests [here](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/upload.md)
+We can take a look at example manifests [here](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/upload.md)
 
 The supported image formats are:
 

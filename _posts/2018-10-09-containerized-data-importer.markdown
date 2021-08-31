@@ -25,7 +25,7 @@ This approach supports two main use-cases:
 - A cluster administrator can build an abstract registry of immutable images (referred to as "Golden Images") which can be cloned and later consumed by KubeVirt
 - An ad-hoc user (granted access) can import a VM image into their own namespace and feed this image directly to KubeVirt, bypassing the cloning step
 
-For an in depth look at the system and workflow, see the [Design](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/design.md#design) documentation.
+For an in depth look at the system and workflow, see the [Design](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/design.md#design) documentation.
 
 # Data Format
 
@@ -153,7 +153,7 @@ Edit the PVC above -
 - cdi.kubevirt.io/storage.import.endpoint: The full URL to the VM image in the format of: http://www.myUrl.com/path/of/data or s3://bucketName/fileName.
 - storageClassName: The default StorageClass will be used if not set. Otherwise, set to a desired StorageClass.
 
-Note: It is possible to use authentication when importing the image from the endpoint url. Please see [using secret during import](https://github.com/kubevirt/containerized-data-importer/blob/master/manifests/example/endpoint-secret.yaml)
+Note: It is possible to use authentication when importing the image from the endpoint url. Please see [using secret during import](https://github.com/kubevirt/containerized-data-importer/blob/main/manifests/example/endpoint-secret.yaml)
 
 ## Deploy the manifest yaml files
 

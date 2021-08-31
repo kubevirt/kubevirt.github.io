@@ -106,7 +106,7 @@ kubectl rollout status -n cdi deployment cdi-deployment
 
 Alright, cool. We have everything we need now. Let's setup the VM.
 
-We will start with the `PersistenVolume`'s required by [CDI’s DataVolume](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md) resources. Since I’m using minikube with no dynamic storage provider, I’ll be creating 2 PVs with a reference to the PVCs that will claim them. Notice `claimRef` in each of the PVs.
+We will start with the `PersistenVolume`'s required by [CDI’s DataVolume](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md) resources. Since I’m using minikube with no dynamic storage provider, I’ll be creating 2 PVs with a reference to the PVCs that will claim them. Notice `claimRef` in each of the PVs.
 
 ```yaml
 apiVersion: v1

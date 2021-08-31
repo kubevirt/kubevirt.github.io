@@ -155,7 +155,7 @@ fedora-cloud-base   Bound    local-pv-e824538e   5Gi       RWO            local 
 
 While I’m not going to provide a detailed example here, another option for importing VM images into a PVC is to host the image on an http server (or as an s3 object) and then use a DataVolume to import the VM image into the PVC from a URL.
 
-Replace the url in this example with one hosting the qcow2 image. More information about this import method can be found [here](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md#https3registry-source).
+Replace the url in this example with one hosting the qcow2 image. More information about this import method can be found [here](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md#https3registry-source).
 
 ```sh
 kind: DataVolume
@@ -274,7 +274,7 @@ fedora-nginx            Bound    local-pv-8dla23ds    5Gi       RWO            l
 
 At this point we have a namespace, vm-images, that contains PVCs with our VM images on them. Those PVCs represent VM images in the same way AWS's AMIs represent VM images and this **vm-images namespace is our VM image repository.**
 
-Using CDI's i[cross namespace cloning feature](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one), VM's can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository". Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined [here](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/RBAC.md#pvc-cloning).
+Using CDI's i[cross namespace cloning feature](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/clone-datavolume.md#how-to-clone-an-image-from-one-dv-to-another-one), VM's can now be launched across multiple namespaces throughout the entire cluster using the PVCs in this “repository". Note that non-admin users need a special RBAC role to allow for this cross namespace PVC cloning. Any non-admin user who needs the ability to access the vm-images namespace for PVC cloning will need the RBAC permissions outlined [here](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/RBAC.md#pvc-cloning).
 
 Below is an example of the RBAC necessary to enable cross namespace cloning from the vm-images namespace to the default namespace using the default service account.
 

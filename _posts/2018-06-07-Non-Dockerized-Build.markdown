@@ -41,7 +41,7 @@ Currently, the Makefile includes targets that address different things: building
 
 ### Prerequisites
 
-Best place to look for that is in the docker file definition for the build environment: [hack/docker-builder/Dockerfile](https://github.com/kubevirt/kubevirt/blob/master/hack/builder/Dockerfile)
+Best place to look for that is in the docker file definition for the build environment: [hack/docker-builder/Dockerfile](https://github.com/kubevirt/kubevirt/blob/main/hack/builder/Dockerfile)
 
 Note that not everything from there is needed for building, so the bare minimum on Fedora27 would be:
 
@@ -139,9 +139,9 @@ File has the following targets:
 
 - **bootstrap**: this is actually part of the prerequisites, but added all golang tool dependencies here, since this is agnostic of the running platform Should be called once
   - Note that the k8s code generators use specific version
-  - Note that these are not code dependencies, as they are handled by using a `vendor` directory, as well as the distclean, deps-install and deps-update targets in the [standard makefile](ttps://github.com/kubevirt/kubevirt/blob/master/Makefile)
-- **generate**: Calling [hack/generate.sh](https://github.com/kubevirt/kubevirt/blob/master/hack/generate.sh) script similarly to the [standard makefile](https://github.com/kubevirt/kubevirt/blob/master/Makefile). It builds all generators (under the `tools` directory) and use them to generate: test mocks, KubeVirt resources and test yamls
-- **apidocs**: this is similar to apidocs target in the [standard makefile](ttps://github.com/kubevirt/kubevirt/blob/master/Makefile)
+  - Note that these are not code dependencies, as they are handled by using a `vendor` directory, as well as the distclean, deps-install and deps-update targets in the [standard makefile](https://github.com/kubevirt/kubevirt/blob/main/Makefile)
+- **generate**: Calling [hack/generate.sh](https://github.com/kubevirt/kubevirt/blob/main/hack/generate.sh) script similarly to the [standard makefile](https://github.com/kubevirt/kubevirt/blob/main/Makefile). It builds all generators (under the `tools` directory) and use them to generate: test mocks, KubeVirt resources and test yamls
+- **apidocs**: this is similar to apidocs target in the [standard makefile](https://github.com/kubevirt/kubevirt/blob/main/Makefile)
 - **build**: this is building all product binaries, and then using a script ([copy-cmd.sh](../assets/2018-06-07-Non-Dockerized-Build/copy-cmd.sh), should be placed under: `hack`) to copy the binaries from their standard location into the `_out` directory, where the cluster management scripts expect them
 - **test**: building and running unit tests
   check: using similar code to the one used in the standard makefile: formatting files, fixing package imports and calling go vet

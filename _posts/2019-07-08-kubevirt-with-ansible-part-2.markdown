@@ -41,7 +41,7 @@ Virtual machines managed by KubeVirt are highly customizable. Among the features
   - [Examples, lots of examples](https://docs.ansible.com/ansible/latest/collections/community/general/kubevirt_vm_module.html#examples)
 - DataVolumes
   - [Introductory blog post]({% post_url 2018-10-10-CDI-DataVolumes %})
-  - [Upstream documentation](https://github.com/kubevirt/containerized-data-importer/blob/master/doc/datavolumes.md)
+  - [Upstream documentation](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md)
 - Multus
   - [Introductory blog post]({% post_url 2018-09-12-attaching-to-multiple-networks %})
   - [GitHub repo](https://github.com/intel/multus-cni)

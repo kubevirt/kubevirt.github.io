@@ -12,7 +12,7 @@ tags: [unit testing]
 
 There are [way too many reasons](https://blog.codinghorror.com/i-pity-the-fool-who-doesnt-write-unit-tests/) to write unit tests, but my favorite one is: the freedom to hack, modify and improve the code without fear, and get quick feedback that you are on the right track.
 
-Of course, writing good integration tests (the stuff under the [tests](https://github.com/kubevirt/kubevirt/tree/master/tests) directory) is the best way to validate that everything works, but unit tests has great value as:
+Of course, writing good integration tests (the stuff under the [tests](https://github.com/kubevirt/kubevirt/tree/main/tests) directory) is the best way to validate that everything works, but unit tests has great value as:
 
 - They are much faster to run (~30 seconds in our case)
 - You get nice coverage reports with [coveralls](https://coveralls.io/github/kubevirt/kubevirt)
@@ -39,8 +39,8 @@ There are several frameworks we use to write unit tests:
 - If you need mocks for k8s objects and interfaces, use their framework. They have a tool called [client-gen](https://github.com/kubernetes/code-generator), which generates both the code and the mocks based on the defined APIs
   - The generated mock interfaces and objects of the k8s client are [here](https://github.com/kubernetes/client-go/blob/master/kubernetes/fake/clientset_generated.go). Note that they a use a different mechanism to control the mocked behavior than the one used in GoMock
   - Mocked actions are more are [here](https://github.com/kubernetes/client-go/tree/master/testing)
-- Unit test utilities are placed under [testutils](https://github.com/kubevirt/kubevirt/tree/master/pkg/testutils)
-- Some integration test utilities are also useful for unit testing, see this [file](https://github.com/kubevirt/kubevirt/blob/master/tests/utils.go)
+- Unit test utilities are placed under [testutils](https://github.com/kubevirt/kubevirt/tree/main/pkg/testutils)
+- Some integration test utilities are also useful for unit testing, see this [file](https://github.com/kubevirt/kubevirt/blob/main/tests/utils.go)
 - When testing interfaces, a mock HTTP server is usually needed. For that we use the [golang httptest package](https://golang.org/pkg/net/http/httptest/)
   - gomega also has a package called [ghttp](http://onsi.github.io/gomega/#ghttp-testing-http-clients) that could be used for same purpose
 

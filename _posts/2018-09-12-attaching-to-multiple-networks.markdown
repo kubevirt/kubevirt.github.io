@@ -170,7 +170,7 @@ ovs-vsctl add-br blue
 - To install the OVS CNI use:
 
 ```bash
-$ kubectl apply -f https://raw.githubusercontent.com/kubevirt/ovs-cni/master/examples/ovs-cni.yml
+$ kubectl apply -f https://raw.githubusercontent.com/k8snetworkplumbingwg/ovs-cni/main/examples/ovs-cni.yml
 ```
 
 - Create a `NetworkAttachmentDefinition` CRD for the "blue" bridge:
@@ -210,7 +210,7 @@ spec:
     }'
 ```
 
-- More information could be found in the [OVS CNI documentation](https://github.com/kubevirt/ovs-cni/blob/master/docs/deployment-on-arbitrary-cluster.md)
+- More information could be found in the [OVS CNI documentation](https://github.com/k8snetworkplumbingwg/ovs-cni/blob/main/docs/deployment-on-arbitrary-cluster.md)
 
 ## Deploy a Virtual Machine with 2 Interfaces
 
