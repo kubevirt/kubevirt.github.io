@@ -5381,6 +5381,10 @@ var CRDsValidation map[string]string = map[string]string{
         ready:
           description: Ready indicates if the virtual machine is running and ready
           type: boolean
+        restoreInProgress:
+          description: RestoreInProgress is the name of the VirtualMachineRestore
+            currently executing
+          type: string
         snapshotInProgress:
           description: SnapshotInProgress is the name of the VirtualMachineSnapshot
             currently executing
@@ -8176,6 +8180,10 @@ var CRDsValidation map[string]string = map[string]string{
               format: int64
               type: integer
           type: object
+        virtualMachineRevisionName:
+          description: VirtualMachineRevisionName is used to get the vm revision of
+            the vmi when doing an online vm snapshot
+          type: string
         volumeStatus:
           description: VolumeStatus contains the statuses of all the volumes
           items:
@@ -15421,6 +15429,10 @@ var CRDsValidation map[string]string = map[string]string{
                       description: Ready indicates if the virtual machine is running
                         and ready
                       type: boolean
+                    restoreInProgress:
+                      description: RestoreInProgress is the name of the VirtualMachineRestore
+                        currently executing
+                      type: string
                     snapshotInProgress:
                       description: SnapshotInProgress is the name of the VirtualMachineSnapshot
                         currently executing

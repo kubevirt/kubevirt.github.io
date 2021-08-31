@@ -442,7 +442,11 @@ func (ctrl *VMSnapshotController) createContent(vmSnapshot *snapshotv1.VirtualMa
 	}
 
 	var volumeBackups []snapshotv1.VolumeBackup
-	for volumeName, pvcName := range source.PersistentVolumeClaims() {
+	pvcs, err := source.PersistentVolumeClaims()
+	if err != nil {
+		return err
+	}
+	for volumeName, pvcName := range pvcs {
 		pvc, err := ctrl.getSnapshotPVC(vmSnapshot.Namespace, pvcName)
 		if err != nil {
 			return err
@@ -466,6 +470,10 @@ func (ctrl *VMSnapshotController) createContent(vmSnapshot *snapshotv1.VirtualMa
 		volumeBackups = append(volumeBackups, vb)
 	}
 
+	sourceSpec, err := source.Spec()
+	if err != nil {
+		return err
+	}
 	content := &snapshotv1.VirtualMachineSnapshotContent{
 		ObjectMeta: metav1.ObjectMeta{
 			Name:       getVMSnapshotContentName(vmSnapshot),
@@ -474,7 +482,7 @@ func (ctrl *VMSnapshotController) createContent(vmSnapshot *snapshotv1.VirtualMa
 		},
 		Spec: snapshotv1.VirtualMachineSnapshotContentSpec{
 			VirtualMachineSnapshotName: &vmSnapshot.Name,
-			Source:                     source.Spec(),
+			Source:                     sourceSpec,
 			VolumeBackups:              volumeBackups,
 		},
 	}
@@ -617,8 +625,9 @@ func (ctrl *VMSnapshotController) updateSnapshotStatus(vmSnapshot *snapshotv1.Vi
 				return err
 			}
 
+			indications := []snapshotv1.Indication{}
 			if online {
-				indications := []snapshotv1.Indication{snapshotv1.VMSnapshotOnlineSnapshotIndication}
+				indications = append(indications, snapshotv1.VMSnapshotOnlineSnapshotIndication)
 
 				ga, err := source.GuestAgent()
 				if err != nil {
@@ -631,9 +640,8 @@ func (ctrl *VMSnapshotController) updateSnapshotStatus(vmSnapshot *snapshotv1.Vi
 				} else {
 					indications = append(indications, snapshotv1.VMSnapshotNoGuestAgentIndication)
 				}
-
-				vmSnapshotCpy.Status.Indications = indications
 			}
+			vmSnapshotCpy.Status.Indications = indications
 		} else {
 			updateSnapshotCondition(vmSnapshotCpy, newProgressingCondition(corev1.ConditionFalse, "Source does not exist"))
 		}
@@ -684,6 +692,15 @@ func (ctrl *VMSnapshotController) getVolumeSnapshotStatus(vm *kubevirtv1.Virtual
 		}
 	}
 
+	snapshottable := ctrl.isVolumeSnapshottable(volume)
+	if !snapshottable {
+		return kubevirtv1.VolumeSnapshotStatus{
+			Name:    volume.Name,
+			Enabled: false,
+			Reason:  fmt.Sprintf("Snapshot is not supported for this volumeSource type [%s]", volume.Name),
+		}
+	}
+
 	sc, err := ctrl.getVolumeStorageClass(vm.Namespace, volume)
 	if err != nil {
 		return kubevirtv1.VolumeSnapshotStatus{Name: volume.Name, Enabled: false, Reason: err.Error()}
@@ -703,6 +720,11 @@ func (ctrl *VMSnapshotController) getVolumeSnapshotStatus(vm *kubevirtv1.Virtual
 	}
 
 	return kubevirtv1.VolumeSnapshotStatus{Name: volume.Name, Enabled: true}
+}
+
+func (ctrl *VMSnapshotController) isVolumeSnapshottable(volume *kubevirtv1.Volume) bool {
+	return volume.VolumeSource.PersistentVolumeClaim != nil ||
+		volume.VolumeSource.DataVolume != nil
 }
 
 func (ctrl *VMSnapshotController) getVolumeStorageClass(namespace string, volume *kubevirtv1.Volume) (string, error) {

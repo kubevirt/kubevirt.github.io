@@ -238,6 +238,11 @@ type VirtualMachineInstanceStatus struct {
 
 	// +optional
 	TopologyHints *TopologyHints `json:"topologyHints,omitempty"`
+
+	//VirtualMachineRevisionName is used to get the vm revision of the vmi when doing
+	// an online vm snapshot
+	// +optional
+	VirtualMachineRevisionName string `json:"virtualMachineRevisionName,omitempty"`
 }
 
 // PersistentVolumeClaimInfo contains the relavant information virt-handler needs cached about a PVC
@@ -1275,6 +1280,8 @@ type VirtualMachineStartFailure struct {
 type VirtualMachineStatus struct {
 	// SnapshotInProgress is the name of the VirtualMachineSnapshot currently executing
 	SnapshotInProgress *string `json:"snapshotInProgress,omitempty"`
+	// RestoreInProgress is the name of the VirtualMachineRestore currently executing
+	RestoreInProgress *string `json:"restoreInProgress,omitempty"`
 	// Created indicates if the virtual machine is created in the cluster
 	Created bool `json:"created,omitempty"`
 	// Ready indicates if the virtual machine is running and ready

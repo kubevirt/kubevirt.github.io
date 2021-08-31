@@ -73,6 +73,7 @@ func (VirtualMachineInstanceStatus) SwaggerDoc() map[string]string {
 		"volumeStatus":                  "VolumeStatus contains the statuses of all the volumes\n+optional\n+listType=atomic",
 		"fsFreezeStatus":                "FSFreezeStatus is the state of the fs of the guest\nit can be either frozen or thawed\n+optional",
 		"topologyHints":                 "+optional",
+		"virtualMachineRevisionName":    "VirtualMachineRevisionName is used to get the vm revision of the vmi when doing\nan online vm snapshot\n+optional",
 	}
 }
 
@@ -318,6 +319,7 @@ func (VirtualMachineStatus) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":                       "VirtualMachineStatus represents the status returned by the\ncontroller to describe how the VirtualMachine is doing\n\n+k8s:openapi-gen=true",
 		"snapshotInProgress":     "SnapshotInProgress is the name of the VirtualMachineSnapshot currently executing",
+		"restoreInProgress":      "RestoreInProgress is the name of the VirtualMachineRestore currently executing",
 		"created":                "Created indicates if the virtual machine is created in the cluster",
 		"ready":                  "Ready indicates if the virtual machine is running and ready",
 		"printableStatus":        "PrintableStatus is a human readable, high-level representation of the status of the virtual machine",

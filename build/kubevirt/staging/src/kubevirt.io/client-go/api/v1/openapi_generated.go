@@ -25194,6 +25194,13 @@ func schema_kubevirtio_client_go_api_v1_VirtualMachineInstanceStatus(ref common.
 							Ref: ref("kubevirt.io/client-go/api/v1.TopologyHints"),
 						},
 					},
+					"virtualMachineRevisionName": {
+						SchemaProps: spec.SchemaProps{
+							Description: "VirtualMachineRevisionName is used to get the vm revision of the vmi when doing an online vm snapshot",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 				},
 			},
 		},
@@ -25407,6 +25414,13 @@ func schema_kubevirtio_client_go_api_v1_VirtualMachineStatus(ref common.Referenc
 					"snapshotInProgress": {
 						SchemaProps: spec.SchemaProps{
 							Description: "SnapshotInProgress is the name of the VirtualMachineSnapshot currently executing",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"restoreInProgress": {
+						SchemaProps: spec.SchemaProps{
+							Description: "RestoreInProgress is the name of the VirtualMachineRestore currently executing",
 							Type:        []string{"string"},
 							Format:      "",
 						},
