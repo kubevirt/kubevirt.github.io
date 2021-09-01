@@ -31,7 +31,7 @@ These changes take effect immediately if you are deploying KubeVirt from the mas
 
 [0] https://github.com/kubevirt/kubevirt/pull/2548
 [1] https://github.com/kubevirt/hyperconverged-cluster-operator
-[2] https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md
+[2] https://github.com/kubevirt/hyperconverged-cluster-operator/blob/main/docs/conditions.md
 
 Best regards,
 ```
@@ -57,4 +57,4 @@ Check for more information on the following URL's
 
 - <https://github.com/kubevirt/kubevirt/pull/2548>
 - <https://github.com/kubevirt/hyperconverged-cluster-operator>
-- <https://github.com/kubevirt/hyperconverged-cluster-operator/blob/master/docs/conditions.md>
+- <https://github.com/kubevirt/hyperconverged-cluster-operator/blob/main/docs/conditions.md>

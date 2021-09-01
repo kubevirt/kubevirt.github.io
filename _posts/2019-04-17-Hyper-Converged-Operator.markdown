@@ -17,7 +17,7 @@ This Blog assumes that the reader is aware of the concept of Operators and how i
 
 ## What it does?
 
-The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md), etc... - where users can deploy and configure them in a single object. This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM. It only creates operator CRs, which is the user's prerogative.
+The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/kubevirt/cluster-network-addons-operator/blob/main/README.md), etc... - where users can deploy and configure them in a single object. This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM. It only creates operator CRs, which is the user's prerogative.
 
 ## How does it work?
 
@@ -223,7 +223,7 @@ virtualmachines.kubevirt.io                                      2019-05-07T20:2
 ## You can also read more about CDI, CNA, ssp-operator, web-ui and KubeVirt:
 
 - [CDI]({% post_url 2018-10-10-CDI-DataVolumes %})
-- [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md)
+- [CNA](https://github.com/kubevirt/cluster-network-addons-operator/blob/main/README.md)
 - [KubeVirt]({% link pages/quickstart_minikube.md  %})
 - [ssp-operator](https://github.com/MarSik/kubevirt-ssp-operator)
 - [kubevirt-web-ui](https://github.com/kubevirt/web-ui)

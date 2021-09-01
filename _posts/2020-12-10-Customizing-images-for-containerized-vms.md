@@ -485,7 +485,7 @@ Format specific information:
 ```
 
 > warning "Warning"
-> Virtual size of the image is 4.3G, since we agreed 10G the disk must be resized and root filesystem expanded before being containerized. Currently, there is no way to specify disk capacity in containerDisk as it can be done with [emptyDisks](https://github.com/kubevirt/kubevirt/blob/master/docs/container-empty-disks.md#implementation). The size of the root filesystem and disk when running in KubeVirt is driven by the image.
+> Virtual size of the image is 4.3G, since we agreed 10G the disk must be resized and root filesystem expanded before being containerized. Currently, there is no way to specify disk capacity in containerDisk as it can be done with [emptyDisks](https://github.com/kubevirt/kubevirt/blob/main/docs/container-empty-disks.md#implementation). The size of the root filesystem and disk when running in KubeVirt is driven by the image.
 > It is recommended to save the QCOW2 images under /var/lib/libvirt/images/ so that qemu user have permissions to expand or resize them.
 
 ```sh

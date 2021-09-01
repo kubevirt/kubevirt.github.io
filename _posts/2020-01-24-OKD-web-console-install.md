@@ -170,14 +170,14 @@ source ./contrib/environment.sh
 
 ## Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)
 
-In order to ease the installation of KubeVirt, the unified operator called **[HCO](https://github.com/kubevirt/hyperconverged-cluster-operator)** will be deployed. The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md), etc... - where users can deploy and configure them in a single object.
+In order to ease the installation of KubeVirt, the unified operator called **[HCO](https://github.com/kubevirt/hyperconverged-cluster-operator)** will be deployed. The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - [kubevirt](https://blog.openshift.com/a-first-look-at-kubevirt/), [cdi](http://kubevirt.io/2018/CDI-DataVolumes.html), [networking](https://github.com/kubevirt/cluster-network-addons-operator/blob/main/README.md), etc... - where users can deploy and configure them in a single object.
 
 This operator is sometimes referred to as a "meta operator" or an "operator for operators". Most importantly, this operator doesn't replace or interfere with OLM. It only creates operator CRs, which is the user's prerogative. More information about HCO can be found in the post published in this blog by Ryan Hallisey: [Hyper Converged Operator on OCP 4 and K8s(HCO)](https://kubevirt.io/2019/Hyper-Converged-Operator.html).
 
 The HCO repository provides plenty of information on how to install the operator. In this lab, it has been installed as [Using the HCO without OLM or Marketplace](https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace), which basically executes this deployment script:
 
 ```sh
-$ curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
+$ curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/deploy.sh | bash
 + kubectl create ns kubevirt-hyperconverged
 namespace/kubevirt-hyperconverged created
 + namespaces=("openshift")
@@ -190,27 +190,27 @@ namespace/openshift created
 ++ kubectl config current-context
 + kubectl config set-context kubernetes-admin@kubernetes --namespace=kubevirt-hyperconverged
 Context "kubernetes-admin@kubernetes" modified.
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/cluster-network-addons00.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/cluster-network-addons00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/containerized-data-importer00.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/containerized-data-importer00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/cdis.cdi.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/hco.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/hco.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/hyperconvergeds.hco.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/kubevirt00.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/kubevirt00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirts.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/node-maintenance00.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/node-maintenance00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance00.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirtcommontemplatesbundles.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance01.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance01.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirtmetricsaggregations.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance02.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance02.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirtnodelabellerbundles.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance03.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance03.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirttemplatevalidators.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/v2vvmware.crd.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/v2vvmware.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/v2vvmwares.kubevirt.io created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role.yaml
 role.rbac.authorization.k8s.io/cluster-network-addons-operator created
 clusterrole.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
 clusterrole.rbac.authorization.k8s.io/cluster-network-addons-operator created
@@ -218,14 +218,14 @@ clusterrole.rbac.authorization.k8s.io/kubevirt-operator created
 clusterrole.rbac.authorization.k8s.io/kubevirt-ssp-operator created
 clusterrole.rbac.authorization.k8s.io/cdi-operator created
 clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/service_account.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/service_account.yaml
 serviceaccount/cdi-operator created
 serviceaccount/cluster-network-addons-operator created
 serviceaccount/hyperconverged-cluster-operator created
 serviceaccount/kubevirt-operator created
 serviceaccount/kubevirt-ssp-operator created
 serviceaccount/node-maintenance-operator created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role_binding.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role_binding.yaml
 rolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
 clusterrolebinding.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
 clusterrolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
@@ -233,14 +233,14 @@ clusterrolebinding.rbac.authorization.k8s.io/kubevirt-operator created
 clusterrolebinding.rbac.authorization.k8s.io/kubevirt-ssp-operator created
 clusterrolebinding.rbac.authorization.k8s.io/cdi-operator created
 clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/operator.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/operator.yaml
 deployment.apps/hyperconverged-cluster-operator created
 deployment.apps/cluster-network-addons-operator created
 deployment.apps/virt-operator created
 deployment.apps/kubevirt-ssp-operator created
 deployment.apps/cdi-operator created
 deployment.apps/node-maintenance-operator created
-+ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/hco.cr.yaml
++ kubectl create -f https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
 hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
 ```
 

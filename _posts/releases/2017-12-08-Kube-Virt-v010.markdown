@@ -80,5 +80,5 @@ Pre-built containers are published on Docker Hub and can be viewed at:
 
 \[git-evtag\]: <https://github.com/cgwalters/git-evtag#using-git-evtag>
 \[contributing\]:
-<https://github.com/kubevirt/kubevirt/blob/master/CONTRIBUTING.md>
-\[license\]: <https://github.com/kubevirt/kubevirt/blob/master/LICENSE>
+<https://github.com/kubevirt/kubevirt/blob/main/CONTRIBUTING.md>
+\[license\]: <https://github.com/kubevirt/kubevirt/blob/main/LICENSE>
