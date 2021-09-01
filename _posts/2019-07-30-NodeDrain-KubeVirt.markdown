@@ -212,7 +212,7 @@ spec:
 For testing purpose, we can deploy a sample VM instance as shown:
 
 ```sh
-kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+kubectl apply -f https://kubevirt.io/labs/manifests/vm.yaml
 ```
 
 Now start the VM `testvm`
