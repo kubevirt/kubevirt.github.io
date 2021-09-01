@@ -439,7 +439,7 @@ skydive-analyzer-5db567b4bc-m77kq   2/2       Running   0          5m
 
 <h3 id="ingress-nginx">ingress-nginx</h3>
 
-<p>To provide external access our example NodeJS application we need to an ingress controller. For this example we are going to use <a href="https://github.com/kubernetes/ingress-nginx/tree/master/deploy">ingress-nginx</a></p>
+<p>To provide external access our example NodeJS application we need to an ingress controller. For this example we are going to use <a href="https://github.com/kubernetes/ingress-nginx/tree/main/deploy">ingress-nginx</a></p>
 
 <p>I created a simple script <code class="language-plaintext highlighter-rouge">ingress.sh</code> that follows the installation documentation for ingress-nginx with a couple minor modifications:</p>
 
@@ -626,19 +626,19 @@ address=/.ingress.virtomation.com/172.31.50.231
     </figure>
 </div>
 
-<h2 id="virt-launcher---virtwrap">virt-launcher - <a href="https://github.com/kubevirt/kubevirt/tree/master/pkg/virt-launcher/virtwrap">virtwrap</a></h2>
+<h2 id="virt-launcher---virtwrap">virt-launcher - <a href="https://github.com/kubevirt/kubevirt/tree/main/pkg/virt-launcher/virtwrap">virtwrap</a></h2>
 
 <p>virt-launcher is the pod that runs the necessary components instantiate and run a virtual machine. We are only going to concentrate on the network portion in this post.</p>
 
-<h3 id="virtwrap-manager"><a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/manager.go">virtwrap manager</a></h3>
+<h3 id="virtwrap-manager"><a href="https://github.com/kubevirt/kubevirt/blob/main/pkg/virt-launcher/virtwrap/manager.go">virtwrap manager</a></h3>
 
 <p>Before the virtual machine is started the <code class="language-plaintext highlighter-rouge">preStartHook</code> will run <code class="language-plaintext highlighter-rouge">SetupPodNetwork</code>.</p>
 
-<h3 id="setuppodnetwork--setupdefaultpodnetwork">SetupPodNetwork → <a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/network/network.go">SetupDefaultPodNetwork</a></h3>
+<h3 id="setuppodnetwork--setupdefaultpodnetwork">SetupPodNetwork → <a href="https://github.com/kubevirt/kubevirt/blob/main/pkg/virt-launcher/virtwrap/network/network.go">SetupDefaultPodNetwork</a></h3>
 
 <p>This function calls three functions that are detailed below <code class="language-plaintext highlighter-rouge">discoverPodNetworkInterface</code>, <code class="language-plaintext highlighter-rouge">preparePodNetworkInterface</code> and <code class="language-plaintext highlighter-rouge">StartDHCP</code></p>
 
-<h4 id="discoverpodnetworkinterface"><a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/network/network.go">discoverPodNetworkInterface</a></h4>
+<h4 id="discoverpodnetworkinterface"><a href="https://github.com/kubevirt/kubevirt/blob/main/pkg/virt-launcher/virtwrap/network/network.go">discoverPodNetworkInterface</a></h4>
 
 <p>This function gathers the following information about the pod interface:</p>
 
@@ -659,7 +659,7 @@ address=/.ingress.virtomation.com/172.31.50.231
 
 <p>This is stored for later use in configuring DHCP.</p>
 
-<h4 id="preparepodnetworkinterfaces"><a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/network/network.go">preparePodNetworkInterfaces</a></h4>
+<h4 id="preparepodnetworkinterfaces"><a href="https://github.com/kubevirt/kubevirt/blob/main/pkg/virt-launcher/virtwrap/network/network.go">preparePodNetworkInterfaces</a></h4>
 
 <p>Once the current details of the pod interface have been stored following operations are performed:</p>
 
@@ -686,7 +686,7 @@ address=/.ingress.virtomation.com/172.31.50.231
 
 <p>This will provide libvirt a bridge to use for the virtual machine that will be created.</p>
 
-<h4 id="startdhcp--dhcpserver--singleclientdhcpserver">StartDHCP → DHCPServer → <a href="https://github.com/kubevirt/kubevirt/blob/master/pkg/virt-launcher/virtwrap/network/dhcp/dhcp.go">SingleClientDHCPServer</a></h4>
+<h4 id="startdhcp--dhcpserver--singleclientdhcpserver">StartDHCP → DHCPServer → <a href="https://github.com/kubevirt/kubevirt/blob/main/pkg/virt-launcher/virtwrap/network/dhcp/dhcp.go">SingleClientDHCPServer</a></h4>
 
 <p>This DHCP server only provides a single address to a client in this case the virtual machine that will be started. The network details - the IP address, gateway, routes, DNS servers and suffixes are taken from the pod which will be served to the virtual machine.</p>
 

@@ -262,7 +262,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h2 id="what-it-does">What it does</h2>
 
-<p>In short: Deploys a Kubernetes (or OpenShift) cluster using QEMU Virtual Machines, that run inside Docker containers. First a base image is <a href="https://github.com/kubevirt/kubevirtci/blob/master/cluster-provision/k8s/provision.sh">provisioned</a>, this image contains a stock a Kubernetes node. Then one or more of these images are deployed in the target environment to make up the cluster.</p>
+<p>In short: Deploys a Kubernetes (or OpenShift) cluster using QEMU Virtual Machines, that run inside Docker containers. First a base image is <a href="https://github.com/kubevirt/kubevirtci/blob/main/cluster-provision/k8s/provision.sh">provisioned</a>, this image contains a stock a Kubernetes node. Then one or more of these images are deployed in the target environment to make up the cluster.</p>
 
 <h3 id="provisioning">Provisioning</h3>
 
@@ -285,7 +285,7 @@ Once the node is provisioned, it is packaged inside a Docker container and publi
 
 <h3 id="how-does-it-work">How does it work?</h3>
 
-<p>After the provision step, which has created a pre-built Kubernetes node in a virtual machine, the deployment step doesn’t happen all by itself. Starting up the cluster is handled by a cli application, aptly named <a href="https://github.com/kubevirt/kubevirtci/tree/master/cluster-provision/gocli">‘gocli’</a>.</p>
+<p>After the provision step, which has created a pre-built Kubernetes node in a virtual machine, the deployment step doesn’t happen all by itself. Starting up the cluster is handled by a cli application, aptly named <a href="https://github.com/kubevirt/kubevirtci/tree/main/cluster-provision/gocli">‘gocli’</a>.</p>
 
 <p>Gocli is a go application that contains the knowledge needed to start the cluster, make a node the master node, and then register the other nodes with the master node as compute nodes. It also does a few other nice things, like start a dnsmasq container for dns inside the cluster, and a docker registry container for images. It also can extract and update the kubeconfig for the cluster, to make it possible for external tools to interact with the cluster (such as kubectl). And it can of course shut down the cluster in an orderly fashion.</p>
 

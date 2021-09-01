@@ -422,13 +422,13 @@ kubectl create clusterrolebinding console <span class="nt">--clusterrole</span><
 
 <h2 id="deploy-kubevirt-using-the-hyperconverged-cluster-operator-hco">Deploy KubeVirt using the Hyperconverged Cluster Operator (HCO)</h2>
 
-<p>In order to ease the installation of KubeVirt, the unified operator called <strong><a href="https://github.com/kubevirt/hyperconverged-cluster-operator">HCO</a></strong> will be deployed. The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - <a href="https://blog.openshift.com/a-first-look-at-kubevirt/">kubevirt</a>, <a href="http://kubevirt.io/2018/CDI-DataVolumes.html">cdi</a>, <a href="https://github.com/kubevirt/cluster-network-addons-operator/blob/master/README.md">networking</a>, etc… - where users can deploy and configure them in a single object.</p>
+<p>In order to ease the installation of KubeVirt, the unified operator called <strong><a href="https://github.com/kubevirt/hyperconverged-cluster-operator">HCO</a></strong> will be deployed. The goal of the hyperconverged-cluster-operator (HCO) is to provide a single entrypoint for multiple operators - <a href="https://blog.openshift.com/a-first-look-at-kubevirt/">kubevirt</a>, <a href="http://kubevirt.io/2018/CDI-DataVolumes.html">cdi</a>, <a href="https://github.com/kubevirt/cluster-network-addons-operator/blob/main/README.md">networking</a>, etc… - where users can deploy and configure them in a single object.</p>
 
 <p>This operator is sometimes referred to as a “meta operator” or an “operator for operators”. Most importantly, this operator doesn’t replace or interfere with OLM. It only creates operator CRs, which is the user’s prerogative. More information about HCO can be found in the post published in this blog by Ryan Hallisey: <a href="https://kubevirt.io/2019/Hyper-Converged-Operator.html">Hyper Converged Operator on OCP 4 and K8s(HCO)</a>.</p>
 
 <p>The HCO repository provides plenty of information on how to install the operator. In this lab, it has been installed as <a href="https://github.com/kubevirt/hyperconverged-cluster-operator#using-the-hco-without-olm-or-marketplace">Using the HCO without OLM or Marketplace</a>, which basically executes this deployment script:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/deploy.sh | bash
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>curl https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/deploy.sh | bash
 + kubectl create ns kubevirt-hyperconverged
 namespace/kubevirt-hyperconverged created
 + <span class="nv">namespaces</span><span class="o">=(</span><span class="s2">"openshift"</span><span class="o">)</span>
@@ -441,27 +441,27 @@ namespace/openshift created
 ++ kubectl config current-context
 + kubectl config set-context kubernetes-admin@kubernetes <span class="nt">--namespace</span><span class="o">=</span>kubevirt-hyperconverged
 Context <span class="s2">"kubernetes-admin@kubernetes"</span> modified.
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/cluster-network-addons00.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/cluster-network-addons00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/networkaddonsconfigs.networkaddonsoperator.network.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/containerized-data-importer00.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/containerized-data-importer00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/cdis.cdi.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/hco.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/hco.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/hyperconvergeds.hco.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/kubevirt00.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/kubevirt00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirts.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/node-maintenance00.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/node-maintenance00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/nodemaintenances.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance00.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance00.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirtcommontemplatesbundles.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance01.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance01.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirtmetricsaggregations.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance02.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance02.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirtnodelabellerbundles.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/scheduling-scale-performance03.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/scheduling-scale-performance03.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/kubevirttemplatevalidators.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/crds/v2vvmware.crd.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/crds/v2vvmware.crd.yaml
 customresourcedefinition.apiextensions.k8s.io/v2vvmwares.kubevirt.io created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role.yaml
 role.rbac.authorization.k8s.io/cluster-network-addons-operator created
 clusterrole.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
 clusterrole.rbac.authorization.k8s.io/cluster-network-addons-operator created
@@ -469,14 +469,14 @@ clusterrole.rbac.authorization.k8s.io/kubevirt-operator created
 clusterrole.rbac.authorization.k8s.io/kubevirt-ssp-operator created
 clusterrole.rbac.authorization.k8s.io/cdi-operator created
 clusterrole.rbac.authorization.k8s.io/node-maintenance-operator created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/service_account.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/service_account.yaml
 serviceaccount/cdi-operator created
 serviceaccount/cluster-network-addons-operator created
 serviceaccount/hyperconverged-cluster-operator created
 serviceaccount/kubevirt-operator created
 serviceaccount/kubevirt-ssp-operator created
 serviceaccount/node-maintenance-operator created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/cluster_role_binding.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/cluster_role_binding.yaml
 rolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
 clusterrolebinding.rbac.authorization.k8s.io/hyperconverged-cluster-operator created
 clusterrolebinding.rbac.authorization.k8s.io/cluster-network-addons-operator created
@@ -484,14 +484,14 @@ clusterrolebinding.rbac.authorization.k8s.io/kubevirt-operator created
 clusterrolebinding.rbac.authorization.k8s.io/kubevirt-ssp-operator created
 clusterrolebinding.rbac.authorization.k8s.io/cdi-operator created
 clusterrolebinding.rbac.authorization.k8s.io/node-maintenance-operator created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/operator.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/operator.yaml
 deployment.apps/hyperconverged-cluster-operator created
 deployment.apps/cluster-network-addons-operator created
 deployment.apps/virt-operator created
 deployment.apps/kubevirt-ssp-operator created
 deployment.apps/cdi-operator created
 deployment.apps/node-maintenance-operator created
-+ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/master/deploy/hco.cr.yaml
++ kubectl create <span class="nt">-f</span> https://raw.githubusercontent.com/kubevirt/hyperconverged-cluster-operator/main/deploy/hco.cr.yaml
 hyperconverged.hco.kubevirt.io/hyperconverged-cluster created
 </code></pre></div></div>
 
