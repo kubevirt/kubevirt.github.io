@@ -158,7 +158,7 @@ WARNING: You installed a plugin from the krew-index plugin repository.
 For this example, a cirros Virtual Machine is going to be created, in this example, the kind of disk used is a registry disk (not persistent):
 
 ```sh
-k8s-test.local# kubectl apply -f https://raw.githubusercontent.com/kubevirt/kubevirt.github.io/master/labs/manifests/vm.yaml
+k8s-test.local# kubectl apply -f https://kubevirt.io/labs/manifests/vm.yaml
 
 k8s-test.local# kubectl get vms
 NAME        AGE   RUNNING   VOLUME
