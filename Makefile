@@ -6,6 +6,7 @@ VIOLET := $(shell tput -Txterm setaf 5)
 AQUA   := $(shell tput -Txterm setaf 6)
 WHITE  := $(shell tput -Txterm setaf 7)
 RESET  := $(shell tput -Txterm sgr0)
+SELINUX := $(shell [ -x /usr/sbin/getenforce ] && /usr/sbin/getenforce)
 
 
 TARGET_MAX_CHAR_NUM=20
@@ -22,7 +23,7 @@ help:
 	@echo 'Env Variables:'
 	@printf "  ${YELLOW}CONTAINER_ENGINE${RESET}\tSet container engine, [*podman*, docker]\n"
 	@printf "  ${YELLOW}BUILD_ENGINE${RESET}\t\tSet build engine, [*podman*, buildah, docker]\n"
-	@printf "  ${YELLOW}SELINUX_ENABLED${RESET}\tEnable SELinux on containers, [*False*, True]\n"
+	@printf "  ${YELLOW}SELINUX_ENABLED${RESET}\tEnable SELinux on containers, [False, True] Will attempt autodetection if unset.\n"
 	@echo ''
 	@echo 'Targets:'
 	@awk '/^[a-zA-Z\-_0-9]+:/ { \
@@ -82,6 +83,10 @@ ifeq ($(shell test "$(SELINUX_ENABLED)" = True  -o  \
 		@$(eval export SELINUX_ENABLED=,Z)
 else
 		@$(eval export SELINUX_ENABLED='')
+endif
+else
+ifeq ($(SELINUX), Enforcing)
+	@$(eval export SELINUX_ENABLED=,Z)
 endif
 endif
 	@echo
