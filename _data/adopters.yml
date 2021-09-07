@@ -1,5 +1,8 @@
 adopters:
   endusers:
+    - name: Apple, Inc.
+      logo: apple_logo_black.svg.png
+      url: https://www.apple.com
     # - name: CLOUDFLARE
     #   logo: CLOUDFLARE.png
     #   url: https://www.cloudflare.com
