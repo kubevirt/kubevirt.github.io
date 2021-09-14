@@ -52,7 +52,9 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 	BeforeEach(func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
+	})
 
+	AfterEach(func() {
 		tests.BeforeTestCleanup()
 	})
 
@@ -148,7 +150,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 			})
 		})
 		Context("[Serial]should obey the disk verification limits in the KubeVirt CR", func() {
-			It("disk verification should fail when the memory limit is too low", func() {
+			It("[test_id:7182]disk verification should fail when the memory limit is too low", func() {
 				By("Reducing the diskVerificaton memory usage limit")
 				kv := util.GetCurrentKv(virtClient)
 				kv.Spec.Configuration.DeveloperConfiguration = &v1.DeveloperConfiguration{

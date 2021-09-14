@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-09-01T15:48:20+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Running virtual machines in Istio service mesh</title><link href="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html" rel="alternate" type="text/html" title="Running virtual machines in Istio service mesh" /><published>2021-08-13T00:00:00+00:00</published><updated>2021-08-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh</id><content type="html" xml:base="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-09-14T19:37:28+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Running virtual machines in Istio service mesh</title><link href="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html" rel="alternate" type="text/html" title="Running virtual machines in Istio service mesh" /><published>2021-08-13T00:00:00+00:00</published><updated>2021-08-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh</id><content type="html" xml:base="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;This blog post demonstrates running virtual machines in &lt;a href=&quot;https://istio.io/&quot;&gt;Istio&lt;/a&gt; service mesh.&lt;/p&gt;
 
@@ -63,12 +63,15 @@ kubectl &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt &lt;span class
 
 &lt;p&gt;While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
 Download Istio manifests and client binary by running the following command:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISTIO_VERSION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;1.10.0
 curl &lt;span class=&quot;nt&quot;&gt;-L&lt;/span&gt; https://istio.io/downloadIstio | sh -
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;and export path to the istioctl binary by following the output of the above command.&lt;/p&gt;
 
 &lt;p&gt;Finally, deploy Kiali, Jaeger and Prometheus addons:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; istio-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISTIO_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/samples/addons/kiali.yaml
 kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; istio-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISTIO_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/samples/addons/jaeger.yaml
 kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; istio-&lt;span class=&quot;k&quot;&gt;${&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;ISTIO_VERSION&lt;/span&gt;&lt;span class=&quot;k&quot;&gt;}&lt;/span&gt;/samples/addons/prometheus.yaml
@@ -91,6 +94,7 @@ This involves adding a label and creating a &lt;code class=&quot;language-plaint
 &lt;h4 id=&quot;network-attachment-definiton&quot;&gt;Network attachment definiton&lt;/h4&gt;
 
 &lt;p&gt;When Multus is installed in k8s cluster, a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NetworkAttachmentDefinition&lt;/code&gt; called &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-cni&lt;/code&gt; &lt;strong&gt;must&lt;/strong&gt; be created in &lt;strong&gt;each&lt;/strong&gt; namespace where Istio sidecar containers are to be used:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; | kubectl create -f -
 apiVersion: &quot;k8s.cni.cncf.io/v1&quot;
 kind: NetworkAttachmentDefinition
@@ -104,6 +108,7 @@ metadata:
 &lt;h3 id=&quot;topology&quot;&gt;Topology&lt;/h3&gt;
 
 &lt;p&gt;To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh:&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt; repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080,&lt;/li&gt;
   &lt;li&gt;&lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-vmi&lt;/code&gt; repeatedly request the HTTP service running on the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt; VMI.&lt;/li&gt;
@@ -118,6 +123,7 @@ traffic metrics can be observed in Kiali dashboard for &lt;code class=&quot;lang
 Without this annotation, traffic would not be properly routed through the istio proxy sidecar.
 Additonally, Istio uses &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;app&lt;/code&gt; label for adding contextual information to the collected telemetry.
 Both, the annotation and label can be seen in the following virtual machine example:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; | kubectl create -f -
 apiVersion: kubevirt.io/v1
 kind: VirtualMachineInstance
@@ -173,6 +179,7 @@ spec:
       name: cloudinitdisk
 &lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
 &lt;p&gt;The cloud init section of the VMI runs two loops requesting &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt.io&lt;/code&gt; website every second to generate outbound traffic (from the VMI) and serving simple HTTP server on port &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;8080&lt;/code&gt;, which will be used for monitoring of inbound traffic (to the VMI).&lt;/p&gt;
 
 &lt;p&gt;Let’s also create a service for the VMI that will be used to access the http server in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt;:&lt;/p&gt;
@@ -192,6 +199,7 @@ spec:
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Finally, create the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-vmi&lt;/code&gt; VMI, for the purpose of generating inbound traffic to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt; VMI:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; | kubectl create -f -
 apiVersion: kubevirt.io/v1
 kind: VirtualMachineInstance
@@ -234,10 +242,12 @@ spec:
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;Wait for the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt; to be ready:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl &lt;span class=&quot;nb&quot;&gt;wait&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--for&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;condition&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ready &lt;span class=&quot;nt&quot;&gt;--timeout&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;180s pod &lt;span class=&quot;nt&quot;&gt;-l&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;app&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;istio-vmi
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;After creating the VMIs, the corresponding virt-launcher pods should have 3 ready containers, as shown in the snippet below:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get pods
 NAME                             READY   STATUS    RESTARTS   AGE
 virt-launcher-istio-vmi-XYZ      3/3     Running   0          4m13s
@@ -258,6 +268,7 @@ virt-launcher-istio-vmi-99t8t.default         SYNCED     SYNCED     SYNCED     S
 
 &lt;p&gt;With both VMIs up and running, we can open the Kiali dashboard and observe the traffic metrics.
 Run the following command, to access Kiali dashboard:&lt;/p&gt;
+
 &lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;istioctl dashboard kiali
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
@@ -276,6 +287,7 @@ Run the following command, to access Kiali dashboard:&lt;/p&gt;
 &lt;/div&gt;
 
 &lt;p&gt;In the topology graph, we can observe the following traffic flows:&lt;/p&gt;
+
 &lt;ul&gt;
   &lt;li&gt;requests from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;cirros-vmi&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt; via &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi-svc&lt;/code&gt; service,&lt;/li&gt;
   &lt;li&gt;requests from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;istio-vmi&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PasstroughCluster&lt;/code&gt;. The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;PastroughCluster&lt;/code&gt; marks  destinations external to our service mesh.&lt;/li&gt;

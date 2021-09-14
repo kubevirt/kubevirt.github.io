@@ -1,4 +1,21 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-09-01T15:48:20+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html">&lt;h2 id=&quot;v0440&quot;&gt;v0.44.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-09-14T19:37:28+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.45.0</title><link href="https://kubevirt.io//2021/changelog-v0.45.0.html" rel="alternate" type="text/html" title="KubeVirt v0.45.0" /><published>2021-09-08T00:00:00+00:00</published><updated>2021-09-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.45.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.45.0.html">&lt;h2 id=&quot;v0450&quot;&gt;v0.45.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Wed Sep 8 13:56:47 2021 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #6191][marceloamaral] Addition of perfscale-load-generator to perform stress tests to evaluate the control plane&lt;/li&gt;
+  &lt;li&gt;[PR #6248][VirrageS] Reduced logging in hot paths&lt;/li&gt;
+  &lt;li&gt;[PR #6079][weihanglo] Hotplug volume can be unplugged at anytime and reattached after a VM restart.&lt;/li&gt;
+  &lt;li&gt;[PR #6101][rmohr] Make k8s client rate limits configurable&lt;/li&gt;
+  &lt;li&gt;[PR #6204][sradco] This PR adds to each alert the runbook url that points to a runbook that provides additional details on each alert and how to mitigate it.&lt;/li&gt;
+  &lt;li&gt;[PR #5974][vladikr] a list of desired mdev types can now be provided in KubeVirt CR to kubevirt to configure these devices on relevant nodes&lt;/li&gt;
+  &lt;li&gt;[PR #6147][rmohr] Fix rbac permissions for freeze/unfreeze, addvolume/removevolume, guestosinfo, filesystemlist and userlist&lt;/li&gt;
+  &lt;li&gt;[PR #6161][ashleyschuett] Remove HostDevice validation on VMI creation&lt;/li&gt;
+  &lt;li&gt;[PR #6078][zcahana] Report ErrImagePull/ImagePullBackOff VM status when image pull errors occur&lt;/li&gt;
+  &lt;li&gt;[PR #6176][kwiesmueller] Fix goroutine leak in virt-handler, potentially causing issues with a high turnover of VMIs.&lt;/li&gt;
+  &lt;li&gt;[PR #6047][ShellyKa13] Add phases to the vm snapshot api, specifically a failure phase&lt;/li&gt;
+  &lt;li&gt;[PR #6138][ansijain] NA&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.45.0</summary></entry><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html">&lt;h2 id=&quot;v0440&quot;&gt;v0.44.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Mon Aug 9 14:20:14 2021 +0000&lt;/p&gt;
 
@@ -243,25 +260,4 @@
   &lt;li&gt;[PR #4488][salanki] Disable Virtio-FS metadata cache to prevent OOM conditions on the host.&lt;/li&gt;
   &lt;li&gt;[PR #3937][vladikr] Generalize host devices assignment. Provides an interface between kubevirt and external device plugins. Provides a mechanism for whitelisting host devices.&lt;/li&gt;
   &lt;li&gt;[PR #4443][rmohr] All kubevirt webhooks support now dry-runs.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.36.0</summary></entry><entry><title type="html">KubeVirt v0.35.0</title><link href="https://kubevirt.io//2020/changelog-v0.35.0.html" rel="alternate" type="text/html" title="KubeVirt v0.35.0" /><published>2020-11-09T00:00:00+00:00</published><updated>2020-11-09T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.35.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.35.0.html">&lt;h2 id=&quot;v0350&quot;&gt;v0.35.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Mon Nov 9 13:08:27 2020 +0000&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[PR #4409][vladikr] Increase the static memory overhead by 10Mi&lt;/li&gt;
-  &lt;li&gt;[PR #4272][maiqueb] Add &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ip-family&lt;/code&gt; to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl expose&lt;/code&gt; command.&lt;/li&gt;
-  &lt;li&gt;[PR #4398][rmohr] VMIs reflect deleted stuck virt-launcher pods with the “PodTerminating” Reason in the ready condition. The VMIRS detects this reason and immediately creates replacement VMIs.&lt;/li&gt;
-  &lt;li&gt;[PR #4393][salanki] Disable legacy service links in &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virt-launcher&lt;/code&gt; Pods to speed up Pod instantiation and decrease Kubelet load in namespaces with many services.&lt;/li&gt;
-  &lt;li&gt;[PR #2935][maiqueb] Add the macvtap BindMechanism.&lt;/li&gt;
-  &lt;li&gt;[PR #4132][mstarostik] fixes a bug that prevented unique device name allocation when configuring both scsi and sata drives&lt;/li&gt;
-  &lt;li&gt;[PR #3257][xpivarc] Added support of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubectl explain&lt;/code&gt; for Kubevirt resources.&lt;/li&gt;
-  &lt;li&gt;[PR #4288][ezrasilvera] Adding DownwardAPI volumes type&lt;/li&gt;
-  &lt;li&gt;[PR #4233][maya-r] Update base image used for pods to Fedora 31.&lt;/li&gt;
-  &lt;li&gt;[PR #4192][xpivarc] We now run gosec in Kubevirt&lt;/li&gt;
-  &lt;li&gt;[PR #4328][stu-gott] Version 2.x QEMU guest agents are supported.&lt;/li&gt;
-  &lt;li&gt;[PR #4289][AlonaKaplan] Masquerade binding - set the virt-launcher pod interface MTU on the bridge.&lt;/li&gt;
-  &lt;li&gt;[PR #4300][maiqueb] Update the NetworkInterfaceMultiqueue openAPI documentation to better specify its semantics within KubeVirt.&lt;/li&gt;
-  &lt;li&gt;[PR #4277][awels] PVCs populated by DVs are now allowed as volumes.&lt;/li&gt;
-  &lt;li&gt;[PR #4265][dhiller] Fix virtctl help text when running as a plugin&lt;/li&gt;
-  &lt;li&gt;[PR #4273][dhiller] Only run Travis build for PRs against release branches&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.35.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.36.0</summary></entry></feed>

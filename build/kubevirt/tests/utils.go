@@ -108,6 +108,7 @@ import (
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
 	"kubevirt.io/kubevirt/tests/flags"
+	. "kubevirt.io/kubevirt/tests/framework/matcher"
 	"kubevirt.io/kubevirt/tests/libnet"
 	"kubevirt.io/kubevirt/tests/libvmi"
 
@@ -473,6 +474,7 @@ func SynchronizedAfterTestSuiteCleanup() {
 	if Config.ManageStorageClasses {
 		deleteStorageClass(Config.StorageClassHostPath)
 		deleteStorageClass(Config.StorageClassBlockVolume)
+		deleteStorageClass(Config.StorageClassHostPathSeparateDevice)
 	}
 	CleanNodes()
 }
@@ -657,8 +659,11 @@ func SynchronizedBeforeTestSetup() []byte {
 	}
 
 	if Config.ManageStorageClasses {
-		createStorageClass(Config.StorageClassHostPath)
-		createStorageClass(Config.StorageClassBlockVolume)
+		immediateBinding := storagev1.VolumeBindingImmediate
+		wffc := storagev1.VolumeBindingWaitForFirstConsumer
+		createStorageClass(Config.StorageClassHostPath, &immediateBinding)
+		createStorageClass(Config.StorageClassBlockVolume, &immediateBinding)
+		createStorageClass(Config.StorageClassHostPathSeparateDevice, &wffc)
 	}
 
 	EnsureKVMPresent()
@@ -781,7 +786,7 @@ func RestoreKubeVirtResource() {
 	}
 }
 
-func createStorageClass(name string) {
+func createStorageClass(name string, bindingMode *storagev1.VolumeBindingMode) {
 	virtClient, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
 
@@ -792,7 +797,8 @@ func createStorageClass(name string) {
 				"kubevirt.io/test": name,
 			},
 		},
-		Provisioner: name,
+		Provisioner:       "kubernetes.io/no-provisioner",
+		VolumeBindingMode: bindingMode,
 	}
 	_, err = virtClient.StorageV1().StorageClasses().Create(context.Background(), sc, metav1.CreateOptions{})
 	if !errors.IsAlreadyExists(err) {
@@ -952,6 +958,10 @@ func CreateHostPathPVC(os, size string) {
 	CreatePVC(os, size, Config.StorageClassHostPath, false)
 }
 
+func CreateHostPathPVConSeparateDevice(os, size string) {
+	CreatePVC(os, size, Config.StorageClassHostPathSeparateDevice, false)
+}
+
 func CreatePVC(os, size, storageClass string, recycledPV bool) {
 	virtCli, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
@@ -1016,6 +1026,82 @@ func newPVC(os, size, storageClass string, recycledPV bool) *k8sv1.PersistentVol
 			},
 			StorageClassName: &storageClass,
 		},
+	}
+}
+
+func DeleteAllSeparateDeviceHostPathPvs() {
+	virtClient, err := kubecli.GetKubevirtClient()
+	util2.PanicOnError(err)
+
+	pvList, err := virtClient.CoreV1().PersistentVolumes().List(context.Background(), metav1.ListOptions{})
+	util2.PanicOnError(err)
+	for _, pv := range pvList.Items {
+		if pv.Spec.StorageClassName == Config.StorageClassHostPathSeparateDevice {
+			// ignore error we want to attempt to delete them all.
+			virtClient.CoreV1().PersistentVolumes().Delete(context.Background(), pv.Name, metav1.DeleteOptions{})
+		}
+	}
+}
+
+func CreateAllSeparateDeviceHostPathPvs(osName string) {
+	virtClient, err := kubecli.GetKubevirtClient()
+	util2.PanicOnError(err)
+	Eventually(func() int {
+		nodes := util2.GetAllSchedulableNodes(virtClient)
+		if len(nodes.Items) > 0 {
+			for _, node := range nodes.Items {
+				createSeparateDeviceHostPathPv(osName, node.Name)
+			}
+		}
+		return len(nodes.Items)
+	}, 5*time.Minute, 10*time.Second).ShouldNot(BeZero(), "no schedulable nodes found")
+}
+
+func createSeparateDeviceHostPathPv(osName, nodeName string) {
+	virtCli, err := kubecli.GetKubevirtClient()
+	util2.PanicOnError(err)
+	name := fmt.Sprintf("separate-device-%s-pv", nodeName)
+	pv := &k8sv1.PersistentVolume{
+		ObjectMeta: metav1.ObjectMeta{
+			Name: fmt.Sprintf("%s-%s", name, util2.NamespaceTestDefault),
+			Labels: map[string]string{
+				"kubevirt.io/test": osName,
+				cleanup.TestLabelForNamespace(util2.NamespaceTestDefault): "",
+			},
+		},
+		Spec: k8sv1.PersistentVolumeSpec{
+			AccessModes: []k8sv1.PersistentVolumeAccessMode{k8sv1.ReadWriteOnce},
+			Capacity: k8sv1.ResourceList{
+				"storage": resource.MustParse("3Gi"),
+			},
+			PersistentVolumeReclaimPolicy: k8sv1.PersistentVolumeReclaimRetain,
+			PersistentVolumeSource: k8sv1.PersistentVolumeSource{
+				HostPath: &k8sv1.HostPathVolumeSource{
+					Path: "/tmp/hostImages/mount_hp/test",
+				},
+			},
+			StorageClassName: Config.StorageClassHostPathSeparateDevice,
+			NodeAffinity: &k8sv1.VolumeNodeAffinity{
+				Required: &k8sv1.NodeSelector{
+					NodeSelectorTerms: []k8sv1.NodeSelectorTerm{
+						{
+							MatchExpressions: []k8sv1.NodeSelectorRequirement{
+								{
+									Key:      "kubernetes.io/hostname",
+									Operator: k8sv1.NodeSelectorOpIn,
+									Values:   []string{nodeName},
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	_, err = virtCli.CoreV1().PersistentVolumes().Create(context.Background(), pv, metav1.CreateOptions{})
+	if !errors.IsAlreadyExists(err) {
+		util2.PanicOnError(err)
 	}
 }
 
@@ -1485,7 +1571,7 @@ func RunVMIAndExpectLaunch(vmi *v1.VirtualMachineInstance, timeout int) *v1.Virt
 func RunVMIAndExpectLaunchWithDataVolume(vmi *v1.VirtualMachineInstance, dv *cdiv1.DataVolume, timeout int) *v1.VirtualMachineInstance {
 	obj := RunVMI(vmi, timeout)
 	By("Waiting until the DataVolume is ready")
-	WaitForSuccessfulDataVolumeImport(dv, timeout)
+	Eventually(ThisDV(dv), timeout).Should(HaveSucceeded())
 	By("Waiting until the VirtualMachineInstance will start")
 	WaitForSuccessfulVMIStartWithTimeout(obj, timeout)
 	return obj
@@ -1872,7 +1958,7 @@ func NewRandomVirtualMachineInstanceWithOCSDisk(imageUrl, namespace string, acce
 	dv.Spec.PVC.VolumeMode = &volMode
 	_, err = virtCli.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
 	Expect(err).ToNot(HaveOccurred())
-	WaitForSuccessfulDataVolumeImport(dv, 240)
+	Eventually(ThisDV(dv), 240).Should(HaveSucceeded())
 	return NewRandomVMIWithDataVolume(dv.Name), dv
 }
 
@@ -2858,50 +2944,6 @@ func NewRandomVMIWithCustomMacAddress() *v1.VirtualMachineInstance {
 	return vmi
 }
 
-// Block until DataVolume succeeds on storage with Immediate binding
-// or is in WaitForFirstConsumer state on storage with WaitForFirstConsumer binding.
-func WaitForDataVolumeReadyToStartVMI(obj runtime.Object, seconds int) {
-	vmi, ok := obj.(*v1.VirtualMachineInstance)
-	ExpectWithOffset(1, ok).To(BeTrue(), "Object is not of type *v1.VMI")
-	WaitForDataVolumeReady(vmi.Namespace, vmi.Spec.Volumes[0].DataVolume.Name, seconds)
-}
-
-func WaitForDataVolumeReady(namespace, name string, seconds int) {
-	waitForDataVolumePhase(namespace, name, seconds, cdiv1.WaitForFirstConsumer, cdiv1.Succeeded)
-}
-
-func WaitForDataVolumeImportInProgress(namespace, name string, seconds int) {
-	waitForDataVolumePhase(namespace, name, seconds, cdiv1.WaitForFirstConsumer, cdiv1.ImportInProgress)
-}
-
-func WaitForDataVolumePhaseWFFC(namespace, name string, seconds int) {
-	waitForDataVolumePhase(namespace, name, seconds, cdiv1.WaitForFirstConsumer)
-}
-
-func WaitForSuccessfulDataVolumeImport(dv *cdiv1.DataVolume, seconds int) {
-	waitForDataVolumePhase(dv.Namespace, dv.Name, seconds, cdiv1.Succeeded)
-}
-
-func waitForDataVolumePhase(namespace, name string, seconds int, phase ...cdiv1.DataVolumePhase) {
-	By("Checking that the DataVolume has succeeded")
-	virtClient, err := kubecli.GetKubevirtClient()
-	ExpectWithOffset(2, err).ToNot(HaveOccurred())
-
-	EventuallyWithOffset(2,
-		func() cdiv1.DataVolumePhase {
-			dv, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(namespace).Get(context.Background(), name, metav1.GetOptions{})
-			if apierrors.IsNotFound(err) {
-				return cdiv1.PhaseUnset
-			}
-			ExpectWithOffset(2, err).ToNot(HaveOccurred())
-
-			return dv.Status.Phase
-		},
-		time.Duration(seconds)*time.Second, 1*time.Second).
-		Should(BeElementOf(phase),
-			"Timed out waiting for DataVolume to enter Succeeded phase")
-}
-
 // Block until the specified VirtualMachineInstance reached either Failed or Running states
 func WaitForVMIStartOrFailed(obj runtime.Object, seconds int, wp WarningsPolicy) (nodeName string) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -3374,6 +3416,8 @@ func LibvirtDomainIsPersistent(virtClient kubecli.KubevirtClient, vmi *v1.Virtua
 	return strings.Contains(stdout, vmi.Namespace+"_"+vmi.Name), nil
 }
 
+// Deprecated: BeforeAll must not be used. Tests need to be self-contained to allow sane cleanup, accurate reporting and
+// parallel execution.
 func BeforeAll(fn func()) {
 	first := true
 	BeforeEach(func() {

@@ -319,12 +319,15 @@ kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kube
 
 <p>While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
 Download Istio manifests and client binary by running the following command:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span>1.10.0
 curl <span class="nt">-L</span> https://istio.io/downloadIstio | sh -
 </code></pre></div></div>
+
 <p>and export path to the istioctl binary by following the output of the above command.</p>
 
 <p>Finally, deploy Kiali, Jaeger and Prometheus addons:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/kiali.yaml
 kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/jaeger.yaml
 kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/prometheus.yaml
@@ -347,6 +350,7 @@ This involves adding a label and creating a <code class="language-plaintext high
 <h4 id="network-attachment-definiton">Network attachment definiton</h4>
 
 <p>When Multus is installed in k8s cluster, a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> called <code class="language-plaintext highlighter-rouge">istio-cni</code> <strong>must</strong> be created in <strong>each</strong> namespace where Istio sidecar containers are to be used:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
@@ -360,6 +364,7 @@ metadata:
 <h3 id="topology">Topology</h3>
 
 <p>To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh:</p>
+
 <ul>
   <li><code class="language-plaintext highlighter-rouge">istio-vmi</code> repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080,</li>
   <li><code class="language-plaintext highlighter-rouge">cirros-vmi</code> repeatedly request the HTTP service running on the <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI.</li>
@@ -374,6 +379,7 @@ traffic metrics can be observed in Kiali dashboard for <code class="language-pla
 Without this annotation, traffic would not be properly routed through the istio proxy sidecar.
 Additonally, Istio uses <code class="language-plaintext highlighter-rouge">app</code> label for adding contextual information to the collected telemetry.
 Both, the annotation and label can be seen in the following virtual machine example:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
 apiVersion: kubevirt.io/v1
 kind: VirtualMachineInstance
@@ -429,6 +435,7 @@ spec:
       name: cloudinitdisk
 </span><span class="no">EOF
 </span></code></pre></div></div>
+
 <p>The cloud init section of the VMI runs two loops requesting <code class="language-plaintext highlighter-rouge">kubevirt.io</code> website every second to generate outbound traffic (from the VMI) and serving simple HTTP server on port <code class="language-plaintext highlighter-rouge">8080</code>, which will be used for monitoring of inbound traffic (to the VMI).</p>
 
 <p>Let’s also create a service for the VMI that will be used to access the http server in <code class="language-plaintext highlighter-rouge">istio-vmi</code>:</p>
@@ -448,6 +455,7 @@ spec:
 </span></code></pre></div></div>
 
 <p>Finally, create the <code class="language-plaintext highlighter-rouge">cirros-vmi</code> VMI, for the purpose of generating inbound traffic to <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
 apiVersion: kubevirt.io/v1
 kind: VirtualMachineInstance
@@ -490,10 +498,12 @@ spec:
 </span></code></pre></div></div>
 
 <p>Wait for the <code class="language-plaintext highlighter-rouge">istio-vmi</code> to be ready:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">condition</span><span class="o">=</span>ready <span class="nt">--timeout</span><span class="o">=</span>180s pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>istio-vmi
 </code></pre></div></div>
 
 <p>After creating the VMIs, the corresponding virt-launcher pods should have 3 ready containers, as shown in the snippet below:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods
 NAME                             READY   STATUS    RESTARTS   AGE
 virt-launcher-istio-vmi-XYZ      3/3     Running   0          4m13s
@@ -514,6 +524,7 @@ virt-launcher-istio-vmi-99t8t.default         SYNCED     SYNCED     SYNCED     S
 
 <p>With both VMIs up and running, we can open the Kiali dashboard and observe the traffic metrics.
 Run the following command, to access Kiali dashboard:</p>
+
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl dashboard kiali
 </code></pre></div></div>
 
@@ -532,6 +543,7 @@ Run the following command, to access Kiali dashboard:</p>
 </div>
 
 <p>In the topology graph, we can observe the following traffic flows:</p>
+
 <ul>
   <li>requests from <code class="language-plaintext highlighter-rouge">cirros-vmi</code> to <code class="language-plaintext highlighter-rouge">istio-vmi</code> via <code class="language-plaintext highlighter-rouge">istio-vmi-svc</code> service,</li>
   <li>requests from <code class="language-plaintext highlighter-rouge">istio-vmi</code> to <code class="language-plaintext highlighter-rouge">PasstroughCluster</code>. The <code class="language-plaintext highlighter-rouge">PastroughCluster</code> marks  destinations external to our service mesh.</li>

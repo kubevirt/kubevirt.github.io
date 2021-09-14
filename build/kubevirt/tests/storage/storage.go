@@ -110,10 +110,9 @@ var _ = SIGDescribe("Storage", func() {
 
 		runHostPathJobAndExpectCompletion := func(pod *k8sv1.Pod) *k8sv1.Pod {
 			pod, err = virtClient.CoreV1().Pods(util.NamespaceTestDefault).Create(context.Background(), pod, metav1.CreateOptions{})
-			podWithName := pod.DeepCopy()
 			Expect(err).ToNot(HaveOccurred())
 			Eventually(ThisPod(pod), 120).Should(BeInPhase(k8sv1.PodSucceeded))
-			_, err = ThisPod(pod)()
+			podWithName, err := ThisPod(pod)()
 			Expect(err).ToNot(HaveOccurred())
 			return podWithName
 		}
@@ -495,7 +494,7 @@ var _ = SIGDescribe("Storage", func() {
 				Expect(err).ToNot(HaveOccurred())
 				By("Waiting until the DataVolume is ready")
 				if tests.HasBindingModeWaitForFirstConsumer() {
-					tests.WaitForDataVolumePhaseWFFC(dataVolume.Namespace, dataVolume.Name, 30)
+					Eventually(ThisDV(dataVolume), 30).Should(BeInPhase(cdiv1.WaitForFirstConsumer))
 				}
 				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("512Mi")
 
@@ -720,15 +719,18 @@ var _ = SIGDescribe("Storage", func() {
 
 		Context("[rfe_id:2298][crit:medium][vendor:cnv-qe@redhat.com][level:component] With HostDisk and PVC initialization", func() {
 
+			BeforeEach(func() {
+				if !checks.HasFeature(virtconfig.HostDiskGate) {
+					Skip("Cluster has the HostDisk featuregate disabled, skipping  the tests")
+				}
+			})
+
 			Context("With a HostDisk defined", func() {
 
 				var hostDiskDir string
 				var nodeName string
 
 				BeforeEach(func() {
-					if !checks.HasFeature(virtconfig.HostDiskGate) {
-						Skip("Cluster has the HostDisk featuregate disabled, skipping  the tests")
-					}
 					hostDiskDir = tests.RandTmpDir()
 					nodeName = ""
 				})
@@ -947,7 +949,10 @@ var _ = SIGDescribe("Storage", func() {
 					pod.Spec.Containers[0].Lifecycle = &k8sv1.Lifecycle{
 						PreStop: &k8sv1.Handler{
 							Exec: &k8sv1.ExecAction{
-								Command: []string{"umount", mountDir},
+								Command: []string{
+									"/usr/bin/bash", "-c",
+									fmt.Sprintf("rm -f %s && umount %s", diskPath, mountDir),
+								},
 							},
 						},
 					}
@@ -965,6 +970,8 @@ var _ = SIGDescribe("Storage", func() {
 						}
 						return k8sv1.ConditionFalse
 					}, 30, 1).Should(Equal(k8sv1.ConditionTrue))
+					pod, err = ThisPod(pod)()
+					Expect(err).ToNot(HaveOccurred())
 
 					By("Determining the size of the mounted directory")
 					diskSizeStr, _, err := tests.ExecuteCommandOnPodV2(virtClient, pod, pod.Spec.Containers[0].Name, []string{"/usr/bin/bash", "-c", fmt.Sprintf("df %s | tail -n 1 | awk '{print $4}'", mountDir)})
@@ -972,7 +979,15 @@ var _ = SIGDescribe("Storage", func() {
 					diskSize, err = strconv.Atoi(strings.TrimSpace(diskSizeStr))
 					diskSize = diskSize * 1000 // byte to kilobyte
 					Expect(err).ToNot(HaveOccurred())
+				})
 
+				AfterEach(func() {
+					if vmi != nil {
+						Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
+						tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 120)
+					}
+					Expect(virtClient.CoreV1().Pods(pod.Namespace).Delete(context.Background(), pod.Name, metav1.DeleteOptions{})).To(Succeed())
+					tests.WaitForPodToDisappearWithTimeout(pod.Name, 120)
 				})
 
 				configureToleration := func(toleration int) {
