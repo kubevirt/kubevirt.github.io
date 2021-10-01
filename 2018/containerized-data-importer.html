@@ -219,7 +219,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", "AWS", "EC2", "AMI", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -394,7 +394,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
   <span class="na">labels</span><span class="pi">:</span>
     <span class="na">app</span><span class="pi">:</span> <span class="s">containerized-data-importer</span>
   <span class="na">annotations</span><span class="pi">:</span>
-    <span class="s">cdi.kubevirt.io/storage.import.endpoint</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"</span> <span class="c1"># Required. Format: (http||s3)://www.myUrl.com/path/of/data</span>
+    <span class="na">cdi.kubevirt.io/storage.import.endpoint</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://download.cirros-cloud.net/0.4.0/cirros-0.4.0-x86_64-disk.img"</span> <span class="c1"># Required. Format: (http||s3)://www.myUrl.com/path/of/data</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">accessModes</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
@@ -463,8 +463,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 Regardless of the Kubernetes version, a storage class with volumeBindingMode set to “WaitForFirstConsumer” needs to be created. Eg:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">kind</span><span class="pi">:</span> <span class="s">StorageClass</span>
-   <span class="s">apiVersion</span><span class="pi">:</span> <span class="s">storage.k8s.io/v1</span>
-   <span class="s">metadata</span><span class="pi">:</span>
+   <span class="s">apiVersion</span><span class="err">:</span> <span class="s">storage.k8s.io/v1</span>
+   <span class="s">metadata</span><span class="err">:</span>
      <span class="na">name</span><span class="pi">:</span> <span class="s">&lt;local-storage-name&gt;</span>
    <span class="na">provisioner</span><span class="pi">:</span> <span class="s">kubernetes.io/no-provisioner</span>
    <span class="na">volumeBindingMode</span><span class="pi">:</span> <span class="s">WaitForFirstConsumer</span>
@@ -480,7 +480,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <span class="na">labels</span><span class="pi">:</span>
     <span class="na">app</span><span class="pi">:</span> <span class="s">Host-Assisted-Cloning</span>
   <span class="na">annotations</span><span class="pi">:</span>
-    <span class="s">k8s.io/CloneRequest</span><span class="pi">:</span> <span class="s2">"</span><span class="s">source-ns/golden-pvc"</span>
+    <span class="na">k8s.io/CloneRequest</span><span class="pi">:</span> <span class="s2">"</span><span class="s">source-ns/golden-pvc"</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">accessModes</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
@@ -542,7 +542,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <span class="na">labels</span><span class="pi">:</span>
     <span class="na">app</span><span class="pi">:</span> <span class="s">containerized-data-importer</span>
   <span class="na">annotations</span><span class="pi">:</span>
-    <span class="s">cdi.kubevirt.io/storage.upload.target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+    <span class="na">cdi.kubevirt.io/storage.upload.target</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">accessModes</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
@@ -605,7 +605,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <span class="na">name</span><span class="pi">:</span> <span class="s">protect-mynamespace</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">hard</span><span class="pi">:</span>
-    <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
+    <span class="na">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
 </code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-plaintext highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "0"</code> would also accomplish the same affect by not allowing any pvc requests against the storageclass for this namespace.</p>
@@ -622,7 +622,7 @@ Regardless of the Kubernetes version, a storage class with volumeBindingMode set
   <span class="na">name</span><span class="pi">:</span> <span class="s">protect-mynamespace</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">hard</span><span class="pi">:</span>
-    <span class="s">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">500Gi"</span>
+    <span class="na">&lt;STORAGE-CLASS-NAME&gt;.storageclass.storage.k8s.io/requests.storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">500Gi"</span>
 </code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p><code class="language-plaintext highlighter-rouge">.storageclass.storage.k8s.io/persistentvolumeclaims: "4"</code> could be used and this would only allow for 4 pvc requests in this namespace, anything over that would be denied.</p>

@@ -1,4 +1,149 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-09-14T19:59:21+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Running virtual machines in Istio service mesh</title><link href="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html" rel="alternate" type="text/html" title="Running virtual machines in Istio service mesh" /><published>2021-08-13T00:00:00+00:00</published><updated>2021-08-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh</id><content type="html" xml:base="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-10-01T23:13:15+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Import AWS AMIs as KubeVirt Golden Images</title><link href="https://kubevirt.io//2021/Importing-EC2-to-KubeVirt.html" rel="alternate" type="text/html" title="Import AWS AMIs as KubeVirt Golden Images" /><published>2021-09-21T00:00:00+00:00</published><updated>2021-09-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Importing-EC2-to-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2021/Importing-EC2-to-KubeVirt.html">&lt;h2 id=&quot;breaking-out&quot;&gt;Breaking Out&lt;/h2&gt;
+
+&lt;p&gt;There comes a point where an operations team has invested so heavily in a Iaas platform that they are effectively locked into that platform. For example, here’s one scenario outlining how this can happen. An operations team has created automation around building VM images and keeping images up-to-date. In AWS that automation likely involves starting an EC2 instance, injecting some application logic into that instance, sealing the instance’s boot source as an AMI, and finally copying that AMI around to all the AWS regions the team deploys in.&lt;/p&gt;
+
+&lt;p&gt;If the team was interested in evaluating KubeVirt as an alternative Iaas platform to AWS’s EC2, given the team’s existing tooling there’s not a clear path for doing this. It’s that scenario where the tooling in the &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import&quot;&gt;kubevirt-cloud-import&lt;/a&gt; project comes into play.&lt;/p&gt;
+
+&lt;h2 id=&quot;kubevirt-cloud-import&quot;&gt;Kubevirt Cloud Import&lt;/h2&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import&quot;&gt;KubeVirt Cloud Import&lt;/a&gt; project explores the practicality of transitioning VMs from various cloud providers into KubeVirt. As of writing this, automation for exporting AMIs from EC2 into KubeVirt works, and it’s really not all that complicated.&lt;/p&gt;
+
+&lt;p&gt;This blog post will explore the fundamentals of how AMIs are exported, and how the KubeVirt Cloud Import project leverages these techniques to build automation pipelines.&lt;/p&gt;
+
+&lt;h2 id=&quot;nuts-and-bolts-of-importing-amis&quot;&gt;Nuts and Bolts of Importing AMIs&lt;/h2&gt;
+
+&lt;h3 id=&quot;official-aws-ami-export-support&quot;&gt;Official AWS AMI Export Support&lt;/h3&gt;
+
+&lt;p&gt;AWS supports an &lt;a href=&quot;https://docs.aws.amazon.com/vm-import/latest/userguide/vmexport_image.html&quot;&gt;api&lt;/a&gt; for exporting AMIs as a file to an s3 bucket. This support works quite well, however there’s a long list of &lt;a href=&quot;https://docs.aws.amazon.com/vm-import/latest/userguide/vmexport_image.html#limits-image-export&quot;&gt;limitations&lt;/a&gt; that impact what AMIs are eligible for export. The most limiting of those items is the one that prevents any image built from an AMI on the marketplace from being eligible for the official export support.&lt;/p&gt;
+
+&lt;h3 id=&quot;unofficial-aws-export-support&quot;&gt;Unofficial AWS export Support&lt;/h3&gt;
+
+&lt;p&gt;Regardless of what AWS officially supports or not, there’s absolutely nothing preventing someone from exporting an AMI’s contents themselves. The technique just involves creating an EC2 instance, attaching an EBS volume (containing the AMI contents) as a block device, then streaming that block devices contents where ever you want.&lt;/p&gt;
+
+&lt;p&gt;Theoretically, the steps roughly look like this.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Convert AMI to a volume by finding the underlying AMI’s snapshot and converting it to an EBS volume.&lt;/li&gt;
+  &lt;li&gt;Create an EC2 instance with the EBS volume containing the AMI contents as a secondary data device.&lt;/li&gt;
+  &lt;li&gt;Within the EC2 guest, copy the EBS device’s contents as a disk img &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dd if=/dev/xvda of=/tmp/disk/disk.img&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Then upload the disk image to an object store like s3. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aws s3 cp /tmp/disk/disk.img s3://my-b1-bucket/ upload: ../tmp/disk/disk.img to s3://my-b1-bucket/disk.img&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;basics-of-importing-data-into-kubevirt&quot;&gt;Basics of Importing Data into KubeVirt&lt;/h3&gt;
+
+&lt;p&gt;Once a disk image is in s3, a KubeVirt companion project called the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;Containerized Data Importer&lt;/a&gt; (or CDI for short) can be used to import the disk from s3 into a PVC within the KubeVirt cluster. This import flow can be expressed as a CDI DataVolume custom resource.&lt;/p&gt;
+
+&lt;p&gt;Below is an example yaml for importing s3 contents into a PVC using a DataVolume&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdi.kubevirt.io/v1beta1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DataVolume&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;example-import-dv&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;s3&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;https://s3.us-west-2.amazonaws.com/my-ami-exports/kubevirt-image-exports/export-ami-0dc4e69702f74df50.vmdk&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;secretRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;my-s3-credentials&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;6Gi&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once the AMI file content is stored in a PVC, CDI can be used further to clone that AMI’s PVC on a per VM basis. This effectively recreates the AMI to EC2 relationship that exists in AWS. You can find more information about CDI &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;automating-ami-import&quot;&gt;Automating AMI import&lt;/h2&gt;
+
+&lt;p&gt;Using the technique of exporting an AMI to an s3 bucket and importing the AMI from s3 into a KubeVirt cluster using CDI, the Kubevirt Cloud Import project provides the glue necessary for tying all of these pieces together in the form of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import-ami&lt;/code&gt; cli command and a Tekton task.&lt;/p&gt;
+
+&lt;h2 id=&quot;automation-using-the-import-ami-cli-command&quot;&gt;Automation using the import-ami CLI command&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import-ami&lt;/code&gt; takes a set of arguments related to the AMI you wish to import into KubeVirt and the name of the PVC you’d like the AMI to be imported into. Upon execution, import-ami will call all the appropriate AWS and KubeVirt APIs to make this work. The result is a PVC with the AMI contents that is capable of being launched by a KubeVirt VM.&lt;/p&gt;
+
+&lt;p&gt;In the example below, A publicly shared &lt;a href=&quot;https://alt.fedoraproject.org/cloud/&quot;&gt;fedora34 AMI&lt;/a&gt; is imported into the KubeVirt cluster as a PVC called fedora34-golden-image&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;S3_BUCKET&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;my-bucket
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;S3_SECRET&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;s3-readonly-cred
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;AWS_REGION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;us-west-2
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;AMI_ID&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ami-00a4fdd3db8bb2851
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PVC_STORAGECLASS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;rook-ceph-block
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PVC_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;fedora34-golden-image
+
+import-ami &lt;span class=&quot;nt&quot;&gt;--s3-bucket&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$S3_BUCKET&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--region&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$AWS_REGION&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--ami-id&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$AMI_ID&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pvc-storageclass&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$PVC_STORAGECLASS&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--s3-secret&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$S3_SECRET&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$PVC_NAME&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;automation-using-the-import-ami-tekton-task&quot;&gt;Automation using the import-ami Tekton Task&lt;/h2&gt;
+
+&lt;p&gt;In addition to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import-ami&lt;/code&gt; cli command, the KubeVirt Cloud Import project also includes a &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import/blob/main/tasks/import-ami/manifests/import-ami.yaml&quot;&gt;Tekton task&lt;/a&gt; which wraps the cli command and allows integrating AMI import into a Tekton pipeline.&lt;/p&gt;
+
+&lt;p&gt;Using a Tekton pipeline, someone can combine the task of importing an AMI into KubeVirt with the task of starting a VM using that AMI. An example pipeline can be found &lt;a href=&quot;https://raw.githubusercontent.com/davidvossel/kubevirt-cloud-import/main/examples/create-vm-from-ami-pipeline.yaml&quot;&gt;here&lt;/a&gt; which outlines how this is accomplished.&lt;/p&gt;
+
+&lt;p&gt;Below is a pipeline run that uses the example pipeline to import the publicly shared fedora34 AMI into a PVC, then starts a VM using that imported AMI.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; pipeline-run.yaml
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: my-vm-creation-pipeline
+  namespace: default
+spec:
+  serviceAccountName: my-kubevirt-service-account
+  pipelineRef:
+    name: create-vm-pipeline 
+  params:
+    - name: vmName
+      value: vm-fedora34
+    - name: s3Bucket
+      value: my-kubevirt-exports
+    - name: s3ReadCredentialsSecret
+      value: my-s3-read-only-credentials
+    - name: awsRegion
+      value: us-west-2
+    - name: amiId 
+      value: ami-00a4fdd3db8bb2851
+    - name: pvcStorageClass 
+      value: rook-ceph-block
+    - name: pvcName
+      value: fedora34
+    - name: pvcNamespace
+      value: default
+    - name: pvcSize
+      value: 6Gi
+    - name: pvcAccessMode
+      value: ReadWriteOnce
+    - name: awsCredentialsSecret
+      value: my-aws-credentials
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; pipeline-run.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After posting the pipeline run, watch for the pipeline run to complete.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pipelinerun
+selecting docker as container runtime
+NAME                      SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+my-vm-creation-pipeline   True        Succeeded   11m         9m54s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then observe that the resulting VM is online&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi
+selecting docker as container runtime
+NAME          AGE   PHASE     IP               NODENAME   READY
+vm-fedora34   11m   Running   10.244.196.175   node01     True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For more detailed and up-to-date information about how to automate AMI import using Tekton, view the KubeVirt Cloud Import &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import/blob/main/README.md&quot;&gt;README.md&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;key-takeaways&quot;&gt;Key Takeaways&lt;/h2&gt;
+
+&lt;p&gt;The portability of workloads across different environments is becoming increasingly important and operations teams need to be vigilant about avoiding vendor lock in. For containers, Kubernetes is an attractive option because it provides a consistent API layer that can run across multiple cloud platforms. KubeVirt can provide that same level of consistency for VMs. As a community we need to invest further into automation tools that allow people to make the transition to KubeVirt.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="AWS" /><category term="EC2" /><category term="AMI" /><summary type="html">Breaking Out</summary></entry><entry><title type="html">Running virtual machines in Istio service mesh</title><link href="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html" rel="alternate" type="text/html" title="Running virtual machines in Istio service mesh" /><published>2021-08-13T00:00:00+00:00</published><updated>2021-08-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh</id><content type="html" xml:base="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html">&lt;h2 id=&quot;introduction&quot;&gt;Introduction&lt;/h2&gt;
 
 &lt;p&gt;This blog post demonstrates running virtual machines in &lt;a href=&quot;https://istio.io/&quot;&gt;Istio&lt;/a&gt; service mesh.&lt;/p&gt;
 
@@ -1133,7 +1278,7 @@ You can also change the Answer File according to your needs by consulting the al
 &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-autounattend&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;Autounattend.xml&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Autounattend.xml&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;&amp;lt;unattend xmlns=&quot;urn:schemas-microsoft-com:unattend&quot;&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;windowsPE&quot;&amp;gt;&lt;/span&gt;
@@ -1588,7 +1733,7 @@ You need to replace PVC_NAME with &lt;code class=&quot;language-plaintext highli
   &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -2659,9 +2804,9 @@ this progress we can query the CR status with the following command:&lt;/p&gt;
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;allocatable&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;This is an example of &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;NetworkAttachmentDefinition&lt;/code&gt; to expose the bridge available on the host to users:&lt;/p&gt;
@@ -2671,7 +2816,7 @@ this progress we can query the CR status with the following command:&lt;/p&gt;
 &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge-network&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/resourceName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;k8s.v1.cni.cncf.io/resourceName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;{&lt;/span&gt;
@@ -2689,7 +2834,7 @@ this progress we can query the CR status with the following command:&lt;/p&gt;
 it:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge-network&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;k8s.v1.cni.cncf.io/networks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge-network&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;h2 id=&quot;setting-up-node-networking-with-nodenetworkconfigurationpolicy-aka-nncp&quot;&gt;Setting up node networking with NodeNetworkConfigurationPolicy (aka nncp)&lt;/h2&gt;
@@ -2863,9 +3008,9 @@ can be consumed on the node:&lt;/p&gt;
 
 &lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;allocatable&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;capacity&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;1k&lt;/span&gt;
 &lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
 &lt;p&gt;At this point we have an L2 linux bridge ready and connected to NIC eth1.&lt;/p&gt;
@@ -2882,7 +3027,7 @@ bridge vlan-filtering we add the vlan we want to use to isolate our VMs:&lt;/p&g
 &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;br0-100-l2&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;annotations&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;k8s.v1.cni.cncf.io/resourceName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;k8s.v1.cni.cncf.io/resourceName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;bridge.network.kubevirt.io/br0&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;config&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;{&lt;/span&gt;
@@ -3083,7 +3228,7 @@ nd_eth1_vma [label = &quot;eth1&quot;];
 &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;mutatevirtualmachines.kubemacpool.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;allocate&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;mutatevirtualmachines.kubemacpool.io&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;allocate&lt;/span&gt;
 &lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;kubevirt.io/v1alpha3&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachine&lt;/span&gt;
@@ -3094,7 +3239,7 @@ nd_eth1_vma [label = &quot;eth1&quot;];
   &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node01&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kubernetes.io/hostname&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node01&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -3148,7 +3293,7 @@ nd_eth1_vma [label = &quot;eth1&quot;];
   &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;nodeSelector&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubernetes.io/hostname&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node02&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kubernetes.io/hostname&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;node02&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;devices&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
           &lt;span class=&quot;na&quot;&gt;disks&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -3270,195 +3415,4 @@ round-trip min/avg/max &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; 357.040/38
 
 &lt;p&gt;In this blog post we used network components from KubeVirt project to connect two VMs on different nodes
 through a linux bridge connected to a secondary NIC. This illustrates how VM traffic can be directed to a specific NIC
-on a node using a secondary NIC on a VM.&lt;/p&gt;</content><author><name>ellorent</name></author><category term="news" /><category term="kubevirt-hyperconverged" /><category term="cnao" /><category term="cluster-network-addons-operator" /><category term="kubernetes-nmstate" /><category term="nmstate" /><category term="bridge" /><category term="multus" /><category term="networking" /><category term="CNI" /><category term="multiple networks" /><summary type="html">Introduction</summary></entry><entry><title type="html">Import virtual machine from oVirt</title><link href="https://kubevirt.io//2020/Import-VM-from-oVirt.html" rel="alternate" type="text/html" title="Import virtual machine from oVirt" /><published>2020-08-06T00:00:00+00:00</published><updated>2020-08-06T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Import-VM-from-oVirt</id><content type="html" xml:base="https://kubevirt.io//2020/Import-VM-from-oVirt.html">&lt;h2 id=&quot;about-vm-import-operator&quot;&gt;About vm-import-operator&lt;/h2&gt;
-
-&lt;p&gt;Virtual machine import operator makes life easier for users who want to migrate their virtual machine workload from different infrastructures to KubeVirt. Currently the operator supports migration from oVirt only. The operator is configurable so user can define how the storage or network should be mapped. For the disk import vm import operator is using the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;CDI&lt;/a&gt;, so in order to have the vm import working you must have both KubeVirt and CDI installed.&lt;/p&gt;
-
-&lt;h3 id=&quot;import-rules&quot;&gt;Import rules&lt;/h3&gt;
-
-&lt;p&gt;Before the import process is initiated we run validation of the source VM, to be sure the KubeVirt will run the source VM smoothly. We have many &lt;a href=&quot;https://github.com/kubevirt/vm-import-operator/blob/master/docs/rules.md&quot;&gt;rules&lt;/a&gt; defined including storage, network and the VM. You will see all warning messages in the conditions field. For example:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-11T11:13:31Z&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-11T11:13:31Z&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;specifies&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;IO&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Threads:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;1,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;NUMA&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;tune&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;secified:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;interleave'&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerificationReportedWarnings&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerified&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;h3 id=&quot;supported-guest-operating-systems&quot;&gt;Supported Guest Operating Systems&lt;/h3&gt;
-
-&lt;p&gt;We support following guest operating systems:&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;Red Hat Enterprise Linux 6&lt;/li&gt;
-  &lt;li&gt;Red Hat Enterprise Linux 7&lt;/li&gt;
-  &lt;li&gt;Red Hat Enterprise Linux 8&lt;/li&gt;
-  &lt;li&gt;Microsoft Windows 10&lt;/li&gt;
-  &lt;li&gt;Microsoft Windows Server 2012r2&lt;/li&gt;
-  &lt;li&gt;Microsoft Windows Server 2016&lt;/li&gt;
-  &lt;li&gt;Microsoft Windows Server 2019&lt;/li&gt;
-  &lt;li&gt;CentOS Linux 6&lt;/li&gt;
-  &lt;li&gt;CentOS Linux 7&lt;/li&gt;
-  &lt;li&gt;CentOS Linux 8&lt;/li&gt;
-  &lt;li&gt;Ubuntu 18.04&lt;/li&gt;
-  &lt;li&gt;Fedora&lt;/li&gt;
-  &lt;li&gt;openSUSE&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;h2 id=&quot;setup-vm-import-operator&quot;&gt;Setup vm-import-operator&lt;/h2&gt;
-
-&lt;p&gt;Source code for virtual machine import operator is hosted on github under &lt;a href=&quot;https://github.com/kubevirt&quot;&gt;KubeVirt&lt;/a&gt; organization. You can very easily deploy it on your Kubernetes by running following commands:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/namespace.yaml
-kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/operator.yaml
-kubectl apply &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; https://github.com/kubevirt/vm-import-operator/releases/download/v0.1.0/vmimportconfig_cr.yaml
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;By default the operator is deployed to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt-hyperconverged&lt;/code&gt; namespace,
-you can verify that the operator is deployed and running by running:&lt;/p&gt;
-
-&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;kubectl get deploy vm-import-controller &lt;span class=&quot;nt&quot;&gt;-n&lt;/span&gt; kubevirt-hyperconverged
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;If you are using &lt;a href=&quot;https://github.com/kubevirt/hyperconverged-cluster-operator/&quot;&gt;HCO&lt;/a&gt;, you don’t have to install it manually,
-because the HCO takes care of that.&lt;/p&gt;
-
-&lt;h2 id=&quot;importing-virtual-machine-from-ovirt&quot;&gt;Importing virtual machine from oVirt&lt;/h2&gt;
-
-&lt;p&gt;In order to import a virtual machine from oVirt user must obtain credentials for the oVirt environment. oVirt environment is usually accessed using username, password and http URL. Note that you must provide CA certificate of your oVirt environment. If you have those - create a secret out of them:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;---&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Secret&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirt-secret&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Opaque&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;stringData&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|-&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;apiUrl: https://engine-url/ovirt-engine/api&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;username: admin@internal&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;password: &quot;secretpassword&quot;&lt;/span&gt;
-    &lt;span class=&quot;s&quot;&gt;caCert: |&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;-----BEGIN CERTIFICATE-----&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;MIIEMjCCAxqgAwIBAgICEAAwDQYJKoZIhvcNAQELBQAwbDELMAkGA1UEBhMCVVMxJDAiBgNVBAoM&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;....&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;fFyt91ClrUtTE707IFnYdQQUiZ4zI0q+6pmw6+xx8mH5k8Ad6D71pF718xCM1NiBx/Cusg==&lt;/span&gt;
-      &lt;span class=&quot;s&quot;&gt;-----END CERTIFICATE-----&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Another step to initiate the import is creating the mappings. The mappings has three categories - storage mapping, disk mapping and network mapping. For storage mapping user can define which oVirt storage domain will be mapped to which storage class. Disk mapping can override the storage mapping for specific disks. The network mappings map oVirt network to the kubernetes network. So here an simple example of mapping:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2v.kubevirt.io/v1alpha1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ResourceMapping&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm-mapping&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;networkMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirtmgmt/ovirtmgmt&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;storageMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystoragedomain&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystorageclass&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The above mapping maps &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ovirtmgmt/ovirtmgmt&lt;/code&gt; which is in format of vNIC profile/network to the pod network and disks from &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mystoragedomain&lt;/code&gt; to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;mystorageclass&lt;/code&gt;. Once we have mapping and the secret, we can initiate the import by creating a VM import CR. You must provide the name of the mapping, secret, source VM and target VM name.&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2v.kubevirt.io/v1alpha1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineImport&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;providerCredentialsSecret&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirt-secret&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;resourceMapping&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm-mapping&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;targetVmName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm&lt;/span&gt;
- &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-   &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-     &lt;span class=&quot;na&quot;&gt;vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-       &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
-       &lt;span class=&quot;na&quot;&gt;cluster&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-         &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mycluster&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Note that it is also possible to use internal mappings, so the user can create the mappings inside the VM import CR, for example:&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;v2v.kubevirt.io/v1alpha1&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineImport&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;providerCredentialsSecret&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirt-secret&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;namespace&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;default&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;targetVmName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm&lt;/span&gt;
-  &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;ovirt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;mappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;networkMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ovirtmgmt/ovirtmgmt&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;pod&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;storageMappings&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystoragedomain&lt;/span&gt;
-            &lt;span class=&quot;na&quot;&gt;target&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-              &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mystorageclass&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;vm&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;myvm&lt;/span&gt;
-        &lt;span class=&quot;na&quot;&gt;cluster&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-          &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;mycluster&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;Now let the operator do its work. You can explore the status by checking the status of the VM import CR&lt;/p&gt;
-
-&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nn&quot;&gt;...&lt;/span&gt;
-&lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;conditions&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Validation completed successfully&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ValidationCompleted&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Valid&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;specifies&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;IO&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;Threads:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;1,&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;VM&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;has&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;NUMA&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;tune&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;mode&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;secified:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt; &lt;/span&gt;&lt;span class=&quot;s&quot;&gt;interleave'&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerificationReportedWarnings&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MappingRulesVerified&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:10:29Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:09:22Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Copying virtual machine disks&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ProcessingCompleted&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Processing&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;lastHeartbeatTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:10:29Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;lastTransitionTime&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;2020-08-05T13:10:29Z&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;message&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Virtual machine disks import done&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;reason&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;VirtualMachineReady&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;status&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;True&quot;&lt;/span&gt;
-      &lt;span class=&quot;na&quot;&gt;type&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Succeeded&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;dataVolumes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-    &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm-26097887-1f4d-4718-961f-f5b63a49c3f5&lt;/span&gt;
-    &lt;span class=&quot;na&quot;&gt;targetVmName&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;testvm&lt;/span&gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
-
-&lt;p&gt;The import process goes through different stages. The first stage is the validation where HCO checks for unsupported mappings.
-The others are for processing and reporting to provide VM and disks ready status.&lt;/p&gt;
-
-&lt;h2 id=&quot;future&quot;&gt;Future&lt;/h2&gt;
-
-&lt;p&gt;For future releases it is planned to support importing virtual machines from VMware, reporting Prometheus metrics and SR-IOV.&lt;/p&gt;</content><author><name>Ondra Machacek</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="import" /><category term="oVirt" /><summary type="html">About vm-import-operator</summary></entry></feed>
+on a node using a secondary NIC on a VM.&lt;/p&gt;</content><author><name>ellorent</name></author><category term="news" /><category term="kubevirt-hyperconverged" /><category term="cnao" /><category term="cluster-network-addons-operator" /><category term="kubernetes-nmstate" /><category term="nmstate" /><category term="bridge" /><category term="multus" /><category term="networking" /><category term="CNI" /><category term="multiple networks" /><summary type="html">Introduction</summary></entry></feed>

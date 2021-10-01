@@ -165,7 +165,7 @@ var _ = SIGDescribe("Storage", func() {
 				tests.RemoveErrorDisk(nodeName, address)
 			})
 
-			It("[QUARANTINE] should pause VMI on IO error", func() {
+			It(" should pause VMI on IO error", func() {
 				By("Creating VMI with faulty disk")
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
 				vmi = tests.AddPVCDisk(vmi, "pvc-disk", "virtio", pvc.Name)
@@ -247,7 +247,7 @@ var _ = SIGDescribe("Storage", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It("[QUARANTINE] should pause VMI on IO error", func() {
+			It(" should pause VMI on IO error", func() {
 				By("Creating VMI with faulty disk")
 				vmi := tests.NewRandomVMIWithPVC(pvc.Name)
 				_, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
@@ -481,7 +481,7 @@ var _ = SIGDescribe("Storage", func() {
 				if !tests.HasCDI() {
 					Skip("Skip DataVolume tests when CDI is not present")
 				}
-				dataVolume = tests.NewRandomDataVolumeWithHttpImport(tests.GetUrl(tests.AlpineHttpUrl), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dataVolume = tests.NewRandomDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
 			})
 			AfterEach(func() {
 				err = virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Delete(context.Background(), dataVolume.Name, metav1.DeleteOptions{})
@@ -599,7 +599,7 @@ var _ = SIGDescribe("Storage", func() {
 				},
 					table.Entry("[test_id:3136]with Ephemeral PVC", tests.NewRandomVMIWithEphemeralPVC, "", nil),
 					table.Entry("[test_id:4619]with Ephemeral PVC from NFS using ipv4 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv4Protocol),
-					table.Entry("[QUARANTINE]with Ephemeral PVC from NFS using ipv6 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv6Protocol),
+					table.Entry("with Ephemeral PVC from NFS using ipv6 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv6Protocol),
 				)
 			})
 
@@ -675,7 +675,7 @@ var _ = SIGDescribe("Storage", func() {
 				num := 3
 				By("Starting and stopping the VirtualMachineInstance number of times")
 				for i := 1; i <= num; i++ {
-					obj := tests.RunVMIAndExpectLaunch(vmi, 120)
+					obj := tests.RunVMIAndExpectLaunch(vmi, 240)
 
 					// Verify console on last iteration to verify the VirtualMachineInstance is still booting properly
 					// after being restarted multiple times
@@ -713,7 +713,11 @@ var _ = SIGDescribe("Storage", func() {
 				Expect(err).ToNot(HaveOccurred())
 				_, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
 				Expect(err).To(HaveOccurred())
-				Expect(err.Error()).To(ContainSubstring("virtiofs feature gate is not enabled"))
+				if checks.HasFeature(virtconfig.NonRoot) {
+					Expect(err.Error()).To(And(ContainSubstring("VirtioFS"), ContainSubstring("session mode")))
+				} else {
+					Expect(err.Error()).To(ContainSubstring("virtiofs feature gate is not enabled"))
+				}
 			})
 		})
 
@@ -1056,30 +1060,12 @@ var _ = SIGDescribe("Storage", func() {
 			})
 		})
 
-		Context("[rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component]With Alpine ISCSI PVC (using ISCSI IPv4 address)", func() {
+		Context("[rook-ceph][rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component]With Alpine block volume PVC", func() {
 
-			pvName := fmt.Sprintf("test-iscsi-lun%s", rand.String(48))
-
-			BeforeEach(func() {
-				// Start a ISCSI POD and service
-				By("Creating a ISCSI POD")
-				iscsiTargetPod := tests.CreateISCSITargetPOD(cd.ContainerDiskAlpine)
-				iscsiTargetIPAddress := libnet.GetPodIpByFamily(iscsiTargetPod, k8sv1.IPv4Protocol)
-				Expect(iscsiTargetIPAddress).NotTo(BeEmpty())
-
-				tests.CreateISCSIPvAndPvc(pvName, "1Gi", iscsiTargetIPAddress, k8sv1.ReadWriteMany, k8sv1.PersistentVolumeBlock)
-			})
-
-			AfterEach(func() {
-				// create a new PV and PVC (PVs can't be reused)
-				tests.DeletePvAndPvc(pvName)
-			})
-
-			// Not a candidate for NFS because these tests exercise ISCSI
 			It("[test_id:3139]should be successfully started", func() {
 				By("Create a VMIWithPVC")
 				// Start the VirtualMachineInstance with the PVC attached
-				vmi = tests.NewRandomVMIWithPVC(pvName)
+				vmi, _ := tests.NewRandomVirtualMachineInstanceWithOCSDisk(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util.NamespaceTestDefault, k8sv1.ReadWriteMany, k8sv1.PersistentVolumeBlock)
 				By("Launching a VMI with PVC ")
 				tests.RunVMIAndExpectLaunch(vmi, 180)
 
@@ -1088,7 +1074,7 @@ var _ = SIGDescribe("Storage", func() {
 			})
 		})
 
-		Context("[rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component] With not existing PVC", func() {
+		Context("[rfe_id:2288][crit:high][arm64][vendor:cnv-qe@redhat.com][level:component] With not existing PVC", func() {
 			// Not a candidate for NFS because the PVC in question doesn't actually exist
 			It("[test_id:1040] should get unschedulable condition", func() {
 				// Start the VirtualMachineInstance

@@ -133,7 +133,7 @@ func NewImageUploadCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
 	cmd.Flags().StringVar(&pvcSize, "pvc-size", "", "DEPRECATED - The size of the PVC to create (ex. 10Gi, 500Mi).")
 	cmd.Flags().StringVar(&size, "size", "", "The size of the DataVolume to create (ex. 10Gi, 500Mi).")
 	cmd.Flags().StringVar(&storageClass, "storage-class", "", "The storage class for the PVC.")
-	cmd.Flags().StringVar(&accessMode, "access-mode", "ReadWriteOnce", "The access mode for the PVC.")
+	cmd.Flags().StringVar(&accessMode, "access-mode", "", "The access mode for the PVC.")
 	cmd.Flags().BoolVar(&blockVolume, "block-volume", false, "Create a PVC with VolumeMode=Block (default Filesystem).")
 	cmd.Flags().StringVar(&imagePath, "image-path", "", "Path to the local VM image.")
 	cmd.MarkFlagRequired("image-path")
@@ -172,10 +172,6 @@ func parseArgs(args []string) error {
 
 	if len(pvcSize) > 0 {
 		size = pvcSize
-	}
-
-	if accessMode == string(v1.ReadOnlyMany) {
-		return fmt.Errorf("cannot upload to a readonly volume, use either ReadWriteOnce or ReadWriteMany if supported")
 	}
 
 	// check deprecated invocation
@@ -449,6 +445,8 @@ func waitDvUploadScheduled(client kubecli.KubevirtClient, namespace, name string
 		if dv.Status.Phase == cdiv1.WaitForFirstConsumer {
 			return false, fmt.Errorf("cannot upload to DataVolume in WaitForFirstConsumer state, make sure the PVC is Bound")
 		}
+		// TODO: can check Condition/Event here to provide user with some error messages
+
 		done := dv.Status.Phase == cdiv1.UploadReady
 		if !done && !loggedStatus {
 			fmt.Printf("Waiting for PVC %s upload pod to be ready...\n", name)
@@ -519,7 +517,7 @@ func waitUploadProcessingComplete(client kubernetes.Interface, namespace, name s
 }
 
 func createUploadDataVolume(client kubecli.KubevirtClient, namespace, name, size, storageClass, accessMode string, blockVolume bool) (*cdiv1.DataVolume, error) {
-	pvcSpec, err := createPVCSpec(size, storageClass, accessMode, blockVolume)
+	pvcSpec, err := createStorageSpec(client, size, storageClass, accessMode, blockVolume)
 	if err != nil {
 		return nil, err
 	}
@@ -533,7 +531,7 @@ func createUploadDataVolume(client kubecli.KubevirtClient, namespace, name, size
 			Source: &cdiv1.DataVolumeSource{
 				Upload: &cdiv1.DataVolumeSourceUpload{},
 			},
-			PVC: pvcSpec,
+			Storage: pvcSpec,
 		},
 	}
 
@@ -543,6 +541,39 @@ func createUploadDataVolume(client kubecli.KubevirtClient, namespace, name, size
 	}
 
 	return dv, nil
+}
+
+func createStorageSpec(client kubecli.KubevirtClient, size, storageClass, accessMode string, blockVolume bool) (*cdiv1.StorageSpec, error) {
+	quantity, err := resource.ParseQuantity(size)
+	if err != nil {
+		return nil, fmt.Errorf("validation failed for size=%s: %s", size, err)
+	}
+
+	spec := &cdiv1.StorageSpec{
+		Resources: v1.ResourceRequirements{
+			Requests: v1.ResourceList{
+				v1.ResourceStorage: quantity,
+			},
+		},
+	}
+
+	if storageClass != "" {
+		spec.StorageClassName = &storageClass
+	}
+
+	if accessMode != "" {
+		if accessMode == string(v1.ReadOnlyMany) {
+			return nil, fmt.Errorf("cannot upload to a readonly volume, use either ReadWriteOnce or ReadWriteMany if supported")
+		}
+		spec.AccessModes = []v1.PersistentVolumeAccessMode{v1.PersistentVolumeAccessMode(accessMode)}
+	}
+
+	if blockVolume {
+		volMode := v1.PersistentVolumeBlock
+		spec.VolumeMode = &volMode
+	}
+
+	return spec, nil
 }
 
 func createUploadPVC(client kubernetes.Interface, namespace, name, size, storageClass, accessMode string, blockVolume bool) (*v1.PersistentVolumeClaim, error) {
@@ -588,8 +619,13 @@ func createPVCSpec(size, storageClass, accessMode string, blockVolume bool) (*v1
 		spec.StorageClassName = &storageClass
 	}
 
+	if accessMode == string(v1.ReadOnlyMany) {
+		return nil, fmt.Errorf("cannot upload to a readonly volume, use either ReadWriteOnce or ReadWriteMany if supported")
+	}
 	if accessMode != "" {
 		spec.AccessModes = []v1.PersistentVolumeAccessMode{v1.PersistentVolumeAccessMode(accessMode)}
+	} else {
+		spec.AccessModes = []v1.PersistentVolumeAccessMode{v1.ReadWriteOnce}
 	}
 
 	if blockVolume {

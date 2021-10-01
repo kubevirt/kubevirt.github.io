@@ -135,11 +135,14 @@ func migratableDomXML(dom cli.VirDomain, vmi *v1.VirtualMachineInstance) (string
 	var buf bytes.Buffer
 	encoder := xml.NewEncoder(&buf)
 
-	depth := 0
-	inMeta := false
-	inMetaKV := false
-	inMetaKVMigration := false
+	var location = make([]string, 0)
+	var newLocation []string = nil
 	for {
+		if newLocation != nil {
+			// Postpone popping end elements from `location` to ensure their removal
+			location = newLocation
+			newLocation = nil
+		}
 		token, err := decoder.RawToken()
 		if err == io.EOF {
 			break
@@ -151,29 +154,16 @@ func migratableDomXML(dom cli.VirDomain, vmi *v1.VirtualMachineInstance) (string
 
 		switch v := token.(type) {
 		case xml.StartElement:
-			if depth == 1 && v.Name.Local == "metadata" {
-				inMeta = true
-			} else if inMeta && depth == 2 && v.Name.Local == "kubevirt" {
-				inMetaKV = true
-			} else if inMetaKV && depth == 3 && v.Name.Local == "migration" {
-				inMetaKVMigration = true
-			}
-			depth++
+			location = append(location, v.Name.Local)
 		case xml.EndElement:
-			depth--
-			if inMetaKVMigration && depth == 3 && v.Name.Local == "migration" {
-				inMetaKVMigration = false
-				continue // Skip </migration>
-			}
-			if inMetaKV && depth == 2 && v.Name.Local == "kubevirt" {
-				inMetaKV = false
-			}
-			if inMeta && depth == 1 && v.Name.Local == "metadata" {
-				inMeta = false
-			}
+			newLocation = location[:len(location)-1]
 		}
-		if inMetaKVMigration {
-			continue // We're inside metadata/kubevirt/migration, continuing to skip elements
+		if len(location) >= 4 &&
+			location[0] == "domain" &&
+			location[1] == "metadata" &&
+			location[2] == "kubevirt" &&
+			location[3] == "migration" {
+			continue // We're inside domain/metadata/kubevirt/migration, continue will skip elements
 		}
 
 		if err := encoder.EncodeToken(xml.CopyToken(token)); err != nil {
@@ -763,7 +753,7 @@ func (l *LibvirtDomainManager) generateMigrationProxies(vmi *v1.VirtualMachineIn
 	return proxies
 }
 
-func generateMigrationParams(dom cli.VirDomain, vmi *v1.VirtualMachineInstance, options *cmdclient.MigrationOptions) (*libvirt.DomainMigrateParameters, error) {
+func generateMigrationParams(dom cli.VirDomain, vmi *v1.VirtualMachineInstance, options *cmdclient.MigrationOptions, virtShareDir string) (*libvirt.DomainMigrateParameters, error) {
 	bandwidth, err := converter.QuantityToMebiByte(options.Bandwidth)
 	if err != nil {
 		return nil, err
@@ -774,20 +764,28 @@ func generateMigrationParams(dom cli.VirDomain, vmi *v1.VirtualMachineInstance, 
 		return nil, err
 	}
 
-	migrURI := fmt.Sprintf("tcp://%s", ip.NormalizeIPAddress(ip.GetLoopbackAddress()))
+	key := migrationproxy.ConstructProxyKey(string(vmi.UID), migrationproxy.LibvirtDirectMigrationPort)
+	migrURI := fmt.Sprintf("unix://%s", migrationproxy.SourceUnixFile(virtShareDir, key))
 	params := &libvirt.DomainMigrateParameters{
-		URI:          migrURI,
-		URISet:       true,
-		Bandwidth:    bandwidth, // MiB/s
-		BandwidthSet: bandwidth > 0,
-		DestXML:      xmlstr,
-		DestXMLSet:   true,
+		URI:           migrURI,
+		URISet:        true,
+		Bandwidth:     bandwidth, // MiB/s
+		BandwidthSet:  bandwidth > 0,
+		DestXML:       xmlstr,
+		DestXMLSet:    true,
+		PersistXML:    xmlstr,
+		PersistXMLSet: true,
 	}
 
 	copyDisks := getDiskTargetsForMigration(dom, vmi)
 	if len(copyDisks) != 0 {
 		params.MigrateDisks = copyDisks
 		params.MigrateDisksSet = true
+		// add a socket for live block migration
+		key := migrationproxy.ConstructProxyKey(string(vmi.UID), migrationproxy.LibvirtBlockMigrationPort)
+		disksURI := fmt.Sprintf("unix://%s", migrationproxy.SourceUnixFile(virtShareDir, key))
+		params.DisksURI = disksURI
+		params.DisksURISet = true
 	}
 
 	return params, nil
@@ -797,8 +795,6 @@ func (l *LibvirtDomainManager) migrateHelper(vmi *v1.VirtualMachineInstance, opt
 
 	var err error
 	var params *libvirt.DomainMigrateParameters
-
-	proxies := l.generateMigrationProxies(vmi)
 
 	domName := api.VMINamespaceKeyFunc(vmi)
 	dom, err := l.virConn.LookupDomainByName(domName)
@@ -823,7 +819,7 @@ func (l *LibvirtDomainManager) migrateHelper(vmi *v1.VirtualMachineInstance, opt
 			return fmt.Errorf("error encountered during preparing domain for migration: %v", err)
 		}
 
-		params, err = generateMigrationParams(dom, vmi, options)
+		params, err = generateMigrationParams(dom, vmi, options, l.virtShareDir)
 		if err != nil {
 			return fmt.Errorf("error encountered while generating migration parameters: %v", err)
 		}
@@ -834,15 +830,6 @@ func (l *LibvirtDomainManager) migrateHelper(vmi *v1.VirtualMachineInstance, opt
 	err = critSection()
 	if err != nil {
 		return err
-	}
-
-	// establish all connection proxies before starting migration
-	for _, proxy := range proxies {
-		defer proxy.Stop()
-		err := proxy.Start()
-		if err != nil {
-			return fmt.Errorf("error encountered during proxy setup: %v", err)
-		}
 	}
 
 	// initiate the live migration

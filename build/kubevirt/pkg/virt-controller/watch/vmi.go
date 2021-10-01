@@ -515,6 +515,14 @@ func (c *VMIController) updateStatus(vmi *virtv1.VirtualMachineInstance, pod *k8
 				}
 				vmiCopy.ObjectMeta.Labels[virtv1.NodeNameLabel] = pod.Spec.NodeName
 				vmiCopy.Status.NodeName = pod.Spec.NodeName
+
+				// Set the VMI migration transport now before the VMI can be migrated
+				// This status field is needed to support the migration of legacy virt-launchers
+				// to newer ones. In an absence of this field on the vmi, the target launcher
+				// will set up a TCP proxy, as expected by a legacy virt-launcher.
+				if shouldSetMigrationTransport(pod) {
+					vmiCopy.Status.MigrationTransport = virtv1.MigrationTransportUnix
+				}
 			} else if isPodDownOrGoingDown(pod) {
 				vmiCopy.Status.Phase = virtv1.Failed
 			}
@@ -1187,8 +1195,25 @@ func (c *VMIController) addVirtualMachineInstance(obj interface{}) {
 }
 
 func (c *VMIController) deleteVirtualMachineInstance(obj interface{}) {
-	c.lowerVMIExpectation(obj)
-	c.enqueueVirtualMachine(obj)
+	vmi, ok := obj.(*virtv1.VirtualMachineInstance)
+
+	// When a delete is dropped, the relist will notice a vmi in the store not
+	// in the list, leading to the insertion of a tombstone object which contains
+	// the deleted key/value. Note that this value might be stale.
+	if !ok {
+		tombstone, ok := obj.(cache.DeletedFinalStateUnknown)
+		if !ok {
+			log.Log.Reason(fmt.Errorf("couldn't get object from tombstone %+v", obj)).Error("Failed to process delete notification")
+			return
+		}
+		vmi, ok = tombstone.Obj.(*virtv1.VirtualMachineInstance)
+		if !ok {
+			log.Log.Reason(fmt.Errorf("tombstone contained object that is not a vmi %#v", obj)).Error("Failed to process delete notification")
+			return
+		}
+	}
+	c.lowerVMIExpectation(vmi)
+	c.enqueueVirtualMachine(vmi)
 }
 
 func (c *VMIController) updateVirtualMachineInstance(_, curr interface{}) {
@@ -1401,6 +1426,11 @@ func (c *VMIController) setActivePods(vmi *virtv1.VirtualMachineInstance) (*virt
 
 func isTempPod(pod *k8sv1.Pod) bool {
 	_, ok := pod.Annotations[virtv1.EphemeralProvisioningObject]
+	return ok
+}
+
+func shouldSetMigrationTransport(pod *k8sv1.Pod) bool {
+	_, ok := pod.Annotations[virtv1.MigrationTransportUnixAnnotation]
 	return ok
 }
 

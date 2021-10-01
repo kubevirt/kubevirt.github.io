@@ -108,6 +108,10 @@ func VirtualMachineInstanceKey(vmi *v1.VirtualMachineInstance) string {
 	return fmt.Sprintf("%v/%v", vmi.ObjectMeta.Namespace, vmi.ObjectMeta.Name)
 }
 
+func VirtualMachineKey(vm *v1.VirtualMachine) string {
+	return fmt.Sprintf("%v/%v", vm.ObjectMeta.Namespace, vm.ObjectMeta.Name)
+}
+
 func PodKey(pod *k8sv1.Pod) string {
 	return fmt.Sprintf("%v/%v", pod.Namespace, pod.Name)
 }
@@ -296,8 +300,12 @@ func VMIActivePodsCount(vmi *v1.VirtualMachineInstance, vmiPodInformer cache.Sha
 }
 
 func GeneratePatchBytes(ops []string) []byte {
-
 	return []byte(fmt.Sprintf("[%s]", strings.Join(ops, ", ")))
+}
+
+func EscapeJSONPointer(ptr string) string {
+	s := strings.ReplaceAll(ptr, "~", "~0")
+	return strings.ReplaceAll(s, "/", "~1")
 }
 
 func SetVMIPhaseTransitionTimestamp(oldVMI *v1.VirtualMachineInstance, newVMI *v1.VirtualMachineInstance) {

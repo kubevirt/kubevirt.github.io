@@ -1,4 +1,149 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.0">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-09-14T19:59:21+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.45.0</title><link href="https://kubevirt.io//2021/changelog-v0.45.0.html" rel="alternate" type="text/html" title="KubeVirt v0.45.0" /><published>2021-09-08T00:00:00+00:00</published><updated>2021-09-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.45.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.45.0.html">&lt;h2 id=&quot;v0450&quot;&gt;v0.45.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-10-01T23:13:15+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Import AWS AMIs as KubeVirt Golden Images</title><link href="https://kubevirt.io//2021/Importing-EC2-to-KubeVirt.html" rel="alternate" type="text/html" title="Import AWS AMIs as KubeVirt Golden Images" /><published>2021-09-21T00:00:00+00:00</published><updated>2021-09-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Importing-EC2-to-KubeVirt</id><content type="html" xml:base="https://kubevirt.io//2021/Importing-EC2-to-KubeVirt.html">&lt;h2 id=&quot;breaking-out&quot;&gt;Breaking Out&lt;/h2&gt;
+
+&lt;p&gt;There comes a point where an operations team has invested so heavily in a Iaas platform that they are effectively locked into that platform. For example, here’s one scenario outlining how this can happen. An operations team has created automation around building VM images and keeping images up-to-date. In AWS that automation likely involves starting an EC2 instance, injecting some application logic into that instance, sealing the instance’s boot source as an AMI, and finally copying that AMI around to all the AWS regions the team deploys in.&lt;/p&gt;
+
+&lt;p&gt;If the team was interested in evaluating KubeVirt as an alternative Iaas platform to AWS’s EC2, given the team’s existing tooling there’s not a clear path for doing this. It’s that scenario where the tooling in the &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import&quot;&gt;kubevirt-cloud-import&lt;/a&gt; project comes into play.&lt;/p&gt;
+
+&lt;h2 id=&quot;kubevirt-cloud-import&quot;&gt;Kubevirt Cloud Import&lt;/h2&gt;
+
+&lt;p&gt;The &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import&quot;&gt;KubeVirt Cloud Import&lt;/a&gt; project explores the practicality of transitioning VMs from various cloud providers into KubeVirt. As of writing this, automation for exporting AMIs from EC2 into KubeVirt works, and it’s really not all that complicated.&lt;/p&gt;
+
+&lt;p&gt;This blog post will explore the fundamentals of how AMIs are exported, and how the KubeVirt Cloud Import project leverages these techniques to build automation pipelines.&lt;/p&gt;
+
+&lt;h2 id=&quot;nuts-and-bolts-of-importing-amis&quot;&gt;Nuts and Bolts of Importing AMIs&lt;/h2&gt;
+
+&lt;h3 id=&quot;official-aws-ami-export-support&quot;&gt;Official AWS AMI Export Support&lt;/h3&gt;
+
+&lt;p&gt;AWS supports an &lt;a href=&quot;https://docs.aws.amazon.com/vm-import/latest/userguide/vmexport_image.html&quot;&gt;api&lt;/a&gt; for exporting AMIs as a file to an s3 bucket. This support works quite well, however there’s a long list of &lt;a href=&quot;https://docs.aws.amazon.com/vm-import/latest/userguide/vmexport_image.html#limits-image-export&quot;&gt;limitations&lt;/a&gt; that impact what AMIs are eligible for export. The most limiting of those items is the one that prevents any image built from an AMI on the marketplace from being eligible for the official export support.&lt;/p&gt;
+
+&lt;h3 id=&quot;unofficial-aws-export-support&quot;&gt;Unofficial AWS export Support&lt;/h3&gt;
+
+&lt;p&gt;Regardless of what AWS officially supports or not, there’s absolutely nothing preventing someone from exporting an AMI’s contents themselves. The technique just involves creating an EC2 instance, attaching an EBS volume (containing the AMI contents) as a block device, then streaming that block devices contents where ever you want.&lt;/p&gt;
+
+&lt;p&gt;Theoretically, the steps roughly look like this.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;Convert AMI to a volume by finding the underlying AMI’s snapshot and converting it to an EBS volume.&lt;/li&gt;
+  &lt;li&gt;Create an EC2 instance with the EBS volume containing the AMI contents as a secondary data device.&lt;/li&gt;
+  &lt;li&gt;Within the EC2 guest, copy the EBS device’s contents as a disk img &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;dd if=/dev/xvda of=/tmp/disk/disk.img&lt;/code&gt;&lt;/li&gt;
+  &lt;li&gt;Then upload the disk image to an object store like s3. &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;aws s3 cp /tmp/disk/disk.img s3://my-b1-bucket/ upload: ../tmp/disk/disk.img to s3://my-b1-bucket/disk.img&lt;/code&gt;&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;h3 id=&quot;basics-of-importing-data-into-kubevirt&quot;&gt;Basics of Importing Data into KubeVirt&lt;/h3&gt;
+
+&lt;p&gt;Once a disk image is in s3, a KubeVirt companion project called the &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;Containerized Data Importer&lt;/a&gt; (or CDI for short) can be used to import the disk from s3 into a PVC within the KubeVirt cluster. This import flow can be expressed as a CDI DataVolume custom resource.&lt;/p&gt;
+
+&lt;p&gt;Below is an example yaml for importing s3 contents into a PVC using a DataVolume&lt;/p&gt;
+
+&lt;div class=&quot;language-yaml highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;na&quot;&gt;apiVersion&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;cdi.kubevirt.io/v1beta1&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;kind&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;DataVolume&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;example-import-dv&quot;&lt;/span&gt;
+&lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;source&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;s3&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;https://s3.us-west-2.amazonaws.com/my-ami-exports/kubevirt-image-exports/export-ami-0dc4e69702f74df50.vmdk&quot;&lt;/span&gt;
+         &lt;span class=&quot;na&quot;&gt;secretRef&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;my-s3-credentials&quot;&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;pvc&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;accessModes&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;ReadWriteOnce&lt;/span&gt;
+    &lt;span class=&quot;na&quot;&gt;resources&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+      &lt;span class=&quot;na&quot;&gt;requests&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;storage&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;6Gi&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Once the AMI file content is stored in a PVC, CDI can be used further to clone that AMI’s PVC on a per VM basis. This effectively recreates the AMI to EC2 relationship that exists in AWS. You can find more information about CDI &lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;here&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;automating-ami-import&quot;&gt;Automating AMI import&lt;/h2&gt;
+
+&lt;p&gt;Using the technique of exporting an AMI to an s3 bucket and importing the AMI from s3 into a KubeVirt cluster using CDI, the Kubevirt Cloud Import project provides the glue necessary for tying all of these pieces together in the form of the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import-ami&lt;/code&gt; cli command and a Tekton task.&lt;/p&gt;
+
+&lt;h2 id=&quot;automation-using-the-import-ami-cli-command&quot;&gt;Automation using the import-ami CLI command&lt;/h2&gt;
+
+&lt;p&gt;The &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import-ami&lt;/code&gt; takes a set of arguments related to the AMI you wish to import into KubeVirt and the name of the PVC you’d like the AMI to be imported into. Upon execution, import-ami will call all the appropriate AWS and KubeVirt APIs to make this work. The result is a PVC with the AMI contents that is capable of being launched by a KubeVirt VM.&lt;/p&gt;
+
+&lt;p&gt;In the example below, A publicly shared &lt;a href=&quot;https://alt.fedoraproject.org/cloud/&quot;&gt;fedora34 AMI&lt;/a&gt; is imported into the KubeVirt cluster as a PVC called fedora34-golden-image&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;S3_BUCKET&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;my-bucket
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;S3_SECRET&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;s3-readonly-cred
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;AWS_REGION&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;us-west-2
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;AMI_ID&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;ami-00a4fdd3db8bb2851
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PVC_STORAGECLASS&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;rook-ceph-block
+&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PVC_NAME&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;fedora34-golden-image
+
+import-ami &lt;span class=&quot;nt&quot;&gt;--s3-bucket&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$S3_BUCKET&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--region&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$AWS_REGION&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--ami-id&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$AMI_ID&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pvc-storageclass&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$PVC_STORAGECLASS&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--s3-secret&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$S3_SECRET&lt;/span&gt; &lt;span class=&quot;nt&quot;&gt;--pvc-name&lt;/span&gt; &lt;span class=&quot;nv&quot;&gt;$PVC_NAME&lt;/span&gt;
+
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;h2 id=&quot;automation-using-the-import-ami-tekton-task&quot;&gt;Automation using the import-ami Tekton Task&lt;/h2&gt;
+
+&lt;p&gt;In addition to the &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;import-ami&lt;/code&gt; cli command, the KubeVirt Cloud Import project also includes a &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import/blob/main/tasks/import-ami/manifests/import-ami.yaml&quot;&gt;Tekton task&lt;/a&gt; which wraps the cli command and allows integrating AMI import into a Tekton pipeline.&lt;/p&gt;
+
+&lt;p&gt;Using a Tekton pipeline, someone can combine the task of importing an AMI into KubeVirt with the task of starting a VM using that AMI. An example pipeline can be found &lt;a href=&quot;https://raw.githubusercontent.com/davidvossel/kubevirt-cloud-import/main/examples/create-vm-from-ami-pipeline.yaml&quot;&gt;here&lt;/a&gt; which outlines how this is accomplished.&lt;/p&gt;
+
+&lt;p&gt;Below is a pipeline run that uses the example pipeline to import the publicly shared fedora34 AMI into a PVC, then starts a VM using that imported AMI.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;
+&lt;span class=&quot;nb&quot;&gt;cat&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;no&quot;&gt;EOF&lt;/span&gt;&lt;span class=&quot;sh&quot;&gt; &amp;gt; pipeline-run.yaml
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: my-vm-creation-pipeline
+  namespace: default
+spec:
+  serviceAccountName: my-kubevirt-service-account
+  pipelineRef:
+    name: create-vm-pipeline 
+  params:
+    - name: vmName
+      value: vm-fedora34
+    - name: s3Bucket
+      value: my-kubevirt-exports
+    - name: s3ReadCredentialsSecret
+      value: my-s3-read-only-credentials
+    - name: awsRegion
+      value: us-west-2
+    - name: amiId 
+      value: ami-00a4fdd3db8bb2851
+    - name: pvcStorageClass 
+      value: rook-ceph-block
+    - name: pvcName
+      value: fedora34
+    - name: pvcNamespace
+      value: default
+    - name: pvcSize
+      value: 6Gi
+    - name: pvcAccessMode
+      value: ReadWriteOnce
+    - name: awsCredentialsSecret
+      value: my-aws-credentials
+&lt;/span&gt;&lt;span class=&quot;no&quot;&gt;EOF
+
+&lt;/span&gt;kubectl create &lt;span class=&quot;nt&quot;&gt;-f&lt;/span&gt; pipeline-run.yaml
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;After posting the pipeline run, watch for the pipeline run to complete.&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get pipelinerun
+selecting docker as container runtime
+NAME                      SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+my-vm-creation-pipeline   True        Succeeded   11m         9m54s
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;Then observe that the resulting VM is online&lt;/p&gt;
+
+&lt;div class=&quot;language-bash highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;kubectl get vmi
+selecting docker as container runtime
+NAME          AGE   PHASE     IP               NODENAME   READY
+vm-fedora34   11m   Running   10.244.196.175   node01     True
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;For more detailed and up-to-date information about how to automate AMI import using Tekton, view the KubeVirt Cloud Import &lt;a href=&quot;https://github.com/davidvossel/kubevirt-cloud-import/blob/main/README.md&quot;&gt;README.md&lt;/a&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;key-takeaways&quot;&gt;Key Takeaways&lt;/h2&gt;
+
+&lt;p&gt;The portability of workloads across different environments is becoming increasingly important and operations teams need to be vigilant about avoiding vendor lock in. For containers, Kubernetes is an attractive option because it provides a consistent API layer that can run across multiple cloud platforms. KubeVirt can provide that same level of consistency for VMs. As a community we need to invest further into automation tools that allow people to make the transition to KubeVirt.&lt;/p&gt;</content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="AWS" /><category term="EC2" /><category term="AMI" /><summary type="html">Breaking Out</summary></entry><entry><title type="html">KubeVirt v0.45.0</title><link href="https://kubevirt.io//2021/changelog-v0.45.0.html" rel="alternate" type="text/html" title="KubeVirt v0.45.0" /><published>2021-09-08T00:00:00+00:00</published><updated>2021-09-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.45.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.45.0.html">&lt;h2 id=&quot;v0450&quot;&gt;v0.45.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Wed Sep 8 13:56:47 2021 +0000&lt;/p&gt;
 
@@ -1286,7 +1431,7 @@ You can also change the Answer File according to your needs by consulting the al
 &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
   &lt;span class=&quot;na&quot;&gt;name&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-autounattend&lt;/span&gt;
 &lt;span class=&quot;na&quot;&gt;data&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;Autounattend.xml&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
+  &lt;span class=&quot;na&quot;&gt;Autounattend.xml&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;pi&quot;&gt;|&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;&amp;lt;?xml version=&quot;1.0&quot; encoding=&quot;utf-8&quot;?&amp;gt;&lt;/span&gt;
     &lt;span class=&quot;s&quot;&gt;&amp;lt;unattend xmlns=&quot;urn:schemas-microsoft-com:unattend&quot;&amp;gt;&lt;/span&gt;
         &lt;span class=&quot;s&quot;&gt;&amp;lt;settings pass=&quot;windowsPE&quot;&amp;gt;&lt;/span&gt;
@@ -1741,7 +1886,7 @@ You need to replace PVC_NAME with &lt;code class=&quot;language-plaintext highli
   &lt;span class=&quot;na&quot;&gt;template&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;metadata&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;labels&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
-        &lt;span class=&quot;s&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm&lt;/span&gt;
+        &lt;span class=&quot;na&quot;&gt;kubevirt.io/domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;windows-10-vm&lt;/span&gt;
     &lt;span class=&quot;na&quot;&gt;spec&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
       &lt;span class=&quot;na&quot;&gt;domain&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
         &lt;span class=&quot;na&quot;&gt;cpu&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt;
@@ -1791,35 +1936,4 @@ You need to replace PVC_NAME with &lt;code class=&quot;language-plaintext highli
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer&quot;&gt;YAML files used in this example&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt-tekton-tasks&quot;&gt;KubeVirt Tekton Tasks&lt;/a&gt;&lt;/li&gt;
   &lt;li&gt;&lt;a href=&quot;https://github.com/tektoncd/pipeline&quot;&gt;Tekton Pipelines&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>Filip Křepinský</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Tekton Pipelines" /><category term="KubeVirt Tekton Tasks" /><category term="Windows" /><summary type="html">Introduction</summary></entry><entry><title type="html">KubeVirt v0.40.0</title><link href="https://kubevirt.io//2021/changelog-v0.40.0.html" rel="alternate" type="text/html" title="KubeVirt v0.40.0" /><published>2021-04-19T00:00:00+00:00</published><updated>2021-04-19T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.40.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.40.0.html">&lt;h2 id=&quot;v0400&quot;&gt;v0.40.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Mon Apr 19 12:25:41 2021 +0000&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[PR #5467][rmohr] Fixes upgrades from KubeVirt v0.36&lt;/li&gt;
-  &lt;li&gt;[PR #5350][jean-edouard] Removal of entire &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;permittedHostDevices&lt;/code&gt; section will now remove all user-defined host device plugins.&lt;/li&gt;
-  &lt;li&gt;[PR #5242][jean-edouard] Creating more than 1 migration at the same time for a given VMI will now fail&lt;/li&gt;
-  &lt;li&gt;[PR #4907][vasiliy-ul] Initial cgroupv2 support&lt;/li&gt;
-  &lt;li&gt;[PR #5324][jean-edouard] Default feature gates can now be defined in the provider configuration.&lt;/li&gt;
-  &lt;li&gt;[PR #5006][alicefr] Add discard=unmap option&lt;/li&gt;
-  &lt;li&gt;[PR #5022][davidvossel] Fixes race condition between operator adding service and webhooks that can result in installs/uninstalls failing&lt;/li&gt;
-  &lt;li&gt;[PR #5310][ashleyschuett] Reconcile CRD resources&lt;/li&gt;
-  &lt;li&gt;[PR #5102][iholder-redhat] Go version updated to 1.14.14&lt;/li&gt;
-  &lt;li&gt;[PR #4746][ashleyschuett] Reconcile Deployments, DaemonSets, MutatingWebhookConfigurations and ValidatingWebhookConfigurations&lt;/li&gt;
-  &lt;li&gt;[PR #5037][ormergi] Hot-plug SR-IOV VF interfaces to VM’s post a successful migration.&lt;/li&gt;
-  &lt;li&gt;[PR #5269][mlsorensen] Prometheus metrics scraped from virt-handler are now served from the VMI informer cache, rather than calling back to the Kubernetes API for VMI information.&lt;/li&gt;
-  &lt;li&gt;[PR #5138][davidvossel] virt-handler now waits up to 5 minutes for all migrations on the node to complete before shutting down.&lt;/li&gt;
-  &lt;li&gt;[PR #5191][yuvalturg] Added a metric for monitoring CPU affinity&lt;/li&gt;
-  &lt;li&gt;[PR #5215][xphyr] Enable detection of Intel GVT-g vGPU.&lt;/li&gt;
-  &lt;li&gt;[PR #4760][rmohr] Make virt-handler heartbeat more efficient and robust: Only one combined PATCH and no need to detect different cluster types anymore.&lt;/li&gt;
-  &lt;li&gt;[PR #5091][iholder-redhat] QEMU SeaBios debug logs are being seen as part of virt-launcher log.&lt;/li&gt;
-  &lt;li&gt;[PR #5221][rmohr] Remove  workload placement validation webhook which blocks placement updates when VMIs are running&lt;/li&gt;
-  &lt;li&gt;[PR #5128][yuvalturg] Modified memory related metrics by adding several new metrics and splitting the swap traffic bytes metric&lt;/li&gt;
-  &lt;li&gt;[PR #5084][ashleyschuett] Add validation to CustomizeComponents object on the KubeVirt resource&lt;/li&gt;
-  &lt;li&gt;[PR #5182][davidvossel] New [release-blocker] functional test marker to signify tests that can never be disabled before making a release&lt;/li&gt;
-  &lt;li&gt;[PR #5137][davidvossel] Added our policy around release branch backporting in docs/release-branch-backporting.md&lt;/li&gt;
-  &lt;li&gt;[PR #5096][yuvalturg] Modified networking metrics by adding new metrics, splitting existing ones by rx/tx and using the device alias for the interface name when available&lt;/li&gt;
-  &lt;li&gt;[PR #5088][awels] Hotplug works with hostpath storage.&lt;/li&gt;
-  &lt;li&gt;[PR #4908][dhiller] Move travis tag and master builds to kubevirt prow.&lt;/li&gt;
-  &lt;li&gt;[PR #4741][EdDev] Allow live migration for SR-IOV VM/s without preserving the VF interfaces.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.40.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>Filip Křepinský</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Tekton Pipelines" /><category term="KubeVirt Tekton Tasks" /><category term="Windows" /><summary type="html">Introduction</summary></entry></feed>

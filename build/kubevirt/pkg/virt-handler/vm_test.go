@@ -1224,7 +1224,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Expect(notReadySince.Before(time.Now())).To(BeTrue())
 					return true, nil
 				})
-				mockContainerDiskMounter.EXPECT().Mount(gomock.Any(), gomock.Any()).Return(fmt.Errorf("aborting since we only want to reach this point"))
+				mockContainerDiskMounter.EXPECT().MountAndVerify(gomock.Any()).Return(nil, fmt.Errorf("aborting since we only want to reach this point"))
 				vmiInterface.EXPECT().Update(gomock.Any()).AnyTimes()
 
 				controller.Execute()
@@ -1545,7 +1545,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			updatedVmi.Status.MigrationState.TargetDirectMigrationNodePorts = destSrcPorts
 
 			client.EXPECT().Ping()
-			client.EXPECT().SyncMigrationTarget(vmi)
+			client.EXPECT().SyncMigrationTarget(vmi, gomock.Any())
 			vmiInterface.EXPECT().Update(updatedVmi)
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIMigrationTargetPrepared)
@@ -1787,6 +1787,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			vmiUpdated := vmi.DeepCopy()
 			vmiUpdated.Status.MigrationState.Completed = true
+			vmiUpdated.Status.MigrationTransport = v1.MigrationTransportUnix
 			vmiUpdated.Status.MigrationState.StartTimestamp = &now
 			vmiUpdated.Status.MigrationState.EndTimestamp = &now
 			vmiUpdated.Status.NodeName = "othernode"

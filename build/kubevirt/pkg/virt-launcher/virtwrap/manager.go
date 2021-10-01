@@ -97,7 +97,7 @@ type DomainManager interface {
 	MarkGracefulShutdownVMI(*v1.VirtualMachineInstance) error
 	ListAllDomains() ([]*api.Domain, error)
 	MigrateVMI(*v1.VirtualMachineInstance, *cmdclient.MigrationOptions) error
-	PrepareMigrationTarget(*v1.VirtualMachineInstance, bool) error
+	PrepareMigrationTarget(*v1.VirtualMachineInstance, bool, *cmdv1.VirtualMachineOptions) error
 	GetDomainStats() ([]*stats.DomainStats, error)
 	CancelVMIMigration(*v1.VirtualMachineInstance) error
 	GetGuestInfo() (v1.VirtualMachineInstanceGuestAgentInfo, error)
@@ -130,6 +130,7 @@ type LibvirtDomainManager struct {
 	networkCacheStoreFactory cache.InterfaceCacheFactory
 	ephemeralDiskCreator     ephemeraldisk.EphemeralDiskCreatorInterface
 	directIOChecker          converter.DirectIOChecker
+	disksInfo                map[string]*cmdv1.DiskInfo
 }
 
 type hostDeviceTypePrefix struct {
@@ -177,6 +178,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir string, age
 		networkCacheStoreFactory: cache.NewInterfaceCacheFactory(),
 		ephemeralDiskCreator:     ephemeralDiskCreator,
 		directIOChecker:          directIOChecker,
+		disksInfo:                map[string]*cmdv1.DiskInfo{},
 	}
 	manager.credManager = accesscredentials.NewManager(connection, &manager.domainModifyLock)
 
@@ -288,8 +290,12 @@ func (l *LibvirtDomainManager) getGuestTimeContext() context.Context {
 }
 
 // PrepareMigrationTarget the target pod environment before the migration is initiated
-func (l *LibvirtDomainManager) PrepareMigrationTarget(vmi *v1.VirtualMachineInstance, allowEmulation bool) error {
-	return l.prepareMigrationTarget(vmi, allowEmulation)
+func (l *LibvirtDomainManager) PrepareMigrationTarget(
+	vmi *v1.VirtualMachineInstance,
+	allowEmulation bool,
+	options *cmdv1.VirtualMachineOptions,
+) error {
+	return l.prepareMigrationTarget(vmi, allowEmulation, options)
 }
 
 // FinalizeVirtualMachineMigration finalized the migration after the migration has completed and vmi is running on target pod.
@@ -422,10 +428,21 @@ func (l *LibvirtDomainManager) generateCloudInitISO(vmi *v1.VirtualMachineInstan
 // The Domain.Spec can be alterned in this function and any changes
 // made to the domain will get set in libvirt after this function exits.
 func (l *LibvirtDomainManager) preStartHook(vmi *v1.VirtualMachineInstance, domain *api.Domain) (*api.Domain, error) {
-
 	logger := log.Log.Object(vmi)
 
 	logger.Info("Executing PreStartHook on VMI pod environment")
+
+	disksInfo := map[string]*containerdisk.DiskInfo{}
+	for k, v := range l.disksInfo {
+		if v != nil {
+			disksInfo[k] = &containerdisk.DiskInfo{
+				Format:      v.Format,
+				BackingFile: v.BackingFile,
+				ActualSize:  int(v.ActualSize),
+				VirtualSize: int(v.VirtualSize),
+			}
+		}
+	}
 
 	// generate cloud-init data
 	cloudInitData, err := cloudinit.ReadCloudInitVolumeDataSource(vmi, config.SecretSourceDir)
@@ -468,7 +485,7 @@ func (l *LibvirtDomainManager) preStartHook(vmi *v1.VirtualMachineInstance, doma
 	}
 
 	// Create ephemeral disk for container disks
-	err = containerdisk.CreateEphemeralImages(vmi, l.ephemeralDiskCreator)
+	err = containerdisk.CreateEphemeralImages(vmi, l.ephemeralDiskCreator, disksInfo)
 	if err != nil {
 		return domain, fmt.Errorf("preparing ephemeral container disk images failed: %v", err)
 	}
@@ -632,8 +649,7 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 	// Check if PVC volumes are block volumes
 	isBlockPVCMap := make(map[string]bool)
 	isBlockDVMap := make(map[string]bool)
-	diskInfo := make(map[string]*containerdisk.DiskInfo)
-	for i, volume := range vmi.Spec.Volumes {
+	for _, volume := range vmi.Spec.Volumes {
 		if volume.VolumeSource.PersistentVolumeClaim != nil {
 			isBlockPVC := false
 			if _, ok := hotplugVolumes[volume.Name]; ok {
@@ -642,16 +658,6 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 				isBlockPVC, _ = isBlockDeviceVolume(volume.Name)
 			}
 			isBlockPVCMap[volume.Name] = isBlockPVC
-		} else if volume.VolumeSource.ContainerDisk != nil {
-			image, err := containerdisk.GetDiskTargetPartFromLauncherView(i)
-			if err != nil {
-				return nil, err
-			}
-			info, err := converter.GetImageInfo(image)
-			if err != nil {
-				return nil, err
-			}
-			diskInfo[volume.Name] = info
 		} else if volume.VolumeSource.DataVolume != nil {
 			isBlockDV := false
 			if _, ok := hotplugVolumes[volume.Name]; ok {
@@ -687,7 +693,6 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 		CPUSet:                podCPUSet,
 		IsBlockPVC:            isBlockPVCMap,
 		IsBlockDV:             isBlockDVMap,
-		DiskType:              diskInfo,
 		EFIConfiguration:      efiConf,
 		UseVirtioTransitional: vmi.Spec.Domain.Devices.UseVirtioTransitional != nil && *vmi.Spec.Domain.Devices.UseVirtioTransitional,
 		PermanentVolumes:      permanentVolumes,
@@ -704,7 +709,12 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 		c.MemBalloonStatsPeriod = uint(options.MemBalloonStatsPeriod)
 		// Add preallocated and thick-provisioned volumes for which we need to avoid the discard=unmap option
 		c.VolumesDiscardIgnore = options.PreallocatedVolumes
+
+		if len(options.DisksInfo) > 0 {
+			l.disksInfo = options.DisksInfo
+		}
 	}
+	c.DisksInfo = l.disksInfo
 
 	if !isMigrationTarget {
 		sriovDevices, err := sriov.CreateHostDevices(vmi)
@@ -1343,6 +1353,19 @@ func (l *LibvirtDomainManager) GetDomainStats() ([]*stats.DomainStats, error) {
 	return l.virConn.GetDomainStats(statsTypes, flags)
 }
 
+func addToDeviceMetadata(metadataType cloudinit.DeviceMetadataType, address *api.Address, mac string, tag string, devicesMetadata []cloudinit.DeviceData) []cloudinit.DeviceData {
+	pciAddrStr := fmt.Sprintf("%s:%s:%s:%s", address.Domain[2:], address.Bus[2:], address.Slot[2:], address.Function[2:])
+	deviceData := cloudinit.DeviceData{
+		Type:    metadataType,
+		Bus:     address.Type,
+		Address: pciAddrStr,
+		MAC:     mac,
+		Tags:    []string{tag},
+	}
+	devicesMetadata = append(devicesMetadata, deviceData)
+	return devicesMetadata
+}
+
 func (l *LibvirtDomainManager) buildDevicesMetadata(vmi *v1.VirtualMachineInstance, dom cli.VirDomain) ([]cloudinit.DeviceData, error) {
 	taggedInterfaces := make(map[string]v1.Interface)
 	var devicesMetadata []cloudinit.DeviceData
@@ -1358,23 +1381,31 @@ func (l *LibvirtDomainManager) buildDevicesMetadata(vmi *v1.VirtualMachineInstan
 	if err != nil {
 		return nil, err
 	}
+
 	interfaces := devices.Interfaces
 	for _, nic := range interfaces {
 		if data, exist := taggedInterfaces[nic.Alias.GetName()]; exist {
-			address := nic.Address
 			var mac string
 			if nic.MAC != nil {
 				mac = nic.MAC.MAC
 			}
-			pciAddrStr := fmt.Sprintf("%s:%s:%s:%s", address.Domain[2:], address.Bus[2:], address.Slot[2:], address.Function[2:])
-			deviceData := cloudinit.DeviceData{
-				Type:    cloudinit.NICMetadataType,
-				Bus:     nic.Address.Type,
-				Address: pciAddrStr,
-				MAC:     mac,
-				Tags:    []string{data.Tag},
-			}
-			devicesMetadata = append(devicesMetadata, deviceData)
+			devicesMetadata = addToDeviceMetadata(cloudinit.NICMetadataType,
+				nic.Address,
+				mac,
+				data.Tag,
+				devicesMetadata)
+		}
+	}
+
+	hostDevices := devices.HostDevices
+	for _, dev := range hostDevices {
+		devAliasNoPrefix := strings.Replace(dev.Alias.GetName(), sriov.AliasPrefix, "", -1)
+		if data, exist := taggedInterfaces[devAliasNoPrefix]; exist {
+			devicesMetadata = addToDeviceMetadata(cloudinit.NICMetadataType,
+				dev.Address,
+				"",
+				data.Tag,
+				devicesMetadata)
 		}
 	}
 	return devicesMetadata, nil

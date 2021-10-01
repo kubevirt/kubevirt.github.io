@@ -17,15 +17,6 @@
 # Copyright 2017 Red Hat, Inc.
 #
 
-# CI considerations: $TARGET is used by the jenkins build, to distinguish what to test
-# Currently considered $TARGET values:
-#     vagrant-dev: Runs all functional tests on a development vagrant setup (deprecated)
-#     vagrant-release: Runs all possible functional tests on a release deployment in vagrant (deprecated)
-#     kubernetes-dev: Runs all functional tests on a development kubernetes setup
-#     kubernetes-release: Runs all functional tests on a release kubernetes setup
-#     openshift-release: Runs all functional tests on a release openshift setup
-#     TODO: vagrant-tagged-release: Runs all possible functional tests on a release deployment in vagrant on a tagged release
-
 set -ex
 
 export TIMESTAMP=${TIMESTAMP:-1}
@@ -61,7 +52,7 @@ elif [[ $TARGET =~ sig-storage ]]; then
 elif [[ $TARGET =~ sig-compute ]]; then
   export KUBEVIRT_PROVIDER=${TARGET/-sig-compute/}
 elif [[ $TARGET =~ sig-operator ]]; then
-  export KUBEVIRT_PROVIDER=${TARGET/-sig-operator/}  
+  export KUBEVIRT_PROVIDER=${TARGET/-sig-operator/}
 else
   export KUBEVIRT_PROVIDER=${TARGET}
 fi
@@ -73,7 +64,7 @@ fi
 
 if [[ $TARGET =~ sriov.* ]]; then
   export KUBEVIRT_NUM_NODES=3
-  export KUBEVIRT_DEPLOY_CDI=false
+  export KUBEVIRT_DEPLOY_CDI="false"
 elif [[ $TARGET =~ vgpu.* ]]; then
   export KUBEVIRT_NUM_NODES=1
 else
@@ -184,13 +175,32 @@ fi
 kubectl() { KUBEVIRTCI_VERBOSE=false cluster-up/kubectl.sh "$@"; }
 cli() { cluster-up/cli.sh "$@"; }
 
+determine_cri_bin() {
+    if [ "${KUBEVIRTCI_RUNTIME}" = "podman" ]; then
+        echo podman
+    elif [ "${KUBEVIRTCI_RUNTIME}" = "docker" ]; then
+        echo docker
+    else
+        if curl --unix-socket /${HOME}/podman.sock http://d/v3.0.0/libpod/info >/dev/null 2>&1; then
+            echo podman
+        elif docker ps >/dev/null; then
+            echo docker
+        else
+            >&2 echo "no working container runtime found. Neither docker nor podman seems to work."
+            exit 1
+        fi
+    fi
+}
+
 collect_debug_logs() {
     local containers
 
-    containers=( $(docker ps -a --format '{{ .Names }}') )
+    local cri_bin="$(determine_cri_bin)"
+
+    containers=( $("${cri_bin}" ps -a --format '{{ .Names }}') )
     for container in "${containers[@]}"; do
         echo "======== $container ========"
-        docker logs "$container"
+        "${cri_bin}" logs "$container"
     done
 }
 
@@ -257,11 +267,11 @@ timeout=300
 sample=30
 
 for i in ${namespaces[@]}; do
-  # Wait until kubevirt pods are running
+  # Wait until kubevirt pods are running or completed
   current_time=0
-  while [ -n "$(kubectl get pods -n $i --no-headers | grep -v Running)" ]; do
-    echo "Waiting for kubevirt pods to enter the Running state ..."
-    kubectl get pods -n $i --no-headers | >&2 grep -v Running || true
+  while [ -n "$(kubectl get pods -n $i --no-headers | grep -v -E 'Running|Completed')" ]; do
+    echo "Waiting for kubevirt pods to enter the Running/Completed state ..."
+    kubectl get pods -n $i --no-headers | >&2 grep -v -E 'Running|Completed' || true
     sleep $sample
 
     current_time=$((current_time + sample))
@@ -274,9 +284,9 @@ for i in ${namespaces[@]}; do
 
   # Make sure all containers are ready
   current_time=0
-  while [ -n "$(kubectl get pods -n $i -o'custom-columns=status:status.containerStatuses[*].ready' --no-headers | grep false)" ]; do
+  while [ -n "$(kubectl get pods -n $i --field-selector=status.phase==Running -o'custom-columns=status:status.containerStatuses[*].ready' --no-headers | grep false)" ]; do
     echo "Waiting for KubeVirt containers to become ready ..."
-    kubectl get pods -n $i -o'custom-columns=status:status.containerStatuses[*].ready' --no-headers | grep false || true
+    kubectl get pods -n $i --field-selector=status.phase==Running -o'custom-columns=status:status.containerStatuses[*].ready' --no-headers | grep false || true
     sleep $sample
 
     current_time=$((current_time + sample))
@@ -365,6 +375,20 @@ if [[ -z ${KUBEVIRT_E2E_FOCUS} && -z ${KUBEVIRT_E2E_SKIP} ]]; then
   fi
 fi
 
+if [[ $KUBEVIRT_NONROOT =~ true ]]; then
+  if [[ -z $KUBEVIRT_E2E_FOCUS ]]; then
+    export KUBEVIRT_E2E_FOCUS="\\[verify-nonroot\\]"
+  else
+    export KUBEVIRT_E2E_FOCUS="$KUBEVIRT_E2E_FOCUS|\\[verify-nonroot\\]"
+  fi
+else
+  if [[ -z $KUBEVIRT_E2E_SKIP ]]; then
+    export KUBEVIRT_E2E_SKIP="\\[verify-nonroot\\]"
+  else
+    export KUBEVIRT_E2E_SKIP="$KUBEVIRT_E2E_SKIP|\\[verify-nonroot\\]"
+  fi
+fi
+
 # If KUBEVIRT_QUARANTINE is not set, do not run quarantined tests. When it is
 # set the whole suite (quarantined and stable) will be run.
 if [ -z "$KUBEVIRT_QUARANTINE" ]; then
@@ -372,6 +396,10 @@ if [ -z "$KUBEVIRT_QUARANTINE" ]; then
         export KUBEVIRT_E2E_SKIP="${KUBEVIRT_E2E_SKIP}|QUARANTINE"
     else
         export KUBEVIRT_E2E_SKIP="QUARANTINE"
+    fi
+    # quarantine test_id:3145 only for nonroot lanes
+    if [[ $KUBEVIRT_NONROOT =~ true ]]; then
+        export KUBEVIRT_E2E_SKIP="${KUBEVIRT_E2E_SKIP}|test_id:3145"
     fi
 fi
 

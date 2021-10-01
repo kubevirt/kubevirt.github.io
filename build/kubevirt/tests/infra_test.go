@@ -122,7 +122,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			return duration
 		}
 
-		It("on the controller rate limiter should lead to delayed VMI starts", func() {
+		It("[QUARANTINE]on the controller rate limiter should lead to delayed VMI starts", func() {
 			By("first getting the basetime for a replicaset")
 			replicaset := tests.NewRandomReplicaSetFromVMI(libvmi.NewCirros(libvmi.WithResourceMemory("1Mi")), int32(0))
 			replicaset, err = virtClient.ReplicaSet(util.NamespaceTestDefault).Create(replicaset)
@@ -152,7 +152,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			Expect(slowDuration.Seconds()).To(BeNumerically(">", 2*fastDuration.Seconds()))
 		})
 
-		It("on the virt handler rate limiter should lead to delayed VMI running states", func() {
+		It("[QUARANTINE]on the virt handler rate limiter should lead to delayed VMI running states", func() {
 			By("first getting the basetime for a replicaset")
 			targetNode := util.GetAllSchedulableNodes(virtClient).Items[0]
 			vmi := libvmi.NewCirros(
@@ -1546,6 +1546,38 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		})
 	})
 
+	Describe("cluster profiler for pprof data aggregation", func() {
+		BeforeEach(func() {
+			tests.BeforeTestCleanup()
+		})
+
+		Context("when ClusterProfiler feature gate", func() {
+			It("is disabled it should prevent subresource access", func() {
+				tests.DisableFeatureGate("ClusterProfiler")
+
+				err := virtClient.ClusterProfiler().Start()
+				Expect(err).ToNot(BeNil())
+
+				err = virtClient.ClusterProfiler().Stop()
+				Expect(err).ToNot(BeNil())
+
+				_, err = virtClient.ClusterProfiler().Dump()
+				Expect(err).ToNot(BeNil())
+			})
+			It("is enabled it should allow subresource access", func() {
+				tests.EnableFeatureGate("ClusterProfiler")
+
+				err := virtClient.ClusterProfiler().Start()
+				Expect(err).To(BeNil())
+
+				err = virtClient.ClusterProfiler().Stop()
+				Expect(err).To(BeNil())
+
+				_, err = virtClient.ClusterProfiler().Dump()
+				Expect(err).To(BeNil())
+			})
+		})
+	})
 })
 
 func getLeader() string {

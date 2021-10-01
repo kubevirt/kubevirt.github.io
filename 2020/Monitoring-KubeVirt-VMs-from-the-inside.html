@@ -219,7 +219,7 @@ document.addEventListener("click", function (e) {
 </script>
 
 <script>
-var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", ]
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", "AWS", "EC2", "AMI", ]
 autocomplete(document.getElementById("search-input"), mykeywords);
 </script>
 
@@ -381,7 +381,7 @@ kubectl rollout status <span class="nt">-n</span> cdi deployment cdi-deployment
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">monitorable-vm</span>
       <span class="na">labels</span><span class="pi">:</span>
-        <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+        <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">domain</span><span class="pi">:</span>
         <span class="na">resources</span><span class="pi">:</span>
@@ -448,7 +448,7 @@ EOF'</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">monitorable-vm-node-exporter</span>
   <span class="na">labels</span><span class="pi">:</span>
-    <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+    <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">ports</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">metrics</span>
@@ -456,7 +456,7 @@ EOF'</span>
     <span class="na">targetPort</span><span class="pi">:</span> <span class="m">9100</span>
     <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
   <span class="na">selector</span><span class="pi">:</span>
-    <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+    <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
 <span class="nn">---</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">monitoring.coreos.com/v1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">ServiceMonitor</span>
@@ -464,14 +464,14 @@ EOF'</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt-node-exporters-servicemonitor</span>
   <span class="na">namespace</span><span class="pi">:</span> <span class="s">monitoring</span>
   <span class="na">labels</span><span class="pi">:</span>
-    <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+    <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
     <span class="na">release</span><span class="pi">:</span> <span class="s">monitoring</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">namespaceSelector</span><span class="pi">:</span>
     <span class="na">any</span><span class="pi">:</span> <span class="no">true</span>
   <span class="na">selector</span><span class="pi">:</span>
     <span class="na">matchLabels</span><span class="pi">:</span>
-      <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+      <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
   <span class="na">endpoints</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="s">metrics</span>
     <span class="na">interval</span><span class="pi">:</span> <span class="s">15s</span>
@@ -486,7 +486,7 @@ EOF'</span>
     <span class="na">targetPort</span><span class="pi">:</span> <span class="m">9100</span>
     <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
   <span class="na">selector</span><span class="pi">:</span>
-    <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+    <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
 </code></pre></div></div>
 
 <p>On the specification, we are creating a new port named <code class="language-plaintext highlighter-rouge">metrics</code> that will be redirected to every pod labeled with <code class="language-plaintext highlighter-rouge">prometheus.kubevirt.io: "node-exporter"</code>, at port 9100, which is the default port number for the node-exporter.</p>
@@ -496,7 +496,7 @@ EOF'</span>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">monitorable-vm-node-exporter</span>
   <span class="na">labels</span><span class="pi">:</span>
-    <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+    <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
 </code></pre></div></div>
 
 <p>We are also labeling the Service itself with <code class="language-plaintext highlighter-rouge">prometheus.kubevirt.io: "node-exporter"</code>, that will be used by the <code class="language-plaintext highlighter-rouge">ServiceMonitor</code> object.</p>
@@ -508,7 +508,7 @@ EOF'</span>
     <span class="na">any</span><span class="pi">:</span> <span class="no">true</span>
   <span class="na">selector</span><span class="pi">:</span>
     <span class="na">matchLabels</span><span class="pi">:</span>
-      <span class="s">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
+      <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
   <span class="na">endpoints</span><span class="pi">:</span>
   <span class="pi">-</span> <span class="na">port</span><span class="pi">:</span> <span class="s">metrics</span>
     <span class="na">interval</span><span class="pi">:</span> <span class="s">15s</span>
@@ -540,7 +540,7 @@ kubectl describe <span class="nt">-n</span> monitoring prometheuses.monitoring.c
 <p>With this behavior, alerts like the one below won’t work since our target is literally gone, not down.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">alert</span><span class="pi">:</span> <span class="s">KubeVirtVMDown</span>
-    <span class="s">expr</span><span class="pi">:</span> <span class="s">up{pod=~"virt-launcher.*"} == </span><span class="m">0</span>
+    <span class="s">expr</span><span class="err">:</span> <span class="s">up{pod=~"virt-launcher.*"} == </span><span class="m">0</span>
     <span class="na">for</span><span class="pi">:</span> <span class="s">1m</span>
     <span class="na">labels</span><span class="pi">:</span>
       <span class="na">severity</span><span class="pi">:</span> <span class="s">warning</span>
@@ -551,7 +551,7 @@ kubectl describe <span class="nt">-n</span> monitoring prometheuses.monitoring.c
 <p><strong>BUT</strong>, if the VM is constantly crashing without being stopped, the pod won’t be killed and the target will still be monitored. Node-exporter will never start or will go down constantly alongside the VM, so an alert like this might work:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">alert</span><span class="pi">:</span> <span class="s">KubeVirtVMCrashing</span>
-    <span class="s">expr</span><span class="pi">:</span> <span class="s">up{pod=~"virt-launcher.*"} == </span><span class="m">0</span>
+    <span class="s">expr</span><span class="err">:</span> <span class="s">up{pod=~"virt-launcher.*"} == </span><span class="m">0</span>
     <span class="na">for</span><span class="pi">:</span> <span class="s">5m</span>
     <span class="na">labels</span><span class="pi">:</span>
       <span class="na">severity</span><span class="pi">:</span> <span class="s">critical</span>
