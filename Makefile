@@ -102,9 +102,6 @@ else
 endif
 endif
 
-ifndef LINT_IMAGE
-	@$(eval export LINT_IMAGE=quay.io/tauerbec/markdownlint-cli:latest)
-endif
 
 ## Build site. This target should only be used by Netlify and Prow
 build: envvar
@@ -163,6 +160,13 @@ check_links: | envvar stop
 #END BIG SHELL SCRIPT
 
 
+## Check markdown linting
+check_lint: | envvar stop
+	@echo "${GREEN}Makefile: Linting Markdown files using ${LINT_IMAGE}${RESET}"
+	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache --workdir=/srv ${IMGTAG} /bin/bash -c 'markdownlint -c .markdownlint.yaml -i .markdownlintignore **/*.md'
+	@echo
+
+
 ## Check spelling on content
 check_spelling: | envvar stop
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
@@ -219,10 +223,3 @@ stop: | envvar
 	@echo "${GREEN}Makefile: Stop running container${RESET}"
 	${CONTAINER_ENGINE} rm -f website 2> /dev/null; echo
 	@echo -n
-
-## Check markdown linting
-check_lint: | envvar
-	@echo "${GREEN}Makefile: Linting Markdown files using ${LINT_IMAGE}${RESET}"
-	${CONTAINER_ENGINE} run -it --rm -v ${PWD}:/src:ro${SELINUX_ENABLED} --workdir /src ${LINT_IMAGE} **/*.md
-	@echo
-
