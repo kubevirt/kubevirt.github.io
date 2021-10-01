@@ -218,12 +218,6 @@ When this VM manifest is posted to the cluster, as part of the launch flow a pvc
 
 #### A few caveats to be considered before using DataVolumes
 
-From the above manifest the two main sections that needs an attention are `source` and `pvc`.
-
-The `source` part declares that there is a disk image living on an http server that we want to use as a volume for this VM. The `pvc` part declares the spec that should be used to create the pvc that hosts the source data.
-
-When this VM manifest is posted to the cluster as part of the launch flow, a pvc will be created using the spec provided and the source data will be automatically imported into that pvc before the VM starts. When the VM is deleted, the storage provisioned by the DataVolume will automatically be deleted as well.
-
 A DataVolume is a custom resource provided by the Containerized Data Importer (CDI) project. KubeVirt integrates with CDI in order to provide users a workflow for dynamically creating pvcs and importing data into those pvcs.
 
 In order to take advantage of the `DataVolume` volume source on a VM or VMI, the DataVolumes feature gate must be enabled in the `kubevirt-config` config map before KubeVirt is installed. CDI must also be installed(follow the steps as mentioned above).
