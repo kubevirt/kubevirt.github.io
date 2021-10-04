@@ -40,4 +40,18 @@ order: 10
       </figcaption>
     </figure>
   </div>
+  <div class="col-6">
+    <figure class="figure">
+      <iframe style="width: 400px; height: 300px;" src="https://www.youtube-nocookie.com/embed/videoseries?list=PLnLpXX8KHIYxbPDcPqitNI8o5Bmoe5ZP6" frameborder="0" allow="autoplay; encrypted-media" title="KubeVirt Community Weekly Meetings" allowfullscreen></iframe>
+      <figcaption class="figure-caption">
+        <h3>KubeVirt Community SIG - Performance & Scale Weekly Meetings Playlist</h3>
+        <p>
+          A playlist of all of the KubeVirt SIG - Performance & Scale community weekly meetings.
+        </p>
+      </figcaption>
+    </figure>
+  </div>
 </div>
+
+
+
