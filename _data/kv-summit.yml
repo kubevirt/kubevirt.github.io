@@ -1,0 +1,61 @@
+list:
+  - title: Introduction And Kubevirt History
+    intro: In the first session of the KubeVirt Summit, Fabian Deutsch (@dummdida) talks about the project's history.
+    url: https://www.youtube-nocookie.com/embed/BX0k5jnyNag
+  - title: Automated Migration of VMs from VMware or Openstack to KubeVirt
+    intro: KubeVirt opens scenarios for a Kubernetes based infrastructure that can handle both VMs and containers. Wouldn't it be great to just automatically move all your Virtual Machines from legacy environments and consolidate your whole infrastructure around Kubernetes and KubeVirt?
+    url: https://www.youtube-nocookie.com/embed/2Fm8IJ7gyRg
+  - title: Avoid merging broken code with Prow
+    intro: This session is about creation of prow jobs in general. Prow is a Kubernetes based CI/CD system.
+    url: https://www.youtube-nocookie.com/embed/4JV7YJbini0
+  - title: Building great VMs with common templates
+    intro: Common templates are covering most of the nowadays operating systems. Users can easily create e.g. Windows VMs, without complicated settings. 
+    url: https://www.youtube-nocookie.com/embed/C0zTKrMSQXE
+  - title: Automate KubeVirt with Tekton pipelines
+    intro: This talk introduces a new effort to bring KubeVirt specific tasks to Tekton Pipelines (CI/CD-style pipelines on k8s).
+    url: https://www.youtube-nocookie.com/embed/ZA4fN_ogpY0
+  - title: KubeVirt data protection and forensics forum
+    intro: Let's get together to discuss plans/ideas to extend KubeVirt's data protection and forensics functionality.
+    url: https://www.youtube-nocookie.com/embed/qRw2cLVqJ3c
+  - title: Zero downtime KubeVirt updates
+    intro: In this session I'll cover the general strategy behind how we approach updating KubeVirt from a developer's perspective as well as discuss future improvments to our update process.
+    url: https://www.youtube-nocookie.com/embed/UZCFmrVFSz8
+  - title: Introducing Volume Hotplug in KubeVirt
+    intro: Introduction into the current state of volume hotpluging in KubeVirt, what is possible, what is not possible and what are the challenges.
+    url: https://www.youtube-nocookie.com/embed/4OxcqF4Lmh0
+  - title: Accelerating VNF and CNF with PCI passthrough and KubeVirt
+    intro: This sesion introduces PCI device passthrough to containers and VMs managed by KubeVirt.
+    url: https://www.youtube-nocookie.com/embed/PJ4D2NqMO2A
+  - title: Harvester an OSS HCI solution built on Kubernetes and KubeVirt
+    intro: Project Harvester is a new open source alternative to traditional proprietary hyperconverged infrastructure software. It is built on top of cutting-edge open source technologies including Kubernetes, KubeVirt and Longhorn.
+    url: https://www.youtube-nocookie.com/embed/Kp_xs4bfUXI
+  - title: Kubevirt Live migration and SRIOV
+    intro: KubeVirt Live Migration now supports VM's connected to SRIOV NIC's.
+    url: https://www.youtube-nocookie.com/embed/PxsVU95vLp8
+  - title: Moving oVirt and VMware VMs to KubeVirt with VM Import Operator and Forklift.
+    intro: VM Import Operator (VMIO) allows Kubernetes administrators to easily import their oVirt- and VMware- managed virtual machines to KubeVirt.
+    url: https://www.youtube-nocookie.com/embed/S7hVcv2Fu6I
+  - title: KubeVirt opinionated deployment via Hyperconverged Cluster Operator
+    intro: The Hyperconverged Cluster Operator can be installed on bare metal server clusters in a matter of minutes, even from a GUI, without requiring a deep knowledge of Kubernetes internals.
+    url: https://www.youtube-nocookie.com/embed/6Jxbt1SzLRE
+  - title: Privilege dropping, one capability at a time
+    intro: KubeVirt's architecture is composed of two main components virt-handler, a trusted DaemonSet, running in each node, which operates as the virtualization agent, and virt-launcher, an untrusted Kubernetes pod encapsulating a single libvirt + qemu process.
+    url: https://www.youtube-nocookie.com/embed/7qVcDraf_DI
+  - title: Introducing the new KubeVirt driver for Ansible Molecule
+    intro: Molecule is a well known test framework for Ansible. But when you run your Molecule test in Kubernetes, no real good solution exists. I'm working on creating new Molecule driver for KubeVirt to find a better approach and get a 100% pure Kubernetes solution.
+    url: https://www.youtube-nocookie.com/embed/oCk6hzk7lAM
+  - title: Virtual Machine Batch API
+    intro: KubeVirt extends the Kubernetes ReplicaSets API to provide Virtual Machines with similar functionality and the same can be done with Kubernetes Jobs. In order to bulk schedule VirtualMachines, an admin could use a VirtualMachine Batch API, a VirtualMachineJob, to launch many VirtualMachines from a single API call.
+    url: https://www.youtube-nocookie.com/embed/BbzFMcksMlU
+  - title: CPU Pinning with custom policies
+    intro: KubeVirt supports CPU pinning via the Kubernetes CPU Manager. However there are a few gaps with achieving CPU pinning only via CPU Manager It supports only static policy and doesn’t allow for custom pinning. It supports only Guaranteed QoS class.
+    url: https://www.youtube-nocookie.com/embed/xSMFQR_Uh1M
+  - title: The Road to Version 1
+    intro: A few months ago the KubeVirt community started to discuss what would be the requirements that KubeVirt should meet in order to release KubeVirt Version 1.0.
+    url: https://www.youtube-nocookie.com/embed/Qcci8U1J05w
+  - title: Moving a Visual Effects Studio to the cloud with Kubernetes and KubeVirt
+    intro: As the rapid transition to remote work happened, VFX studios and designers used to beefy workstations, on-site storage clusters and high performance networking have had to scramble to make those resources available to people at home.
+    url: https://www.youtube-nocookie.com/embed/me25mlhgERI
+  - title: Office Hours Q&A with KubeVirt maintainers
+    intro: Our final session is an opportunity for you to ask all your KubeVirt questions, whether they're about the project, or they are about using KubeVirt in production. Maintainers and experts will be on hand.
+    url: https://www.youtube-nocookie.com/embed/cWNxJHiLPek
