@@ -7,6 +7,8 @@ toc:
         url: /videos/talks.html
       - page: Tech Demos
         url: /videos/tech-demos.html
+      - page: Kubevirt Summit
+        url: /videos/kubevirt-summit.html
   - title: Community
     subfolderitems:
       - page: Weekly Meetings
