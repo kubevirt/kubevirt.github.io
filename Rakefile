@@ -63,7 +63,8 @@ namespace :links do
             :log_level          => :info,
             :external_only      => true,
             :internal_domains   => ["https://instructor.labs.sysdeseng.com", "https://www.youtube.com"],
-            :url_ignore         => [ /http(s)?:\/\/(www.)?katacoda.com.*/,
+            :url_ignore         => [ /http(s)?:\/\/(kubevirt.io\/\/(user-guide)?(videos)?).*/,
+                                     /http(s)?:\/\/(www.)?katacoda.com.*/,
                                      /http(s)?:\/\/(metal.)equinix.com.*/ ],
             :url_swap           => {'https://kubevirt.io/' => '',},
             :http_status_ignore => [0, 400, 429, 999]

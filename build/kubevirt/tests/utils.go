@@ -62,6 +62,7 @@ import (
 	apierrors "k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/meta"
 	"k8s.io/apimachinery/pkg/api/resource"
+	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/fields"
@@ -74,6 +75,7 @@ import (
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes/scheme"
+	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/tools/remotecommand"
 	"k8s.io/client-go/transport/spdy"
@@ -752,6 +754,23 @@ func AdjustKubeVirtResource() {
 	adjustedKV, err := virtClient.KubeVirt(kv.Namespace).Patch(kv.Name, types.JSONPatchType, []byte(patchData))
 	util2.PanicOnError(err)
 	KubeVirtDefaultConfig = adjustedKV.Spec.Configuration
+	nodes, err := virtClient.CoreV1().Nodes().List(context.Background(), metav1.ListOptions{})
+	Expect(err).NotTo(HaveOccurred())
+	if checks.HasFeature(virtconfig.CPUManager) && len(nodes.Items) > 1 {
+		// CPUManager is not enabled in the control-plane node
+		waitForSchedulableNodeWithCPUManager()
+	}
+}
+
+func waitForSchedulableNodeWithCPUManager() {
+
+	virtClient, err := kubecli.GetKubevirtClient()
+	util2.PanicOnError(err)
+	Eventually(func() bool {
+		nodes, err := virtClient.CoreV1().Nodes().List(context.Background(), k8smetav1.ListOptions{LabelSelector: v1.NodeSchedulable + "=" + "true," + v1.CPUManager + "=true"})
+		Expect(err).ToNot(HaveOccurred(), "Should list compute nodes")
+		return len(nodes.Items) != 0
+	}, 360, 1*time.Second).Should(BeTrue())
 }
 
 func RestoreKubeVirtResource() {
@@ -3984,6 +4003,36 @@ func RunCommandOnVmiPod(vmi *v1.VirtualMachineInstance, command []string) string
 	return output
 }
 
+// RunCommandOnVmiTargetPod runs specified command on the target virt-launcher pod of a migration
+func RunCommandOnVmiTargetPod(vmi *v1.VirtualMachineInstance, command []string) (string, error) {
+	virtClient, err := kubecli.GetKubevirtClient()
+	util2.PanicOnError(err)
+
+	pods, err := virtClient.CoreV1().Pods(util2.NamespaceTestDefault).List(context.Background(), metav1.ListOptions{})
+	ExpectWithOffset(1, err).ToNot(HaveOccurred())
+	ExpectWithOffset(1, pods.Items).NotTo(BeEmpty())
+	var vmiPod *k8sv1.Pod
+	for _, pod := range pods.Items {
+		if pod.Name == vmi.Status.MigrationState.TargetPod {
+			vmiPod = &pod
+			break
+		}
+	}
+	if vmiPod == nil {
+		return "", fmt.Errorf("failed to find migration target pod")
+	}
+
+	output, err := ExecuteCommandOnPod(
+		virtClient,
+		vmiPod,
+		"compute",
+		command,
+	)
+	ExpectWithOffset(1, err).ToNot(HaveOccurred())
+
+	return output, nil
+}
+
 // GetNodeLibvirtCapabilities returns node libvirt capabilities
 func GetNodeLibvirtCapabilities(vmi *v1.VirtualMachineInstance) string {
 	return RunCommandOnVmiPod(vmi, []string{"virsh", "-r", "capabilities"})
@@ -4809,20 +4858,6 @@ func FormatIPForURL(ip string) string {
 	return ip
 }
 
-func getClusterDnsServiceIP(virtClient kubecli.KubevirtClient) (string, error) {
-	dnsServiceName := "kube-dns"
-	dnsNamespace := "kube-system"
-	if IsOpenShift() {
-		dnsServiceName = "dns-default"
-		dnsNamespace = "openshift-dns"
-	}
-	kubeDNSService, err := virtClient.CoreV1().Services(dnsNamespace).Get(context.Background(), dnsServiceName, metav1.GetOptions{})
-	if err != nil {
-		return "", err
-	}
-	return kubeDNSService.Spec.ClusterIP, nil
-}
-
 func GetKubernetesApiServiceIp(virtClient kubecli.KubevirtClient) (string, error) {
 	kubernetesServiceName := "kubernetes"
 	kubernetesServiceNamespace := "default"
@@ -5012,4 +5047,39 @@ func MountCloudInitFunc(devName string) func(*v1.VirtualMachineInstance) {
 		}, 15)
 		Expect(err).ToNot(HaveOccurred())
 	}
+}
+
+func DryRunCreate(client *rest.RESTClient, resource, namespace string, obj interface{}, result runtime.Object) error {
+	opts := metav1.CreateOptions{DryRun: []string{metav1.DryRunAll}}
+	return client.Post().
+		Namespace(namespace).
+		Resource(resource).
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(obj).
+		Do(context.Background()).
+		Into(result)
+}
+
+func DryRunUpdate(client *rest.RESTClient, resource, name, namespace string, obj interface{}, result runtime.Object) error {
+	opts := metav1.UpdateOptions{DryRun: []string{metav1.DryRunAll}}
+	return client.Put().
+		Name(name).
+		Namespace(namespace).
+		Resource(resource).
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(obj).
+		Do(context.Background()).
+		Into(result)
+}
+
+func DryRunPatch(client *rest.RESTClient, resource, name, namespace string, pt types.PatchType, data []byte, result runtime.Object) error {
+	opts := metav1.PatchOptions{DryRun: []string{metav1.DryRunAll}}
+	return client.Patch(pt).
+		Name(name).
+		Namespace(namespace).
+		Resource(resource).
+		VersionedParams(&opts, scheme.ParameterCodec).
+		Body(data).
+		Do(context.Background()).
+		Into(result)
 }

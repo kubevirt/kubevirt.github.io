@@ -400,6 +400,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubevirt.io/client-go/api/v1.RESTClientConfiguration":                               schema_kubevirtio_client_go_api_v1_RESTClientConfiguration(ref),
 		"kubevirt.io/client-go/api/v1.RTCTimer":                                              schema_kubevirtio_client_go_api_v1_RTCTimer(ref),
 		"kubevirt.io/client-go/api/v1.RateLimiter":                                           schema_kubevirtio_client_go_api_v1_RateLimiter(ref),
+		"kubevirt.io/client-go/api/v1.Realtime":                                              schema_kubevirtio_client_go_api_v1_Realtime(ref),
 		"kubevirt.io/client-go/api/v1.ReloadableComponentConfiguration":                      schema_kubevirtio_client_go_api_v1_ReloadableComponentConfiguration(ref),
 		"kubevirt.io/client-go/api/v1.RemoveVolumeOptions":                                   schema_kubevirtio_client_go_api_v1_RemoveVolumeOptions(ref),
 		"kubevirt.io/client-go/api/v1.ResourceRequirements":                                  schema_kubevirtio_client_go_api_v1_ResourceRequirements(ref),
@@ -14034,11 +14035,17 @@ func schema_kubevirtio_client_go_api_v1_CPU(ref common.ReferenceCallback) common
 							Format:      "",
 						},
 					},
+					"realtime": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Realtime instructs the virt-launcher to tune the VMI for lower latency, optional for real time workloads",
+							Ref:         ref("kubevirt.io/client-go/api/v1.Realtime"),
+						},
+					},
 				},
 			},
 		},
 		Dependencies: []string{
-			"kubevirt.io/client-go/api/v1.CPUFeature", "kubevirt.io/client-go/api/v1.NUMA"},
+			"kubevirt.io/client-go/api/v1.CPUFeature", "kubevirt.io/client-go/api/v1.NUMA", "kubevirt.io/client-go/api/v1.Realtime"},
 	}
 }
 
@@ -18038,6 +18045,26 @@ func schema_kubevirtio_client_go_api_v1_RateLimiter(ref common.ReferenceCallback
 	}
 }
 
+func schema_kubevirtio_client_go_api_v1_Realtime(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "Realtime holds the tuning knobs specific for realtime workloads.",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"mask": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Mask defines the vcpu mask expression that defines which vcpus are used for realtime. Format matches libvirt's expressions. Example: \"0-3,^1\",\"0,2,3\",\"2-3\"",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+				},
+			},
+		},
+	}
+}
+
 func schema_kubevirtio_client_go_api_v1_ReloadableComponentConfiguration(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -20956,6 +20983,13 @@ func schema_kubevirtio_client_go_api_v1_VolumeStatus(ref common.ReferenceCallbac
 						SchemaProps: spec.SchemaProps{
 							Description: "If the volume is hotplug, this will contain the hotplug status.",
 							Ref:         ref("kubevirt.io/client-go/api/v1.HotplugVolumeStatus"),
+						},
+					},
+					"size": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Represents the size of the volume",
+							Type:        []string{"integer"},
+							Format:      "int64",
 						},
 					},
 				},

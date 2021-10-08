@@ -366,9 +366,9 @@ For this purpose the kubernetes-nmstate project was born as a cluster wide node 
 <p>It works as a Kubernetes <code class="language-plaintext highlighter-rouge">DaemonSet</code> running pods on all the cluster nodes and reconciling three different CRs:</p>
 
 <ul>
-  <li><a href="https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/master/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationpolicy_cr.yaml">NodeNetworkConfigurationPolicy</a> to specify cluster node network desired configuration</li>
-  <li><a href="https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/master/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationenactment_cr.yaml">NodeNetworkConfigurationEnactment</a> (nnce) to troubleshoot issues with nncp</li>
-  <li><a href="https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/master/deploy/crds/nmstate.io_v1beta1_nodenetworkstate_cr.yaml">NodeNetworkState</a> (nns) to view the node’s networking configuration</li>
+  <li><a href="https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationpolicy_cr.yaml">NodeNetworkConfigurationPolicy</a> to specify cluster node network desired configuration</li>
+  <li><a href="https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationenactment_cr.yaml">NodeNetworkConfigurationEnactment</a> (nnce) to troubleshoot issues with nncp</li>
+  <li><a href="https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1beta1_nodenetworkstate_cr.yaml">NodeNetworkState</a> (nns) to view the node’s networking configuration</li>
 </ul>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Project kubernetes-nmstate has a distributed architecture to reduce kube-apiserver connectivity dependency, this means that every pod will configure the networking on the node that it’s running without much interaction with kube-apiserver.</p>

@@ -3806,6 +3806,16 @@ var CRDsValidation map[string]string = map[string]string{
                                 boundaries of host numa nodes.
                               type: object
                           type: object
+                        realtime:
+                          description: Realtime instructs the virt-launcher to tune
+                            the VMI for lower latency, optional for real time workloads
+                          properties:
+                            mask:
+                              description: 'Mask defines the vcpu mask expression
+                                that defines which vcpus are used for realtime. Format
+                                matches libvirt''s expressions. Example: "0-3,^1","0,2,3","2-3"'
+                              type: string
+                          type: object
                         sockets:
                           description: Sockets specifies the number of sockets inside
                             the vmi. Must be a value greater or equal 1.
@@ -6529,6 +6539,16 @@ var CRDsValidation map[string]string = map[string]string{
                         nodes.
                       type: object
                   type: object
+                realtime:
+                  description: Realtime instructs the virt-launcher to tune the VMI
+                    for lower latency, optional for real time workloads
+                  properties:
+                    mask:
+                      description: 'Mask defines the vcpu mask expression that defines
+                        which vcpus are used for realtime. Format matches libvirt''s
+                        expressions. Example: "0-3,^1","0,2,3","2-3"'
+                      type: string
+                  type: object
                 sockets:
                   description: Sockets specifies the number of sockets inside the
                     vmi. Must be a value greater or equal 1.
@@ -8251,6 +8271,10 @@ var CRDsValidation map[string]string = map[string]string{
                 description: Reason is a brief description of why we are in the current
                   hotplug volume phase
                 type: string
+              size:
+                description: Represents the size of the volume
+                format: int64
+                type: integer
               target:
                 description: 'Target is the target name used when adding the volume
                   to the VM, eg: vda'
@@ -8510,6 +8534,16 @@ var CRDsValidation map[string]string = map[string]string{
                         the virtual numa nodes never cross boundaries of host numa
                         nodes.
                       type: object
+                  type: object
+                realtime:
+                  description: Realtime instructs the virt-launcher to tune the VMI
+                    for lower latency, optional for real time workloads
+                  properties:
+                    mask:
+                      description: 'Mask defines the vcpu mask expression that defines
+                        which vcpus are used for realtime. Format matches libvirt''s
+                        expressions. Example: "0-3,^1","0,2,3","2-3"'
+                      type: string
                   type: object
                 sockets:
                   description: Sockets specifies the number of sockets inside the
@@ -10270,6 +10304,16 @@ var CRDsValidation map[string]string = map[string]string{
                                 memory and CPUs on the virtual numa nodes never cross
                                 boundaries of host numa nodes.
                               type: object
+                          type: object
+                        realtime:
+                          description: Realtime instructs the virt-launcher to tune
+                            the VMI for lower latency, optional for real time workloads
+                          properties:
+                            mask:
+                              description: 'Mask defines the vcpu mask expression
+                                that defines which vcpus are used for realtime. Format
+                                matches libvirt''s expressions. Example: "0-3,^1","0,2,3","2-3"'
+                              type: string
                           type: object
                         sockets:
                           description: Sockets specifies the number of sockets inside
@@ -13708,6 +13752,18 @@ var CRDsValidation map[string]string = map[string]string{
                                             memory and CPUs on the virtual numa nodes
                                             never cross boundaries of host numa nodes.
                                           type: object
+                                      type: object
+                                    realtime:
+                                      description: Realtime instructs the virt-launcher
+                                        to tune the VMI for lower latency, optional
+                                        for real time workloads
+                                      properties:
+                                        mask:
+                                          description: 'Mask defines the vcpu mask
+                                            expression that defines which vcpus are
+                                            used for realtime. Format matches libvirt''s
+                                            expressions. Example: "0-3,^1","0,2,3","2-3"'
+                                          type: string
                                       type: object
                                     sockets:
                                       description: Sockets specifies the number of

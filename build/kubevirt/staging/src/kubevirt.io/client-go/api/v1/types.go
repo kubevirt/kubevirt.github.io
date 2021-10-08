@@ -287,6 +287,8 @@ type VolumeStatus struct {
 	PersistentVolumeClaimInfo *PersistentVolumeClaimInfo `json:"persistentVolumeClaimInfo,omitempty"`
 	// If the volume is hotplug, this will contain the hotplug status.
 	HotplugVolume *HotplugVolumeStatus `json:"hotplugVolume,omitempty"`
+	// Represents the size of the volume
+	Size int64 `json:"size,omitempty"`
 }
 
 // HotplugVolumeStatus represents the hotplug status of the volume
@@ -385,6 +387,10 @@ func (v *VirtualMachineInstance) WantsToHaveQOSGuaranteed() bool {
 // ShouldStartPaused returns true if VMI should be started in paused state
 func (v *VirtualMachineInstance) ShouldStartPaused() bool {
 	return v.Spec.StartStrategy != nil && *v.Spec.StartStrategy == StartStrategyPaused
+}
+
+func (v *VirtualMachineInstance) IsRealtimeEnabled() bool {
+	return v.Spec.Domain.CPU != nil && v.Spec.Domain.CPU.Realtime != nil
 }
 
 //
@@ -780,6 +786,9 @@ const (
 
 	// MigrationTransportUnixAnnotation means that the VMI will be migrated using the unix URI
 	MigrationTransportUnixAnnotation string = "kubevirt.io/migrationTransportUnix"
+
+	// RealtimeLabel marks the node as capable of running realtime workloads
+	RealtimeLabel string = "kubevirt.io/realtime"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {
@@ -1258,7 +1267,7 @@ const (
 	// VirtualMachineStatusTerminating indicates that the virtual machine is in the process of deletion,
 	// as well as its associated resources (VirtualMachineInstance, DataVolumes, …).
 	VirtualMachineStatusTerminating VirtualMachinePrintableStatus = "Terminating"
-	// VirtualMachineStatusCrashLoopBackOff indicates that the virtual machine is currently in a crash loop waiting to be retried
+	// VirtualMachineStatusCrashLoopBackOff indicates that the virtual machine is currently in a crash loop waiting to be retried.
 	VirtualMachineStatusCrashLoopBackOff VirtualMachinePrintableStatus = "CrashLoopBackOff"
 	// VirtualMachineStatusMigrating indicates that the virtual machine is in the process of being migrated
 	// to another host.
@@ -1268,13 +1277,17 @@ const (
 	VirtualMachineStatusUnknown VirtualMachinePrintableStatus = "Unknown"
 	// VirtualMachineStatusUnschedulable indicates that an error has occurred while scheduling the virtual machine,
 	// e.g. due to unsatisfiable resource requests or unsatisfiable scheduling constraints.
-	VirtualMachineStatusUnschedulable VirtualMachinePrintableStatus = "FailedUnschedulable"
+	VirtualMachineStatusUnschedulable VirtualMachinePrintableStatus = "ErrorUnschedulable"
 	// VirtualMachineStatusErrImagePull indicates that an error has occured while pulling an image for
 	// a containerDisk VM volume.
 	VirtualMachineStatusErrImagePull VirtualMachinePrintableStatus = "ErrImagePull"
 	// VirtualMachineStatusImagePullBackOff indicates that an error has occured while pulling an image for
 	// a containerDisk VM volume, and that kubelet is backing off before retrying.
 	VirtualMachineStatusImagePullBackOff VirtualMachinePrintableStatus = "ImagePullBackOff"
+	// VirtualMachineStatusPvcNotFound indicates that the virtual machine references a PVC volume which doesn't exist.
+	VirtualMachineStatusPvcNotFound VirtualMachinePrintableStatus = "ErrorPvcNotFound"
+	// VirtualMachineStatusDataVolumeNotFound indicates that the virtual machine references a DataVolume volume which doesn't exist.
+	VirtualMachineStatusDataVolumeNotFound VirtualMachinePrintableStatus = "ErrorDataVolumeNotFound"
 )
 
 // VirtualMachineStartFailure tracks VMIs which failed to transition successfully

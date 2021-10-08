@@ -1,4 +1,29 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-10-04T16:08:40+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.45.0</title><link href="https://kubevirt.io//2021/changelog-v0.45.0.html" rel="alternate" type="text/html" title="KubeVirt v0.45.0" /><published>2021-09-08T00:00:00+00:00</published><updated>2021-09-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.45.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.45.0.html">&lt;h2 id=&quot;v0450&quot;&gt;v0.45.0&lt;/h2&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-10-08T22:11:12+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.46.0</title><link href="https://kubevirt.io//2021/changelog-v0.46.0.html" rel="alternate" type="text/html" title="KubeVirt v0.46.0" /><published>2021-10-08T00:00:00+00:00</published><updated>2021-10-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.46.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.46.0.html">&lt;h2 id=&quot;v0460&quot;&gt;v0.46.0&lt;/h2&gt;
+
+&lt;p&gt;Released on: Fri Oct 8 21:12:33 2021 +0000&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;[PR #6425][awels] Hotplug disks are possible when iothreads are enabled.&lt;/li&gt;
+  &lt;li&gt;[PR #6297][acardace] mutate migration PDBs instead of creating an additional one for the duration of the migration.&lt;/li&gt;
+  &lt;li&gt;[PR #6464][awels] BugFix: Fixed hotplug race between kubelet and virt-handler when virt-launcher dies unexpectedly.&lt;/li&gt;
+  &lt;li&gt;[PR #6465][salanki] Fix corrupted DHCP Gateway Option from local DHCP server, leading to rejected IP configuration on Windows VMs.&lt;/li&gt;
+  &lt;li&gt;[PR #6458][vladikr] Tagged SR-IOV interfaces will now appear in the config drive metadata&lt;/li&gt;
+  &lt;li&gt;[PR #6446][brybacki] Access mode for virtctl image upload is now optional. This version of virtctl now requires CDI v1.34 or greater&lt;/li&gt;
+  &lt;li&gt;[PR #6391][zcahana] Cleanup obsolete permissions from virt-operator’s ClusterRole&lt;/li&gt;
+  &lt;li&gt;[PR #6419][rthallisey] Fix virt-controller panic caused by lots of deleted VMI events&lt;/li&gt;
+  &lt;li&gt;[PR #5972][kwiesmueller] Add a &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;ssh&lt;/code&gt; command to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;virtctl&lt;/code&gt; that can be used to open SSH sessions to VMs/VMIs.&lt;/li&gt;
+  &lt;li&gt;[PR #6403][jrife] Removed go module pinning to an old version (v0.3.0) of github.com/go-kit/kit&lt;/li&gt;
+  &lt;li&gt;[PR #6367][brybacki] virtctl imageupload now uses DataVolume.spec.storage&lt;/li&gt;
+  &lt;li&gt;[PR #6198][iholder-redhat] Fire a Prometheus alert when a lot of REST failures are detected in virt-api&lt;/li&gt;
+  &lt;li&gt;[PR #6211][davidvossel] cluster-profiler pprof gathering tool and corresponding “ClusterProfiler” feature gate&lt;/li&gt;
+  &lt;li&gt;[PR #6323][vladikr] switch live migration to use unix sockets&lt;/li&gt;
+  &lt;li&gt;[PR #6374][vladikr] Fix the default setting of CPU requests on vmipods&lt;/li&gt;
+  &lt;li&gt;[PR #6283][rthallisey] Record the time it takes to delete a VMI and expose it as a metric&lt;/li&gt;
+  &lt;li&gt;[PR #6251][rmohr] Better place vcpu threads on host cpus to form more efficient passthrough architectures&lt;/li&gt;
+  &lt;li&gt;[PR #6377][rmohr] Don’t fail on failed selinux relabel attempts if selinux is permissive&lt;/li&gt;
+  &lt;li&gt;[PR #6308][awels] BugFix: hotplug was broken when using it with a hostpath volume that was on a separate device.&lt;/li&gt;
+  &lt;li&gt;[PR #6186][davidvossel] Add resource and verb labels to rest_client_requests_total metric&lt;/li&gt;
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.46.0</summary></entry><entry><title type="html">KubeVirt v0.45.0</title><link href="https://kubevirt.io//2021/changelog-v0.45.0.html" rel="alternate" type="text/html" title="KubeVirt v0.45.0" /><published>2021-09-08T00:00:00+00:00</published><updated>2021-09-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.45.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.45.0.html">&lt;h2 id=&quot;v0450&quot;&gt;v0.45.0&lt;/h2&gt;
 
 &lt;p&gt;Released on: Wed Sep 8 13:56:47 2021 +0000&lt;/p&gt;
 
@@ -238,26 +263,4 @@
   &lt;li&gt;[PR #4625][awels] virtctl upload now shows error when specifying access mode of ReadOnlyMany&lt;/li&gt;
   &lt;li&gt;[PR #4396][xpivarc] KubeVirt is now explainable!&lt;/li&gt;
   &lt;li&gt;[PR #4517][danielBelenky] Fix guest agent reporting.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.37.0</summary></entry><entry><title type="html">KubeVirt v0.36.0</title><link href="https://kubevirt.io//2020/changelog-v0.36.0.html" rel="alternate" type="text/html" title="KubeVirt v0.36.0" /><published>2020-12-16T00:00:00+00:00</published><updated>2020-12-16T00:00:00+00:00</updated><id>https://kubevirt.io//2020/changelog-v0.36.0</id><content type="html" xml:base="https://kubevirt.io//2020/changelog-v0.36.0.html">&lt;h2 id=&quot;v0360&quot;&gt;v0.36.0&lt;/h2&gt;
-
-&lt;p&gt;Released on: Wed Dec 16 14:30:37 2020 +0000&lt;/p&gt;
-
-&lt;ul&gt;
-  &lt;li&gt;[PR #4667][kubevirt-bot] Update libvirt base container to be based of packages in rhel-av 8.3&lt;/li&gt;
-  &lt;li&gt;[PR #4634][kubevirt-bot] Failure detection and handling for VM with EFI Insecure Boot in KubeVirt environments where EFI Insecure Boot is not supported by design.&lt;/li&gt;
-  &lt;li&gt;[PR #4647][kubevirt-bot] Re-introduce the CAP_NET_ADMIN, to allow migration of VMs already having it.&lt;/li&gt;
-  &lt;li&gt;[PR #4627][kubevirt-bot] Fix guest agent reporting.&lt;/li&gt;
-  &lt;li&gt;[PR #4458][awels] It is now possible to hotplug DataVolume and PVC volumes into a running Virtual Machine.&lt;/li&gt;
-  &lt;li&gt;[PR #4025][brybacki] Adds a special handling for DataVolumes in WaitForFirstConsumer state to support CDI’s delayed binding mode.&lt;/li&gt;
-  &lt;li&gt;[PR #4217][mfranczy] Set only an IP address for interfaces reported by qemu-guest-agent. Previously that was CIDR.&lt;/li&gt;
-  &lt;li&gt;[PR #4195][davidvossel] AccessCredentials API for dynamic user/password and ssh public key injection&lt;/li&gt;
-  &lt;li&gt;[PR #4335][oshoval] VMI status displays SRIOV interfaces with their network name only when they have originally&lt;/li&gt;
-  &lt;li&gt;[PR #4408][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 6.6.0 and QEMU 5.1.0.&lt;/li&gt;
-  &lt;li&gt;[PR #4514][ArthurSens] &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;domain&lt;/code&gt; label removed from metric &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;kubevirt_vmi_memory_unused_bytes&lt;/code&gt;&lt;/li&gt;
-  &lt;li&gt;[PR #4542][danielBelenky] Fix double migration on node evacuation&lt;/li&gt;
-  &lt;li&gt;[PR #4506][maiqueb] Remove CAP_NET_ADMIN from the virt-launcher pod.&lt;/li&gt;
-  &lt;li&gt;[PR #4501][AlonaKaplan] CAP_NET_RAW removed from virt-launcher.&lt;/li&gt;
-  &lt;li&gt;[PR #4488][salanki] Disable Virtio-FS metadata cache to prevent OOM conditions on the host.&lt;/li&gt;
-  &lt;li&gt;[PR #3937][vladikr] Generalize host devices assignment. Provides an interface between kubevirt and external device plugins. Provides a mechanism for whitelisting host devices.&lt;/li&gt;
-  &lt;li&gt;[PR #4443][rmohr] All kubevirt webhooks support now dry-runs.&lt;/li&gt;
-&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.36.0</summary></entry></feed>
+&lt;/ul&gt;</content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html">v0.37.0</summary></entry></feed>
