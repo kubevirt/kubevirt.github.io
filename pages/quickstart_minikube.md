@@ -52,6 +52,16 @@ Minikube ships a kubectl client version that matches the kubernetes version to a
   > info ""
   > See the minikube handbook [_here_](https://minikube.sigs.k8s.io/docs/) for advanced start options and instructions on how to operate minikube.
 
+{% include quickstarts/multi_node_minikube.md %}
+
+> warning "Core DNS race condition"
+> An issue has been
+> [reported](https://github.com/kubernetes/minikube/issues/11608) where the
+> `coredns` pod in multi-node minikube comes up with the wrong IP address. If
+> this happens, kubevirt will fail to install properly. To work around, delete
+> the `coredns` pod from the kube-system namespace and disable/enable the
+> kubevirt addon in minikube.
+
 ## Deploy KubeVirt
 
 KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components.
@@ -111,16 +121,6 @@ By default KubeVirt will deploy 7 pods, 3 services, 1 daemonset, 3 deployment ap
   ```bash
   kubectl logs pod/kubevirt-install-manager -n kube-system
   ```
-
-{% include quickstarts/multi_node_minikube.md %}
-
-> warning "Core DNS race condition"
-> An issue has been
-> [reported](https://github.com/kubernetes/minikube/issues/11608) where the
-> `coredns` pod in multi-node minikube comes up with the wrong IP address. If
-> this happens, kubevirt will fail to install properly. To work around, delete
-> the `coredns` pod from the kube-system namespace and disable/enable the
-> kubevirt addon in minikube.
 
 {% include quickstarts/virtctl.md %}
 
