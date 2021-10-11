@@ -44,7 +44,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-10-08 22:11:12 +0000" >
+    <meta property="og:article:published_time" content="2021-10-11 22:25:46 +0000" >
     <meta name="twitter:title" content="KubeVirt quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -481,6 +481,39 @@ To install kubectl client please follow the official documentation for your syst
 
 
 </div></div>
+<h3 id="multi-node-minikube">Multi-Node Minikube</h3>
+
+<p>Minikube has support for adding additional nodes to a cluster. This can be
+helpful in experimenting with KubeVirt on minikube as some operations like node
+affinity or live migration require more than one cluster node to demonstrate.</p>
+
+<h4 id="container-network-interface">Container Network Interface</h4>
+
+<p>By default, minikube sets up a kubernetes cluster using either a virtual
+machine appliance or a container. For a single node setup, local network
+connectivity is sufficient. In the case where multiple nodes are involved, even
+when using containers or VMs on the same host, kubernetes needs to define a
+shared network to allow pods on one host to communicate with pods on the other
+host. To this end, minikube supports a number of <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/">Container Network Interface
+(CNI) plugins</a>
+the simplest of which is <a href="https://github.com/flannel-io/flannel#flannel">flannel</a>.</p>
+
+<h4 id="updating-the-minikube-start-command">Updating the minikube start command</h4>
+
+<p>To have minikube start up with the flannel CNI plugin over two nodes, alter the minikube start command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube start <span class="nt">--nodes</span><span class="o">=</span>2 <span class="nt">--cni</span><span class="o">=</span>flannel
+</code></pre></div></div>
+
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Core DNS race condition</p><p>An issue has been
+<a href="https://github.com/kubernetes/minikube/issues/11608">reported</a> where the
+<code class="language-plaintext highlighter-rouge">coredns</code> pod in multi-node minikube comes up with the wrong IP address. If
+this happens, kubevirt will fail to install properly. To work around, delete
+the <code class="language-plaintext highlighter-rouge">coredns</code> pod from the kube-system namespace and disable/enable the
+kubevirt addon in minikube.</p>
+
+
+</div></div>
 <h2 id="deploy-kubevirt">Deploy KubeVirt</h2>
 
 <p>KubeVirt can be installed using the KubeVirt operator, which manages the lifecycle of all the KubeVirt core components.</p>
@@ -553,39 +586,6 @@ If for any reason nested virtualization cannot be enabled do enable KubeVirt emu
   </li>
 </ul>
 
-<h2 id="multi-node-minikube">Multi-Node Minikube</h2>
-
-<p>Minikube has support for adding additional nodes to a cluster. This can be
-helpful in experimenting with KubeVirt on minikube as some operations like node
-affinity or live migration require more than one cluster node to demonstrate.</p>
-
-<h3 id="container-network-interface">Container Network Interface</h3>
-
-<p>By default, minikube sets up a kubernetes cluster using either a virtual
-machine appliance or a container. For a single node setup, local network
-connectivity is sufficient. In the case where multiple nodes are involved, even
-when using containers or VMs on the same host, kubernetes needs to define a
-shared network to allow pods on one host to communicate with pods on the other
-host. To this end, minikube supports a number of <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/compute-storage-net/network-plugins/">Container Network Interface
-(CNI) plugins</a>
-the simplest of which is <a href="https://github.com/flannel-io/flannel#flannel">flannel</a>.</p>
-
-<h3 id="updating-the-minikube-start-command">Updating the minikube start command</h3>
-
-<p>To have minikube start up with the flannel CNI plugin over two nodes, alter the minikube start command:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>minikube start <span class="nt">--nodes</span><span class="o">=</span>2 <span class="nt">--cni</span><span class="o">=</span>flannel
-</code></pre></div></div>
-
-<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Core DNS race condition</p><p>An issue has been
-<a href="https://github.com/kubernetes/minikube/issues/11608">reported</a> where the
-<code class="language-plaintext highlighter-rouge">coredns</code> pod in multi-node minikube comes up with the wrong IP address. If
-this happens, kubevirt will fail to install properly. To work around, delete
-the <code class="language-plaintext highlighter-rouge">coredns</code> pod from the kube-system namespace and disable/enable the
-kubevirt addon in minikube.</p>
-
-
-</div></div>
 <h2 id="virtctl">Virtctl</h2>
 
 <p>KubeVirt provides an additional binary called <em>virtctl</em> for quick access to the serial and graphical ports of a VM and also handle start/stop operations.</p>
