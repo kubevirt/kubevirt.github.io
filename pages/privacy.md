@@ -8,7 +8,7 @@ tags: [privacy, cookies, hosting]
 
 ## Privacy Statement for the KubeVirt Project
 
-As KubeVirt is a project of the Cloud Native Computing Foundation, this site falls under the [Linux Foundation Privacy Policy](https://www.linuxfoundation.org/privacy/){:target="\_blank"}. All terms of that privacy policy apply to this site.
+As KubeVirt is a project of the Cloud Native Computing Foundation, this site falls under the [Linux Foundation Privacy Policy](https://linuxfoundation.org/privacy-policy/){:target="\_blank"}. All terms of that privacy policy apply to this site.
 
 ## How to Contact Us
 
