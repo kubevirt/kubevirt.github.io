@@ -584,7 +584,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineSnapshot Tests", func() {
 				}, time.Minute, 2*time.Second).Should(BeTrue())
 			})
 
-			It("should unfreeze vm if snapshot fails when deadline exceeded", func() {
+			It("[test_id:6949]should unfreeze vm if snapshot fails when deadline exceeded", func() {
 				var vmi *v1.VirtualMachineInstance
 				vm, vmi = createAndStartVM(tests.NewRandomVMWithDataVolumeWithRegistryImport(
 					cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskFedoraTestTooling),
@@ -959,7 +959,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineSnapshot Tests", func() {
 				Expect(*snapshot.Status.ReadyToUse).To(BeTrue())
 			})
 
-			It("snapshot change phase to in progress and succeeded and then should not fail", func() {
+			It("[test_id:6952]snapshot change phase to in progress and succeeded and then should not fail", func() {
 				createDenyVolumeSnapshotCreateWebhook()
 				snapshot = newSnapshot()
 				snapshot.Spec.FailureDeadline = &metav1.Duration{Duration: time.Minute}
@@ -1018,7 +1018,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineSnapshot Tests", func() {
 				Expect(snapshot.Status.Phase).To(Equal(snapshotv1.Succeeded))
 			})
 
-			It("snapshot should fail when deadline exceeded due to volume snapshots failure", func() {
+			It("[test_id:6838]snapshot should fail when deadline exceeded due to volume snapshots failure", func() {
 				createDenyVolumeSnapshotCreateWebhook()
 				snapshot = newSnapshot()
 				snapshot.Spec.FailureDeadline = &metav1.Duration{Duration: 40 * time.Second}
@@ -1084,17 +1084,24 @@ func getSnapshotStorageClass(client kubecli.KubevirtClient) (string, error) {
 	if err != nil {
 		return "", err
 	}
-
-	if len(volumeSnapshotClasses.Items) > 0 {
-		storageClasses, err := client.StorageV1().StorageClasses().List(context.Background(), metav1.ListOptions{})
-		if err != nil {
-			return "", err
+	if len(volumeSnapshotClasses.Items) == 0 {
+		return "", nil
+	}
+	defaultSnapClass := volumeSnapshotClasses.Items[0]
+	for _, snapClass := range volumeSnapshotClasses.Items {
+		if snapClass.Annotations["snapshot.storage.kubernetes.io/is-default-class"] == "true" {
+			defaultSnapClass = snapClass
 		}
+	}
 
-		for _, sc := range storageClasses.Items {
-			if sc.Provisioner == volumeSnapshotClasses.Items[0].Driver {
-				return sc.Name, nil
-			}
+	storageClasses, err := client.StorageV1().StorageClasses().List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		return "", err
+	}
+
+	for _, sc := range storageClasses.Items {
+		if sc.Provisioner == defaultSnapClass.Driver {
+			return sc.Name, nil
 		}
 	}
 

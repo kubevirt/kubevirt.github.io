@@ -43,6 +43,7 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/json"
 	"k8s.io/apimachinery/pkg/watch"
+	"k8s.io/utils/pointer"
 
 	"kubevirt.io/kubevirt/tests/util"
 
@@ -443,10 +444,6 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 		)
 
 		It("[test_id:1522]should remove owner references on the VirtualMachineInstance if it is orphan deleted", func() {
-
-			// Cascade=false delete fails in ocp 3.11 with CRDs that contain multiple versions.
-			tests.SkipIfOpenShiftAndBelowOrEqualVersion("cascade=false delete does not work with CRD multi version support in ocp 3.11", "1.11.0")
-
 			newVM := newVirtualMachine(true)
 
 			By("Getting owner references")
@@ -859,6 +856,34 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				v1.VirtualMachineStatusDataVolumeNotFound,
 			),
 		)
+
+		It("should report an error status when data volume error occurs", func() {
+			By("Verifying that required StorageClass is configured")
+			storageClassName := tests.Config.StorageClassLocal
+
+			_, err := virtClient.StorageV1().StorageClasses().Get(context.Background(), storageClassName, metav1.GetOptions{})
+			if errors.IsNotFound(err) {
+				Skip("Skipping since required StorageClass is not configured")
+			}
+			Expect(err).ToNot(HaveOccurred())
+
+			By("Creating a VM with a DataVolume cloned from an invalid source")
+			vm := tests.NewRandomVMWithDataVolumeWithRegistryImport("no-such-image",
+				util.NamespaceTestDefault, storageClassName, k8sv1.ReadWriteOnce)
+			vm.Spec.Running = pointer.BoolPtr(true)
+			_, err = virtClient.VirtualMachine(util.NamespaceTestDefault).Create(vm)
+			Expect(err).ToNot(HaveOccurred())
+
+			vmPrintableStatus := func() v1.VirtualMachinePrintableStatus {
+				updatedVm, err := virtClient.VirtualMachine(vm.Namespace).Get(vm.Name, &k8smetav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+				return updatedVm.Status.PrintableStatus
+			}
+
+			By("Verifying that the VM status eventually gets set to DataVolumeError")
+			Eventually(vmPrintableStatus, 300*time.Second, 1*time.Second).
+				Should(Equal(v1.VirtualMachineStatusDataVolumeError))
+		})
 
 		Context("Using virtctl interface", func() {
 			It("[test_id:1529]should start a VirtualMachineInstance once", func() {

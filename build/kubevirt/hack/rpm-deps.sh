@@ -136,7 +136,6 @@ launcherbase_base="
   libvirt-client-${LIBVIRT_VERSION}
   libvirt-daemon-driver-qemu-${LIBVIRT_VERSION}
   qemu-kvm-core-${QEMU_VERSION}
-  python36
 "
 launcherbase_x86_64="
   edk2-ovmf-${EDK2_VERSION}
@@ -146,6 +145,7 @@ launcherbase_aarch64="
   edk2-aarch64-${EDK2_VERSION}
 "
 launcherbase_extra="
+  ethtool
   findutils
   iptables
   nftables
@@ -163,6 +163,7 @@ bazel run \
     --name launcherbase_x86_64 \
     --basesystem centos-stream-release \
     --force-ignore-with-dependencies '^mozjs60' \
+    --force-ignore-with-dependencies 'python' \
     $centos_base \
     $centos_extra \
     $launcherbase_base \
@@ -176,6 +177,7 @@ bazel run \
     --name launcherbase_aarch64 --arch aarch64 \
     --basesystem centos-stream-release \
     --force-ignore-with-dependencies '^mozjs60' \
+    --force-ignore-with-dependencies 'python' \
     $centos_base \
     $centos_extra \
     $launcherbase_base \
@@ -204,6 +206,7 @@ bazel run \
     --config=${ARCHITECTURE} \
     //:bazeldnf -- rpmtree --public --arch=aarch64 --name handlerbase_aarch64 \
     --basesystem centos-stream-release \
+    --force-ignore-with-dependencies 'python' \
     $centos_base \
     $centos_extra \
     $handler_base \
@@ -213,6 +216,7 @@ bazel run \
     --config=${ARCHITECTURE} \
     //:bazeldnf -- rpmtree --public --name handlerbase_x86_64 \
     --basesystem centos-stream-release \
+    --force-ignore-with-dependencies 'python' \
     $centos_base \
     $centos_extra \
     $handler_base \

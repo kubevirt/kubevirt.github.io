@@ -119,41 +119,22 @@ var _ = SIGDescribe("[Serial][rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com]
 		tests.BeforeAll(func() {
 			tests.BeforeTestCleanup()
 
-			// Prepare inbound and outbound VMI definitions
+			inboundVMI = libvmi.NewCirros()
+			outboundVMI = libvmi.NewCirros()
 
-			// inboundVMI expects implicitly to be added to the pod network
-			inboundVMI = tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
-			// Remove the masquerade interface to use the default bridge one
-			inboundVMI.Spec.Domain.Devices.Interfaces = nil
-			inboundVMI.Spec.Networks = nil
+			inboundVMIWithPodNetworkSet = libvmi.NewCirros(
+				libvmi.WithInterface(*v1.DefaultBridgeNetworkInterface()),
+				libvmi.WithNetwork(v1.DefaultPodNetwork()))
 
-			// outboundVMI is used to connect to other vms
-			outboundVMI = tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
-			// Remove the masquerade interface to use the default bridge one
-			outboundVMI.Spec.Domain.Devices.Interfaces = nil
-			outboundVMI.Spec.Networks = nil
-
-			// inboudnVMIWithPodNetworkSet adds itself in an explicit fashion to the pod network
-			inboundVMIWithPodNetworkSet = tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
-			// Remove the masquerade interface to use the default bridge one
-			inboundVMIWithPodNetworkSet.Spec.Domain.Devices.Interfaces = nil
-			inboundVMIWithPodNetworkSet.Spec.Networks = nil
-			v1.SetDefaults_NetworkInterface(inboundVMIWithPodNetworkSet)
-			Expect(inboundVMIWithPodNetworkSet.Spec.Domain.Devices.Interfaces).NotTo(BeEmpty())
-
-			// inboundVMIWithCustomMacAddress specifies a custom MAC address
-			inboundVMIWithCustomMacAddress = tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
-			// Remove the masquerade interface to use the default bridge one
-			inboundVMIWithCustomMacAddress.Spec.Domain.Devices.Interfaces = nil
-			inboundVMIWithCustomMacAddress.Spec.Networks = nil
-			v1.SetDefaults_NetworkInterface(inboundVMIWithCustomMacAddress)
-			Expect(inboundVMIWithCustomMacAddress.Spec.Domain.Devices.Interfaces).NotTo(BeEmpty())
-			inboundVMIWithCustomMacAddress.Spec.Domain.Devices.Interfaces[0].MacAddress = "de:ad:00:00:be:af"
+			inboundVMIWithCustomMacAddress = libvmi.NewCirros(
+				libvmi.WithInterface(*libvmi.InterfaceWithMac(v1.DefaultBridgeNetworkInterface(), "de:ad:00:00:be:af")),
+				libvmi.WithNetwork(v1.DefaultPodNetwork()))
 
 			// Create VMIs
 			for _, networkVMI := range []*v1.VirtualMachineInstance{inboundVMI, outboundVMI, inboundVMIWithPodNetworkSet, inboundVMIWithCustomMacAddress} {
-				_, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(networkVMI)
+				vmi, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(networkVMI)
 				Expect(err).ToNot(HaveOccurred())
+				*networkVMI = *vmi
 			}
 
 			// Wait for VMIs to become ready
@@ -165,22 +146,17 @@ var _ = SIGDescribe("[Serial][rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com]
 			tests.StartTCPServer(inboundVMI, testPort)
 		})
 
-		table.DescribeTable("should be able to reach", func(destination string) {
+		table.DescribeTable("should be able to reach", func(vmiRef **v1.VirtualMachineInstance) {
 			var cmdCheck, addrShow, addr string
-
-			if destination == "InboundVMIWithCustomMacAddress" {
-				tests.SkipIfOpenShift("Custom MAC addresses on pod networks are not supported")
-			}
-
-			switch destination {
-			case "Internet":
+			if vmiRef == nil {
 				addr = "kubevirt.io"
-			case "InboundVMI":
-				addr = inboundVMI.Status.Interfaces[0].IP
-			case "InboundVMIWithPodNetworkSet":
-				addr = inboundVMIWithPodNetworkSet.Status.Interfaces[0].IP
-			case "InboundVMIWithCustomMacAddress":
-				addr = inboundVMIWithCustomMacAddress.Status.Interfaces[0].IP
+			} else {
+				vmi := *vmiRef
+				if vmiHasCustomMacAddress(vmi) {
+					tests.SkipIfOpenShift("Custom MAC addresses on pod networks are not supported")
+				}
+
+				addr = vmi.Status.Interfaces[0].IP
 			}
 
 			payloadSize := 0
@@ -251,10 +227,10 @@ var _ = SIGDescribe("[Serial][rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com]
 			}, 15)
 			Expect(err).ToNot(HaveOccurred())
 		},
-			table.Entry("[test_id:1539]the Inbound VirtualMachineInstance", "InboundVMI"),
-			table.Entry("[test_id:1540]the Inbound VirtualMachineInstance with pod network connectivity explicitly set", "InboundVMIWithPodNetworkSet"),
-			table.Entry("[test_id:1541]the Inbound VirtualMachineInstance with custom MAC address", "InboundVMIWithCustomMacAddress"),
-			table.Entry("[test_id:1542]the internet", "Internet"),
+			table.Entry("[test_id:1539]the Inbound VirtualMachineInstance", &inboundVMI),
+			table.Entry("[test_id:1540]the Inbound VirtualMachineInstance with pod network connectivity explicitly set", &inboundVMIWithPodNetworkSet),
+			table.Entry("[test_id:1541]the Inbound VirtualMachineInstance with custom MAC address", &inboundVMIWithCustomMacAddress),
+			table.Entry("[test_id:1542]the internet", nil),
 		)
 
 		table.DescribeTable("should be reachable via the propagated IP from a Pod", func(op v12.NodeSelectorOperator, hostNetwork bool) {
@@ -1061,24 +1037,11 @@ var _ = SIGDescribe("[Serial][rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com]
 			_, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
 			Expect(err).ToNot(HaveOccurred())
 			tests.WaitUntilVMIReady(vmi, console.LoginToAlpine)
-
-			output := tests.RunCommandOnVmiPod(vmi, []string{"python3", "-c", `import array
-import fcntl
-import socket
-import struct
-SIOCETHTOOL     = 0x8946
-ETHTOOL_GTXCSUM = 0x00000016
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-sockfd = sock.fileno()
-ecmd = array.array('B', struct.pack('I39s', ETHTOOL_GTXCSUM, b'\x00'*39))
-ifreq = struct.pack('16sP', str.encode('k6t-eth0'), ecmd.buffer_info()[0])
-fcntl.ioctl(sockfd, SIOCETHTOOL, ifreq)
-res = ecmd.tostring()
-print(res[4])
-sock = None
-sockfd = None`})
-
-			ExpectWithOffset(1, strings.TrimSpace(output)).To(Equal("0"))
+			output := tests.RunCommandOnVmiPod(
+				vmi,
+				[]string{"/bin/bash", "-c", "/usr/sbin/ethtool -k k6t-eth0|grep tx-checksumming|awk '{ printf $2 }'"},
+			)
+			ExpectWithOffset(1, strings.TrimSpace(output)).To(Equal("off"))
 		})
 	})
 
@@ -1155,4 +1118,9 @@ func gatewayIPFromCIDR(cidr string) string {
 	oct := len(ip) - 1
 	ip[oct]++
 	return ip.String()
+}
+
+func vmiHasCustomMacAddress(vmi *v1.VirtualMachineInstance) bool {
+	return vmi.Spec.Domain.Devices.Interfaces != nil &&
+		vmi.Spec.Domain.Devices.Interfaces[0].MacAddress != ""
 }
