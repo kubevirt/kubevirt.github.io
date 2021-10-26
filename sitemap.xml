@@ -617,6 +617,10 @@
 <lastmod>2021-10-08T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2021/Running-Realtime-Workloads.html</loc>
+<lastmod>2021-10-13T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1365,6 +1369,12 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/ami.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/real-time.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/cpumanager.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>

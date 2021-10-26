@@ -36,7 +36,7 @@ import (
 	"k8s.io/apimachinery/pkg/api/errors"
 	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	v1 "kubevirt.io/client-go/api/v1"
+	v1 "kubevirt.io/client-go/apis/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
@@ -45,7 +45,7 @@ import (
 	"kubevirt.io/kubevirt/tests/libvmi"
 )
 
-var _ = SIGDescribe("[Serial]Services", func() {
+var _ = SIGDescribe("Services", func() {
 	var virtClient kubecli.KubevirtClient
 
 	runTCPClientExpectingHelloWorldFromServer := func(host, port, namespace string, retries int32) *batchv1.Job {

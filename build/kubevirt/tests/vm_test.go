@@ -47,7 +47,7 @@ import (
 
 	"kubevirt.io/kubevirt/tests/util"
 
-	v1 "kubevirt.io/client-go/api/v1"
+	v1 "kubevirt.io/client-go/apis/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/pkg/controller"
@@ -842,16 +842,14 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			table.Entry(
 				"missing PVC",
 				func() *v1.VirtualMachineInstance {
-					vmi := tests.NewRandomVMIWithEphemeralDisk("vmi-with-missing-pvc")
-					return tests.AddPVCDisk(vmi, "disk1", "virtio", "missing-pvc")
+					return tests.NewRandomVMIWithPVC("missing-pvc")
 				},
 				v1.VirtualMachineStatusPvcNotFound,
 			),
 			table.Entry(
 				"missing DataVolume",
 				func() *v1.VirtualMachineInstance {
-					vmi, _ := newVirtualMachineInstanceWithOCSFileDisk()
-					return vmi
+					return tests.NewRandomVMIWithDataVolume("missing-datavolume")
 				},
 				v1.VirtualMachineStatusDataVolumeNotFound,
 			),

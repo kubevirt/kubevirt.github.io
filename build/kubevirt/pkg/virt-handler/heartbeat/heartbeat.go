@@ -14,7 +14,7 @@ import (
 	utilwait "k8s.io/apimachinery/pkg/util/wait"
 	k8scli "k8s.io/client-go/kubernetes/typed/core/v1"
 
-	v1 "kubevirt.io/client-go/api/v1"
+	v1 "kubevirt.io/client-go/apis/core/v1"
 	"kubevirt.io/client-go/log"
 	virtutil "kubevirt.io/kubevirt/pkg/util"
 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
@@ -64,6 +64,9 @@ func (h *HeartBeat) heartBeat(heartBeatInterval time.Duration, stopCh chan struc
 	h.waitForDevicePlugins(stopCh)
 
 	// from now on periodically update the node status
+	// This sets the heartbeat to:
+	// 1 minute with a 1.2 jitter + the time it takes for the heartbeat function to run (sliding == true).
+	// So the amount of time between heartbeats randomly varies between 1min and 2min12sec + the heartbeat function execution time.
 	wait.JitterUntil(h.do, heartBeatInterval, 1.2, true, stopCh)
 }
 

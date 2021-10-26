@@ -35,7 +35,7 @@ import (
 
 	"kubevirt.io/kubevirt/pkg/util/status"
 
-	virtv1 "kubevirt.io/client-go/api/v1"
+	virtv1 "kubevirt.io/client-go/apis/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/controller"
@@ -206,7 +206,7 @@ func (c *VMIReplicaSet) execute(key string) error {
 		return fresh, nil
 	})
 	cm := controller.NewVirtualMachineControllerRefManager(controller.RealVirtualMachineControl{Clientset: c.clientset}, rs, selector, virtv1.VirtualMachineInstanceReplicaSetGroupVersionKind, canAdoptFunc)
-	vmis, err = cm.ClaimVirtualMachines(vmis)
+	vmis, err = cm.ClaimVirtualMachineInstances(vmis)
 	if err != nil {
 		return err
 	}

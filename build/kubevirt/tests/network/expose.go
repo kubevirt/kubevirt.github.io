@@ -20,7 +20,7 @@ import (
 
 	"kubevirt.io/kubevirt/tests/util"
 
-	v1 "kubevirt.io/client-go/api/v1"
+	v1 "kubevirt.io/client-go/apis/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/assert"
@@ -76,6 +76,7 @@ var _ = SIGDescribe("[rfe_id:253][crit:medium][vendor:cnv-qe@redhat.com][level:c
 	const xfailError = "Secondary ip on dual stack service is not working. Tracking issue - https://github.com/kubevirt/kubevirt/issues/5477"
 
 	BeforeEach(func() {
+		tests.BeforeTestCleanup()
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
 	})
@@ -168,8 +169,7 @@ var _ = SIGDescribe("[rfe_id:253][crit:medium][vendor:cnv-qe@redhat.com][level:c
 
 	Context("Expose service on a VM", func() {
 		var tcpVM *v1.VirtualMachineInstance
-		tests.BeforeAll(func() {
-			tests.BeforeTestCleanup()
+		BeforeEach(func() {
 			tcpVM = newLabeledVMI("vm", virtClient, true)
 			tests.GenerateHelloWorldServer(tcpVM, testPort, "tcp")
 		})
@@ -434,8 +434,7 @@ var _ = SIGDescribe("[rfe_id:253][crit:medium][vendor:cnv-qe@redhat.com][level:c
 
 	Context("Expose UDP service on a VMI", func() {
 		var udpVM *v1.VirtualMachineInstance
-		tests.BeforeAll(func() {
-			tests.BeforeTestCleanup()
+		BeforeEach(func() {
 			udpVM = newLabeledVMI("udp-vm", virtClient, true)
 			tests.GenerateHelloWorldServer(udpVM, testPort, "udp")
 		})
@@ -560,9 +559,7 @@ var _ = SIGDescribe("[rfe_id:253][crit:medium][vendor:cnv-qe@redhat.com][level:c
 		const numberOfVMs = 2
 
 		var vmrs *v1.VirtualMachineInstanceReplicaSet
-		tests.BeforeAll(func() {
-			tests.BeforeTestCleanup()
-
+		BeforeEach(func() {
 			By("Creating a VMRS object with 2 replicas")
 			template := newLabeledVMI("vmirs", virtClient, false)
 			vmrs = tests.NewRandomReplicaSetFromVMI(template, int32(numberOfVMs))
@@ -683,8 +680,6 @@ var _ = SIGDescribe("[rfe_id:253][crit:medium][vendor:cnv-qe@redhat.com][level:c
 
 		Context("Expose a VM as a ClusterIP service.", func() {
 			var serviceName string
-
-			BeforeEach(tests.BeforeTestCleanup)
 
 			BeforeEach(func() {
 				vm, err = createStoppedVM(virtClient, util.NamespaceTestDefault)

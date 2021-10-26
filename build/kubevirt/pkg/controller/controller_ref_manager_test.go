@@ -29,7 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
-	virtv1 "kubevirt.io/client-go/api/v1"
+	virtv1 "kubevirt.io/client-go/apis/core/v1"
 	cdiv1 "kubevirt.io/containerized-data-importer/pkg/apis/core/v1beta1"
 )
 
@@ -69,7 +69,7 @@ func newVirtualMachine(virtualmachineName string, label map[string]string, owner
 	return vmi
 }
 
-func TestClaimVirtualMachine(t *testing.T) {
+func TestClaimVirtualMachineInstance(t *testing.T) {
 	controllerKind := schema.GroupVersionKind{}
 	type test struct {
 		name            string
@@ -175,7 +175,7 @@ func TestClaimVirtualMachine(t *testing.T) {
 		}(),
 	}
 	for _, test := range tests {
-		claimed, err := test.manager.ClaimVirtualMachines(test.virtualmachines)
+		claimed, err := test.manager.ClaimVirtualMachineInstances(test.virtualmachines)
 		if test.expectError && err == nil {
 			t.Errorf("Test case `%s`, expected error but got nil", test.name)
 		} else if !reflect.DeepEqual(test.claimed, claimed) {
