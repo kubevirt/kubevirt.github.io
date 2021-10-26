@@ -129,7 +129,7 @@ For this purpose the kubernetes-nmstate project was born as a cluster wide node 
 
 It works as a Kubernetes `DaemonSet` running pods on all the cluster nodes and reconciling three different CRs:
 
-- [NodeNetworkConfigurationPolicy](https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationpolicy_cr.yaml) to specify cluster node network desired configuration
+- [NodeNetworkConfigurationPolicy](https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1_nodenetworkconfigurationpolicy_cr.yaml) to specify cluster node network desired configuration
 - [NodeNetworkConfigurationEnactment](https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1beta1_nodenetworkconfigurationenactment_cr.yaml) (nnce) to troubleshoot issues with nncp
 - [NodeNetworkState](https://raw.githubusercontent.com/nmstate/kubernetes-nmstate/main/deploy/crds/nmstate.io_v1beta1_nodenetworkstate_cr.yaml) (nns) to view the node's networking configuration
 
