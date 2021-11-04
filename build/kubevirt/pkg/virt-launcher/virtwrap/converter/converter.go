@@ -118,6 +118,7 @@ type ConverterContext struct {
 	VolumesDiscardIgnore  []string
 	Topology              *cmdv1.Topology
 	CpuScheduler          *api.VCPUScheduler
+	ExpandDisksEnabled    bool
 }
 
 func contains(volumes []string, name string) bool {
@@ -125,6 +126,13 @@ func contains(volumes []string, name string) bool {
 		if name == v {
 			return true
 		}
+	}
+	return false
+}
+
+func isAMD64(arch string) bool {
+	if arch == "amd64" {
+		return true
 	}
 	return false
 }
@@ -143,7 +151,7 @@ func isARM64(arch string) bool {
 	return false
 }
 
-func Convert_v1_Disk_To_api_Disk(c *ConverterContext, diskDevice *v1.Disk, disk *api.Disk, prefixMap map[string]deviceNamer, numQueues *uint) error {
+func Convert_v1_Disk_To_api_Disk(c *ConverterContext, diskDevice *v1.Disk, disk *api.Disk, prefixMap map[string]deviceNamer, numQueues *uint, volumeStatusMap map[string]v1.VolumeStatus) error {
 	if diskDevice.Disk != nil {
 		var unit int
 		disk.Device = "disk"
@@ -209,6 +217,15 @@ func Convert_v1_Disk_To_api_Disk(c *ConverterContext, diskDevice *v1.Disk, disk 
 		if !contains(c.VolumesDiscardIgnore, diskDevice.Name) {
 			disk.Driver.Discard = "unmap"
 		}
+		volumeStatus, ok := volumeStatusMap[diskDevice.Name]
+		if ok && volumeStatus.PersistentVolumeClaimInfo != nil {
+			disk.FilesystemOverhead = volumeStatus.PersistentVolumeClaimInfo.FilesystemOverhead
+			capacity, ok := volumeStatus.PersistentVolumeClaimInfo.Capacity[k8sv1.ResourceStorage]
+			if ok {
+				disk.Capacity = &capacity
+			}
+		}
+		disk.ExpandDisksEnabled = c.ExpandDisksEnabled
 	}
 	if numQueues != nil && disk.Target.Bus == "virtio" {
 		disk.Driver.Queues = numQueues
@@ -408,7 +425,7 @@ func SetDriverCacheMode(disk *api.Disk, directIOChecker DirectIOChecker) error {
 	return nil
 }
 
-func isPreAllocated(path string) bool {
+func IsPreAllocated(path string) bool {
 	diskInf, err := GetImageInfo(path)
 	if err != nil {
 		return false
@@ -437,7 +454,7 @@ func SetOptimalIOMode(disk *api.Disk) error {
 	// O_DIRECT is needed for io="native"
 	if v1.DriverCache(disk.Driver.Cache) == v1.CacheNone {
 		// set native for block device or pre-allocateed image file
-		if (disk.Source.Dev != "") || isPreAllocated(disk.Source.File) {
+		if (disk.Source.Dev != "") || IsPreAllocated(disk.Source.File) {
 			disk.Driver.IO = v1.IONative
 		}
 	}
@@ -1230,7 +1247,7 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 	// SMBios option does not work in Power, attempting to set it will result in the following error message:
 	// "Option not supported for this target" issued by qemu-system-ppc64, so don't set it in case GOARCH is ppc64le
 	// ARM64 use UEFI boot by default, set SMBios is unnecessory.
-	if !isPPC64(c.Architecture) && !isARM64(c.Architecture) {
+	if isAMD64(c.Architecture) {
 		domain.Spec.OS.SMBios = &api.SMBios{
 			Mode: "sysinfo",
 		}
@@ -1378,11 +1395,16 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 		numBlkQueues = &vcpus
 	}
 
+	volumeStatusMap := make(map[string]v1.VolumeStatus)
+	for _, volumeStatus := range vmi.Status.VolumeStatus {
+		volumeStatusMap[volumeStatus.Name] = volumeStatus
+	}
+
 	prefixMap := newDeviceNamer(vmi.Status.VolumeStatus, vmi.Spec.Domain.Devices.Disks)
 	for _, disk := range vmi.Spec.Domain.Devices.Disks {
 		newDisk := api.Disk{}
 
-		err := Convert_v1_Disk_To_api_Disk(c, &disk, &newDisk, prefixMap, numBlkQueues)
+		err := Convert_v1_Disk_To_api_Disk(c, &disk, &newDisk, prefixMap, numBlkQueues, volumeStatusMap)
 		if err != nil {
 			return err
 		}
@@ -1518,7 +1540,7 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 	//In ppc64le usb devices like mouse / keyboard are set by default,
 	//so we can't disable the controller otherwise we run into the following error:
 	//"unsupported configuration: USB is disabled for this domain, but USB devices are present in the domain XML"
-	if !isUSBDevicePresent && !isUSBRedirEnabled && c.Architecture != "ppc64le" {
+	if !isUSBDevicePresent && !isUSBRedirEnabled && isAMD64(c.Architecture) {
 		// disable usb controller
 		domain.Spec.Devices.Controllers = append(domain.Spec.Devices.Controllers, api.Controller{
 			Type:  "usb",
@@ -1704,14 +1726,43 @@ func Convert_v1_VirtualMachineInstance_To_api_Domain(vmi *v1.VirtualMachineInsta
 	if vmi.Spec.Domain.Devices.AutoattachGraphicsDevice == nil || *vmi.Spec.Domain.Devices.AutoattachGraphicsDevice == true {
 		var heads uint = 1
 		var vram uint = 16384
-		domain.Spec.Devices.Video = []api.Video{
-			{
-				Model: api.VideoModel{
-					Type:  "vga",
-					Heads: &heads,
-					VRam:  &vram,
+		// For arm64, qemu-kvm only support virtio-gpu display device, so set it as default video device.
+		// tablet and keyboard devices are necessary for control the VM via vnc connection
+		if isARM64(c.Architecture) {
+			domain.Spec.Devices.Video = []api.Video{
+				{
+					Model: api.VideoModel{
+						Type:  "virtio",
+						Heads: &heads,
+					},
 				},
-			},
+			}
+
+			if !hasTabletDevice(vmi) {
+				domain.Spec.Devices.Inputs = append(domain.Spec.Devices.Inputs,
+					api.Input{
+						Bus:  "usb",
+						Type: "tablet",
+					},
+				)
+			}
+
+			domain.Spec.Devices.Inputs = append(domain.Spec.Devices.Inputs,
+				api.Input{
+					Bus:  "usb",
+					Type: "keyboard",
+				},
+			)
+		} else {
+			domain.Spec.Devices.Video = []api.Video{
+				{
+					Model: api.VideoModel{
+						Type:  "vga",
+						Heads: &heads,
+						VRam:  &vram,
+					},
+				},
+			}
 		}
 		domain.Spec.Devices.Graphics = []api.Graphics{
 			{
@@ -2015,4 +2066,15 @@ func GetVolumeNameByTarget(domain *api.Domain, target string) string {
 
 func isNumaPassthrough(vmi *v1.VirtualMachineInstance) bool {
 	return vmi.Spec.Domain.CPU.NUMA != nil && vmi.Spec.Domain.CPU.NUMA.GuestMappingPassthrough != nil
+}
+
+func hasTabletDevice(vmi *v1.VirtualMachineInstance) bool {
+	if vmi.Spec.Domain.Devices.Inputs != nil {
+		for _, device := range vmi.Spec.Domain.Devices.Inputs {
+			if device.Type == "tablet" {
+				return true
+			}
+		}
+	}
+	return false
 }

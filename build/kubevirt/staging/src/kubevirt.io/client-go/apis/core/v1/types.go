@@ -268,6 +268,10 @@ type PersistentVolumeClaimInfo struct {
 	// Preallocated indicates if the PVC's storage is preallocated or not
 	// +optional
 	Preallocated bool `json:"preallocated,omitempty"`
+
+	// Percentage of filesystem's size to be reserved when resizing the PVC
+	// +optional
+	FilesystemOverhead *cdiv1.Percent `json:"filesystemOverhead,omitempty"`
 }
 
 // VolumeStatus represents information about the status of volumes attached to the VirtualMachineInstance.
@@ -725,7 +729,7 @@ const (
 	AppComponent = "kubevirt"
 	// This label will be set on all resources created by the operator
 	ManagedByLabel              = AppLabelPrefix + "/managed-by"
-	ManagedByLabelOperatorValue = "kubevirt-operator"
+	ManagedByLabelOperatorValue = "virt-operator"
 	// This annotation represents the kubevirt version for an install strategy configmap.
 	InstallStrategyVersionAnnotation = "kubevirt.io/install-strategy-version"
 	// This annotation represents the kubevirt registry used for an install strategy configmap.
@@ -1936,6 +1940,12 @@ type VirtualMachineInstanceFileSystem struct {
 	TotalBytes     int    `json:"totalBytes"`
 }
 
+// FreezeUnfreezeTimeout represent the time unfreeze will be triggered if guest was not unfrozen by unfreeze command
+// +k8s:openapi-gen=true
+type FreezeUnfreezeTimeout struct {
+	UnfreezeTimeout *metav1.Duration `json:"unfreezeTimeout"`
+}
+
 // AddVolumeOptions is provided when dynamically hot plugging a volume and disk
 // +k8s:openapi-gen=true
 type AddVolumeOptions struct {
@@ -2140,6 +2150,14 @@ type ProfilerResult struct {
 // +k8s:openapi-gen=true
 type ClusterProfilerResults struct {
 	ComponentResults map[string]ProfilerResult `json:"componentResults"`
+	Continue         string                    `json:"continue,omitempty"`
+}
+
+// +k8s:openapi-gen=true
+type ClusterProfilerRequest struct {
+	LabelSelector string `json:"labelSelector,omitempty"`
+	Continue      string `json:"continue,omitempty"`
+	PageSize      int64  `json:"pageSize"`
 }
 
 // FlavorMatcher references a flavor that is used to fill fields in the VMI template.

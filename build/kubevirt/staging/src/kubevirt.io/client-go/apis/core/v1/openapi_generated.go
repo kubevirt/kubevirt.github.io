@@ -405,6 +405,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubevirt.io/client-go/apis/core/v1.ClockOffsetUTC":                                        schema_client_go_apis_core_v1_ClockOffsetUTC(ref),
 		"kubevirt.io/client-go/apis/core/v1.CloudInitConfigDriveSource":                            schema_client_go_apis_core_v1_CloudInitConfigDriveSource(ref),
 		"kubevirt.io/client-go/apis/core/v1.CloudInitNoCloudSource":                                schema_client_go_apis_core_v1_CloudInitNoCloudSource(ref),
+		"kubevirt.io/client-go/apis/core/v1.ClusterProfilerRequest":                                schema_client_go_apis_core_v1_ClusterProfilerRequest(ref),
 		"kubevirt.io/client-go/apis/core/v1.ClusterProfilerResults":                                schema_client_go_apis_core_v1_ClusterProfilerResults(ref),
 		"kubevirt.io/client-go/apis/core/v1.ComponentConfig":                                       schema_client_go_apis_core_v1_ComponentConfig(ref),
 		"kubevirt.io/client-go/apis/core/v1.ConfigDriveSSHPublicKeyAccessCredentialPropagation":    schema_client_go_apis_core_v1_ConfigDriveSSHPublicKeyAccessCredentialPropagation(ref),
@@ -443,6 +444,7 @@ func GetOpenAPIDefinitions(ref common.ReferenceCallback) map[string]common.OpenA
 		"kubevirt.io/client-go/apis/core/v1.Flags":                                                 schema_client_go_apis_core_v1_Flags(ref),
 		"kubevirt.io/client-go/apis/core/v1.FlavorMatcher":                                         schema_client_go_apis_core_v1_FlavorMatcher(ref),
 		"kubevirt.io/client-go/apis/core/v1.FloppyTarget":                                          schema_client_go_apis_core_v1_FloppyTarget(ref),
+		"kubevirt.io/client-go/apis/core/v1.FreezeUnfreezeTimeout":                                 schema_client_go_apis_core_v1_FreezeUnfreezeTimeout(ref),
 		"kubevirt.io/client-go/apis/core/v1.GPU":                                                   schema_client_go_apis_core_v1_GPU(ref),
 		"kubevirt.io/client-go/apis/core/v1.GenerationStatus":                                      schema_client_go_apis_core_v1_GenerationStatus(ref),
 		"kubevirt.io/client-go/apis/core/v1.GuestAgentCommandInfo":                                 schema_client_go_apis_core_v1_GuestAgentCommandInfo(ref),
@@ -19293,6 +19295,37 @@ func schema_client_go_apis_core_v1_CloudInitNoCloudSource(ref common.ReferenceCa
 	}
 }
 
+func schema_client_go_apis_core_v1_ClusterProfilerRequest(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Type: []string{"object"},
+				Properties: map[string]spec.Schema{
+					"labelSelector": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"continue": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
+					"pageSize": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"integer"},
+							Format: "int64",
+						},
+					},
+				},
+				Required: []string{"pageSize"},
+			},
+		},
+	}
+}
+
 func schema_client_go_apis_core_v1_ClusterProfilerResults(ref common.ReferenceCallback) common.OpenAPIDefinition {
 	return common.OpenAPIDefinition{
 		Schema: spec.Schema{
@@ -19312,6 +19345,12 @@ func schema_client_go_apis_core_v1_ClusterProfilerResults(ref common.ReferenceCa
 							},
 						},
 					},
+					"continue": {
+						SchemaProps: spec.SchemaProps{
+							Type:   []string{"string"},
+							Format: "",
+						},
+					},
 				},
 				Required: []string{"componentResults"},
 			},
@@ -19329,8 +19368,15 @@ func schema_client_go_apis_core_v1_ComponentConfig(ref common.ReferenceCallback)
 				Properties: map[string]spec.Schema{
 					"nodePlacement": {
 						SchemaProps: spec.SchemaProps{
-							Description: "nodePlacement decsribes scheduling confiuguration for specific KubeVirt components",
+							Description: "nodePlacement describes scheduling configuration for specific KubeVirt components",
 							Ref:         ref("kubevirt.io/client-go/apis/core/v1.NodePlacement"),
+						},
+					},
+					"replicas": {
+						SchemaProps: spec.SchemaProps{
+							Description: "replicas indicates how many replicas should be created for each KubeVirt infrastructure component (like virt-api or virt-controller). Defaults to 2.",
+							Type:        []string{"integer"},
+							Format:      "byte",
 						},
 					},
 				},
@@ -20793,6 +20839,27 @@ func schema_client_go_apis_core_v1_FloppyTarget(ref common.ReferenceCallback) co
 				},
 			},
 		},
+	}
+}
+
+func schema_client_go_apis_core_v1_FreezeUnfreezeTimeout(ref common.ReferenceCallback) common.OpenAPIDefinition {
+	return common.OpenAPIDefinition{
+		Schema: spec.Schema{
+			SchemaProps: spec.SchemaProps{
+				Description: "FreezeUnfreezeTimeout represent the time unfreeze will be triggered if guest was not unfrozen by unfreeze command",
+				Type:        []string{"object"},
+				Properties: map[string]spec.Schema{
+					"unfreezeTimeout": {
+						SchemaProps: spec.SchemaProps{
+							Ref: ref("k8s.io/apimachinery/pkg/apis/meta/v1.Duration"),
+						},
+					},
+				},
+				Required: []string{"unfreezeTimeout"},
+			},
+		},
+		Dependencies: []string{
+			"k8s.io/apimachinery/pkg/apis/meta/v1.Duration"},
 	}
 }
 
@@ -22700,6 +22767,13 @@ func schema_client_go_apis_core_v1_PersistentVolumeClaimInfo(ref common.Referenc
 						SchemaProps: spec.SchemaProps{
 							Description: "Preallocated indicates if the PVC's storage is preallocated or not",
 							Type:        []string{"boolean"},
+							Format:      "",
+						},
+					},
+					"filesystemOverhead": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Percentage of filesystem's size to be reserved when resizing the PVC",
+							Type:        []string{"string"},
 							Format:      "",
 						},
 					},

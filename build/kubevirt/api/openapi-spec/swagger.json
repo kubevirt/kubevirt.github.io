@@ -7655,6 +7655,16 @@
     "put": {
      "description": "Freeze a VirtualMachineInstance object.",
      "operationId": "v1Freeze",
+     "parameters": [
+      {
+       "name": "body",
+       "in": "body",
+       "required": true,
+       "schema": {
+        "$ref": "#/definitions/v1.FreezeUnfreezeTimeout"
+       }
+      }
+     ],
      "responses": {
       "200": {
        "description": "OK",
@@ -8740,6 +8750,16 @@
     "put": {
      "description": "Freeze a VirtualMachineInstance object.",
      "operationId": "v1alpha3Freeze",
+     "parameters": [
+      {
+       "name": "body",
+       "in": "body",
+       "required": true,
+       "schema": {
+        "$ref": "#/definitions/v1.FreezeUnfreezeTimeout"
+       }
+      }
+     ],
      "responses": {
       "200": {
        "description": "OK",
@@ -11133,8 +11153,13 @@
     "type": "object",
     "properties": {
      "nodePlacement": {
-      "description": "nodePlacement decsribes scheduling confiuguration for specific KubeVirt components",
+      "description": "nodePlacement describes scheduling configuration for specific KubeVirt components",
       "$ref": "#/definitions/v1.NodePlacement"
+     },
+     "replicas": {
+      "description": "replicas indicates how many replicas should be created for each KubeVirt infrastructure component (like virt-api or virt-controller). Defaults to 2.",
+      "type": "integer",
+      "format": "byte"
      }
     }
    },
@@ -11911,6 +11936,18 @@
      "tray": {
       "description": "Tray indicates if the tray of the device is open or closed. Allowed values are \"open\" and \"closed\". Defaults to closed.",
       "type": "string"
+     }
+    }
+   },
+   "v1.FreezeUnfreezeTimeout": {
+    "description": "FreezeUnfreezeTimeout represent the time unfreeze will be triggered if guest was not unfrozen by unfreeze command",
+    "type": "object",
+    "required": [
+     "unfreezeTimeout"
+    ],
+    "properties": {
+     "unfreezeTimeout": {
+      "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.Duration"
      }
     }
    },
@@ -12890,6 +12927,10 @@
       "additionalProperties": {
        "$ref": "#/definitions/k8s.io.apimachinery.pkg.api.resource.Quantity"
       }
+     },
+     "filesystemOverhead": {
+      "description": "Percentage of filesystem's size to be reserved when resizing the PVC",
+      "type": "string"
      },
      "preallocated": {
       "description": "Preallocated indicates if the PVC's storage is preallocated or not",

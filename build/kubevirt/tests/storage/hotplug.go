@@ -55,8 +55,6 @@ const (
 	virtCtlVolumeName      = "--volume-name=%s"
 	verifyCannotAccessDisk = "ls: %s: No such file or directory"
 
-	waitDiskTemplateError         = "waiting on new disk to appear in template"
-	waitVolumeTemplateError       = "waiting on new volume to appear in template"
 	waitVolumeRequestProcessError = "waiting on all VolumeRequests to be processed"
 
 	expectReturn = "echo $?\n"
@@ -183,83 +181,6 @@ var _ = SIGDescribe("Hotplug", func() {
 		}, 3*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
 	}
 
-	verifyVolumeAndDiskVMAdded := func(vm *v1.VirtualMachine, volumeNames ...string) {
-		nameMap := make(map[string]bool)
-		for _, volumeName := range volumeNames {
-			nameMap[volumeName] = true
-		}
-		log.Log.Infof("Checking %d volumes", len(volumeNames))
-		Eventually(func() error {
-			updatedVM, err := virtClient.VirtualMachine(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-
-			if len(updatedVM.Status.VolumeRequests) > 0 {
-				return fmt.Errorf(waitVolumeRequestProcessError)
-			}
-
-			foundVolume := 0
-			foundDisk := 0
-
-			for _, volume := range updatedVM.Spec.Template.Spec.Volumes {
-				if _, ok := nameMap[volume.Name]; ok {
-					foundVolume++
-				}
-			}
-			for _, disk := range updatedVM.Spec.Template.Spec.Domain.Devices.Disks {
-				if _, ok := nameMap[disk.Name]; ok {
-					foundDisk++
-				}
-			}
-
-			if foundDisk != len(volumeNames) {
-				return fmt.Errorf(waitDiskTemplateError)
-			}
-			if foundVolume != len(volumeNames) {
-				return fmt.Errorf(waitVolumeTemplateError)
-			}
-
-			return nil
-		}, 90*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
-	}
-
-	verifyVolumeAndDiskVMIAdded := func(vmi *v1.VirtualMachineInstance, volumeNames ...string) {
-		nameMap := make(map[string]bool)
-		for _, volumeName := range volumeNames {
-			nameMap[volumeName] = true
-		}
-		Eventually(func() error {
-			updatedVMI, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
-			if err != nil {
-				return err
-			}
-
-			foundVolume := 0
-			foundDisk := 0
-
-			for _, volume := range updatedVMI.Spec.Volumes {
-				if _, ok := nameMap[volume.Name]; ok {
-					foundVolume++
-				}
-			}
-			for _, disk := range updatedVMI.Spec.Domain.Devices.Disks {
-				if _, ok := nameMap[disk.Name]; ok {
-					foundDisk++
-				}
-			}
-
-			if foundDisk != len(volumeNames) {
-				return fmt.Errorf(waitDiskTemplateError)
-			}
-			if foundVolume != len(volumeNames) {
-				return fmt.Errorf(waitVolumeTemplateError)
-			}
-
-			return nil
-		}, 90*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
-	}
-
 	verifyVolumeAndDiskVMRemoved := func(vm *v1.VirtualMachine, volumeNames ...string) {
 		nameMap := make(map[string]bool)
 		for _, volumeName := range volumeNames {
@@ -304,7 +225,7 @@ var _ = SIGDescribe("Hotplug", func() {
 			foundVolume := 0
 			for _, volumeStatus := range updatedVMI.Status.VolumeStatus {
 				log.Log.Infof("Volume Status, name: %s, target [%s], phase:%s, reason: %s", volumeStatus.Name, volumeStatus.Target, volumeStatus.Phase, volumeStatus.Reason)
-				if _, ok := nameMap[volumeStatus.Name]; ok && volumeStatus.HotplugVolume != nil {
+				if _, ok := nameMap[volumeStatus.Name]; ok && volumeStatus.HotplugVolume != nil && volumeStatus.Target != "" {
 					if volumeStatus.Phase == phase {
 						foundVolume++
 					}
@@ -518,7 +439,7 @@ var _ = SIGDescribe("Hotplug", func() {
 			addVolumeFunc(vm.Name, vm.Namespace, testNewVolume1, "madeup", "scsi")
 			addVolumeFunc(vm.Name, vm.Namespace, testNewVolume2, "madeup", "scsi")
 			By("Verifying the volumes have been added to the template spec")
-			verifyVolumeAndDiskVMAdded(vm, testNewVolume1, testNewVolume2)
+			tests.VerifyVolumeAndDiskVMAdded(virtClient, vm, testNewVolume1, testNewVolume2)
 			By("Removing new volumes from VM")
 			removeVolumeFunc(vm.Name, vm.Namespace, testNewVolume1)
 			removeVolumeFunc(vm.Name, vm.Namespace, testNewVolume2)
@@ -575,7 +496,7 @@ var _ = SIGDescribe("Hotplug", func() {
 
 			vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			verifyVolumeAndDiskVMIAdded(vmi, dvNames...)
+			tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, dvNames...)
 			verifyVolumeStatus(vmi, v1.VolumeReady, dvNames...)
 			getVmiConsoleAndLogin(vmi)
 			verifyHotplugAttachedAndUseable(vmi, dvNames)
@@ -650,11 +571,11 @@ var _ = SIGDescribe("Hotplug", func() {
 				addVolumeFunc(vm.Name, vm.Namespace, "testvolume", dv.Name, "scsi")
 				By("Verifying the volume and disk are in the VM and VMI")
 				if !vmiOnly {
-					verifyVolumeAndDiskVMAdded(vm, "testvolume")
+					tests.VerifyVolumeAndDiskVMAdded(virtClient, vm, "testvolume")
 				}
 				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
-				verifyVolumeAndDiskVMIAdded(vmi, "testvolume")
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "testvolume")
 				verifyVolumeStatus(vmi, v1.VolumeReady, "testvolume")
 				getVmiConsoleAndLogin(vmi)
 				targets := verifyHotplugAttachedAndUseable(vmi, []string{"testvolume"})
@@ -688,14 +609,15 @@ var _ = SIGDescribe("Hotplug", func() {
 					By("Adding volume to running VM")
 					addVolumeFunc(vm.Name, vm.Namespace, volumeName, dv.Name, "scsi")
 					testVolumes = append(testVolumes, volumeName)
+					verifyVolumeStatus(vmi, v1.VolumeReady, testVolumes...)
 				}
 				By("Verifying the volume and disk are in the VM and VMI")
 				if !vmiOnly {
-					verifyVolumeAndDiskVMAdded(vm, testVolumes...)
+					tests.VerifyVolumeAndDiskVMAdded(virtClient, vm, testVolumes...)
 				}
 				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
-				verifyVolumeAndDiskVMIAdded(vmi, testVolumes...)
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, testVolumes...)
 				verifyVolumeStatus(vmi, v1.VolumeReady, testVolumes...)
 				targets := verifyHotplugAttachedAndUseable(vmi, testVolumes)
 				verifySingleAttachmentPod(vmi)
@@ -736,11 +658,11 @@ var _ = SIGDescribe("Hotplug", func() {
 
 				By("Verifying the volume and disk are in the VM and VMI")
 				if !vmiOnly {
-					verifyVolumeAndDiskVMAdded(vm, testVolumes[:len(testVolumes)-1]...)
+					tests.VerifyVolumeAndDiskVMAdded(virtClient, vm, testVolumes[:len(testVolumes)-1]...)
 				}
 				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
-				verifyVolumeAndDiskVMIAdded(vmi, testVolumes[:len(testVolumes)-1]...)
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, testVolumes[:len(testVolumes)-1]...)
 				waitForAttachmentPodToRun(vmi)
 				verifyVolumeStatus(vmi, v1.VolumeReady, testVolumes[:len(testVolumes)-1]...)
 				verifySingleAttachmentPod(vmi)
@@ -812,10 +734,10 @@ var _ = SIGDescribe("Hotplug", func() {
 				By("Adding volume to running VM")
 				addDVVolumeVM(vm.Name, vm.Namespace, "testvolume", dvBlock.Name, "scsi")
 				By("Verifying the volume and disk are in the VM and VMI")
-				verifyVolumeAndDiskVMAdded(vm, "testvolume")
+				tests.VerifyVolumeAndDiskVMAdded(virtClient, vm, "testvolume")
 				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
-				verifyVolumeAndDiskVMIAdded(vmi, "testvolume")
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "testvolume")
 				verifyVolumeStatus(vmi, v1.VolumeReady, "testvolume")
 				verifySingleAttachmentPod(vmi)
 
@@ -833,7 +755,7 @@ var _ = SIGDescribe("Hotplug", func() {
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Verifying that the hotplugged volume is hotpluggable after a restart")
-				verifyVolumeAndDiskVMIAdded(vmi, "testvolume")
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "testvolume")
 				verifyVolumeStatus(vmi, v1.VolumeReady, "testvolume")
 
 				By("Verifying the hotplug device is auto-mounted during booting")
@@ -877,7 +799,7 @@ var _ = SIGDescribe("Hotplug", func() {
 				By("Adding volume to running VM")
 				addDVVolumeVM(vm.Name, vm.Namespace, "block", dvBlock.Name, "scsi")
 				addDVVolumeVM(vm.Name, vm.Namespace, "fs", dvFileSystem.Name, "scsi")
-				verifyVolumeAndDiskVMIAdded(vmi, "block", "fs")
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "block", "fs")
 
 				verifyVolumeStatus(vmi, v1.VolumeReady, "block", "fs")
 				targets := getTargetsFromVolumeStatus(vmi, "block", "fs")
@@ -987,7 +909,7 @@ var _ = SIGDescribe("Hotplug", func() {
 				By("Verifying the volume and disk are in the VMI")
 				vmi, err = virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
-				verifyVolumeAndDiskVMIAdded(vmi, volumeName)
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, volumeName)
 				verifyVolumeStatus(vmi, v1.VolumeReady, volumeName)
 
 				By("Verifying the VMI is still migrateable")
@@ -1030,7 +952,7 @@ var _ = SIGDescribe("Hotplug", func() {
 				addVolumeFunc(vmi.Name, vmi.Namespace, volumeName, dv.Name, "scsi")
 				vmi, err = virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
-				verifyVolumeAndDiskVMIAdded(vmi, volumeName)
+				tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, volumeName)
 				verifyVolumeStatus(vmi, v1.VolumeReady, volumeName)
 			})
 		})
@@ -1074,7 +996,7 @@ var _ = SIGDescribe("Hotplug", func() {
 			By("Verifying the volume and disk are in the VM and VMI")
 			vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			verifyVolumeAndDiskVMIAdded(vmi, "testvolume")
+			tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "testvolume")
 			verifyVolumeStatus(vmi, v1.VolumeReady, "testvolume")
 
 			getVmiConsoleAndLogin(vmi)
@@ -1119,7 +1041,7 @@ var _ = SIGDescribe("Hotplug", func() {
 			By("Verifying the volume and disk are in the VM and VMI")
 			vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			verifyVolumeAndDiskVMIAdded(vmi, "testvolume")
+			tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "testvolume")
 			verifyVolumeStatus(vmi, v1.VolumeReady, "testvolume")
 
 			getVmiConsoleAndLogin(vmi)
@@ -1166,7 +1088,7 @@ var _ = SIGDescribe("Hotplug", func() {
 			By("Verifying the volume and disk are in the VM and VMI")
 			vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			verifyVolumeAndDiskVMIAdded(vmi, "testvolume")
+			tests.VerifyVolumeAndDiskVMIAdded(virtClient, vmi, "testvolume")
 			verifyVolumeStatus(vmi, v1.VolumeReady, "testvolume")
 
 			getVmiConsoleAndLogin(vmi)

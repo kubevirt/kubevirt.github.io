@@ -42,7 +42,6 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/apimachinery/pkg/labels"
-	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/client-go/informers"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/cache"
@@ -151,6 +150,18 @@ type KubeInformerFactory interface {
 
 	// Fake CDI DataSource informer used when feature gate is disabled
 	DummyDataSource() cache.SharedIndexInformer
+
+	// Watches for CDI objects
+	CDI() cache.SharedIndexInformer
+
+	// Fake CDI informer used when feature gate is disabled
+	DummyCDI() cache.SharedIndexInformer
+
+	// Watches for CDIConfig objects
+	CDIConfig() cache.SharedIndexInformer
+
+	// Fake CDIConfig informer used when feature gate is disabled
+	DummyCDIConfig() cache.SharedIndexInformer
 
 	// CRD
 	CRD() cache.SharedIndexInformer
@@ -433,20 +444,13 @@ func (f *kubeInformerFactory) VirtualMachineSnapshot() cache.SharedIndexInformer
 			"vm": func(obj interface{}) ([]string, error) {
 				vms, ok := obj.(*snapshotv1.VirtualMachineSnapshot)
 				if !ok {
-
 					return nil, unexpectedObjectError
 				}
 
-				if vms.Spec.Source.APIGroup != nil {
-					gv, err := schema.ParseGroupVersion(*vms.Spec.Source.APIGroup)
-					if err != nil {
-						return nil, err
-					}
-
-					if gv.Group == core.GroupName &&
-						vms.Spec.Source.Kind == "VirtualMachine" {
-						return []string{vms.Spec.Source.Name}, nil
-					}
+				if vms.Spec.Source.APIGroup != nil &&
+					*vms.Spec.Source.APIGroup == core.GroupName &&
+					vms.Spec.Source.Kind == "VirtualMachine" {
+					return []string{fmt.Sprintf("%s/%s", vms.Namespace, vms.Spec.Source.Name)}, nil
 				}
 
 				return nil, nil
@@ -467,7 +471,8 @@ func (f *kubeInformerFactory) VirtualMachineSnapshotContent() cache.SharedIndexI
 				var volumeSnapshots []string
 				for _, v := range vmsc.Spec.VolumeBackups {
 					if v.VolumeSnapshotName != nil {
-						volumeSnapshots = append(volumeSnapshots, *v.VolumeSnapshotName)
+						k := fmt.Sprintf("%s/%s", vmsc.Namespace, *v.VolumeSnapshotName)
+						volumeSnapshots = append(volumeSnapshots, k)
 					}
 				}
 				return volumeSnapshots, nil
@@ -487,16 +492,10 @@ func (f *kubeInformerFactory) VirtualMachineRestore() cache.SharedIndexInformer 
 					return nil, unexpectedObjectError
 				}
 
-				if vmr.Spec.Target.APIGroup != nil {
-					gv, err := schema.ParseGroupVersion(*vmr.Spec.Target.APIGroup)
-					if err != nil {
-						return nil, err
-					}
-
-					if gv.Group == core.GroupName &&
-						vmr.Spec.Target.Kind == "VirtualMachine" {
-						return []string{vmr.Spec.Target.Name}, nil
-					}
+				if vmr.Spec.Target.APIGroup != nil &&
+					*vmr.Spec.Target.APIGroup == core.GroupName &&
+					vmr.Spec.Target.Kind == "VirtualMachine" {
+					return []string{fmt.Sprintf("%s/%s", vmr.Namespace, vmr.Spec.Target.Name)}, nil
 				}
 
 				return nil, nil
@@ -543,6 +542,38 @@ func (f *kubeInformerFactory) DataSource() cache.SharedIndexInformer {
 func (f *kubeInformerFactory) DummyDataSource() cache.SharedIndexInformer {
 	return f.getInformer("fakeDataSourceInformer", func() cache.SharedIndexInformer {
 		informer, _ := testutils.NewFakeInformerFor(&cdiv1.DataSource{})
+		return informer
+	})
+}
+
+func (f *kubeInformerFactory) CDI() cache.SharedIndexInformer {
+	return f.getInformer("cdiInformer", func() cache.SharedIndexInformer {
+		restClient := f.clientSet.CdiClient().CdiV1beta1().RESTClient()
+		lw := cache.NewListWatchFromClient(restClient, "cdis", k8sv1.NamespaceAll, fields.Everything())
+
+		return cache.NewSharedIndexInformer(lw, &cdiv1.CDI{}, f.defaultResync, cache.Indexers{})
+	})
+}
+
+func (f *kubeInformerFactory) DummyCDI() cache.SharedIndexInformer {
+	return f.getInformer("fakeCdiInformer", func() cache.SharedIndexInformer {
+		informer, _ := testutils.NewFakeInformerFor(&cdiv1.CDI{})
+		return informer
+	})
+}
+
+func (f *kubeInformerFactory) CDIConfig() cache.SharedIndexInformer {
+	return f.getInformer("cdiConfigInformer", func() cache.SharedIndexInformer {
+		restClient := f.clientSet.CdiClient().CdiV1beta1().RESTClient()
+		lw := cache.NewListWatchFromClient(restClient, "cdiconfigs", k8sv1.NamespaceAll, fields.Everything())
+
+		return cache.NewSharedIndexInformer(lw, &cdiv1.CDIConfig{}, f.defaultResync, cache.Indexers{})
+	})
+}
+
+func (f *kubeInformerFactory) DummyCDIConfig() cache.SharedIndexInformer {
+	return f.getInformer("fakeCdiConfigInformer", func() cache.SharedIndexInformer {
+		informer, _ := testutils.NewFakeInformerFor(&cdiv1.CDIConfig{})
 		return informer
 	})
 }

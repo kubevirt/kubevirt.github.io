@@ -80,11 +80,12 @@ func (VirtualMachineInstanceStatus) SwaggerDoc() map[string]string {
 
 func (PersistentVolumeClaimInfo) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":             "PersistentVolumeClaimInfo contains the relavant information virt-handler needs cached about a PVC\n+k8s:openapi-gen=true",
-		"accessModes":  "AccessModes contains the desired access modes the volume should have.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1\n+listType=atomic\n+optional",
-		"volumeMode":   "VolumeMode defines what type of volume is required by the claim.\nValue of Filesystem is implied when not included in claim spec.\n+optional",
-		"capacity":     "Capacity represents the capacity set on the corresponding PVC spec\n+optional",
-		"preallocated": "Preallocated indicates if the PVC's storage is preallocated or not\n+optional",
+		"":                   "PersistentVolumeClaimInfo contains the relavant information virt-handler needs cached about a PVC\n+k8s:openapi-gen=true",
+		"accessModes":        "AccessModes contains the desired access modes the volume should have.\nMore info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes-1\n+listType=atomic\n+optional",
+		"volumeMode":         "VolumeMode defines what type of volume is required by the claim.\nValue of Filesystem is implied when not included in claim spec.\n+optional",
+		"capacity":           "Capacity represents the capacity set on the corresponding PVC spec\n+optional",
+		"preallocated":       "Preallocated indicates if the PVC's storage is preallocated or not\n+optional",
+		"filesystemOverhead": "Percentage of filesystem's size to be reserved when resizing the PVC\n+optional",
 	}
 }
 
@@ -573,6 +574,12 @@ func (VirtualMachineInstanceFileSystem) SwaggerDoc() map[string]string {
 	}
 }
 
+func (FreezeUnfreezeTimeout) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"": "FreezeUnfreezeTimeout represent the time unfreeze will be triggered if guest was not unfrozen by unfreeze command\n+k8s:openapi-gen=true",
+	}
+}
+
 func (AddVolumeOptions) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"":             "AddVolumeOptions is provided when dynamically hot plugging a volume and disk\n+k8s:openapi-gen=true",
@@ -706,6 +713,12 @@ func (ProfilerResult) SwaggerDoc() map[string]string {
 }
 
 func (ClusterProfilerResults) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"": "+k8s:openapi-gen=true",
+	}
+}
+
+func (ClusterProfilerRequest) SwaggerDoc() map[string]string {
 	return map[string]string{
 		"": "+k8s:openapi-gen=true",
 	}
