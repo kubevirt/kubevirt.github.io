@@ -3,6 +3,7 @@
 from io import BytesIO
 import pycurl
 import json
+import os
 import re
 import string
 import sys
@@ -18,6 +19,21 @@ adopters = {
         "vendors": [],
     }
 }
+
+def logo(name):
+    result = []
+    path = '../assets/images/adopters/'
+    name = re.sub('[^a-zA-Z0-9 \n]', '', name)
+    for root, dirs, files in os.walk(path):
+        result = [s for s in files if '.' + name + '.' in '.' + s]
+
+    if len(result) > 1:
+        print("Image search yielded more than 1 result")
+        print(result)
+        print("Please resolve this and settle on one img file")
+        raise SystemExit
+    return result[0]
+
 
 try:
     with open(f_adopters, 'r') as f:
@@ -45,7 +61,7 @@ except OSError:
 for line in lines:
     if '| ' in line:
         line = line.replace('| ', '', 1)
-        regexp = re.compile(r'([Ee]nd-user|[Ii]ntegration|[Vv]endor)')
+        regexp = re.compile(r'([Ee]nd-[Uu]ser|[Ii]ntegration|[Vv]endor)')
         if regexp.search(line):
             line = line.split('| ')
             line[0] = line[0].replace('-','').lower().rstrip() + 's'
@@ -55,7 +71,7 @@ for line in lines:
                 (
                     {
                     "link": line[3],
-                    "logo": ''.join(i for i in line[1] if not i in " ,.") + '.png',
+                    "logo": logo(line[1].replace(' ','')),
                     "name": line[1]
                     }
                 )
