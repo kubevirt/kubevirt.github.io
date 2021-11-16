@@ -25,7 +25,7 @@ We are currently driven by
 This week we achieved to:
 
 - Present at KVM Forum, Prague (@rmohr, @fabiand)
-  <http://redhat.slides.com/fdeutsch/running-virtual-machines-on-kubernetes-with-libvirt-and-kvm-at-kvm-forum-2017#/>
+  <http://slides.com/fabiand/running-virtual-machines-on-kubernetes-at-kvm-forum-2017#>
 
 - Proposal on how to construct the VM API (@rmohr, @michalskrivanek)
   <https://github.com/kubevirt/kubevirt/pull/466>
