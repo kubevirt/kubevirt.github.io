@@ -258,7 +258,8 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 				secret, err := virtClient.CoreV1().Secrets(flags.KubeVirtInstallNamespace).Get(context.Background(), components.KubeVirtCASecretName, metav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
 				secret.Data = map[string][]byte{
-					"random": []byte("nonsense"),
+					"tls.crt": []byte(""),
+					"tls.key": []byte(""),
 				}
 
 				_, err = virtClient.CoreV1().Secrets(flags.KubeVirtInstallNamespace).Update(context.Background(), secret, metav1.UpdateOptions{})
@@ -344,7 +345,8 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 					return err
 				}
 				secret.Data = map[string][]byte{
-					"random": []byte("nonsense"),
+					"tls.crt": []byte(""),
+					"tls.key": []byte(""),
 				}
 				_, err = virtClient.CoreV1().Secrets(flags.KubeVirtInstallNamespace).Update(context.Background(), secret, metav1.UpdateOptions{})
 
@@ -1564,7 +1566,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 				_, err = virtClient.ClusterProfiler().Dump(&v1.ClusterProfilerRequest{})
 				Expect(err).ToNot(BeNil())
 			})
-			It("is enabled it should allow subresource access", func() {
+			It("[QUARANTINE] is enabled it should allow subresource access", func() {
 				tests.EnableFeatureGate("ClusterProfiler")
 
 				err := virtClient.ClusterProfiler().Start()

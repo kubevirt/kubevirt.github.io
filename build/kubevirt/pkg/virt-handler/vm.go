@@ -269,12 +269,6 @@ type VirtualMachineController struct {
 	vmiExpectations             *controller.UIDTrackingControllerExpectations
 }
 
-type virtLauncherCriticalNetworkError struct {
-	msg string
-}
-
-func (e *virtLauncherCriticalNetworkError) Error() string { return e.msg }
-
 type virtLauncherCriticalSecurebootError struct {
 	msg string
 }
@@ -495,47 +489,39 @@ func (d *VirtualMachineController) clearPodNetworkPhase1(vmi *v1.VirtualMachineI
 // it results in killing/spawning a posix thread. Only do this if it
 // is absolutely necessary. The cache informs us if this action has
 // already taken place or not for a VMI
-func (d *VirtualMachineController) setPodNetworkPhase1(vmi *v1.VirtualMachineInstance) (bool, error) {
+func (d *VirtualMachineController) setPodNetworkPhase1(vmi *v1.VirtualMachineInstance) error {
 
 	// configure network
 	res, err := d.podIsolationDetector.Detect(vmi)
 	if err != nil {
-		return false, fmt.Errorf("failed to detect isolation for launcher pod: %v", err)
+		return fmt.Errorf("failed to detect isolation for launcher pod: %v", err)
 	}
 
-	pid := res.Pid()
-
 	// check to see if we've already completed phase1 for this vmi
-	cachedPid, exists := d.phase1NetworkSetupCache.Load(vmi.UID)
-
-	if exists && cachedPid == pid {
-		return false, nil
+	if _, exists := d.phase1NetworkSetupCache.Load(vmi.UID); exists {
+		return nil
 	}
 
 	if virtutil.IsNonRootVMI(vmi) && virtutil.WantVirtioNetDevice(vmi) {
-		err := d.claimDeviceOwnership(vmi, "vhost-net")
+		rootMount := res.MountRoot()
+		err := d.claimDeviceOwnership(rootMount, "vhost-net")
 		if err != nil {
-			return true, fmt.Errorf("failed to set up vhost-net device, %s", err)
+			return neterrors.CreateCriticalNetworkError(fmt.Errorf("failed to set up vhost-net device, %s", err))
 		}
 	}
 
+	pid := res.Pid()
 	err = res.DoNetNS(func() error {
 		return netsetup.NewVMNetworkConfigurator(vmi, d.networkCacheStoreFactory).SetupPodNetworkPhase1(pid)
 	})
-
 	if err != nil {
-		_, critical := err.(*neterrors.CriticalNetworkError)
-		if critical {
-			return true, err
-		}
-		return false, err
-
+		return err
 	}
 
 	// cache that phase 1 has completed for this vmi.
-	d.phase1NetworkSetupCache.Store(vmi.UID, pid)
+	d.phase1NetworkSetupCache.Store(vmi.UID, 0)
 
-	return false, nil
+	return nil
 }
 
 func domainMigrated(domain *api.Domain) bool {
@@ -1269,7 +1255,8 @@ func (d *VirtualMachineController) updateVMIStatus(origVMI *v1.VirtualMachineIns
 	d.updatePausedConditions(vmi, domain, condManager)
 
 	// Handle sync error
-	if _, ok := syncError.(*virtLauncherCriticalNetworkError); ok {
+	var criticalNetErr *neterrors.CriticalNetworkError
+	if goerror.As(syncError, &criticalNetErr) {
 		log.Log.Errorf("virt-launcher crashed due to a network error. Updating VMI %s status to Failed", vmi.Name)
 		vmi.Status.Phase = v1.Failed
 	}
@@ -2550,31 +2537,26 @@ func (d *VirtualMachineController) vmUpdateHelperMigrationTarget(origVMI *v1.Vir
 	}
 
 	// configure network inside virt-launcher compute container
-	criticalNetworkError, err := d.setPodNetworkPhase1(vmi)
-	if err != nil {
-		if criticalNetworkError {
-			return &virtLauncherCriticalNetworkError{fmt.Sprintf("failed to configure vmi network for migration target: %v", err)}
-		} else {
-			return fmt.Errorf("failed to configure vmi network for migration target: %v", err)
-		}
-
+	if err := d.setPodNetworkPhase1(vmi); err != nil {
+		return fmt.Errorf("failed to configure vmi network for migration target: %w", err)
 	}
 
-	err = d.claimDeviceOwnership(vmi, "kvm")
+	isolationRes, err := d.podIsolationDetector.Detect(vmi)
+	if err != nil {
+		return fmt.Errorf("failed to detect isolation for launcher pod: %v", err)
+	}
+	virtLauncherRootMount := isolationRes.MountRoot()
+
+	err = d.claimDeviceOwnership(virtLauncherRootMount, "kvm")
 	if err != nil {
 		return fmt.Errorf("failed to set up file ownership for /dev/kvm: %v", err)
-	}
-
-	res, err := d.podIsolationDetector.Detect(vmi)
-	if err != nil {
-		return err
 	}
 
 	lessPVCSpaceToleration := d.clusterConfig.GetLessPVCSpaceToleration()
 	minimumPVCReserveBytes := d.clusterConfig.GetMinimumReservePVCBytes()
 
 	// initialize disks images for empty PVC
-	hostDiskCreator := hostdisk.NewHostDiskCreator(d.recorder, lessPVCSpaceToleration, minimumPVCReserveBytes, res.MountRoot())
+	hostDiskCreator := hostdisk.NewHostDiskCreator(d.recorder, lessPVCSpaceToleration, minimumPVCReserveBytes, virtLauncherRootMount)
 	err = hostDiskCreator.Create(vmi)
 	if err != nil {
 		return fmt.Errorf("preparing host-disks failed: %v", err)
@@ -2644,31 +2626,26 @@ func (d *VirtualMachineController) vmUpdateHelperDefault(origVMI *v1.VirtualMach
 			return err
 		}
 
-		criticalNetworkError, err := d.setPodNetworkPhase1(vmi)
-		if err != nil {
-			if criticalNetworkError {
-				return &virtLauncherCriticalNetworkError{fmt.Sprintf("failed to configure vmi network: %v", err)}
-			} else {
-				return fmt.Errorf("failed to configure vmi network: %v", err)
-			}
-
+		if err := d.setPodNetworkPhase1(vmi); err != nil {
+			return fmt.Errorf("failed to configure vmi network: %w", err)
 		}
 
-		err = d.claimDeviceOwnership(vmi, "kvm")
+		isolationRes, err := d.podIsolationDetector.Detect(vmi)
+		if err != nil {
+			return fmt.Errorf("failed to detect isolation for launcher pod: %v", err)
+		}
+		virtLauncherRootMount := isolationRes.MountRoot()
+
+		err = d.claimDeviceOwnership(virtLauncherRootMount, "kvm")
 		if err != nil {
 			return fmt.Errorf("failed to set up file ownership for /dev/kvm: %v", err)
-		}
-
-		res, err := d.podIsolationDetector.Detect(vmi)
-		if err != nil {
-			return err
 		}
 
 		lessPVCSpaceToleration := d.clusterConfig.GetLessPVCSpaceToleration()
 		minimumPVCReserveBytes := d.clusterConfig.GetMinimumReservePVCBytes()
 
 		// initialize disks images for empty PVC
-		hostDiskCreator := hostdisk.NewHostDiskCreator(d.recorder, lessPVCSpaceToleration, minimumPVCReserveBytes, res.MountRoot())
+		hostDiskCreator := hostdisk.NewHostDiskCreator(d.recorder, lessPVCSpaceToleration, minimumPVCReserveBytes, virtLauncherRootMount)
 		err = hostDiskCreator.Create(vmi)
 		if err != nil {
 			return fmt.Errorf("preparing host-disks failed: %v", err)
@@ -2938,13 +2915,8 @@ func (d *VirtualMachineController) isHostModelMigratable(vmi *v1.VirtualMachineI
 	return nil
 }
 
-func (d *VirtualMachineController) claimDeviceOwnership(vmi *v1.VirtualMachineInstance, deviceName string) error {
-	isolation, err := d.podIsolationDetector.Detect(vmi)
-	if err != nil {
-		return err
-	}
-
-	kvmPath := filepath.Join(isolation.MountRoot(), "dev", deviceName)
+func (d *VirtualMachineController) claimDeviceOwnership(virtLauncherRootMount, deviceName string) error {
+	kvmPath := filepath.Join(virtLauncherRootMount, "dev", deviceName)
 
 	softwareEmulation, err := util.UseSoftwareEmulationForDevice(kvmPath, d.clusterConfig.AllowEmulation())
 	if err != nil || softwareEmulation {

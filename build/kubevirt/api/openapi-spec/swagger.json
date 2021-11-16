@@ -11984,6 +11984,9 @@
      "name": {
       "description": "Name of the GPU device as exposed by a device plugin",
       "type": "string"
+     },
+     "virtualGPUOptions": {
+      "$ref": "#/definitions/v1.VGPUOptions"
      }
     }
    },
@@ -13458,6 +13461,27 @@
      "secret": {
       "description": "Secret means that the access credential is pulled from a kubernetes secret",
       "$ref": "#/definitions/v1.AccessCredentialSecretSource"
+     }
+    }
+   },
+   "v1.VGPUDisplayOptions": {
+    "type": "object",
+    "properties": {
+     "enabled": {
+      "description": "Enabled determines if a display addapter backed by a vGPU should be enabled or disabled on the guest. Defaults to true.",
+      "type": "boolean"
+     },
+     "ramFB": {
+      "description": "Enables a boot framebuffer, until the guest OS loads a real GPU driver Defaults to true.",
+      "$ref": "#/definitions/v1.FeatureState"
+     }
+    }
+   },
+   "v1.VGPUOptions": {
+    "type": "object",
+    "properties": {
+     "display": {
+      "$ref": "#/definitions/v1.VGPUDisplayOptions"
      }
     }
    },
@@ -15476,12 +15500,17 @@
    "v1beta1.DataVolumeSourceRegistry": {
     "description": "DataVolumeSourceRegistry provides the parameters to create a Data Volume from an registry source",
     "type": "object",
-    "required": [
-     "url"
-    ],
     "properties": {
      "certConfigMap": {
       "description": "CertConfigMap provides a reference to the Registry certs",
+      "type": "string"
+     },
+     "imageStream": {
+      "description": "ImageStream is the name of image stream for import",
+      "type": "string"
+     },
+     "pullMethod": {
+      "description": "PullMethod can be either \"pod\" (default import), or \"node\" (node docker cache based import)",
       "type": "string"
      },
      "secretRef": {
@@ -15489,7 +15518,7 @@
       "type": "string"
      },
      "url": {
-      "description": "URL is the url of the Docker registry source",
+      "description": "URL is the url of the registry source (starting with the scheme: docker, oci-archive)",
       "type": "string"
      }
     }
