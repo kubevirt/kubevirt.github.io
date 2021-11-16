@@ -1,0 +1,3 @@
+[build]
+  publish = "./_site"
+  command = "sed -i 's/jekyll build/jekyll build --future/g' Rakefile; rake; touch _site/.nojekyll"
