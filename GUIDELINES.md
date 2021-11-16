@@ -9,7 +9,7 @@ Please use the following as general guidelines on any kind of contents generated
 ### Technical setup
 
 - Install `pre-commit` in your system and from the repositry folder run `pre-commit install` so that git hook is in place.
-  - It will avoid commits to `source` and `master` branch
+  - It will avoid commits to `source` and `main` branch
   - It will spell check articles before commit can be performed
   - Adjust some formatting in markdown like tables, spaces before and after headings, etc (via prettifier)
   - If you're using `npm` you can also add pre-commit as dependency for development so that it incorporates the `pre-commit` hook and it also spellchecks before you submit to CI and risk to get a failure in build. To do so, use: `npm install --save-dev pre-commit`
