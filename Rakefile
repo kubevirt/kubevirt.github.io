@@ -145,4 +145,4 @@ namespace :links do
 end
 
 desc 'The default task will execute all tests in a row'
-task :default => ['links:build', 'links:test_external', 'links:test_internal']
+task :default => ['links:build']
