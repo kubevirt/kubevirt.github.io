@@ -7,7 +7,7 @@
     "doc": "docs"
   },
   "scripts": {
-    "publish-travis": "master _site",
+    "publish-travis": "main _site",
     "test": "yaspeller-ci --only-errors --find-repeat-words --ignore-digits --ignore-urls ./**/*.md"
   },
   "pre-commit": [

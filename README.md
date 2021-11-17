@@ -1,6 +1,6 @@
 # Contributing to KubeVirt.io
 
-[![Build Status](https://prow.ci.kubevirt.io/badge.svg?jobs=push-kubevirt.github.io-master-build-and-push-to-gh-pages)](https://prow.ci.kubevirt.io/?repo=kubevirt%2Fkubevirt.github.io&type=postsubmit&job=push-kubevirt.github.io-master-build-and-push-to-gh-pages)
+[![Build Status](https://prow.ci.kubevirt.io/badge.svg?jobs=push-kubevirt.github.io-main-build-and-push-to-gh-pages)](https://prow.ci.kubevirt.io/?repo=kubevirt%2Fkubevirt.github.io&type=postsubmit&job=push-kubevirt.github.io-main-build-and-push-to-gh-pages)
 
 The [kubevirt.io](https://kubevirt.io) website is a [Jekyll](https://jekyllrb.com/) driven site hosted by GitHub Pages.
 
@@ -51,27 +51,27 @@ upstream	git@github.com:kubevirt/kubevirt.github.io.git (fetch)
 upstream	git@github.com:kubevirt/kubevirt.github.io.git (push)
 ```
 
-To sync the master branch from the upstream repository, perform the following ...
+To sync the main branch from the upstream repository, perform the following ...
 
 ```bash
-git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f
+git checkout main; git fetch upstream; git reset --hard upstream/main; git push origin main -f
 ```
 
-*Note* Master branch is purely cosmetic for this repo. Merges to master **ARE NOT ACCEPTED**.
+*Note* Master branch is purely cosmetic for this repo. Merges to main **ARE NOT ACCEPTED**.
 
 
-All work must be branched from `master` branch. Perform the following to sync from upstream ...
+All work must be branched from `main` branch. Perform the following to sync from upstream ...
 
 ```bash
-git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f
+git checkout main; git fetch upstream; git reset --hard upstream/main; git push origin main -f
 ```
 
 #### Feature branch
 
-Even though changes from a local `master` branch are accepted it is inadvisable, can cause confusion and possibly data loss. Please use feature branches branched from `master` by running the following ...
+Even though changes from a local `main` branch are accepted it is inadvisable, can cause confusion and possibly data loss. Please use feature branches branched from `main` by running the following ...
 
 ```bash
-git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f; git branch feat_branch; git checkout feat_branch; git push --set-upstream origin feat_branch
+git checkout main; git fetch upstream; git reset --hard upstream/main; git push origin main -f; git branch feat_branch; git checkout feat_branch; git push --set-upstream origin feat_branch
 ```
 
 #### Rebase
@@ -79,7 +79,7 @@ git checkout master; git fetch upstream; git reset --hard upstream/master; git p
 Periodically a feature branch will need to be rebased as the local and origin fall behind upstream. Perform the following to rebase ...
 
 ```bash
-git checkout master; git fetch upstream; git reset --hard upstream/master; git push origin master -f; git checkout feat_branch; git rebase origin/master; git push -f
+git checkout main; git fetch upstream; git reset --hard upstream/main; git push origin main -f; git checkout feat_branch; git rebase origin/main; git push -f
 ```
 
 There is always a strong possibility for merge conflicts. Proceed with caution in resolving. Each conflict must be hand edited. Perform the following to resolve each conflict ...
@@ -172,7 +172,7 @@ git commit -s -m "The commit message" file1 file 2 file3 ...
 You will see the following in the transaction log
 ```bash
 git log
-commit hashbrowns (HEAD -> feat_branch, upstream/master, origin/master, master)
+commit hashbrowns (HEAD -> feat_branch, upstream/main, origin/main, main)
 Author: KubeVirt contributer <kubevirt_contributer@kubevirt.io>
 Date:   Mon Jan 01 00:00:00 2021 -0700
 
@@ -185,7 +185,7 @@ Signed-off-by: <your configured git identity>
 
 3) Often you will see a `Compare & Pull Request` button ... Click on that
 
-4) Ensure your base branch is `master`, your compare branch is `feat_branch`, and the file diff's are correct.
+4) Ensure your base branch is `main`, your compare branch is `feat_branch`, and the file diff's are correct.
 
 5) Create a nice subject and body for the pull request. Be sure to tag related issues, people of interest, and click the "Create pull request" button.
 
