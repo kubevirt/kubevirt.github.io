@@ -23,7 +23,9 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	virtv1 "kubevirt.io/client-go/apis/core/v1"
+	virtv1 "kubevirt.io/api/core/v1"
+
+	"kubevirt.io/api/migrations"
 )
 
 func GetAllCluster() []runtime.Object {
@@ -143,6 +145,7 @@ func newAdminClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/removevolume",
 					"virtualmachineinstances/freeze",
 					"virtualmachineinstances/unfreeze",
+					"virtualmachineinstances/softreboot",
 				},
 				Verbs: []string{
 					"update",
@@ -199,6 +202,28 @@ func newAdminClusterRole() *rbacv1.ClusterRole {
 				},
 				Verbs: []string{
 					"get", "delete", "create", "update", "patch", "list", "watch", "deletecollection",
+				},
+			},
+			{
+				APIGroups: []string{
+					"pool.kubevirt.io",
+				},
+				Resources: []string{
+					"virtualmachinepools",
+				},
+				Verbs: []string{
+					"get", "delete", "create", "update", "patch", "list", "watch", "deletecollection",
+				},
+			},
+			{
+				APIGroups: []string{
+					migrations.GroupName,
+				},
+				Resources: []string{
+					migrations.ResourceMigrationPolicies,
+				},
+				Verbs: []string{
+					"get", "list", "watch",
 				},
 			},
 		},
@@ -245,6 +270,7 @@ func newEditClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/removevolume",
 					"virtualmachineinstances/freeze",
 					"virtualmachineinstances/unfreeze",
+					"virtualmachineinstances/softreboot",
 				},
 				Verbs: []string{
 					"update",
@@ -305,6 +331,17 @@ func newEditClusterRole() *rbacv1.ClusterRole {
 			},
 			{
 				APIGroups: []string{
+					"pool.kubevirt.io",
+				},
+				Resources: []string{
+					"virtualmachinepools",
+				},
+				Verbs: []string{
+					"get", "delete", "create", "update", "patch", "list", "watch",
+				},
+			},
+			{
+				APIGroups: []string{
 					"kubevirt.io",
 				},
 				Resources: []string{
@@ -312,6 +349,17 @@ func newEditClusterRole() *rbacv1.ClusterRole {
 				},
 				Verbs: []string{
 					"get", "list",
+				},
+			},
+			{
+				APIGroups: []string{
+					migrations.GroupName,
+				},
+				Resources: []string{
+					migrations.ResourceMigrationPolicies,
+				},
+				Verbs: []string{
+					"get", "list", "watch",
 				},
 			},
 		},
@@ -380,6 +428,28 @@ func newViewClusterRole() *rbacv1.ClusterRole {
 				Resources: []string{
 					"virtualmachineflavors",
 					"virtualmachineclusterflavors",
+				},
+				Verbs: []string{
+					"get", "list", "watch",
+				},
+			},
+			{
+				APIGroups: []string{
+					"pool.kubevirt.io",
+				},
+				Resources: []string{
+					"virtualmachinepools",
+				},
+				Verbs: []string{
+					"get", "list", "watch",
+				},
+			},
+			{
+				APIGroups: []string{
+					migrations.GroupName,
+				},
+				Resources: []string{
+					migrations.ResourceMigrationPolicies,
 				},
 				Verbs: []string{
 					"get", "list", "watch",

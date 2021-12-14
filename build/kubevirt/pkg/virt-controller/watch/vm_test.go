@@ -24,8 +24,10 @@ import (
 	framework "k8s.io/client-go/tools/cache/testing"
 	"k8s.io/client-go/tools/record"
 
-	virtv1 "kubevirt.io/client-go/apis/core/v1"
-	flavorv1alpha1 "kubevirt.io/client-go/apis/flavor/v1alpha1"
+	"kubevirt.io/client-go/api"
+
+	virtv1 "kubevirt.io/api/core/v1"
+	flavorv1alpha1 "kubevirt.io/api/flavor/v1alpha1"
 	cdifake "kubevirt.io/client-go/generated/containerized-data-importer/clientset/versioned/fake"
 	"kubevirt.io/client-go/generated/kubevirt/clientset/versioned/fake"
 	"kubevirt.io/client-go/kubecli"
@@ -137,7 +139,7 @@ var _ = Describe("VirtualMachine", func() {
 		shouldExpectVMIFinalizerRemoval := func(vmi *virtv1.VirtualMachineInstance) {
 			patch := `[{ "op": "test", "path": "/metadata/finalizers", "value": ["kubevirt.io/virtualMachineControllerFinalize"] }, { "op": "replace", "path": "/metadata/finalizers", "value": [] }]`
 
-			vmiInterface.EXPECT().Patch(vmi.Name, types.JSONPatchType, []byte(patch)).Return(vmi, nil)
+			vmiInterface.EXPECT().Patch(vmi.Name, types.JSONPatchType, []byte(patch), &metav1.PatchOptions{}).Return(vmi, nil)
 		}
 
 		shouldExpectDataVolumeCreationPriorityClass := func(uid types.UID, labels map[string]string, annotations map[string]string, priorityClassName string, idx *int) {
@@ -1339,7 +1341,7 @@ var _ = Describe("VirtualMachine", func() {
 		It("should ignore non-matching VMIs", func() {
 			vm, vmi := DefaultVirtualMachine(true)
 
-			nonMatchingVMI := virtv1.NewMinimalVMI("testvmi1")
+			nonMatchingVMI := api.NewMinimalVMI("testvmi1")
 			nonMatchingVMI.ObjectMeta.Labels = map[string]string{"test": "test1"}
 
 			addVirtualMachine(vm)
@@ -1364,7 +1366,7 @@ var _ = Describe("VirtualMachine", func() {
 
 			vmInterface.EXPECT().Get(vm.ObjectMeta.Name, gomock.Any()).Return(vm, nil)
 			vmInterface.EXPECT().UpdateStatus(gomock.Any()).Return(vm, nil)
-			vmiInterface.EXPECT().Patch(vmi.ObjectMeta.Name, gomock.Any(), gomock.Any())
+			vmiInterface.EXPECT().Patch(vmi.ObjectMeta.Name, gomock.Any(), gomock.Any(), &metav1.PatchOptions{})
 
 			controller.Execute()
 		})
@@ -2474,7 +2476,7 @@ func VirtualMachineFromVMI(name string, vmi *virtv1.VirtualMachineInstance, star
 }
 
 func DefaultVirtualMachineWithNames(started bool, vmName string, vmiName string) (*virtv1.VirtualMachine, *virtv1.VirtualMachineInstance) {
-	vmi := virtv1.NewMinimalVMI(vmiName)
+	vmi := api.NewMinimalVMI(vmiName)
 	vmi.GenerateName = "prettyrandom"
 	vmi.Status.Phase = virtv1.Running
 	vmi.Finalizers = append(vmi.Finalizers, virtv1.VirtualMachineControllerFinalizer)

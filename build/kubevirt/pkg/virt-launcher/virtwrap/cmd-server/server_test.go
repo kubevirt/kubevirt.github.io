@@ -31,7 +31,7 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/info"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 	cmdclient "kubevirt.io/kubevirt/pkg/virt-handler/cmd-client"
@@ -117,6 +117,13 @@ var _ = Describe("Virt remote commands", func() {
 			vmi := v1.NewVMIReferenceFromName("testvmi")
 			domainManager.EXPECT().UnfreezeVMI(vmi)
 			err := client.UnfreezeVirtualMachine(vmi)
+			Expect(err).ToNot(HaveOccurred())
+		})
+
+		It("should soft reboot a vmi", func() {
+			vmi := v1.NewVMIReferenceFromName("testvmi")
+			domainManager.EXPECT().SoftRebootVMI(vmi)
+			err := client.SoftRebootVirtualMachine(vmi)
 			Expect(err).ToNot(HaveOccurred())
 		})
 

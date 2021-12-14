@@ -54,11 +54,12 @@ import (
 	"k8s.io/apimachinery/pkg/types"
 	"libvirt.org/go/libvirt"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/log"
 	cloudinit "kubevirt.io/kubevirt/pkg/cloud-init"
 	"kubevirt.io/kubevirt/pkg/config"
 	containerdisk "kubevirt.io/kubevirt/pkg/container-disk"
+	"kubevirt.io/kubevirt/pkg/controller"
 	"kubevirt.io/kubevirt/pkg/emptydisk"
 	ephemeraldisk "kubevirt.io/kubevirt/pkg/ephemeral-disk"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
@@ -69,6 +70,7 @@ import (
 	agentpoller "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/agent-poller"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/cli"
+	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice/legacy"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice/sriov"
 	domainerrors "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/errors"
@@ -92,6 +94,7 @@ type DomainManager interface {
 	UnpauseVMI(*v1.VirtualMachineInstance) error
 	FreezeVMI(*v1.VirtualMachineInstance, int32) error
 	UnfreezeVMI(*v1.VirtualMachineInstance) error
+	SoftRebootVMI(*v1.VirtualMachineInstance) error
 	KillVMI(*v1.VirtualMachineInstance) error
 	DeleteVMI(*v1.VirtualMachineInstance) error
 	SignalShutdownVMI(*v1.VirtualMachineInstance) error
@@ -324,7 +327,7 @@ func (l *LibvirtDomainManager) hotPlugHostDevices(vmi *v1.VirtualMachineInstance
 		return err
 	}
 
-	if err := sriov.AttachHostDevices(domain, sriovHostDevices); err != nil {
+	if err := hostdevice.AttachHostDevices(domain, sriovHostDevices); err != nil {
 		return err
 	}
 
@@ -1211,6 +1214,37 @@ func (l *LibvirtDomainManager) UnfreezeVMI(vmi *v1.VirtualMachineInstance) error
 		log.Log.Errorf("Failed to unfreeze vmi, %s", err.Error())
 		return err
 	}
+	return nil
+}
+
+func (l *LibvirtDomainManager) SoftRebootVMI(vmi *v1.VirtualMachineInstance) error {
+	domainRebootFlagValues := libvirt.DOMAIN_REBOOT_GUEST_AGENT
+	condManager := controller.NewVirtualMachineInstanceConditionManager()
+	if !condManager.HasConditionWithStatus(vmi, v1.VirtualMachineInstanceAgentConnected, k8sv1.ConditionTrue) {
+		if features := vmi.Spec.Domain.Features; features != nil && features.ACPI.Enabled != nil && !(*features.ACPI.Enabled) {
+			err := fmt.Errorf("VMI neither have the agent connected nor the ACPI feature enabled")
+			log.Log.Object(vmi).Reason(err).Error("Setting the domain reboot flag failed.")
+			return err
+		}
+		domainRebootFlagValues = libvirt.DOMAIN_REBOOT_ACPI_POWER_BTN
+	}
+
+	domName := api.VMINamespaceKeyFunc(vmi)
+	dom, err := l.virConn.LookupDomainByName(domName)
+	if err != nil {
+		log.Log.Object(vmi).Reason(err).Error("Getting the domain for soft reboot failed.")
+		return err
+	}
+
+	defer dom.Free()
+	if err = dom.Reboot(domainRebootFlagValues); err != nil {
+		libvirtError, ok := err.(libvirt.Error)
+		if !ok || libvirtError.Code != libvirt.ERR_AGENT_UNRESPONSIVE {
+			log.Log.Object(vmi).Reason(err).Error("Soft rebooting the domain failed.")
+			return err
+		}
+	}
+
 	return nil
 }
 

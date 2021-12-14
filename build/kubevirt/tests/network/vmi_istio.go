@@ -40,7 +40,7 @@ import (
 	"k8s.io/apimachinery/pkg/apis/meta/v1/unstructured"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/pkg/network/istio"
 	"kubevirt.io/kubevirt/tests"
@@ -171,7 +171,7 @@ var _ = SIGDescribe("[Serial] Istio", func() {
 			JustBeforeEach(func() {
 				sourcePodName = tests.GetVmPodName(virtClient, vmi)
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).NotTo(HaveOccurred())
 				Eventually(func() error {
 					return migrationCompleted(migration)

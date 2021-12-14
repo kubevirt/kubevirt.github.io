@@ -44,7 +44,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/testutils"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 )
 
@@ -1769,6 +1769,42 @@ var _ = Describe("Converter", func() {
 			vmi.Spec.Domain.Devices.Inputs[0].Bus = ""
 			domain := vmiToDomain(vmi, c)
 			Expect(domain.Spec.Devices.Inputs[0].Bus).To(Equal("usb"), "Expect usb bus")
+		})
+
+		It("should not enable sound cards emulation by default", func() {
+			v1.SetObjectDefaults_VirtualMachineInstance(vmi)
+			vmi.Spec.Domain.Devices.Sound = nil
+			domain := vmiToDomain(vmi, c)
+			Expect(len(domain.Spec.Devices.SoundCards)).To(Equal(0))
+		})
+
+		It("should enable default sound card with existing but empty sound devices", func() {
+			v1.SetObjectDefaults_VirtualMachineInstance(vmi)
+			name := "audio-default-ich9"
+			vmi.Spec.Domain.Devices.Sound = &v1.SoundDevice{
+				Name: name,
+			}
+			domain := vmiToDomain(vmi, c)
+			Expect(len(domain.Spec.Devices.SoundCards)).To(Equal(1))
+			Expect(domain.Spec.Devices.SoundCards).To(ContainElement(api.SoundCard{
+				Alias: api.NewUserDefinedAlias(name),
+				Model: "ich9",
+			}))
+		})
+
+		It("should enable ac97 sound card ", func() {
+			v1.SetObjectDefaults_VirtualMachineInstance(vmi)
+			name := "audio-ac97"
+			vmi.Spec.Domain.Devices.Sound = &v1.SoundDevice{
+				Name:  name,
+				Model: "ac97",
+			}
+			domain := vmiToDomain(vmi, c)
+			Expect(len(domain.Spec.Devices.SoundCards)).To(Equal(1))
+			Expect(domain.Spec.Devices.SoundCards).To(ContainElement(api.SoundCard{
+				Alias: api.NewUserDefinedAlias(name),
+				Model: "ac97",
+			}))
 		})
 
 		It("should enable usb redirection when number of USB client devices > 0", func() {

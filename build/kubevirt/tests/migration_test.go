@@ -62,7 +62,7 @@ import (
 
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
@@ -229,7 +229,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 	runAndCancelMigration := func(migration *v1.VirtualMachineInstanceMigration, vmi *v1.VirtualMachineInstance, timeout int) *v1.VirtualMachineInstanceMigration {
 		By("Starting a Migration")
 		Eventually(func() error {
-			migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+			migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 			return err
 		}, timeout, 1*time.Second).ShouldNot(HaveOccurred())
 
@@ -258,7 +258,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 	runAndImmediatelyCancelMigration := func(migration *v1.VirtualMachineInstanceMigration, vmi *v1.VirtualMachineInstance, timeout int) *v1.VirtualMachineInstanceMigration {
 		By("Starting a Migration")
 		Eventually(func() error {
-			migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+			migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 			return err
 		}, timeout, 1*time.Second).ShouldNot(HaveOccurred())
 
@@ -279,7 +279,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 	runMigrationAndExpectFailure := func(migration *v1.VirtualMachineInstanceMigration, timeout int) string {
 		By("Starting a Migration")
 		Eventually(func() error {
-			migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+			migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 			return err
 		}, timeout, 1*time.Second).ShouldNot(HaveOccurred())
 		By("Waiting until the Migration Completes")
@@ -320,30 +320,12 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 	getLibvirtdPid := func(pod *k8sv1.Pod) string {
 		stdout, stderr, err := tests.ExecuteCommandOnPodV2(virtClient, pod, "compute",
 			[]string{
-				"ps",
-				"-x",
+				"pidof",
+				"libvirtd",
 			})
-		Expect(err).ToNot(HaveOccurred(), `"ps -x" failed with stdout="`+stdout+`" and stderr="`+stderr+`"`)
-
-		pid := ""
-		for _, str := range strings.Split(stdout, "\n") {
-			if !strings.Contains(str, "libvirtd") {
-				continue
-			}
-			words := strings.Fields(str)
-
-			Expect(len(words)).To(Equal(7), fmt.Sprintf("Found %s", words))
-
-			// verify it is numeric
-			_, err = strconv.Atoi(words[0])
-			Expect(err).ToNot(HaveOccurred(), "should have found pid for libvirtd that is numeric")
-
-			pid = words[0]
-			break
-
-		}
-
-		Expect(pid).ToNot(Equal(""), "libvirtd pid not found")
+		errorMassageFormat := "faild after running `pidof libvirtd`  with stdout:\n %v \n stderr:\n %v \n err: \n %v \n"
+		Expect(err).ToNot(HaveOccurred(), fmt.Sprintf(errorMassageFormat, stdout, stderr, err))
+		pid := strings.TrimSuffix(stdout, "\n")
 		return pid
 	}
 
@@ -354,7 +336,80 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 		}
 	}
 
+	setMigrationBandwidthLimitation := func(migrationBandwidth resource.Quantity) {
+		cfg := getCurrentKv()
+		cfg.MigrationConfiguration.BandwidthPerMigration = &migrationBandwidth
+		tests.UpdateKubeVirtConfigValueAndWait(cfg)
+	}
+
 	Describe("Starting a VirtualMachineInstance ", func() {
+
+		var pvName string
+		var memoryRequestSize resource.Quantity
+
+		BeforeEach(func() {
+			memoryRequestSize = resource.MustParse(fedoraVMSize)
+			pvName = "test-nfs" + rand.String(48)
+		})
+
+		guestAgentMigrationTestFunc := func(mode v1.MigrationMode) {
+			By("Creating the  VMI")
+			vmi := tests.NewRandomVMIWithPVC(pvName)
+			vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = memoryRequestSize
+			vmi.Spec.Domain.Devices.Rng = &v1.Rng{}
+
+			// add userdata for guest agent and service account mount
+			mountSvcAccCommands := fmt.Sprintf(`#!/bin/bash
+					mkdir /mnt/servacc
+					mount /dev/$(lsblk --nodeps -no name,serial | grep %s | cut -f1 -d' ') /mnt/servacc
+				`, secretDiskSerial)
+			tests.AddUserData(vmi, "cloud-init", mountSvcAccCommands)
+
+			tests.AddServiceAccountDisk(vmi, "default")
+			disks := vmi.Spec.Domain.Devices.Disks
+			disks[len(disks)-1].Serial = secretDiskSerial
+
+			vmi = runVMIAndExpectLaunchIgnoreWarnings(vmi, 180)
+
+			// Wait for cloud init to finish and start the agent inside the vmi.
+			tests.WaitAgentConnected(virtClient, vmi)
+
+			By("Checking that the VirtualMachineInstance console has expected output")
+			Expect(libnet.WithIPv6(console.LoginToFedora)(vmi)).To(Succeed(), "Should be able to login to the Fedora VM")
+
+			if mode == v1.MigrationPostCopy {
+				By("Running stress test to allow transition to post-copy")
+				runStressTest(vmi, stressLargeVMSize, stressDefaultTimeout)
+			}
+
+			// execute a migration, wait for finalized state
+			By("Starting the Migration for iteration")
+			migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+			migrationUID := tests.RunMigrationAndExpectCompletion(virtClient, migration, tests.MigrationWaitTime)
+
+			By("Checking VMI, confirm migration state")
+			tests.ConfirmVMIPostMigration(virtClient, vmi, migrationUID)
+			confirmMigrationMode(vmi, mode)
+
+			By("Is agent connected after migration")
+			tests.WaitAgentConnected(virtClient, vmi)
+
+			By("Checking that the migrated VirtualMachineInstance console has expected output")
+			Expect(console.OnPrivilegedPrompt(vmi, 60)).To(BeTrue(), "Should stay logged in to the migrated VM")
+
+			By("Checking that the service account is mounted")
+			Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
+				&expect.BSnd{S: "cat /mnt/servacc/namespace\n"},
+				&expect.BExp{R: util.NamespaceTestDefault},
+			}, 30)).To(Succeed(), "Should be able to access the mounted service account file")
+
+			By("Deleting the VMI")
+			Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
+
+			By("Waiting for VMI to disappear")
+			tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 120)
+		}
+
 		Context("with a bridge network interface", func() {
 			It("[test_id:3226]should reject a migration of a vmi with a bridge interface", func() {
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
@@ -387,7 +442,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
 
 				By("Starting a Migration")
-				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("InterfaceNotLiveMigratable"))
 
@@ -659,7 +714,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 			// Previously, we'd stop getting events after libvirt reconnect, which
 			// prevented things like migration. This test verifies we can migrate after
 			// resetting libvirt
-			It("[test_id:4746][QUARANTINE]should migrate even if libvirt has restarted at some point.", func() {
+			It("[test_id:4746]should migrate even if libvirt has restarted at some point.", func() {
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskCirros))
 				tests.AddUserData(vmi, "cloud-init", "#!/bin/bash\necho 'hello'\n")
 
@@ -680,13 +735,14 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 
 				// kill libvirtd
 				By(fmt.Sprintf("Killing libvirtd with pid %s", pid))
-				_, _, err = tests.ExecuteCommandOnPodV2(virtClient, &pods.Items[0], "compute",
+				stdout, stderr, err := tests.ExecuteCommandOnPodV2(virtClient, &pods.Items[0], "compute",
 					[]string{
 						"kill",
 						"-9",
 						pid,
 					})
-				Expect(err).ToNot(HaveOccurred())
+				errorMassageFormat := "faild after running `kill -9 %v`  with stdout:\n %v \n stderr:\n %v \n err: \n %v \n"
+				Expect(err).ToNot(HaveOccurred(), fmt.Sprintf(errorMassageFormat, pid, stdout, stderr, err))
 
 				// wait for both libvirt to respawn and all connections to re-establish
 				time.Sleep(30 * time.Second)
@@ -711,6 +767,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
 
 			})
+
 			It("[test_id:6972]should migrate to a persistent (non-transient) libvirt domain.", func() {
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskCirros))
 				tests.AddUserData(vmi, "cloud-init", "#!/bin/bash\necho 'hello'\n")
@@ -754,7 +811,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
 
 				By("Pausing the VirtualMachineInstance")
-				virtClient.VirtualMachineInstance(vmi.Namespace).Pause(vmi.Name)
+				virtClient.VirtualMachineInstance(vmi.Namespace).Pause(vmi.Name, &v1.PauseOptions{})
 				tests.WaitForVMICondition(virtClient, vmi, v1.VirtualMachineInstancePaused, 30)
 
 				By("verifying that the vmi is still paused before migration")
@@ -783,6 +840,136 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				isPaused, err = tests.LibvirtDomainIsPaused(virtClient, vmi)
 				Expect(err).ToNot(HaveOccurred(), "Should get domain state successfully")
 				Expect(isPaused).To(BeFalse(), "The VMI should be running, but it is not.")
+			})
+		})
+
+		Context("with an pending target pod", func() {
+			var nodes *k8sv1.NodeList
+			BeforeEach(func() {
+				tests.BeforeTestCleanup()
+				Eventually(func() []k8sv1.Node {
+					nodes = util.GetAllSchedulableNodes(virtClient)
+					return nodes.Items
+				}, 60*time.Second, 1*time.Second).ShouldNot(BeEmpty(), "There should be some compute node")
+			})
+
+			It("should automatically cancel unschedulable migration after a timeout period", func() {
+				vmi := tests.NewRandomFedoraVMIWithGuestAgent()
+				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse(fedoraVMSize)
+
+				// Add node affinity to ensure VMI affinity rules block target pod from being created
+				addNodeAffinityToVMI(vmi, nodes.Items[0].Name)
+
+				By("Starting the VirtualMachineInstance")
+				vmi = runVMIAndExpectLaunch(vmi, 240)
+
+				// execute a migration that is expected to fail
+				By("Starting the Migration")
+				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+				migration.Annotations = map[string]string{v1.MigrationUnschedulablePodTimeoutSecondsAnnotation: "130"}
+
+				By("Starting a Migration")
+				var err error
+				Eventually(func() error {
+					migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
+					return err
+				}, 5, 1*time.Second).Should(Succeed(), "migration creation should succeed")
+
+				By("Migration should observe a timeout period before canceling unschedulable target pod")
+				Consistently(func() error {
+
+					migration, err := virtClient.VirtualMachineInstanceMigration(migration.Namespace).Get(migration.Name, &metav1.GetOptions{})
+					if err != nil {
+						return err
+					}
+
+					if migration.Status.Phase == v1.MigrationFailed {
+						return fmt.Errorf("Migration should observe timeout period before transitioning to failed state")
+					}
+					return nil
+
+				}, 1*time.Minute, 10*time.Second).Should(Succeed())
+
+				By("Migration should fail eventually due to pending target pod timeout")
+				Eventually(func() error {
+					migration, err := virtClient.VirtualMachineInstanceMigration(migration.Namespace).Get(migration.Name, &metav1.GetOptions{})
+					if err != nil {
+						return err
+					}
+
+					if migration.Status.Phase != v1.MigrationFailed {
+						return fmt.Errorf("Waiting on migration with phase %s to reach phase Failed", migration.Status.Phase)
+					}
+					return nil
+				}, 2*time.Minute, 5*time.Second).Should(Succeed(), "migration creation should fail")
+
+				// delete VMI
+				By("Deleting the VMI")
+				Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
+
+				By("Waiting for VMI to disappear")
+				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
+			})
+
+			It("should automatically cancel pending target pod after a catch all timeout period", func() {
+				vmi := tests.NewRandomFedoraVMIWithGuestAgent()
+				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse(fedoraVMSize)
+
+				By("Starting the VirtualMachineInstance")
+				vmi = runVMIAndExpectLaunch(vmi, 240)
+
+				// execute a migration that is expected to fail
+				By("Starting the Migration")
+				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+				migration.Annotations = map[string]string{v1.MigrationPendingPodTimeoutSecondsAnnotation: "130"}
+
+				// Add a fake continer image to the target pod to force a image pull failure which
+				// keeps the target pod in pending state
+				// Make sure to actually use an image repository we own here so no one
+				// can somehow figure out a way to execute custom logic in our func tests.
+				migration.Annotations[v1.FuncTestMigrationTargetImageOverrideAnnotation] = "quay.io/kubevirtci/some-fake-image:" + rand.String(12)
+
+				By("Starting a Migration")
+				var err error
+				Eventually(func() error {
+					migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
+					return err
+				}, 5, 1*time.Second).Should(Succeed(), "migration creation should succeed")
+
+				By("Migration should observe a timeout period before canceling pending target pod")
+				Consistently(func() error {
+
+					migration, err := virtClient.VirtualMachineInstanceMigration(migration.Namespace).Get(migration.Name, &metav1.GetOptions{})
+					if err != nil {
+						return err
+					}
+
+					if migration.Status.Phase == v1.MigrationFailed {
+						return fmt.Errorf("Migration should observe timeout period before transitioning to failed state")
+					}
+					return nil
+
+				}, 1*time.Minute, 10*time.Second).Should(Succeed())
+
+				By("Migration should fail eventually due to pending target pod timeout")
+				Eventually(func() error {
+					migration, err := virtClient.VirtualMachineInstanceMigration(migration.Namespace).Get(migration.Name, &metav1.GetOptions{})
+					if err != nil {
+						return err
+					}
+
+					if migration.Status.Phase != v1.MigrationFailed {
+						return fmt.Errorf("Waiting on migration with phase %s to reach phase Failed", migration.Status.Phase)
+					}
+					return nil
+				}, 2*time.Minute, 5*time.Second).Should(Succeed(), "migration creation should fail")
+
+				// delete VMI
+				By("Deleting the VMI")
+				Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
+
+				By("Waiting for VMI to disappear")
+				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
 			})
 		})
 		Context("with auto converge enabled", func() {
@@ -915,7 +1102,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
 
 				By("Starting a Migration")
-				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("DisksNotLiveMigratable"))
 
@@ -971,7 +1158,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 
 				By("Starting a first migration")
 				migration1 := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-				migration1, err = virtClient.VirtualMachineInstanceMigration(migration1.Namespace).Create(migration1)
+				migration1, err = virtClient.VirtualMachineInstanceMigration(migration1.Namespace).Create(migration1, &metav1.CreateOptions{})
 				Expect(err).To(BeNil())
 
 				// Successfully tested with 40, but requests start getting throttled above 10, which is better to avoid to prevent flakyness
@@ -983,7 +1170,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 						defer GinkgoRecover()
 						defer wg.Done()
 						migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-						_, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+						_, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 						Expect(err).To(HaveOccurred(), fmt.Sprintf("Extra migration %d should have failed to create", n))
 						Expect(err.Error()).To(ContainSubstring(`admission webhook "migration-create-validator.kubevirt.io" denied the request: in-flight migration detected.`))
 					}(n)
@@ -1084,7 +1271,6 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 			})
 		})
 		Context("with a Fedora shared NFS PVC (using nfs ipv4 address), cloud init and service account", func() {
-			var pvName string
 			var vmi *v1.VirtualMachineInstance
 			var dv *cdiv1.DataVolume
 			var wffcPod *k8sv1.Pod
@@ -1093,7 +1279,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				quantity, err := resource.ParseQuantity("5Gi")
 				Expect(err).ToNot(HaveOccurred())
 				url := "docker://" + cd.ContainerDiskFor(cd.ContainerDiskFedoraTestTooling)
-				dv := tests.NewRandomDataVolumeWithRegistryImport(url, util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dv = tests.NewRandomDataVolumeWithRegistryImport(url, util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
 				dv.Spec.PVC.Resources.Requests["storage"] = quantity
 				_, err = virtClient.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
@@ -1125,7 +1311,6 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				By("waiting for the dv import to pvc to finish")
 				Eventually(ThisDV(dv), 600).Should(HaveSucceeded())
 
-				pvName = "test-nfs" + rand.String(48)
 				// Prepare a NFS backed PV
 				By("Starting an NFS POD to serve the PVC contents")
 				nfsPod := storageframework.RenderNFSServerWithPVC("nfsserver", dv.Name)
@@ -1140,11 +1325,6 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				By("create a new NFS PV and PVC")
 				os := string(cd.ContainerDiskFedoraTestTooling)
 				tests.CreateNFSPvAndPvc(pvName, util.NamespaceTestDefault, "5Gi", nfsIP, os)
-
-				cfg := getCurrentKv()
-				migrationBandwidth := resource.MustParse("40Mi")
-				cfg.MigrationConfiguration.BandwidthPerMigration = &migrationBandwidth
-				tests.UpdateKubeVirtConfigValueAndWait(cfg)
 			})
 
 			AfterEach(func() {
@@ -1165,78 +1345,9 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				}
 			})
 
-			table.DescribeTable("should be migrated successfully, using guest agent on VM", func(migrationConfiguration *v1.MigrationConfiguration, mode v1.MigrationMode) {
-				memoryRequestSize := resource.MustParse(fedoraVMSize)
-				if migrationConfiguration != nil {
-					config := getCurrentKv()
-					config.MigrationConfiguration = migrationConfiguration
-					tests.UpdateKubeVirtConfigValueAndWait(config)
-					memoryRequestSize = resource.MustParse("1Gi")
-				}
-
-				// Start the VirtualMachineInstance with the PVC attached
-				By("Creating the  VMI")
-				vmi = tests.NewRandomVMIWithPVC(pvName)
-				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = memoryRequestSize
-				vmi.Spec.Domain.Devices.Rng = &v1.Rng{}
-
-				// add userdata for guest agent and service account mount
-				mountSvcAccCommands := fmt.Sprintf(`#!/bin/bash
-					mkdir /mnt/servacc
-					mount /dev/$(lsblk --nodeps -no name,serial | grep %s | cut -f1 -d' ') /mnt/servacc
-				`, secretDiskSerial)
-				tests.AddUserData(vmi, "cloud-init", mountSvcAccCommands)
-
-				tests.AddServiceAccountDisk(vmi, "default")
-				disks := vmi.Spec.Domain.Devices.Disks
-				disks[len(disks)-1].Serial = secretDiskSerial
-
-				vmi = runVMIAndExpectLaunchIgnoreWarnings(vmi, 180)
-
-				// Wait for cloud init to finish and start the agent inside the vmi.
-				tests.WaitAgentConnected(virtClient, vmi)
-
-				By("Checking that the VirtualMachineInstance console has expected output")
-				Expect(libnet.WithIPv6(console.LoginToFedora)(vmi)).To(Succeed(), "Should be able to login to the Fedora VM")
-
-				if migrationConfiguration != nil {
-					By("Running stress test to allow transition to post-copy")
-					runStressTest(vmi, stressLargeVMSize, stressDefaultTimeout)
-				}
-
-				// execute a migration, wait for finalized state
-				By("Starting the Migration for iteration")
-				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-				migrationUID := tests.RunMigrationAndExpectCompletion(virtClient, migration, tests.MigrationWaitTime)
-
-				By("Checking VMI, confirm migration state")
-				tests.ConfirmVMIPostMigration(virtClient, vmi, migrationUID)
-				confirmMigrationMode(vmi, mode)
-
-				By("Is agent connected after migration")
-				tests.WaitAgentConnected(virtClient, vmi)
-
-				By("Checking that the migrated VirtualMachineInstance console has expected output")
-				Expect(console.OnPrivilegedPrompt(vmi, 60)).To(BeTrue(), "Should stay logged in to the migrated VM")
-
-				By("Checking that the service account is mounted")
-				Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
-					&expect.BSnd{S: "cat /mnt/servacc/namespace\n"},
-					&expect.BExp{R: util.NamespaceTestDefault},
-				}, 30)).To(Succeed(), "Should be able to access the mounted service account file")
-
-				By("Deleting the VMI")
-				Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
-
-				By("Waiting for VMI to disappear")
-				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 120)
-			},
-				table.Entry("[test_id:2653] with default migration configuration", nil, v1.MigrationPreCopy),
-				table.Entry("[QUARANTINE][test_id:5004] with postcopy", &v1.MigrationConfiguration{
-					AllowPostCopy:           pointer.BoolPtr(true),
-					CompletionTimeoutPerGiB: pointer.Int64Ptr(1),
-				}, v1.MigrationPostCopy),
-			)
+			It("[test_id:2653] should be migrated successfully, using guest agent on VM with default migration configuration", func() {
+				guestAgentMigrationTestFunc(v1.MigrationPreCopy)
+			})
 
 			It("[test_id:6975] should have guest agent functional after migration", func() {
 				By("Creating the  VMI")
@@ -1322,7 +1433,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 					// execute a migration, wait for finalized state
 					By("Starting the Migration")
 					migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-					migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+					migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 
 					By("Waiting for the proxy connection details to appear")
 					Eventually(func() bool {
@@ -1398,7 +1509,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 					// execute a migration, wait for finalized state
 					By("Starting the Migration")
 					migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-					migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+					migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 
 					By("Waiting for the proxy connection details to appear")
 					Eventually(func() bool {
@@ -1462,6 +1573,94 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 		})
 
 		Context("migration postcopy", func() {
+
+			var dv *cdiv1.DataVolume
+			var wffcPod *k8sv1.Pod
+
+			BeforeEach(func() {
+				By("Limit migration bandwidth")
+				setMigrationBandwidthLimitation(resource.MustParse("40Mi"))
+
+				By("Allowing post-copy")
+				config := getCurrentKv()
+				config.MigrationConfiguration.AllowPostCopy = pointer.BoolPtr(true)
+				config.MigrationConfiguration.CompletionTimeoutPerGiB = pointer.Int64Ptr(1)
+				tests.UpdateKubeVirtConfigValueAndWait(config)
+				memoryRequestSize = resource.MustParse("1Gi")
+
+				quantity, err := resource.ParseQuantity("5Gi")
+				Expect(err).ToNot(HaveOccurred())
+				url := "docker://" + cd.ContainerDiskFor(cd.ContainerDiskFedoraTestTooling)
+				dv := tests.NewRandomDataVolumeWithRegistryImport(url, util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dv.Spec.PVC.Resources.Requests["storage"] = quantity
+				_, err = virtClient.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				wffcPod = tests.RenderPod("wffc-temp-pod", []string{"echo"}, []string{"done"})
+				wffcPod.Spec.Containers[0].VolumeMounts = []k8sv1.VolumeMount{
+
+					{
+						Name:      "tmp-data",
+						MountPath: "/data/tmp-data",
+					},
+				}
+				wffcPod.Spec.Volumes = []k8sv1.Volume{
+					{
+						Name: "tmp-data",
+						VolumeSource: k8sv1.VolumeSource{
+							PersistentVolumeClaim: &k8sv1.PersistentVolumeClaimVolumeSource{
+								ClaimName: dv.Name,
+							},
+						},
+					},
+				}
+
+				By("pinning the wffc dv")
+				wffcPod, err = virtClient.CoreV1().Pods(util.NamespaceTestDefault).Create(context.Background(), wffcPod, metav1.CreateOptions{})
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(ThisPod(wffcPod), 120).Should(BeInPhase(k8sv1.PodSucceeded))
+
+				By("waiting for the dv import to pvc to finish")
+				Eventually(ThisDV(dv), 600).Should(HaveSucceeded())
+
+				// Prepare a NFS backed PV
+				By("Starting an NFS POD to serve the PVC contents")
+				nfsPod := storageframework.RenderNFSServerWithPVC("nfsserver", dv.Name)
+				nfsPod, err = virtClient.CoreV1().Pods(util.NamespaceTestDefault).Create(context.Background(), nfsPod, metav1.CreateOptions{})
+				Expect(err).ToNot(HaveOccurred())
+				Eventually(ThisPod(nfsPod), 120).Should(BeInPhase(k8sv1.PodRunning))
+				nfsPod, err = ThisPod(nfsPod)()
+				Expect(err).ToNot(HaveOccurred())
+				nfsIP := libnet.GetPodIpByFamily(nfsPod, k8sv1.IPv4Protocol)
+				Expect(nfsIP).NotTo(BeEmpty())
+				// create a new PV and PVC (PVs can't be reused)
+				By("create a new NFS PV and PVC")
+				os := string(cd.ContainerDiskFedoraTestTooling)
+				tests.CreateNFSPvAndPvc(pvName, util.NamespaceTestDefault, "5Gi", nfsIP, os)
+			})
+
+			AfterEach(func() {
+				By("Deleting NFS pod")
+				// PVs can't be reused
+				tests.DeletePvAndPvc(pvName)
+
+				if dv != nil {
+					By("Deleting the DataVolume")
+					Expect(virtClient.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Delete(context.Background(), dv.Name, metav1.DeleteOptions{})).To(Succeed())
+					dv = nil
+				}
+				if wffcPod != nil {
+					By("Deleting the wffc pod")
+					err = virtClient.CoreV1().Pods(util.NamespaceTestDefault).Delete(context.Background(), wffcPod.Name, metav1.DeleteOptions{})
+					Expect(err).ToNot(HaveOccurred())
+					wffcPod = nil
+				}
+			})
+
+			It("[test_id:5004] should be migrated successfully, using guest agent on VM with postcopy", func() {
+				guestAgentMigrationTestFunc(v1.MigrationPostCopy)
+			})
+
 			It("[QUARANTINE][test_id:4747] should migrate using cluster level config for postcopy", func() {
 				config := getCurrentKv()
 				config.MigrationConfiguration.AllowPostCopy = pointer.BoolPtr(true)
@@ -1586,7 +1785,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 					podName := fmt.Sprintf("migration-killer-pod-%d", idx)
 
 					// kill the handler right as we detect the qemu target process come online
-					pod := tests.RenderPrivilegedPod(podName, []string{"/bin/bash", "-c"}, []string{fmt.Sprintf("while true; do ps aux | grep \"%s\" && pkill -9 virt-handler && sleep 5; done", emulator)})
+					pod := tests.RenderPrivilegedPod(podName, []string{"/bin/bash", "-c"}, []string{fmt.Sprintf("while true; do ps aux | grep -v \"defunct\" | grep \"%s\" && pkill -9 virt-handler && sleep 5; done", emulator)})
 
 					pod.Spec.NodeName = entry.Name
 					createdPod, err := virtClient.CoreV1().Pods(util.NamespaceTestDefault).Create(context.Background(), pod, metav1.CreateOptions{})
@@ -1704,7 +1903,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				// execute a migration
 				By("Starting the Migration")
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Waiting for Migration to reach Preparing Target Phase")
@@ -1788,7 +1987,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				// execute a migration
 				By("Starting the Migration")
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Waiting for Migration to reach Preparing Target Phase")
@@ -1868,7 +2067,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
 
 				By("Starting a Migration")
-				_, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				_, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).To(HaveOccurred())
 				Expect(err.Error()).To(ContainSubstring("DisksNotLiveMigratable"))
 
@@ -2066,12 +2265,15 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 			It("[test_id:6981]should migrate only to nodes supporting right cpu model", func() {
 				if !isHeterogeneousCluster() {
 					log.Log.Warning("all nodes have the same CPU model. Therefore the test is a happy-path since " +
-						"VMIs with host-model CPU can be migrated to every other node")
+						"VMIs with default CPU can be migrated to every other node")
 				}
 
-				By("Creating a VMI with host-model CPU mode")
+				By("Creating a VMI with default CPU mode")
 				vmi := cirrosVMIWithEvictionStrategy()
-				vmi.Spec.Domain.CPU = &v1.CPU{Model: v1.CPUModeHostModel}
+
+				if cpu := vmi.Spec.Domain.CPU; cpu != nil && cpu.Model != v1.CPUModeHostModel {
+					log.Log.Warning("test is not expected to pass with CPU model other than host-model")
+				}
 
 				By("Starting the VirtualMachineInstance")
 				vmi = runVMIAndExpectLaunch(vmi, 240)
@@ -2098,6 +2300,66 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				Expect(isModelSupportedOnNode(newNode, hostModel)).To(BeTrue(), "original host model should be supported on new node")
 				expectFeatureToBeSupportedOnNode(newNode, requiredFeatures)
 			})
+		})
+
+		Context("with migration policies", func() {
+
+			confirmMigrationPolicyName := func(vmi *v1.VirtualMachineInstance, expectedName *string) {
+				By("Retrieving the VMI post migration")
+				vmi, err = virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				By("Verifying the VMI's configuration source")
+				if expectedName == nil {
+					Expect(vmi.Status.MigrationState.MigrationPolicyName).To(BeNil())
+				} else {
+					Expect(vmi.Status.MigrationState.MigrationPolicyName).ToNot(BeNil())
+					Expect(*vmi.Status.MigrationState.MigrationPolicyName).To(Equal(*expectedName))
+				}
+			}
+
+			getVmisNamespace := func(vmi *v1.VirtualMachineInstance) *k8sv1.Namespace {
+				namespace, err := virtClient.CoreV1().Namespaces().Get(context.Background(), vmi.Namespace, metav1.GetOptions{})
+				Expect(err).ShouldNot(HaveOccurred())
+				Expect(namespace).ShouldNot(BeNil())
+				return namespace
+			}
+
+			table.DescribeTable("migration policy", func(defineMigrationPolicy bool) {
+				By("Updating config to allow auto converge")
+				config := getCurrentKv()
+				config.MigrationConfiguration.AllowPostCopy = pointer.BoolPtr(true)
+				tests.UpdateKubeVirtConfigValueAndWait(config)
+
+				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskCirros))
+
+				var expectedPolicyName *string
+				if defineMigrationPolicy {
+					By("Creating a migration policy that overrides cluster policy")
+					policy := tests.GetPolicyMatchedToVmi("testpolicy", vmi, getVmisNamespace(vmi), 1, 0)
+					policy.Spec.AllowPostCopy = pointer.BoolPtr(false)
+
+					_, err := virtClient.MigrationPolicy().Create(context.Background(), policy, metav1.CreateOptions{})
+					Expect(err).ToNot(HaveOccurred())
+
+					expectedPolicyName = &policy.Name
+				}
+
+				By("Starting the VirtualMachineInstance")
+				vmi = runVMIAndExpectLaunch(vmi, 240)
+
+				By("Starting the Migration")
+				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+				migrationUID := tests.RunMigrationAndExpectCompletion(virtClient, migration, 180)
+
+				// check VMI, confirm migration state
+				tests.ConfirmVMIPostMigration(virtClient, vmi, migrationUID)
+				confirmMigrationPolicyName(vmi, expectedPolicyName)
+			},
+				table.Entry("should override cluster-wide policy if defined", true),
+				table.Entry("should not affect cluster-wide policy if not defined", false),
+			)
+
 		})
 	})
 
@@ -2240,7 +2502,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				}
 			})
 
-			It("[sig-compute]should delete PDBs created by an old virt-controller", func() {
+			It("[sig-compute][test_id:7680]should delete PDBs created by an old virt-controller", func() {
 				By("creating the VMI")
 				createdVMI, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
 				Expect(err).ToNot(HaveOccurred())
@@ -2290,7 +2552,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 				// execute a migration, wait for finalized state
 				By("Starting the Migration")
 				migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
-				migration, err := virtClient.VirtualMachineInstanceMigration(vmi.Namespace).Create(migration)
+				migration, err := virtClient.VirtualMachineInstanceMigration(vmi.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Waiting until we have two available pods")

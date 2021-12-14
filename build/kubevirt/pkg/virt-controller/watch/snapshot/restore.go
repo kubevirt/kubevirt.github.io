@@ -32,8 +32,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	kubevirtv1 "kubevirt.io/client-go/apis/core/v1"
-	snapshotv1 "kubevirt.io/client-go/apis/snapshot/v1alpha1"
+	kubevirtv1 "kubevirt.io/api/core/v1"
+	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/controller"
 )
@@ -499,8 +499,13 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 	newVM := t.vm.DeepCopy()
 	newVM.Spec = snapshotVM.Spec
 	// update Running state in case snapshot was on online VM
-	running := false
-	newVM.Spec.Running = &running
+	if newVM.Spec.RunStrategy != nil {
+		runStrategyHalted := kubevirtv1.RunStrategyHalted
+		newVM.Spec.RunStrategy = &runStrategyHalted
+	} else if newVM.Spec.Running != nil {
+		running := false
+		newVM.Spec.Running = &running
+	}
 	newVM.Spec.DataVolumeTemplates = newTemplates
 	newVM.Spec.Template.Spec.Volumes = newVolumes
 	if newVM.Annotations == nil {

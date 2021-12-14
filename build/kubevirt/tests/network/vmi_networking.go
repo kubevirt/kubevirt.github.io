@@ -40,9 +40,11 @@ import (
 	netutils "k8s.io/utils/net"
 	"k8s.io/utils/pointer"
 
+	api2 "kubevirt.io/client-go/api"
+
 	"kubevirt.io/kubevirt/tests/util"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/virt-controller/services"
@@ -729,6 +731,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 			)
 
 			It("[outside_connectivity]should be able to reach the outside world [IPv6]", func() {
+				libnet.SkipWhenNotDualStackCluster(virtClient)
 				// Cluster nodes subnet (docker network gateway)
 				// Docker network subnet cidr definition:
 				// https://github.com/kubevirt/project-infra/blob/master/github/ci/shared-deployments/files/docker-daemon-mirror.conf#L5
@@ -766,7 +769,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 			}
 
 			runMigrationAndExpectCompletion := func(migration *v1.VirtualMachineInstanceMigration, timeout int) {
-				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+				migration, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 				Expect(err).NotTo(HaveOccurred())
 
 				Eventually(func() error {
@@ -988,7 +991,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 		})
 		It("[test_id:2964]should reject VMIs with bridge interface when it's not permitted on pod network", func() {
 			var t int64 = 0
-			vmi := v1.NewMinimalVMIWithNS(util.NamespaceTestDefault, libvmi.RandName(libvmi.DefaultVmiName))
+			vmi := api2.NewMinimalVMIWithNS(util.NamespaceTestDefault, libvmi.RandName(libvmi.DefaultVmiName))
 			vmi.Spec.TerminationGracePeriodSeconds = &t
 			vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("128Mi")
 			tests.AddEphemeralDisk(vmi, "disk0", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))

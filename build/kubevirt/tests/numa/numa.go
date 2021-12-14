@@ -16,7 +16,7 @@ import (
 
 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
@@ -26,7 +26,7 @@ import (
 	"kubevirt.io/kubevirt/tests/util"
 )
 
-var _ = Describe("[sig-compute][serial]NUMA", func() {
+var _ = Describe("[sig-compute][Serial]NUMA", func() {
 
 	var virtClient kubecli.KubevirtClient
 	BeforeEach(func() {

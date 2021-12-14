@@ -29,7 +29,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
-	virtv1 "kubevirt.io/client-go/apis/core/v1"
+	virtv1 "kubevirt.io/api/core/v1"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
 
@@ -316,6 +316,16 @@ type FakeVirtualMachineControl struct {
 
 var _ VirtualMachineControlInterface = &FakeVirtualMachineControl{}
 
+func (f *FakeVirtualMachineControl) PatchVirtualMachineInstance(_, _ string, data []byte) error {
+	f.Lock()
+	defer f.Unlock()
+	f.Patches = append(f.Patches, data)
+	if f.Err != nil {
+		return f.Err
+	}
+	return nil
+}
+
 func (f *FakeVirtualMachineControl) PatchVirtualMachine(_, _ string, data []byte) error {
 	f.Lock()
 	defer f.Unlock()
@@ -325,6 +335,7 @@ func (f *FakeVirtualMachineControl) PatchVirtualMachine(_, _ string, data []byte
 	}
 	return nil
 }
+
 func (f *FakeVirtualMachineControl) PatchDataVolume(_, _ string, data []byte) error {
 	f.Lock()
 	defer f.Unlock()

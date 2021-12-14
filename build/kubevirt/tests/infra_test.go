@@ -65,7 +65,7 @@ import (
 	v1ext "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	extclient "k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	clusterutil "kubevirt.io/kubevirt/pkg/util/cluster"
 	"kubevirt.io/kubevirt/pkg/virt-controller/leaderelectionconfig"
@@ -122,7 +122,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			return duration
 		}
 
-		It("[QUARANTINE]on the controller rate limiter should lead to delayed VMI starts", func() {
+		It("on the controller rate limiter should lead to delayed VMI starts", func() {
 			By("first getting the basetime for a replicaset")
 			replicaset := tests.NewRandomReplicaSetFromVMI(libvmi.NewCirros(libvmi.WithResourceMemory("1Mi")), int32(0))
 			replicaset, err = virtClient.ReplicaSet(util.NamespaceTestDefault).Create(replicaset)
@@ -309,7 +309,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 
 			By("checking that we can still start virtual machines and connect to the VMI")
 			vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
-			vmi = tests.RunVMI(vmi, 60)
+			vmi = tests.RunVMIAndExpectLaunch(vmi, 60)
 			Expect(console.LoginToAlpine(vmi)).To(Succeed())
 		})
 
@@ -325,7 +325,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			By("repeatedly starting VMIs until virt-api and virt-handler certificates are updated")
 			Eventually(func() (rotated bool) {
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
-				vmi = tests.RunVMI(vmi, 60)
+				vmi = tests.RunVMIAndExpectLaunch(vmi, 60)
 				Expect(console.LoginToAlpine(vmi)).To(Succeed())
 				err = virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})
 				Expect(err).ToNot(HaveOccurred())

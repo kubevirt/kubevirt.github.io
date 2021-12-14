@@ -34,7 +34,7 @@ import (
 	"k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/testing"
 
-	kubevirtv1 "kubevirt.io/client-go/apis/core/v1"
+	kubevirtv1 "kubevirt.io/api/core/v1"
 
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/pkg/testutils"
@@ -97,7 +97,7 @@ var _ = Describe("Node-labeller ", func() {
 			},
 		}
 
-		config, _, _, _ = testutils.NewFakeClusterConfigUsingKV(kv)
+		config, _, _ = testutils.NewFakeClusterConfigUsingKV(kv)
 
 		nlController, err = newNodeLabeller(config, virtClient, "testNode", k8sv1.NamespaceDefault, "testdata")
 		Expect(err).ToNot(HaveOccurred())

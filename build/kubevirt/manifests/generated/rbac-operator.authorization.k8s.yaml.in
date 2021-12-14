@@ -223,6 +223,7 @@ rules:
   - virtualmachineinstances/removevolume
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
+  - virtualmachineinstances/softreboot
   verbs:
   - update
   - get
@@ -335,6 +336,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - ""
   resources:
   - configmaps
@@ -389,6 +398,12 @@ rules:
 - apiGroups:
   - ""
   resources:
+  - pods/status
+  verbs:
+  - patch
+- apiGroups:
+  - ""
+  resources:
   - nodes
   verbs:
   - get
@@ -430,6 +445,18 @@ rules:
   verbs:
   - '*'
 - apiGroups:
+  - pool.kubevirt.io
+  resources:
+  - virtualmachinepools
+  verbs:
+  - watch
+  - list
+  - create
+  - delete
+  - update
+  - patch
+  - get
+- apiGroups:
   - kubevirt.io
   resources:
   - '*'
@@ -442,6 +469,7 @@ rules:
   - virtualmachineinstances/removevolume
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
+  - virtualmachineinstances/softreboot
   verbs:
   - update
 - apiGroups:
@@ -508,6 +536,20 @@ rules:
   - list
   - watch
 - apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - ""
+  resources:
+  - namespaces
+  verbs:
+  - get
+- apiGroups:
   - kubevirt.io
   resources:
   - virtualmachineinstances
@@ -556,6 +598,14 @@ rules:
   - list
   - watch
 - apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
   - ""
   resources:
   - configmaps
@@ -589,6 +639,7 @@ rules:
   - virtualmachineinstances/removevolume
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
+  - virtualmachineinstances/softreboot
   verbs:
   - update
 - apiGroups:
@@ -645,6 +696,27 @@ rules:
   - list
   - watch
   - deletecollection
+- apiGroups:
+  - pool.kubevirt.io
+  resources:
+  - virtualmachinepools
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+  - deletecollection
+- apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - subresources.kubevirt.io
   resources:
@@ -664,6 +736,7 @@ rules:
   - virtualmachineinstances/removevolume
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
+  - virtualmachineinstances/softreboot
   verbs:
   - update
 - apiGroups:
@@ -718,12 +791,32 @@ rules:
   - list
   - watch
 - apiGroups:
+  - pool.kubevirt.io
+  resources:
+  - virtualmachinepools
+  verbs:
+  - get
+  - delete
+  - create
+  - update
+  - patch
+  - list
+  - watch
+- apiGroups:
   - kubevirt.io
   resources:
   - kubevirts
   verbs:
   - get
   - list
+- apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
+  verbs:
+  - get
+  - list
+  - watch
 - apiGroups:
   - subresources.kubevirt.io
   resources:
@@ -759,6 +852,22 @@ rules:
   resources:
   - virtualmachineflavors
   - virtualmachineclusterflavors
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - pool.kubevirt.io
+  resources:
+  - virtualmachinepools
+  verbs:
+  - get
+  - list
+  - watch
+- apiGroups:
+  - migrations.kubevirt.io
+  resources:
+  - migrationpolicies
   verbs:
   - get
   - list

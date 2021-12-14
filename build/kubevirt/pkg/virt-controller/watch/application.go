@@ -52,7 +52,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/healthz"
 	"kubevirt.io/kubevirt/pkg/monitoring/profiler"
 
-	snapshotv1 "kubevirt.io/client-go/apis/snapshot/v1alpha1"
+	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	clientutil "kubevirt.io/client-go/util"
@@ -150,6 +150,9 @@ type VirtControllerApp struct {
 	rsController *VMIReplicaSet
 	rsInformer   cache.SharedIndexInformer
 
+	poolController *PoolController
+	poolInformer   cache.SharedIndexInformer
+
 	vmController *VMController
 	vmInformer   cache.SharedIndexInformer
 
@@ -176,6 +179,8 @@ type VirtControllerApp struct {
 
 	flavorInformer        cache.SharedIndexInformer
 	clusterFlavorInformer cache.SharedIndexInformer
+
+	migrationPolicyInformer cache.SharedIndexInformer
 
 	LeaderElection leaderelectionconfig.Configuration
 
@@ -204,6 +209,7 @@ type VirtControllerApp struct {
 	nodeControllerThreads             int
 	vmiControllerThreads              int
 	rsControllerThreads               int
+	poolControllerThreads             int
 	vmControllerThreads               int
 	migrationControllerThreads        int
 	evacuationControllerThreads       int
@@ -275,19 +281,17 @@ func Execute() {
 
 	app.informerFactory = controller.NewKubeInformerFactory(app.restClient, app.clientSet, nil, app.kubevirtNamespace)
 
-	configMapInformer := app.informerFactory.ConfigMap()
 	app.crdInformer = app.informerFactory.CRD()
 	app.kubeVirtInformer = app.informerFactory.KubeVirt()
 	app.informerFactory.Start(stopChan)
 
-	// Wire up health check triggers
-	configMapInformer.SetWatchErrorHandler(func(r *cache.Reflector, err error) {
+	app.kubeVirtInformer.SetWatchErrorHandler(func(r *cache.Reflector, err error) {
 		apiHealthVersion.Clear()
 		cache.DefaultWatchErrorHandler(r, err)
 	})
 
-	cache.WaitForCacheSync(stopChan, configMapInformer.HasSynced, app.crdInformer.HasSynced, app.kubeVirtInformer.HasSynced)
-	app.clusterConfig = virtconfig.NewClusterConfig(configMapInformer, app.crdInformer, app.kubeVirtInformer, app.kubevirtNamespace)
+	cache.WaitForCacheSync(stopChan, app.crdInformer.HasSynced, app.kubeVirtInformer.HasSynced)
+	app.clusterConfig = virtconfig.NewClusterConfig(app.crdInformer, app.kubeVirtInformer, app.kubevirtNamespace)
 
 	app.reInitChan = make(chan string, 10)
 	app.hasCDI = app.clusterConfig.HasDataVolumeAPI()
@@ -315,6 +319,7 @@ func Execute() {
 	app.vmiRecorder = app.newRecorder(k8sv1.NamespaceAll, "virtualmachine-controller")
 
 	app.rsInformer = app.informerFactory.VMIReplicaSet()
+	app.poolInformer = app.informerFactory.VMPool()
 
 	app.persistentVolumeClaimInformer = app.informerFactory.PersistentVolumeClaim()
 	app.persistentVolumeClaimCache = app.persistentVolumeClaimInformer.GetStore()
@@ -351,8 +356,11 @@ func Execute() {
 	app.flavorInformer = app.informerFactory.VirtualMachineFlavor()
 	app.clusterFlavorInformer = app.informerFactory.VirtualMachineClusterFlavor()
 
+	app.migrationPolicyInformer = app.informerFactory.MigrationPolicy()
+
 	app.initCommon()
 	app.initReplicaSet()
+	app.initPool()
 	app.initVirtualMachines()
 	app.initDisruptionBudgetController()
 	app.initEvacuationController()
@@ -445,6 +453,7 @@ func (vca *VirtControllerApp) onStartedLeading() func(ctx context.Context) {
 		go vca.nodeController.Run(vca.nodeControllerThreads, stop)
 		go vca.vmiController.Run(vca.vmiControllerThreads, stop)
 		go vca.rsController.Run(vca.rsControllerThreads, stop)
+		go vca.poolController.Run(vca.poolControllerThreads, stop)
 		go vca.vmController.Run(vca.vmControllerThreads, stop)
 		go vca.migrationController.Run(vca.migrationControllerThreads, stop)
 		go vca.snapshotController.Run(vca.snapshotControllerThreads, stop)
@@ -513,6 +522,7 @@ func (vca *VirtControllerApp) initCommon() {
 		vca.nodeInformer,
 		vca.persistentVolumeClaimInformer,
 		vca.pdbInformer,
+		vca.migrationPolicyInformer,
 		vca.vmiRecorder,
 		vca.clientSet,
 		vca.clusterConfig,
@@ -524,6 +534,16 @@ func (vca *VirtControllerApp) initCommon() {
 func (vca *VirtControllerApp) initReplicaSet() {
 	recorder := vca.newRecorder(k8sv1.NamespaceAll, "virtualmachinereplicaset-controller")
 	vca.rsController = NewVMIReplicaSet(vca.vmiInformer, vca.rsInformer, recorder, vca.clientSet, controller.BurstReplicas)
+}
+
+func (vca *VirtControllerApp) initPool() {
+	recorder := vca.newRecorder(k8sv1.NamespaceAll, "virtualmachinepool-controller")
+	vca.poolController = NewPoolController(vca.clientSet,
+		vca.vmiInformer,
+		vca.vmInformer,
+		vca.poolInformer,
+		recorder,
+		controller.BurstReplicas)
 }
 
 func (vca *VirtControllerApp) initVirtualMachines() {
@@ -675,6 +695,9 @@ func (vca *VirtControllerApp) AddFlags() {
 
 	flag.IntVar(&vca.rsControllerThreads, "rs-controller-threads", defaultControllerThreads,
 		"Number of goroutines to run for replicaset controller")
+
+	flag.IntVar(&vca.poolControllerThreads, "pool-controller-threads", defaultControllerThreads,
+		"Number of goroutines to run for pool controller")
 
 	flag.IntVar(&vca.vmControllerThreads, "vm-controller-threads", defaultControllerThreads,
 		"Number of goroutines to run for vm controller")

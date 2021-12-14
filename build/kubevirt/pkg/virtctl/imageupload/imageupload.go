@@ -210,8 +210,8 @@ func (c *command) run(args []string) error {
 	if err := parseArgs(args); err != nil {
 		return err
 	}
-	// #nosec G304 No risk for path injection as this funtion exectues with
-	// the same previliges as those of virtctl user who supplies imagePath
+	// #nosec G304 No risk for path injection as this function executes with
+	// the same privileges as those of virtctl user who supplies imagePath
 	file, err := os.Open(imagePath)
 	if err != nil {
 		return err
@@ -445,7 +445,7 @@ func waitDvUploadScheduled(client kubecli.KubevirtClient, namespace, name string
 			return false, err
 		}
 
-		if dv.Status.Phase == cdiv1.WaitForFirstConsumer {
+		if dv.Status.Phase == cdiv1.WaitForFirstConsumer && !forceBind {
 			return false, fmt.Errorf("cannot upload to DataVolume in WaitForFirstConsumer state, make sure the PVC is Bound")
 		}
 		// TODO: can check Condition/Event here to provide user with some error messages
@@ -480,7 +480,7 @@ func waitUploadServerReady(client kubernetes.Interface, namespace, name string, 
 			return false, err
 		}
 
-		// upload controler sets this to true when uploadserver pod is ready to receive data
+		// upload controller sets this to true when uploadserver pod is ready to receive data
 		podReady := pvc.Annotations[PodReadyAnnotation]
 		done, _ := strconv.ParseBool(podReady)
 
@@ -506,7 +506,7 @@ func waitUploadProcessingComplete(client kubernetes.Interface, namespace, name s
 			return false, err
 		}
 
-		// upload controler sets this to true when uploadserver pod is ready to receive data
+		// upload controller sets this to true when uploadserver pod is ready to receive data
 		podPhase := pvc.Annotations[PodPhaseAnnotation]
 
 		if podPhase == string(v1.PodSucceeded) {

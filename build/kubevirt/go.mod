@@ -8,6 +8,7 @@ require (
 	github.com/coreos/go-iptables v0.5.0
 	github.com/coreos/go-semver v0.3.0
 	github.com/coreos/prometheus-operator v0.38.1-0.20200424145508-7e176fda06cc
+	github.com/davecgh/go-spew v1.1.1
 	github.com/emicklei/go-restful v2.10.0+incompatible
 	github.com/emicklei/go-restful-openapi v1.2.0
 	github.com/evanphx/json-patch v4.9.0+incompatible
@@ -72,6 +73,7 @@ require (
 	k8s.io/kube-aggregator v0.20.2
 	k8s.io/kube-openapi v0.0.0-20210113233702-8566a335510f
 	k8s.io/utils v0.0.0-20210111153108-fddb29f9d009
+	kubevirt.io/api v0.0.0-00010101000000-000000000000
 	kubevirt.io/client-go v0.0.0-00010101000000-000000000000
 	kubevirt.io/containerized-data-importer v1.41.0
 	kubevirt.io/containerized-data-importer-api v1.41.0
@@ -119,6 +121,7 @@ replace (
 	k8s.io/sample-cli-plugin => k8s.io/sample-cli-plugin v0.20.2
 	k8s.io/sample-controller => k8s.io/sample-controller v0.20.2
 
+	kubevirt.io/api => ./staging/src/kubevirt.io/api
 	kubevirt.io/client-go => ./staging/src/kubevirt.io/client-go
 
 	kubevirt.io/containerized-data-importer => kubevirt.io/containerized-data-importer v1.41.0

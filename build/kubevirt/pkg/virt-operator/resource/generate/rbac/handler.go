@@ -25,7 +25,8 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 
-	virtv1 "kubevirt.io/client-go/apis/core/v1"
+	virtv1 "kubevirt.io/api/core/v1"
+	"kubevirt.io/api/migrations"
 )
 
 const HandlerServiceAccountName = "kubevirt-handler"
@@ -142,6 +143,17 @@ func newHandlerClusterRole() *rbacv1.ClusterRole {
 					"get",
 					"list",
 					"watch",
+				},
+			},
+			{
+				APIGroups: []string{
+					migrations.GroupName,
+				},
+				Resources: []string{
+					migrations.ResourceMigrationPolicies,
+				},
+				Verbs: []string{
+					"get", "list", "watch",
 				},
 			},
 		},

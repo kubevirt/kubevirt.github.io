@@ -30,7 +30,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/log"
 )
 
@@ -529,6 +529,7 @@ func (m *volumeMounter) updateDevicesList(path string, rule *configs.DeviceRule)
 		return err
 	}
 	if !m.skipSafetyCheck {
+		// Reference to Blacklist is in external API
 		if !target.IsBlacklist() && !reflect.DeepEqual(currentAfter, target) {
 			return errors.New("resulting devices cgroup doesn't precisely match target")
 		} else if target.IsBlacklist() != currentAfter.IsBlacklist() {

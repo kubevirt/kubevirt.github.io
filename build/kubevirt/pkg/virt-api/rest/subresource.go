@@ -42,7 +42,7 @@ import (
 
 	"kubevirt.io/kubevirt/pkg/util/status"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/controller"
@@ -107,13 +107,16 @@ func (app *SubresourceAPIApp) fetchAndValidateVirtualMachineInstance(namespace, 
 	return
 }
 
-func (app *SubresourceAPIApp) putRequestHandler(request *restful.Request, response *restful.Response, validate validation, getVirtHandlerURL URLResolver) {
+func (app *SubresourceAPIApp) putRequestHandler(request *restful.Request, response *restful.Response, validate validation, getVirtHandlerURL URLResolver, dryRun bool) {
 	_, url, conn, statusErr := app.prepareConnection(request, validate, getVirtHandlerURL)
 	if statusErr != nil {
 		writeError(statusErr, response)
 		return
 	}
 
+	if dryRun {
+		return
+	}
 	err := conn.Put(url, app.handlerTLSConfiguration, request.Request.Body)
 	if err != nil {
 		writeError(errors.NewInternalError(err), response)
@@ -219,13 +222,30 @@ func (app *SubresourceAPIApp) MigrateVMRequestHandler(request *restful.Request, 
 	name := request.PathParameter("name")
 	namespace := request.PathParameter("namespace")
 
+	bodyStruct := &v1.MigrateOptions{}
+	if request.Request.Body != nil {
+		err := yaml.NewYAMLOrJSONDecoder(request.Request.Body, 1024).Decode(&bodyStruct)
+		switch err {
+		case io.EOF, nil:
+			break
+		default:
+			writeError(errors.NewBadRequest(fmt.Sprintf("Can not unmarshal Request body to struct, error: %s", err)), response)
+			return
+		}
+	}
 	vm, err := app.fetchVirtualMachine(name, namespace)
 	if err != nil {
 		writeError(err, response)
 		return
 	}
 
-	if !vm.Status.Ready {
+	vmi, err := app.FetchVirtualMachineInstance(namespace, name)
+	if err != nil {
+		writeError(err, response)
+		return
+	}
+
+	if vmi.Status.Phase != v1.Running {
 		writeError(errors.NewConflict(v1.Resource("virtualmachine"), name, fmt.Errorf("VM is not running")), response)
 		return
 	}
@@ -245,7 +265,7 @@ func (app *SubresourceAPIApp) MigrateVMRequestHandler(request *restful.Request, 
 			Spec: v1.VirtualMachineInstanceMigrationSpec{
 				VMIName: name,
 			},
-		})
+		}, &k8smetav1.CreateOptions{DryRun: bodyStruct.DryRun})
 		if err != nil {
 			return errors.NewInternalError(err)
 		}
@@ -555,7 +575,7 @@ func (app *SubresourceAPIApp) StopVMRequestHandler(request *restful.Request, res
 	if hasVMI && !vmi.IsFinal() && bodyStruct.GracePeriod != nil {
 		bodyString := getUpdateTerminatingSecondsGracePeriod(*bodyStruct.GracePeriod)
 		log.Log.Object(vmi).V(2).Infof("Patching VMI: %s", bodyString)
-		_, err = app.virtCli.VirtualMachineInstance(namespace).Patch(vmi.GetName(), patchType, []byte(bodyString))
+		_, err = app.virtCli.VirtualMachineInstance(namespace).Patch(vmi.GetName(), patchType, []byte(bodyString), &k8smetav1.PatchOptions{DryRun: bodyStruct.DryRun})
 		if err != nil {
 			writeError(errors.NewInternalError(err), response)
 			return
@@ -624,7 +644,23 @@ func (app *SubresourceAPIApp) PauseVMIRequestHandler(request *restful.Request, r
 		return conn.PauseURI(vmi)
 	}
 
-	app.putRequestHandler(request, response, validate, getURL)
+	bodyStruct := &v1.PauseOptions{}
+	if request.Request.Body != nil {
+		err := yaml.NewYAMLOrJSONDecoder(request.Request.Body, 1024).Decode(&bodyStruct)
+		switch err {
+		case io.EOF, nil:
+			break
+		default:
+			writeError(errors.NewBadRequest(fmt.Sprintf("Can not unmarshal Request body to struct, error: %s", err)), response)
+			return
+		}
+	}
+	var dryRun bool
+	if len(bodyStruct.DryRun) > 0 && bodyStruct.DryRun[0] == k8smetav1.DryRunAll {
+		dryRun = true
+	}
+	app.putRequestHandler(request, response, validate, getURL, dryRun)
+
 }
 
 func (app *SubresourceAPIApp) UnpauseVMIRequestHandler(request *restful.Request, response *restful.Response) {
@@ -642,7 +678,23 @@ func (app *SubresourceAPIApp) UnpauseVMIRequestHandler(request *restful.Request,
 	getURL := func(vmi *v1.VirtualMachineInstance, conn kubecli.VirtHandlerConn) (string, error) {
 		return conn.UnpauseURI(vmi)
 	}
-	app.putRequestHandler(request, response, validate, getURL)
+
+	bodyStruct := &v1.UnpauseOptions{}
+	if request.Request.Body != nil {
+		err := yaml.NewYAMLOrJSONDecoder(request.Request.Body, 1024).Decode(&bodyStruct)
+		switch err {
+		case io.EOF, nil:
+			break
+		default:
+			writeError(errors.NewBadRequest(fmt.Sprintf("Can not unmarshal Request body to struct, error: %s", err)), response)
+			return
+		}
+	}
+	var dryRun bool
+	if len(bodyStruct.DryRun) > 0 && bodyStruct.DryRun[0] == k8smetav1.DryRunAll {
+		dryRun = true
+	}
+	app.putRequestHandler(request, response, validate, getURL, dryRun)
 
 }
 
@@ -659,7 +711,7 @@ func (app *SubresourceAPIApp) FreezeVMIRequestHandler(request *restful.Request, 
 		return conn.FreezeURI(vmi)
 	}
 
-	app.putRequestHandler(request, response, validate, getURL)
+	app.putRequestHandler(request, response, validate, getURL, false)
 }
 
 func (app *SubresourceAPIApp) UnfreezeVMIRequestHandler(request *restful.Request, response *restful.Response) {
@@ -673,8 +725,33 @@ func (app *SubresourceAPIApp) UnfreezeVMIRequestHandler(request *restful.Request
 	getURL := func(vmi *v1.VirtualMachineInstance, conn kubecli.VirtHandlerConn) (string, error) {
 		return conn.UnfreezeURI(vmi)
 	}
-	app.putRequestHandler(request, response, validate, getURL)
+	app.putRequestHandler(request, response, validate, getURL, false)
 
+}
+
+func (app *SubresourceAPIApp) SoftRebootVMIRequestHandler(request *restful.Request, response *restful.Response) {
+
+	validate := func(vmi *v1.VirtualMachineInstance) *errors.StatusError {
+		if vmi.Status.Phase != v1.Running {
+			return errors.NewConflict(v1.Resource("virtualmachineinstance"), vmi.Name, fmt.Errorf("VM is not running"))
+		}
+		condManager := controller.NewVirtualMachineInstanceConditionManager()
+		if condManager.HasConditionWithStatus(vmi, v1.VirtualMachineInstancePaused, v12.ConditionTrue) {
+			return errors.NewConflict(v1.Resource("virtualmachineinstance"), vmi.Name, fmt.Errorf("VMI is paused"))
+		}
+		if !condManager.HasCondition(vmi, v1.VirtualMachineInstanceAgentConnected) {
+			if features := vmi.Spec.Domain.Features; features != nil && features.ACPI.Enabled != nil && !(*features.ACPI.Enabled) {
+				return errors.NewConflict(v1.Resource("virtualmachineinstance"), vmi.Name, fmt.Errorf("VMI neither have the agent connected nor the ACPI feature enabled"))
+			}
+		}
+		return nil
+	}
+
+	getURL := func(vmi *v1.VirtualMachineInstance, conn kubecli.VirtHandlerConn) (string, error) {
+		return conn.SoftRebootURI(vmi)
+	}
+
+	app.putRequestHandler(request, response, validate, getURL, false)
 }
 
 func (app *SubresourceAPIApp) fetchVirtualMachine(name string, namespace string) (*v1.VirtualMachine, *errors.StatusError) {
@@ -1140,7 +1217,7 @@ func (app *SubresourceAPIApp) vmiVolumePatch(name, namespace string, volumeReque
 	}
 
 	log.Log.Object(vmi).V(4).Infof("Patching VMI: %s", patch)
-	if _, err := app.virtCli.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte(patch)); err != nil {
+	if _, err := app.virtCli.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte(patch), &k8smetav1.PatchOptions{}); err != nil {
 		log.Log.Object(vmi).V(1).Errorf("unable to patch vmi: %v", err)
 		if errors.IsInvalid(err) {
 			if statErr, ok := err.(*errors.StatusError); ok {

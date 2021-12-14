@@ -25,14 +25,18 @@ import (
 	"reflect"
 	"strings"
 
+	"kubevirt.io/api/migrations"
+
+	migrationsv1 "kubevirt.io/api/migrations/v1alpha1"
+
 	restful "github.com/emicklei/go-restful"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
-	flavorv1alpha1 "kubevirt.io/client-go/apis/flavor/v1alpha1"
-	snapshotv1 "kubevirt.io/client-go/apis/snapshot/v1alpha1"
+	v1 "kubevirt.io/api/core/v1"
+	flavorv1alpha1 "kubevirt.io/api/flavor/v1alpha1"
+	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
 	mime "kubevirt.io/kubevirt/pkg/rest"
 )
 
@@ -42,6 +46,7 @@ func ComposeAPIDefinitions() []*restful.WebService {
 		kubevirtApiServiceDefinitions,
 		snapshotApiServiceDefinitions,
 		flavorApiServiceDefinitions,
+		migrationPoliciesApiServiceDefinitions,
 	} {
 		result = append(result, f()...)
 	}
@@ -125,6 +130,26 @@ func snapshotApiServiceDefinitions() []*restful.WebService {
 	}
 
 	ws2, err := ResourceProxyAutodiscovery(vmsGVR)
+	if err != nil {
+		panic(err)
+	}
+	return []*restful.WebService{ws, ws2}
+}
+
+func migrationPoliciesApiServiceDefinitions() []*restful.WebService {
+	mpGVR := migrationsv1.SchemeGroupVersion.WithResource(migrations.ResourceMigrationPolicies)
+
+	ws, err := GroupVersionProxyBase(schema.GroupVersion{Group: migrationsv1.SchemeGroupVersion.Group, Version: migrationsv1.SchemeGroupVersion.Version})
+	if err != nil {
+		panic(err)
+	}
+
+	ws, err = GenericClusterResourceProxy(ws, mpGVR, &migrationsv1.MigrationPolicy{}, migrationsv1.MigrationPolicyKind.Kind, &migrationsv1.MigrationPolicyList{})
+	if err != nil {
+		panic(err)
+	}
+
+	ws2, err := ResourceProxyAutodiscovery(mpGVR)
 	if err != nil {
 		panic(err)
 	}

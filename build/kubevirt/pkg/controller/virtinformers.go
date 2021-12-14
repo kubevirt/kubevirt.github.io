@@ -48,11 +48,14 @@ import (
 	apiregv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 	aggregatorclient "k8s.io/kube-aggregator/pkg/client/clientset_generated/clientset"
 
-	"kubevirt.io/client-go/apis/core"
+	"kubevirt.io/api/core"
+	"kubevirt.io/api/migrations"
 
-	kubev1 "kubevirt.io/client-go/apis/core/v1"
-	flavorv1 "kubevirt.io/client-go/apis/flavor/v1alpha1"
-	snapshotv1 "kubevirt.io/client-go/apis/snapshot/v1alpha1"
+	kubev1 "kubevirt.io/api/core/v1"
+	flavorv1 "kubevirt.io/api/flavor/v1alpha1"
+	migrationsv1 "kubevirt.io/api/migrations/v1alpha1"
+	poolv1 "kubevirt.io/api/pool/v1alpha1"
+	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
@@ -88,6 +91,9 @@ type KubeInformerFactory interface {
 	// Watches for VirtualMachineInstanceReplicaSet objects
 	VMIReplicaSet() cache.SharedIndexInformer
 
+	// Watches for VirtualMachinePool objects
+	VMPool() cache.SharedIndexInformer
+
 	// Watches for VirtualMachineInstancePreset objects
 	VirtualMachinePreset() cache.SharedIndexInformer
 
@@ -118,6 +124,9 @@ type KubeInformerFactory interface {
 	// Watches VirtualMachineClusterFlavor objects
 	VirtualMachineClusterFlavor() cache.SharedIndexInformer
 
+	// Watches MigrationPolicy objects
+	MigrationPolicy() cache.SharedIndexInformer
+
 	// Watches for k8s extensions api configmap
 	ApiAuthConfigMap() cache.SharedIndexInformer
 
@@ -126,9 +135,6 @@ type KubeInformerFactory interface {
 
 	// ConfigMaps which are managed by the operator
 	OperatorConfigMap() cache.SharedIndexInformer
-
-	// Watches for ConfigMap objects
-	ConfigMap() cache.SharedIndexInformer
 
 	// Watches for PersistentVolumeClaim objects
 	PersistentVolumeClaim() cache.SharedIndexInformer
@@ -396,6 +402,13 @@ func (f *kubeInformerFactory) VMIReplicaSet() cache.SharedIndexInformer {
 	})
 }
 
+func (f *kubeInformerFactory) VMPool() cache.SharedIndexInformer {
+	return f.getInformer("vmpool", func() cache.SharedIndexInformer {
+		lw := cache.NewListWatchFromClient(f.clientSet.GeneratedKubeVirtClient().PoolV1alpha1().RESTClient(), "virtualmachinepools", k8sv1.NamespaceAll, fields.Everything())
+		return cache.NewSharedIndexInformer(lw, &poolv1.VirtualMachinePool{}, f.defaultResync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+	})
+}
+
 func (f *kubeInformerFactory) VirtualMachinePreset() cache.SharedIndexInformer {
 	return f.getInformer("vmiPresetInformer", func() cache.SharedIndexInformer {
 		lw := cache.NewListWatchFromClient(f.restClient, "virtualmachineinstancepresets", k8sv1.NamespaceAll, fields.Everything())
@@ -433,7 +446,7 @@ func (f *kubeInformerFactory) KubeVirtNode() cache.SharedIndexInformer {
 func (f *kubeInformerFactory) VirtualMachine() cache.SharedIndexInformer {
 	return f.getInformer("vmInformer", func() cache.SharedIndexInformer {
 		lw := cache.NewListWatchFromClient(f.restClient, "virtualmachines", k8sv1.NamespaceAll, fields.Everything())
-		return cache.NewSharedIndexInformer(lw, &kubev1.VirtualMachine{}, f.defaultResync, cache.Indexers{})
+		return cache.NewSharedIndexInformer(lw, &kubev1.VirtualMachine{}, f.defaultResync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	})
 }
 
@@ -518,6 +531,13 @@ func (f *kubeInformerFactory) VirtualMachineClusterFlavor() cache.SharedIndexInf
 	})
 }
 
+func (f *kubeInformerFactory) MigrationPolicy() cache.SharedIndexInformer {
+	return f.getInformer("migrationPolicyInformer", func() cache.SharedIndexInformer {
+		lw := cache.NewListWatchFromClient(f.clientSet.GeneratedKubeVirtClient().MigrationsV1alpha1().RESTClient(), migrations.ResourceMigrationPolicies, k8sv1.NamespaceAll, fields.Everything())
+		return cache.NewSharedIndexInformer(lw, &migrationsv1.MigrationPolicy{}, f.defaultResync, cache.Indexers{})
+	})
+}
+
 func (f *kubeInformerFactory) DataVolume() cache.SharedIndexInformer {
 	return f.getInformer("dataVolumeInformer", func() cache.SharedIndexInformer {
 		lw := cache.NewListWatchFromClient(f.clientSet.CdiClient().CdiV1beta1().RESTClient(), "datavolumes", k8sv1.NamespaceAll, fields.Everything())
@@ -591,15 +611,6 @@ func (f *kubeInformerFactory) KubeVirtCAConfigMap() cache.SharedIndexInformer {
 	return f.getInformer("extensionsKubeVirtCAConfigMapInformer", func() cache.SharedIndexInformer {
 		restClient := f.clientSet.CoreV1().RESTClient()
 		fieldSelector := fields.OneTermEqualSelector("metadata.name", "kubevirt-ca")
-		lw := cache.NewListWatchFromClient(restClient, "configmaps", f.kubevirtNamespace, fieldSelector)
-		return cache.NewSharedIndexInformer(lw, &k8sv1.ConfigMap{}, f.defaultResync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
-	})
-}
-
-func (f *kubeInformerFactory) ConfigMap() cache.SharedIndexInformer {
-	return f.getInformer("configMapInformer", func() cache.SharedIndexInformer {
-		restClient := f.clientSet.CoreV1().RESTClient()
-		fieldSelector := fields.OneTermEqualSelector("metadata.name", "kubevirt-config")
 		lw := cache.NewListWatchFromClient(restClient, "configmaps", f.kubevirtNamespace, fieldSelector)
 		return cache.NewSharedIndexInformer(lw, &k8sv1.ConfigMap{}, f.defaultResync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	})

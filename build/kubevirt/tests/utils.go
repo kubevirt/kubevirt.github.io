@@ -47,6 +47,8 @@ import (
 	"sync"
 	"time"
 
+	migrationsv1 "kubevirt.io/api/migrations/v1alpha1"
+
 	expect "github.com/google/goexpect"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/config"
@@ -81,6 +83,8 @@ import (
 	"k8s.io/client-go/transport/spdy"
 	netutils "k8s.io/utils/net"
 
+	"kubevirt.io/client-go/api"
+
 	"kubevirt.io/kubevirt/tests/framework/checks"
 
 	util2 "kubevirt.io/kubevirt/tests/util"
@@ -92,7 +96,8 @@ import (
 
 	"kubevirt.io/kubevirt/pkg/certificates/bootstrap"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
+	poolv1 "kubevirt.io/api/pool/v1alpha1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
@@ -1766,6 +1771,9 @@ func cleanNamespaces() {
 		//Remove all HPA
 		util2.PanicOnError(virtCli.AutoscalingV1().RESTClient().Delete().Namespace(namespace).Resource("horizontalpodautoscalers").Do(context.Background()).Error())
 
+		// Remove all VirtualMachinePools
+		util2.PanicOnError(virtCli.VirtualMachinePool(namespace).DeleteCollection(context.Background(), metav1.DeleteOptions{}, metav1.ListOptions{}))
+
 		// Remove all VirtualMachines
 		util2.PanicOnError(virtCli.RestClient().Delete().Namespace(namespace).Resource("virtualmachines").Do(context.Background()).Error())
 
@@ -1778,7 +1786,7 @@ func cleanNamespaces() {
 		util2.PanicOnError(err)
 		for _, vmi := range vmis.Items {
 			if controller.HasFinalizer(&vmi, v1.VirtualMachineInstanceFinalizer) {
-				_, err := virtCli.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte("[{ \"op\": \"remove\", \"path\": \"/metadata/finalizers\" }]"))
+				_, err := virtCli.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte("[{ \"op\": \"remove\", \"path\": \"/metadata/finalizers\" }]"), &metav1.PatchOptions{})
 				if !errors.IsNotFound(err) {
 					util2.PanicOnError(err)
 				}
@@ -1863,6 +1871,14 @@ func cleanNamespaces() {
 
 		// Remove all Istio PeerAuthentications
 		util2.PanicOnError(removeAllGroupVersionResourceFromNamespace(schema.GroupVersionResource{Group: "security.istio.io", Version: "v1beta1", Resource: "peerauthentications"}, namespace))
+
+		// Remove migration policies
+		migrationPolicyList, err := virtCli.MigrationPolicy().List(context.Background(), metav1.ListOptions{})
+		util2.PanicOnError(err)
+		for _, policy := range migrationPolicyList.Items {
+			util2.PanicOnError(virtCli.MigrationPolicy().Delete(context.Background(), policy.Name, metav1.DeleteOptions{}))
+		}
+
 	}
 }
 
@@ -2084,7 +2100,7 @@ func NewRandomVMI() *v1.VirtualMachineInstance {
 }
 
 func NewRandomVMIWithNS(namespace string) *v1.VirtualMachineInstance {
-	vmi := v1.NewMinimalVMIWithNS(namespace, libvmi.RandName(libvmi.DefaultVmiName))
+	vmi := api.NewMinimalVMIWithNS(namespace, libvmi.RandName(libvmi.DefaultVmiName))
 
 	t := defaultTestGracePeriod
 	vmi.Spec.TerminationGracePeriodSeconds = &t
@@ -3108,6 +3124,34 @@ func NewInt32(x int32) *int32 {
 	return &x
 }
 
+func NewRandomPoolFromVMI(vmi *v1.VirtualMachineInstance, replicas int32, running bool) *poolv1.VirtualMachinePool {
+	selector := "pool" + rand.String(5)
+	pool := &poolv1.VirtualMachinePool{
+		ObjectMeta: metav1.ObjectMeta{Name: "pool" + rand.String(5)},
+		Spec: poolv1.VirtualMachinePoolSpec{
+			Replicas: &replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{"select": selector},
+			},
+			VirtualMachineTemplate: &poolv1.VirtualMachineTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"select": selector},
+				},
+				Spec: v1.VirtualMachineSpec{
+					Running: &running,
+					Template: &v1.VirtualMachineInstanceTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Labels: map[string]string{"select": selector},
+						},
+						Spec: vmi.Spec,
+					},
+				},
+			},
+		},
+	}
+	return pool
+}
+
 func NewRandomReplicaSetFromVMI(vmi *v1.VirtualMachineInstance, replicas int32) *v1.VirtualMachineInstanceReplicaSet {
 	name := "replicaset" + rand.String(5)
 	rs := &v1.VirtualMachineInstanceReplicaSet{
@@ -3787,6 +3831,15 @@ func NotDeleted(vmis *v1.VirtualMachineInstanceList) (notDeleted []v1.VirtualMac
 	return
 }
 
+func NotDeletedVMs(vms *v1.VirtualMachineList) (notDeleted []v1.VirtualMachine) {
+	for _, vm := range vms.Items {
+		if vm.DeletionTimestamp == nil {
+			notDeleted = append(notDeleted, vm)
+		}
+	}
+	return
+}
+
 func Running(vmis *v1.VirtualMachineInstanceList) (running []v1.VirtualMachineInstance) {
 	for _, vmi := range vmis.Items {
 		if vmi.DeletionTimestamp == nil && vmi.Status.Phase == v1.Running {
@@ -4421,28 +4474,6 @@ func GenerateHelloWorldServer(vmi *v1.VirtualMachineInstance, testPort int, prot
 	}, 60)).To(Succeed())
 }
 
-// UpdateClusterConfigValueAndWait updates the given configuration in the kubevirt config map and then waits
-// to allow the configuration events to be propagated to the consumers.
-func UpdateClusterConfigValueAndWait(key string, value string) string {
-	if config.GinkgoConfig.ParallelTotal > 1 {
-		Fail("Tests which alter the global kubevirt configuration must not be executed in parallel")
-	}
-	virtClient, err := kubecli.GetKubevirtClient()
-	util2.PanicOnError(err)
-	cfgMap, err := virtClient.CoreV1().ConfigMaps(flags.KubeVirtInstallNamespace).Get(context.Background(), virtconfig.ConfigMapName, metav1.GetOptions{})
-	ExpectWithOffset(1, err).NotTo(HaveOccurred())
-	oldValue := cfgMap.Data[key]
-	if cfgMap.Data[key] == value {
-		return value
-	}
-	cfgMap.Data[key] = value
-	cfg, err := virtClient.CoreV1().ConfigMaps(flags.KubeVirtInstallNamespace).Update(context.Background(), cfgMap, metav1.UpdateOptions{})
-	ExpectWithOffset(1, err).ToNot(HaveOccurred())
-	waitForConfigToBePropagated(cfg.ResourceVersion)
-	log.DefaultLogger().Infof("Deployment is in sync with config resource version %s", cfg.ResourceVersion)
-	return oldValue
-}
-
 // UpdateKubeVirtConfigValueAndWait updates the given configuration in the kubevirt custom resource
 // and then waits  to allow the configuration events to be propagated to the consumers.
 func UpdateKubeVirtConfigValueAndWait(kvConfig v1.KubeVirtConfiguration) *v1.KubeVirt {
@@ -4549,15 +4580,6 @@ func ExpectResourceVersionToBeLessThanConfigVersion(resourceVersion, configVersi
 	return true
 }
 
-func ExpectResourceVersionToBeEqualConfigVersion(resourceVersion, configVersion string) bool {
-	if resourceVersion > configVersion {
-		log.DefaultLogger().Errorf("Config is not in sync. Expected %s, Got %s", resourceVersion, configVersion)
-		return false
-	}
-
-	return true
-}
-
 func waitForConfigToBePropagated(resourceVersion string) {
 	WaitForConfigToBePropagatedToComponent("kubevirt.io=virt-controller", resourceVersion, ExpectResourceVersionToBeLessThanConfigVersion)
 	WaitForConfigToBePropagatedToComponent("kubevirt.io=virt-api", resourceVersion, ExpectResourceVersionToBeLessThanConfigVersion)
@@ -4603,6 +4625,10 @@ func WaitForConfigToBePropagatedToComponent(podLabel string, resourceVersion str
 
 func WaitAgentConnected(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance) {
 	WaitForVMICondition(virtClient, vmi, v1.VirtualMachineInstanceAgentConnected, 12*60)
+}
+
+func WaitAgentDisconnected(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance) {
+	WaitForVMIConditionRemovedOrFalse(virtClient, vmi, v1.VirtualMachineInstanceAgentConnected, 30)
 }
 
 func WaitForVMICondition(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance, conditionType v1.VirtualMachineInstanceConditionType, timeoutSec int) {
@@ -4938,19 +4964,6 @@ func GetNodeDrainKey() string {
 	return virtconfig.NodeDrainTaintDefaultKey
 }
 
-func GetKubeVirtConfigMap() (*k8sv1.ConfigMap, error) {
-	virtClient, err := kubecli.GetKubevirtClient()
-	util2.PanicOnError(err)
-
-	options := metav1.GetOptions{}
-	cfgMap, err := virtClient.CoreV1().ConfigMaps(flags.KubeVirtInstallNamespace).Get(context.Background(), virtconfig.ConfigMapName, options)
-	if err != nil && !errors.IsNotFound(err) {
-		util2.PanicOnError(err)
-	}
-
-	return cfgMap, err
-}
-
 func RandTmpDir() string {
 	return tmpPath + "/" + rand.String(10)
 }
@@ -4958,19 +4971,41 @@ func RandTmpDir() string {
 func getTagHint() string {
 	//git describe --tags --abbrev=0 "$(git rev-parse HEAD)"
 	cmd := exec.Command("git", "rev-parse", "HEAD")
-	bytes, err := cmd.Output()
+	cmdOutput, err := cmd.Output()
 	if err != nil {
 		return ""
 	}
 
-	cmd = exec.Command("git", "describe", "--tags", "--abbrev=0", strings.TrimSpace(string(bytes)))
-	bytes, err = cmd.Output()
+	cmd = exec.Command("git", "describe", "--tags", "--abbrev=0", strings.TrimSpace(string(cmdOutput)))
+	cmdOutput, err = cmd.Output()
 	if err != nil {
 		return ""
 	}
 
-	return strings.TrimSpace(strings.Split(string(bytes), "-rc")[0])
+	return strings.TrimSpace(strings.Split(string(cmdOutput), "-rc")[0])
 
+}
+
+func GetUpstreamReleaseAssetURL(tag string, assetName string) string {
+	client := github.NewClient(nil)
+
+	var err error
+	var release *github.RepositoryRelease
+
+	Eventually(func() error {
+		release, _, err = client.Repositories.GetReleaseByTag(context.Background(), "kubevirt", "kubevirt", tag)
+
+		return err
+	}, 10*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
+
+	for _, asset := range release.Assets {
+		if asset.GetName() == assetName {
+			return asset.GetBrowserDownloadURL()
+		}
+	}
+
+	Fail(fmt.Sprintf("Asset %s not found in release %s of kubevirt upstream repo", assetName, tag))
+	return ""
 }
 
 func DetectLatestUpstreamOfficialTag() (string, error) {
@@ -5274,4 +5309,48 @@ func CreateCephPVC(virtClient kubecli.KubevirtClient, name string, size resource
 
 	return createdPvc
 
+}
+
+func GetPolicyMatchedToVmi(name string, vmi *v1.VirtualMachineInstance, namespace *k8sv1.Namespace, matchingVmiLabels, matchingNSLabels int) *migrationsv1.MigrationPolicy {
+	Expect(vmi).ToNot(BeNil())
+	Expect(namespace).ToNot(BeNil())
+	Expect(name).ToNot(BeEmpty())
+
+	policy := kubecli.NewMinimalMigrationPolicy(name)
+
+	if vmi.Labels == nil {
+		vmi.Labels = make(map[string]string)
+	}
+	if namespace.Labels == nil {
+		namespace.Labels = make(map[string]string)
+	}
+
+	if policy.Spec.Selectors == nil {
+		policy.Spec.Selectors = &migrationsv1.Selectors{
+			VirtualMachineInstanceSelector: &metav1.LabelSelector{MatchLabels: map[string]string{}},
+			NamespaceSelector:              &metav1.LabelSelector{MatchLabels: map[string]string{}},
+		}
+	} else if policy.Spec.Selectors.VirtualMachineInstanceSelector == nil {
+		policy.Spec.Selectors.VirtualMachineInstanceSelector = &metav1.LabelSelector{MatchLabels: map[string]string{}}
+	} else if policy.Spec.Selectors.NamespaceSelector == nil {
+		policy.Spec.Selectors.NamespaceSelector = &metav1.LabelSelector{MatchLabels: map[string]string{}}
+	}
+
+	labelKeyPattern := "mp-key-%d"
+	labelValuePattern := "mp-value-%d"
+
+	applyLabels := func(policyLabels, vmiOrNSLabels map[string]string, labelCount int) {
+		for i := 0; i < labelCount; i++ {
+			labelKey := fmt.Sprintf(labelKeyPattern, i)
+			labelValue := fmt.Sprintf(labelValuePattern, i)
+
+			vmiOrNSLabels[labelKey] = labelValue
+			policyLabels[labelKey] = labelValue
+		}
+	}
+
+	applyLabels(policy.Spec.Selectors.VirtualMachineInstanceSelector.MatchLabels, vmi.Labels, matchingVmiLabels)
+	applyLabels(policy.Spec.Selectors.NamespaceSelector.MatchLabels, namespace.Labels, matchingNSLabels)
+
+	return policy
 }

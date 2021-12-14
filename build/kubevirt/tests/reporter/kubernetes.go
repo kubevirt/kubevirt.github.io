@@ -26,7 +26,7 @@ import (
 	"k8s.io/client-go/discovery"
 	apiregv1 "k8s.io/kube-aggregator/pkg/apis/apiregistration/v1"
 
-	v12 "kubevirt.io/client-go/apis/core/v1"
+	v12 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	apicdi "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
@@ -1004,6 +1004,7 @@ func (r *KubernetesReporter) executeNodeCommands(virtCli kubecli.KubevirtClient,
 		{command: networkPrefix + "nft list ruleset", fileNameSuffix: "nftlist"},
 
 		{command: hostPrefix + "/usr/bin/" + networkPrefix + "/usr/sbin/iptables --list -v", fileNameSuffix: "iptables"},
+		{command: "ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
 	}
 
 	r.executeContainerCommands(virtCli, logsdir, &pod, "virt-handler", cmds)
@@ -1019,6 +1020,7 @@ func (r *KubernetesReporter) executeVirtLauncherCommands(virtCli kubecli.Kubevir
 		{command: "bridge fdb", fileNameSuffix: "brfdb"},
 		{command: "lspci", fileNameSuffix: "lspci"},
 		{command: "env", fileNameSuffix: "env"},
+		{command: "ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
 	}
 
 	r.executeContainerCommands(virtCli, logsdir, &pod, "compute", cmds)

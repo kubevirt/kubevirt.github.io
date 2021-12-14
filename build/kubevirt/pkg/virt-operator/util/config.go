@@ -33,7 +33,7 @@ import (
 
 	k8sv1 "k8s.io/api/core/v1"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	clientutil "kubevirt.io/client-go/util"
 )
 
@@ -69,9 +69,10 @@ const (
 	DefaultMonitorAccount = "prometheus-k8s"
 
 	// lookup keys in AdditionalProperties
-	ImagePrefixKey    = "imagePrefix"
-	ProductNameKey    = "productName"
-	ProductVersionKey = "productVersion"
+	ImagePrefixKey      = "imagePrefix"
+	ProductNameKey      = "productName"
+	ProductComponentKey = "productComponent"
+	ProductVersionKey   = "productVersion"
 
 	// the regex used to parse the operator image
 	operatorImageRegex = "^(.*)/(.*)virt-operator([@:].*)?$"
@@ -433,6 +434,10 @@ func (c *KubeVirtDeploymentConfig) GetNamespace() string {
 func (c *KubeVirtDeploymentConfig) GetVerbosity() string {
 	// not configurable yet
 	return "2"
+}
+
+func (c *KubeVirtDeploymentConfig) GetProductComponent() string {
+	return c.AdditionalProperties[ProductComponentKey]
 }
 
 func (c *KubeVirtDeploymentConfig) GetProductName() string {

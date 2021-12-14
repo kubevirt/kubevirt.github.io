@@ -25,7 +25,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
+	"reflect"
 	"regexp"
+	"strconv"
 	"strings"
 	"time"
 
@@ -47,7 +49,7 @@ import (
 
 	"kubevirt.io/kubevirt/tests/util"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/pkg/controller"
@@ -840,14 +842,14 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			Eventually(vmPrintableStatus, 300*time.Second, 1*time.Second).Should(Equal(status))
 		},
 			table.Entry(
-				"missing PVC",
+				"[test_id:7596]missing PVC",
 				func() *v1.VirtualMachineInstance {
 					return tests.NewRandomVMIWithPVC("missing-pvc")
 				},
 				v1.VirtualMachineStatusPvcNotFound,
 			),
 			table.Entry(
-				"missing DataVolume",
+				"[test_id:7597]missing DataVolume",
 				func() *v1.VirtualMachineInstance {
 					return tests.NewRandomVMIWithDataVolume("missing-datavolume")
 				},
@@ -855,7 +857,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			),
 		)
 
-		It("should report an error status when data volume error occurs", func() {
+		It("[test_id:7679]should report an error status when data volume error occurs", func() {
 			By("Verifying that required StorageClass is configured")
 			storageClassName := tests.Config.StorageClassLocal
 
@@ -866,7 +868,8 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 			Expect(err).ToNot(HaveOccurred())
 
 			By("Creating a VM with a DataVolume cloned from an invalid source")
-			vm := tests.NewRandomVMWithDataVolumeWithRegistryImport("no-such-image",
+			// Registry URL scheme validated in CDI
+			vm := tests.NewRandomVMWithDataVolumeWithRegistryImport("docker://no.such/image",
 				util.NamespaceTestDefault, storageClassName, k8sv1.ReadWriteOnce)
 			vm.Spec.Running = pointer.BoolPtr(true)
 			_, err = virtClient.VirtualMachine(util.NamespaceTestDefault).Create(vm)
@@ -959,7 +962,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				Eventually(func() bool {
 					newVM, err = virtClient.VirtualMachine(newVM.Namespace).Get(newVM.Name, &k8smetav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
-					return newVM.Status.Ready
+					return newVM.Status.Created
 				}, 360*time.Second, 1*time.Second).Should(BeTrue())
 
 				By("Getting running VirtualMachineInstance with paused condition")
@@ -1220,6 +1223,32 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 						return nextVMI.Status.MigrationState != nil && nextVMI.Status.MigrationState.Completed
 					}, 240*time.Second, 1*time.Second).Should(BeTrue())
 				})
+
+				It("should not migrate a running vm if dry-run option is passed", func() {
+					nodes := util.GetAllSchedulableNodes(virtClient)
+					if len(nodes.Items) < 2 {
+						Skip("Migration tests require at least 2 nodes")
+					}
+					By("creating a VM with RunStrategyAlways")
+					virtualMachine := newVirtualMachineWithRunStrategy(v1.RunStrategyAlways)
+
+					By("Waiting for VM to be ready")
+					Eventually(func() bool {
+						virtualMachine, err = virtClient.VirtualMachine(virtualMachine.Namespace).Get(virtualMachine.Name, &k8smetav1.GetOptions{})
+						Expect(err).ToNot(HaveOccurred())
+						return virtualMachine.Status.Ready
+					}, 360*time.Second, 1*time.Second).Should(BeTrue())
+
+					By("Invoking virtctl migrate with dry-run option")
+					migrateCommand := tests.NewRepeatableVirtctlCommand(vm.COMMAND_MIGRATE, "--dry-run", "--namespace", virtualMachine.Namespace, virtualMachine.Name)
+					Expect(migrateCommand()).To(Succeed())
+
+					By("Check that no migration was actually created")
+					Consistently(func() bool {
+						_, err = virtClient.VirtualMachineInstanceMigration(virtualMachine.Namespace).Get(virtualMachine.Name, &metav1.GetOptions{})
+						return errors.IsNotFound(err)
+					}, 60*time.Second, 5*time.Second).Should(BeTrue(), "migration should not be created in a dry run mode")
+				})
 			})
 
 			Context("Using RunStrategyRerunOnFailure", func() {
@@ -1459,7 +1488,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 					Eventually(func() bool {
 						virtualMachine, err = virtClient.VirtualMachine(virtualMachine.Namespace).Get(virtualMachine.Name, &k8smetav1.GetOptions{})
 						Expect(err).ToNot(HaveOccurred())
-						return virtualMachine.Status.Ready
+						return virtualMachine.Status.Created
 					}, 360*time.Second, 1*time.Second).Should(BeTrue())
 
 					By("Getting running VirtualMachineInstance with paused condition")
@@ -1620,9 +1649,9 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 						return virtualMachine.Status.Ready
 					}, 360*time.Second, 1*time.Second).Should(BeTrue())
 				})
-				table.DescribeTable("with a failing VMI and the kubevirt.io/keep-launcher-alive-after-failure annotation", func(keepLauncher string, podPhase k8sv1.PodPhase) {
+				table.DescribeTable("with a failing VMI and the kubevirt.io/keep-launcher-alive-after-failure annotation", func(keepLauncher string) {
 					// The estimated execution time of one test is 400 seconds.
-					By("creating a Kernel Boot VMI with a mismatched disk")
+					By("Creating a Kernel Boot VMI with a mismatched disk")
 					vmi := utils.GetVMIKernelBoot()
 					vmi.Spec.Domain.Firmware.KernelBoot.Container.Image = cd.ContainerDiskFor(cd.ContainerDiskCirros)
 
@@ -1653,16 +1682,30 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 						newVMI, err := virtClient.VirtualMachineInstance(newVM.Namespace).Get(newVM.Name, &k8smetav1.GetOptions{})
 						Expect(err).ToNot(HaveOccurred())
 						return newVMI.Status.Phase == v1.Failed
-					}, 400*time.Second, 1*time.Second).Should(BeTrue())
+					}, 480*time.Second, 1*time.Second).Should(BeTrue())
 
-					// Virt launcher should be in the Running phase if the Annotation v1.KeepLauncherAfterFailureAnnotation is set to true
-					By(fmt.Sprintf("Verify that the VMI VirtLauncher Pod is in the expected state as %v", podPhase))
+					// If the annotation v1.KeepLauncherAfterFailureAnnotation is set to true, the containerStatus of the
+					//   compute container of the virt-launcher pod is kept in the running state.
+					// If the annotation v1.KeepLauncherAfterFailureAnnotation is set to false or not set, the virt-launcher pod will become failed.
+					By("Verify that the virt-launcher pod or its container is in the expected state")
 					newVMI, _ := virtClient.VirtualMachineInstance(newVM.Namespace).Get(newVM.Name, &k8smetav1.GetOptions{})
 					launcherPod := libvmi.GetPodByVirtualMachineInstance(newVMI, newVM.Namespace)
-					Expect(launcherPod.Status.Phase).To(Equal(podPhase))
+
+					if toKeep, _ := strconv.ParseBool(keepLauncher); toKeep {
+						Consistently(func() bool {
+							for _, status := range launcherPod.Status.ContainerStatuses {
+								if status.Name == "compute" && status.State.Running != nil {
+									return true
+								}
+							}
+							return false
+						}, 10*time.Second, 1*time.Second).Should(BeTrue())
+					} else {
+						Eventually(Expect(launcherPod.Status.Phase).To(Equal(k8sv1.PodFailed)), 160*time.Second, 1*time.Second).Should(BeTrue())
+					}
 				},
-					table.Entry("[test_id:7164]VMI launcher pod should fail", "false", k8sv1.PodFailed),
-					table.Entry("[test_id:6993]VMI launcher pod should keep running", "true", k8sv1.PodRunning),
+					table.Entry("[test_id:7164]VMI launcher pod should fail", "false"),
+					table.Entry("[test_id:6993]VMI launcher pod compute container should keep running", "true"),
 				)
 			})
 		})
@@ -1794,7 +1837,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 		})
 
 		Context("should not change anything if dry-run option is passed", func() {
-			It("in start command", func() {
+			It("[test_id:7530]in start command", func() {
 				vmi = tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
 				thisVm := tests.NewRandomVirtualMachine(vmi, false)
 
@@ -1815,7 +1858,7 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				Expect(errors.IsNotFound(err)).To(BeTrue())
 			})
 
-			It("in stop command", func() {
+			table.DescribeTable("in stop command", func(flags ...string) {
 				vmi = tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
 				thisVm := tests.NewRandomVirtualMachine(vmi, true)
 
@@ -1829,8 +1872,16 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				By("Waiting for VMI to start")
 				waitForVMIStart(virtClient, vmi)
 
+				By("Getting current vmi instance")
+				originalVMI, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &k8smetav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				var args = []string{vm.COMMAND_STOP, "--namespace", thisVm.Namespace, thisVm.Name, "--dry-run"}
+				if flags != nil {
+					args = append(args, flags...)
+				}
 				By("Invoking virtctl stop with dry-run option")
-				virtctl := tests.NewRepeatableVirtctlCommand(vm.COMMAND_STOP, "--namespace", thisVm.Namespace, "--dry-run", thisVm.Name)
+				virtctl := tests.NewRepeatableVirtctlCommand(args...)
 				err = virtctl()
 				Expect(err).ToNot(HaveOccurred())
 
@@ -1843,9 +1894,14 @@ var _ = Describe("[rfe_id:1177][crit:medium][vendor:cnv-qe@redhat.com][level:com
 				newVMI, err := virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &k8smetav1.GetOptions{})
 				Expect(err).ToNot(HaveOccurred())
 				Expect(newVMI.ObjectMeta.DeletionTimestamp).To(BeNil())
-			})
+				Expect(reflect.DeepEqual(newVMI, originalVMI)).To(BeTrue())
+			},
 
-			It("in restart command", func() {
+				table.Entry("[test_id:7529]with no other flags"),
+				table.Entry("[test_id:7604]with grace period", "--grace-period=10", "--force"),
+			)
+
+			It("[test_id:7528]in restart command", func() {
 				vmi = tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
 				thisVm := tests.NewRandomVirtualMachine(vmi, true)
 

@@ -30,12 +30,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	authClientV1 "k8s.io/client-go/kubernetes/typed/authorization/v1"
 
-	"kubevirt.io/client-go/apis/core"
+	"kubevirt.io/api/core"
 
 	"kubevirt.io/kubevirt/tests/util"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
-	"kubevirt.io/client-go/apis/snapshot/v1alpha1"
+	v1 "kubevirt.io/api/core/v1"
+	pool "kubevirt.io/api/pool"
+	"kubevirt.io/api/snapshot/v1alpha1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 )
@@ -231,6 +232,14 @@ var _ = Describe("[rfe_id:500][crit:high][arm64][vendor:cnv-qe@redhat.com][level
 				denyModificationsFor("view"),
 				denyAllFor("default")),
 
+			table.Entry("given a vmpool",
+				pool.GroupName,
+				"virtualmachinepools",
+				allowAllFor("admin"),
+				denyDeleteCollectionFor("edit"),
+				denyModificationsFor("view"),
+				denyAllFor("default")),
+
 			table.Entry("[test_id:528]given a vmi preset",
 				core.GroupName,
 				"virtualmachineinstancepresets",
@@ -329,6 +338,10 @@ var _ = Describe("[rfe_id:500][crit:high][arm64][vendor:cnv-qe@redhat.com][level
 				"virtualmachineinstances", "unfreeze",
 				allowUpdateFor("admin", "edit"),
 				denyAllFor("view", "default")),
+			table.Entry("on vmi softreboot",
+				"virtualmachineinstances", "softreboot",
+				allowUpdateFor("admin", "edit"),
+				denyAllFor("view", "default")),
 		)
 	})
 
@@ -377,6 +390,7 @@ var _ = Describe("[rfe_id:500][crit:high][arm64][vendor:cnv-qe@redhat.com][level
 			},
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances"),
 				table.Entry("[test_id:2915]given a vm", "virtualmachines"),
+				table.Entry("given a vmpool", "virtualmachinepools"),
 				table.Entry("[test_id:2917]given a vmi preset", "virtualmachineinstancepresets"),
 				table.Entry("[test_id:2919]given a vmi replica set", "virtualmachineinstancereplicasets"),
 				table.Entry("[test_id:3235]given a vmi migration", "virtualmachineinstancemigrations"),
@@ -390,6 +404,7 @@ var _ = Describe("[rfe_id:500][crit:high][arm64][vendor:cnv-qe@redhat.com][level
 			},
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/pause", "update"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/unpause", "update"),
+				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/softreboot", "update"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/console", "get"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/vnc", "get"),
 			)
@@ -420,6 +435,7 @@ var _ = Describe("[rfe_id:500][crit:high][arm64][vendor:cnv-qe@redhat.com][level
 			},
 				table.Entry("[test_id:2920]given a vmi", "virtualmachineinstances"),
 				table.Entry("[test_id:2831]given a vm", "virtualmachines"),
+				table.Entry("given a vmpool", "virtualmachinepools"),
 				table.Entry("[test_id:2916]given a vmi preset", "virtualmachineinstancepresets"),
 				table.Entry("[test_id:2918][crit:low]given a vmi replica set", "virtualmachineinstancereplicasets"),
 				table.Entry("[test_id:2837]given a vmi migration", "virtualmachineinstancemigrations"),
@@ -433,6 +449,7 @@ var _ = Describe("[rfe_id:500][crit:high][arm64][vendor:cnv-qe@redhat.com][level
 			},
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/pause", "update"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/unpause", "update"),
+				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/softreboot", "update"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/console", "get"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/vnc", "get"),
 				table.Entry("[test_id:2921]given a vmi", "virtualmachineinstances/guestosinfo", "get"),

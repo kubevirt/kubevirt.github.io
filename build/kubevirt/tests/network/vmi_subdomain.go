@@ -30,7 +30,7 @@ import (
 	expect "github.com/google/goexpect"
 	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
@@ -103,6 +103,6 @@ func fedoraMasqueradeVMI() *v1.VirtualMachineInstance {
 
 func fedoraBridgeBindingVMI() *v1.VirtualMachineInstance {
 	return libvmi.NewFedora(
-		libvmi.WithInterface(libvmi.InterfaceDeviceWithBridgeBinding()),
+		libvmi.WithInterface(libvmi.InterfaceDeviceWithBridgeBinding(libvmi.DefaultInterfaceName)),
 		libvmi.WithNetwork(v1.DefaultPodNetwork()))
 }

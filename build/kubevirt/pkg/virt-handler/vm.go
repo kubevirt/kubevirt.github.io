@@ -50,6 +50,7 @@ import (
 
 	netcache "kubevirt.io/kubevirt/pkg/network/cache"
 	netsetup "kubevirt.io/kubevirt/pkg/network/setup"
+	netvmispec "kubevirt.io/kubevirt/pkg/network/vmispec"
 	"kubevirt.io/kubevirt/pkg/util"
 
 	"kubevirt.io/kubevirt/pkg/virt-handler/heartbeat"
@@ -60,7 +61,7 @@ import (
 	device_manager "kubevirt.io/kubevirt/pkg/virt-handler/device-manager"
 	hotplug_volume "kubevirt.io/kubevirt/pkg/virt-handler/hotplug-disk"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	containerdisk "kubevirt.io/kubevirt/pkg/container-disk"
@@ -1409,10 +1410,18 @@ func (d *VirtualMachineController) calculateLiveMigrationCondition(vmi *v1.Virtu
 		return newNonMigratableCondition("VMI uses virtiofs", v1.VirtualMachineInstanceReasonVirtIOFSNotMigratable), isBlockMigration
 	}
 
+	if vmiContainsPCIHostDevice(vmi) {
+		return newNonMigratableCondition("VMI uses a PCI host devices", v1.VirtualMachineInstanceReasonHostDeviceNotMigratable), isBlockMigration
+	}
+
 	return &v1.VirtualMachineInstanceCondition{
 		Type:   v1.VirtualMachineInstanceIsMigratable,
 		Status: k8sv1.ConditionTrue,
 	}, isBlockMigration
+}
+
+func vmiContainsPCIHostDevice(vmi *v1.VirtualMachineInstance) bool {
+	return len(vmi.Spec.Domain.Devices.HostDevices) > 0 || len(vmi.Spec.Domain.Devices.GPUs) > 0
 }
 
 func (c *VirtualMachineController) Run(threadiness int, stopCh chan struct{}) {
@@ -2121,37 +2130,8 @@ func (d *VirtualMachineController) processVmShutdown(vmi *v1.VirtualMachineInsta
 
 	// Only attempt to gracefully shutdown if the domain has the ACPI feature enabled
 	if isACPIEnabled(vmi, domain) {
-		expired, timeLeft := d.hasGracePeriodExpired(domain)
-		if !expired {
-			if domain.Status.Status != api.Shutdown {
-				err = client.ShutdownVirtualMachine(vmi)
-				if err != nil && !cmdclient.IsDisconnected(err) {
-					// Only report err if it wasn't the result of a disconnect.
-					return err
-				}
-
-				log.Log.Object(vmi).Infof("Signaled graceful shutdown for %s", vmi.GetObjectMeta().GetName())
-
-				// Make sure that we don't hot-loop in case we send the first domain notification
-				if timeLeft == -1 {
-					timeLeft = 5
-					if vmi.Spec.TerminationGracePeriodSeconds != nil && *vmi.Spec.TerminationGracePeriodSeconds < timeLeft {
-						timeLeft = *vmi.Spec.TerminationGracePeriodSeconds
-					}
-				}
-				// In case we have a long grace period, we want to resend the graceful shutdown every 5 seconds
-				// That's important since a booting OS can miss ACPI signals
-				if timeLeft > 5 {
-					timeLeft = 5
-				}
-
-				// pending graceful shutdown.
-				d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Duration(timeLeft)*time.Second)
-				d.recorder.Event(vmi, k8sv1.EventTypeNormal, v1.ShuttingDown.String(), VMIGracefulShutdown)
-			} else {
-				log.Log.V(4).Object(vmi).Infof("%s is already shutting down.", vmi.GetObjectMeta().GetName())
-			}
-			return nil
+		if expired, timeLeft := d.hasGracePeriodExpired(domain); !expired {
+			return d.handleVMIShutdown(vmi, domain, client, timeLeft)
 		}
 		log.Log.Object(vmi).Infof("Grace period expired, killing deleted VirtualMachineInstance %s", vmi.GetObjectMeta().GetName())
 	} else {
@@ -2171,6 +2151,47 @@ func (d *VirtualMachineController) processVmShutdown(vmi *v1.VirtualMachineInsta
 
 	d.recorder.Event(vmi, k8sv1.EventTypeNormal, v1.Deleted.String(), VMIStopping)
 
+	return nil
+}
+
+func (d *VirtualMachineController) handleVMIShutdown(vmi *v1.VirtualMachineInstance, domain *api.Domain, client cmdclient.LauncherClient, timeLeft int64) error {
+	if domain.Status.Status != api.Shutdown {
+		return d.shutdownVMI(vmi, client, timeLeft)
+	}
+	log.Log.V(4).Object(vmi).Infof("%s is already shutting down.", vmi.GetObjectMeta().GetName())
+	return nil
+}
+
+func (d *VirtualMachineController) shutdownVMI(vmi *v1.VirtualMachineInstance, client cmdclient.LauncherClient, timeLeft int64) error {
+	err := client.ShutdownVirtualMachine(vmi)
+	if err != nil && !cmdclient.IsDisconnected(err) {
+		// Only report err if it wasn't the result of a disconnect.
+		//
+		// Both virt-launcher and virt-handler are trying to destroy
+		// the VirtualMachineInstance at the same time. It's possible the client may get
+		// disconnected during the kill request, which shouldn't be
+		// considered an error.
+		return err
+	}
+
+	log.Log.Object(vmi).Infof("Signaled graceful shutdown for %s", vmi.GetObjectMeta().GetName())
+
+	// Make sure that we don't hot-loop in case we send the first domain notification
+	if timeLeft == -1 {
+		timeLeft = 5
+		if vmi.Spec.TerminationGracePeriodSeconds != nil && *vmi.Spec.TerminationGracePeriodSeconds < timeLeft {
+			timeLeft = *vmi.Spec.TerminationGracePeriodSeconds
+		}
+	}
+	// In case we have a long grace period, we want to resend the graceful shutdown every 5 seconds
+	// That's important since a booting OS can miss ACPI signals
+	if timeLeft > 5 {
+		timeLeft = 5
+	}
+
+	// pending graceful shutdown.
+	d.Queue.AddAfter(controller.VirtualMachineInstanceKey(vmi), time.Duration(timeLeft)*time.Second)
+	d.recorder.Event(vmi, k8sv1.EventTypeNormal, v1.ShuttingDown.String(), VMIGracefulShutdown)
 	return nil
 }
 
@@ -2256,48 +2277,18 @@ func (d *VirtualMachineController) isPreMigrationTarget(vmi *v1.VirtualMachineIn
 }
 
 func (d *VirtualMachineController) checkNetworkInterfacesForMigration(vmi *v1.VirtualMachineInstance) error {
-	err := validatePodNetworkInterfaceUsesMasqueradeBinding(vmi)
-	if err != nil {
-		return err
+	ifaces := vmi.Spec.Domain.Devices.Interfaces
+	if len(ifaces) == 0 {
+		return nil
 	}
 
-	err = d.validateSRIOVInterfacesForMigration(vmi)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
-func validatePodNetworkInterfaceUsesMasqueradeBinding(vmi *v1.VirtualMachineInstance) error {
-	interfacesByName := map[string]v1.Interface{}
-	for _, iface := range vmi.Spec.Domain.Devices.Interfaces {
-		interfacesByName[iface.Name] = iface
-	}
-
-	vmiPodNetworkName := lookupVMIPodNetworkName(vmi.Spec.Networks)
-	if vmiPodNetworkName != "" && interfacesByName[vmiPodNetworkName].Masquerade == nil {
+	if !netvmispec.IsPodNetworkWithMasqueradeBindingInterface(vmi.Spec.Networks, ifaces) {
 		return fmt.Errorf("cannot migrate VMI which does not use masquerade to connect to the pod network")
 	}
 
-	return nil
-}
-
-func lookupVMIPodNetworkName(networks []v1.Network) string {
-	for _, network := range networks {
-		if network.Pod != nil {
-			return network.Name
-		}
-	}
-
-	return ""
-}
-
-func (d *VirtualMachineController) validateSRIOVInterfacesForMigration(vmi *v1.VirtualMachineInstance) error {
-	for _, iface := range vmi.Spec.Domain.Devices.Interfaces {
-		if iface.SRIOV != nil && !d.clusterConfig.SRIOVLiveMigrationEnabled() {
-			return fmt.Errorf("SRIOVLiveMigration feature-gate is closed, can't migrate VMI with SRIOV interfaces")
-		}
+	sriovLiveMigrationEnabled := d.clusterConfig.SRIOVLiveMigrationEnabled()
+	if len(netvmispec.FilterSRIOVInterfaces(ifaces)) > 0 && !sriovLiveMigrationEnabled {
+		return fmt.Errorf("SRIOVLiveMigration feature-gate is closed, can't migrate VMI with SRIOV interfaces")
 	}
 
 	return nil
@@ -2461,7 +2452,10 @@ func (d *VirtualMachineController) vmUpdateHelperMigrationSource(origVMI *v1.Vir
 			d.recorder.Event(vmi, k8sv1.EventTypeNormal, v1.Migrating.String(), "VirtualMachineInstance is aborting migration.")
 		}
 	} else {
-		migrationConfiguration := d.clusterConfig.GetMigrationConfiguration()
+		migrationConfiguration := vmi.Status.MigrationState.MigrationConfiguration
+		if migrationConfiguration == nil {
+			migrationConfiguration = d.clusterConfig.GetMigrationConfiguration()
+		}
 
 		options := &cmdclient.MigrationOptions{
 			Bandwidth:               *migrationConfiguration.BandwidthPerMigration,

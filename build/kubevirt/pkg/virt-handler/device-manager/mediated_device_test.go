@@ -12,7 +12,7 @@ import (
 	"github.com/onsi/ginkgo/extensions/table"
 	. "github.com/onsi/gomega"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/yaml"
@@ -180,7 +180,7 @@ var _ = Describe("Mediated Device", func() {
 					Phase: v1.KubeVirtPhaseDeploying,
 				},
 			}
-			fakeClusterConfig, _, _, kvInformer := testutils.NewFakeClusterConfigUsingKV(kv)
+			fakeClusterConfig, _, kvInformer := testutils.NewFakeClusterConfigUsingKV(kv)
 
 			By("creating an empty device controller")
 			deviceController := NewDeviceController("master", 10, "rw", fakeClusterConfig)

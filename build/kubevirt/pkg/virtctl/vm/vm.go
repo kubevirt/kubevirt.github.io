@@ -28,7 +28,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 
 	"github.com/spf13/cobra"
 	"k8s.io/client-go/tools/clientcmd"
@@ -50,11 +50,12 @@ const (
 
 	volumeNameArg         = "volume-name"
 	notDefinedGracePeriod = -1
+	dryRunCommandUsage    = "--dry-run=false: Flag used to set whether to perform a dry run or not. If true the command will be executed without performing any changes."
 )
 
 var (
 	forceRestart bool
-	gracePeriod  int64 = -1
+	gracePeriod  int64
 	volumeName   string
 	serial       string
 	persist      bool
@@ -74,7 +75,7 @@ func NewStartCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&startPaused, "paused", false, "--paused=false: If set to true, start virtual machine in paused state")
-	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "--dry-run=false: Flag used to set whether to perform a dry run or not. If true the command will be executed without performing any changes.")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, dryRunCommandUsage)
 	cmd.SetUsageTemplate(templates.UsageTemplate())
 	return cmd
 }
@@ -92,8 +93,8 @@ func NewStopCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
 	}
 
 	cmd.Flags().BoolVar(&forceRestart, "force", false, "--force=false: Only used when grace-period=0. If true, immediately remove VMI pod from API and bypass graceful deletion. Note that immediate deletion of some resources may result in inconsistency or data loss and requires confirmation.")
-	cmd.Flags().Int64Var(&gracePeriod, "grace-period", -1, "--grace-period=-1: Period of time in seconds given to the VMI to terminate gracefully. Can only be set to 0 when --force is true (force deletion). Currently only setting 0 is supported.")
-	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "--dry-run=false: Flag used to set whether to perform a dry run or not. If true the command will be executed without performing any changes.")
+	cmd.Flags().Int64Var(&gracePeriod, "grace-period", notDefinedGracePeriod, "--grace-period=-1: Period of time in seconds given to the VMI to terminate gracefully. Can only be set to 0 when --force is true (force deletion). Currently only setting 0 is supported.")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, dryRunCommandUsage)
 	cmd.SetUsageTemplate(templates.UsageTemplate())
 	return cmd
 }
@@ -110,8 +111,8 @@ func NewRestartCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
 		},
 	}
 	cmd.Flags().BoolVar(&forceRestart, "force", false, "--force=false: Only used when grace-period=0. If true, immediately remove VMI pod from API and bypass graceful deletion. Note that immediate deletion of some resources may result in inconsistency or data loss and requires confirmation.")
-	cmd.Flags().Int64Var(&gracePeriod, "grace-period", -1, "--grace-period=-1: Period of time in seconds given to the VMI to terminate gracefully. Can only be set to 0 when --force is true (force deletion). Currently only setting 0 is supported.")
-	cmd.Flags().BoolVar(&dryRun, "dry-run", false, "--dry-run=false: Flag used to set whether to perform a dry run or not. If true the command will be executed without performing any changes.")
+	cmd.Flags().Int64Var(&gracePeriod, "grace-period", notDefinedGracePeriod, "--grace-period=-1: Period of time in seconds given to the VMI to terminate gracefully. Can only be set to 0 when --force is true (force deletion). Currently only setting 0 is supported.")
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, dryRunCommandUsage)
 	cmd.SetUsageTemplate(templates.UsageTemplate())
 	return cmd
 }
@@ -127,6 +128,7 @@ func NewMigrateCommand(clientConfig clientcmd.ClientConfig) *cobra.Command {
 			return c.Run(args)
 		},
 	}
+	cmd.Flags().BoolVar(&dryRun, "dry-run", false, dryRunCommandUsage)
 	cmd.SetUsageTemplate(templates.UsageTemplate())
 	return cmd
 }
@@ -387,16 +389,16 @@ func (o *Command) Run(args []string) error {
 			return fmt.Errorf("Error stopping VirtualMachine %v", err)
 		}
 	case COMMAND_RESTART:
-		if gracePeriod != -1 && forceRestart == false {
+		if gracePeriod != notDefinedGracePeriod && forceRestart == false {
 			return fmt.Errorf("Can not set gracePeriod without --force=true")
 		}
 		if forceRestart {
-			if gracePeriod != -1 {
+			if gracePeriod != notDefinedGracePeriod {
 				err = virtClient.VirtualMachine(namespace).ForceRestart(vmiName, &v1.RestartOptions{GracePeriodSeconds: &gracePeriod, DryRun: dryRunOption})
 				if err != nil {
 					return fmt.Errorf("Error restarting VirtualMachine, %v", err)
 				}
-			} else if gracePeriod == -1 {
+			} else if gracePeriod == notDefinedGracePeriod {
 				return fmt.Errorf("Can not force restart without gracePeriod")
 			}
 			break
@@ -406,7 +408,7 @@ func (o *Command) Run(args []string) error {
 			return fmt.Errorf("Error restarting VirtualMachine %v", err)
 		}
 	case COMMAND_MIGRATE:
-		err = virtClient.VirtualMachine(namespace).Migrate(vmiName)
+		err = virtClient.VirtualMachine(namespace).Migrate(vmiName, &v1.MigrateOptions{DryRun: dryRunOption})
 		if err != nil {
 			return fmt.Errorf("Error migrating VirtualMachine %v", err)
 		}

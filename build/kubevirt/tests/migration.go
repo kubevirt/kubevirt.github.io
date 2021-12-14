@@ -12,7 +12,7 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 )
 
@@ -46,7 +46,7 @@ func RunMigrationAndExpectCompletion(virtClient kubecli.KubevirtClient, migratio
 	var err error
 	var migrationCreated *v1.VirtualMachineInstanceMigration
 	Eventually(func() error {
-		migrationCreated, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration)
+		migrationCreated, err = virtClient.VirtualMachineInstanceMigration(migration.Namespace).Create(migration, &metav1.CreateOptions{})
 		return err
 	}, timeout, 1*time.Second).Should(Succeed(), "migration creation should succeed")
 	migration = migrationCreated

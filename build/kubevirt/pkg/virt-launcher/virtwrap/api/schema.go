@@ -32,7 +32,7 @@ import (
 	"k8s.io/apimachinery/pkg/runtime/schema"
 	"k8s.io/apimachinery/pkg/types"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/precond"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 )
@@ -457,6 +457,7 @@ type Devices struct {
 	Rng         *Rng               `xml:"rng,omitempty"`
 	Filesystems []FilesystemDevice `xml:"filesystem,omitempty"`
 	Redirs      []RedirectedDevice `xml:"redirdev,omitempty"`
+	SoundCards  []SoundCard        `xml:"sound,omitempty"`
 }
 
 // RedirectedDevice describes a device to be redirected
@@ -923,6 +924,15 @@ type ChannelSource struct {
 }
 
 //END Channel --------------------
+
+//BEGIN Sound -------------------
+
+type SoundCard struct {
+	Alias *Alias `xml:"alias,omitempty"`
+	Model string `xml:"model,attr"`
+}
+
+//END Sound -------------------
 
 //BEGIN Video -------------------
 

@@ -32,7 +32,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	kubevirtv1 "kubevirt.io/client-go/apis/core/v1"
+	kubevirtv1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	"kubevirt.io/kubevirt/pkg/testutils"
@@ -62,7 +62,7 @@ var _ = Describe("Node-labeller config", func() {
 		},
 	}
 
-	clusterConfig, _, _, _ := testutils.NewFakeClusterConfigUsingKV(kv)
+	clusterConfig, _, _ := testutils.NewFakeClusterConfigUsingKV(kv)
 
 	BeforeSuite(func() {
 		ctrl := gomock.NewController(GinkgoT())

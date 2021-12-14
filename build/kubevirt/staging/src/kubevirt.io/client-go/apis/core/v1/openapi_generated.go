@@ -21963,6 +21963,13 @@ func schema_client_go_apis_core_v1_KubeVirtSpec(ref common.ReferenceCallback) co
 							Format:      "",
 						},
 					},
+					"productComponent": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Designate the apps.kubevirt.io/component label for KubeVirt components. Useful if KubeVirt is included as part of a product. If ProductComponent is not specified, the component label default value is kubevirt.",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
 					"configuration": {
 						SchemaProps: spec.SchemaProps{
 							Description: "holds kubevirt configurations. same as the virt-configMap",
@@ -24696,6 +24703,13 @@ func schema_client_go_apis_core_v1_VirtualMachineInstanceMigrationState(ref comm
 					"mode": {
 						SchemaProps: spec.SchemaProps{
 							Description: "Lets us know if the vmi is currently running pre or post copy migration",
+							Type:        []string{"string"},
+							Format:      "",
+						},
+					},
+					"migrationConfigSource": {
+						SchemaProps: spec.SchemaProps{
+							Description: "Lets us know if the vmi migration configuration is affected by KubevirtCR or a migration policy",
 							Type:        []string{"string"},
 							Format:      "",
 						},

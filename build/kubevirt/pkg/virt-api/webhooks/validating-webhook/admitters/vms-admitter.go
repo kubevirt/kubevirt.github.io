@@ -31,7 +31,7 @@ import (
 	k8sfield "k8s.io/apimachinery/pkg/util/validation/field"
 	"k8s.io/client-go/tools/cache"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	cdiclone "kubevirt.io/containerized-data-importer/pkg/clone"
 	"kubevirt.io/kubevirt/pkg/controller"
@@ -522,7 +522,8 @@ func validateRestoreStatus(ar *admissionv1.AdmissionRequest, vm *v1.VirtualMachi
 	}
 
 	if !reflect.DeepEqual(oldVM.Spec, vm.Spec) {
-		if *vm.Spec.Running {
+		strategy, _ := vm.RunStrategy()
+		if strategy != v1.RunStrategyHalted {
 			return []metav1.StatusCause{{
 				Type:    metav1.CauseTypeFieldValueNotSupported,
 				Message: fmt.Sprintf("Cannot start VM until restore %q completes", *vm.Status.RestoreInProgress),

@@ -45,7 +45,7 @@ import (
 
 	"kubevirt.io/kubevirt/pkg/util/ratelimiter"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/client-go/log"
 	clientutil "kubevirt.io/client-go/util"
@@ -233,6 +233,7 @@ func (app *virtAPIApp) composeSubresources() {
 
 		subws.Route(subws.PUT(rest.NamespacedResourcePath(subresourcesvmGVR)+rest.SubResourcePath("migrate")).
 			To(subresourceApp.MigrateVMRequestHandler).
+			Reads(v1.MigrateOptions{}).
 			Param(rest.NamespaceParam(subws)).Param(rest.NameParam(subws)).
 			Operation(version.Version+"Migrate").
 			Doc("Migrate a running VirtualMachine to another node.").
@@ -279,8 +280,17 @@ func (app *virtAPIApp) composeSubresources() {
 			Returns(http.StatusOK, "OK", "").
 			Returns(http.StatusInternalServerError, httpStatusInternalServerError, ""))
 
+		subws.Route(subws.PUT(rest.NamespacedResourcePath(subresourcesvmiGVR)+rest.SubResourcePath("softreboot")).
+			To(subresourceApp.SoftRebootVMIRequestHandler).
+			Param(rest.NamespaceParam(subws)).Param(rest.NameParam(subws)).
+			Operation(version.Version+"SoftReboot").
+			Doc("Soft reboot a VirtualMachineInstance object.").
+			Returns(http.StatusOK, "OK", "").
+			Returns(http.StatusInternalServerError, httpStatusInternalServerError, ""))
+
 		subws.Route(subws.PUT(rest.NamespacedResourcePath(subresourcesvmiGVR)+rest.SubResourcePath("pause")).
 			To(subresourceApp.PauseVMIRequestHandler).
+			Reads(v1.PauseOptions{}).
 			Param(rest.NamespaceParam(subws)).Param(rest.NameParam(subws)).
 			Operation(version.Version+"Pause").
 			Doc("Pause a VirtualMachineInstance object.").
@@ -290,6 +300,7 @@ func (app *virtAPIApp) composeSubresources() {
 
 		subws.Route(subws.PUT(rest.NamespacedResourcePath(subresourcesvmiGVR)+rest.SubResourcePath("unpause")).
 			To(subresourceApp.UnpauseVMIRequestHandler). // handles VMIs as well
+			Reads(v1.UnpauseOptions{}).
 			Param(rest.NamespaceParam(subws)).Param(rest.NameParam(subws)).
 			Operation(version.Version+"Unpause").
 			Doc("Unpause a VirtualMachineInstance object.").
@@ -487,6 +498,10 @@ func (app *virtAPIApp) composeSubresources() {
 					},
 					{
 						Name:       "virtualmachineinstances/unfreeze",
+						Namespaced: true,
+					},
+					{
+						Name:       "virtualmachineinstances/softreboot",
 						Namespaced: true,
 					},
 					{
@@ -723,6 +738,9 @@ func (app *virtAPIApp) registerValidatingWebhooks(informers *webhooks.Informers)
 	http.HandleFunc(components.VMIRSValidatePath, func(w http.ResponseWriter, r *http.Request) {
 		validating_webhook.ServeVMIRS(w, r, app.clusterConfig)
 	})
+	http.HandleFunc(components.VMPoolValidatePath, func(w http.ResponseWriter, r *http.Request) {
+		validating_webhook.ServeVMPool(w, r, app.clusterConfig)
+	})
 	http.HandleFunc(components.VMIPresetValidatePath, func(w http.ResponseWriter, r *http.Request) {
 		validating_webhook.ServeVMIPreset(w, r)
 	})
@@ -749,6 +767,9 @@ func (app *virtAPIApp) registerValidatingWebhooks(informers *webhooks.Informers)
 	})
 	http.HandleFunc(components.LauncherEvictionValidatePath, func(w http.ResponseWriter, r *http.Request) {
 		validating_webhook.ServePodEvictionInterceptor(w, r, app.clusterConfig, app.virtCli)
+	})
+	http.HandleFunc(components.MigrationPolicyCreateValidatePath, func(w http.ResponseWriter, r *http.Request) {
+		validating_webhook.ServeMigrationPolicies(w, r, app.virtCli)
 	})
 }
 
@@ -880,9 +901,9 @@ func (app *virtAPIApp) Run() {
 	// Run informers for webhooks usage
 	kubeInformerFactory := controller.NewKubeInformerFactory(app.virtCli.RestClient(), app.virtCli, app.aggregatorClient, app.namespace)
 
-	configMapInformer := kubeInformerFactory.ConfigMap()
+	kubeVirtInformer := kubeInformerFactory.KubeVirt()
 	// Wire up health check trigger
-	configMapInformer.SetWatchErrorHandler(func(r *cache.Reflector, err error) {
+	kubeVirtInformer.SetWatchErrorHandler(func(r *cache.Reflector, err error) {
 		apiHealthVersion.Clear()
 		cache.DefaultWatchErrorHandler(r, err)
 	})
@@ -890,7 +911,6 @@ func (app *virtAPIApp) Run() {
 	kubeInformerFactory.ApiAuthConfigMap()
 	kubeInformerFactory.KubeVirtCAConfigMap()
 	crdInformer := kubeInformerFactory.CRD()
-	kubeVirtInformer := kubeInformerFactory.KubeVirt()
 	vmiInformer := kubeInformerFactory.VMI()
 	vmiPresetInformer := kubeInformerFactory.VirtualMachinePreset()
 	namespaceLimitsInformer := kubeInformerFactory.LimitRanges()
@@ -901,7 +921,7 @@ func (app *virtAPIApp) Run() {
 	kubeInformerFactory.Start(stopChan)
 	kubeInformerFactory.WaitForCacheSync(stopChan)
 
-	app.clusterConfig = virtconfig.NewClusterConfig(configMapInformer, crdInformer, kubeVirtInformer, app.namespace)
+	app.clusterConfig = virtconfig.NewClusterConfig(crdInformer, kubeVirtInformer, app.namespace)
 	app.hasCDIDataSource = app.clusterConfig.HasDataSourceAPI()
 	app.clusterConfig.SetConfigModifiedCallback(app.configModificationCallback)
 	app.clusterConfig.SetConfigModifiedCallback(app.shouldChangeLogVerbosity)

@@ -6,7 +6,7 @@ package cmdclient
 import (
 	gomock "github.com/golang/mock/gomock"
 
-	v1 "kubevirt.io/client-go/apis/core/v1"
+	v1 "kubevirt.io/api/core/v1"
 	v10 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 	api "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 	stats "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/stats"
@@ -91,6 +91,16 @@ func (_m *MockLauncherClient) SyncMigrationTarget(vmi *v1.VirtualMachineInstance
 
 func (_mr *_MockLauncherClientRecorder) SyncMigrationTarget(arg0, arg1 interface{}) *gomock.Call {
 	return _mr.mock.ctrl.RecordCall(_mr.mock, "SyncMigrationTarget", arg0, arg1)
+}
+
+func (_m *MockLauncherClient) SoftRebootVirtualMachine(vmi *v1.VirtualMachineInstance) error {
+	ret := _m.ctrl.Call(_m, "SoftRebootVirtualMachine", vmi)
+	ret0, _ := ret[0].(error)
+	return ret0
+}
+
+func (_mr *_MockLauncherClientRecorder) SoftRebootVirtualMachine(arg0 interface{}) *gomock.Call {
+	return _mr.mock.ctrl.RecordCall(_mr.mock, "SoftRebootVirtualMachine", arg0)
 }
 
 func (_m *MockLauncherClient) SignalTargetPodCleanup(vmi *v1.VirtualMachineInstance) error {
