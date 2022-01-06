@@ -61,6 +61,7 @@ const (
 	failedToProcessDeleteNotificationErrMsg   = "Failed to process delete notification"
 	successfulUpdatePodDisruptionBudgetReason = "SuccessfulUpdate"
 	failedUpdatePodDisruptionBudgetReason     = "FailedUpdate"
+	failedGetAttractionPodsFmt                = "failed to get attachment pods: %v"
 )
 
 // This is the timeout used when a target pod is stuck in
@@ -365,7 +366,7 @@ func (c *MigrationController) updateStatus(migration *virtv1.VirtualMachineInsta
 		pod = pods[0]
 
 		if attachmentPods, err := controller.AttachmentPods(pod, c.podInformer); err != nil {
-			return fmt.Errorf("failed to get attachment pods: %v", err)
+			return fmt.Errorf(failedGetAttractionPodsFmt, err)
 		} else {
 			attachmentPodExists = len(attachmentPods) > 0
 			if attachmentPodExists {
@@ -466,14 +467,6 @@ func (c *MigrationController) updateStatus(migration *virtv1.VirtualMachineInsta
 					}
 				} else {
 					migrationCopy.Status.Phase = virtv1.MigrationScheduled
-				}
-			} else if cpu := vmi.Spec.Domain.CPU; cpu != nil && cpu.Model == virtv1.CPUModeHostModel && isPodPending(pod) {
-				nodes := c.nodeInformer.GetStore().List()
-				for _, node := range nodes {
-					if !isNodeSuitableForHostModelMigration(node.(*k8sv1.Node), pod) {
-						c.recorder.Eventf(migration, k8sv1.EventTypeWarning, NoSuitableNodesForHostModelMigration,
-							"Migration cannot proceed since no node is suitable to run the required CPU model / required features.")
-					}
 				}
 			}
 		case virtv1.MigrationScheduled:
@@ -653,7 +646,7 @@ func (c *MigrationController) handleTargetPodHandoff(migration *virtv1.VirtualMa
 	if controller.VMIHasHotplugVolumes(vmiCopy) {
 		attachmentPods, err := controller.AttachmentPods(pod, c.podInformer)
 		if err != nil {
-			return fmt.Errorf("failed to get attachment pods: %v", err)
+			return fmt.Errorf(failedGetAttractionPodsFmt, err)
 		}
 		if len(attachmentPods) > 0 {
 			log.Log.Object(migration).Infof("Target attachment pod for vmi %s/%s: %s", vmiCopy.Namespace, vmiCopy.Name, string(attachmentPods[0].UID))
@@ -746,6 +739,7 @@ func (c *MigrationController) handleTargetPodCreation(key string, migration *vir
 
 	// XXX: Make this configurable, think about limit per node, bandwidth per migration, and so on.
 	if len(runningMigrations) >= int(*c.clusterConfig.GetMigrationConfiguration().ParallelMigrationsPerCluster) {
+		log.Log.Object(migration).Infof("Waiting to schedule target pod for vmi [%s/%s] migration because total running parallel migration count [%d] is currently at the global cluster limit.", vmi.Namespace, vmi.Name, len(runningMigrations))
 		// Let's wait until some migrations are done
 		c.Queue.AddAfter(key, time.Second*5)
 		return nil
@@ -760,6 +754,7 @@ func (c *MigrationController) handleTargetPodCreation(key string, migration *vir
 	if outboundMigrations >= int(*c.clusterConfig.GetMigrationConfiguration().ParallelOutboundMigrationsPerNode) {
 		// Let's ensure that we only have two outbound migrations per node
 		// XXX: Make this configurable, thinkg about inbound migration limit, bandwidh per migration, and so on.
+		log.Log.Object(migration).Infof("Waiting to schedule target pod for vmi [%s/%s] migration because total running parallel outbound migrations on target node [%d] has hit outbound migrations per node limit.", vmi.Namespace, vmi.Name, outboundMigrations)
 		c.Queue.AddAfter(key, time.Second*5)
 		return nil
 	}
@@ -938,6 +933,13 @@ func (c *MigrationController) handlePendingPodTimeout(migration *virtv1.VirtualM
 	secondsSpentPending := timeSinceCreationSeconds(&pod.ObjectMeta)
 
 	if isPodPendingUnschedulable(pod) {
+		c.alertIfHostModelIsUnschedulable(vmi, pod)
+		c.recorder.Eventf(
+			migration,
+			k8sv1.EventTypeWarning,
+			MigrationTargetPodUnschedulable,
+			"Migration target pod for VMI [%s/%s] is currently unschedulable.", vmi.Namespace, vmi.Name)
+		log.Log.Object(migration).Warningf("Migration target pod for VMI [%s/%s] is currently unschedulable.", vmi.Namespace, vmi.Name)
 		if secondsSpentPending >= unschedulableTimeout {
 			return c.deleteTimedOutTargetPod(migration, vmi, pod, "unschedulable pod timeout period exceeded")
 		} else {
@@ -1000,7 +1002,7 @@ func (c *MigrationController) sync(key string, migration *virtv1.VirtualMachineI
 			if controller.VMIHasHotplugVolumes(vmi) {
 				attachmentPods, err := controller.AttachmentPods(pod, c.podInformer)
 				if err != nil {
-					return fmt.Errorf("failed to get attachment pods: %v", err)
+					return fmt.Errorf(failedGetAttractionPodsFmt, err)
 				}
 				if len(attachmentPods) == 0 {
 					log.Log.Object(migration).Infof("Creating attachment pod for vmi %s/%s on node %s", vmi.Namespace, vmi.Name, pod.Spec.NodeName)
@@ -1407,6 +1409,42 @@ func (c *MigrationController) getNodeForVMI(vmi *virtv1.VirtualMachineInstance) 
 	return node, nil
 }
 
+func (c *MigrationController) alertIfHostModelIsUnschedulable(vmi *virtv1.VirtualMachineInstance, targetPod *k8sv1.Pod) {
+	fittingNodeFound := false
+
+	if cpu := vmi.Spec.Domain.CPU; cpu == nil || cpu.Model != virtv1.CPUModeHostModel {
+		return
+	}
+
+	requiredNodeLabels := map[string]string{}
+	for key, value := range targetPod.Spec.NodeSelector {
+		if strings.HasPrefix(key, virtv1.HostModelCPULabel) || strings.HasPrefix(key, virtv1.CPUFeatureLabel) {
+			requiredNodeLabels[key] = value
+		}
+	}
+
+	nodes := c.nodeInformer.GetStore().List()
+	for _, nodeInterface := range nodes {
+		node := nodeInterface.(*k8sv1.Node)
+
+		if node.Name == vmi.Status.NodeName {
+			continue // avoid checking the VMI's source node
+		}
+
+		if isNodeSuitableForHostModelMigration(node, requiredNodeLabels) {
+			log.Log.Object(vmi).Infof("Node %s is suitable to run vmi %s host model cpu mode (more nodes may fit as well)", node.Name, vmi.Name)
+			fittingNodeFound = true
+			break
+		}
+	}
+
+	if !fittingNodeFound {
+		warningMsg := fmt.Sprintf("Migration cannot proceed since no node is suitable to run the required CPU model / required features: %v", requiredNodeLabels)
+		c.recorder.Eventf(vmi, k8sv1.EventTypeWarning, NoSuitableNodesForHostModelMigration, warningMsg)
+		log.Log.Object(vmi).Warning(warningMsg)
+	}
+}
+
 func prepareNodeSelectorForHostCpuModel(node *k8sv1.Node, pod *k8sv1.Pod) error {
 	var hostCpuModel, hostCpuModelLabelKey, hostModelLabelValue string
 
@@ -1434,21 +1472,12 @@ func prepareNodeSelectorForHostCpuModel(node *k8sv1.Node, pod *k8sv1.Pod) error 
 	return nil
 }
 
-func isNodeSuitableForHostModelMigration(node *k8sv1.Node, pod *k8sv1.Pod) bool {
-	nodeHasLabel := func(key, value string) bool {
-		if nodeValue, ok := node.Labels[key]; ok {
-			if value == nodeValue {
-				return true
-			}
-		}
-		return false
-	}
+func isNodeSuitableForHostModelMigration(node *k8sv1.Node, requiredNodeLabels map[string]string) bool {
+	for key, value := range requiredNodeLabels {
+		nodeValue, ok := node.Labels[key]
 
-	for key, value := range pod.Labels {
-		if strings.HasPrefix(key, virtv1.HostModelCPULabel) || strings.HasPrefix(key, virtv1.CPUFeatureLabel) {
-			if !nodeHasLabel(key, value) {
-				return false
-			}
+		if !ok || nodeValue != value {
+			return false
 		}
 	}
 

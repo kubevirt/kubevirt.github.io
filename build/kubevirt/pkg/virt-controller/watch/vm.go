@@ -57,6 +57,12 @@ import (
 	typesutil "kubevirt.io/kubevirt/pkg/util/types"
 )
 
+const (
+	fetchingRunStrategyErrFmt = "Error fetching RunStrategy: %v"
+	fetchingVMKeyErrFmt       = "Error fetching vmKey: %v"
+	startingVMIFailureFmt     = "Failure while starting VMI: %v"
+)
+
 type CloneAuthFunc func(pvcNamespace, pvcName, saNamespace, saName string) (bool, string, error)
 
 // Repeating info / error messages
@@ -291,33 +297,9 @@ func (c *VMController) execute(key string) error {
 
 	var syncErr syncError
 
-	// Scale up or down, if all expected creates and deletes were report by the listener
-	if c.needsSync(key) && vm.ObjectMeta.DeletionTimestamp == nil {
-		runStrategy, err := vm.RunStrategy()
-		if err != nil {
-			return err
-		}
-
-		dataVolumesReady, err := c.handleDataVolumes(vm, dataVolumes)
-		if err != nil {
-			syncErr = &syncErrorImpl{fmt.Errorf("Error encountered while creating DataVolumes: %v", err), FailedCreateReason}
-		} else if dataVolumesReady || runStrategy == virtv1.RunStrategyHalted {
-			syncErr = c.startStop(vm, vmi)
-		} else {
-			log.Log.Object(vm).V(3).Infof("Waiting on DataVolumes to be ready. %d datavolumes found", len(dataVolumes))
-		}
-
-		// Must check needsSync again here because a VMI can be created or
-		// deleted in the startStop function which impacts how we process
-		// hotplugged volumes
-		if c.needsSync(key) && syncErr == nil {
-
-			err = c.handleVolumeRequests(vm, vmi)
-			if err != nil {
-				syncErr = &syncErrorImpl{fmt.Errorf("Error encountered while handling volume hotplug requests: %v", err), HotPlugVolumeErrorReason}
-			}
-		}
-		virtControllerVMWorkQueueTracer.StepTrace(key, "sync", trace.Field{Key: "VM Name", Value: vm.Name})
+	syncErr, err = c.sync(vm, vmi, key, dataVolumes)
+	if err != nil {
+		return err
 	}
 
 	if syncErr != nil {
@@ -330,11 +312,7 @@ func (c *VMController) execute(key string) error {
 		return err
 	}
 
-	if syncErr != nil {
-		return syncErr
-	}
-
-	return nil
+	return syncErr
 }
 
 func (c *VMController) listDataVolumesForVM(vm *virtv1.VirtualMachine) ([]*cdiv1.DataVolume, error) {
@@ -608,11 +586,11 @@ func (c *VMController) handleVolumeRequests(vm *virtv1.VirtualMachine, vmi *virt
 func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance) syncError {
 	runStrategy, err := vm.RunStrategy()
 	if err != nil {
-		return &syncErrorImpl{fmt.Errorf("Error fetching RunStrategy: %v", err), FailedCreateReason}
+		return &syncErrorImpl{fmt.Errorf(fetchingRunStrategyErrFmt, err), FailedCreateReason}
 	}
 	vmKey, err := controller.KeyFunc(vm)
 	if err != nil {
-		log.Log.Object(vm).Errorf("Error fetching vmKey: %v", err)
+		log.Log.Object(vm).Errorf(fetchingVMKeyErrFmt, err)
 		return &syncErrorImpl{err, FailedCreateReason}
 	}
 	log.Log.Object(vm).V(4).Infof("VirtualMachine RunStrategy: %s", runStrategy)
@@ -655,7 +633,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 		log.Log.Object(vm).Infof("%s due to runStrategy: %s", startingVmMsg, runStrategy)
 		err := c.startVMI(vm)
 		if err != nil {
-			return &syncErrorImpl{fmt.Errorf("Failure while starting VMI: %v", err), FailedCreateReason}
+			return &syncErrorImpl{fmt.Errorf(startingVMIFailureFmt, err), FailedCreateReason}
 		}
 		return nil
 
@@ -694,7 +672,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 		log.Log.Object(vm).Infof("%s due to runStrategy: %s", startingVmMsg, runStrategy)
 		err := c.startVMI(vm)
 		if err != nil {
-			return &syncErrorImpl{fmt.Errorf("Failure while starting VMI: %v", err), FailedCreateReason}
+			return &syncErrorImpl{fmt.Errorf(startingVMIFailureFmt, err), FailedCreateReason}
 		}
 		return nil
 
@@ -719,7 +697,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 
 				err := c.startVMI(vm)
 				if err != nil {
-					return &syncErrorImpl{fmt.Errorf("Failure while starting VMI: %v", err), FailedCreateReason}
+					return &syncErrorImpl{fmt.Errorf(startingVMIFailureFmt, err), FailedCreateReason}
 				}
 			}
 		}
@@ -740,7 +718,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 					vmCopy.Spec.Running = &running
 				}
 				_, err := c.clientset.VirtualMachine(vmCopy.Namespace).Update(vmCopy)
-				return &syncErrorImpl{fmt.Errorf("Failure while starting VMI: %v", err), FailedCreateReason}
+				return &syncErrorImpl{fmt.Errorf(startingVMIFailureFmt, err), FailedCreateReason}
 			}
 			return nil
 		}
@@ -756,7 +734,7 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 func (c *VMController) isVMIStartExpected(vm *virtv1.VirtualMachine) bool {
 	vmKey, err := controller.KeyFunc(vm)
 	if err != nil {
-		log.Log.Object(vm).Errorf("Error fetching vmKey: %v", err)
+		log.Log.Object(vm).Errorf(fetchingVMKeyErrFmt, err)
 		return false
 	}
 
@@ -773,7 +751,7 @@ func (c *VMController) isVMIStartExpected(vm *virtv1.VirtualMachine) bool {
 func (c *VMController) isVMIStopExpected(vm *virtv1.VirtualMachine) bool {
 	vmKey, err := controller.KeyFunc(vm)
 	if err != nil {
-		log.Log.Object(vm).Errorf("Error fetching vmKey: %v", err)
+		log.Log.Object(vm).Errorf(fetchingVMKeyErrFmt, err)
 		return false
 	}
 
@@ -790,7 +768,7 @@ func (c *VMController) isVMIStopExpected(vm *virtv1.VirtualMachine) bool {
 func isSetToStart(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance) bool {
 	runStrategy, err := vm.RunStrategy()
 	if err != nil {
-		log.Log.Object(vm).Errorf("Error fetching RunStrategy: %v", err)
+		log.Log.Object(vm).Errorf(fetchingRunStrategyErrFmt, err)
 		return false
 	}
 
@@ -926,7 +904,7 @@ func shouldClearStartFailure(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachi
 
 	runStrategy, err := vm.RunStrategy()
 	if err != nil {
-		log.Log.Object(vm).Errorf("Error fetching RunStrategy: %v", err)
+		log.Log.Object(vm).Errorf(fetchingRunStrategyErrFmt, err)
 		return false
 	}
 
@@ -1582,89 +1560,9 @@ func (c *VMController) updateStatus(vmOrig *virtv1.VirtualMachine, vmi *virtv1.V
 	}
 	vm.Status.Ready = ready
 
-	clearChangeRequest := false
-	if len(vm.Status.StateChangeRequests) != 0 {
-		// Only consider one stateChangeRequest at a time. The second and subsequent change
-		// requests have not been acted upon by this controller yet!
-		stateChange := vm.Status.StateChangeRequests[0]
-		switch stateChange.Action {
-		case virtv1.StopRequest:
-			if vmi == nil {
-				// because either the VM or VMI informers can trigger processing here
-				// double check the state of the cluster before taking action
-				_, err := c.clientset.VirtualMachineInstance(vm.ObjectMeta.Namespace).Get(vm.GetName(), &v1.GetOptions{})
-				if err != nil && errors.IsNotFound(err) {
-					// If there's no VMI, then the VMI was stopped, and the stopRequest can be cleared
-					log.Log.Object(vm).V(4).Infof("No VMI. Clearing stop request")
-					clearChangeRequest = true
-				}
-			} else {
-				if stateChange.UID == nil {
-					// It never makes sense to have a request to stop a VMI that doesn't
-					// have a UUID associated with it. This shouldn't be possible -- but if
-					// it occurs, clear the stopRequest because it can't be acted upon
-					log.Log.Object(vm).Errorf("Stop Request has no UID.")
-					clearChangeRequest = true
-				} else if *stateChange.UID != vmi.UID {
-					// If there is a VMI, but the UID doesn't match, then it
-					// must have been previously stopped, so the stopRequest can be cleared
-					log.Log.Object(vm).V(4).Infof("VMI's UID doesn't match. clearing stop request")
-					clearChangeRequest = true
-				}
-			}
-		case virtv1.StartRequest:
-			// If the current VMI is running, then it has been started.
-			if vmi != nil {
-				log.Log.Object(vm).V(4).Infof("VMI exists. clearing start request")
-				clearChangeRequest = true
-			}
-		}
-	}
+	c.trimDoneVolumeRequests(vm)
 
-	if len(vm.Status.VolumeRequests) > 0 {
-		volumeMap := make(map[string]virtv1.Volume)
-		diskMap := make(map[string]virtv1.Disk)
-
-		for _, volume := range vm.Spec.Template.Spec.Volumes {
-			volumeMap[volume.Name] = volume
-		}
-		for _, disk := range vm.Spec.Template.Spec.Domain.Devices.Disks {
-			diskMap[disk.Name] = disk
-		}
-
-		tmpVolRequests := vm.Status.VolumeRequests[:0]
-		for _, request := range vm.Status.VolumeRequests {
-
-			var added bool
-			var volName string
-
-			removeRequest := false
-
-			if request.AddVolumeOptions != nil {
-				volName = request.AddVolumeOptions.Name
-				added = true
-			} else if request.RemoveVolumeOptions != nil {
-				volName = request.RemoveVolumeOptions.Name
-				added = false
-			}
-
-			_, volExists := volumeMap[volName]
-			_, diskExists := diskMap[volName]
-
-			if added && volExists && diskExists {
-				removeRequest = true
-			} else if !added && !volExists && !diskExists {
-				removeRequest = true
-			}
-
-			if !removeRequest {
-				tmpVolRequests = append(tmpVolRequests, request)
-			}
-		}
-		vm.Status.VolumeRequests = tmpVolRequests
-	}
-
-	if clearChangeRequest {
+	if c.isTrimFirstChangeRequestNeeded(vm, vmi) {
 		vm.Status.StateChangeRequests = vm.Status.StateChangeRequests[1:]
 	}
 
@@ -1743,7 +1641,7 @@ func (c *VMController) isVirtualMachineStatusCrashLoopBackOff(vm *virtv1.Virtual
 
 	runStrategy, err := vm.RunStrategy()
 	if err != nil {
-		log.Log.Object(vm).Errorf("Error fetching RunStrategy: %v", err)
+		log.Log.Object(vm).Errorf(fetchingRunStrategyErrFmt, err)
 		return false
 	}
 
@@ -2023,6 +1921,134 @@ func (c *VMController) processFailureCondition(vm *virtv1.VirtualMachine, vmi *v
 	})
 
 	return
+}
+
+func (c *VMController) isTrimFirstChangeRequestNeeded(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance) (clearChangeRequest bool) {
+	if len(vm.Status.StateChangeRequests) == 0 {
+		return false
+	}
+
+	// Only consider one stateChangeRequest at a time. The second and subsequent change
+	// requests have not been acted upon by this controller yet!
+	stateChange := vm.Status.StateChangeRequests[0]
+	switch stateChange.Action {
+	case virtv1.StopRequest:
+		if vmi == nil {
+			// because either the VM or VMI informers can trigger processing here
+			// double check the state of the cluster before taking action
+			_, err := c.clientset.VirtualMachineInstance(vm.ObjectMeta.Namespace).Get(vm.GetName(), &v1.GetOptions{})
+			if err != nil && errors.IsNotFound(err) {
+				// If there's no VMI, then the VMI was stopped, and the stopRequest can be cleared
+				log.Log.Object(vm).V(4).Infof("No VMI. Clearing stop request")
+				return true
+			}
+		} else {
+			if stateChange.UID == nil {
+				// It never makes sense to have a request to stop a VMI that doesn't
+				// have a UUID associated with it. This shouldn't be possible -- but if
+				// it occurs, clear the stopRequest because it can't be acted upon
+				log.Log.Object(vm).Errorf("Stop Request has no UID.")
+				return true
+			} else if *stateChange.UID != vmi.UID {
+				// If there is a VMI, but the UID doesn't match, then it
+				// must have been previously stopped, so the stopRequest can be cleared
+				log.Log.Object(vm).V(4).Infof("VMI's UID doesn't match. clearing stop request")
+				return true
+			}
+		}
+	case virtv1.StartRequest:
+		// If the current VMI is running, then it has been started.
+		if vmi != nil {
+			log.Log.Object(vm).V(4).Infof("VMI exists. clearing start request")
+			return true
+		}
+	}
+
+	return false
+}
+
+func (c *VMController) trimDoneVolumeRequests(vm *virtv1.VirtualMachine) {
+	if len(vm.Status.VolumeRequests) == 0 {
+		return
+	}
+
+	volumeMap := make(map[string]virtv1.Volume)
+	diskMap := make(map[string]virtv1.Disk)
+
+	for _, volume := range vm.Spec.Template.Spec.Volumes {
+		volumeMap[volume.Name] = volume
+	}
+	for _, disk := range vm.Spec.Template.Spec.Domain.Devices.Disks {
+		diskMap[disk.Name] = disk
+	}
+
+	tmpVolRequests := vm.Status.VolumeRequests[:0]
+	for _, request := range vm.Status.VolumeRequests {
+
+		var added bool
+		var volName string
+
+		removeRequest := false
+
+		if request.AddVolumeOptions != nil {
+			volName = request.AddVolumeOptions.Name
+			added = true
+		} else if request.RemoveVolumeOptions != nil {
+			volName = request.RemoveVolumeOptions.Name
+			added = false
+		}
+
+		_, volExists := volumeMap[volName]
+		_, diskExists := diskMap[volName]
+
+		if added && volExists && diskExists {
+			removeRequest = true
+		} else if !added && !volExists && !diskExists {
+			removeRequest = true
+		}
+
+		if !removeRequest {
+			tmpVolRequests = append(tmpVolRequests, request)
+		}
+	}
+	vm.Status.VolumeRequests = tmpVolRequests
+}
+
+func (c *VMController) sync(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance, key string, dataVolumes []*cdiv1.DataVolume) (syncError, error) {
+	var syncErr syncError
+
+	if !c.needsSync(key) || vm.ObjectMeta.DeletionTimestamp != nil {
+		return nil, nil
+	}
+
+	// Scale up or down, if all expected creates and deletes were report by the listener
+	runStrategy, err := vm.RunStrategy()
+	if err != nil {
+		return nil, err
+	}
+
+	dataVolumesReady, err := c.handleDataVolumes(vm, dataVolumes)
+	if err != nil {
+		syncErr = &syncErrorImpl{fmt.Errorf("Error encountered while creating DataVolumes: %v", err), FailedCreateReason}
+	} else if dataVolumesReady || runStrategy == virtv1.RunStrategyHalted {
+		syncErr = c.startStop(vm, vmi)
+	} else {
+		log.Log.Object(vm).V(3).Infof("Waiting on DataVolumes to be ready. %d datavolumes found", len(dataVolumes))
+	}
+
+	// Must check needsSync again here because a VMI can be created or
+	// deleted in the startStop function which impacts how we process
+	// hotplugged volumes
+	if c.needsSync(key) && syncErr == nil {
+
+		err = c.handleVolumeRequests(vm, vmi)
+		if err != nil {
+			syncErr = &syncErrorImpl{fmt.Errorf("Error encountered while handling volume hotplug requests: %v", err), HotPlugVolumeErrorReason}
+		}
+	}
+	virtControllerVMWorkQueueTracer.StepTrace(key, "sync", trace.Field{Key: "VM Name", Value: vm.Name})
+
+	return syncErr, nil
 }
 
 // resolveControllerRef returns the controller referenced by a ControllerRef,

@@ -156,6 +156,26 @@ type VirtualMachineInstanceSpec struct {
 	AccessCredentials []AccessCredential `json:"accessCredentials,omitempty"`
 }
 
+func (vmiSpec *VirtualMachineInstanceSpec) UnmarshalJSON(data []byte) error {
+	type VMISpecAlias VirtualMachineInstanceSpec
+	var vmiSpecAlias VMISpecAlias
+
+	if err := json.Unmarshal(data, &vmiSpecAlias); err != nil {
+		return err
+	}
+
+	if vmiSpecAlias.DNSConfig != nil {
+		for i, ns := range vmiSpecAlias.DNSConfig.Nameservers {
+			if sanitizedIP, err := sanitizeIP(ns); err == nil {
+				vmiSpecAlias.DNSConfig.Nameservers[i] = sanitizedIP
+			}
+		}
+	}
+
+	*vmiSpec = VirtualMachineInstanceSpec(vmiSpecAlias)
+	return nil
+}
+
 // VirtualMachineInstancePhaseTransitionTimestamp gives a timestamp in relation to when a phase is set on a vmi
 type VirtualMachineInstancePhaseTransitionTimestamp struct {
 	// Phase is the status of the VirtualMachineInstance in kubernetes world. It is not the VirtualMachineInstance status, but partially correlates to it.
@@ -419,6 +439,8 @@ const (
 	VirtualMachineInstanceReasonVirtIOFSNotMigratable = "VirtIOFSNotLiveMigratable"
 	// Reason means that VMI is not live migratable because it uses PCI host devices
 	VirtualMachineInstanceReasonHostDeviceNotMigratable = "HostDeviceNotLiveMigratable"
+	// Reason means that VMI is not live migratable because it uses Secure Encrypted Virtualization (SEV)
+	VirtualMachineInstanceReasonSEVNotMigratable = "SEVNotLiveMigratable"
 )
 
 const (
@@ -499,12 +521,13 @@ type VirtualMachineInstanceNetworkInterface struct {
 	// Hardware address of a Virtual Machine interface
 	MAC string `json:"mac,omitempty"`
 	// Name of the interface, corresponds to name of the network assigned to the interface
-	// TODO: remove omitempty, when api breaking changes are allowed
 	Name string `json:"name,omitempty"`
 	// List of all IP addresses of a Virtual Machine interface
 	IPs []string `json:"ipAddresses,omitempty"`
 	// The interface name inside the Virtual Machine
 	InterfaceName string `json:"interfaceName,omitempty"`
+	// Specifies the origin of the interface data collected. values: domain, guest-agent, or both
+	InfoSource string `json:"infoSource,omitempty"`
 }
 
 type VirtualMachineInstanceGuestOSInfo struct {
@@ -569,6 +592,13 @@ type VirtualMachineInstanceMigrationState struct {
 	MigrationPolicyName *string `json:"migrationPolicyName,omitempty"`
 	// Migration configurations to apply
 	MigrationConfiguration *MigrationConfiguration `json:"migrationConfiguration,omitempty"`
+	// If the VMI requires dedicated CPUs, this field will
+	// hold the dedicated CPU set on the target node
+	// +listType=atomic
+	TargetCPUSet []int `json:"targetCPUSet,omitempty"`
+	// If the VMI requires dedicated CPUs, this field will
+	// hold the numa topology on the target node
+	TargetNodeTopology string `json:"targetNodeTopology,omitempty"`
 }
 
 type MigrationAbortStatus string
@@ -703,8 +733,9 @@ const (
 	// This label identifies each resource as part of KubeVirt
 	AppComponent = "kubevirt"
 	// This label will be set on all resources created by the operator
-	ManagedByLabel              = AppLabelPrefix + "/managed-by"
-	ManagedByLabelOperatorValue = "kubevirt-operator"
+	ManagedByLabel                 = AppLabelPrefix + "/managed-by"
+	ManagedByLabelOperatorValue    = "virt-operator"
+	ManagedByLabelOperatorOldValue = "kubevirt-operator"
 	// This annotation represents the kubevirt version for an install strategy configmap.
 	InstallStrategyVersionAnnotation = "kubevirt.io/install-strategy-version"
 	// This annotation represents the kubevirt registry used for an install strategy configmap.
@@ -786,6 +817,9 @@ const (
 
 	// VirtualMahcineInstanceTemplateHash is used by the pool controller to determine when a VMI needs to be updated
 	VirtualMachineInstanceTemplateHash string = "kubevirt.io/vmi-template-hash"
+
+	// SEVLabel marks the node as capable of running workloads with SEV
+	SEVLabel string = "kubevirt.io/sev"
 )
 
 func NewVMI(name string, uid types.UID) *VirtualMachineInstance {
@@ -1933,6 +1967,14 @@ type AddVolumeOptions struct {
 	Disk *Disk `json:"disk"`
 	// VolumeSource represents the source of the volume to map to the disk.
 	VolumeSource *HotplugVolumeSource `json:"volumeSource"`
+	// When present, indicates that modifications should not be
+	// persisted. An invalid or unrecognized dryRun directive will
+	// result in an error response and no further processing of the
+	// request. Valid values are:
+	// - All: all dry run stages will be processed
+	// +optional
+	// +listType=atomic
+	DryRun []string `json:"dryRun,omitempty"`
 }
 
 // RemoveVolumeOptions is provided when dynamically hot unplugging volume and disk
@@ -1940,6 +1982,14 @@ type RemoveVolumeOptions struct {
 	// Name represents the name that maps to both the disk and volume that
 	// should be removed
 	Name string `json:"name"`
+	// When present, indicates that modifications should not be
+	// persisted. An invalid or unrecognized dryRun directive will
+	// result in an error response and no further processing of the
+	// request. Valid values are:
+	// - All: all dry run stages will be processed
+	// +optional
+	// +listType=atomic
+	DryRun []string `json:"dryRun,omitempty"`
 }
 
 type TokenBucketRateLimiter struct {
@@ -2017,6 +2067,7 @@ type MigrationConfiguration struct {
 	UnsafeMigrationOverride           *bool              `json:"unsafeMigrationOverride,omitempty"`
 	AllowPostCopy                     *bool              `json:"allowPostCopy,omitempty"`
 	DisableTLS                        *bool              `json:"disableTLS,omitempty"`
+	Network                           *string            `json:"network,omitempty"`
 }
 
 // DiskVerification holds container disks verification limits
@@ -2087,6 +2138,20 @@ type MediatedHostDevice struct {
 type MediatedDevicesConfiguration struct {
 	// +listType=atomic
 	MediatedDevicesTypes []string `json:"mediatedDevicesTypes,omitempty"`
+	// +optional
+	// +listType=atomic
+	NodeMediatedDeviceTypes []NodeMediatedDeviceTypesConfig `json:"nodeMediatedDeviceTypes,omitempty"`
+}
+
+// NodeMediatedDeviceTypesConfig holds inforamtion about MDEV types to be defined in a specifc node that matches the NodeSelector field.
+// +k8s:openapi-gen=true
+type NodeMediatedDeviceTypesConfig struct {
+	// NodeSelector is a selector which must be true for the vmi to fit on a node.
+	// Selector which must match a node's labels for the vmi to be scheduled on that node.
+	// More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
+	NodeSelector map[string]string `json:"nodeSelector"`
+	// +listType=atomic
+	MediatedDevicesTypes []string `json:"mediatedDevicesTypes"`
 }
 
 // NetworkConfiguration holds network options

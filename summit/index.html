@@ -46,7 +46,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2021-12-14 03:43:01 +0000" >
+    <meta property="og:article:published_time" content="2022-01-06 22:33:42 +0000" >
     <meta name="twitter:title" content="KubeVirt Summit | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -233,499 +233,41 @@ autocomplete(document.getElementById("search-input"), mykeywords);
       <div class="container post">
   <h1 class="page-title">KubeVirt Summit</h1>
   <article class="post-content">
-    <p>The KubeVirt community held its first ever dedicated online event about all
-things KubeVirt. The KubeVirt Summit was a 2-day virtual event to discover,
+    <p>The second online KubeVirt Summit is coming on Feburary 16-17!</p>
+
+<p>The KubeVirt Summit is a 2-day virtual event to discover,
 discuss, hack and learn about managing virtual machines in Kubernetes using
 KubeVirt.</p>
 
-<p>Many thanks to everyone who contributed to the event!</p>
+<p>We are looking for Session Leaders, see below.</p>
 
 <h2 id="when">When</h2>
 
-<p>The event took place online during two half-days (5 hours each day):</p>
+<p>The event will take place online during two half-days (5 hours each day):</p>
 
 <ul>
-  <li>Dates: February 9 and 10, 2021.</li>
+  <li>Dates: February 16 and 17, 2022</li>
   <li>Time: 14:00 – 19:00 UTC (09:00–14:00 EST, 15:00–20:00 CET)</li>
 </ul>
 
-<h2 id="program">Program</h2>
+<h2 id="rsvp">RSVP</h2>
 
-<p>The event consisted of 20 sessions with the following schedule (all times in UTC):</p>
+<p>You can <a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/">RSVP for KubeVirt Summit on community.cncf.io</a>.  You will need to register with CNCF.io if you have not before. Attendance is free.</p>
 
-<table>
-  <thead>
-    <tr>
-      <th>Date</th>
-      <th>Time</th>
-      <th>Session Title</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td>9/Feb</td>
-      <td>14:00</td>
-      <td><a href="#welcome">Welcome to the KubeVirt Summit!</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>14:30</td>
-      <td><a href="#automated-migration">Automated migration of VMs from VMware or OpenStack to KubeVirt</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>15:00</td>
-      <td><a href="#prow">How to avoid merging broken code with automated testing using prow</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>15:30</td>
-      <td><a href="#templates">Building great VMs with common templates</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>16:00</td>
-      <td><a href="#tekton">Automating KubeVirt with Tekton Pipelines</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>16:30</td>
-      <td><a href="#snapshots">KubeVirt Data Protection and Forensics Forum</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>17:00</td>
-      <td><a href="#upgrades">Zero Downtime KubeVirt Updates</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>17:30</td>
-      <td><a href="#hotplug">Introducing Volume Hotplug in KubeVirt</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>18:00</td>
-      <td><a href="#pci-passthrough">Accelerating VNF and CNF with PCI passthrough and KubeVirt</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>18:30</td>
-      <td><a href="#harvester">Harvester: an Open Source HCI solution built on Kubernetes and KubeVirt</a></td>
-    </tr>
-    <tr>
-      <td>10/Feb</td>
-      <td>14:00</td>
-      <td><a href="#sriov">KubeVirt Live Migration and SRIOV</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>14:30</td>
-      <td><a href="#forklift">Moving oVirt and VMware VMs to KubeVirt with VM Import Operator and Forklift</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>15:00</td>
-      <td><a href="#hco">KubeVirt opinionated deployment via Hyperconverged Cluster Operator</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>15:30</td>
-      <td><a href="#capabilities">Privilege dropping, one capability at a time</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>16:00</td>
-      <td><a href="#molecule">Introducing the new KubeVirt driver for Ansible Molecule</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>16:30</td>
-      <td><a href="#batch-api">Virtual Machine Batch API</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>17:00</td>
-      <td><a href="#cpu-pinning">CPU Pinning with custom policies</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>17:30</td>
-      <td><a href="#road-v1">The Road to Version 1</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>18:00</td>
-      <td><a href="#vfx">Moving a Visual Effects Studio to the cloud with Kubernetes and KubeVirt</a></td>
-    </tr>
-    <tr>
-      <td> </td>
-      <td>18:30</td>
-      <td><a href="#office-hours">Office Hours: Q&amp;A with KubeVirt maintainers</a></td>
-    </tr>
-  </tbody>
-</table>
+<h2 id="call-for-session-proposals">Call for Session Proposals</h2>
 
-<h2 id="session-details">Session details</h2>
-
-<p>Here is a list of all the sessions with a short abstract, presenter information and links to the session’s recording and slides.</p>
-
-<p><a name="welcome"></a></p>
-
-<h3 id="welcome-to-the-kubevirt-summit-introduction-and-history">Welcome to the KubeVirt Summit! Introduction and history</h3>
-
-<p><a href="https://youtu.be/BX0k5jnyNag">Recording</a> / <a href="https://drive.google.com/file/d/1CCnemQ1CntxskcOlgkTieFb2omR-GQ_I/view">Slides</a></p>
-
-<p>In the first session of the KubeVirt Summit, Fabian Deutsch (<a href="https://twitter.com/dummdida">@dummdida</a>) talks about the project’s history.</p>
-
-<p><a name="automated-migration"></a></p>
-
-<h3 id="automated-migration-of-vms-from-vmware-or-openstack-to-kubevirt">Automated Migration of VMs from VMware or Openstack to KubeVirt</h3>
-
-<p><a href="https://youtu.be/2Fm8IJ7gyRg">Recording</a> / <a href="https://drive.google.com/file/d/1gOteQvEwU2vR4dPAxNLC0iAZ0UwlUcYE/view?usp=sharing">Slides</a></p>
-
-<p>KubeVirt opens scenarios for a Kubernetes based infrastructure that can handle both VMs and containers. Wouldn’t it be great to just automatically move all your Virtual Machines from legacy environments and consolidate your whole infrastructure around Kubernetes and KubeVirt?</p>
-
-<p>Coriolis performs automated migrations among most common clouds and virtualization solutions, like VMware, OpenStack, AWS, Azure, AzureStack, OCI, Hyper-V and now also KubeVirt.</p>
-
-<p>During this session we will perform a live demo showing how to migrate a VM from VMware vSphere to KubeVirt and a separate demo showing the migration of a VM from OpenStack to KubeVirt.</p>
-
-<p>Presenters:</p>
+<p>We are <a href="https://forms.gle/KXaPWpJzk7Z12bRD8">looking for community members to lead sessions</a> on contributing to, or using, KubeVirt.  Topics should be anything that is open source and focused on the KubeVirt ecosystem, whether contributing to it or using it. Examples of talks from last year’s Summit include:</p>
 
 <ul>
-  <li>Alessandro Pilotti, CEO/CTO, Cloudbase Solutions, <a href="https://twitter.com/cloudbaseit">@cloudbaseit</a>, <a href="https://github.com/alexpilotti/">https://github.com/alexpilotti/</a></li>
-  <li>Gabriel Samfira, Cloud Architect, Cloudbase Solutions, <a href="https://twitter.com/gabriel_samfira">@gabriel_samfira</a>, <a href="https://github.com/gabriel-samfira">https://github.com/gabriel-samfira</a></li>
+  <li>Migrating VMs to KubeVirt</li>
+  <li>Data protection discussion</li>
+  <li>Advanced container networking and KubeVirt</li>
+  <li>Enabling Prow-based automated testing</li>
+  <li>Zero downtime upgrades</li>
+  <li>Privilege dropping</li>
 </ul>
 
-<p><a name="prow"></a></p>
-
-<h3 id="avoid-merging-broken-code-with-prow">Avoid merging broken code with Prow</h3>
-
-<p><a href="https://youtu.be/4JV7YJbini0">Recording</a> / <a href="https://drive.google.com/file/d/14A-pKmSwMZCDghATnOTHcAkt84TPu_AD/view?usp=sharing">Slides</a></p>
-
-<p>This session is about creation of prow jobs in general. Prow is a Kubernetes based CI/CD system.</p>
-
-<p>We cover what is a prow job, what job types are available, how to configure job triggers, testing jobs: requirements, obstacles and pitfalls configurations for merge gating other usages of jobs (publishing, bumping, …).</p>
-
-<p>Attendants will be able to know what job types are available, which one to use for a specific problem and how to verify their job works on their machine (TM) before creating a PR.</p>
-
-<p>Presenter: Daniel Hiller, Senior Software Engineer OpenShift Virtualization, Red Hat. <a href="https://twitter.com/dhill3r">@dhill3r</a>, <a href="https://github.com/dhiller">https://github.com/dhiller</a></p>
-
-<p><a name="templates"></a></p>
-
-<h3 id="building-great-vms-with-common-templates">Building great VMs with common templates</h3>
-
-<p><a href="https://youtu.be/C0zTKrMSQXE">Recording</a></p>
-
-<p>Common templates are covering most of the nowadays operating systems. Users can easily create e.g. Windows VMs, without complicated settings.</p>
-
-<p>The presentation covers:</p>
-
-<ul>
-  <li>What are common templates</li>
-  <li>Which operating systems are supported</li>
-  <li>How common templates work</li>
-  <li>How to use them</li>
-</ul>
-
-<p>Attendants will be able to know what are common templates and how to use them.</p>
-
-<p>Presenter: Karel Simon, Software Engineer, Red Hat</p>
-
-<p><a name="tekton"></a></p>
-
-<h3 id="automating-kubevirt-with-tekton-pipelines">Automating KubeVirt with Tekton Pipelines</h3>
-
-<p><a href="https://youtu.be/ZA4fN_ogpY0">Recording</a> / <a href="https://drive.google.com/file/d/1baGeO-iPsI2HPzS8pq1b4My3hRQDSfw5/view?usp=sharing">Slides</a></p>
-
-<p>This talk introduces a new effort to bring KubeVirt specific tasks to Tekton
-Pipelines (CI/CD-style pipelines on k8s).  The goal of this project is to have
-tasks for managing VMs and running virtualized workloads as part of the
-pipelines flow.</p>
-
-<p>The speaker will showcase what pipelines you can build at the moment, and what
-are the plans for the future.</p>
-
-<p>Presenter: Filip Křepinský, Senior Software Engineer, Red Hat, <a href="https://github.com/suomiy">https://github.com/suomiy</a></p>
-
-<p><a name="snapshots"></a></p>
-
-<h3 id="kubevirt-data-protection-and-forensics-forum">KubeVirt data protection and forensics forum</h3>
-
-<p><a href="https://youtu.be/qRw2cLVqJ3c">Recording</a> / <a href="https://drive.google.com/file/d/1QQijYPFVQx7Ki2VVaQtNObSjJdeno0iS/view?usp=sharing">Slides</a></p>
-
-<p>Let’s get together to discuss plans/ideas to extend KubeVirt’s data protection and forensics functionality.</p>
-
-<p>Presenters:</p>
-
-<ul>
-  <li>Michael Henriksen, Red Hat, <a href="https://github.com/mhenriks">https://github.com/mhenriks</a></li>
-  <li>Ryan Hallisey, NVIDIA, <a href="https://twitter.com/rthallisey">@rthallisey</a>, <a href="https://github.com/rthallisey">https://github.com/rthallisey</a></li>
-</ul>
-
-<p><a name="upgrades"></a></p>
-
-<h3 id="zero-downtime-kubevirt-updates">Zero downtime KubeVirt updates</h3>
-
-<p><a href="https://youtu.be/UZCFmrVFSz8">Recording</a> / <a href="https://drive.google.com/file/d/1MYPo8rp1SGPNJnVhothDBFYccxxLtX65/view?usp=sharing">Slides</a></p>
-
-<p>KubeVirt has a very precise and resilient method for ensuring zero downtime updates occur.</p>
-
-<p>In this session I’ll cover the general strategy behind how we approach updating KubeVirt from a developer’s perspective as well as discuss future improvements to our update process.</p>
-
-<p>Attendees will come away with an understanding of how KubeVirt’s update process has been designed, how it is tested, and what future enhancements are coming soon.</p>
-
-<p>Presenter: David Vossel, Senior Principal Software Engineer, Red Hat, <a href="https://github.com/davidvossel">https://github.com/davidvossel</a></p>
-
-<p><a name="hotplug"></a></p>
-
-<h3 id="introducing-volume-hotplug-in-kubevirt">Introducing Volume Hotplug in KubeVirt</h3>
-
-<p><a href="https://youtu.be/4OxcqF4Lmh0">Recording</a> / <a href="https://drive.google.com/file/d/18-BpnpAwDbmvWtJ63_tWTzF98XDTFVM7/view?usp=sharing">Slides</a></p>
-
-<p>Introduction into the current state of volume hotplugging in KubeVirt, what is possible, what is not possible and what are the challenges.</p>
-
-<p>Presenter: Alexander Wels, Principal Software Engineer, Red Hat</p>
-
-<p><a name="pci-passthrough"></a></p>
-
-<h3 id="accelerating-vnf-and-cnf-with-pci-passthrough-and-kubevirt">Accelerating VNF and CNF with PCI passthrough and KubeVirt</h3>
-
-<p><a href="https://youtu.be/PJ4D2NqMO2A">Recording</a> / <a href="https://drive.google.com/file/d/17QJDZQj8zkoyCLjKwDz97vz4Wjw8CH3s/view?usp=sharing">Slides</a></p>
-
-<p>This session introduces PCI device passthrough to containers and VMs managed by KubeVirt.</p>
-
-<p>An overview of PCI passthrough and the Generic Device API is provided, illustrated with a specific practical use case that uses Intel QAT to accelerate VNF/CNF in edge computing.</p>
-
-<p>Presenters:</p>
-
-<ul>
-  <li>Vladik Romanovsky, Principal Software Engineer, Red Hat</li>
-  <li>Le Yao, Intel SSE/CSE</li>
-</ul>
-
-<p><a name="harvester"></a></p>
-
-<h3 id="harvester-an-oss-hci-solution-built-on-kubernetes-and-kubevirt">Harvester: an OSS HCI solution built on Kubernetes and KubeVirt</h3>
-
-<p><a href="https://youtu.be/Kp_xs4bfUXI">Recording</a> / <a href="https://drive.google.com/file/d/1DeCgnDF4aFFMq3tVeWtrO5LuxbjMYPo2/view?usp=sharing">Slides</a></p>
-
-<p>Project Harvester is a new open source alternative to traditional proprietary hyperconverged infrastructure software. It is built on top of cutting-edge open source technologies including Kubernetes, KubeVirt and Longhorn.</p>
-
-<p>In this talk, we will talk about why we decide to build Harvester, how did we integrated with KubeVirt, and the lessons we’ve learnt along the way. We will also have a demo of current release of Harvester by the end of session.</p>
-
-<p>Presenter: Sheng Yang: Senior Engineering Manager, SUSE, <a href="https://twitter.com/yasker">@yasker</a>, <a href="https://github.com/yasker">https://github.com/yasker</a></p>
-
-<p><a name="sriov"></a></p>
-
-<h3 id="kubevirt-live-migration-and-sriov">Kubevirt Live migration and SRIOV</h3>
-
-<p><a href="https://youtu.be/PxsVU95vLp8">Recording</a> / <a href="https://drive.google.com/file/d/1DeCgnDF4aFFMq3tVeWtrO5LuxbjMYPo2/view?usp=sharing">Slides</a></p>
-
-<p>KubeVirt Live Migration now supports VM’s connected to SRIOV NIC’s.</p>
-
-<p>On virtualized environments, Live Migration is a tool you want to have in your toolbox especially on production. It enables you to improve your services availability and reduce the recovery time drastically.</p>
-
-<p>In this session we will discuss why and how to use this feature for VM’s with SRIOV NIC’s.</p>
-
-<p>Presenter: Or Mergi, Software Engineer, Red Hat, <a href="https://github.com/ormergi">https://github.com/ormergi</a></p>
-
-<p><a name="forklift"></a></p>
-
-<h3 id="moving-ovirt-and-vmware-vms-to-kubevirt-with-vm-import-operator-and-forklift">Moving oVirt and VMware VMs to KubeVirt with VM Import Operator and Forklift</h3>
-
-<p><a href="https://youtu.be/S7hVcv2Fu6I">Recording</a> / <a href="https://drive.google.com/file/d/1JS0xugQvXB_yXsISbLQlnjhRCq85dLTR/view?usp=sharing">Slides</a></p>
-
-<p>VM Import Operator (VMIO) allows Kubernetes administrators to easily import their oVirt- and VMware- managed virtual machines to KubeVirt.</p>
-
-<p>Konveyor’s Forklift is a project that leverages VMIO to propose a user interface for large scale migrations, introducing the concept of migration plan and implementing inventory and validation services.</p>
-
-<p>In this talk, the speakers will explain the design of the Virtual Machine Import Operator and how it can be used to import virtual machines to KubeVirt. Afterwards the speakers will show how Forklift uses VMIO to deliver better user experience while importing virtual machines to KubeVirt.</p>
-
-<p>The attendees will:</p>
-
-<ul>
-  <li>learn how VM Import Operator works</li>
-  <li>see an oVirt virtual machine import to Kubernetes (KubeVirt) with VMIO</li>
-  <li>see VMware virtual machines import to Kubernetes (KubeVirt) with Forklift</li>
-  <li>know how to import their VMware or oVirt workloads to Kubernetes with VMIO or Forklift</li>
-</ul>
-
-<p>Presenters:</p>
-
-<ul>
-  <li>Jakub Dzon, Senior Software Engineer, Red Hat</li>
-  <li>Fabien Dupont, Senior Principal Engineer &amp; Engineering Manager, Red Hat</li>
-</ul>
-
-<p>References:</p>
-
-<ul>
-  <li><a href="https://github.com/kubevirt/vm-import-operator">VM Import Operator</a> (VMIO).</li>
-  <li>Konveyor’s <a href="https://docs.konveyor.io/">Forklift</a>.</li>
-</ul>
-
-<p><a name="hco"></a></p>
-
-<h3 id="kubevirt-opinionated-deployment-via-hyperconverged-cluster-operator">KubeVirt opinionated deployment via Hyperconverged Cluster Operator</h3>
-
-<p><a href="https://youtu.be/6Jxbt1SzLRE">Recording</a> / <a href="https://drive.google.com/file/d/1zO3B0IWe4jxJlOrHBu5I4nvt6pvvqHNc/view?usp=sharing">Slides</a></p>
-
-<p>How deploy KubeVirt and several adjacent operators with ease?</p>
-
-<p>The HyperConverged Cluster operator (HCO) is a unified operator deploying and controlling KubeVirt and several adjacent operators:</p>
-
-<ul>
-  <li>Containerized Data Importer</li>
-  <li>Scheduling, Scale and Performance</li>
-  <li>Cluster Network Addons</li>
-  <li>Node Maintenance</li>
-</ul>
-
-<p>The purpose of HCO is to ease the deployment, upgrade, monitoring and configuration of an opinionated version of the KubeVirt cluster.</p>
-
-<p>The Hyperconverged Cluster Operator can be installed on bare metal server clusters in a matter of minutes, even from a GUI, without requiring a deep knowledge of Kubernetes internals.</p>
-
-<p>An attendee will learn:</p>
-
-<ul>
-  <li>how to deploy and maintain a KubeVirt cluster with the Hyperconverged Cluster Operator</li>
-  <li>a <a href="https://youtu.be/tHPHfL5PzGM">demo</a></li>
-  <li>ongoing development and how to contribute</li>
-</ul>
-
-<p>Presenters:</p>
-
-<ul>
-  <li>Nahshon Unna-Tsametet, Senior Software Engineer, Red Hat, <a href="https://github.com/nunnatsa">https://github.com/nunnatsa</a></li>
-  <li>Oren Cohen, Software Engineer, Red Hat, <a href="https://github.com/orenc1">https://github.com/orenc1</a></li>
-</ul>
-
-<p>References:</p>
-
-<ul>
-  <li><a href="https://github.com/kubevirt/hyperconverged-cluster-operator">HyperConverged Cluster operator</a> (HCO).</li>
-</ul>
-
-<p><a name="capabilities"></a></p>
-
-<h3 id="privilege-dropping-one-capability-at-a-time">Privilege dropping, one capability at a time</h3>
-
-<p><a href="https://youtu.be/7qVcDraf_DI">Recording</a> / <a href="https://drive.google.com/file/d/1m-oRtZYiMEasr6ICSDc3ShHGEqm0IFsM/view?usp=sharing">Slides</a></p>
-
-<p>KubeVirt’s architecture is composed of two main components: virt-handler, a trusted DaemonSet, running in each node, which operates as the virtualization agent, and virt-launcher, an untrusted Kubernetes pod encapsulating a single libvirt + qemu process.</p>
-
-<p>To reduce the attack surface of the overall solution, the untrusted virt-launcher component should run with as little linux capabilities as possible.</p>
-
-<p>The goal of this talk is to explain the journey to get there, and the steps taken to drop CAPNETADMIN, and CAPNETRAW from the untrusted component.</p>
-
-<p>This talk will encompass changes in KubeVirt and Libvirt, and requires some general prior information about networking (dhcp / L2 networking).</p>
-
-<p>Presenter: Miguel Duarte Barroso, Software Developer, Red Hat</p>
-
-<p><a name="molecule"></a></p>
-
-<h3 id="introducing-the-new-kubevirt-driver-for-ansible-molecule">Introducing the new KubeVirt driver for Ansible Molecule</h3>
-
-<p><a href="https://youtu.be/oCk6hzk7lAM">Recording</a> / <a href="https://drive.google.com/file/d/1jvoat_XT16YX5wwA7AwBMo3p3vs2r2xF/view?usp=sharing">Slides</a></p>
-
-<p>Molecule is a well known test framework for Ansible. But when you run your Molecule test in Kubernetes, no real good solution exists. I’m working on creating new Molecule driver for KubeVirt to find a better approach and get a 100% pure Kubernetes solution.</p>
-
-<p>In this session I will introduce quickly why it may be better than actual drivers, how it works, and make a demo.</p>
-
-<p>Presenter: Joël Séguillon, Senior DevOps Consultant in mission at <a href="https://www.ateme.com">www.ateme.com</a> - <a href="https://github.com/jseguillon">https://github.com/jseguillon</a> (<a href="https://www.linkedin.com/in/jo%C3%ABl-s%C3%A9guillon-91a55814/">LinkedIn</a>)</p>
-
-<p><a name="batch-api"></a></p>
-
-<h3 id="virtual-machine-batch-api">Virtual Machine Batch API</h3>
-
-<p><a href="https://youtu.be/BbzFMcksMlU">Recording</a> / <a href="https://drive.google.com/file/d/1z6t70wiaF6WukOTauY0ZPiAF33J6d6oT/view?usp=sharing">Slides</a></p>
-
-<p>KubeVirt extends the Kubernetes ReplicaSets API to provide Virtual Machines with similar functionality and the same can be done with Kubernetes Jobs. In order to bulk schedule VirtualMachines, an admin could use a VirtualMachine Batch API, a VirtualMachineJob, to launch many VirtualMachines from a single API call.</p>
-
-<p>In this session, we’d like to share ideas, discuss use cases, and consider possible solutions to bulk Virtual Machine scheduling.</p>
-
-<p>Presenters:</p>
-
-<ul>
-  <li>Huy Pham, NVIDIA. <a href="https://github.com/huypham21">https://github.com/huypham21</a></li>
-  <li>Ryan Hallisey, NVIDIA, <a href="https://twitter.com/rthallisey">@rthallisey</a>, <a href="https://github.com/rthallisey">https://github.com/rthallisey</a></li>
-</ul>
-
-<p><a name="cpu-pinning"></a></p>
-
-<h3 id="cpu-pinning-with-custom-policies">CPU Pinning with custom policies</h3>
-
-<p><a href="https://youtu.be/xSMFQR_Uh1M">Recording</a> / <a href="https://drive.google.com/file/d/16Wy8s-uCr_B6GdQgWBB1_EIX2awUTFDu/view?usp=sharing">Slides</a></p>
-
-<p>KubeVirt supports CPU pinning via the Kubernetes CPU Manager. However there are a few gaps with achieving CPU pinning only via CPU Manager: It supports only static policy and doesn’t allow for custom pinning. It supports only Guaranteed QoS class.</p>
-
-<p>The insistence by CPU Manager to keep a shared pool means that it is impossible to overcommit in a way that allows all CPUs to be bound to guest CPUs. It provides a best-effort allocation of CPUs belonging to a socket and physical core. In such cases it is susceptible to corner cases and might lead to fragmentation. That is, Kubernetes keeps us from deploying VMs as densely as we can without Kubernetes.</p>
-
-<p>An important requirement for us is to do away with the shared pool and let kubelet and containers that do not require dedicated placement to use any CPU, just as system processes do. Moreover, system services such as the container runtime and the kubelet itself can continue to run on these exclusive CPUs. The exclusivity offered by the CPU Manager only extends to other pods.</p>
-
-<p>In this session we’d like to discuss the workarounds we use for supporting a custom CPU pinning using a dedicated CPU device plugin and integrating it with KubeVirt and discuss use cases.</p>
-
-<p>Presenters:</p>
-
-<ul>
-  <li>Sowmya Seetharaman, NVIDIA, <a href="https://github.com/sseetharaman6">https://github.com/sseetharaman6</a></li>
-  <li>Dhanya Bhat, NVIDIA, <a href="https://github.com/dbbhat">https://github.com/dbbhat</a></li>
-</ul>
-
-<p><a name="road-v1"></a></p>
-
-<h3 id="the-road-to-version-1">The Road to Version 1</h3>
-
-<p><a href="https://youtu.be/Qcci8U1J05w">Recording</a></p>
-
-<p>A few months ago the KubeVirt community started to discuss what would be the requirements that KubeVirt should meet in order to release KubeVirt Version 1.0.</p>
-
-<p>This session aims to:</p>
-
-<ul>
-  <li>Provide a recap of the discussion so far</li>
-  <li>Review any relevant updates since the last time the plan was discussed</li>
-  <li>Collect additional feedback / elements for discussion</li>
-  <li>Propose the next steps to take</li>
-</ul>
-
-<p>In summary, this session is another step in the journey towards the release of KubeVirt Version 1.</p>
-
-<p>Session lead: David Vossel, Senior Principal Software Engineer, Red Hat</p>
-
-<p><a name="vfx"></a></p>
-
-<h3 id="moving-a-visual-effects-studio-to-the-cloud-with-kubernetes-and-kubevirt">Moving a Visual Effects Studio to the cloud with Kubernetes and KubeVirt</h3>
-
-<p><a href="https://youtu.be/me25mlhgERI">Recording</a></p>
-
-<p>As the rapid transition to remote work happened, VFX studios and designers used to beefy workstations, on-site storage clusters and high performance networking have had to scramble to make those resources available to people at home.</p>
-
-<p>This presentation details how a VFX studio with 60 designers transitioned from a fully on-premise environment to complete cloud workflow. Combining KubeVirt powered Virtual Workstations with render nodes and storage running natively in Kubernetes provided a solution that beat expectations. Being able to manage all components via the same Kubernetes API allowed for a quick integration into existing systems.</p>
-
-<p>We will be discussing our experience integrating KubeVirt under a strict deadline while leveraging bleeding edge features such as Virtio-FS.</p>
-
-<p>Presenter: Peter Salanki, Director of Engineering, CoreWeave, Inc, <a href="https://github.com/salanki">https://github.com/salanki</a></p>
-
-<p><a name="office-hours"></a></p>
-
-<h3 id="office-hours-qa-with-kubevirt-maintainers">Office Hours: Q&amp;A with KubeVirt maintainers</h3>
-
-<p><a href="https://youtu.be/cWNxJHiLPek">Recording</a></p>
-
-<p>Our final session is an opportunity for you to ask all your KubeVirt questions, whether they’re about the project, or they are about using KubeVirt in production. Maintainers and experts will be on hand.</p>
-
-<p>Panelists:</p>
-
-<ul>
-  <li>David Vossel, Senior Principal Software Engineer, Red Hat</li>
-  <li>Adam Litke, Engineering Manager, Red Hat</li>
-  <li>Petr Horacek, Engineering Manager, Red Hat</li>
-</ul>
-
-<h2 id="whats-next">What’s next?</h2>
-
-<p>Keep the conversations going through the <a href="https://groups.google.com/forum/#!forum/kubevirt-dev">mailing list</a> or the <a href="https://kubernetes.slack.com/archives/C8ED7RKFE">#virtualization Slack channel</a> in Kubernetes Slack (register <a href="https://slack.k8s.io/">here</a> if needed)!</p>
+<p>The KubeVirt community is looking for people to lead sessions – whether presentations, discussions, or panels – on topics around contributing to, or production usage of, KubeVirt. We’re also looking for one or two tutorials. Submit your proposal(s) by January 17th <a href="https://forms.gle/KXaPWpJzk7Z12bRD8">via the form</a>.  Sessions will be reviewed by the KubeVirt Summit Content Committee.</p>
 
 <h2 id="sponsors">Sponsors</h2>
 
@@ -775,8 +317,8 @@ are the plans for the future.</p>
   </div>
   <div class="row">
     <div class="col text-sm-left footer-licensing" style="text-align: center;">
-      Copyright 2021 The KubeVirt Contributors<br>
-      Copyright 2021 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      Copyright 2022 The KubeVirt Contributors<br>
+      Copyright 2022 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
       This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
       <p class="privacy-statement text-sm-left" style="text-align: center;">
         <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>

@@ -66,6 +66,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/hooks"
 	"kubevirt.io/kubevirt/pkg/ignition"
 	netsetup "kubevirt.io/kubevirt/pkg/network/setup"
+	kutil "kubevirt.io/kubevirt/pkg/util"
 	accesscredentials "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/access-credentials"
 	agentpoller "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/agent-poller"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
@@ -79,8 +80,22 @@ import (
 )
 
 const (
+	failedSyncGuestTime  = "failed to sync guest time"
+	failedGetDomain      = "Getting the domain failed."
+	failedGetDomainState = "Getting the domain state failed."
+)
+
+const (
 	PCI_RESOURCE_PREFIX  = "PCI_RESOURCE"
 	MDEV_RESOURCE_PREFIX = "MDEV_PCI_RESOURCE"
+
+	baseEphemeralDiskDir = "/var/run/kubevirt-ephemeral-disks/"
+)
+
+var (
+	getEphemeralDiskBaseDir = func() string {
+		return baseEphemeralDiskDir
+	}
 )
 
 type contextStore struct {
@@ -221,7 +236,7 @@ func (l *LibvirtDomainManager) setGuestTime(vmi *v1.VirtualMachineInstance) erro
 	domName := api.VMINamespaceKeyFunc(vmi)
 	dom, err := l.virConn.LookupDomainByName(domName)
 	if err != nil {
-		log.Log.Object(vmi).Reason(err).Error("failed to sync guest time")
+		log.Log.Object(vmi).Reason(err).Error(failedSyncGuestTime)
 		return err
 	}
 
@@ -235,7 +250,7 @@ func (l *LibvirtDomainManager) setGuestTime(vmi *v1.VirtualMachineInstance) erro
 		for {
 			select {
 			case <-timeout:
-				log.Log.Object(vmi).Error("failed to sync guest time")
+				log.Log.Object(vmi).Error(failedSyncGuestTime)
 				return
 			case <-ctx.Done():
 				return
@@ -247,7 +262,7 @@ func (l *LibvirtDomainManager) setGuestTime(vmi *v1.VirtualMachineInstance) erro
 				if err != nil {
 					libvirtError, ok := err.(libvirt.Error)
 					if !ok {
-						log.Log.Object(vmi).Reason(err).Warning("failed to sync guest time")
+						log.Log.Object(vmi).Reason(err).Warning(failedSyncGuestTime)
 						return
 					}
 
@@ -263,7 +278,7 @@ func (l *LibvirtDomainManager) setGuestTime(vmi *v1.VirtualMachineInstance) erro
 						log.Log.Object(vmi).Reason(err).Warning("failed to set time: agent not configured")
 						return
 					default:
-						log.Log.Object(vmi).Reason(err).Warning("failed to sync guest time")
+						log.Log.Object(vmi).Reason(err).Warning(failedSyncGuestTime)
 					}
 				} else {
 					log.Log.Object(vmi).Info("guest VM time sync finished successfully")
@@ -345,17 +360,20 @@ func (l *LibvirtDomainManager) GuestPing(domainName string) error {
 }
 
 func getVMIEphemeralDisksTotalSize() *resource.Quantity {
-	var baseDir = "/var/run/kubevirt-ephemeral-disks/"
+	baseDir := getEphemeralDiskBaseDir()
 	totalSize := int64(0)
 	err := filepath.Walk(baseDir, func(path string, f os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
 		if !f.IsDir() {
 			totalSize += f.Size()
 		}
-		return err
+		return nil
 	})
 	if err != nil {
 		log.Log.Reason(err).Warning("failed to get VMI ephemeral disks size")
-		return &resource.Quantity{Format: resource.BinarySI}
+		return resource.NewScaledQuantity(0, 0)
 	}
 
 	return resource.NewScaledQuantity(totalSize, 0)
@@ -689,15 +707,16 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 	var efiConf *converter.EFIConfiguration
 	if vmi.IsBootloaderEFI() {
 		secureBoot := vmi.Spec.Domain.Firmware.Bootloader.EFI.SecureBoot == nil || *vmi.Spec.Domain.Firmware.Bootloader.EFI.SecureBoot
+		sev := kutil.IsSEVVMI(vmi)
 
-		if !l.efiEnvironment.Bootable(secureBoot) {
-			log.Log.Reason(err).Errorf("EFI OVMF roms missing for booting in EFI mode with SecureBoot=%v", secureBoot)
-			return nil, fmt.Errorf("EFI OVMF roms missing for booting in EFI mode with SecureBoot=%v", secureBoot)
+		if !l.efiEnvironment.Bootable(secureBoot, sev) {
+			log.Log.Reason(err).Errorf("EFI OVMF roms missing for booting in EFI mode with SecureBoot=%v, SEV=%v", secureBoot, sev)
+			return nil, fmt.Errorf("EFI OVMF roms missing for booting in EFI mode with SecureBoot=%v, SEV=%v", secureBoot, sev)
 		}
 
 		efiConf = &converter.EFIConfiguration{
-			EFICode:      l.efiEnvironment.EFICode(secureBoot),
-			EFIVars:      l.efiEnvironment.EFIVars(secureBoot),
+			EFICode:      l.efiEnvironment.EFICode(secureBoot, sev),
+			EFIVars:      l.efiEnvironment.EFIVars(secureBoot, sev),
 			SecureLoader: secureBoot,
 		}
 	}
@@ -714,6 +733,7 @@ func (l *LibvirtDomainManager) generateConverterContext(vmi *v1.VirtualMachineIn
 		UseVirtioTransitional: vmi.Spec.Domain.Devices.UseVirtioTransitional != nil && *vmi.Spec.Domain.Devices.UseVirtioTransitional,
 		PermanentVolumes:      permanentVolumes,
 		EphemeraldiskCreator:  l.ephemeralDiskCreator,
+		UseLaunchSecurity:     kutil.IsSEVVMI(vmi),
 	}
 
 	if options != nil {
@@ -807,14 +827,14 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
 			}
 			logger.Info("Domain defined.")
 		} else {
-			logger.Reason(err).Error("Getting the domain failed.")
+			logger.Reason(err).Error(failedGetDomain)
 			return nil, err
 		}
 	}
 	defer dom.Free()
 	domState, _, err := dom.GetState()
 	if err != nil {
-		logger.Reason(err).Error("Getting the domain state failed.")
+		logger.Reason(err).Error(failedGetDomainState)
 		return nil, err
 	}
 
@@ -1090,7 +1110,7 @@ func (l *LibvirtDomainManager) PauseVMI(vmi *v1.VirtualMachineInstance) error {
 
 	domState, _, err := dom.GetState()
 	if err != nil {
-		logger.Reason(err).Error("Getting the domain state failed.")
+		logger.Reason(err).Error(failedGetDomainState)
 		return err
 	}
 
@@ -1130,7 +1150,7 @@ func (l *LibvirtDomainManager) UnpauseVMI(vmi *v1.VirtualMachineInstance) error 
 
 	domState, _, err := dom.GetState()
 	if err != nil {
-		logger.Reason(err).Error("Getting the domain state failed.")
+		logger.Reason(err).Error(failedGetDomainState)
 		return err
 	}
 
@@ -1307,7 +1327,7 @@ func (l *LibvirtDomainManager) SignalShutdownVMI(vmi *v1.VirtualMachineInstance)
 
 	domState, _, err := dom.GetState()
 	if err != nil {
-		log.Log.Object(vmi).Reason(err).Error("Getting the domain state failed.")
+		log.Log.Object(vmi).Reason(err).Error(failedGetDomainState)
 		return err
 	}
 
@@ -1348,7 +1368,7 @@ func (l *LibvirtDomainManager) KillVMI(vmi *v1.VirtualMachineInstance) error {
 		if domainerrors.IsNotFound(err) {
 			return nil
 		} else {
-			log.Log.Object(vmi).Reason(err).Error("Getting the domain failed.")
+			log.Log.Object(vmi).Reason(err).Error(failedGetDomain)
 			return err
 		}
 	}
@@ -1359,7 +1379,7 @@ func (l *LibvirtDomainManager) KillVMI(vmi *v1.VirtualMachineInstance) error {
 		if domainerrors.IsNotFound(err) {
 			return nil
 		}
-		log.Log.Object(vmi).Reason(err).Error("Getting the domain state failed.")
+		log.Log.Object(vmi).Reason(err).Error(failedGetDomainState)
 		return err
 	}
 
@@ -1388,7 +1408,7 @@ func (l *LibvirtDomainManager) DeleteVMI(vmi *v1.VirtualMachineInstance) error {
 		if domainerrors.IsNotFound(err) {
 			return nil
 		} else {
-			log.Log.Object(vmi).Reason(err).Error("Getting the domain failed.")
+			log.Log.Object(vmi).Reason(err).Error(failedGetDomain)
 			return err
 		}
 	}

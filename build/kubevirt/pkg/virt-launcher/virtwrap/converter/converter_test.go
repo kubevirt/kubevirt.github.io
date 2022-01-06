@@ -30,6 +30,8 @@ import (
 	"strconv"
 	"strings"
 
+	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/converter/vcpu"
+
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/extensions/table"
@@ -37,6 +39,7 @@ import (
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	k8smeta "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/utils/pointer"
 
 	"kubevirt.io/kubevirt/pkg/virt-controller/services"
 
@@ -45,6 +48,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 
 	v1 "kubevirt.io/api/core/v1"
+	kvapi "kubevirt.io/client-go/api"
 	cmdv1 "kubevirt.io/kubevirt/pkg/handler-launcher-com/cmd/v1"
 )
 
@@ -1870,7 +1874,7 @@ var _ = Describe("Converter", func() {
 
 		table.DescribeTable("should calculate mebibyte from a quantity", func(quantity string, mebibyte int) {
 			mi64, _ := resource.ParseQuantity(quantity)
-			q, err := QuantityToMebiByte(mi64)
+			q, err := vcpu.QuantityToMebiByte(mi64)
 			Expect(err).ToNot(HaveOccurred())
 			Expect(q).To(BeNumerically("==", mebibyte))
 		},
@@ -1888,13 +1892,13 @@ var _ = Describe("Converter", func() {
 
 		It("should fail calculating mebibyte if the quantity is less than 0", func() {
 			mi64, _ := resource.ParseQuantity("-2G")
-			_, err := QuantityToMebiByte(mi64)
+			_, err := vcpu.QuantityToMebiByte(mi64)
 			Expect(err).To(HaveOccurred())
 		})
 
 		table.DescribeTable("should calculate memory in bytes", func(quantity string, bytes int) {
 			m64, _ := resource.ParseQuantity(quantity)
-			memory, err := QuantityToByte(m64)
+			memory, err := vcpu.QuantityToByte(m64)
 			Expect(memory.Value).To(BeNumerically("==", bytes))
 			Expect(memory.Unit).To(Equal("b"))
 			Expect(err).ToNot(HaveOccurred())
@@ -1910,7 +1914,7 @@ var _ = Describe("Converter", func() {
 		It("should calculate memory in bytes", func() {
 			By("specyfing negative memory size -45Gi")
 			m45gi, _ := resource.ParseQuantity("-45Gi")
-			_, err := QuantityToByte(m45gi)
+			_, err := vcpu.QuantityToByte(m45gi)
 			Expect(err).To(HaveOccurred())
 		})
 
@@ -2805,7 +2809,7 @@ var _ = Describe("Converter", func() {
 			domain.Spec.IOThreads = &api.IOThreads{}
 			domain.Spec.IOThreads.IOThreads = uint(6)
 
-			err := formatDomainIOThreadPin(vmi, domain, 0, c)
+			err := vcpu.FormatDomainIOThreadPin(vmi, domain, 0, c.CPUSet)
 			Expect(err).ToNot(HaveOccurred())
 			expectedLayout := []api.CPUTuneIOThreadPin{
 				{IOThread: 1, CPUSet: "5,6,7"},
@@ -2838,7 +2842,7 @@ var _ = Describe("Converter", func() {
 			domain.Spec.IOThreads = &api.IOThreads{}
 			domain.Spec.IOThreads.IOThreads = uint(6)
 
-			err := formatDomainIOThreadPin(vmi, domain, 0, c)
+			err := vcpu.FormatDomainIOThreadPin(vmi, domain, 0, c.CPUSet)
 			Expect(err).ToNot(HaveOccurred())
 			expectedLayout := []api.CPUTuneIOThreadPin{
 				{IOThread: 1, CPUSet: "6"},
@@ -3182,6 +3186,99 @@ var _ = Describe("Converter", func() {
 			table.Entry("block mode DV", Convert_v1_Hotplug_DataVolume_To_api_Disk, "test-block-dv", true, false),
 			table.Entry("'discard ignore' DV", Convert_v1_Hotplug_DataVolume_To_api_Disk, "test-discard-ignore", false, true),
 		)
+	})
+
+	Context("with AMD SEV LaunchSecurity", func() {
+		var (
+			vmi *v1.VirtualMachineInstance
+			c   *ConverterContext
+		)
+
+		BeforeEach(func() {
+			vmi = kvapi.NewMinimalVMI("testvmi")
+			v1.SetObjectDefaults_VirtualMachineInstance(vmi)
+			vmi.Spec.Domain.Devices.Rng = &v1.Rng{}
+			vmi.Spec.Domain.Devices.AutoattachMemBalloon = pointer.BoolPtr(true)
+			vmi.Spec.Domain.Devices.Interfaces = []v1.Interface{
+				*v1.DefaultBridgeNetworkInterface(), *v1.DefaultSlirpNetworkInterface(),
+			}
+			vmi.Spec.Networks = []v1.Network{
+				*v1.DefaultPodNetwork(), *v1.DefaultPodNetwork(),
+			}
+			vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{
+				SEV: &v1.SEV{},
+			}
+			vmi.Spec.Domain.Features = &v1.Features{
+				SMM: &v1.FeatureState{
+					Enabled: pointer.BoolPtr(false),
+				},
+			}
+			vmi.Spec.Domain.Firmware = &v1.Firmware{
+				Bootloader: &v1.Bootloader{
+					EFI: &v1.EFI{
+						SecureBoot: pointer.BoolPtr(false),
+					},
+				},
+			}
+			c = &ConverterContext{
+				AllowEmulation:    true,
+				EFIConfiguration:  &EFIConfiguration{},
+				UseLaunchSecurity: true,
+			}
+		})
+
+		It("should set LaunchSecurity domain element with 'sev' type and 'NoDebug' policy", func() {
+			domain := vmiToDomain(vmi, c)
+			Expect(domain).ToNot(BeNil())
+			Expect(domain.Spec.LaunchSecurity).ToNot(BeNil())
+			Expect(domain.Spec.LaunchSecurity.Type).To(Equal("sev"))
+			Expect(domain.Spec.LaunchSecurity.Policy).To(Equal(SEVPolicyNoDebug))
+		})
+
+		It("should set IOMMU attribute of the RngDriver", func() {
+			rng := &api.Rng{}
+			Expect(Convert_v1_Rng_To_api_Rng(&v1.Rng{}, rng, c)).To(Succeed())
+			Expect(rng.Driver).ToNot(BeNil())
+			Expect(rng.Driver.IOMMU).To(Equal("on"))
+
+			domain := vmiToDomain(vmi, c)
+			Expect(domain).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Rng).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Rng.Driver).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Rng.Driver.IOMMU).To(Equal("on"))
+		})
+
+		It("should set IOMMU attribute of the MemBalloonDriver", func() {
+			memBaloon := &api.MemBalloon{}
+			ConvertV1ToAPIBalloning(&v1.Devices{}, memBaloon, c)
+			Expect(memBaloon.Driver).ToNot(BeNil())
+			Expect(memBaloon.Driver.IOMMU).To(Equal("on"))
+
+			domain := vmiToDomain(vmi, c)
+			Expect(domain).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Ballooning).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Ballooning.Driver).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Ballooning.Driver.IOMMU).To(Equal("on"))
+		})
+
+		It("should set IOMMU attribute of the virtio-net driver", func() {
+			domain := vmiToDomain(vmi, c)
+			Expect(domain).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Interfaces).To(HaveLen(2))
+			Expect(domain.Spec.Devices.Interfaces[0].Driver).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Interfaces[0].Driver.IOMMU).To(Equal("on"))
+			Expect(domain.Spec.Devices.Interfaces[1].Driver).To(BeNil())
+		})
+
+		It("should disable the iPXE option ROM", func() {
+			domain := vmiToDomain(vmi, c)
+			Expect(domain).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Interfaces).To(HaveLen(2))
+			Expect(domain.Spec.Devices.Interfaces[0].Rom).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Interfaces[0].Rom.Enabled).To(Equal("no"))
+			Expect(domain.Spec.Devices.Interfaces[1].Rom).ToNot(BeNil())
+			Expect(domain.Spec.Devices.Interfaces[1].Rom.Enabled).To(Equal("no"))
+		})
 	})
 })
 

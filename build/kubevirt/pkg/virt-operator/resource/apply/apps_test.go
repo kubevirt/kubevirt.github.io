@@ -311,7 +311,7 @@ var _ = Describe("Apply Apps", func() {
 				},
 			}
 
-			daemonSet, err = components.NewHandlerDaemonSet(Namespace, Registry, "", Version, "", "", "", "", corev1.PullIfNotPresent, "verbosity", map[string]string{})
+			daemonSet, err = components.NewHandlerDaemonSet(Namespace, Registry, "", Version, "", "", "", "", corev1.PullIfNotPresent, nil, "verbosity", map[string]string{})
 			Expect(err).ToNot(HaveOccurred())
 			markHandlerReady(daemonSet)
 			daemonSet.UID = "random-id"
@@ -686,7 +686,7 @@ var _ = Describe("Apply Apps", func() {
 			managedBy, ok := deployment.Labels["app.kubernetes.io/managed-by"]
 
 			Expect(ok).To(BeTrue())
-			Expect(managedBy).To(Equal("kubevirt-operator"))
+			Expect(managedBy).To(Equal("virt-operator"))
 
 			version, ok := deployment.Annotations["kubevirt.io/install-strategy-version"]
 			Expect(ok).To(BeTrue())

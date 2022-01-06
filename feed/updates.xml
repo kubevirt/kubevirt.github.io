@@ -1,1225 +1,1225 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/updates.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2021-12-14T03:43:01+00:00</updated><id>https://kubevirt.io//feed/updates.xml</id><title type="html">KubeVirt.io | Updates</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">This Week In Kube Virt 23</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html" rel="alternate" type="text/html" title="This Week In Kube Virt 23" /><published>2018-04-27T00:00:00+00:00</published><updated>2018-04-27T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-23</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html">&lt;p&gt;This is a close-to weekly update from the KubeVirt team.&lt;/p&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/updates.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-06T22:33:42+00:00</updated><id>https://kubevirt.io//feed/updates.xml</id><title type="html">KubeVirt.io | Updates</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">This Week In Kube Virt 23</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html" rel="alternate" type="text/html" title="This Week In Kube Virt 23" /><published>2018-04-27T00:00:00+00:00</published><updated>2018-04-27T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-23</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html"><![CDATA[<p>This is a close-to weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;In general there is now more work happening outside of the core kubevirt
-repository.&lt;/p&gt;
+<p>In general there is now more work happening outside of the core kubevirt
+repository.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Closing a lot of loose ends&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Stepping back to identify gaps for 1.0&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Closing a lot of loose ends</p>
+  </li>
+  <li>
+    <p>Stepping back to identify gaps for 1.0</p>
+  </li>
+</ul>
 
-&lt;p&gt;Within the last two weeks we achieved to:&lt;/p&gt;
+<p>Within the last two weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Release KubeVirt v0.4.1 to address some shutdown issues&lt;/p&gt;
+<ul>
+  <li>
+    <p>Release KubeVirt v0.4.1 to address some shutdown issues</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases/tag/v0.4.1&quot;&gt;https://github.com/kubevirt/kubevirt/releases/tag/v0.4.1&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Many VM life-cycle and guarantee fixes (@rmohr @vossel)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.4.1">https://github.com/kubevirt/kubevirt/releases/tag/v0.4.1</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Many VM life-cycle and guarantee fixes (@rmohr @vossel)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/951&quot;&gt;https://github.com/kubevirt/kubevirt/pull/951&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/948&quot;&gt;https://github.com/kubevirt/kubevirt/pull/948&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/935&quot;&gt;https://github.com/kubevirt/kubevirt/pull/935&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/838&quot;&gt;https://github.com/kubevirt/kubevirt/pull/838&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/907&quot;&gt;https://github.com/kubevirt/kubevirt/pull/907&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/883&quot;&gt;https://github.com/kubevirt/kubevirt/pull/883&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Pass labels from VM to pod for better Service integration (@rmohr)&lt;/p&gt;
+    <ul>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/951">https://github.com/kubevirt/kubevirt/pull/951</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/948">https://github.com/kubevirt/kubevirt/pull/948</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/935">https://github.com/kubevirt/kubevirt/pull/935</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/838">https://github.com/kubevirt/kubevirt/pull/838</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/907">https://github.com/kubevirt/kubevirt/pull/907</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/883">https://github.com/kubevirt/kubevirt/pull/883</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Pass labels from VM to pod for better Service integration (@rmohr)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/939&quot;&gt;https://github.com/kubevirt/kubevirt/pull/939&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Packaging preparations (@rmohr)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/939">https://github.com/kubevirt/kubevirt/pull/939</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Packaging preparations (@rmohr)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/941&quot;&gt;https://github.com/kubevirt/kubevirt/pull/941&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues/924&quot;&gt;https://github.com/kubevirt/kubevirt/issues/924&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/950&quot;&gt;https://github.com/kubevirt/kubevirt/pull/950&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Controller readiness clarifications (@rmohr)&lt;/p&gt;
+    <ul>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/941">https://github.com/kubevirt/kubevirt/pull/941</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/issues/924">https://github.com/kubevirt/kubevirt/issues/924</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/950">https://github.com/kubevirt/kubevirt/pull/950</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Controller readiness clarifications (@rmohr)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/901&quot;&gt;https://github.com/kubevirt/kubevirt/pull/901&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Validation improvements using CRD scheme and webhooks (@vossel)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/901">https://github.com/kubevirt/kubevirt/pull/901</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Validation improvements using CRD scheme and webhooks (@vossel)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;Webhook: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/911&quot;&gt;https://github.com/kubevirt/kubevirt/pull/911&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Scheme: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/850&quot;&gt;https://github.com/kubevirt/kubevirt/pull/850&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/917&quot;&gt;https://github.com/kubevirt/kubevirt/pull/917&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Add Windows tests (@alukiano)&lt;/p&gt;
+    <ul>
+      <li>
+        <p>Webhook: <a href="https://github.com/kubevirt/kubevirt/pull/911">https://github.com/kubevirt/kubevirt/pull/911</a></p>
+      </li>
+      <li>
+        <p>Scheme: <a href="https://github.com/kubevirt/kubevirt/pull/850">https://github.com/kubevirt/kubevirt/pull/850</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/kubevirt/pull/917">https://github.com/kubevirt/kubevirt/pull/917</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p>Add Windows tests (@alukiano)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/809&quot;&gt;https://github.com/kubevirt/kubevirt/pull/809&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve PVC tests (@petrkotas)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/809">https://github.com/kubevirt/kubevirt/pull/809</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Improve PVC tests (@petrkotas)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/862&quot;&gt;https://github.com/kubevirt/kubevirt/pull/862&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Enable SELinux in OpenShift CI environment&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Tests to run KubeVirt on Kubernetes 1.10&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/862">https://github.com/kubevirt/kubevirt/pull/862</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Enable SELinux in OpenShift CI environment</p>
+  </li>
+  <li>
+    <p>Tests to run KubeVirt on Kubernetes 1.10</p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;virtctl expose convenience verb (@yuvalif)&lt;/p&gt;
+<ul>
+  <li>
+    <p>virtctl expose convenience verb (@yuvalif)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/962&quot;&gt;https://github.com/kubevirt/kubevirt/pull/962&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;CRIO support in CI&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;virtctl bash/zsh completion (@rmohr)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/962">https://github.com/kubevirt/kubevirt/pull/962</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>CRIO support in CI</p>
+  </li>
+  <li>
+    <p>virtctl bash/zsh completion (@rmohr)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/916&quot;&gt;https://github.com/kubevirt/kubevirt/pull/916&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improved error messages from virtctl (@fromanirh)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/916">https://github.com/kubevirt/kubevirt/pull/916</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Improved error messages from virtctl (@fromanirh)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/934&quot;&gt;https://github.com/kubevirt/kubevirt/pull/934&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improved validation feedback (@vossel)&lt;/p&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/934">https://github.com/kubevirt/kubevirt/pull/934</a></li>
+    </ul>
+  </li>
+  <li>
+    <p>Improved validation feedback (@vossel)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/960&quot;&gt;https://github.com/kubevirt/kubevirt/pull/960&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li><a href="https://github.com/kubevirt/kubevirt/pull/960">https://github.com/kubevirt/kubevirt/pull/960</a></li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a close-to weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 22</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html" rel="alternate" type="text/html" title="This Week In Kube Virt 22" /><published>2018-04-06T00:00:00+00:00</published><updated>2018-04-06T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-22</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html">&lt;p&gt;This is a close-to weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a close-to weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 22</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html" rel="alternate" type="text/html" title="This Week In Kube Virt 22" /><published>2018-04-06T00:00:00+00:00</published><updated>2018-04-06T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-22</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html"><![CDATA[<p>This is a close-to weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;In general there is now more work happening outside of the core kubevirt
-repository.&lt;/p&gt;
+<p>In general there is now more work happening outside of the core kubevirt
+repository.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;p&gt;Within the last two weeks we achieved to:&lt;/p&gt;
+<p>Within the last two weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Release KubeVirt v0.4.0
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases/tag/v0.4.0&quot;&gt;https://github.com/kubevirt/kubevirt/releases/tag/v0.4.0&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Many networking fixes (@mlsorensen @vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/870&quot;&gt;https://github.com/kubevirt/kubevirt/pull/870&lt;/a&gt;
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/869&quot;&gt;https://github.com/kubevirt/kubevirt/pull/869&lt;/a&gt;
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/847&quot;&gt;https://github.com/kubevirt/kubevirt/pull/847&lt;/a&gt;
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/856&quot;&gt;https://github.com/kubevirt/kubevirt/pull/856&lt;/a&gt;
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/839&quot;&gt;https://github.com/kubevirt/kubevirt/pull/839&lt;/a&gt;
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/830&quot;&gt;https://github.com/kubevirt/kubevirt/pull/830&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Aligned config reading for virtctl (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/860&quot;&gt;https://github.com/kubevirt/kubevirt/pull/860&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Subresource Aggregated API server for console endpoints (@vossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/770&quot;&gt;https://github.com/kubevirt/kubevirt/pull/770&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Enable OpenShift tests in CI (@alukiano @rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/833&quot;&gt;https://github.com/kubevirt/kubevirt/pull/833&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;virtctl convenience functions for start/stop of VMs (@sgott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/817&quot;&gt;https://github.com/kubevirt/kubevirt/pull/817&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Ansible - Improved Gluster support for kubevirt-ansible
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt-ansible/pull/174&quot;&gt;https://github.com/kubevirt/kubevirt-ansible/pull/174&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;POC Device Plugins for KVM and network (@mpolednik @phoracek)
-&lt;a href=&quot;https://github.com/kubevirt/kubernetes-device-plugins&quot;&gt;https://github.com/kubevirt/kubernetes-device-plugins&lt;/a&gt;&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Release KubeVirt v0.4.0
+(<a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.4.0">https://github.com/kubevirt/kubevirt/releases/tag/v0.4.0</a>)</p>
+  </li>
+  <li>
+    <p>Many networking fixes (@mlsorensen @vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/870">https://github.com/kubevirt/kubevirt/pull/870</a>
+<a href="https://github.com/kubevirt/kubevirt/pull/869">https://github.com/kubevirt/kubevirt/pull/869</a>
+<a href="https://github.com/kubevirt/kubevirt/pull/847">https://github.com/kubevirt/kubevirt/pull/847</a>
+<a href="https://github.com/kubevirt/kubevirt/pull/856">https://github.com/kubevirt/kubevirt/pull/856</a>
+<a href="https://github.com/kubevirt/kubevirt/pull/839">https://github.com/kubevirt/kubevirt/pull/839</a>
+<a href="https://github.com/kubevirt/kubevirt/pull/830">https://github.com/kubevirt/kubevirt/pull/830</a>)</p>
+  </li>
+  <li>
+    <p>Aligned config reading for virtctl (@rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/860">https://github.com/kubevirt/kubevirt/pull/860</a>)</p>
+  </li>
+  <li>
+    <p>Subresource Aggregated API server for console endpoints (@vossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/770">https://github.com/kubevirt/kubevirt/pull/770</a>)</p>
+  </li>
+  <li>
+    <p>Enable OpenShift tests in CI (@alukiano @rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/833">https://github.com/kubevirt/kubevirt/pull/833</a>)</p>
+  </li>
+  <li>
+    <p>virtctl convenience functions for start/stop of VMs (@sgott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/817">https://github.com/kubevirt/kubevirt/pull/817</a>)</p>
+  </li>
+  <li>
+    <p>Ansible - Improved Gluster support for kubevirt-ansible
+(<a href="https://github.com/kubevirt/kubevirt-ansible/pull/174">https://github.com/kubevirt/kubevirt-ansible/pull/174</a>)</p>
+  </li>
+  <li>
+    <p>POC Device Plugins for KVM and network (@mpolednik @phoracek)
+<a href="https://github.com/kubevirt/kubernetes-device-plugins">https://github.com/kubevirt/kubernetes-device-plugins</a></p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Additional network glue approach (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/787&quot;&gt;https://github.com/kubevirt/kubevirt/pull/787&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;CRD validation using OpenAPIv3 (@vossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/850&quot;&gt;https://github.com/kubevirt/kubevirt/pull/850&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Windows VM tests (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/809&quot;&gt;https://github.com/kubevirt/kubevirt/pull/809&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Data importer - Functional tests
-(&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer/pull/81&quot;&gt;https://github.com/kubevirt/containerized-data-importer/pull/81&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Additional network glue approach (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/787">https://github.com/kubevirt/kubevirt/pull/787</a>)</p>
+  </li>
+  <li>
+    <p>CRD validation using OpenAPIv3 (@vossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/850">https://github.com/kubevirt/kubevirt/pull/850</a>)</p>
+  </li>
+  <li>
+    <p>Windows VM tests (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/809">https://github.com/kubevirt/kubevirt/pull/809</a>)</p>
+  </li>
+  <li>
+    <p>Data importer - Functional tests
+(<a href="https://github.com/kubevirt/containerized-data-importer/pull/81">https://github.com/kubevirt/containerized-data-importer/pull/81</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a close-to weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 21</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html" rel="alternate" type="text/html" title="This Week In Kube Virt 21" /><published>2018-03-20T00:00:00+00:00</published><updated>2018-03-20T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-21</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a close-to weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 21</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html" rel="alternate" type="text/html" title="This Week In Kube Virt 21" /><published>2018-03-20T00:00:00+00:00</published><updated>2018-03-20T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-21</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html"><![CDATA[<p>This is a weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;In general there is now more work happening outside of the core kubevirt
-repository.&lt;/p&gt;
+<p>In general there is now more work happening outside of the core kubevirt
+repository.</p>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;p&gt;Within the last two weeks we achieved to:&lt;/p&gt;
+<p>Within the last two weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Multi platform (Windows, Mac, Linux) support for virtctl (@slintes)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/811&quot;&gt;https://github.com/kubevirt/kubevirt/pull/811&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Stable UUIDs for OfflineVirtualMachines (@fromanirh)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/766&quot;&gt;https://github.com/kubevirt/kubevirt/pull/766&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;OpenShift support for CI (@alukiano, @rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/792&quot;&gt;https://github.com/kubevirt/kubevirt/pull/792&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;v2v improvements - for easier imports of existing VMs (@pkliczewski)
-(&lt;a href=&quot;https://github.com/kubevirt/v2v-job&quot;&gt;https://github.com/kubevirt/v2v-job&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Data importer - to import existing disk images (@copejon @jeffvance)
-(&lt;a href=&quot;https://github.com/kubevirt/containerized-data-importer&quot;&gt;https://github.com/kubevirt/containerized-data-importer&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;POC Device Plugins for KVM and network (@mpolednik @phoracek)
-&lt;a href=&quot;https://github.com/kubevirt/kubernetes-device-plugins&quot;&gt;https://github.com/kubevirt/kubernetes-device-plugins&lt;/a&gt;&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Multi platform (Windows, Mac, Linux) support for virtctl (@slintes)
+(<a href="https://github.com/kubevirt/kubevirt/pull/811">https://github.com/kubevirt/kubevirt/pull/811</a>)</p>
+  </li>
+  <li>
+    <p>Stable UUIDs for OfflineVirtualMachines (@fromanirh)
+(<a href="https://github.com/kubevirt/kubevirt/pull/766">https://github.com/kubevirt/kubevirt/pull/766</a>)</p>
+  </li>
+  <li>
+    <p>OpenShift support for CI (@alukiano, @rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/792">https://github.com/kubevirt/kubevirt/pull/792</a>)</p>
+  </li>
+  <li>
+    <p>v2v improvements - for easier imports of existing VMs (@pkliczewski)
+(<a href="https://github.com/kubevirt/v2v-job">https://github.com/kubevirt/v2v-job</a>)</p>
+  </li>
+  <li>
+    <p>Data importer - to import existing disk images (@copejon @jeffvance)
+(<a href="https://github.com/kubevirt/containerized-data-importer">https://github.com/kubevirt/containerized-data-importer</a>)</p>
+  </li>
+  <li>
+    <p>POC Device Plugins for KVM and network (@mpolednik @phoracek)
+<a href="https://github.com/kubevirt/kubernetes-device-plugins">https://github.com/kubevirt/kubernetes-device-plugins</a></p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Subresources for consoles (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/770&quot;&gt;https://github.com/kubevirt/kubevirt/pull/770&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Additional network glue approach (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/787&quot;&gt;https://github.com/kubevirt/kubevirt/pull/787&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;virtctl convenience functions for start/stop of VMs (@sgott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/817&quot;&gt;https://github.com/kubevirt/kubevirt/pull/817&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Subresources for consoles (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/770">https://github.com/kubevirt/kubevirt/pull/770</a>)</p>
+  </li>
+  <li>
+    <p>Additional network glue approach (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/787">https://github.com/kubevirt/kubevirt/pull/787</a>)</p>
+  </li>
+  <li>
+    <p>virtctl convenience functions for start/stop of VMs (@sgott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/817">https://github.com/kubevirt/kubevirt/pull/817</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 20</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html" rel="alternate" type="text/html" title="This Week In Kube Virt 20" /><published>2018-03-08T00:00:00+00:00</published><updated>2018-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-20</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 20</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html" rel="alternate" type="text/html" title="This Week In Kube Virt 20" /><published>2018-03-08T00:00:00+00:00</published><updated>2018-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-20</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html"><![CDATA[<p>This is a weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;p&gt;Within the last two weeks we achieved to:&lt;/p&gt;
+<p>Within the last two weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Released KubeVirt v0.3.0
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0&quot;&gt;https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0&lt;/a&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Merged VirtualMachinePresets (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/652&quot;&gt;https://github.com/kubevirt/kubevirt/pull/652&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Merged OfflineVirtualMachine (@pkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/667&quot;&gt;https://github.com/kubevirt/kubevirt/pull/667&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Merged ephemeral disk support (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/728&quot;&gt;https://github.com/kubevirt/kubevirt/pull/728&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Fixes to test KubeVirt on OpenShift (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/774&quot;&gt;https://github.com/kubevirt/kubevirt/pull/774&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Scheduler awareness of VM pods (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/673&quot;&gt;https://github.com/kubevirt/kubevirt/pull/673&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Plain text inline cloud-init (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/757&quot;&gt;https://github.com/kubevirt/kubevirt/pull/757&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Define guest specific labels to be used with presets (@yanirq)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/767&quot;&gt;https://github.com/kubevirt/kubevirt/pull/767&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Special note: A ton of automation, CI, and test fixes (@rmohr)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Released KubeVirt v0.3.0
+<a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0">https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0</a></p>
+  </li>
+  <li>
+    <p>Merged VirtualMachinePresets (@stu-gott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/652">https://github.com/kubevirt/kubevirt/pull/652</a>)</p>
+  </li>
+  <li>
+    <p>Merged OfflineVirtualMachine (@pkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/667">https://github.com/kubevirt/kubevirt/pull/667</a>)</p>
+  </li>
+  <li>
+    <p>Merged ephemeral disk support (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/728">https://github.com/kubevirt/kubevirt/pull/728</a>)</p>
+  </li>
+  <li>
+    <p>Fixes to test KubeVirt on OpenShift (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/774">https://github.com/kubevirt/kubevirt/pull/774</a>)</p>
+  </li>
+  <li>
+    <p>Scheduler awareness of VM pods (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/673">https://github.com/kubevirt/kubevirt/pull/673</a>)</p>
+  </li>
+  <li>
+    <p>Plain text inline cloud-init (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/757">https://github.com/kubevirt/kubevirt/pull/757</a>)</p>
+  </li>
+  <li>
+    <p>Define guest specific labels to be used with presets (@yanirq)
+(<a href="https://github.com/kubevirt/kubevirt/pull/767">https://github.com/kubevirt/kubevirt/pull/767</a>)</p>
+  </li>
+  <li>
+    <p>Special note: A ton of automation, CI, and test fixes (@rmohr)</p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Stable UUIDs for OfflineVirtualMachines (@fromanirh)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/766&quot;&gt;https://github.com/kubevirt/kubevirt/pull/766&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Subresources for consoles (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/770&quot;&gt;https://github.com/kubevirt/kubevirt/pull/770&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Additional network glue approach (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/787&quot;&gt;https://github.com/kubevirt/kubevirt/pull/787&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improvement for testing on OpenShift (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/792&quot;&gt;https://github.com/kubevirt/kubevirt/pull/792&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Stable UUIDs for OfflineVirtualMachines (@fromanirh)
+(<a href="https://github.com/kubevirt/kubevirt/pull/766">https://github.com/kubevirt/kubevirt/pull/766</a>)</p>
+  </li>
+  <li>
+    <p>Subresources for consoles (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/770">https://github.com/kubevirt/kubevirt/pull/770</a>)</p>
+  </li>
+  <li>
+    <p>Additional network glue approach (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/787">https://github.com/kubevirt/kubevirt/pull/787</a>)</p>
+  </li>
+  <li>
+    <p>Improvement for testing on OpenShift (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/792">https://github.com/kubevirt/kubevirt/pull/792</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 19</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html" rel="alternate" type="text/html" title="This Week In Kube Virt 19" /><published>2018-02-23T00:00:00+00:00</published><updated>2018-02-23T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-19</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html">&lt;p&gt;This is a bi-weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 19</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html" rel="alternate" type="text/html" title="This Week In Kube Virt 19" /><published>2018-02-23T00:00:00+00:00</published><updated>2018-02-23T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-19</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html"><![CDATA[<p>This is a bi-weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;Within the last two weeks we achieved to:&lt;/p&gt;
+<p>Within the last two weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Support for native file-system PVs as disk storage (@alukiano,
-@davidvossel) (&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/734&quot;&gt;https://github.com/kubevirt/kubevirt/pull/734&lt;/a&gt;,
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/671&quot;&gt;https://github.com/kubevirt/kubevirt/pull/671&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Support for native pod networking for VMs (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/686&quot;&gt;https://github.com/kubevirt/kubevirt/pull/686&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Many patches to improve kubevirt-ansible usability
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt-ansible/pulse/monthly&quot;&gt;https://github.com/kubevirt/kubevirt-ansible/pulse/monthly&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Introduce the kubernetes-device-plugins (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubernetes-device-plugins/&quot;&gt;https://github.com/kubevirt/kubernetes-device-plugins/&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Introduce the kubernetes-device-plugin for bridge networking
+<ul>
+  <li>
+    <p>Support for native file-system PVs as disk storage (@alukiano,
+@davidvossel) (<a href="https://github.com/kubevirt/kubevirt/pull/734">https://github.com/kubevirt/kubevirt/pull/734</a>,
+<a href="https://github.com/kubevirt/kubevirt/pull/671">https://github.com/kubevirt/kubevirt/pull/671</a>)</p>
+  </li>
+  <li>
+    <p>Support for native pod networking for VMs (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/686">https://github.com/kubevirt/kubevirt/pull/686</a>)</p>
+  </li>
+  <li>
+    <p>Many patches to improve kubevirt-ansible usability
+(<a href="https://github.com/kubevirt/kubevirt-ansible/pulse/monthly">https://github.com/kubevirt/kubevirt-ansible/pulse/monthly</a>)</p>
+  </li>
+  <li>
+    <p>Introduce the kubernetes-device-plugins (@mpolednik)
+(<a href="https://github.com/kubevirt/kubernetes-device-plugins/">https://github.com/kubevirt/kubernetes-device-plugins/</a>)</p>
+  </li>
+  <li>
+    <p>Introduce the kubernetes-device-plugin for bridge networking
 (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubernetes-device-plugins/pull/4&quot;&gt;https://github.com/kubevirt/kubernetes-device-plugins/pull/4&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Add vendor/ tree (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/715&quot;&gt;https://github.com/kubevirt/kubevirt/pull/715&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Expose disk bus (@fromani)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/672&quot;&gt;https://github.com/kubevirt/kubevirt/pull/672&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Allow deploying OpenShift in vagrant (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/631&quot;&gt;https://github.com/kubevirt/kubevirt/pull/631&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Release of v0.3.0-alpha.3
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0-alpha.3&quot;&gt;https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0-alpha.3&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+(<a href="https://github.com/kubevirt/kubernetes-device-plugins/pull/4">https://github.com/kubevirt/kubernetes-device-plugins/pull/4</a>)</p>
+  </li>
+  <li>
+    <p>Add vendor/ tree (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/715">https://github.com/kubevirt/kubevirt/pull/715</a>)</p>
+  </li>
+  <li>
+    <p>Expose disk bus (@fromani)
+(<a href="https://github.com/kubevirt/kubevirt/pull/672">https://github.com/kubevirt/kubevirt/pull/672</a>)</p>
+  </li>
+  <li>
+    <p>Allow deploying OpenShift in vagrant (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/631">https://github.com/kubevirt/kubevirt/pull/631</a>)</p>
+  </li>
+  <li>
+    <p>Release of v0.3.0-alpha.3
+(<a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0-alpha.3">https://github.com/kubevirt/kubevirt/releases/tag/v0.3.0-alpha.3</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement VirtualMachinePresets (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/652&quot;&gt;https://github.com/kubevirt/kubevirt/pull/652&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement OfflineVirtualMachines (@pkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/667&quot;&gt;https://github.com/kubevirt/kubevirt/pull/667&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Expose CPU requirements in VM pod (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/673&quot;&gt;https://github.com/kubevirt/kubevirt/pull/673&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Implement VirtualMachinePresets (@stu-gott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/652">https://github.com/kubevirt/kubevirt/pull/652</a>)</p>
+  </li>
+  <li>
+    <p>Implement OfflineVirtualMachines (@pkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/667">https://github.com/kubevirt/kubevirt/pull/667</a>)</p>
+  </li>
+  <li>
+    <p>Expose CPU requirements in VM pod (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/673">https://github.com/kubevirt/kubevirt/pull/673</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a bi-weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 18</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html" rel="alternate" type="text/html" title="This Week In Kube Virt 18" /><published>2018-02-10T00:00:00+00:00</published><updated>2018-02-10T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-18</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a bi-weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 18</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html" rel="alternate" type="text/html" title="This Week In Kube Virt 18" /><published>2018-02-10T00:00:00+00:00</published><updated>2018-02-10T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-18</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html"><![CDATA[<p>This is a weekly update from the KubeVirt team.</p>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Rework our architecture&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Rework our architecture</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;p&gt;Within the last weeks we achieved to:&lt;/p&gt;
+<p>Within the last weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Move to a decentralized the architecture (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/663&quot;&gt;https://github.com/kubevirt/kubevirt/pull/663&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Drop live migration for now (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/702&quot;&gt;https://github.com/kubevirt/kubevirt/pull/702&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Change default network provider to flannel (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/710&quot;&gt;https://github.com/kubevirt/kubevirt/pull/710&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Adjust uuid API (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/675&quot;&gt;https://github.com/kubevirt/kubevirt/pull/675&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Make cirros and alpine ready for q35 (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/688&quot;&gt;https://github.com/kubevirt/kubevirt/pull/688&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Move to a decentralized the architecture (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/663">https://github.com/kubevirt/kubevirt/pull/663</a>)</p>
+  </li>
+  <li>
+    <p>Drop live migration for now (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/702">https://github.com/kubevirt/kubevirt/pull/702</a>)</p>
+  </li>
+  <li>
+    <p>Change default network provider to flannel (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/710">https://github.com/kubevirt/kubevirt/pull/710</a>)</p>
+  </li>
+  <li>
+    <p>Adjust uuid API (@mpolednik)
+(<a href="https://github.com/kubevirt/kubevirt/pull/675">https://github.com/kubevirt/kubevirt/pull/675</a>)</p>
+  </li>
+  <li>
+    <p>Make cirros and alpine ready for q35 (@rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/688">https://github.com/kubevirt/kubevirt/pull/688</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Decentralized pod networking (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/686&quot;&gt;https://github.com/kubevirt/kubevirt/pull/686&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement VirtualMachinePresets (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/652&quot;&gt;https://github.com/kubevirt/kubevirt/pull/652&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement OfflineVirtualMachines (@pkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/667&quot;&gt;https://github.com/kubevirt/kubevirt/pull/667&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Allow deploying OpenShift in vagrant (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/631&quot;&gt;https://github.com/kubevirt/kubevirt/pull/631&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Expose CPU requirements in VM pod (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/673&quot;&gt;https://github.com/kubevirt/kubevirt/pull/673&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Add support for PVs via kubelet (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/671&quot;&gt;https://github.com/kubevirt/kubevirt/pull/671&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Decentralized pod networking (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/686">https://github.com/kubevirt/kubevirt/pull/686</a>)</p>
+  </li>
+  <li>
+    <p>Implement VirtualMachinePresets (@stu-gott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/652">https://github.com/kubevirt/kubevirt/pull/652</a>)</p>
+  </li>
+  <li>
+    <p>Implement OfflineVirtualMachines (@pkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/667">https://github.com/kubevirt/kubevirt/pull/667</a>)</p>
+  </li>
+  <li>
+    <p>Allow deploying OpenShift in vagrant (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/631">https://github.com/kubevirt/kubevirt/pull/631</a>)</p>
+  </li>
+  <li>
+    <p>Expose CPU requirements in VM pod (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/673">https://github.com/kubevirt/kubevirt/pull/673</a>)</p>
+  </li>
+  <li>
+    <p>Add support for PVs via kubelet (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/671">https://github.com/kubevirt/kubevirt/pull/671</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 17</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html" rel="alternate" type="text/html" title="This Week In Kube Virt 17" /><published>2018-01-30T00:00:00+00:00</published><updated>2018-01-30T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-17</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 17</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html" rel="alternate" type="text/html" title="This Week In Kube Virt 17" /><published>2018-01-30T00:00:00+00:00</published><updated>2018-01-30T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-17</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html"><![CDATA[<p>This is a weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Rework our architecture&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Rework our architecture</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;Over the weekend you could have seen our talks at devconf.cz:&lt;/p&gt;
+<p>Over the weekend you could have seen our talks at devconf.cz:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=BzY2mzeVjrw&quot;&gt;“Kubernetes Cloud Autoscaler for Isolated
-Workloads”&lt;/a&gt; by @rmohr&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=avxBRRwRa-8&quot;&gt;“Outcast: Virtualization in a container
-world?”&lt;/a&gt; by @fabiand&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p><a href="https://www.youtube.com/watch?v=BzY2mzeVjrw">“Kubernetes Cloud Autoscaler for Isolated
+Workloads”</a> by @rmohr</p>
+  </li>
+  <li>
+    <p><a href="https://www.youtube.com/watch?v=avxBRRwRa-8">“Outcast: Virtualization in a container
+world?”</a> by @fabiand</p>
+  </li>
+</ul>
 
-&lt;p&gt;Within the last weeks we achieved to:&lt;/p&gt;
+<p>Within the last weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Introduced Fedora Cloud image for testing (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/685&quot;&gt;https://github.com/kubevirt/kubevirt/pull/685&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Switch to q35 by default (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/650&quot;&gt;https://github.com/kubevirt/kubevirt/pull/650&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Introduced Fedora Cloud image for testing (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/685">https://github.com/kubevirt/kubevirt/pull/685</a>)</p>
+  </li>
+  <li>
+    <p>Switch to q35 by default (@mpolednik)
+(<a href="https://github.com/kubevirt/kubevirt/pull/650">https://github.com/kubevirt/kubevirt/pull/650</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Decentralize the architecture (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/663&quot;&gt;https://github.com/kubevirt/kubevirt/pull/663&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Decentralized pod networking (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/686&quot;&gt;https://github.com/kubevirt/kubevirt/pull/686&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement VirtualMachinePresets (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/652&quot;&gt;https://github.com/kubevirt/kubevirt/pull/652&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Allow deploying OpenShift in vagrant (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/631&quot;&gt;https://github.com/kubevirt/kubevirt/pull/631&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Expose CPU requirements in VM pod (@vladikr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/673&quot;&gt;https://github.com/kubevirt/kubevirt/pull/673&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Adjust uuid API (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/675&quot;&gt;https://github.com/kubevirt/kubevirt/pull/675&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Make cirros and alpine ready for q35 (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/688&quot;&gt;https://github.com/kubevirt/kubevirt/pull/688&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Decentralize the architecture (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/663">https://github.com/kubevirt/kubevirt/pull/663</a>)</p>
+  </li>
+  <li>
+    <p>Decentralized pod networking (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/686">https://github.com/kubevirt/kubevirt/pull/686</a>)</p>
+  </li>
+  <li>
+    <p>Implement VirtualMachinePresets (@stu-gott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/652">https://github.com/kubevirt/kubevirt/pull/652</a>)</p>
+  </li>
+  <li>
+    <p>Allow deploying OpenShift in vagrant (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/631">https://github.com/kubevirt/kubevirt/pull/631</a>)</p>
+  </li>
+  <li>
+    <p>Expose CPU requirements in VM pod (@vladikr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/673">https://github.com/kubevirt/kubevirt/pull/673</a>)</p>
+  </li>
+  <li>
+    <p>Adjust uuid API (@mpolednik)
+(<a href="https://github.com/kubevirt/kubevirt/pull/675">https://github.com/kubevirt/kubevirt/pull/675</a>)</p>
+  </li>
+  <li>
+    <p>Make cirros and alpine ready for q35 (@rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/688">https://github.com/kubevirt/kubevirt/pull/688</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry><entry><title type="html">This Week In Kube Virt 16 Holiday Wrap Up Edition</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Holiday Wrap Up Edition" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html">&lt;p&gt;This is a weekly update from the KubeVirt team - including the holiday
-backlog update.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team.]]></summary></entry><entry><title type="html">This Week In Kube Virt 16 Holiday Wrap Up Edition</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Holiday Wrap Up Edition" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html"><![CDATA[<p>This is a weekly update from the KubeVirt team - including the holiday
+backlog update.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Rework out architecture&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+  <li>
+    <p>Rework out architecture</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+</ul>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;Within the last weeks we achieved to:&lt;/p&gt;
+<p>Within the last weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Drop of HAProxy and redeisng of console access (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/618&quot;&gt;https://github.com/kubevirt/kubevirt/pull/618&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Dockerized builds to make sure the build env matches the runtime env
+<ul>
+  <li>
+    <p>Drop of HAProxy and redeisng of console access (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/618">https://github.com/kubevirt/kubevirt/pull/618</a>)</p>
+  </li>
+  <li>
+    <p>Dockerized builds to make sure the build env matches the runtime env
 (@rmohr and others)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/647&quot;&gt;https://github.com/kubevirt/kubevirt/pull/647&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;OwnerReference fixes (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/642&quot;&gt;https://github.com/kubevirt/kubevirt/pull/642&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;OfflineVirtualMachineDesign documentation (@petrkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/641&quot;&gt;https://github.com/kubevirt/kubevirt/pull/641&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Further RBAC improvements (@gbenhaim)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/640&quot;&gt;https://github.com/kubevirt/kubevirt/pull/640&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;User-Guide&lt;/strong&gt;&lt;/p&gt;
+(<a href="https://github.com/kubevirt/kubevirt/pull/647">https://github.com/kubevirt/kubevirt/pull/647</a>)</p>
+  </li>
+  <li>
+    <p>OwnerReference fixes (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/642">https://github.com/kubevirt/kubevirt/pull/642</a>)</p>
+  </li>
+  <li>
+    <p>OfflineVirtualMachineDesign documentation (@petrkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/641">https://github.com/kubevirt/kubevirt/pull/641</a>)</p>
+  </li>
+  <li>
+    <p>Further RBAC improvements (@gbenhaim)
+(<a href="https://github.com/kubevirt/kubevirt/pull/640">https://github.com/kubevirt/kubevirt/pull/640</a>)</p>
+  </li>
+  <li>
+    <p><strong>User-Guide</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;The guide saw many updates also for planned stuff&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Update to reflect v0.2.0 changes (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/12&quot;&gt;https://github.com/kubevirt/user-guide/pull/12&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;NodeSelector and affinity (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/15&quot;&gt;https://github.com/kubevirt/user-guide/pull/15&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Hardware configuration (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/14&quot;&gt;https://github.com/kubevirt/user-guide/pull/14&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Volumes and disks (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/13&quot;&gt;https://github.com/kubevirt/user-guide/pull/13&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Cloud-Init (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/10&quot;&gt;https://github.com/kubevirt/user-guide/pull/10&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;API Reference&lt;/strong&gt;&lt;/p&gt;
+    <ul>
+      <li>
+        <p>The guide saw many updates also for planned stuff</p>
+      </li>
+      <li>
+        <p>Update to reflect v0.2.0 changes (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/12">https://github.com/kubevirt/user-guide/pull/12</a>)</p>
+      </li>
+      <li>
+        <p>NodeSelector and affinity (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/15">https://github.com/kubevirt/user-guide/pull/15</a>)</p>
+      </li>
+      <li>
+        <p>Hardware configuration (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/14">https://github.com/kubevirt/user-guide/pull/14</a>)</p>
+      </li>
+      <li>
+        <p>Volumes and disks (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/13">https://github.com/kubevirt/user-guide/pull/13</a>)</p>
+      </li>
+      <li>
+        <p>Cloud-Init (@davidvossel)
+(<a href="https://github.com/kubevirt/user-guide/pull/10">https://github.com/kubevirt/user-guide/pull/10</a>)</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>API Reference</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;Now updated regularly (@lukas-bednar)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/643&quot;&gt;https://github.com/kubevirt/kubevirt/pull/643&lt;/a&gt;)
-&lt;a href=&quot;https://kubevirt.io/api-reference/master/definitions.html&quot;&gt;https://kubevirt.io/api-reference/master/definitions.html&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Demo&lt;/strong&gt;&lt;/p&gt;
+    <ul>
+      <li>Now updated regularly (@lukas-bednar)
+(<a href="https://github.com/kubevirt/kubevirt/pull/643">https://github.com/kubevirt/kubevirt/pull/643</a>)
+<a href="https://kubevirt.io/api-reference/master/definitions.html">https://kubevirt.io/api-reference/master/definitions.html</a></li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Demo</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;Got updated to v0.2.0 (@fabiand)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;But an issue with virtctl was introduced&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/demo&quot;&gt;https://github.com/kubevirt/demo&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;UI&lt;/strong&gt;&lt;/p&gt;
+    <ul>
+      <li>
+        <p>Got updated to v0.2.0 (@fabiand)</p>
+      </li>
+      <li>
+        <p>But an issue with virtctl was introduced</p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/demo">https://github.com/kubevirt/demo</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>UI</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;The WIP KubeVirt provider for ManageIQ was showcased
-(@masayag @pkliczewski)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/ManageIQ/manageiq-providers-kubevirt/&quot;&gt;https://github.com/ManageIQ/manageiq-providers-kubevirt/&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://www.youtube.com/watch?v=9Gf2Nv7h558&quot;&gt;https://www.youtube.com/watch?v=9Gf2Nv7h558&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li>
+        <p>The WIP KubeVirt provider for ManageIQ was showcased
+(@masayag @pkliczewski)</p>
+      </li>
+      <li>
+        <p><a href="https://github.com/ManageIQ/manageiq-providers-kubevirt/">https://github.com/ManageIQ/manageiq-providers-kubevirt/</a></p>
+      </li>
+      <li>
+        <p><a href="https://www.youtube.com/watch?v=9Gf2Nv7h558">https://www.youtube.com/watch?v=9Gf2Nv7h558</a></p>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;&lt;img src=&quot;https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/e63ef729acd78c92940699004b2bdb54cf9874e1/miq-2018-01.png&quot; alt=&quot;miq 2018
-01&quot; /&gt;&lt;/p&gt;
+<p><img src="https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/e63ef729acd78c92940699004b2bdb54cf9874e1/miq-2018-01.png" alt="miq 2018
+01" /></p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;UI&lt;/strong&gt;&lt;/p&gt;
+<ul>
+  <li>
+    <p><strong>UI</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;The Cockpit plugin makes some progress (@mlibra):&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li>The Cockpit plugin makes some progress (@mlibra):</li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;&lt;img src=&quot;https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/16796e942793fbab48398c78c600ea7eabd7413a/02.png&quot; alt=&quot;02&quot; /&gt;&lt;/p&gt;
+<p><img src="https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/16796e942793fbab48398c78c600ea7eabd7413a/02.png" alt="02" /></p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Ansible&lt;/strong&gt;&lt;/p&gt;
+<ul>
+  <li>
+    <p><strong>Ansible</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;Move to stable kubevirt release manifests (@gbenhaim)
-(&lt;a href=&quot;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37&quot;&gt;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Many improvements to make it work seamlessly
-(@gbenhaim @lukas-bednar)&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li>
+        <p>Move to stable kubevirt release manifests (@gbenhaim)
+(<a href="https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37">https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37</a>)</p>
+      </li>
+      <li>
+        <p>Many improvements to make it work seamlessly
+(@gbenhaim @lukas-bednar)</p>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Decentralize the architecture (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/663&quot;&gt;https://github.com/kubevirt/kubevirt/pull/663&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement VirtualMachinePresets (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/652&quot;&gt;https://github.com/kubevirt/kubevirt/pull/652&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;virtctl fixes (@davidvossel and @awels)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/648&quot;&gt;https://github.com/kubevirt/kubevirt/pull/648&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Move to q35 machine type (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/650&quot;&gt;https://github.com/kubevirt/kubevirt/pull/650&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Allow deploying OpenShift in vagrant (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/631&quot;&gt;https://github.com/kubevirt/kubevirt/pull/631&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;User-Guide&lt;/strong&gt;:&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Offline Virtual Machine docs (@petrkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/9&quot;&gt;https://github.com/kubevirt/user-guide/pull/9&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Persistent Virtual Machines (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/11&quot;&gt;https://github.com/kubevirt/user-guide/pull/11&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Decentralize the architecture (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/663">https://github.com/kubevirt/kubevirt/pull/663</a>)</p>
+  </li>
+  <li>
+    <p>Implement VirtualMachinePresets (@stu-gott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/652">https://github.com/kubevirt/kubevirt/pull/652</a>)</p>
+  </li>
+  <li>
+    <p>virtctl fixes (@davidvossel and @awels)
+(<a href="https://github.com/kubevirt/kubevirt/pull/648">https://github.com/kubevirt/kubevirt/pull/648</a>)</p>
+  </li>
+  <li>
+    <p>Move to q35 machine type (@mpolednik)
+(<a href="https://github.com/kubevirt/kubevirt/pull/650">https://github.com/kubevirt/kubevirt/pull/650</a>)</p>
+  </li>
+  <li>
+    <p>Allow deploying OpenShift in vagrant (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/631">https://github.com/kubevirt/kubevirt/pull/631</a>)</p>
+  </li>
+  <li>
+    <p><strong>User-Guide</strong>:</p>
+  </li>
+  <li>
+    <p>Offline Virtual Machine docs (@petrkotas)
+(<a href="https://github.com/kubevirt/user-guide/pull/9">https://github.com/kubevirt/user-guide/pull/9</a>)</p>
+  </li>
+  <li>
+    <p>Persistent Virtual Machines (@stu-gott)
+(<a href="https://github.com/kubevirt/user-guide/pull/11">https://github.com/kubevirt/user-guide/pull/11</a>)</p>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team - including the holiday backlog update.</summary></entry><entry><title type="html">This Week In Kube Virt 16 Size Xl</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Size Xl" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html">&lt;p&gt;This is a weekly update from the KubeVirt team - including the holiday
-backlog update.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team - including the holiday backlog update.]]></summary></entry><entry><title type="html">This Week In Kube Virt 16 Size Xl</title><link href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html" rel="alternate" type="text/html" title="This Week In Kube Virt 16 Size Xl" /><published>2018-01-19T00:00:00+00:00</published><updated>2018-01-19T00:00:00+00:00</updated><id>https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL</id><content type="html" xml:base="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html"><![CDATA[<p>This is a weekly update from the KubeVirt team - including the holiday
+backlog update.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Building a solid user-story around KubeVirt&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Caring about end-to-end (backend, core, ui)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Rework out architecture&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Getting dependencies into shape (storage)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve the user-experience for users (UI, deployment)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Building a solid user-story around KubeVirt</p>
+  </li>
+  <li>
+    <p>Caring about end-to-end (backend, core, ui)</p>
+  </li>
+  <li>
+    <p>Rework out architecture</p>
+  </li>
+  <li>
+    <p>Getting dependencies into shape (storage)</p>
+  </li>
+  <li>
+    <p>Improve the user-experience for users (UI, deployment)</p>
+  </li>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+</ul>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;Within the last weeks we achieved to:&lt;/p&gt;
+<p>Within the last weeks we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Drop of HAProxy and redeisng of console access (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/618&quot;&gt;https://github.com/kubevirt/kubevirt/pull/618&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Dockerized builds to make sure the build env matches the runtime env
+<ul>
+  <li>
+    <p>Drop of HAProxy and redeisng of console access (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/618">https://github.com/kubevirt/kubevirt/pull/618</a>)</p>
+  </li>
+  <li>
+    <p>Dockerized builds to make sure the build env matches the runtime env
 (@rmohr and others)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/647&quot;&gt;https://github.com/kubevirt/kubevirt/pull/647&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;OwnerReference fixes (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/642&quot;&gt;https://github.com/kubevirt/kubevirt/pull/642&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;OfflineVirtualMachineDesign documentation (@petrkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/641&quot;&gt;https://github.com/kubevirt/kubevirt/pull/641&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Further RBAC improvements (@gbenhaim)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/640&quot;&gt;https://github.com/kubevirt/kubevirt/pull/640&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;User-Guide&lt;/strong&gt;&lt;/p&gt;
+(<a href="https://github.com/kubevirt/kubevirt/pull/647">https://github.com/kubevirt/kubevirt/pull/647</a>)</p>
+  </li>
+  <li>
+    <p>OwnerReference fixes (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/642">https://github.com/kubevirt/kubevirt/pull/642</a>)</p>
+  </li>
+  <li>
+    <p>OfflineVirtualMachineDesign documentation (@petrkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/641">https://github.com/kubevirt/kubevirt/pull/641</a>)</p>
+  </li>
+  <li>
+    <p>Further RBAC improvements (@gbenhaim)
+(<a href="https://github.com/kubevirt/kubevirt/pull/640">https://github.com/kubevirt/kubevirt/pull/640</a>)</p>
+  </li>
+  <li>
+    <p><strong>User-Guide</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;The guide saw many updates also for planned stuff&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Update to reflect v0.2.0 changes (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/12&quot;&gt;https://github.com/kubevirt/user-guide/pull/12&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;NodeSelector and affinity (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/15&quot;&gt;https://github.com/kubevirt/user-guide/pull/15&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Hardware configuration (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/14&quot;&gt;https://github.com/kubevirt/user-guide/pull/14&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Volumes and disks (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/13&quot;&gt;https://github.com/kubevirt/user-guide/pull/13&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Cloud-Init (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/10&quot;&gt;https://github.com/kubevirt/user-guide/pull/10&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;API Reference&lt;/strong&gt;&lt;/p&gt;
+    <ul>
+      <li>
+        <p>The guide saw many updates also for planned stuff</p>
+      </li>
+      <li>
+        <p>Update to reflect v0.2.0 changes (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/12">https://github.com/kubevirt/user-guide/pull/12</a>)</p>
+      </li>
+      <li>
+        <p>NodeSelector and affinity (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/15">https://github.com/kubevirt/user-guide/pull/15</a>)</p>
+      </li>
+      <li>
+        <p>Hardware configuration (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/14">https://github.com/kubevirt/user-guide/pull/14</a>)</p>
+      </li>
+      <li>
+        <p>Volumes and disks (@rmohr)
+(<a href="https://github.com/kubevirt/user-guide/pull/13">https://github.com/kubevirt/user-guide/pull/13</a>)</p>
+      </li>
+      <li>
+        <p>Cloud-Init (@davidvossel)
+(<a href="https://github.com/kubevirt/user-guide/pull/10">https://github.com/kubevirt/user-guide/pull/10</a>)</p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>API Reference</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;Now updated regularly (@lukas-bednar)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/643&quot;&gt;https://github.com/kubevirt/kubevirt/pull/643&lt;/a&gt;)
-&lt;a href=&quot;https://kubevirt.io/api-reference/master/definitions.html&quot;&gt;https://kubevirt.io/api-reference/master/definitions.html&lt;/a&gt;&lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Demo&lt;/strong&gt;&lt;/p&gt;
+    <ul>
+      <li>Now updated regularly (@lukas-bednar)
+(<a href="https://github.com/kubevirt/kubevirt/pull/643">https://github.com/kubevirt/kubevirt/pull/643</a>)
+<a href="https://kubevirt.io/api-reference/master/definitions.html">https://kubevirt.io/api-reference/master/definitions.html</a></li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>Demo</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;Got updated to v0.2.0 (@fabiand)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;But an issue with virtctl was introduced&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/kubevirt/demo&quot;&gt;https://github.com/kubevirt/demo&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;UI&lt;/strong&gt;&lt;/p&gt;
+    <ul>
+      <li>
+        <p>Got updated to v0.2.0 (@fabiand)</p>
+      </li>
+      <li>
+        <p>But an issue with virtctl was introduced</p>
+      </li>
+      <li>
+        <p><a href="https://github.com/kubevirt/demo">https://github.com/kubevirt/demo</a></p>
+      </li>
+    </ul>
+  </li>
+  <li>
+    <p><strong>UI</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;The WIP KubeVirt provider for ManageIQ was showcased
-(@masayag @pkliczewski)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/ManageIQ/manageiq-providers-kubevirt/&quot;&gt;https://github.com/ManageIQ/manageiq-providers-kubevirt/&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Video: &lt;a href=&quot;https://www.youtube.com/watch?v=9Gf2Nv7h558&quot;&gt;https://www.youtube.com/watch?v=9Gf2Nv7h558&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Screenshot:&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li>
+        <p>The WIP KubeVirt provider for ManageIQ was showcased
+(@masayag @pkliczewski)</p>
+      </li>
+      <li>
+        <p><a href="https://github.com/ManageIQ/manageiq-providers-kubevirt/">https://github.com/ManageIQ/manageiq-providers-kubevirt/</a></p>
+      </li>
+      <li>
+        <p>Video: <a href="https://www.youtube.com/watch?v=9Gf2Nv7h558">https://www.youtube.com/watch?v=9Gf2Nv7h558</a></p>
+      </li>
+      <li>
+        <p>Screenshot:</p>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;&lt;img src=&quot;https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/e63ef729acd78c92940699004b2bdb54cf9874e1/miq-2018-01.png&quot; alt=&quot;miq 2018
-01&quot; /&gt;&lt;/p&gt;
+<p><img src="https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/e63ef729acd78c92940699004b2bdb54cf9874e1/miq-2018-01.png" alt="miq 2018
+01" /></p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;UI&lt;/strong&gt;&lt;/p&gt;
+<ul>
+  <li>
+    <p><strong>UI</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;The Cockpit plugin makes some progress (@mlibra)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/cockpit-project/cockpit/wiki/Feature:-Kubernetes:-KubeVirt-support-enhancements&quot;&gt;https://github.com/cockpit-project/cockpit/wiki/Feature:-Kubernetes:-KubeVirt-support-enhancements&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;a href=&quot;https://github.com/cockpit-project/cockpit/pull/7830&quot;&gt;https://github.com/cockpit-project/cockpit/pull/7830&lt;/a&gt;&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Screenshot:&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li>
+        <p>The Cockpit plugin makes some progress (@mlibra)</p>
+      </li>
+      <li>
+        <p><a href="https://github.com/cockpit-project/cockpit/wiki/Feature:-Kubernetes:-KubeVirt-support-enhancements">https://github.com/cockpit-project/cockpit/wiki/Feature:-Kubernetes:-KubeVirt-support-enhancements</a></p>
+      </li>
+      <li>
+        <p><a href="https://github.com/cockpit-project/cockpit/pull/7830">https://github.com/cockpit-project/cockpit/pull/7830</a></p>
+      </li>
+      <li>
+        <p>Screenshot:</p>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;&lt;img src=&quot;https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/16796e942793fbab48398c78c600ea7eabd7413a/02.png&quot; alt=&quot;02&quot; /&gt;&lt;/p&gt;
+<p><img src="https://gist.githubusercontent.com/fabiand/417615d509badb8bff7d6f6a0d736df6/raw/16796e942793fbab48398c78c600ea7eabd7413a/02.png" alt="02" /></p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;&lt;strong&gt;Ansible&lt;/strong&gt;&lt;/p&gt;
+<ul>
+  <li>
+    <p><strong>Ansible</strong></p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;Move to stable kubevirt release manifests (@gbenhaim)
-(&lt;a href=&quot;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37&quot;&gt;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37&lt;/a&gt;)&lt;/p&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;Many improvements to make it work seamlessly
-(@gbenhaim @lukas-bednar)&lt;/p&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+    <ul>
+      <li>
+        <p>Move to stable kubevirt release manifests (@gbenhaim)
+(<a href="https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37">https://github.com/kubevirt-incubator/kubevirt-ansible/pull/37</a>)</p>
+      </li>
+      <li>
+        <p>Many improvements to make it work seamlessly
+(@gbenhaim @lukas-bednar)</p>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on:&lt;/p&gt;
+<p>In addition to this, we are also working on:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Decentralize the architecture (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/663&quot;&gt;https://github.com/kubevirt/kubevirt/pull/663&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Implement VirtualMachinePresets (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/652&quot;&gt;https://github.com/kubevirt/kubevirt/pull/652&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;virtctl fixes (@davidvossel and @awels)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/648&quot;&gt;https://github.com/kubevirt/kubevirt/pull/648&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Move to q35 machine type (@mpolednik)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/650&quot;&gt;https://github.com/kubevirt/kubevirt/pull/650&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Allow deploying OpenShift in vagrant (@alukiano)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/631&quot;&gt;https://github.com/kubevirt/kubevirt/pull/631&lt;/a&gt;)&lt;/p&gt;
+<ul>
+  <li>
+    <p>Decentralize the architecture (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/663">https://github.com/kubevirt/kubevirt/pull/663</a>)</p>
+  </li>
+  <li>
+    <p>Implement VirtualMachinePresets (@stu-gott)
+(<a href="https://github.com/kubevirt/kubevirt/pull/652">https://github.com/kubevirt/kubevirt/pull/652</a>)</p>
+  </li>
+  <li>
+    <p>virtctl fixes (@davidvossel and @awels)
+(<a href="https://github.com/kubevirt/kubevirt/pull/648">https://github.com/kubevirt/kubevirt/pull/648</a>)</p>
+  </li>
+  <li>
+    <p>Move to q35 machine type (@mpolednik)
+(<a href="https://github.com/kubevirt/kubevirt/pull/650">https://github.com/kubevirt/kubevirt/pull/650</a>)</p>
+  </li>
+  <li>
+    <p>Allow deploying OpenShift in vagrant (@alukiano)
+(<a href="https://github.com/kubevirt/kubevirt/pull/631">https://github.com/kubevirt/kubevirt/pull/631</a>)</p>
 
-    &lt;ul&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;User-Guide&lt;/strong&gt;:&lt;/p&gt;
+    <ul>
+      <li>
+        <p><strong>User-Guide</strong>:</p>
 
-        &lt;ul&gt;
-          &lt;li&gt;
-            &lt;p&gt;Offline Virtual Machine docs (@petrkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/9&quot;&gt;https://github.com/kubevirt/user-guide/pull/9&lt;/a&gt;)&lt;/p&gt;
-          &lt;/li&gt;
-          &lt;li&gt;
-            &lt;p&gt;Persistent Virtual Machines (@stu-gott)
-(&lt;a href=&quot;https://github.com/kubevirt/user-guide/pull/11&quot;&gt;https://github.com/kubevirt/user-guide/pull/11&lt;/a&gt;)&lt;/p&gt;
-          &lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-      &lt;li&gt;
-        &lt;p&gt;&lt;strong&gt;Storage&lt;/strong&gt;&lt;/p&gt;
+        <ul>
+          <li>
+            <p>Offline Virtual Machine docs (@petrkotas)
+(<a href="https://github.com/kubevirt/user-guide/pull/9">https://github.com/kubevirt/user-guide/pull/9</a>)</p>
+          </li>
+          <li>
+            <p>Persistent Virtual Machines (@stu-gott)
+(<a href="https://github.com/kubevirt/user-guide/pull/11">https://github.com/kubevirt/user-guide/pull/11</a>)</p>
+          </li>
+        </ul>
+      </li>
+      <li>
+        <p><strong>Storage</strong></p>
 
-        &lt;ul&gt;
-          &lt;li&gt;
-            &lt;p&gt;Working on enabling PV cloning using PV
+        <ul>
+          <li>
+            <p>Working on enabling PV cloning using PV
 annotations (@aglitke)
-(&lt;a href=&quot;https://github.com/aglitke/external-storage/tree/clone-poc&quot;&gt;https://github.com/aglitke/external-storage/tree/clone-poc&lt;/a&gt;)&lt;/p&gt;
-          &lt;/li&gt;
-          &lt;li&gt;
-            &lt;p&gt;Working on optimizing Gluster for in-cluster storage&lt;/p&gt;
-          &lt;/li&gt;
-          &lt;li&gt;
-            &lt;p&gt;Working on the ability to simplify VM image uploads&lt;/p&gt;
-          &lt;/li&gt;
-        &lt;/ul&gt;
-      &lt;/li&gt;
-    &lt;/ul&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+(<a href="https://github.com/aglitke/external-storage/tree/clone-poc">https://github.com/aglitke/external-storage/tree/clone-poc</a>)</p>
+          </li>
+          <li>
+            <p>Working on optimizing Gluster for in-cluster storage</p>
+          </li>
+          <li>
+            <p>Working on the ability to simplify VM image uploads</p>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </li>
+</ul>
 
-&lt;p&gt;Take a look at the pulse, to get an overview over all changes of this
-week: &lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
+<p>Take a look at the pulse, to get an overview over all changes of this
+week: <a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team - including the holiday backlog update.</summary></entry><entry><title type="html">This Week In Kube Virt 15</title><link href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html" rel="alternate" type="text/html" title="This Week In Kube Virt 15" /><published>2017-12-15T00:00:00+00:00</published><updated>2017-12-15T00:00:00+00:00</updated><id>https://kubevirt.io//2017/This-Week-in-Kube-Virt-15</id><content type="html" xml:base="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html">&lt;p&gt;This is a weekly update from the KubeVirt team.&lt;/p&gt;
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team - including the holiday backlog update.]]></summary></entry><entry><title type="html">This Week In Kube Virt 15</title><link href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html" rel="alternate" type="text/html" title="This Week In Kube Virt 15" /><published>2017-12-15T00:00:00+00:00</published><updated>2017-12-15T00:00:00+00:00</updated><id>https://kubevirt.io//2017/This-Week-in-Kube-Virt-15</id><content type="html" xml:base="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html"><![CDATA[<p>This is a weekly update from the KubeVirt team.</p>
 
-&lt;p&gt;We are currently driven by&lt;/p&gt;
+<p>We are currently driven by</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Being easier to be used on Kubernetes and OpenShift&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Enabling people to contribute&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Streamlining and improving the Kubernetes experience&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Being easier to be used on Kubernetes and OpenShift</p>
+  </li>
+  <li>
+    <p>Enabling people to contribute</p>
+  </li>
+  <li>
+    <p>Streamlining and improving the Kubernetes experience</p>
+  </li>
+</ul>
 
-&lt;!-- more --&gt;
+<!-- more -->
 
-&lt;p&gt;This week we achieved to:&lt;/p&gt;
+<p>This week we achieved to:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;VM Grace period and shutdown improvements (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/526&quot;&gt;https://github.com/kubevirt/kubevirt/pull/526&lt;/a&gt;)&lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>VM Grace period and shutdown improvements (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/526">https://github.com/kubevirt/kubevirt/pull/526</a>)</li>
+</ul>
 
-&lt;p&gt;On another side we were also successful in:&lt;/p&gt;
+<p>On another side we were also successful in:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Initiating a Kubernetes WG Virtualization mainlinglist:
-&lt;a href=&quot;https://groups.google.com/forum/#!forum/kubernetes-wg-virtualization&quot;&gt;https://groups.google.com/forum/#!forum/kubernetes-wg-virtualization&lt;/a&gt;&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Triggering a #virtualization slack channel in the Kubernetes org&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<ul>
+  <li>
+    <p>Initiating a Kubernetes WG Virtualization mainlinglist:
+<a href="https://groups.google.com/forum/#!forum/kubernetes-wg-virtualization">https://groups.google.com/forum/#!forum/kubernetes-wg-virtualization</a></p>
+  </li>
+  <li>
+    <p>Triggering a #virtualization slack channel in the Kubernetes org</p>
+  </li>
+</ul>
 
-&lt;p&gt;In addition to this, we are also working on quite a few things:&lt;/p&gt;
+<p>In addition to this, we are also working on quite a few things:</p>
 
-&lt;ul&gt;
-  &lt;li&gt;
-    &lt;p&gt;Serial console rework (@davidvossel)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/613&quot;&gt;https://github.com/kubevirt/kubevirt/pull/613&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;VM API Redesign (@rmohr)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/606&quot;&gt;https://github.com/kubevirt/kubevirt/pull/606&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Add OpenShift support (@karimb)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/608&quot;&gt;https://github.com/kubevirt/kubevirt/pull/608&lt;/a&gt;,
-&lt;a href=&quot;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/29&quot;&gt;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/29&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Ansible Broker support (@gbenhaim)
-(&lt;a href=&quot;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/30&quot;&gt;https://github.com/kubevirt-incubator/kubevirt-ansible/pull/30&lt;/a&gt;)&lt;/p&gt;
-  &lt;/li&gt;
-  &lt;li&gt;
-    &lt;p&gt;Improve development builds (@petrkotas)
-(&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pull/609&quot;&gt;https://github.com/kubevirt/kubevirt/pull/609&lt;/a&gt;) - Take a look at
+<ul>
+  <li>
+    <p>Serial console rework (@davidvossel)
+(<a href="https://github.com/kubevirt/kubevirt/pull/613">https://github.com/kubevirt/kubevirt/pull/613</a>)</p>
+  </li>
+  <li>
+    <p>VM API Redesign (@rmohr)
+(<a href="https://github.com/kubevirt/kubevirt/pull/606">https://github.com/kubevirt/kubevirt/pull/606</a>)</p>
+  </li>
+  <li>
+    <p>Add OpenShift support (@karimb)
+(<a href="https://github.com/kubevirt/kubevirt/pull/608">https://github.com/kubevirt/kubevirt/pull/608</a>,
+<a href="https://github.com/kubevirt-incubator/kubevirt-ansible/pull/29">https://github.com/kubevirt-incubator/kubevirt-ansible/pull/29</a>)</p>
+  </li>
+  <li>
+    <p>Ansible Broker support (@gbenhaim)
+(<a href="https://github.com/kubevirt-incubator/kubevirt-ansible/pull/30">https://github.com/kubevirt-incubator/kubevirt-ansible/pull/30</a>)</p>
+  </li>
+  <li>
+    <p>Improve development builds (@petrkotas)
+(<a href="https://github.com/kubevirt/kubevirt/pull/609">https://github.com/kubevirt/kubevirt/pull/609</a>) - Take a look at
 the pulse, to get an overview over all changes of this week:
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/pulse&quot;&gt;https://github.com/kubevirt/kubevirt/pulse&lt;/a&gt;&lt;/p&gt;
-  &lt;/li&gt;
-&lt;/ul&gt;
+<a href="https://github.com/kubevirt/kubevirt/pulse">https://github.com/kubevirt/kubevirt/pulse</a></p>
+  </li>
+</ul>
 
-&lt;p&gt;Finally you can view our open issues at
-&lt;a href=&quot;https://github.com/kubevirt/kubevirt/issues&quot;&gt;https://github.com/kubevirt/kubevirt/issues&lt;/a&gt;&lt;/p&gt;
+<p>Finally you can view our open issues at
+<a href="https://github.com/kubevirt/kubevirt/issues">https://github.com/kubevirt/kubevirt/issues</a></p>
 
-&lt;p&gt;And keep track of events at our calendar
-&lt;a href=&quot;https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&quot;&gt;18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com&lt;/a&gt;&lt;/p&gt;
+<p>And keep track of events at our calendar
+<a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com">18pc0jur01k8f2cccvn5j04j1g@group.calendar.google.com</a></p>
 
-&lt;p&gt;If you need some help or want to chat you can find us on
-&amp;lt;irc://irc.freenode.net/#kubevirt&amp;gt;&lt;/p&gt;</content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html">This is a weekly update from the KubeVirt team.</summary></entry></feed>
+<p>If you need some help or want to chat you can find us on
+&lt;irc://irc.freenode.net/#kubevirt&gt;</p>]]></content><author><name>fabiand</name></author><category term="updates" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This is a weekly update from the KubeVirt team.]]></summary></entry></feed>

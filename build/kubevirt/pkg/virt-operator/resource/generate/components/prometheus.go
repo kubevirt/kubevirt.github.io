@@ -9,10 +9,18 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-const KUBEVIRT_PROMETHEUS_RULE_NAME = "prometheus-kubevirt-rules"
-const prometheusLabelKey = "prometheus.kubevirt.io"
-const prometheusLabelValue = "true"
-const runbookUrlBasePath = "https://kubevirt.io/monitoring/runbooks/"
+const (
+	KUBEVIRT_PROMETHEUS_RULE_NAME = "prometheus-kubevirt-rules"
+	prometheusLabelKey            = "prometheus.kubevirt.io"
+	prometheusLabelValue          = "true"
+	runbookUrlBasePath            = "https://kubevirt.io/monitoring/runbooks/"
+	severityAlertLabelKey         = "severity"
+	partOfAlertLabelKey           = "kubernetes_operator_part_of"
+	partOfAlertLabelValue         = "kubevirt"
+	componentAlertLabelKey        = "kubernetes_operator_component"
+	componentAlertLabelValue      = "kubevirt"
+	durationFiveMinutes           = "5 minutes"
+)
 
 func NewServiceMonitorCR(namespace string, monitorNamespace string, insecureSkipVerify bool) *v1.ServiceMonitor {
 	return &v1.ServiceMonitor{
@@ -98,7 +106,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "VirtAPIDown",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -114,7 +122,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "LowVirtAPICount",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -131,7 +139,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "LowKVMNodesCount",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -155,7 +163,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "LowReadyVirtControllersCount",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -167,7 +175,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "NoReadyVirtController",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -179,7 +187,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "VirtControllerDown",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -191,43 +199,42 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "LowVirtControllersCount",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
 						Record: "vec_by_virt_controllers_all_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-controller-.*', namespace='%s'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-controller", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_controllers_failed_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-controller-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-controller", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Record: "vec_by_virt_controllers_all_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-controller-.*', namespace='%s'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-controller", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_controllers_failed_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-controller-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-controller", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Alert: "VirtControllerRESTErrorsHigh",
 						Expr:  intstr.FromString("(vec_by_virt_controllers_failed_client_rest_requests_in_last_hour / vec_by_virt_controllers_all_client_rest_requests_in_last_hour) >= 0.05"),
-						For:   "5m",
 						Annotations: map[string]string{
 							"summary":     getRestCallsFailedWarning(5, "virt-controller", "hour"),
 							"runbook_url": runbookUrlBasePath + "VirtControllerRESTErrorsHigh",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -235,11 +242,11 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 						Expr:  intstr.FromString("(vec_by_virt_controllers_failed_client_rest_requests_in_last_5m / vec_by_virt_controllers_all_client_rest_requests_in_last_5m) >= 0.8"),
 						For:   "5m",
 						Annotations: map[string]string{
-							"summary":     getRestCallsFailedWarning(80, "virt-controller", "5 minutes"),
+							"summary":     getRestCallsFailedWarning(80, "virt-controller", durationFiveMinutes),
 							"runbook_url": runbookUrlBasePath + "VirtControllerRESTErrorsBurst",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -257,7 +264,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "VirtOperatorDown",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -269,43 +276,42 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "LowVirtOperatorCount",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
 						Record: "vec_by_virt_operators_all_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-operator-.*', namespace='%s'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-operator", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_operators_failed_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-operator-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-operator", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Record: "vec_by_virt_operators_all_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-operator-.*', namespace='%s'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-operator", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_operators_failed_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-operator-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-operator", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Alert: "VirtOperatorRESTErrorsHigh",
 						Expr:  intstr.FromString("(vec_by_virt_operators_failed_client_rest_requests_in_last_hour / vec_by_virt_operators_all_client_rest_requests_in_last_hour) >= 0.05"),
-						For:   "5m",
 						Annotations: map[string]string{
 							"summary":     getRestCallsFailedWarning(5, "virt-operator", "hour"),
 							"runbook_url": runbookUrlBasePath + "VirtOperatorRESTErrorsHigh",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -313,11 +319,11 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 						Expr:  intstr.FromString("(vec_by_virt_operators_failed_client_rest_requests_in_last_5m / vec_by_virt_operators_all_client_rest_requests_in_last_5m) >= 0.8"),
 						For:   "5m",
 						Annotations: map[string]string{
-							"summary":     getRestCallsFailedWarning(80, "virt-operator", "5 minutes"),
+							"summary":     getRestCallsFailedWarning(80, "virt-operator", durationFiveMinutes),
 							"runbook_url": runbookUrlBasePath + "VirtOperatorRESTErrorsBurst",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -341,7 +347,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "LowReadyVirtOperatorsCount",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -353,7 +359,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "NoReadyVirtOperator",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -365,7 +371,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "NoLeadingVirtOperator",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
@@ -384,43 +390,42 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "VirtHandlerDaemonSetRolloutFailing",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
 						Record: "vec_by_virt_handlers_all_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-handler-.*', namespace='%s'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-handler", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_handlers_all_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-handler-.*', namespace='%s'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-handler", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_handlers_failed_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-handler-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-handler", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Record: "vec_by_virt_handlers_failed_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-handler-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-handler", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Alert: "VirtHandlerRESTErrorsHigh",
 						Expr:  intstr.FromString("(vec_by_virt_handlers_failed_client_rest_requests_in_last_hour / vec_by_virt_handlers_all_client_rest_requests_in_last_hour) >= 0.05"),
-						For:   "5m",
 						Annotations: map[string]string{
 							"summary":     getRestCallsFailedWarning(5, "virt-handler", "hour"),
 							"runbook_url": runbookUrlBasePath + "VirtHandlerRESTErrorsHigh",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -428,46 +433,45 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 						Expr:  intstr.FromString("(vec_by_virt_handlers_failed_client_rest_requests_in_last_5m / vec_by_virt_handlers_all_client_rest_requests_in_last_5m) >= 0.8"),
 						For:   "5m",
 						Annotations: map[string]string{
-							"summary":     getRestCallsFailedWarning(80, "virt-handler", "5 minutes"),
+							"summary":     getRestCallsFailedWarning(80, "virt-handler", durationFiveMinutes),
 							"runbook_url": runbookUrlBasePath + "VirtHandlerRESTErrorsBurst",
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
 						Record: "vec_by_virt_apis_all_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-api-.*', namespace='%s'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-api", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_apis_all_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-api-.*', namespace='%s'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-api", ns, "")),
 						),
 					},
 					{
 						Record: "vec_by_virt_apis_failed_client_rest_requests_in_last_5m",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-api-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[5m]))", ns),
+							generateValueDifferenceInFiveMinutesQuery(generateAllPodRequestsQuery("virt-api", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Record: "vec_by_virt_apis_failed_client_rest_requests_in_last_hour",
 						Expr: intstr.FromString(
-							fmt.Sprintf("sum by (pod) (sum_over_time(rest_client_requests_total{pod=~'virt-api-.*', namespace='%s', code=~'(4|5)[0-9][0-9]'}[60m]))", ns),
+							generateValueDifferenceInHourQuery(generateAllPodRequestsQuery("virt-api", ns, "(4|5)[0-9][0-9]")),
 						),
 					},
 					{
 						Alert: "VirtApiRESTErrorsHigh",
 						Expr:  intstr.FromString("(vec_by_virt_apis_failed_client_rest_requests_in_last_hour / vec_by_virt_apis_all_client_rest_requests_in_last_hour) >= 0.05"),
-						For:   "5m",
 						Annotations: map[string]string{
 							"summary": getRestCallsFailedWarning(5, "virt-api", "hour"),
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -475,15 +479,19 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 						Expr:  intstr.FromString("(vec_by_virt_apis_failed_client_rest_requests_in_last_5m / vec_by_virt_apis_all_client_rest_requests_in_last_5m) >= 0.8"),
 						For:   "5m",
 						Annotations: map[string]string{
-							"summary": getRestCallsFailedWarning(80, "virt-api", "5 minutes"),
+							"summary": getRestCallsFailedWarning(80, "virt-api", durationFiveMinutes),
 						},
 						Labels: map[string]string{
-							"severity": "critical",
+							severityAlertLabelKey: "critical",
 						},
 					},
 					{
 						Record: "kubevirt_vm_container_free_memory_bytes",
 						Expr:   intstr.FromString("sum by(pod, container) ( kube_pod_container_resource_limits_memory_bytes{pod=~'virt-launcher-.*', container='compute'} - on(pod,container) container_memory_working_set_bytes{pod=~'virt-launcher-.*', container='compute'})"),
+					},
+					{
+						Record: "kubevirt_vmi_memory_used_bytes",
+						Expr:   intstr.FromString("kubevirt_vmi_memory_available_bytes-kubevirt_vmi_memory_usable_bytes"),
 					},
 					{
 						Alert: "KubevirtVmHighMemoryUsage",
@@ -495,7 +503,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "KubevirtVmHighMemoryUsage",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -511,7 +519,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "OrphanedVirtualMachineImages",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -524,7 +532,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "VMCannotBeEvicted",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -537,7 +545,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "KubeVirtComponentExceedsRequestedMemory",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 					{
@@ -552,7 +560,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 							"runbook_url": runbookUrlBasePath + "KubeVirtComponentExceedsRequestedCPU",
 						},
 						Labels: map[string]string{
-							"severity": "warning",
+							severityAlertLabelKey: "warning",
 						},
 					},
 				},
@@ -571,9 +579,19 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 				"runbook_url": runbookUrlBasePath + "OutdatedVirtualMachineInstanceWorkloads",
 			},
 			Labels: map[string]string{
-				"severity": "warning",
+				severityAlertLabelKey: "warning",
 			},
 		})
+	}
+
+	for _, group := range ruleSpec.Groups {
+		for _, rule := range group.Rules {
+			if rule.Alert == "" {
+				continue
+			}
+			rule.Labels[partOfAlertLabelKey] = partOfAlertLabelValue
+			rule.Labels[componentAlertLabelKey] = componentAlertLabelValue
+		}
 	}
 
 	return ruleSpec

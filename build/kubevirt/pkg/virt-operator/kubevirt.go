@@ -21,10 +21,13 @@ package virt_operator
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"reflect"
 	"sync"
 	"time"
+
+	"k8s.io/apimachinery/pkg/types"
 
 	"golang.org/x/time/rate"
 	appsv1 "k8s.io/api/apps/v1"
@@ -91,7 +94,7 @@ func NewKubeVirtController(
 	c := KubeVirtController{
 		clientset:        clientset,
 		aggregatorClient: aggregatorClient,
-		queue:            workqueue.NewNamedRateLimitingQueue(rl, "virt-operator"),
+		queue:            workqueue.NewNamedRateLimitingQueue(rl, VirtOperator),
 		kubeVirtInformer: informer,
 		recorder:         recorder,
 		stores:           stores,
@@ -667,9 +670,17 @@ func (c *KubeVirtController) execute(key string) error {
 		}
 	}
 
+	// If we detect a change on KubeVirt finalizers we update them
+	// Note: we don't own the metadata section so we need to use Patch() and not Update()
 	if !reflect.DeepEqual(kv.Finalizers, kvCopy.Finalizers) {
-		if _, err := c.clientset.KubeVirt(kvCopy.ObjectMeta.Namespace).Update(kvCopy); err != nil {
-			logger.Reason(err).Errorf("Could not update the KubeVirt resource.")
+		finalizersJson, err := json.Marshal(kvCopy.Finalizers)
+		if err != nil {
+			return err
+		}
+		patch := fmt.Sprintf(`[{"op": "replace", "path": "/metadata/finalizers", "value": %s}]`, string(finalizersJson))
+		_, err = c.clientset.KubeVirt(kvCopy.ObjectMeta.Namespace).Patch(kvCopy.Name, types.JSONPatchType, []byte(patch), &metav1.PatchOptions{})
+		if err != nil {
+			logger.Reason(err).Errorf("Could not patch the KubeVirt finalizers.")
 			return err
 		}
 	}
@@ -679,7 +690,7 @@ func (c *KubeVirtController) execute(key string) error {
 
 func (c *KubeVirtController) generateInstallStrategyJob(config *operatorutil.KubeVirtDeploymentConfig) (*batchv1.Job, error) {
 
-	operatorImage := fmt.Sprintf("%s/%s%s%s", config.GetImageRegistry(), config.GetImagePrefix(), "virt-operator", components.AddVersionSeparatorPrefix(config.GetOperatorVersion()))
+	operatorImage := fmt.Sprintf("%s/%s%s%s", config.GetImageRegistry(), config.GetImagePrefix(), VirtOperator, components.AddVersionSeparatorPrefix(config.GetOperatorVersion()))
 	deploymentConfigJson, err := config.GetJson()
 	if err != nil {
 		return nil, err
@@ -723,7 +734,7 @@ func (c *KubeVirtController) generateInstallStrategyJob(config *operatorutil.Kub
 							Image:           operatorImage,
 							ImagePullPolicy: config.GetImagePullPolicy(),
 							Command: []string{
-								"virt-operator",
+								VirtOperator,
 								"--dump-install-strategy",
 							},
 							Env: []k8sv1.EnvVar{

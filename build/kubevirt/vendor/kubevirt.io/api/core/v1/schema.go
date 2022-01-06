@@ -20,6 +20,8 @@
 package v1
 
 import (
+	"encoding/json"
+
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/types"
@@ -194,6 +196,9 @@ type DomainSpec struct {
 	// Chassis specifies the chassis info passed to the domain.
 	// +optional
 	Chassis *Chassis `json:"chassis,omitempty"`
+	// Launch Security setting of the vmi.
+	// +optional
+	LaunchSecurity *LaunchSecurity `json:"launchSecurity,omitempty"`
 }
 
 // Chassis specifies the chassis info passed to the domain.
@@ -454,7 +459,7 @@ type Devices struct {
 // moment only, USB devices using Usbredir's library and tooling. Another fit
 // would be a smartcard with libcacard.
 //
-// The struct is currently empty as there is no imediate request for
+// The struct is currently empty as there is no immediate request for
 // user-facing APIs. This structure simply turns on USB redirection of
 // UsbClientPassthroughMaxNumberOf devices.
 type ClientPassthroughDevices struct {
@@ -596,6 +601,14 @@ type DiskTarget struct {
 	// If specified, the virtual disk will be placed on the guests pci address with the specified PCI address. For example: 0000:81:01.10
 	// +optional
 	PciAddress string `json:"pciAddress,omitempty"`
+}
+
+type LaunchSecurity struct {
+	// AMD Secure Encrypted Virtualization (SEV).
+	SEV *SEV `json:"sev,omitempty"`
+}
+
+type SEV struct {
 }
 
 type LunTarget struct {
@@ -1138,6 +1151,24 @@ type DHCPOptions struct {
 	PrivateOptions []DHCPPrivateOptions `json:"privateOptions,omitempty"`
 }
 
+func (d *DHCPOptions) UnmarshalJSON(data []byte) error {
+	type DHCPOptionsAlias DHCPOptions
+	var dhcpOptionsAlias DHCPOptionsAlias
+
+	if err := json.Unmarshal(data, &dhcpOptionsAlias); err != nil {
+		return err
+	}
+
+	for i, ntpServer := range dhcpOptionsAlias.NTPServers {
+		if sanitizedIP, err := sanitizeIP(ntpServer); err == nil {
+			dhcpOptionsAlias.NTPServers[i] = sanitizedIP
+		}
+	}
+
+	*d = DHCPOptions(dhcpOptionsAlias)
+	return nil
+}
+
 // DHCPExtraOptions defines Extra DHCP options for a VM.
 type DHCPPrivateOptions struct {
 	// Option is an Integer value from 224-254
@@ -1168,7 +1199,7 @@ type InterfaceSRIOV struct{}
 
 type InterfaceMacvtap struct{}
 
-// Port repesents a port to expose from the virtual machine.
+// Port represents a port to expose from the virtual machine.
 // Default protocol TCP.
 // The port field is mandatory
 type Port struct {
@@ -1318,6 +1349,22 @@ type PodNetwork struct {
 	// IPv6 CIDR for the vm network.
 	// Defaults to fd10:0:2::/120 if not specified.
 	VMIPv6NetworkCIDR string `json:"vmIPv6NetworkCIDR,omitempty"`
+}
+
+func (podNet *PodNetwork) UnmarshalJSON(data []byte) error {
+	type PodNetworkAlias PodNetwork
+	var podNetAlias PodNetworkAlias
+
+	if err := json.Unmarshal(data, &podNetAlias); err != nil {
+		return err
+	}
+
+	if sanitizedCIDR, err := sanitizeCIDR(podNetAlias.VMNetworkCIDR); err == nil {
+		podNetAlias.VMNetworkCIDR = sanitizedCIDR
+	}
+
+	*podNet = PodNetwork(podNetAlias)
+	return nil
 }
 
 // Rng represents the random device passed from host

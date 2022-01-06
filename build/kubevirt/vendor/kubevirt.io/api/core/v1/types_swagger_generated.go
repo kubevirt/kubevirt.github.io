@@ -130,6 +130,7 @@ func (VirtualMachineInstanceNetworkInterface) SwaggerDoc() map[string]string {
 		"name":          "Name of the interface, corresponds to name of the network assigned to the interface",
 		"ipAddresses":   "List of all IP addresses of a Virtual Machine interface",
 		"interfaceName": "The interface name inside the Virtual Machine",
+		"infoSource":    "Specifies the origin of the interface data collected. values: domain, guest-agent, or both",
 	}
 }
 
@@ -166,6 +167,8 @@ func (VirtualMachineInstanceMigrationState) SwaggerDoc() map[string]string {
 		"mode":                           "Lets us know if the vmi is currently running pre or post copy migration",
 		"migrationPolicyName":            "Name of the migration policy. If string is empty, no policy is matched",
 		"migrationConfiguration":         "Migration configurations to apply",
+		"targetCPUSet":                   "If the VMI requires dedicated CPUs, this field will\nhold the dedicated CPU set on the target node\n+listType=atomic",
+		"targetNodeTopology":             "If the VMI requires dedicated CPUs, this field will\nhold the numa topology on the target node",
 	}
 }
 
@@ -589,13 +592,15 @@ func (AddVolumeOptions) SwaggerDoc() map[string]string {
 		"name":         "Name represents the name that will be used to map the\ndisk to the corresponding volume. This overrides any name\nset inside the Disk struct itself.",
 		"disk":         "Disk represents the hotplug disk that will be plugged into the running VMI",
 		"volumeSource": "VolumeSource represents the source of the volume to map to the disk.",
+		"dryRun":       "When present, indicates that modifications should not be\npersisted. An invalid or unrecognized dryRun directive will\nresult in an error response and no further processing of the\nrequest. Valid values are:\n- All: all dry run stages will be processed\n+optional\n+listType=atomic",
 	}
 }
 
 func (RemoveVolumeOptions) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":     "RemoveVolumeOptions is provided when dynamically hot unplugging volume and disk",
-		"name": "Name represents the name that maps to both the disk and volume that\nshould be removed",
+		"":       "RemoveVolumeOptions is provided when dynamically hot unplugging volume and disk",
+		"name":   "Name represents the name that maps to both the disk and volume that\nshould be removed",
+		"dryRun": "When present, indicates that modifications should not be\npersisted. An invalid or unrecognized dryRun directive will\nresult in an error response and no further processing of the\nrequest. Valid values are:\n- All: all dry run stages will be processed\n+optional\n+listType=atomic",
 	}
 }
 
@@ -687,7 +692,16 @@ func (MediatedHostDevice) SwaggerDoc() map[string]string {
 
 func (MediatedDevicesConfiguration) SwaggerDoc() map[string]string {
 	return map[string]string{
-		"":                     "MediatedDevicesConfiguration holds inforamtion about MDEV types to be defined, if available",
+		"":                        "MediatedDevicesConfiguration holds inforamtion about MDEV types to be defined, if available",
+		"mediatedDevicesTypes":    "+listType=atomic",
+		"nodeMediatedDeviceTypes": "+optional\n+listType=atomic",
+	}
+}
+
+func (NodeMediatedDeviceTypesConfig) SwaggerDoc() map[string]string {
+	return map[string]string{
+		"":                     "NodeMediatedDeviceTypesConfig holds inforamtion about MDEV types to be defined in a specifc node that matches the NodeSelector field.\n+k8s:openapi-gen=true",
+		"nodeSelector":         "NodeSelector is a selector which must be true for the vmi to fit on a node.\nSelector which must match a node's labels for the vmi to be scheduled on that node.\nMore info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/",
 		"mediatedDevicesTypes": "+listType=atomic",
 	}
 }

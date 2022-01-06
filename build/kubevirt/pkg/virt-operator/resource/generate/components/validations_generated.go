@@ -705,6 +705,31 @@ var CRDsValidation map[string]string = map[string]string{
                     type: string
                   type: array
                   x-kubernetes-list-type: atomic
+                nodeMediatedDeviceTypes:
+                  items:
+                    description: NodeMediatedDeviceTypesConfig holds inforamtion about
+                      MDEV types to be defined in a specifc node that matches the
+                      NodeSelector field.
+                    properties:
+                      mediatedDevicesTypes:
+                        items:
+                          type: string
+                        type: array
+                        x-kubernetes-list-type: atomic
+                      nodeSelector:
+                        additionalProperties:
+                          type: string
+                        description: 'NodeSelector is a selector which must be true
+                          for the vmi to fit on a node. Selector which must match
+                          a node''s labels for the vmi to be scheduled on that node.
+                          More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/'
+                        type: object
+                    required:
+                    - mediatedDevicesTypes
+                    - nodeSelector
+                    type: object
+                  type: array
+                  x-kubernetes-list-type: atomic
               type: object
             memBalloonStatsPeriod:
               format: int32
@@ -727,6 +752,8 @@ var CRDsValidation map[string]string = map[string]string{
                   type: integer
                 disableTLS:
                   type: boolean
+                network:
+                  type: string
                 nodeDrainTaintKey:
                   type: string
                 parallelMigrationsPerCluster:
@@ -2425,8 +2452,6 @@ var CRDsValidation map[string]string = map[string]string{
         completionTimeoutPerGiB:
           format: int64
           type: integer
-        disableTLS:
-          type: boolean
         selectors:
           properties:
             namespaceSelector:
@@ -4347,7 +4372,7 @@ var CRDsValidation map[string]string = map[string]string{
                                 description: List of ports to be forwarded to the
                                   virtual machine.
                                 items:
-                                  description: Port repesents a port to expose from
+                                  description: Port represents a port to expose from
                                     the virtual machine. Default protocol TCP. The
                                     port field is mandatory
                                   properties:
@@ -4734,6 +4759,13 @@ var CRDsValidation map[string]string = map[string]string{
                         Omitting IOThreadsPolicy disables use of IOThreads. One of:
                         shared, auto'
                       type: string
+                    launchSecurity:
+                      description: Launch Security setting of the vmi.
+                      properties:
+                        sev:
+                          description: AMD Secure Encrypted Virtualization (SEV).
+                          type: object
+                      type: object
                     machine:
                       description: Machine type.
                       properties:
@@ -5787,6 +5819,16 @@ var CRDsValidation map[string]string = map[string]string{
                     required:
                     - name
                     type: object
+                  dryRun:
+                    description: 'When present, indicates that modifications should
+                      not be persisted. An invalid or unrecognized dryRun directive
+                      will result in an error response and no further processing of
+                      the request. Valid values are: - All: all dry run stages will
+                      be processed'
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: atomic
                   name:
                     description: Name represents the name that will be used to map
                       the disk to the corresponding volume. This overrides any name
@@ -5844,6 +5886,16 @@ var CRDsValidation map[string]string = map[string]string{
                   be removed. The details within this field specify how to add the
                   volume
                 properties:
+                  dryRun:
+                    description: 'When present, indicates that modifications should
+                      not be persisted. An invalid or unrecognized dryRun directive
+                      will result in an error response and no further processing of
+                      the request. Valid values are: - All: all dry run stages will
+                      be processed'
+                    items:
+                      type: string
+                    type: array
+                    x-kubernetes-list-type: atomic
                   name:
                     description: Name represents the name that maps to both the disk
                       and volume that should be removed
@@ -7339,7 +7391,7 @@ var CRDsValidation map[string]string = map[string]string{
                         description: List of ports to be forwarded to the virtual
                           machine.
                         items:
-                          description: Port repesents a port to expose from the virtual
+                          description: Port represents a port to expose from the virtual
                             machine. Default protocol TCP. The port field is mandatory
                           properties:
                             name:
@@ -7694,6 +7746,13 @@ var CRDsValidation map[string]string = map[string]string{
               description: 'Controls whether or not disks will share IOThreads. Omitting
                 IOThreadsPolicy disables use of IOThreads. One of: shared, auto'
               type: string
+            launchSecurity:
+              description: Launch Security setting of the vmi.
+              properties:
+                sev:
+                  description: AMD Secure Encrypted Virtualization (SEV).
+                  type: object
+              type: object
             machine:
               description: Machine type.
               properties:
@@ -8562,6 +8621,10 @@ var CRDsValidation map[string]string = map[string]string{
           description: Interfaces represent the details of available network interfaces.
           items:
             properties:
+              infoSource:
+                description: 'Specifies the origin of the interface data collected.
+                  values: domain, guest-agent, or both'
+                type: string
               interfaceName:
                 description: The interface name inside the Virtual Machine
                 type: string
@@ -8578,9 +8641,8 @@ var CRDsValidation map[string]string = map[string]string{
                 description: Hardware address of a Virtual Machine interface
                 type: string
               name:
-                description: 'Name of the interface, corresponds to name of the network
-                  assigned to the interface TODO: remove omitempty, when api breaking
-                  changes are allowed'
+                description: Name of the interface, corresponds to name of the network
+                  assigned to the interface
                 type: string
             type: object
           type: array
@@ -8630,6 +8692,8 @@ var CRDsValidation map[string]string = map[string]string{
                   type: integer
                 disableTLS:
                   type: boolean
+                network:
+                  type: string
                 nodeDrainTaintKey:
                   type: string
                 parallelMigrationsPerCluster:
@@ -8667,6 +8731,13 @@ var CRDsValidation map[string]string = map[string]string{
             targetAttachmentPodUID:
               description: The UID of the target attachment pod for hotplug volumes
               type: string
+            targetCPUSet:
+              description: If the VMI requires dedicated CPUs, this field will hold
+                the dedicated CPU set on the target node
+              items:
+                type: integer
+              type: array
+              x-kubernetes-list-type: atomic
             targetDirectMigrationNodePorts:
               additionalProperties:
                 type: integer
@@ -8682,6 +8753,10 @@ var CRDsValidation map[string]string = map[string]string{
             targetNodeDomainDetected:
               description: The Target Node has seen the Domain Start Event
               type: boolean
+            targetNodeTopology:
+              description: If the VMI requires dedicated CPUs, this field will hold
+                the numa topology on the target node
+              type: string
             targetPod:
               description: The target pod that the VMI is moving to
               type: string
@@ -9411,7 +9486,7 @@ var CRDsValidation map[string]string = map[string]string{
                         description: List of ports to be forwarded to the virtual
                           machine.
                         items:
-                          description: Port repesents a port to expose from the virtual
+                          description: Port represents a port to expose from the virtual
                             machine. Default protocol TCP. The port field is mandatory
                           properties:
                             name:
@@ -9766,6 +9841,13 @@ var CRDsValidation map[string]string = map[string]string{
               description: 'Controls whether or not disks will share IOThreads. Omitting
                 IOThreadsPolicy disables use of IOThreads. One of: shared, auto'
               type: string
+            launchSecurity:
+              description: Launch Security setting of the vmi.
+              properties:
+                sev:
+                  description: AMD Secure Encrypted Virtualization (SEV).
+                  type: object
+              type: object
             machine:
               description: Machine type.
               properties:
@@ -11231,7 +11313,7 @@ var CRDsValidation map[string]string = map[string]string{
                                 description: List of ports to be forwarded to the
                                   virtual machine.
                                 items:
-                                  description: Port repesents a port to expose from
+                                  description: Port represents a port to expose from
                                     the virtual machine. Default protocol TCP. The
                                     port field is mandatory
                                   properties:
@@ -11618,6 +11700,13 @@ var CRDsValidation map[string]string = map[string]string{
                         Omitting IOThreadsPolicy disables use of IOThreads. One of:
                         shared, auto'
                       type: string
+                    launchSecurity:
+                      description: Launch Security setting of the vmi.
+                      properties:
+                        sev:
+                          description: AMD Secure Encrypted Virtualization (SEV).
+                          type: object
+                      type: object
                     machine:
                       description: Machine type.
                       properties:
@@ -14505,7 +14594,7 @@ var CRDsValidation map[string]string = map[string]string{
                                         description: List of ports to be forwarded
                                           to the virtual machine.
                                         items:
-                                          description: Port repesents a port to expose
+                                          description: Port represents a port to expose
                                             from the virtual machine. Default protocol
                                             TCP. The port field is mandatory
                                           properties:
@@ -14911,6 +15000,14 @@ var CRDsValidation map[string]string = map[string]string{
                                 IOThreads. Omitting IOThreadsPolicy disables use of
                                 IOThreads. One of: shared, auto'
                               type: string
+                            launchSecurity:
+                              description: Launch Security setting of the vmi.
+                              properties:
+                                sev:
+                                  description: AMD Secure Encrypted Virtualization
+                                    (SEV).
+                                  type: object
+                              type: object
                             machine:
                               description: Machine type.
                               properties:
@@ -18122,9 +18219,10 @@ var CRDsValidation map[string]string = map[string]string{
                                             description: List of ports to be forwarded
                                               to the virtual machine.
                                             items:
-                                              description: Port repesents a port to
-                                                expose from the virtual machine. Default
-                                                protocol TCP. The port field is mandatory
+                                              description: Port represents a port
+                                                to expose from the virtual machine.
+                                                Default protocol TCP. The port field
+                                                is mandatory
                                               properties:
                                                 name:
                                                   description: If specified, this
@@ -18542,6 +18640,14 @@ var CRDsValidation map[string]string = map[string]string{
                                     share IOThreads. Omitting IOThreadsPolicy disables
                                     use of IOThreads. One of: shared, auto'
                                   type: string
+                                launchSecurity:
+                                  description: Launch Security setting of the vmi.
+                                  properties:
+                                    sev:
+                                      description: AMD Secure Encrypted Virtualization
+                                        (SEV).
+                                      type: object
+                                  type: object
                                 machine:
                                   description: Machine type.
                                   properties:
@@ -19697,6 +19803,16 @@ var CRDsValidation map[string]string = map[string]string{
                                 required:
                                 - name
                                 type: object
+                              dryRun:
+                                description: 'When present, indicates that modifications
+                                  should not be persisted. An invalid or unrecognized
+                                  dryRun directive will result in an error response
+                                  and no further processing of the request. Valid
+                                  values are: - All: all dry run stages will be processed'
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
                               name:
                                 description: Name represents the name that will be
                                   used to map the disk to the corresponding volume.
@@ -19756,6 +19872,16 @@ var CRDsValidation map[string]string = map[string]string{
                               volume should be removed. The details within this field
                               specify how to add the volume
                             properties:
+                              dryRun:
+                                description: 'When present, indicates that modifications
+                                  should not be persisted. An invalid or unrecognized
+                                  dryRun directive will result in an error response
+                                  and no further processing of the request. Valid
+                                  values are: - All: all dry run stages will be processed'
+                                items:
+                                  type: string
+                                type: array
+                                x-kubernetes-list-type: atomic
                               name:
                                 description: Name represents the name that maps to
                                   both the disk and volume that should be removed
