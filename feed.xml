@@ -1,4 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-06T22:33:42+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.48.0</title><link href="https://kubevirt.io//2021/changelog-v0.48.0.html" rel="alternate" type="text/html" title="KubeVirt v0.48.0" /><published>2021-12-06T00:00:00+00:00</published><updated>2021-12-06T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.48.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.48.0.html"><![CDATA[<h2 id="v0480">v0.48.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-13T18:28:23+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.49.0</title><link href="https://kubevirt.io//2022/changelog-v0.49.0.html" rel="alternate" type="text/html" title="KubeVirt v0.49.0" /><published>2022-01-11T00:00:00+00:00</published><updated>2022-01-11T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.49.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.49.0.html"><![CDATA[<h2 id="v0490">v0.49.0</h2>
+
+<p>Released on: Tue Jan 11 17:27:09 2022 +0000</p>
+
+<ul>
+  <li>[PR #7004][iholder-redhat] Bugfix: Avoid setting block migration for volumes used by read-only disks</li>
+  <li>[PR #6959][enp0s3] generate event when target pod enters unschedulable phase</li>
+  <li>[PR #6888][assafad] Added common labels into alert definitions</li>
+  <li>[PR #6166][vasiliy-ul] Experimental support of AMD SEV</li>
+  <li>[PR #6980][vasiliy-ul] Updated the dependencies to include the fix for CVE-2021-43565 (KubeVirt is not affected)</li>
+  <li>[PR #6944][iholder-redhat] Remove disabling TLS configuration from Live Migration Policies</li>
+  <li>[PR #6800][jean-edouard] CPU pinning doesn’t require hardware-assisted virtualization anymore</li>
+  <li>[PR #6501][ShellyKa13] Use virtctl image-upload to upload archive content</li>
+  <li>[PR #6918][iholder-redhat] Bug fix: Unscheduable host-model VMI alert is now properly triggered</li>
+  <li>[PR #6796][Barakmor1] ‘kubevirt-operator’ changed to ‘virt-operator’ on ‘managed-by’ label in kubevirt’s components made by virt-operator</li>
+  <li>[PR #6036][jean-edouard] Migrations can now be done over a dedicated multus network</li>
+  <li>[PR #6933][erkanerol] Add a new lane for monitoring tests</li>
+  <li>[PR #6949][jean-edouard] KubeVirt components should now be successfully removed on CR deletion, even when using only 1 replica for virt-api and virt-controller</li>
+  <li>[PR #6954][maiqueb] Update the <code class="language-plaintext highlighter-rouge">virtctl</code> exposed services <code class="language-plaintext highlighter-rouge">IPFamilyPolicyType</code> default to <code class="language-plaintext highlighter-rouge">IPFamilyPolicyPreferDualStack</code></li>
+  <li>[PR #6931][fossedihelm] added DryRun to AddVolumeOptions and RemoveVolumeOptions</li>
+  <li>[PR #6379][nunnatsa] Fix issue https://bugzilla.redhat.com/show_bug.cgi?id=1945593</li>
+  <li>[PR #6399][iholder-redhat] Introduce live migration policies that allow system-admins to have fine-grained control over migration configuration for different sets of VMs.</li>
+  <li>[PR #6880][iholder-redhat] Add full Podman support for <code class="language-plaintext highlighter-rouge">make</code> and <code class="language-plaintext highlighter-rouge">make test</code></li>
+  <li>[PR #6702][acardace] implement virt-handler canary upgrade and rollback for faster and safer rollouts</li>
+  <li>[PR #6717][davidvossel] Introducing the VirtualMachinePools feature for managing stateful VMs at scale</li>
+  <li>[PR #6698][rthallisey] Add tracing to the virt-controller work queue</li>
+  <li>[PR #6762][fossedihelm] added DryRun mode to virtcl to migrate command</li>
+  <li>[PR #6891][rmohr] Fix “Make raw terminal failed: The handle is invalid?” issue with “virtctl console” when not executed in a pty</li>
+  <li>[PR #6783][rmohr] Skip SSH RSA auth if no RSA key was explicitly provided and not key exists at the default location</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.49.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.48.0</title><link href="https://kubevirt.io//2021/changelog-v0.48.0.html" rel="alternate" type="text/html" title="KubeVirt v0.48.0" /><published>2021-12-06T00:00:00+00:00</published><updated>2021-12-06T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.48.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.48.0.html"><![CDATA[<h2 id="v0480">v0.48.0</h2>
 
 <p>Released on: Mon Dec 6 18:26:51 2021 +0000</p>
 
@@ -983,36 +1012,4 @@ VirtualMachine             testvm     myvms         <span class="nb">false</span
   <li>[PR #5759][mhenriks] Update CDI to 1.34.1</li>
   <li>[PR #5038][kwiesmueller] Add exec command to VM liveness and readinessProbe executed through the qemu-guest-agent.</li>
   <li>[PR #5431][alonSadan] Add NFT and IPTables rules to allow port-forward to non-declared ports on the VMI. Declaring ports on VMI will limit</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.43.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.42.0</title><link href="https://kubevirt.io//2021/changelog-v0.42.0.html" rel="alternate" type="text/html" title="KubeVirt v0.42.0" /><published>2021-06-08T00:00:00+00:00</published><updated>2021-06-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.42.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.42.0.html"><![CDATA[<h2 id="v0420">v0.42.0</h2>
-
-<p>Released on: Tue Jun 8 12:09:49 2021 +0000</p>
-
-<ul>
-  <li>[PR #5738][rmohr] Stop releasing jinja2 templates of our operator. Kustomize is the preferred way for customizations.</li>
-  <li>[PR #5691][ashleyschuett] Allow multiple shutdown events to ensure the event is received by ACPI</li>
-  <li>[PR #5558][ormergi] Drop virt-launcher SYS_RESOURCE capability</li>
-  <li>[PR #5694][davidvossel] Fixes null pointer dereference in migration controller</li>
-  <li>[PR #5416][iholder-redhat] [feature] support booting VMs from a custom kernel/initrd images with custom kernel arguments</li>
-  <li>[PR #5495][iholder-redhat] Go version updated to version 1.16.1.</li>
-  <li>[PR #5502][rmohr] Add downwardMetrics volume to expose a limited set of hots metrics to guests</li>
-  <li>[PR #5601][maya-r] Update libvirt-go to 7.3.0</li>
-  <li>[PR #5661][davidvossel] Validation/Mutation webhooks now explicitly define a 10 second timeout period</li>
-  <li>[PR #5652][rmohr] Automatically discover kube-prometheus installations and configure kubevirt monitoring</li>
-  <li>[PR #5631][davidvossel] Expand backport policy to include logging and debug fixes</li>
-  <li>[PR #5528][zcahana] Introduced a “status.printableStatus” field in the VirtualMachine CRD. This field is now displayed in the tabular output of “kubectl get vm”.</li>
-  <li>[PR #5200][rhrazdil] Add support for Istio proxy traffic routing with masquerade interface. nftables is required for this feature.</li>
-  <li>[PR #5560][oshoval] virt-launcher now populates domain’s guestOS info and interfaces status according guest agent also when doing periodic resyncs.</li>
-  <li>[PR #5514][rhrazdil] Fix live-migration failing when VM with masquarade iface has explicitly specified any of these ports: 22222, 49152, 49153</li>
-  <li>[PR #5583][dhiller] Reenable coverage</li>
-  <li>[PR #5129][davidvossel] Gracefully shutdown virt-api connections and ensure zero exit code under normal shutdown conditions</li>
-  <li>[PR #5582][dhiller] Fix flaky unit tests</li>
-  <li>[PR #5600][davidvossel] Improved logging around VM/VMI shutdown and restart</li>
-  <li>[PR #5564][omeryahud] virtctl rename support is dropped</li>
-  <li>[PR #5585][iholder-redhat] [bugfix] - reject VM defined with volume with no matching disk</li>
-  <li>[PR #5595][zcahana] Fixes adoption of orphan DataVolumes</li>
-  <li>[PR #5566][davidvossel] Release branches are now cut on the first <em>business day</em> of the month rather than the first day.</li>
-  <li>[PR #5108][Omar007] Fixes handling of /proc/<pid>/mountpoint by working on the device information instead of mount information</pid></li>
-  <li>[PR #5250][mlsorensen] Controller health checks will no longer actively test connectivity to the Kubernetes API. They will rely in health of their watches to determine if they have API connectivity.</li>
-  <li>[PR #5563][ashleyschuett] Set KubeVirt resources flags in the KubeVirt CR</li>
-  <li>[PR #5328][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 7.0.0 and QEMU 5.2.0.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.42.0 changes]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.43.0 changes]]></summary></entry></feed>

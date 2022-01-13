@@ -4227,6 +4227,11 @@ var CRDsValidation map[string]string = map[string]string{
                                 description: Name of the GPU device as exposed by
                                   a device plugin
                                 type: string
+                              tag:
+                                description: If specified, the virtual network interface
+                                  address and its tag will be provided to the guest
+                                  via config drive
+                                type: string
                               virtualGPUOptions:
                                 properties:
                                   display:
@@ -4264,6 +4269,11 @@ var CRDsValidation map[string]string = map[string]string{
                                   host device exposed by a device plugin
                                 type: string
                               name:
+                                type: string
+                              tag:
+                                description: If specified, the virtual network interface
+                                  address and its tag will be provided to the guest
+                                  via config drive
                                 type: string
                             required:
                             - deviceName
@@ -7250,6 +7260,10 @@ var CRDsValidation map[string]string = map[string]string{
                         description: Name of the GPU device as exposed by a device
                           plugin
                         type: string
+                      tag:
+                        description: If specified, the virtual network interface address
+                          and its tag will be provided to the guest via config drive
+                        type: string
                       virtualGPUOptions:
                         properties:
                           display:
@@ -7286,6 +7300,10 @@ var CRDsValidation map[string]string = map[string]string{
                           exposed by a device plugin
                         type: string
                       name:
+                        type: string
+                      tag:
+                        description: If specified, the virtual network interface address
+                          and its tag will be provided to the guest via config drive
                         type: string
                     required:
                     - deviceName
@@ -8857,7 +8875,7 @@ var CRDsValidation map[string]string = map[string]string{
                       pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
                       x-kubernetes-int-or-string: true
                     description: Capacity represents the capacity set on the corresponding
-                      PVC spec
+                      PVC status
                     type: object
                   filesystemOverhead:
                     description: Percentage of filesystem's size to be reserved when
@@ -8868,6 +8886,16 @@ var CRDsValidation map[string]string = map[string]string{
                     description: Preallocated indicates if the PVC's storage is preallocated
                       or not
                     type: boolean
+                  requests:
+                    additionalProperties:
+                      anyOf:
+                      - type: integer
+                      - type: string
+                      pattern: ^(\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))(([KMGTPE]i)|[numkMGTPE]|([eE](\+|-)?(([0-9]+(\.[0-9]*)?)|(\.[0-9]+))))?$
+                      x-kubernetes-int-or-string: true
+                    description: Requests represents the resources requested by the
+                      corresponding PVC spec
+                    type: object
                   volumeMode:
                     description: VolumeMode defines what type of volume is required
                       by the claim. Value of Filesystem is implied when not included
@@ -9345,6 +9373,10 @@ var CRDsValidation map[string]string = map[string]string{
                         description: Name of the GPU device as exposed by a device
                           plugin
                         type: string
+                      tag:
+                        description: If specified, the virtual network interface address
+                          and its tag will be provided to the guest via config drive
+                        type: string
                       virtualGPUOptions:
                         properties:
                           display:
@@ -9381,6 +9413,10 @@ var CRDsValidation map[string]string = map[string]string{
                           exposed by a device plugin
                         type: string
                       name:
+                        type: string
+                      tag:
+                        description: If specified, the virtual network interface address
+                          and its tag will be provided to the guest via config drive
                         type: string
                     required:
                     - deviceName
@@ -11168,6 +11204,11 @@ var CRDsValidation map[string]string = map[string]string{
                                 description: Name of the GPU device as exposed by
                                   a device plugin
                                 type: string
+                              tag:
+                                description: If specified, the virtual network interface
+                                  address and its tag will be provided to the guest
+                                  via config drive
+                                type: string
                               virtualGPUOptions:
                                 properties:
                                   display:
@@ -11205,6 +11246,11 @@ var CRDsValidation map[string]string = map[string]string{
                                   host device exposed by a device plugin
                                 type: string
                               name:
+                                type: string
+                              tag:
+                                description: If specified, the virtual network interface
+                                  address and its tag will be provided to the guest
+                                  via config drive
                                 type: string
                             required:
                             - deviceName
@@ -14439,6 +14485,11 @@ var CRDsValidation map[string]string = map[string]string{
                                         description: Name of the GPU device as exposed
                                           by a device plugin
                                         type: string
+                                      tag:
+                                        description: If specified, the virtual network
+                                          interface address and its tag will be provided
+                                          to the guest via config drive
+                                        type: string
                                       virtualGPUOptions:
                                         properties:
                                           display:
@@ -14479,6 +14530,11 @@ var CRDsValidation map[string]string = map[string]string{
                                           of the host device exposed by a device plugin
                                         type: string
                                       name:
+                                        type: string
+                                      tag:
+                                        description: If specified, the virtual network
+                                          interface address and its tag will be provided
+                                          to the guest via config drive
                                         type: string
                                     required:
                                     - deviceName
@@ -18061,6 +18117,12 @@ var CRDsValidation map[string]string = map[string]string{
                                             description: Name of the GPU device as
                                               exposed by a device plugin
                                             type: string
+                                          tag:
+                                            description: If specified, the virtual
+                                              network interface address and its tag
+                                              will be provided to the guest via config
+                                              drive
+                                            type: string
                                           virtualGPUOptions:
                                             properties:
                                               display:
@@ -18103,6 +18165,12 @@ var CRDsValidation map[string]string = map[string]string{
                                               device plugin
                                             type: string
                                           name:
+                                            type: string
+                                          tag:
+                                            description: If specified, the virtual
+                                              network interface address and its tag
+                                              will be provided to the guest via config
+                                              drive
                                             type: string
                                         required:
                                         - deviceName

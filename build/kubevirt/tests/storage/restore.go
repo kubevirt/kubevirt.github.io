@@ -397,7 +397,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 		})
 	})
 
-	Context("[rook-ceph]", func() {
+	Context("[storage-req]", func() {
 		Context("With a more complicated VM", func() {
 			var (
 				vm                   *v1.VirtualMachine
@@ -435,7 +435,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineRestore Tests", func() {
 				}
 			})
 
-			doRestore := func(device string, login console.LoginToFactory, onlineSnapshot bool) {
+			doRestore := func(device string, login console.LoginToFunction, onlineSnapshot bool) {
 				By("creating 'message with initial value")
 				Expect(libnet.WithIPv6(login)(vmi)).To(Succeed())
 

@@ -264,9 +264,13 @@ type PersistentVolumeClaimInfo struct {
 	// +optional
 	VolumeMode *k8sv1.PersistentVolumeMode `json:"volumeMode,omitempty"`
 
-	// Capacity represents the capacity set on the corresponding PVC spec
+	// Capacity represents the capacity set on the corresponding PVC status
 	// +optional
 	Capacity k8sv1.ResourceList `json:"capacity,omitempty"`
+
+	// Requests represents the resources requested by the corresponding PVC spec
+	// +optional
+	Requests k8sv1.ResourceList `json:"requests,omitempty"`
 
 	// Preallocated indicates if the PVC's storage is preallocated or not
 	// +optional
@@ -1429,6 +1433,8 @@ const (
 	CacheNone DriverCache = "none"
 	// CacheWriteThrough - I/O from the guest is cached on the host but written through to the physical medium.
 	CacheWriteThrough DriverCache = "writethrough"
+	// CacheWriteBack - I/O from the guest is cached on the host.
+	CacheWriteBack DriverCache = "writeback"
 
 	// IOThreads - User mode based threads with a shared lock that perform I/O tasks. Can impact performance but offers
 	// more predictable behaviour. This method is also takes fewer CPU cycles to submit I/O requests.

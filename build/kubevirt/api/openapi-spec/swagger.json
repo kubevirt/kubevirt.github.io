@@ -13397,6 +13397,10 @@
       "description": "Name of the GPU device as exposed by a device plugin",
       "type": "string"
      },
+     "tag": {
+      "description": "If specified, the virtual network interface address and its tag will be provided to the guest via config drive",
+      "type": "string"
+     },
      "virtualGPUOptions": {
       "$ref": "#/definitions/v1.VGPUOptions"
      }
@@ -13483,6 +13487,10 @@
       "type": "string"
      },
      "name": {
+      "type": "string"
+     },
+     "tag": {
+      "description": "If specified, the virtual network interface address and its tag will be provided to the guest via config drive",
       "type": "string"
      }
     }
@@ -14448,7 +14456,7 @@
       "x-kubernetes-list-type": "atomic"
      },
      "capacity": {
-      "description": "Capacity represents the capacity set on the corresponding PVC spec",
+      "description": "Capacity represents the capacity set on the corresponding PVC status",
       "type": "object",
       "additionalProperties": {
        "$ref": "#/definitions/k8s.io.apimachinery.pkg.api.resource.Quantity"
@@ -14461,6 +14469,13 @@
      "preallocated": {
       "description": "Preallocated indicates if the PVC's storage is preallocated or not",
       "type": "boolean"
+     },
+     "requests": {
+      "description": "Requests represents the resources requested by the corresponding PVC spec",
+      "type": "object",
+      "additionalProperties": {
+       "$ref": "#/definitions/k8s.io.apimachinery.pkg.api.resource.Quantity"
+      }
      },
      "volumeMode": {
       "description": "VolumeMode defines what type of volume is required by the claim. Value of Filesystem is implied when not included in claim spec.",

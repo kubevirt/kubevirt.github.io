@@ -248,7 +248,7 @@ var _ = SIGDescribe("[Serial]VirtualMachineSnapshot Tests", func() {
 		})
 	})
 
-	Context("[rook-ceph]", func() {
+	Context("[storage-req]", func() {
 		Context("With online vm snapshot", func() {
 			var (
 				snapshotStorageClass string
@@ -713,10 +713,11 @@ var _ = SIGDescribe("[Serial]VirtualMachineSnapshot Tests", func() {
 				}
 
 				running := false
-				vm = tests.NewRandomVMWithDataVolumeInStorageClass(
+				vm = tests.NewRandomVMWithDataVolumeWithRegistryImport(
 					cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine),
 					util.NamespaceTestDefault,
 					sc,
+					corev1.ReadWriteOnce,
 				)
 				vm.Spec.Running = &running
 
@@ -1067,6 +1068,11 @@ func getSnapshotStorageClass(client kubecli.KubevirtClient) (string, error) {
 
 	if !hasV1beta1 {
 		return "", nil
+	}
+
+	configuredStorageClass, exists := tests.GetSnapshotStorageClass()
+	if exists {
+		return configuredStorageClass, nil
 	}
 
 	volumeSnapshotClasses, err := client.KubernetesSnapshotClient().SnapshotV1beta1().VolumeSnapshotClasses().List(context.Background(), metav1.ListOptions{})

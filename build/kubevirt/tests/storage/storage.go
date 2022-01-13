@@ -1000,16 +1000,28 @@ var _ = SIGDescribe("Storage", func() {
 			})
 		})
 
-		Context("[rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component] With Cirros BlockMode PVC", func() {
+		Context("[rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component][storage-req] With Cirros BlockMode PVC", func() {
+			var dataVolume *cdiv1.DataVolume
+
 			BeforeEach(func() {
 				// create a new PV and PVC (PVs can't be reused)
-				tests.CreateBlockVolumePvAndPvc("1Gi")
+				dataVolume = tests.NewRandomBlockDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+
+				_, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Create(context.Background(), dataVolume, metav1.CreateOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				Eventually(ThisDV(dataVolume), 240).Should(Or(HaveSucceeded(), BeInPhase(cdiv1.WaitForFirstConsumer)))
+			})
+
+			AfterEach(func() {
+				err = virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Delete(context.Background(), dataVolume.Name, metav1.DeleteOptions{})
+				Expect(err).ToNot(HaveOccurred())
 			})
 
 			// Not a candidate for NFS because local volumes are used in test
 			It("[test_id:1015]should be successfully started", func() {
 				// Start the VirtualMachineInstance with the PVC attached
-				vmi = tests.NewRandomVMIWithPVC(tests.BlockDiskForTest)
+				vmi = tests.NewRandomVMIWithPVC(dataVolume.Name)
 				// Without userdata the hostname isn't set correctly and the login expecter fails...
 				tests.AddUserData(vmi, cloudInitName, "#!/bin/bash\necho 'hello'\n")
 
@@ -1020,12 +1032,12 @@ var _ = SIGDescribe("Storage", func() {
 			})
 		})
 
-		Context("[rook-ceph][rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component]With Alpine block volume PVC", func() {
+		Context("[storage-req][rfe_id:2288][crit:high][vendor:cnv-qe@redhat.com][level:component]With Alpine block volume PVC", func() {
 
 			It("[test_id:3139]should be successfully started", func() {
 				By("Create a VMIWithPVC")
 				// Start the VirtualMachineInstance with the PVC attached
-				vmi, _ := tests.NewRandomVirtualMachineInstanceWithOCSDisk(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util.NamespaceTestDefault, k8sv1.ReadWriteMany, k8sv1.PersistentVolumeBlock)
+				vmi, _ := tests.NewRandomVirtualMachineInstanceWithBlockDisk(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util.NamespaceTestDefault, k8sv1.ReadWriteMany)
 				By("Launching a VMI with PVC ")
 				tests.RunVMIAndExpectLaunch(vmi, 180)
 
@@ -1136,15 +1148,26 @@ var _ = SIGDescribe("Storage", func() {
 
 		})
 
-		Context("With a volumeMode block backed ephemeral disk", func() {
+		Context("[storage-req] With a volumeMode block backed ephemeral disk", func() {
+			var dataVolume *cdiv1.DataVolume
+
 			BeforeEach(func() {
-				tests.DeletePVC(tests.BlockDiskForTest)
-				tests.CreateBlockVolumePvAndPvc("1Gi")
+				dataVolume = tests.NewRandomBlockDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+
+				_, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Create(context.Background(), dataVolume, metav1.CreateOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				Eventually(ThisDV(dataVolume), 240).Should(Or(HaveSucceeded(), BeInPhase(cdiv1.WaitForFirstConsumer)))
 				vmi = nil
 			})
 
+			AfterEach(func() {
+				err = virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Delete(context.Background(), dataVolume.Name, metav1.DeleteOptions{})
+				Expect(err).ToNot(HaveOccurred())
+			})
+
 			It("should generate the block backingstore disk within the domain", func() {
-				vmi = tests.NewRandomVMIWithEphemeralPVC(tests.BlockDiskForTest)
+				vmi = tests.NewRandomVMIWithEphemeralPVC(dataVolume.Name)
 
 				By("Initializing the VM")
 				tests.RunVMIAndExpectLaunch(vmi, 90)
@@ -1161,7 +1184,7 @@ var _ = SIGDescribe("Storage", func() {
 				Expect(disks[0].BackingStore.Source.Dev).To(Equal(converter.GetBlockDeviceVolumePath("disk0")))
 			})
 			It("should generate the pod with the volumeDevice", func() {
-				vmi = tests.NewRandomVMIWithEphemeralPVC(tests.BlockDiskForTest)
+				vmi = tests.NewRandomVMIWithEphemeralPVC(dataVolume.Name)
 				By("Initializing the VM")
 
 				tests.RunVMIAndExpectLaunch(vmi, 60)

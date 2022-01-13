@@ -26,6 +26,8 @@ import (
 	"strconv"
 	"time"
 
+	"kubevirt.io/client-go/log"
+
 	expect "github.com/google/goexpect"
 	. "github.com/onsi/ginkgo"
 	"github.com/onsi/ginkgo/extensions/table"
@@ -40,7 +42,6 @@ import (
 
 	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
-	"kubevirt.io/client-go/log"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
@@ -278,7 +279,6 @@ var _ = SIGDescribe("Hotplug", func() {
 			}
 			foundVolume := 0
 			for _, volumeStatus := range currentVMI.Status.VolumeStatus {
-				log.Log.Infof("Volume Status, name: %s, target [%s], phase:%s, reason: %s", volumeStatus.Name, volumeStatus.Target, volumeStatus.Phase, volumeStatus.Reason)
 				if _, ok := volumeNamesMap[volumeStatus.Name]; ok && volumeStatus.HotplugVolume != nil && volumeStatus.Target != "" {
 					if volumeStatus.Phase == v1.VolumeReady {
 						foundVolume++
@@ -566,7 +566,7 @@ var _ = SIGDescribe("Hotplug", func() {
 		)
 	})
 
-	Context("[rook-ceph]", func() {
+	Context("[storage-req]", func() {
 		Context("Online VM", func() {
 			var (
 				vm *v1.VirtualMachine
@@ -592,9 +592,9 @@ var _ = SIGDescribe("Hotplug", func() {
 
 			BeforeEach(func() {
 				exists := false
-				sc, exists = tests.GetCephStorageClass()
+				sc, exists = tests.GetRWXBlockStorageClass()
 				if !exists {
-					Skip("Skip OCS tests when Ceph is not present")
+					Skip("Skip test when RWXBlock storage class is not present")
 				}
 
 				template := libvmi.NewCirros()
@@ -900,9 +900,9 @@ var _ = SIGDescribe("Hotplug", func() {
 
 			BeforeEach(func() {
 				exists := false
-				sc, exists = tests.GetCephStorageClass()
+				sc, exists = tests.GetRWXBlockStorageClass()
 				if !exists {
-					Skip("Skip OCS tests when Ceph is not present")
+					Skip("Skip test when RWXBlock storage class is not present")
 				}
 
 				// Workaround for the issue with CPU manager and runc prior to version v1.0.0:
