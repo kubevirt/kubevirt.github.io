@@ -57,7 +57,7 @@ To sync the main branch from the upstream repository, perform the following ...
 git checkout main; git fetch upstream; git reset --hard upstream/main; git push origin main -f
 ```
 
-*Note* Master branch is purely cosmetic for this repo. Merges to main **ARE NOT ACCEPTED**.
+*Note* `main` branch is purely cosmetic for this repo. Merges to main **ARE NOT ACCEPTED**.
 
 
 All work must be branched from `main` branch. Perform the following to sync from upstream ...

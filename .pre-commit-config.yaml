@@ -36,7 +36,7 @@ repos:
   - id: fix-encoding-pragma
   - id: forbid-new-submodules
   - id: no-commit-to-branch
-    args: [--branch, source, --branch, master]
+    args: [--branch, source, --branch, main]
   - id: requirements-txt-fixer
   - id: sort-simple-yaml
   - id: trailing-whitespace
