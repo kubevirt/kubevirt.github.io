@@ -11,8 +11,6 @@ The KubeVirt Summit is a 2-day virtual event to discover,
 discuss, hack and learn about managing virtual machines in Kubernetes using
 KubeVirt.
 
-We are looking for Session Leaders, see below.
-
 ## When
 
 The event will take place online during two half-days (5 hours each day):
@@ -20,22 +18,45 @@ The event will take place online during two half-days (5 hours each day):
 - Dates: February 16 and 17, 2022
 - Time: 14:00 – 19:00 UTC (09:00–14:00 EST, 15:00–20:00 CET)
 
-## RSVP
+## Register
 
-You can [RSVP for KubeVirt Summit on community.cncf.io](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/).  You will need to register with CNCF.io if you have not before. Attendance is free.
+KubeVirt Summit is hosted on Community.CNCF.io.  Because of how that platform works, you need to register for each of the two days of the summit independantly:
 
-## Call for Session Proposals
+* [Register for Day 1](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/) 
+* [Register for Day 2](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/) 
 
-We are [looking for community members to lead sessions](https://forms.gle/KXaPWpJzk7Z12bRD8) on contributing to, or using, KubeVirt.  Topics should be anything that is open source and focused on the KubeVirt ecosystem, whether contributing to it or using it. Examples of talks from last year's Summit include:
+You will need to create an account with CNCF.io if you have not before. Attendance is free.
 
-* Migrating VMs to KubeVirt
-* Data protection discussion
-* Advanced container networking and KubeVirt
-* Enabling Prow-based automated testing
-* Zero downtime upgrades
-* Privilege dropping
+## Schedule
 
-The KubeVirt community is looking for people to lead sessions -- whether presentations, discussions, or panels -- on topics around contributing to, or production usage of, KubeVirt. We're also looking for one or two tutorials. Submit your proposal(s) by January 17th [via the form](https://forms.gle/KXaPWpJzk7Z12bRD8).  Sessions will be reviewed by the KubeVirt Summit Content Committee.
+
+## [DAY 1](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/) Wednesday, February 16
+
+| Time (UTC) | Time (EST) | Session | Speaker | Track |
+| ------- | ------- | ----------------------------- | ------- | ------ | 
+| 14:00 | 9:00 | Keynote/Intro | Fabian Deutch | General |
+| 14:25 | 9:25 | "KubeVirt on Arm64 (Progress, Troubles and Plans)" | Howard Zhang | Contributors |
+| 15:00 | 10:00 | Live Migration Policies - fine tuning migrations dynamically | Itamar Holder | Users |
+| 15:30 | 10:30 | Live Migration Policies - fine tuning migrations dynamically | Itamar Holder | Users |
+| 16:00 | 11:00 | KubeVirt+Harverster: a Windows user tale | Nuno do Carmo | Users |
+| 16:35 | 11:35 | Kubernetes clusters on KubeVirt VMs | David Vossel | Users |
+| 17:10 | 12:10 | Network interface hotplug for KubeVirt | Miguel Duarte Barroso | Contributors |
+| 17:45 | 12:45 | A few bugs and findings from VMI Churn at NVIDIA | Fan Zhang | Contributors |
+| 18:20 | 13:20 | EdgeStack and Singulus: Complete VM network implementation with KubeVirt CNI  | Sangho Shin, Jian Li | Users |
+
+## [DAY 2](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/) Thursday, February 17
+
+| Time (UTC) | Time (EST) | Session | Speaker | Track |
+| ------- | ------- | ----------------------------- | ------- | ------ | 
+| 14:00 | 9:00 | KubeVirt Scale and Performance with SIG-Scale | Ryan Hallisey, Marcelo Amaral | Users |
+| 14:35 | 9:35 | Benchmarking the performance of CPU pinning using different virtual CPU topologies: a KVM vs. KubeVirt analysis | Guoqing Li, Marcelo Amaral | Contributors |
+| 15:10 | 10:10 | Delivering High-Performance VNF Workloads in KubeVirt: Navigating Network Acceleration Low for Latency Requirements | Pooja Ghumre, Ashutosh Tiwari  | Contributors |
+| 15:45 | 10:45 | Extending Kube-Burner to Support CRDs KubeVirt: An Open Source Benchmark Suite for Kubernetes Control Plane Analysis | Marcelo Amaral | Contributors |
+| 16:20 | 11:20 | Automatic configuration of mediated devices / vGPUs in KubeVirt | Vladik Romanovsky | Users
+| 16:55 | 11:55 | Volume Populator Support | Michael Henriksen | Users |
+| 17:30 | 12:30 | KubeVirt Performance Visualization at Nvidia | Qian Xiao | Users |
+| 18:05 | 13:05 | Closing Session | Fabian Deutch | General |
+
 
 ## Sponsors
 
