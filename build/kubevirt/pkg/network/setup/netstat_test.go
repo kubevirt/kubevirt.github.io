@@ -20,8 +20,6 @@
 package network_test
 
 import (
-	"fmt"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -38,6 +36,8 @@ var _ = Describe("netstat", func() {
 	BeforeEach(func() {
 		setup = newTestSetup()
 	})
+
+	AfterEach(func() { setup.Cleanup() })
 
 	It("run status with no domain", func() {
 		Expect(setup.NetStat.UpdateStatus(setup.Vmi, nil)).To(Succeed())
@@ -253,9 +253,9 @@ var _ = Describe("netstat", func() {
 		}), "the pod IP/s should be reported in the status")
 	})
 
-	// The reporting of the SR-IOV interface is based on a false source.
+	// The reporting of the SR-IOV interface when no guest-agent exists is missing.
 	// See https://github.com/kubevirt/kubevirt/issues/7050 for more information.
-	It("should report SR-IOV interface when guest-agent is inactive and no other interface exists", func() {
+	It("should not report SR-IOV interface when guest-agent is inactive and no other interface exists", func() {
 		const (
 			networkName = "sriov-network"
 			ifaceMAC    = "C0:01:BE:E7:15:G0:0D"
@@ -271,9 +271,7 @@ var _ = Describe("netstat", func() {
 
 		setup.NetStat.UpdateStatus(setup.Vmi, setup.Domain)
 
-		Expect(setup.Vmi.Status.Interfaces).To(Equal([]v1.VirtualMachineInstanceNetworkInterface{
-			newVMIStatusIface(networkName, nil, "", "", ""),
-		}), "the SR-IOV interface should be reported in the status, associated to the network")
+		Expect(setup.Vmi.Status.Interfaces).To(Equal([]v1.VirtualMachineInstanceNetworkInterface{}), "the SR-IOV interface should not be reported in the status.")
 	})
 
 	// The reporting of the SR-IOV interface when no guest-agent exists is missing.
@@ -301,7 +299,7 @@ var _ = Describe("netstat", func() {
 		setup.NetStat.UpdateStatus(setup.Vmi, setup.Domain)
 
 		Expect(setup.Vmi.Status.Interfaces).To(Equal([]v1.VirtualMachineInstanceNetworkInterface{
-			newVMIStatusIface(primaryNetworkName, nil, "", "", netvmispec.InfoSourceDomain),
+			newVMIStatusIface(primaryNetworkName, []string{primaryPodIPv4}, "", "", netvmispec.InfoSourceDomain),
 		}), "the SR-IOV interface should not be reported in the status.")
 	})
 
@@ -327,6 +325,90 @@ var _ = Describe("netstat", func() {
 		Expect(setup.Vmi.Status.Interfaces).To(Equal([]v1.VirtualMachineInstanceNetworkInterface{
 			newVMIStatusIface(networkName, nil, ifaceMAC, guestIfaceName, netvmispec.InfoSourceGuestAgent),
 		}), "the SR-IOV interface should be reported in the status, associated to the network")
+	})
+
+	When("the desired state (VMI spec) is not in sync with the state in the guest (guest-agent)", func() {
+		const (
+			primaryNetworkName = "primary"
+			primaryPodIPv4     = "1.1.1.1"
+			primaryPodIPv6     = "fd10:244::8c4c"
+			primaryGaIPv4      = "2.2.2.1"
+			primaryGaIPv6      = "fd20:244::8c4c"
+			primaryMAC         = "1C:CE:C0:01:BE:E7"
+			primaryIfaceName   = "eth0"
+
+			secondaryNetworkName = "secondary"
+			secondaryPodIPv4     = "1.1.1.2"
+			secondaryPodIPv6     = "fd10:244::8c4e"
+			secondaryGaIPv4      = secondaryPodIPv4
+			secondaryGaIPv6      = secondaryPodIPv6
+			secondaryMAC         = "1C:CE:C0:01:BE:E9"
+			secondaryIfaceName   = "eth1"
+
+			newMAC1 = "fd20:000::0001"
+			newMAC2 = "fd20:000::0002"
+		)
+
+		BeforeEach(func() {
+			setup.addNetworkInterface(
+				newVMISpecIfaceWithMasqueradeBinding(primaryNetworkName),
+				newVMISpecPodNetwork(primaryNetworkName),
+				newDomainSpecIface(primaryNetworkName, primaryMAC),
+				primaryPodIPv4, primaryPodIPv6,
+			)
+			setup.addNetworkInterface(
+				newVMISpecIfaceWithBridgeBinding(secondaryNetworkName),
+				newVMISpecMultusNetwork(secondaryNetworkName),
+				newDomainSpecIface(secondaryNetworkName, secondaryMAC),
+				secondaryPodIPv4, secondaryPodIPv6,
+			)
+		})
+
+		It("reports masquerade and bridge interfaces with their MAC changed in the guest", func() {
+			setup.addGuestAgentInterfaces(
+				newDomainStatusIface(primaryIfaceName, nil, primaryMAC, "", netvmispec.InfoSourceDomain),
+				newDomainStatusIface(secondaryIfaceName, nil, secondaryMAC, "", netvmispec.InfoSourceDomain),
+				newDomainStatusIface("", []string{primaryGaIPv4, primaryGaIPv6}, newMAC1, primaryIfaceName, netvmispec.InfoSourceGuestAgent),
+				newDomainStatusIface("", []string{secondaryGaIPv4, secondaryGaIPv6}, newMAC2, secondaryIfaceName, netvmispec.InfoSourceGuestAgent),
+			)
+			setup.NetStat.UpdateStatus(setup.Vmi, setup.Domain)
+
+			Expect(setup.Vmi.Status.Interfaces).To(ConsistOf([]v1.VirtualMachineInstanceNetworkInterface{
+				newVMIStatusIface(primaryNetworkName, []string{primaryPodIPv4, primaryPodIPv6}, primaryMAC, "", netvmispec.InfoSourceDomain),
+				newVMIStatusIface(secondaryNetworkName, nil, secondaryMAC, "", netvmispec.InfoSourceDomain),
+				newVMIStatusIface("", []string{primaryGaIPv4, primaryGaIPv6}, newMAC1, primaryIfaceName, netvmispec.InfoSourceGuestAgent),
+				newVMIStatusIface("", []string{secondaryGaIPv4, secondaryGaIPv6}, newMAC2, secondaryIfaceName, netvmispec.InfoSourceGuestAgent),
+			}))
+		})
+
+		It("reports a new interface that appeared in the guest", func() {
+			const (
+				newGaIPv4    = "3.3.3.3"
+				newGaIPv6    = "fd20:333::3333"
+				newIfaceName = "eth3"
+			)
+			setup.addGuestAgentInterfaces(
+				newDomainStatusIface(primaryNetworkName, []string{primaryGaIPv4, primaryGaIPv6}, primaryMAC, primaryIfaceName, netvmispec.InfoSourceDomainAndGA),
+				newDomainStatusIface(secondaryNetworkName, []string{secondaryGaIPv4, secondaryGaIPv6}, secondaryMAC, secondaryIfaceName, netvmispec.InfoSourceDomainAndGA),
+				newDomainStatusIface("", []string{newGaIPv4, newGaIPv6}, newMAC1, newIfaceName, netvmispec.InfoSourceGuestAgent),
+			)
+			setup.NetStat.UpdateStatus(setup.Vmi, setup.Domain)
+
+			Expect(setup.Vmi.Status.Interfaces).To(ConsistOf([]v1.VirtualMachineInstanceNetworkInterface{
+				newVMIStatusIface(primaryNetworkName, []string{primaryPodIPv4, primaryPodIPv6}, primaryMAC, primaryIfaceName, netvmispec.InfoSourceDomainAndGA),
+				newVMIStatusIface(secondaryNetworkName, []string{secondaryPodIPv4, secondaryPodIPv6}, secondaryMAC, secondaryIfaceName, netvmispec.InfoSourceDomainAndGA),
+				newVMIStatusIface("", []string{newGaIPv4, newGaIPv6}, newMAC1, newIfaceName, netvmispec.InfoSourceGuestAgent),
+			}))
+		})
+
+		It("reports that an interface is not seen in the guest", func() {
+			setup.NetStat.UpdateStatus(setup.Vmi, setup.Domain)
+
+			Expect(setup.Vmi.Status.Interfaces).To(ConsistOf([]v1.VirtualMachineInstanceNetworkInterface{
+				newVMIStatusIface(primaryNetworkName, []string{primaryPodIPv4, primaryPodIPv6}, primaryMAC, "", netvmispec.InfoSourceDomain),
+				newVMIStatusIface(secondaryNetworkName, []string{secondaryPodIPv4, secondaryPodIPv6}, secondaryMAC, "", netvmispec.InfoSourceDomain),
+			}))
+		})
 	})
 
 	Context("misc scenario", func() {
@@ -383,58 +465,13 @@ var _ = Describe("netstat", func() {
 	})
 })
 
-type interfaceCacheFactoryStatusStub struct {
-	podInterfaceCacheStore podInterfaceCacheStoreStatusStub
-}
-
-func newInterfaceCacheFactoryStub() *interfaceCacheFactoryStatusStub {
-	return &interfaceCacheFactoryStatusStub{
-		podInterfaceCacheStore: podInterfaceCacheStoreStatusStub{
-			data: map[string]*cache.PodCacheInterface{},
-		},
-	}
-}
-
-func (i interfaceCacheFactoryStatusStub) CacheForVMI(vmi *v1.VirtualMachineInstance) cache.PodInterfaceCacheStore {
-	return i.podInterfaceCacheStore
-}
-func (i interfaceCacheFactoryStatusStub) CacheDomainInterfaceForPID(pid string) cache.DomainInterfaceStore {
-	return nil
-}
-func (i interfaceCacheFactoryStatusStub) CacheDHCPConfigForPid(pid string) cache.DHCPConfigStore {
-	return nil
-}
-
-type podInterfaceCacheStoreStatusStub struct {
-	data       map[string]*cache.PodCacheInterface
-	failRemove bool
-}
-
-func (p podInterfaceCacheStoreStatusStub) Read(iface string) (*cache.PodCacheInterface, error) {
-	if d, exists := p.data[iface]; exists {
-		return &cache.PodCacheInterface{Iface: d.Iface}, nil
-	}
-	return &cache.PodCacheInterface{}, nil
-}
-
-func (p podInterfaceCacheStoreStatusStub) Write(iface string, cacheInterface *cache.PodCacheInterface) error {
-	p.data[iface] = cacheInterface
-	return nil
-}
-
-func (p podInterfaceCacheStoreStatusStub) Remove() error {
-	if p.failRemove {
-		return fmt.Errorf("remove failed")
-	}
-	return nil
-}
-
 type testSetup struct {
 	Vmi     *v1.VirtualMachineInstance
 	Domain  *api.Domain
 	NetStat *netsetup.NetStat
 
-	ifaceFSCacheFactory *interfaceCacheFactoryStatusStub
+	cacheCreator  *tempCacheCreator
+	podIfaceCache cache.PodInterfaceCache
 
 	// There are two types of caches used: virt-launcher/pod filesystem & virt-handler in-memory (volatile).
 	// volatileCache flag marks that the setup should also populate the volatile cache when a network interface is added.
@@ -448,14 +485,17 @@ func newTestSetupWithVolatileCache() testSetup {
 }
 
 func newTestSetup() testSetup {
+	var cacheCreator tempCacheCreator
+	const uid = "123"
 	vmi := &v1.VirtualMachineInstance{}
-	vmi.UID = "123"
-	ifaceFSCacheFactory := newInterfaceCacheFactoryStub()
+	vmi.UID = uid
+
 	return testSetup{
-		Vmi:                 vmi,
-		Domain:              &api.Domain{},
-		NetStat:             netsetup.NewNetStat(ifaceFSCacheFactory),
-		ifaceFSCacheFactory: ifaceFSCacheFactory,
+		Vmi:           vmi,
+		Domain:        &api.Domain{},
+		NetStat:       netsetup.NewNetStateWithCustomFactory(&cacheCreator),
+		cacheCreator:  &cacheCreator,
+		podIfaceCache: cache.NewPodInterfaceCache(&cacheCreator, uid),
 	}
 }
 
@@ -508,11 +548,16 @@ func (t *testSetup) addGuestAgentInterfaces(interfaces ...api.InterfaceStatus) {
 }
 
 func (t *testSetup) addFSCacheInterface(name string, podIPs ...string) {
-	t.ifaceFSCacheFactory.CacheForVMI(nil).Write(name, makePodCacheInterface(name, podIPs...))
+	c, _ := t.podIfaceCache.IfaceEntry(name)
+	c.Write(makePodCacheInterface(name, podIPs...))
 }
 
-func makePodCacheInterface(networkName string, podIPs ...string) *cache.PodCacheInterface {
-	return &cache.PodCacheInterface{
+func (t *testSetup) Cleanup() {
+	t.cacheCreator.New("").Delete()
+}
+
+func makePodCacheInterface(networkName string, podIPs ...string) *cache.PodIfaceCacheData {
+	return &cache.PodIfaceCacheData{
 		Iface: &v1.Interface{
 			Name: networkName,
 		},

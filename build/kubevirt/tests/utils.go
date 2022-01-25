@@ -132,7 +132,6 @@ const (
 	BinBash                      = "/bin/bash"
 	StartingVMInstance           = "Starting a VirtualMachineInstance"
 	WaitingVMInstanceStart       = "Waiting until the VirtualMachineInstance will start"
-	TestDataVolumeName           = "test-datavolume-"
 	KubevirtIoV1Alpha1           = "cdi.kubevirt.io/v1alpha1"
 	ServerName                   = "--server"
 	CouldNotFindComputeContainer = "could not find compute container for pod"
@@ -140,7 +139,6 @@ const (
 	CommandPipeFailedFmt         = "command pipe failed: %v"
 	EchoLastReturnValue          = "echo $?\n"
 	BashHelloScript              = "#!/bin/bash\necho 'hello'\n"
-	UsrBinBash                   = "/usr/bin/bash"
 )
 
 var Config *KubeVirtTestsConfiguration
@@ -254,6 +252,10 @@ const (
 	cgroupV1cpusetPath = "/sys/fs/cgroup/cpuset/cpuset.cpus"
 	cgroupV2cpusetPath = "/sys/fs/cgroup/cpuset.cpus.effective"
 )
+
+const StorageClassHostPathSeparateDevice = "host-path-sd"
+
+var wffc = storagev1.VolumeBindingWaitForFirstConsumer
 
 type ProcessFunc func(event *k8sv1.Event) (done bool)
 
@@ -492,10 +494,6 @@ func WaitForAllPodsReady(timeout time.Duration, listOptions metav1.ListOptions) 
 func SynchronizedAfterTestSuiteCleanup() {
 	RestoreKubeVirtResource()
 
-	if Config.ManageStorageClasses {
-		deleteStorageClass(Config.StorageClassHostPath)
-		deleteStorageClass(Config.StorageClassHostPathSeparateDevice)
-	}
 	CleanNodes()
 }
 
@@ -677,13 +675,6 @@ func SynchronizedBeforeTestSetup() []byte {
 		DeployTestingInfrastructure()
 	}
 
-	if Config.ManageStorageClasses {
-		immediateBinding := storagev1.VolumeBindingImmediate
-		wffc := storagev1.VolumeBindingWaitForFirstConsumer
-		createStorageClass(Config.StorageClassHostPath, &immediateBinding)
-		createStorageClass(Config.StorageClassHostPathSeparateDevice, &wffc)
-	}
-
 	EnsureKVMPresent()
 	AdjustKubeVirtResource()
 
@@ -822,7 +813,7 @@ func RestoreKubeVirtResource() {
 	}
 }
 
-func createStorageClass(name string, bindingMode *storagev1.VolumeBindingMode) {
+func CreateStorageClass(name string, bindingMode *storagev1.VolumeBindingMode) {
 	virtClient, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
 
@@ -842,7 +833,7 @@ func createStorageClass(name string, bindingMode *storagev1.VolumeBindingMode) {
 	}
 }
 
-func deleteStorageClass(name string) {
+func DeleteStorageClass(name string) {
 	virtClient, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
 
@@ -991,7 +982,8 @@ func CreateSecret(name string, data map[string]string) {
 }
 
 func CreateHostPathPVC(os, size string) {
-	CreatePVC(os, size, Config.StorageClassHostPath, false)
+	sc := "manual"
+	CreatePVC(os, size, sc, false)
 }
 
 func CreatePVC(os, size, storageClass string, recycledPV bool) *k8sv1.PersistentVolumeClaim {
@@ -1069,14 +1061,17 @@ func DeleteAllSeparateDeviceHostPathPvs() {
 	pvList, err := virtClient.CoreV1().PersistentVolumes().List(context.Background(), metav1.ListOptions{})
 	util2.PanicOnError(err)
 	for _, pv := range pvList.Items {
-		if pv.Spec.StorageClassName == Config.StorageClassHostPathSeparateDevice {
+		if pv.Spec.StorageClassName == StorageClassHostPathSeparateDevice {
 			// ignore error we want to attempt to delete them all.
 			virtClient.CoreV1().PersistentVolumes().Delete(context.Background(), pv.Name, metav1.DeleteOptions{})
 		}
 	}
+
+	DeleteStorageClass(StorageClassHostPathSeparateDevice)
 }
 
 func CreateAllSeparateDeviceHostPathPvs(osName string) {
+	CreateStorageClass(StorageClassHostPathSeparateDevice, &wffc)
 	virtClient, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
 	Eventually(func() int {
@@ -1113,7 +1108,7 @@ func createSeparateDeviceHostPathPv(osName, nodeName string) {
 					Path: "/tmp/hostImages/mount_hp/test",
 				},
 			},
-			StorageClassName: Config.StorageClassHostPathSeparateDevice,
+			StorageClassName: StorageClassHostPathSeparateDevice,
 			NodeAffinity: &k8sv1.VolumeNodeAffinity{
 				Required: &k8sv1.NodeSelector{
 					NodeSelectorTerms: []k8sv1.NodeSelectorTerm{
@@ -1138,11 +1133,16 @@ func createSeparateDeviceHostPathPv(osName, nodeName string) {
 	}
 }
 
-func CreateHostPathPv(osName string, hostPath string) string {
-	return CreateHostPathPvWithSize(osName, hostPath, "1Gi")
+func CreateHostPathPv(osName, hostPath string) string {
+	return createHostPathPvWithSize(osName, hostPath, "1Gi")
 }
 
-func CreateHostPathPvWithSize(osName string, hostPath string, size string) string {
+func createHostPathPvWithSize(osName, hostPath, size string) string {
+	sc := "manual"
+	return CreateHostPathPvWithSizeAndStorageClass(osName, hostPath, size, sc)
+}
+
+func CreateHostPathPvWithSizeAndStorageClass(osName, hostPath, size, sc string) string {
 	virtCli, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
 
@@ -1172,7 +1172,7 @@ func CreateHostPathPvWithSize(osName string, hostPath string, size string) strin
 					Type: &hostPathType,
 				},
 			},
-			StorageClassName: Config.StorageClassHostPath,
+			StorageClassName: sc,
 			NodeAffinity: &k8sv1.VolumeNodeAffinity{
 				Required: &k8sv1.NodeSelector{
 					NodeSelectorTerms: []k8sv1.NodeSelectorTerm{
@@ -2023,10 +2023,6 @@ func NewRandomDataVolumeWithRegistryImport(imageUrl, namespace string, accessMod
 	return NewRandomDataVolumeWithRegistryImportInStorageClass(imageUrl, namespace, sc, accessMode, k8sv1.PersistentVolumeFilesystem)
 }
 
-func NewRandomBlankDataVolume(namespace, storageClass, size string, accessMode k8sv1.PersistentVolumeAccessMode, volumeMode k8sv1.PersistentVolumeMode) *cdiv1.DataVolume {
-	return newRandomBlankDataVolume(namespace, storageClass, size, accessMode, volumeMode)
-}
-
 func NewRandomVirtualMachineInstanceWithDisk(imageUrl, namespace, sc string, accessMode k8sv1.PersistentVolumeAccessMode, volMode k8sv1.PersistentVolumeMode) (*v1.VirtualMachineInstance, *cdiv1.DataVolume) {
 	virtCli, err := kubecli.GetKubevirtClient()
 	util2.PanicOnError(err)
@@ -2034,11 +2030,7 @@ func NewRandomVirtualMachineInstanceWithDisk(imageUrl, namespace, sc string, acc
 	dv := NewRandomDataVolumeWithRegistryImportInStorageClass(imageUrl, namespace, sc, accessMode, volMode)
 	_, err = virtCli.CdiClient().CdiV1beta1().DataVolumes(dv.Namespace).Create(context.Background(), dv, metav1.CreateOptions{})
 	Expect(err).ToNot(HaveOccurred())
-	if HasBindingModeWaitForFirstConsumer() {
-		Eventually(ThisDV(dv), 30).Should(BeInPhase(cdiv1.WaitForFirstConsumer))
-	} else {
-		Eventually(ThisDV(dv), 240).Should(HaveSucceeded())
-	}
+	Eventually(ThisDV(dv), 240).Should(Or(HaveSucceeded(), BeInPhase(cdiv1.WaitForFirstConsumer)))
 	return NewRandomVMIWithDataVolume(dv.Name), dv
 }
 
@@ -2072,9 +2064,9 @@ func NewRandomVirtualMachineInstanceWithBlockDisk(imageUrl, namespace string, ac
 	return NewRandomVirtualMachineInstanceWithDisk(imageUrl, namespace, sc, accessMode, k8sv1.PersistentVolumeBlock)
 }
 
-func NewRandomDataVolumeWithRegistryImportInStorageClass(imageUrl, namespace, storageClass string, accessMode k8sv1.PersistentVolumeAccessMode, volumeMode k8sv1.PersistentVolumeMode) *cdiv1.DataVolume {
-	name := TestDataVolumeName + rand.String(12)
-	quantity, err := resource.ParseQuantity("1Gi")
+func newDataVolume(namespace, storageClass string, size string, accessMode k8sv1.PersistentVolumeAccessMode, volumeMode k8sv1.PersistentVolumeMode, dataVolumeSource cdiv1.DataVolumeSource) *cdiv1.DataVolume {
+	name := "test-datavolume-" + rand.String(12)
+	quantity, err := resource.ParseQuantity(size)
 	util2.PanicOnError(err)
 	dataVolume := &cdiv1.DataVolume{
 		ObjectMeta: metav1.ObjectMeta{
@@ -2082,11 +2074,7 @@ func NewRandomDataVolumeWithRegistryImportInStorageClass(imageUrl, namespace, st
 			Namespace: namespace,
 		},
 		Spec: cdiv1.DataVolumeSpec{
-			Source: &cdiv1.DataVolumeSource{
-				Registry: &cdiv1.DataVolumeSourceRegistry{
-					URL: &imageUrl,
-				},
-			},
+			Source: &dataVolumeSource,
 			PVC: &k8sv1.PersistentVolumeClaimSpec{
 				AccessModes: []k8sv1.PersistentVolumeAccessMode{accessMode},
 				VolumeMode:  &volumeMode,
@@ -2108,78 +2096,43 @@ func NewRandomDataVolumeWithRegistryImportInStorageClass(imageUrl, namespace, st
 	return dataVolume
 }
 
-func newRandomBlankDataVolume(namespace, storageClass, size string, accessMode k8sv1.PersistentVolumeAccessMode, volumeMode k8sv1.PersistentVolumeMode) *cdiv1.DataVolume {
-	name := TestDataVolumeName + rand.String(12)
-	quantity, err := resource.ParseQuantity(size)
-	util2.PanicOnError(err)
-	dataVolume := &cdiv1.DataVolume{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: namespace,
-		},
-		Spec: cdiv1.DataVolumeSpec{
-			Source: &cdiv1.DataVolumeSource{
-				Blank: &cdiv1.DataVolumeBlankImage{},
-			},
-			PVC: &k8sv1.PersistentVolumeClaimSpec{
-				AccessModes: []k8sv1.PersistentVolumeAccessMode{accessMode},
-				Resources: k8sv1.ResourceRequirements{
-					Requests: k8sv1.ResourceList{
-						"storage": quantity,
-					},
-				},
-				StorageClassName: &storageClass,
-				VolumeMode:       &volumeMode,
-			},
+func NewRandomDataVolumeWithRegistryImportInStorageClass(imageUrl, namespace, storageClass string, accessMode k8sv1.PersistentVolumeAccessMode, volumeMode k8sv1.PersistentVolumeMode) *cdiv1.DataVolume {
+	size := "1Gi"
+	dataVolumeSource := cdiv1.DataVolumeSource{
+		Registry: &cdiv1.DataVolumeSourceRegistry{
+			URL: &imageUrl,
 		},
 	}
+	return newDataVolume(namespace, storageClass, size, accessMode, volumeMode, dataVolumeSource)
+}
 
-	dataVolume.TypeMeta = metav1.TypeMeta{
-		APIVersion: KubevirtIoV1Alpha1,
-		Kind:       "DataVolume",
+func NewRandomBlankDataVolume(namespace, storageClass, size string, accessMode k8sv1.PersistentVolumeAccessMode, volumeMode k8sv1.PersistentVolumeMode) *cdiv1.DataVolume {
+	dataVolumeSource := cdiv1.DataVolumeSource{
+		Blank: &cdiv1.DataVolumeBlankImage{},
 	}
-
-	return dataVolume
+	return newDataVolume(namespace, storageClass, size, accessMode, volumeMode, dataVolumeSource)
 }
 
 func NewRandomDataVolumeWithPVCSource(sourceNamespace, sourceName, targetNamespace string, accessMode k8sv1.PersistentVolumeAccessMode) *cdiv1.DataVolume {
-	return NewRandomDataVolumeWithPVCSourceWithStorageClass(sourceNamespace, sourceName, targetNamespace, Config.StorageClassLocal, "1Gi", accessMode)
+	sc, exists := GetRWOFileSystemStorageClass()
+	if accessMode == k8sv1.ReadWriteMany {
+		sc, exists = GetRWXFileSystemStorageClass()
+	}
+	if !exists {
+		Skip("Skip test when Filesystem storage is not present")
+	}
+	return newRandomDataVolumeWithPVCSourceWithStorageClass(sourceNamespace, sourceName, targetNamespace, sc, "1Gi", accessMode)
 }
 
-func NewRandomDataVolumeWithPVCSourceWithStorageClass(sourceNamespace, sourceName, targetNamespace, storageClass, size string, accessMode k8sv1.PersistentVolumeAccessMode) *cdiv1.DataVolume {
-	name := TestDataVolumeName + rand.String(12)
-	quantity, err := resource.ParseQuantity(size)
-	util2.PanicOnError(err)
-	dataVolume := &cdiv1.DataVolume{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:      name,
-			Namespace: targetNamespace,
-		},
-		Spec: cdiv1.DataVolumeSpec{
-			Source: &cdiv1.DataVolumeSource{
-				PVC: &cdiv1.DataVolumeSourcePVC{
-					Namespace: sourceNamespace,
-					Name:      sourceName,
-				},
-			},
-			PVC: &k8sv1.PersistentVolumeClaimSpec{
-				AccessModes: []k8sv1.PersistentVolumeAccessMode{accessMode},
-				Resources: k8sv1.ResourceRequirements{
-					Requests: k8sv1.ResourceList{
-						"storage": quantity,
-					},
-				},
-				StorageClassName: &storageClass,
-			},
+func newRandomDataVolumeWithPVCSourceWithStorageClass(sourceNamespace, sourceName, targetNamespace, storageClass, size string, accessMode k8sv1.PersistentVolumeAccessMode) *cdiv1.DataVolume {
+	dataVolumeSource := cdiv1.DataVolumeSource{
+		PVC: &cdiv1.DataVolumeSourcePVC{
+			Namespace: sourceNamespace,
+			Name:      sourceName,
 		},
 	}
-
-	dataVolume.TypeMeta = metav1.TypeMeta{
-		APIVersion: KubevirtIoV1Alpha1,
-		Kind:       "DataVolume",
-	}
-
-	return dataVolume
+	volumeMode := k8sv1.PersistentVolumeFilesystem
+	return newDataVolume(targetNamespace, storageClass, size, accessMode, volumeMode, dataVolumeSource)
 }
 
 func NewRandomVMI() *v1.VirtualMachineInstance {
@@ -3046,24 +2999,6 @@ func WaitForSuccessfulVMIStartWithContextIgnoreSelectedWarnings(ctx context.Cont
 	return waitForVMIStart(ctx, vmi, 360, wp)
 }
 
-func WaitUntilVMIReadyAsync(ctx context.Context, vmi *v1.VirtualMachineInstance, loginTo console.LoginToFunction) func() *v1.VirtualMachineInstance {
-	var (
-		wg       sync.WaitGroup
-		readyVMI *v1.VirtualMachineInstance
-	)
-	wg.Add(1)
-	go func() {
-		defer GinkgoRecover()
-		defer wg.Done()
-		readyVMI = WaitUntilVMIReadyWithContext(ctx, vmi, loginTo)
-	}()
-
-	return func() *v1.VirtualMachineInstance {
-		wg.Wait()
-		return readyVMI
-	}
-}
-
 func WaitUntilVMIReady(vmi *v1.VirtualMachineInstance, loginTo console.LoginToFunction) *v1.VirtualMachineInstance {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -3288,25 +3223,6 @@ func NewRepeatableVirtctlCommand(args ...string) func() error {
 		cmd := NewVirtctlCommand(args...)
 		return cmd.Execute()
 	}
-}
-
-func ExecuteCommandOnCephToolbox(virtCli kubecli.KubevirtClient, command []string) (string, error) {
-	pods, err := virtCli.CoreV1().Pods("rook-ceph").List(context.Background(), metav1.ListOptions{LabelSelector: "app=rook-ceph-tools"})
-	if err != nil {
-		return "", err
-	}
-
-	stdout, stderr, err := ExecuteCommandOnPodV2(virtCli, &pods.Items[0], "rook-ceph-tools", command)
-
-	if err != nil {
-		return "", fmt.Errorf("failed executing command on pod: %v: stderr %v: stdout: %v", err, stderr, stdout)
-	}
-
-	if len(stderr) > 0 {
-		return "", fmt.Errorf("stderr: %v", stderr)
-	}
-
-	return stdout, nil
 }
 
 func ExecuteCommandOnPod(virtCli kubecli.KubevirtClient, pod *k8sv1.Pod, containerName string, command []string) (string, error) {
@@ -3894,7 +3810,10 @@ func CreateNFSPvAndPvc(name string, namespace string, size string, nfsTargetIP s
 func newNFSPV(name string, namespace string, size string, nfsTargetIP string, os string) *k8sv1.PersistentVolume {
 	quantity := resource.MustParse(size)
 
-	storageClass := Config.StorageClassLocal
+	storageClass, exists := GetRWOFileSystemStorageClass()
+	if !exists {
+		Skip("Skip test when Filesystem storage is not present")
+	}
 	volumeMode := k8sv1.PersistentVolumeFilesystem
 
 	nfsTargetIP = ip.NormalizeIPAddress(nfsTargetIP)
@@ -3928,7 +3847,10 @@ func newNFSPVC(name string, namespace string, size string, os string) *k8sv1.Per
 	quantity, err := resource.ParseQuantity(size)
 	util2.PanicOnError(err)
 
-	storageClass := Config.StorageClassLocal
+	storageClass, exists := GetRWOFileSystemStorageClass()
+	if !exists {
+		Skip("Skip test when Filesystem storage is not present")
+	}
 	volumeMode := k8sv1.PersistentVolumeFilesystem
 
 	return &k8sv1.PersistentVolumeClaim{
@@ -4007,15 +3929,6 @@ func SkipIfVersionBelow(message string, expectedVersion string) {
 	Expect(err).NotTo(HaveOccurred())
 
 	if curVersion < expectedVersion {
-		Skip(message)
-	}
-}
-
-func SkipIfVersionAboveOrEqual(message string, expectedVersion string) {
-	curVersion, err := cluster.GetKubernetesVersion()
-	Expect(err).NotTo(HaveOccurred())
-
-	if curVersion >= expectedVersion {
 		Skip(message)
 	}
 }
@@ -4131,16 +4044,6 @@ func RunCommandOnVmiTargetPod(vmi *v1.VirtualMachineInstance, command []string) 
 	ExpectWithOffset(1, err).ToNot(HaveOccurred())
 
 	return output, nil
-}
-
-// GetNodeLibvirtCapabilities returns node libvirt capabilities
-func GetNodeLibvirtCapabilities(vmi *v1.VirtualMachineInstance) string {
-	return RunCommandOnVmiPod(vmi, []string{"virsh", "-r", "capabilities"})
-}
-
-// GetNodeCPUInfo returns output of lscpu on the pod that runs on the specified node
-func GetNodeCPUInfo(vmi *v1.VirtualMachineInstance) string {
-	return RunCommandOnVmiPod(vmi, []string{"lscpu"})
 }
 
 func NewRandomVirtualMachine(vmi *v1.VirtualMachineInstance, running bool) *v1.VirtualMachine {
@@ -4329,20 +4232,24 @@ func VolumeExpansionAllowed(sc string) bool {
 		*storageClass.AllowVolumeExpansion
 }
 
-func HasBindingModeWaitForFirstConsumer() bool {
+func SetDataVolumeForceBindAnnotation(dv *cdiv1.DataVolume) {
+	annotations := dv.GetAnnotations()
+	if annotations == nil {
+		annotations = make(map[string]string)
+	}
+	annotations["cdi.kubevirt.io/storage.bind.immediate.requested"] = "true"
+	dv.SetAnnotations(annotations)
+}
+
+func IsStorageClassBindingModeWaitForFirstConsumer(sc string) bool {
 	virtClient, err := kubecli.GetKubevirtClient()
 	Expect(err).ToNot(HaveOccurred())
-	sc, exists := GetRWOFileSystemStorageClass()
-	if !exists {
-		return false
-	}
 	storageClass, err := virtClient.StorageV1().StorageClasses().Get(context.Background(), sc, metav1.GetOptions{})
-	Expect(err).ToNot(HaveOccurred())
 	if err != nil {
 		return false
 	}
 	return storageClass.VolumeBindingMode != nil &&
-		*storageClass.VolumeBindingMode == storagev1.VolumeBindingWaitForFirstConsumer
+		*storageClass.VolumeBindingMode == wffc
 }
 
 func GetSnapshotStorageClass() (string, bool) {
@@ -4368,20 +4275,6 @@ func GetRWOBlockStorageClass() (string, bool) {
 func GetRWXBlockStorageClass() (string, bool) {
 	storageRWXBlock := Config.StorageRWXBlock
 	return storageRWXBlock, storageRWXBlock != ""
-}
-
-func GetCephStorageClass() (string, bool) {
-	virtClient, err := kubecli.GetKubevirtClient()
-	Expect(err).ToNot(HaveOccurred())
-	storageClassList, err := virtClient.StorageV1().StorageClasses().List(context.Background(), metav1.ListOptions{})
-	Expect(err).ToNot(HaveOccurred())
-	for _, storageClass := range storageClassList.Items {
-		switch storageClass.Provisioner {
-		case "rook-ceph.rbd.csi.ceph.com", "csi-rbdplugin", "openshift-storage.rbd.csi.ceph.com":
-			return storageClass.Name, true
-		}
-	}
-	return "", false
 }
 
 func HasExperimentalIgnitionSupport() bool {
@@ -4545,40 +4438,6 @@ func UpdateKubeVirtConfigValueAndWait(kvConfig v1.KubeVirtConfiguration) *v1.Kub
 	log.DefaultLogger().Infof("system is in sync with kubevirt config resource version %s", kv.ResourceVersion)
 
 	return kv
-}
-
-func UpdateCDIConfigMap(cdiConfig *k8sv1.ConfigMap) *k8sv1.ConfigMap {
-	if cdiConfig == nil {
-		return nil
-	}
-
-	virtClient, err := kubecli.GetKubevirtClient()
-	util2.PanicOnError(err)
-
-	currentConfig, err := virtClient.CoreV1().ConfigMaps(flags.ContainerizedDataImporterNamespace).Get(context.Background(), cdiConfig.Name, metav1.GetOptions{})
-	util2.PanicOnError(err)
-	old, err := json.Marshal(currentConfig)
-	Expect(err).ToNot(HaveOccurred())
-
-	if reflect.DeepEqual(currentConfig.Data, cdiConfig.Data) {
-		return currentConfig
-	}
-
-	if config.GinkgoConfig.ParallelTotal > 1 {
-		Fail("Tests which alter the global CDI configuration must not be executed in parallel")
-	}
-
-	updatedConfig := currentConfig.DeepCopy()
-	updatedConfig.Data = cdiConfig.Data
-	newJson, err := json.Marshal(updatedConfig)
-	Expect(err).ToNot(HaveOccurred())
-
-	patch, err := strategicpatch.CreateTwoWayMergePatch(old, newJson, currentConfig)
-	Expect(err).ToNot(HaveOccurred())
-
-	currentConfig, err = virtClient.CoreV1().ConfigMaps(flags.ContainerizedDataImporterNamespace).Patch(context.Background(), currentConfig.GetName(), types.MergePatchType, patch, metav1.PatchOptions{})
-	Expect(err).ToNot(HaveOccurred())
-	return currentConfig
 }
 
 // resetToDefaultConfig resets the config to the state found when the test suite started. It will wait for the config to

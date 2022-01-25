@@ -23,6 +23,7 @@ import (
 	"context"
 	"fmt"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -986,17 +987,19 @@ var _ = Describe("[sig-compute]Configurations", func() {
 					},
 				}
 
-				By("Starting a VirtualMachineInstance")
-				vmi, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
-				Expect(err).ToNot(HaveOccurred(), "should start vmi")
-				tests.WaitForSuccessfulVMIStart(vmi)
+				By("Creating a VMI")
+				Eventually(func() bool {
+					createdVMI, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
+					Expect(err).ToNot(HaveOccurred(), "should create vmi")
 
-				Expect(vmi.Spec.Domain.Resources.Requests.Memory().ToDec().ScaledValue(resource.Mega)).To(Equal(int64(64)))
-				Expect(vmi.Spec.Domain.Resources.Limits.Memory().ToDec().ScaledValue(resource.Mega)).To(Equal(int64(512)))
-				Expect(vmi.Spec.Domain.Resources.Requests.Cpu().MilliValue()).To(Equal(int64(500)))
-				Expect(vmi.Spec.Domain.Resources.Limits.Cpu().MilliValue()).To(Equal(int64(1000)))
+					err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Delete(createdVMI.Name, &metav1.DeleteOptions{})
+					Expect(err).ToNot(HaveOccurred(), "should delete vmi")
 
-				Expect(err).ToNot(HaveOccurred())
+					return reflect.DeepEqual(createdVMI.Spec.Domain.Resources.Requests.Memory().ToDec().ScaledValue(resource.Mega), int64(64)) &&
+						reflect.DeepEqual(createdVMI.Spec.Domain.Resources.Limits.Memory().ToDec().ScaledValue(resource.Mega), int64(512)) &&
+						reflect.DeepEqual(createdVMI.Spec.Domain.Resources.Requests.Cpu().MilliValue(), int64(500)) &&
+						reflect.DeepEqual(createdVMI.Spec.Domain.Resources.Limits.Cpu().MilliValue(), int64(1000))
+				}, 30*time.Second, time.Second).Should(BeTrue())
 			})
 		})
 
@@ -1200,7 +1203,7 @@ var _ = Describe("[sig-compute]Configurations", func() {
 			})
 		})
 
-		Context("[Serial][rfe_id:140][crit:medium][vendor:cnv-qe@redhat.com][level:component]with guestAgent", func() {
+		Context("[rfe_id:140][crit:medium][vendor:cnv-qe@redhat.com][level:component]with guestAgent", func() {
 			var agentVMI *v1.VirtualMachineInstance
 
 			prepareAgentVM := func() *v1.VirtualMachineInstance {
