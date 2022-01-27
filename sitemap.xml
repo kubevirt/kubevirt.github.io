@@ -629,6 +629,10 @@
 <lastmod>2022-01-11T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2022/KubeVirt-Summit-2022.html</loc>
+<lastmod>2022-01-24T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1473,5 +1477,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page31/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page32/</loc>
 </url>
 </urlset>

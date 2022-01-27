@@ -1,4 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-25T18:56:57+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Running real-time workloads with improved performance</title><link href="https://kubevirt.io//2021/Running-Realtime-Workloads.html" rel="alternate" type="text/html" title="Running real-time workloads with improved performance" /><published>2021-10-13T00:00:00+00:00</published><updated>2021-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Running-Realtime-Workloads</id><content type="html" xml:base="https://kubevirt.io//2021/Running-Realtime-Workloads.html"><![CDATA[<h2 id="motivation">Motivation</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-27T19:37:19+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
+
+<h2 id="when">When</h2>
+
+<p>The event will take place online during two half-days:</p>
+
+<ul>
+  <li>Dates: February 16 and 17, 2022.</li>
+  <li>Time: 14:00 – 19:00 UTC (9:00–14:00 EST, 15:00–20:00 CET)</li>
+</ul>
+
+<h2 id="register">Register</h2>
+
+<p><a href="/summit/">KubeVirt Summit</a> is hosted on Community.CNCF.io. Because of how that platform works, you need to register for each of the two days of the summit independantly:</p>
+
+<ul>
+  <li><a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/">Register for Day 1</a></li>
+  <li><a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/">Register for Day 2</a></li>
+</ul>
+
+<p>You will need to create an account with CNCF.io if you have not before. Attendance is free.</p>
+
+<h2 id="keep-up-to-date">Keep up to date</h2>
+
+<p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
+
+<p>We are looking forward to meeting you there!</p>]]></content><author><name>Chandler Wilkerson</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's second annual dedicated online event]]></summary></entry><entry><title type="html">Running real-time workloads with improved performance</title><link href="https://kubevirt.io//2021/Running-Realtime-Workloads.html" rel="alternate" type="text/html" title="Running real-time workloads with improved performance" /><published>2021-10-13T00:00:00+00:00</published><updated>2021-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Running-Realtime-Workloads</id><content type="html" xml:base="https://kubevirt.io//2021/Running-Realtime-Workloads.html"><![CDATA[<h2 id="motivation">Motivation</h2>
 
 <p>It has been possible in KubeVirt for some time already to run a VM running with a RT kernel, however the performance of such workloads never achieved parity against running on top of a bare metal host virtualized. With the availability of NUMA and CPUManager as features in KubeVirt, we were close to a point where we had almost all the ingredients to deliver the <a href="https://www.libvirt.org/kbase/kvm-realtime.html">recommended</a> tunings in libvirt for achieving the low CPU latency needed for such workloads. We were missing two important settings:</p>
 <ul>
@@ -2832,38 +2858,4 @@ v8-terminal
   <li><a href="https://developers.redhat.com/blog/2019/05/08/red-hat-enterprise-linux-8-image-builder-building-custom-system-images/">Image Builder: Building custom system images</a></li>
   <li><a href="https://weldr.io/lorax/composer-cli.html">Composer-cli information</a></li>
   <li><a href="https://quay.io/repository/alosadag/devstation?tab=tags">Custom-built images available at quay.io</a></li>
-</ul>]]></content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html"><![CDATA[A use case is exposed where containerized VMs running on top of Kubernetes ease the deployment of standardized VMs required by software developers. In this first part, we focus on creating standard images using different tools and then containerize them so that they can be stored in a container registry.]]></summary></entry><entry><title type="html">High Availability – RunStrategies for Virtual Machines</title><link href="https://kubevirt.io//2020/run_strategies.html" rel="alternate" type="text/html" title="High Availability – RunStrategies for Virtual Machines" /><published>2020-12-04T00:00:00+00:00</published><updated>2020-12-04T00:00:00+00:00</updated><id>https://kubevirt.io//2020/run_strategies</id><content type="html" xml:base="https://kubevirt.io//2020/run_strategies.html"><![CDATA[<h2 id="why-isnt-my-vm-running">Why Isn’t My VM Running?</h2>
-
-<p>There’s been a longstanding point of confusion in KubeVirt’s API. One that was raised yet again a few times recently. The confusion stems from the “Running” field of the VM spec. Language has meaning. It’s natural to take it at face value that “Running” means “Running”, right? Well, not so fast.</p>
-
-<h2 id="spec-vs-status">Spec vs Status</h2>
-
-<p>KubeVirt objects follow Kubernetes convention in that they generally have Spec and Status stanzas. The Spec is user configurable and allows the user to indicate the desired state of the cluster in a declarative manner. Meanwhile status sections are not user configurable and reflect the actual state of things in the cluster. In short, users edit the Spec and controllers edit the Status.</p>
-
-<p>So back to the Running field. In this case the Running field is in the VM’s Spec. In other words it’s the user’s intent that the VM is running. It doesn’t reflect the actual running state of the VM.</p>
-
-<h2 id="runstrategy">RunStrategy</h2>
-
-<p>There’s a flip side to the above, equally as confusing: “Running” isn’t always what the user wants. If a user logs into a VM and shuts it down from inside the guest, KubeVirt will dutifully re-spawn it! There certainly exist high availability use cases where that’s exactly the correct reaction, but in most cases that’s just plain confusing. Shutdown is not restart!</p>
-
-<p>We decided to tackle both issues at the same time–by deprecating the “Running” field. As already noted, we could have picked a better name to begin with. By using the name “RunStrategy”, it should hopefully be more clear to the end user that they’re asking for a state, which is of course completely separate from what the system can actually provide. While RunStrategy helps address the nomenclature confusion, it also happens to be an enumerated value. Since Running is a boolean, it can only be true or false. We’re now able to create more meaningful states to accommodate different use cases.</p>
-
-<h3 id="four-runstrategies-currently-exist">Four RunStrategies currently exist</h3>
-
-<ul>
-  <li>Always: If a VM is stopped for any reason, a new instance will be spawned.</li>
-  <li>RerunOnFailure: If a VM ends execution in an error state, a new instance will be spawned. This addressed the second concern listed above. If a user halts a VM manually a new instance will not be spawned.</li>
-  <li>Manual: This is exactly what it means. KubeVirt will neither attempt to start or stop a VM. In order to change state, the user must invoke start/stop/restart from the API. There exist convenience functions in the virtctl command line client as well.</li>
-  <li>Halted: The VM will be stopped if it’s running, and will remain off.</li>
-</ul>
-
-<p>An example using the RerunOnFailure RunStrategy was presented in <a href="/2020/KubeVirt-VM-Image-Usage-Patterns.html">KubeVirt VM Image Usage Patterns</a></p>
-
-<h2 id="high-availability">High Availability</h2>
-
-<p>No discussion of RunStrategies is complete without mentioning High Availability. After all, the implication behind the RerunOnFailure and Always RunStrategies is that your VM should always be available. For the most part this is completely true, but there’s one important scenario where there’s a gap to be aware of: if a node fails completely, e.g. loss of networking or power. Without some means of automatic detection that the node is no longer active, KubeVirt won’t know that the VM has failed. On OpenShift clusters installed using Installer Provisioned Infrastructure (IPI) with MachineHealthCheck enabled can detect failed nodes and reschedule workloads running there.</p>
-
-<p>Mode information on IPI and MHC can be found here:</p>
-
-<p><a href="https://docs.openshift.com/container-platform/4.6/installing/installing_bare_metal_ipi/ipi-install-overview.html#ipi-install-overview">Installer Provisioned Infrastructure</a>
-<a href="https://docs.openshift.com/container-platform/4.6/machine_management/deploying-machine-health-checks.html">Machine Health Check</a></p>]]></content><author><name>Stu Gott</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><summary type="html"><![CDATA[This blog post outlines the various RunStrategies available to VMs]]></summary></entry></feed>
+</ul>]]></content><author><name>Alberto Losada Grande</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="okd" /><category term="containerDisk" /><category term="registry" /><category term="composer-cli" /><category term="virt-customize" /><category term="builder tool" /><summary type="html"><![CDATA[A use case is exposed where containerized VMs running on top of Kubernetes ease the deployment of standardized VMs required by software developers. In this first part, we focus on creating standard images using different tools and then containerize them so that they can be stored in a container registry.]]></summary></entry></feed>

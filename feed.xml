@@ -1,4 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-25T18:56:57+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.49.0</title><link href="https://kubevirt.io//2022/changelog-v0.49.0.html" rel="alternate" type="text/html" title="KubeVirt v0.49.0" /><published>2022-01-11T00:00:00+00:00</published><updated>2022-01-11T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.49.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.49.0.html"><![CDATA[<h2 id="v0490">v0.49.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-01-27T19:37:19+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
+
+<h2 id="when">When</h2>
+
+<p>The event will take place online during two half-days:</p>
+
+<ul>
+  <li>Dates: February 16 and 17, 2022.</li>
+  <li>Time: 14:00 – 19:00 UTC (9:00–14:00 EST, 15:00–20:00 CET)</li>
+</ul>
+
+<h2 id="register">Register</h2>
+
+<p><a href="/summit/">KubeVirt Summit</a> is hosted on Community.CNCF.io. Because of how that platform works, you need to register for each of the two days of the summit independantly:</p>
+
+<ul>
+  <li><a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/">Register for Day 1</a></li>
+  <li><a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/">Register for Day 2</a></li>
+</ul>
+
+<p>You will need to create an account with CNCF.io if you have not before. Attendance is free.</p>
+
+<h2 id="keep-up-to-date">Keep up to date</h2>
+
+<p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
+
+<p>We are looking forward to meeting you there!</p>]]></content><author><name>Chandler Wilkerson</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's second annual dedicated online event]]></summary></entry><entry><title type="html">KubeVirt v0.49.0</title><link href="https://kubevirt.io//2022/changelog-v0.49.0.html" rel="alternate" type="text/html" title="KubeVirt v0.49.0" /><published>2022-01-11T00:00:00+00:00</published><updated>2022-01-11T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.49.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.49.0.html"><![CDATA[<h2 id="v0490">v0.49.0</h2>
 
 <p>Released on: Tue Jan 11 17:27:09 2022 +0000</p>
 
@@ -978,38 +1004,4 @@ VirtualMachine             testvm     myvms         <span class="nb">false</span
 
 <p><a href="https://kubevirt.io/2018/KubeVirt-API-Access-Control.html">KubeVirt API Access Control</a></p>
 
-<p><a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="go" /><category term="api" /><category term="authentication" /><summary type="html"><![CDATA[This blog post discusses authentication methods that can be used with the KubeVirt client-go library.]]></summary></entry><entry><title type="html">KubeVirt v0.43.0</title><link href="https://kubevirt.io//2021/changelog-v0.43.0.html" rel="alternate" type="text/html" title="KubeVirt v0.43.0" /><published>2021-07-09T00:00:00+00:00</published><updated>2021-07-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.43.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.43.0.html"><![CDATA[<h2 id="v0430">v0.43.0</h2>
-
-<p>Released on: Fri Jul 9 15:46:22 2021 +0000</p>
-
-<ul>
-  <li>[PR #5952][mhenriks] Use CDI beta API. CDI v1.20.0 is now the minimum requirement for kubevirt.</li>
-  <li>[PR #5846][rmohr] Add “spec.cpu.numaTopologyPassthrough” which allows emulating a host-alligned virtual numa topology for high performance</li>
-  <li>[PR #5894][rmohr] Add <code class="language-plaintext highlighter-rouge">spec.migrations.disableTLS</code> to the KubeVirt CR to allow disabling encrypted migrations. They stay secure by default.</li>
-  <li>[PR #5649][awels] Enhancement: remove one attachment pod per disk limit (behavior on upgrade with running VM with hotplugged disks is undefined)</li>
-  <li>[PR #5742][rmohr] VMIs which choose evictionStrategy <code class="language-plaintext highlighter-rouge">LifeMigrate</code> and request the <code class="language-plaintext highlighter-rouge">invtsc</code> cpuflag are now live-migrateable</li>
-  <li>[PR #5911][dhiller] Bumps kubevirtci, also suppresses kubectl.sh output to avoid confusing checks</li>
-  <li>[PR #5863][xpivarc] Fix: ioerrors don’t cause crash-looping of notify server</li>
-  <li>[PR #5867][mlsorensen] New build target added to export virt-* images as a tar archive.</li>
-  <li>[PR #5766][davidvossel] Addition of kubevirt_vmi_phase_transition_seconds_since_creation to monitor how long it takes to transition a VMI to a specific phase from creation time.</li>
-  <li>[PR #5823][dhiller] Change default branch to <code class="language-plaintext highlighter-rouge">main</code> for <code class="language-plaintext highlighter-rouge">kubevirt/kubevirt</code> repository</li>
-  <li>[PR #5763][nunnatsa] Fix bug 1945589: Prevent migration of VMIs that uses virtiofs</li>
-  <li>[PR #5827][mlsorensen] Auto-provisioned disk images on empty PVCs now leave 128KiB unused to avoid edge cases that run the volume out of space.</li>
-  <li>[PR #5849][davidvossel] Fixes event recording causing a segfault in virt-controller</li>
-  <li>[PR #5797][rhrazdil] Add serviceAccountDisk automatically when Istio is enabled in VMI annotations</li>
-  <li>[PR #5723][ashleyschuett] Allow virtctl to stop VM and ignore the graceful shutdown period</li>
-  <li>[PR #5806][mlsorensen] configmap, secret, and cloud-init raw disks now work when underlying node storage has 4k blocks.</li>
-  <li>[PR #5623][iholder-redhat] [bugfix]: Allow migration of VMs with host-model CPU to migrate only for compatible nodes</li>
-  <li>[PR #5716][rhrazdil] Fix issue with virt-launcher becoming <code class="language-plaintext highlighter-rouge">NotReady</code> after migration when Istio is used.</li>
-  <li>[PR #5778][ashleyschuett] Update ca-bundle if it is unable to be parsed</li>
-  <li>[PR #5787][acardace] migrated references of authorization/v1beta1 to authorization/v1</li>
-  <li>[PR #5461][rhrazdil] Add support for Istio proxy when no explicit ports are specified on masquerade interface</li>
-  <li>[PR #5751][acardace] EFI VMIs with secureboot disabled can now be booted even when only OVMF_CODE.secboot.fd and OVMF_VARS.fd are present in the virt-launcher image</li>
-  <li>[PR #5629][andreyod] Support starting Virtual Machine with its guest CPU paused using <code class="language-plaintext highlighter-rouge">virtctl start --paused</code></li>
-  <li>[PR #5725][dhiller] Generate REST API coverage report after functional tests</li>
-  <li>[PR #5758][davidvossel] Fixes kubevirt_vmi_phase_count to include all phases, even those that occur before handler hand off.</li>
-  <li>[PR #5745][ashleyschuett] Alert with resource usage exceeds resource requests</li>
-  <li>[PR #5759][mhenriks] Update CDI to 1.34.1</li>
-  <li>[PR #5038][kwiesmueller] Add exec command to VM liveness and readinessProbe executed through the qemu-guest-agent.</li>
-  <li>[PR #5431][alonSadan] Add NFT and IPTables rules to allow port-forward to non-declared ports on the VMI. Declaring ports on VMI will limit</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.43.0 changes]]></summary></entry></feed>
+<p><a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="go" /><category term="api" /><category term="authentication" /><summary type="html"><![CDATA[This blog post discusses authentication methods that can be used with the KubeVirt client-go library.]]></summary></entry></feed>

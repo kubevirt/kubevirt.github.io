@@ -760,6 +760,9 @@ const (
 	// This label indicates the object is a part of the install strategy retrieval process.
 	InstallStrategyLabel = "kubevirt.io/install-strategy"
 
+	// Set by virt-operator to coordinate component deletion
+	VirtOperatorComponentFinalizer string = "kubevirt.io/virtOperatorFinalizer"
+
 	// Set by VMI controller to ensure VMIs are processed during deletion
 	VirtualMachineInstanceFinalizer string = "foregroundDeleteVirtualMachine"
 	// Set By VM controller on VMIs to ensure VMIs are processed by VM controller during deletion
@@ -808,6 +811,11 @@ const (
 	// MigrationPendingPodTimeoutSecondsAnnotation represents a custom timeout period used for target pods stuck in pending for any reason
 	// This exists for functional testing
 	MigrationPendingPodTimeoutSecondsAnnotation string = "kubevirt.io/migrationPendingPodTimeoutSeconds"
+
+	// CustomLibvirtLogFiltersAnnotation can be used to customized libvirt log filters. Example value could be
+	// "3:remote 4:event 3:util.json 3:util.object 3:util.dbus 3:util.netlink 3:node_device 3:rpc 3:access 1:*".
+	// For more info: https://libvirt.org/kbase/debuglogs.html
+	CustomLibvirtLogFiltersAnnotation string = "kubevirt.io/libvirt-log-filters"
 
 	// RealtimeLabel marks the node as capable of running realtime workloads
 	RealtimeLabel string = "kubevirt.io/realtime"

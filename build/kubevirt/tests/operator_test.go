@@ -1517,10 +1517,10 @@ spec:
 			// Since we're likely dealing with api additions/removals here, we
 			// need to ensure we're using a different cache directory after
 			// the update from the previous release occurs.
-			oldClientCacheDir := workDir + "/oldclient"
+			oldClientCacheDir := filepath.Join(workDir, "oldclient")
 			err = os.MkdirAll(oldClientCacheDir, 0755)
 			Expect(err).ToNot(HaveOccurred())
-			newClientCacheDir := workDir + "/newclient"
+			newClientCacheDir := filepath.Join(workDir, "newclient")
 			err = os.MkdirAll(newClientCacheDir, 0755)
 			Expect(err).ToNot(HaveOccurred())
 
@@ -1743,6 +1743,11 @@ spec:
 		It("[test_id:3146]should be able to delete and re-create kubevirt install", func() {
 			allPodsAreReady(originalKv)
 			sanityCheckDeploymentsExist()
+
+			// This ensures that we can remove kubevirt while workloads are running
+			By("Starting some vmis")
+			vmis := generateMigratableVMIs(2)
+			startAllVMIs(vmis)
 
 			By("Deleting KubeVirt object")
 			deleteAllKvAndWait(false)
