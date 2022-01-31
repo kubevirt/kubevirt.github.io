@@ -39,7 +39,7 @@ You will need to create an account with CNCF.io if you have not before. Attendan
 | 15:00 | 10:00 | Live Migration Policies - fine tuning migrations dynamically | Itamar Holder | Users |
 | 15:30 | 10:30 | Live Migration Policies - fine tuning migrations dynamically | Itamar Holder | Users |
 | 16:00 | 11:00 | KubeVirt+Harverster: a Windows user tale | Nuno do Carmo | Users |
-| 16:35 | 11:35 | Kubernetes clusters on KubeVirt VMs | David Vossel | Users |
+| 16:35 | 11:35 | Kubernetes clusters on KubeVirt VMs | David Vossel, Alex Gradouski, Cheng Cheng | Users |
 | 17:10 | 12:10 | Network interface hotplug for KubeVirt | Miguel Duarte Barroso | Contributors |
 | 17:45 | 12:45 | A few bugs and findings from VMI Churn at NVIDIA | Fan Zhang | Contributors |
 | 18:20 | 13:20 | EdgeStack and Singulus: Complete VM network implementation with KubeVirt CNI  | Sangho Shin, Jian Li | Users |
