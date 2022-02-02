@@ -1871,7 +1871,7 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 					podName := fmt.Sprintf("migration-killer-pod-%d", idx)
 
 					// kill the handler right as we detect the qemu target process come online
-					pod := tests.RenderPrivilegedPod(podName, []string{"/bin/bash", "-c"}, []string{fmt.Sprintf("while true; do ps aux | grep -v \"defunct\" | grep \"%s\" && pkill -9 virt-handler && sleep 5; done", emulator)})
+					pod := tests.RenderPrivilegedPod(podName, []string{"/bin/bash", "-c"}, []string{fmt.Sprintf("while true; do ps aux | grep -v \"defunct\" | grep -v \"D\" | grep \"%s\" && pkill -9 virt-handler && sleep 5; done", emulator)})
 
 					pod.Spec.NodeName = entry.Name
 					createdPod, err := virtClient.CoreV1().Pods(util.NamespaceTestDefault).Create(context.Background(), pod, metav1.CreateOptions{})
@@ -1927,6 +1927,53 @@ var _ = Describe("[Serial][rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][leve
 
 				By("Verifying Second Migration Succeeeds")
 				tests.ConfirmVMIPostMigration(virtClient, vmi, migrationUID)
+
+				// delete VMI
+				By("Deleting the VMI")
+				Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
+
+				By("Waiting for VMI to disappear")
+				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
+			})
+
+			It("old finalized migrations should get garbage collected", func() {
+				vmi := tests.NewRandomFedoraVMIWithGuestAgent()
+				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("1Gi")
+
+				// this annotation causes virt launcher to immediately fail a migration
+				vmi.Annotations = map[string]string{v1.FuncTestForceLauncherMigrationFailureAnnotation: ""}
+
+				By("Starting the VirtualMachineInstance")
+				vmi = runVMIAndExpectLaunch(vmi, 240)
+
+				for i := 0; i < 10; i++ {
+					// execute a migration, wait for finalized state
+					By("Starting the Migration")
+					migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+					migration.Name = fmt.Sprintf("%s-iter-%d", vmi.Name, i)
+					migrationUID := runMigrationAndExpectFailure(migration, 180)
+
+					// check VMI, confirm migration state
+					confirmVMIPostMigrationFailed(vmi, migrationUID)
+
+					Eventually(func() error {
+						vmi, err = virtClient.VirtualMachineInstance(vmi.Namespace).Get(vmi.Name, &metav1.GetOptions{})
+						Expect(err).ToNot(HaveOccurred())
+
+						pod, err := virtClient.CoreV1().Pods(vmi.Namespace).Get(context.Background(), vmi.Status.MigrationState.TargetPod, metav1.GetOptions{})
+						Expect(err).ToNot(HaveOccurred())
+
+						if pod.Status.Phase == k8sv1.PodFailed || pod.Status.Phase == k8sv1.PodSucceeded {
+							return nil
+						}
+
+						return fmt.Errorf("still waiting on target pod to complete, current phase is %s", pod.Status.Phase)
+					}, 10*time.Second, time.Second).Should(Succeed(), "Target pod should exit quickly after migration fails.")
+				}
+
+				migrations, err := virtClient.VirtualMachineInstanceMigration(vmi.Namespace).List(&metav1.ListOptions{})
+				Expect(err).To(BeNil())
+				Expect(migrations.Items).To(HaveLen(5))
 
 				// delete VMI
 				By("Deleting the VMI")

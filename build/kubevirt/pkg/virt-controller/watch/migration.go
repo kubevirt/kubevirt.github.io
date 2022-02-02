@@ -23,7 +23,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"reflect"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -33,6 +33,8 @@ import (
 
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/api/policy/v1beta1"
+	"k8s.io/apimachinery/pkg/api/equality"
+	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/labels"
@@ -67,6 +69,11 @@ const (
 // This is the timeout used when a target pod is stuck in
 // a pending unschedulable state.
 const defaultUnschedulablePendingTimeoutSeconds = int64(60 * 5)
+
+// This is how many finalized migration objects left in
+// the system before we begin garbage collecting the oldest
+// migration objects
+const defaultFinalizedMigrationGarbageCollectionBuffer = 5
 
 // This is catch all timeout used when a target pod is stuck in
 // a in the pending phase for any reason. The theory behind this timeout
@@ -207,7 +214,7 @@ func ensureSelectorLabelPresent(migration *virtv1.VirtualMachineInstanceMigratio
 func (c *MigrationController) patchVMI(origVMI, newVMI *virtv1.VirtualMachineInstance) error {
 	var ops []string
 
-	if !reflect.DeepEqual(origVMI.Status.MigrationState, newVMI.Status.MigrationState) {
+	if !equality.Semantic.DeepEqual(origVMI.Status.MigrationState, newVMI.Status.MigrationState) {
 		newState, err := json.Marshal(newVMI.Status.MigrationState)
 		if err != nil {
 			return err
@@ -225,7 +232,7 @@ func (c *MigrationController) patchVMI(origVMI, newVMI *virtv1.VirtualMachineIns
 		}
 	}
 
-	if !reflect.DeepEqual(origVMI.Labels, newVMI.Labels) {
+	if !equality.Semantic.DeepEqual(origVMI.Labels, newVMI.Labels) {
 		newLabels, err := json.Marshal(newVMI.Labels)
 		if err != nil {
 			return err
@@ -314,6 +321,13 @@ func (c *MigrationController) execute(key string) error {
 
 	if syncErr != nil {
 		return syncErr
+	}
+
+	if migration.IsFinal() {
+		err = c.garbageCollectFinalizedMigrations(vmi)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -490,12 +504,12 @@ func (c *MigrationController) updateStatus(migration *virtv1.VirtualMachineInsta
 		}
 	}
 
-	if !reflect.DeepEqual(migration.Status, migrationCopy.Status) {
+	if !equality.Semantic.DeepEqual(migration.Status, migrationCopy.Status) {
 		err := c.statusUpdater.UpdateStatus(migrationCopy)
 		if err != nil {
 			return err
 		}
-	} else if !reflect.DeepEqual(migration.Finalizers, migrationCopy.Finalizers) {
+	} else if !equality.Semantic.DeepEqual(migration.Finalizers, migrationCopy.Finalizers) {
 		_, err := c.clientset.VirtualMachineInstanceMigration(migrationCopy.Namespace).Update(migrationCopy)
 		if err != nil {
 			return err
@@ -676,7 +690,7 @@ func (c *MigrationController) handleSignalMigrationAbort(migration *virtv1.Virtu
 	vmiCopy := vmi.DeepCopy()
 
 	vmiCopy.Status.MigrationState.AbortRequested = true
-	if !reflect.DeepEqual(vmi.Status, vmiCopy.Status) {
+	if !equality.Semantic.DeepEqual(vmi.Status, vmiCopy.Status) {
 		newStatus, err := json.Marshal(vmiCopy.Status)
 		if err != nil {
 			return err
@@ -1167,7 +1181,7 @@ func (c *MigrationController) updatePod(old, cur interface{}) {
 		return
 	}
 
-	labelChanged := !reflect.DeepEqual(curPod.Labels, oldPod.Labels)
+	labelChanged := !equality.Semantic.DeepEqual(curPod.Labels, oldPod.Labels)
 	if curPod.DeletionTimestamp != nil {
 		// having a pod marked for deletion is enough to count as a deletion expectation
 		c.deletePod(curPod)
@@ -1180,7 +1194,7 @@ func (c *MigrationController) updatePod(old, cur interface{}) {
 
 	curControllerRef := c.getControllerOf(curPod)
 	oldControllerRef := c.getControllerOf(oldPod)
-	controllerRefChanged := !reflect.DeepEqual(curControllerRef, oldControllerRef)
+	controllerRefChanged := !equality.Semantic.DeepEqual(curControllerRef, oldControllerRef)
 	if controllerRefChanged && oldControllerRef != nil {
 		// The ControllerRef was changed. Sync the old controller, if any.
 		if migration := c.resolveControllerRef(oldPod.Namespace, oldControllerRef); migration != nil {
@@ -1260,6 +1274,62 @@ func (c *MigrationController) updatePDB(old, cur interface{}) {
 	}
 }
 
+type vmimCollection []*virtv1.VirtualMachineInstanceMigration
+
+func (c vmimCollection) Len() int {
+	return len(c)
+}
+
+func (c vmimCollection) Less(i, j int) bool {
+	t1 := &c[i].CreationTimestamp
+	t2 := &c[j].CreationTimestamp
+	return t1.Before(t2)
+}
+
+func (c vmimCollection) Swap(i, j int) {
+	c[i], c[j] = c[j], c[i]
+}
+
+func (c *MigrationController) garbageCollectFinalizedMigrations(vmi *virtv1.VirtualMachineInstance) error {
+
+	var finalizedMigrations []string
+
+	migrations, err := c.listMigrationsMatchingVMI(vmi.Namespace, vmi.Name)
+	if err != nil {
+		return err
+	}
+
+	// Oldest first
+	sort.Sort(vmimCollection(migrations))
+	for _, migration := range migrations {
+		if migration.IsFinal() && migration.DeletionTimestamp == nil {
+			finalizedMigrations = append(finalizedMigrations, migration.Name)
+		}
+	}
+
+	// only keep the oldest 5 finalized migration objects
+	garbageCollectionCount := len(finalizedMigrations) - defaultFinalizedMigrationGarbageCollectionBuffer
+
+	if garbageCollectionCount <= 0 {
+		return nil
+	}
+
+	for i := 0; i < garbageCollectionCount; i++ {
+		err = c.clientset.VirtualMachineInstanceMigration(vmi.Namespace).Delete(finalizedMigrations[i], &v1.DeleteOptions{})
+		if err != nil && errors.IsNotFound(err) {
+			// This is safe to ignore. It's possible in some
+			// scenarios that the migration we're trying to garbage
+			// collect has already disappeared. Let's log it as debug
+			// and suppress the error in this situation.
+			log.Log.V(3).Reason(err).Infof("error encountered when garbage collecting migration object %s/%s", vmi.Namespace, finalizedMigrations[i])
+		} else if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 // takes a namespace and returns all migrations listening for this vmi
 func (c *MigrationController) listMigrationsMatchingVMI(namespace string, name string) ([]*virtv1.VirtualMachineInstanceMigration, error) {
 	objs, err := c.migrationInformer.GetIndexer().ByIndex(cache.NamespaceIndex, namespace)
@@ -1302,7 +1372,7 @@ func (c *MigrationController) updateVMI(old, cur interface{}) {
 		// have different RVs.
 		return
 	}
-	labelChanged := !reflect.DeepEqual(curVMI.Labels, oldVMI.Labels)
+	labelChanged := !equality.Semantic.DeepEqual(curVMI.Labels, oldVMI.Labels)
 	if curVMI.DeletionTimestamp != nil {
 		// having a DataVOlume marked for deletion is enough
 		// to count as a deletion expectation

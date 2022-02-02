@@ -1,4 +1,4 @@
-// +build amd64
+//go:build amd64
 
 /*
  * This file is part of the KubeVirt project
@@ -23,8 +23,6 @@ package nodelabeller
 
 import (
 	"path"
-
-	"kubevirt.io/kubevirt/tests"
 
 	"github.com/golang/mock/gomock"
 	. "github.com/onsi/ginkgo"
@@ -142,7 +140,7 @@ var _ = Describe("Node-labeller config", func() {
 	Context("should return correct host cpu", func() {
 		var hostCpuModel hostCPUModel
 
-		tests.BeforeAll(func() {
+		BeforeEach(func() {
 			err := nlController.loadHostSupportedFeatures()
 			Expect(err).ToNot(HaveOccurred())
 
