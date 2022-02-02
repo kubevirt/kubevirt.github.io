@@ -36,13 +36,13 @@ You will need to create an account with CNCF.io if you have not before. Attendan
 | ------- | ------- | ----------------------------- | ------- | ------ | 
 | 14:00 | 9:00 | Keynote/Intro | Fabian Deutch | General |
 | 14:25 | 9:25 | "KubeVirt on Arm64 (Progress, Troubles and Plans)" | Howard Zhang | Contributors |
-| 15:00 | 10:00 | Live Migration Policies - fine tuning migrations dynamically | Itamar Holder | Users |
-| 15:30 | 10:30 | Live Migration Policies - fine tuning migrations dynamically | Itamar Holder | Users |
-| 16:00 | 11:00 | KubeVirt+Harverster: a Windows user tale | Nuno do Carmo | Users |
-| 16:35 | 11:35 | Kubernetes clusters on KubeVirt VMs | David Vossel | Users |
-| 17:10 | 12:10 | Network interface hotplug for KubeVirt | Miguel Duarte Barroso | Contributors |
-| 17:45 | 12:45 | A few bugs and findings from VMI Churn at NVIDIA | Fan Zhang | Contributors |
-| 18:20 | 13:20 | EdgeStack and Singulus: Complete VM network implementation with KubeVirt CNI  | Sangho Shin, Jian Li | Users |
+| 15:00 | 10:00 | EdgeStack and Singulus: Complete VM network implementation with KubeVirt CNI  | Sangho Shin, Jian Li | Users |
+| 15:30 | 10:30 | Live Migration Policies - fine tuning migrations dynamically (50min) | Itamar Holder | Users |
+| 16:35 | 11:35 | KubeVirt+Harverster: a Windows user tale | Nuno do Carmo | Users |
+| 17:10 | 12:10 | Kubernetes clusters on KubeVirt VMs | David Vossel, Alex Gradouski, Cheng Cheng | Users |
+| 17:45 | 12:45 | Network interface hotplug for KubeVirt | Miguel Duarte Barroso | Contributors |
+| 18:20 | 13:20 | A few bugs and findings from VMI Churn at NVIDIA | Fan Zhang | Contributors |
+
 
 ## [DAY 2](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/) Thursday, February 17
 
