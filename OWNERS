@@ -12,6 +12,7 @@ filters:
       - dhiller
       - stu-gott
       - phoracek
+      - jberkus
     emeritus_approvers:
       - codificat # 09 June 2021
       - hroyrh # 09 June 2021
