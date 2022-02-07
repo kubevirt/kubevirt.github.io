@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-02-02T23:14:43+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-02-07T19:58:37+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
 
 <h2 id="when">When</h2>
 
@@ -2354,8 +2354,8 @@ Example-http-server
 <span class="py">hostname</span> <span class="p">=</span> <span class="s">"devstation"</span>
 
 <span class="nn">[customizations.kernel]</span>
-<span class="py">append</span> <span class="p">=</span> <span class="s">"console=tty0 console=ttyS0,19200n81"</span>
-
+<span class="py">append</span> <span class="p">=</span> <span class="py">"console</span><span class="p">=</span><span class="err">tty</span><span class="mi">0</span> <span class="py">console</span><span class="p">=</span><span class="err">ttyS</span><span class="mi">0</span><span class="p">,</span><span class="mi">19200</span><span class="err">n</span><span class="mi">81</span><span class="s">"</span><span class="err">
+</span>
 <span class="nn">[customizations.timezone]</span>
 <span class="py">timezone</span> <span class="p">=</span> <span class="s">"Europe/Madrid"</span>
 <span class="py">ntpservers</span> <span class="p">=</span> <span class="p">[</span><span class="s">"0.europe.pool.ntp.org"</span><span class="p">,</span> <span class="s">"1.europe.pool.ntp.org"</span><span class="p">]</span>

@@ -602,8 +602,8 @@ Example-http-server
 <span class="py">hostname</span> <span class="p">=</span> <span class="s">"devstation"</span>
 
 <span class="nn">[customizations.kernel]</span>
-<span class="py">append</span> <span class="p">=</span> <span class="s">"console=tty0 console=ttyS0,19200n81"</span>
-
+<span class="py">append</span> <span class="p">=</span> <span class="py">"console</span><span class="p">=</span><span class="err">tty</span><span class="mi">0</span> <span class="py">console</span><span class="p">=</span><span class="err">ttyS</span><span class="mi">0</span><span class="p">,</span><span class="mi">19200</span><span class="err">n</span><span class="mi">81</span><span class="s">"</span><span class="err">
+</span>
 <span class="nn">[customizations.timezone]</span>
 <span class="py">timezone</span> <span class="p">=</span> <span class="s">"Europe/Madrid"</span>
 <span class="py">ntpservers</span> <span class="p">=</span> <span class="p">[</span><span class="s">"0.europe.pool.ntp.org"</span><span class="p">,</span> <span class="s">"1.europe.pool.ntp.org"</span><span class="p">]</span>
