@@ -249,7 +249,7 @@ func NewController(
 		permissions = "rwm"
 	}
 
-	c.deviceManagerController = device_manager.NewDeviceController(c.host, maxDevices, permissions, clusterConfig, clientset.CoreV1())
+	c.deviceManagerController = device_manager.NewDeviceController(c.host, device_manager.PermanentHostDevicePlugins(maxDevices, permissions), clusterConfig, clientset.CoreV1())
 	c.heartBeat = heartbeat.NewHeartBeat(clientset.CoreV1(), c.deviceManagerController, clusterConfig, host)
 
 	return c
@@ -904,7 +904,9 @@ func (d *VirtualMachineController) updateLiveMigrationConditions(vmi *v1.Virtual
 			vmi.Status.Conditions = append(vmi.Status.Conditions, *liveMigrationCondition)
 		}
 	}
-	if vmi.IsEvictable() && liveMigrationCondition.Status == k8sv1.ConditionFalse {
+
+	evictable := migrations.VMIMigratableOnEviction(d.clusterConfig, vmi)
+	if evictable && liveMigrationCondition.Status == k8sv1.ConditionFalse {
 		d.recorder.Event(vmi, k8sv1.EventTypeWarning, v1.Migrated.String(), "EvictionStrategy is set but vmi is not migratable")
 	}
 }

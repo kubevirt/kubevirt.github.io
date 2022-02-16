@@ -633,6 +633,14 @@
 <lastmod>2022-01-24T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2022/Dedicated-migration-network.html</loc>
+<lastmod>2022-01-25T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>https://kubevirt.io//2022/changelog-v0.50.0.html</loc>
+<lastmod>2022-02-09T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1387,6 +1395,12 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/cpumanager.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/live-migration.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/dedicated-network.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>

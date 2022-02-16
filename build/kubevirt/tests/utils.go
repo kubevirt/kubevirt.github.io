@@ -523,8 +523,56 @@ func BeforeTestCleanup() {
 	cleanNamespaces()
 	CleanNodes()
 	resetToDefaultConfig()
+	ensureKubevirtInfra()
 	CreateHostPathPv(osAlpineHostPath, HostPathAlpine)
 	CreateHostPathPVC(osAlpineHostPath, defaultDiskSize)
+}
+
+func ensureKubevirtInfra() {
+	virtClient, err := kubecli.GetKubevirtClient()
+	util2.PanicOnError(err)
+	kv := util2.GetCurrentKv(virtClient)
+
+	timeout := 180 * time.Second
+	interval := 1 * time.Second
+
+	deployments := []string{
+		"virt-operator",
+		components.VirtAPIName,
+		components.VirtControllerName,
+	}
+
+	ensureDeployment := func(deploymentName string) {
+		deployment, err := virtClient.
+			AppsV1().
+			Deployments(kv.Namespace).
+			Get(context.Background(), deploymentName, metav1.GetOptions{})
+		Expect(err).ToNot(HaveOccurred())
+
+		EventuallyWithOffset(
+			1,
+			ThisDeploymentWith(kv.Namespace, deploymentName),
+			timeout,
+			interval).
+			Should(HaveReadyReplicasNumerically("==", *deployment.Spec.Replicas),
+				"waiting for %s deployment to be ready", deploymentName)
+	}
+
+	for _, deploymentName := range deployments {
+		ensureDeployment(deploymentName)
+	}
+
+	//TODO: implement matcher for Daemonset in test infra
+	Eventually(func() bool {
+		ds, err := virtClient.
+			AppsV1().
+			DaemonSets(kv.Namespace).
+			Get(context.Background(), components.VirtHandlerName, metav1.GetOptions{})
+		Expect(err).ToNot(HaveOccurred())
+
+		return ds.Status.DesiredNumberScheduled == ds.Status.NumberReady
+	}, timeout, interval).Should(BeTrue(), "waiting for virt-handler daemonSet to be ready")
+
 }
 
 func CleanNodes() {
@@ -567,7 +615,7 @@ func CleanNodes() {
 		new.Spec.Taints = taints
 
 		for k := range node.Labels {
-			if strings.HasPrefix(k, "tests.kubevirt.io") {
+			if strings.HasPrefix(k, cleanup.KubeVirtTestLabelPrefix) {
 				found = true
 				delete(new.Labels, k)
 			}
@@ -1820,7 +1868,9 @@ func cleanNamespaces() {
 		util2.PanicOnError(err)
 
 		//Remove all Jobs
-		util2.PanicOnError(virtCli.BatchV1().RESTClient().Delete().Namespace(namespace).Resource("jobs").Do(context.Background()).Error())
+		jobDeleteStrategy := metav1.DeletePropagationOrphan
+		jobDeleteOptions := metav1.DeleteOptions{PropagationPolicy: &jobDeleteStrategy}
+		util2.PanicOnError(virtCli.BatchV1().RESTClient().Delete().Namespace(namespace).Resource("jobs").Body(&jobDeleteOptions).Do(context.Background()).Error())
 		//Remove all HPA
 		util2.PanicOnError(virtCli.AutoscalingV1().RESTClient().Delete().Namespace(namespace).Resource("horizontalpodautoscalers").Do(context.Background()).Error())
 
@@ -2004,6 +2054,9 @@ func createNamespaces() {
 		ns := &k8sv1.Namespace{
 			ObjectMeta: metav1.ObjectMeta{
 				Name: namespace,
+				Labels: map[string]string{
+					cleanup.TestLabelForNamespace(namespace): "",
+				},
 			},
 		}
 		_, err = virtCli.CoreV1().Namespaces().Create(context.Background(), ns, metav1.CreateOptions{})
@@ -2853,14 +2906,6 @@ func AddServiceAccountDisk(vmi *v1.VirtualMachineInstance, serviceAccountName st
 func NewRandomVMIWithSlirpInterfaceEphemeralDiskAndUserdata(containerImage string, userData string, Ports []v1.Port) *v1.VirtualMachineInstance {
 	vmi := NewRandomVMIWithEphemeralDiskAndUserdata(containerImage, userData)
 	vmi.Spec.Domain.Devices.Interfaces = []v1.Interface{{Name: "default", Ports: Ports, InterfaceBindingMethod: v1.InterfaceBindingMethod{Slirp: &v1.InterfaceSlirp{}}}}
-	vmi.Spec.Networks = []v1.Network{*v1.DefaultPodNetwork()}
-
-	return vmi
-}
-
-func NewRandomVMIWithMasqueradeInterfaceEphemeralDiskAndUserdata(containerImage string, userData string, Ports []v1.Port) *v1.VirtualMachineInstance {
-	vmi := NewRandomVMIWithEphemeralDiskAndUserdata(containerImage, userData)
-	vmi.Spec.Domain.Devices.Interfaces = []v1.Interface{{Name: "default", Ports: Ports, InterfaceBindingMethod: v1.InterfaceBindingMethod{Masquerade: &v1.InterfaceMasquerade{}}}}
 	vmi.Spec.Networks = []v1.Network{*v1.DefaultPodNetwork()}
 
 	return vmi
@@ -4497,6 +4542,7 @@ func WaitForConfigToBePropagatedToComponent(podLabel string, resourceVersion str
 			if pod.DeletionTimestamp != nil {
 				continue
 			}
+
 			body, err := CallUrlOnPod(&pod, "8443", "/healthz")
 			if err != nil {
 				return fmt.Errorf("failed to call healthz endpoint. %s", errAdditionalInfo)
@@ -5203,12 +5249,18 @@ func CreateBlockPVC(virtClient kubecli.KubevirtClient, name string, size resourc
 	return createdPvc
 }
 
-func ArchiveFiles(targetFile, tgtDir string, sourceFilesNames ...string) string {
+func CreateArchive(targetFile, tgtDir string, sourceFilesNames ...string) string {
 	tgtPath := filepath.Join(tgtDir, filepath.Base(targetFile)+".tar")
 	tgtFile, err := os.Create(tgtPath)
 	Expect(err).ToNot(HaveOccurred())
 	defer tgtFile.Close()
 
+	ArchiveToFile(tgtFile, sourceFilesNames...)
+
+	return tgtPath
+}
+
+func ArchiveToFile(tgtFile *os.File, sourceFilesNames ...string) {
 	w := tar.NewWriter(tgtFile)
 	defer w.Close()
 
@@ -5229,8 +5281,6 @@ func ArchiveFiles(targetFile, tgtDir string, sourceFilesNames ...string) string 
 		_, err = io.Copy(w, srcFile)
 		Expect(err).ToNot(HaveOccurred())
 	}
-
-	return tgtPath
 }
 
 func GetPolicyMatchedToVmi(name string, vmi *v1.VirtualMachineInstance, namespace *k8sv1.Namespace, matchingVmiLabels, matchingNSLabels int) *migrationsv1.MigrationPolicy {

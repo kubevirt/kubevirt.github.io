@@ -1,4 +1,64 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-02-07T19:58:37+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-02-16T18:19:10+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.50.0</title><link href="https://kubevirt.io//2022/changelog-v0.50.0.html" rel="alternate" type="text/html" title="KubeVirt v0.50.0" /><published>2022-02-09T00:00:00+00:00</published><updated>2022-02-09T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.50.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.50.0.html"><![CDATA[<h2 id="v0500">v0.50.0</h2>
+
+<p>Released on: Wed Feb 9 18:01:08 2022 +0000</p>
+
+<ul>
+  <li>[PR #7056][fossedihelm] Update k8s dependencies to 0.23.1</li>
+  <li>[PR #7135][davidvossel] Switch from reflects.DeepEquals to equality.Semantic.DeepEquals() across the entire project</li>
+  <li>[PR #7052][sradco] Updated recording rule “kubevirt_vm_container_free_memory_bytes”</li>
+  <li>[PR #7000][iholder-redhat] Adds a possibility to override default libvirt log filters though VMI annotations</li>
+  <li>[PR #7064][davidvossel] Fixes issue associated with blocked uninstalls when VMIs exist during removal</li>
+  <li>[PR #7097][iholder-redhat] [Bug fix] VMI with kernel boot stuck on “Terminating” status if more disks are defined</li>
+  <li>[PR #6700][VirrageS] Simplify replacing <code class="language-plaintext highlighter-rouge">time.Ticker</code> in agent poller and fix default values for <code class="language-plaintext highlighter-rouge">qemu-*-interval</code> flags</li>
+  <li>[PR #6581][ormergi] SRIOV network interfaces are now hot-plugged when disconnected manually or due to aborted migrations.</li>
+  <li>[PR #6924][EdDev] Support for legacy GPU definition is removed. Please see https://kubevirt.io/user-guide/virtual_machines/host-devices on how to define host-devices.</li>
+  <li>[PR #6735][uril] The command <code class="language-plaintext highlighter-rouge">migrate_cancel</code> was added to virtctl. It cancels an active VM migration.</li>
+  <li>[PR #6883][rthallisey] Add instance-type to cloud-init metadata</li>
+  <li>[PR #6999][maya-r] When expanding disk images, take the minimum between the request and the capacity - avoid using the full underlying file system on storage like NFS, local.</li>
+  <li>[PR #6946][vladikr] Numa information of an assigned device will be presented in the devices metadata</li>
+  <li>[PR #6042][iholder-redhat] Fully support cgroups v2, include a new cohesive package and perform major refactoring.</li>
+  <li>[PR #6968][vladikr] Added Writeback disk cache support</li>
+  <li>[PR #6995][sradco] Alert OrphanedVirtualMachineImages name was changed to OrphanedVirtualMachineInstances.</li>
+  <li>[PR #6923][rhrazdil] Fix issue with ssh being unreachable on VMIs with Istio proxy</li>
+  <li>[PR #6821][jean-edouard] Migrating VMIs that contain dedicated CPUs will now have properly dedicated CPUs on target</li>
+  <li>[PR #6793][oshoval] Add infoSource field to vmi.status.interfaces.</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.50.0 changes]]></summary></entry><entry><title type="html">Dedicated migration network in KubeVirt</title><link href="https://kubevirt.io//2022/Dedicated-migration-network.html" rel="alternate" type="text/html" title="Dedicated migration network in KubeVirt" /><published>2022-01-25T00:00:00+00:00</published><updated>2022-01-25T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Dedicated-migration-network</id><content type="html" xml:base="https://kubevirt.io//2022/Dedicated-migration-network.html"><![CDATA[<p>Since version 0.49, KubeVirt supports live migrating VMIs over a separate network than the one Kubernetes is running on.</p>
+
+<p>Running migrations over a dedicated network is a great way to increase migration bandwidth and reliability.</p>
+
+<p>This article gives an overview of the feature as well as a concrete example. For more technical information, refer to the <a href="https://kubevirt.io/user-guide/operations/live_migration/#using-a-different-network-for-migrations">KubeVirt documentation</a>.</p>
+
+<h2 id="hardware-configuration">Hardware configuration</h2>
+
+<p>The simplest way to use the feature is to find an unused NIC on every worker node, and to connect them all to the same switch.</p>
+
+<p>All NICs must have the same name. If they don’t, they should be permanently renamed.
+The process for renaming NICs varies depending on your operating system, refer to its documentation if you need help.</p>
+
+<p>Adding servers to the network for services like DHCP or DNS is an option but it is not required.
+If a DHCP is running, it is best if it doesn’t provide routes to other networks / the internet, to keep the migration network isolated.</p>
+
+<h2 id="cluster-configuration">Cluster configuration</h2>
+
+<p>The interface between the physical network and KubeVirt is a NetworkAttachmentDefinition (NAD), created in the namespace where KubeVirt is installed.</p>
+
+<p>The implementation of the NAD is up to the admin, as long as it provides a link to the secondary network.
+The admin must also ensure that the NAD is able to provide cluster-wide IPs, either through a physical DHCP, or with another CNI plugin like <a href="https://github.com/k8snetworkplumbingwg/whereabouts">whereabouts</a></p>
+
+<p>Important: the subnet used here must be completely distinct from the ones used by the main Kubernetes network, to ensure proper routing.</p>
+
+<h2 id="testing">Testing</h2>
+
+<p>If you just want to test the feature, KubeVirtCI supports the creation of multiple nodes, as well as secondary networks.
+All you need is to define the right environment variables before starting the cluster.</p>
+
+<p>See the example below for more info (note that text in the “video” can actually be selected and copy/pasted).</p>
+
+<h2 id="example">Example</h2>
+
+<p>Here is a quick <a href="https://asciinema.org/a/464272">example</a> of a dual-node KubeVirtCI cluster running a migration over a secondary network.</p>
+
+<p>The description of the clip includes more detailed information about the steps involved.</p>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="live migration" /><category term="dedicated network" /><summary type="html"><![CDATA[KubeVirt now supports using a separate network for live migrations]]></summary></entry><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
 
 <h2 id="when">When</h2>
 
@@ -737,271 +797,4 @@ Remaining two charts provide information about Request duration and size.</p>
 
 <p>KubeVirt introduced <a href="https://kubevirt.io/user-guide/virtual_machines/istio_service_mesh/">support for Istio</a>, allowing virtual machines to be part of a service mesh.</p>
 
-<p>This blog post covered running KubeVirt virtual machine in Istio service mesh using an ephemeral kubevirtci cluster. Kiali dashboard was used to observe inbound and outbound traffic of a virtual machine.</p>]]></content><author><name>Radim Hrazdil</name></author><category term="news" /><category term="kubevirt" /><category term="istio" /><category term="virtual machine" /><category term="VM" /><category term="service mesh" /><category term="mesh" /><summary type="html"><![CDATA[This blog post demonstrates running virtual machines in Istio service mesh.]]></summary></entry><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html"><![CDATA[<h2 id="v0440">v0.44.0</h2>
-
-<p>Released on: Mon Aug 9 14:20:14 2021 +0000</p>
-
-<ul>
-  <li>[PR #6058][acardace] Fix virt-launcher exit pod race condition</li>
-  <li>[PR #6035][davidvossel] Addition of perfscale-audit tool for auditing performance of control plane during stress tests</li>
-  <li>[PR #6145][acardace] virt-launcher: disable unencrypted TCP socket for libvirtd.</li>
-  <li>[PR #6163][davidvossel] Handle qemu processes in defunc (zombie) state</li>
-  <li>[PR #6105][ashleyschuett] Add VirtualMachineInstancesPerNode to KubeVirt CR under Spec.Configuration</li>
-  <li>[PR #6104][zcahana] Report FailedUnschedulable VM status when scheduling errors occur</li>
-  <li>[PR #5905][davidvossel] VM CrashLoop detection and Exponential Backoff</li>
-  <li>[PR #6070][acardace] Initiate Live-Migration using a unix socket (exposed by virt-handler) instead of an additional TCP&lt;-&gt;Unix migration proxy started by virt-launcher</li>
-  <li>[PR #5728][vasiliy-ul] Live migration of VMs with hotplug volumes is now enabled</li>
-  <li>[PR #6109][rmohr] Fix virt-controller SCC: Reflect the need for NET_BIND_SERVICE in the virt-controller SCC.</li>
-  <li>[PR #5942][ShellyKa13] Integrate guest agent to online VM snapshot</li>
-  <li>[PR #6034][ashleyschuett] Go version updated to version 1.16.6</li>
-  <li>[PR #6040][yuhaohaoyu] Improved debuggability by keeping the environment of a failed VMI alive.</li>
-  <li>[PR #6068][dhiller] Add check that not all tests have been skipped</li>
-  <li>[PR #6041][xpivarc] [Experimental] Virt-launcher can run as non-root user</li>
-  <li>[PR #6062][iholder-redhat] replace dead “stress” binary with new, maintained, “stress-ng” binary</li>
-  <li>[PR #6029][mhenriks] CDI to 1.36.0 with DataSource support</li>
-  <li>[PR #4089][victortoso] Add support to USB Redirection with usbredir</li>
-  <li>[PR #5946][vatsalparekh] Add guest-agent based ping probe</li>
-  <li>[PR #6005][acardace] make containerDisk validation memory usage limit configurable</li>
-  <li>[PR #5791][zcahana] Added a READY column to the tabular output of “kubectl get vm/vmi”</li>
-  <li>[PR #6006][awels] DataVolumes created by DataVolumeTemplates will follow the associated VMs priority class.</li>
-  <li>[PR #5982][davidvossel] Reduce vmi Update collisions (http code 409) during startup</li>
-  <li>[PR #5891][akalenyu] BugFix: Pending VMIs when creating concurrent bulk of VMs backed by WFFC DVs</li>
-  <li>[PR #5925][rhrazdil] Fix issue with Windows VMs not being assigned IP address configured in network-attachment-definition IPAM.</li>
-  <li>[PR #6007][rmohr] Fix: The bandwidth limitation on migrations is no longer ignored. Caution: The default bandwidth limitation of 64Mi is changed to “unlimited” to not break existing installations.</li>
-  <li>[PR #4944][kwiesmueller] Add <code class="language-plaintext highlighter-rouge">/portforward</code> subresource to <code class="language-plaintext highlighter-rouge">VirtualMachine</code> and <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> that can tunnel TCP traffic through the API Server using a websocket stream.</li>
-  <li>[PR #5402][alicefr] Integration of libguestfs-tools and added new command <code class="language-plaintext highlighter-rouge">guestfs</code> to virtctl</li>
-  <li>[PR #5953][ashleyschuett] Allow Failed VMs to be stopped when using <code class="language-plaintext highlighter-rouge">--force --gracePeriod 0</code></li>
-  <li>[PR #5876][mlsorensen] KubeVirt CR supports specifying a runtime class for virt-launcher pods via ‘launcherRuntimeClass’.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.44.0 changes]]></summary></entry><entry><title type="html">Kubernetes Authentication Options using KubeVirt Client Library</title><link href="https://kubevirt.io//2021/kubevirt-api-auth.html" rel="alternate" type="text/html" title="Kubernetes Authentication Options using KubeVirt Client Library" /><published>2021-07-16T00:00:00+00:00</published><updated>2021-07-16T00:00:00+00:00</updated><id>https://kubevirt.io//2021/kubevirt-api-auth</id><content type="html" xml:base="https://kubevirt.io//2021/kubevirt-api-auth.html"><![CDATA[<ul>
-  <li><a href="#introduction">Introduction</a></li>
-  <li><a href="#requirements">Requirements</a></li>
-  <li><a href="#setup">Setup</a>
-    <ul>
-      <li><a href="#compiling-our-test-application">Compiling our test application</a></li>
-    </ul>
-  </li>
-  <li><a href="#running-our-application-externally-leveraging-a-kubeconfig-file">Running our application externally leveraging a kubeconfig file</a>
-    <ul>
-      <li><a href="#using-the-default-kubeconfig">Using the default kubeconfig</a></li>
-      <li><a href="#creating-a-kubeconfig-for-the-service-account">Creating a kubeconfig for the service account</a></li>
-    </ul>
-  </li>
-  <li><a href="#running-in-a-kubernetes-cluster">Running in a Kubernetes Cluster</a></li>
-  <li><a href="#extending-rbac-role-across-namespaces">Extending RBAC Role across Namespaces</a></li>
-  <li><a href="#creating-custom-rbac-roles">Creating Custom RBAC Roles</a></li>
-  <li><a href="#conclusion">Conclusion</a></li>
-  <li><a href="#references">References</a></li>
-</ul>
-
-<h2 id="introduction">Introduction</h2>
-
-<p>Most interaction with the KubeVirt service can be handled using the <em>virtctl</em> command, or raw yaml applied to your Kubernetes cluster. But what if you want to have more direct programmatic control over the instantiation and management of those virtual machines? The KubeVirt project supplies a Go client library for interacting with KubeVirt called <a href="https://github.com/kubevirt/client-go">client-go</a>. This library allows you to write your own applications that interact directly with the KubeVirt api quickly and easily.</p>
-
-<p>In this post, we will use a simple application to demonstrate how the KubeVirt client library authenticates with your Kubernetes cluster both in and out of your cluster. This application is based on the example application in the “client-go” library with a few small modifications to it, to allow for running both locally and within in the cluster. This tutorial assumes you have some knowledge of Go, and is not meant to be a Go training doc.</p>
-
-<h2 id="requirements">Requirements</h2>
-
-<p>In order to compile and run the test application locally you will need to have the Go programming language installed on your machine. If you do not have the latest version of Go installed, follow the steps on the <a href="https://golang.org/dl/">Downloads</a> page of the Go  web site before proceeding with the rest of the steps in this blog. The steps listed here were tested with Go version 1.16.</p>
-
-<p>You will need a Kubernetes cluster running with the KubeVirt operator installed. If you do not have a cluster available, the easiest way to do this is to follow the steps outlined in the <a href="https://kubevirt.io/quickstart_minikube/">Quick Start with Minikube</a> lab.</p>
-
-<p>The example application we will be using to demonstrate the authentication methods lists out the VMI and VM instances in your cluster in the current namespace. If you do not have any running VMs in your cluster, be sure to create at least one new virtual machine instance in your cluster. For guidance in creating a quick test vm see the <a href="https://kubevirt.io/labs/kubernetes/lab1.html">Use KubeVirt</a> lab.</p>
-
-<h2 id="setup">Setup</h2>
-
-<h3 id="compiling-our-test-application">Compiling our test application</h3>
-
-<p>Start by cloning the example application repo <a href="https://github.com/xphyr/kubevirt-apiauth">https://github.com/xphyr/kubevirt-apiauth</a> and compiling our test application:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/xphyr/kubevirt-apiauth.git
-<span class="nb">cd </span>kubevirt-apiauth/listvms
-go build
-</code></pre></div></div>
-
-<p>Once the program compiles, test to ensure that the application compiled correctly. If you have a working Kubernetes context, running this command may return some values. If you do not have a current context, you will get an error. This is OK, we will discuss authentication next.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./listvms
-2021/06/23 16:51:28 cannot obtain KubeVirt vm list: Get <span class="s2">"http://localhost:8080/apis/kubevirt.io/v1alpha3/namespaces/default/virtualmachines"</span>: dial tcp 127.0.0.1:8080: connect: connection refused
-</code></pre></div></div>
-
-<p>As long as the program runs, you are all set to move onto the next step.</p>
-
-<h2 id="running-our-application-externally-leveraging-a-kubeconfig-file">Running our application externally leveraging a kubeconfig file</h2>
-
-<p>The default authentication file for Kubernetes is the <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/">kubeconfig</a> file. We will not be going into details of this file, but you can click the link to goto the documentation on the kubeconfig file to learn more about it. All you need to know at this time is that when you use the <em>kubectl</em> command you are using a kubeconfig file for your authentication.</p>
-
-<h3 id="using-the-default-kubeconfig">Using the default kubeconfig</h3>
-
-<p>If you haven’t already done so, validate that you have a successful connection to your cluster with the “<em>kubectl</em>” command:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get nodes
-NAME       STATUS   ROLES                  AGE     VERSION
-minikube   Ready    control-plane,master   5d21h   v1.20.7
-</code></pre></div></div>
-
-<p>We now have a valid kubeconfig. On *nix OS such as Linux and OSX, this file is stored in your home directory at <code class="language-plaintext highlighter-rouge">~/.kube/config</code>. You should now be able to run our test application and get some results (assuming you have some running vms in your cluster).</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./listvms/listvms
-Type                       Name       Namespace     Status
-VirtualMachine             testvm     default       <span class="nb">false
-</span>VirtualMachineInstance     testvm     default       Scheduled
-</code></pre></div></div>
-
-<p>This is great, but there is an issue. The authentication method we used is your primary Kubernetes authentication. It has roles and permissions to do many different things in your k8s cluster. Wouldn’t it be better if we could scope that authentication and ensure that your application had a dedicated account, with only the proper permissions to interact with just what your application will need. This is what Kubernetes <strong>Service Accounts</strong> are for.</p>
-
-<p><a href="https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/">Service Accounts</a> are accounts for processes as opposed to users. By default they are scoped to a namespace, but you can give service accounts access to other namespaces through RBAC rules that we will discuss later. In this demo, we will be using the “<em>default</em>” project/namespace, so the service account we create will be initially scoped only to this namespace.</p>
-
-<p>Start by creating a new service account called “mykubevirtrunner” using your default Kubernetes account:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create sa mykubevirtrunner
-<span class="nv">$ </span>kubectl describe sa mykubevirtrunner
-Name:                mykubevirtrunner
-Namespace:           default
-Labels:              &lt;none&gt;
-Annotations:         &lt;none&gt;
-Image pull secrets:  &lt;none&gt;
-Mountable secrets:   mykubevirtrunner-token-pd2mq
-Tokens:              mykubevirtrunner-token-pd2mq
-Events:              &lt;none&gt;
-</code></pre></div></div>
-
-<p>In the describe output you can see that a token and a mountable secret have been created. Let’s take a look at the contents of the secret:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl describe secret mykubevirtrunner-token-pd2mq
-Name:         mykubevirtrunner-token-pd2mq
-Namespace:    default
-Labels:       &lt;none&gt;
-Annotations:  kubernetes.io/service-account.name: mykubevirtrunner
-              kubernetes.io/service-account.uid: f401493b-658a-489d-bcce-0ccce39160a0
-
-Type:  kubernetes.io/service-account-token
-
-Data
-<span class="o">====</span>
-namespace:  7 bytes
-token:      eyJhbGciOiJS...
-ca.crt:     1111 bytes
-
-</code></pre></div></div>
-
-<p>The data listed for the “token” key is the information we will use in the next step, your output will be much longer, it has been truncated for this document. Ensure when copying the value that you get the entire token value.</p>
-
-<h3 id="creating-a-kubeconfig-for-the-service-account">Creating a kubeconfig for the service account</h3>
-
-<p>We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the “<em>kubectl</em>” command to log in with the new token. Open a NEW terminal window. This will be the window we use for the service account. In this new terminal window start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the “<em>kubectl</em>” command to generate a new kubeconfig file:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/sa-kubeconfig
-kubectl config set-cluster minikube <span class="nt">--server</span><span class="o">=</span>https://&lt;update IP address&gt;:8443 <span class="nt">--insecure-skip-tls-verify</span>
-kubectl config set-credentials mykubevirtrunner <span class="nt">--token</span><span class="o">=</span>&lt;<span class="nb">paste </span>token from last step here&gt;
-kubectl config set-context minikube <span class="nt">--cluster</span><span class="o">=</span>minikube <span class="nt">--namespace</span><span class="o">=</span>default <span class="nt">--user</span><span class="o">=</span>mykubevirtrunner
-kubectl config use-context minikube
-</code></pre></div></div>
-
-<p>We can test that the new kubeconfig file is working by running a kubectl command:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods
-Error from server <span class="o">(</span>Forbidden<span class="o">)</span>: pods is forbidden: User <span class="s2">"system:serviceaccount:default:mykubevirtrunner"</span> cannot list resource <span class="s2">"pods"</span> <span class="k">in </span>API group <span class="s2">""</span> <span class="k">in </span>the namespace <span class="s2">"default"</span>
-</code></pre></div></div>
-
-<p>Note that the “User” is now listed as “<em>system:serviceaccount:default:mykubevirtrunner</em>” so we know we are using our new service account. Now try running our test program and note that it is using the service account as well:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>listvms/listvms
-2021/07/07 14:53:23 cannot obtain KubeVirt vm list: virtualmachines.kubevirt.io is forbidden: User <span class="s2">"system:serviceaccount:default:mykubevirtrunner"</span> cannot list resource <span class="s2">"virtualmachines"</span> <span class="k">in </span>API group <span class="s2">"kubevirt.io"</span> <span class="k">in </span>the namespace <span class="s2">"default"</span>
-</code></pre></div></div>
-
-<p>You can see we are now using our service account in our application, but that service account doesn’t have the right permissions… We now need to assign a role to our service account to give it the proper API access. We will start simple and give the service account the <strong>kubevirt.io:view</strong> role, which will allow the service account to see the KubeVirt objects within the “<em>default</em>” namespace:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create clusterrolebinding kubevirt-viewer <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:view <span class="nt">--serviceaccount</span><span class="o">=</span>default:mykubevirtrunner
-clusterrolebinding.rbac.authorization.k8s.io/kubevirt-viewer created
-</code></pre></div></div>
-
-<p>Now run the <em>listvms</em> command again:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./listvms/listvms
-Type                       Name                    Namespace     Status
-VirtualMachineInstance     vm-fedora-ephemeral     myvms         Running
-</code></pre></div></div>
-
-<p>Success! Our application is now using the service account that we created for authentication to the cluster. The service account can be extended by adding additional default roles to the account, or by creating custom roles that limit the scope of the service account to only the exact actions you want to take. When you install KubeVirt you get a set of default roles including “View”, “Edit” and “Admin”. Additional details about these roles are available here: <a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>
-
-<h2 id="running-in-a-kubernetes-cluster">Running in a Kubernetes Cluster</h2>
-
-<p>So all of this is great if you want to run the application outside of your cluster … but what if you want your application to run INSIDE you cluster. You could create a kubeconfig file, and add it to your namespace as a secret and then mount that secret as a volume inside your pod, but there is an easier way that continues to leverage the service account that we created. By default Kubernetes creates a few environment variables for every pod that indicate that the container is running within Kubernetes, and it makes a Kubernetes authentication token for the service account that the container is running as available at /var/run/secrets/kubernetes.io/serviceaccount/token. The client-go KubeVirt library can detect that it is running inside a Kubernetes hosted container and will transparently use the authentication token provided with no additional configuration needed.</p>
-
-<p>A container image with the listvms binary is available at <strong>quay.io/markd/listvms</strong>. We can start a copy of this container using the deployment yaml file located in the ‘listvms/listvms_deployment.yaml’ file.</p>
-
-<p>Switch back to your original terminal window that is using your primary kubeconfig file, and using the “<em>kubectl</em>” command deploy one instance of the test pod, and then check the logs of the pod:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> listvms/listvms_deployment.yaml
-<span class="nv">$ </span>kubectl get pods
-NAME                                      READY   STATUS    RESTARTS   AGE
-listvms-7b8f865c8d-2zqqn                  1/1     Running   0          7m30s
-virt-launcher-vm-fedora-ephemeral-4ljg4   2/2     Running   0          24h
-<span class="nv">$ </span>kubectl logs listvms-7b8f865c8d-2zqqn
-2021/07/07 19:06:42 cannot obtain KubeVirt vm list: virtualmachines.kubevirt.io is forbidden: User <span class="s2">"system:serviceaccount:default:default"</span> cannot list resource <span class="s2">"virtualmachines"</span> <span class="k">in </span>API group <span class="s2">"kubevirt.io"</span> <span class="k">in </span>the namespace <span class="s2">"default"</span>
-</code></pre></div></div>
-
-<blockquote>
-  <p><strong>NOTE:</strong> Be sure to deploy this demo application in a namespace that contains at least one running VM or VMI.</p>
-</blockquote>
-
-<p>The application is unable to run the operation, because it is running as the default service account in the “<em>default</em>” namespace. If you remember previously we created a service account in this namespace called “mykubevirtrunner”. We need only update the deployment to use this service account and we should see some success. Use the “kubectl edit deployment/listvms” command to update the container spec to include the “serviceAccount: mykubevirtrunner” line as show below:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">containers</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">listvms</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/markd/listvms</span>
-      <span class="na">serviceAccount</span><span class="pi">:</span> <span class="s">mykubevirtrunner</span>
-      <span class="na">securityContext</span><span class="pi">:</span> <span class="pi">{}</span>
-      <span class="na">schedulerName</span><span class="pi">:</span> <span class="s">default-scheduler</span>
-</code></pre></div></div>
-
-<p>This change will trigger Kubernetes to redeploy your pod, using the new serviceAccount. We should now see some output from our program:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods
-NAME                                      READY   STATUS    RESTARTS   AGE
-listvms-7b8f865c8d-2qzzn                  1/1     Running   0          7m30s
-virt-launcher-vm-fedora-ephemeral-4ljg4   2/2     Running   0          24h
-<span class="nv">$ </span>kubectl logs listvms-7b8f865c8d-2qzzn
-Type                       Name                    Namespace     Status
-VirtualMachineInstance     vm-fedora-ephemeral     myvms         Running
-awaiting signal
-</code></pre></div></div>
-
-<h2 id="extending-rbac-role-across-namespaces">Extending RBAC Role across Namespaces</h2>
-
-<p>As currently configured, the mykubevirtrunner service account can only “view” KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create namespace myvms
-&lt;launch an addition vm here&gt;
-kubectl create clusterrolebinding kubevirt-viewer <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:view <span class="nt">--serviceaccount</span><span class="o">=</span>default:mykubevirtrunner <span class="nt">-n</span> myvms
-</code></pre></div></div>
-
-<p>We can test that the ServiceAccount has been updated to also have permissions to view in the “myvms” namespace by running our listvms command one more time, this time passing in the optional flag <em>–namespaces</em>. Switch to your terminal window that is using the service account kubeconfig file and run the following command:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>listvms/listvms <span class="nt">--namespaces</span> myvms
-additional namespaces to check are:  myvms
-Checking the following namespaces:  <span class="o">[</span>default myvms]
-Type                       Name       Namespace     Status
-VirtualMachine             testvm     default       <span class="nb">false
-</span>VirtualMachineInstance     testvm     default       Scheduled
-VirtualMachine             testvm     myvms         <span class="nb">false</span>
-</code></pre></div></div>
-
-<p>You can see that now, the ServiceAccount can view the vm and vmi that are in both the default namespace as well as the <em>myvms</em> namespace.</p>
-
-<h2 id="creating-custom-rbac-roles">Creating Custom RBAC Roles</h2>
-
-<p>In this demo we used RBAC roles created as part of the KubeVirt install. You can also create custom RBAC roles for KubeVirt. Documentation on how this can be done is available in the KubeVirt documentation <a href="https://kubevirt.io/user-guide/operations/authorization/#creating-custom-rbac-roles">Creating Custom RBAC Roles</a></p>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>It is possible to control and manage your KubeVirt machines with the use of Kubernetes service accounts and the “client-go” library. When using service accounts, you want to ensure that the account has the minimum role or permissions to do it’s job to ensure the security of your cluster. The “client-go” library gives you options on how you authenticate with your Kubernetes cluster, allowing you to deploy your application both in and out of your Kubernetes cluster.</p>
-
-<h2 id="references">References</h2>
-
-<p><a href="https://github.com/kubevirt/client-go">KubeVirt Client Go</a></p>
-
-<p><a href="https://kubevirt.io/2018/KubeVirt-API-Access-Control.html">KubeVirt API Access Control</a></p>
-
-<p><a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="go" /><category term="api" /><category term="authentication" /><summary type="html"><![CDATA[This blog post discusses authentication methods that can be used with the KubeVirt client-go library.]]></summary></entry></feed>
+<p>This blog post covered running KubeVirt virtual machine in Istio service mesh using an ephemeral kubevirtci cluster. Kiali dashboard was used to observe inbound and outbound traffic of a virtual machine.</p>]]></content><author><name>Radim Hrazdil</name></author><category term="news" /><category term="kubevirt" /><category term="istio" /><category term="virtual machine" /><category term="VM" /><category term="service mesh" /><category term="mesh" /><summary type="html"><![CDATA[This blog post demonstrates running virtual machines in Istio service mesh.]]></summary></entry></feed>
