@@ -50,7 +50,7 @@ You will need to create an account with CNCF.io if you have not before. Attendan
 | ------- | ------- | ----------------------------- | ------- | ------ | 
 | 14:00 | 9:00 | KubeVirt Scale and Performance with SIG-Scale | Ryan Hallisey, Marcelo Amaral | Users |
 | 14:35 | 9:35 | Benchmarking the performance of CPU pinning using different virtual CPU topologies: a KVM vs. KubeVirt analysis | Guoqing Li, Marcelo Amaral | Contributors |
-| 15:10 | 10:10 | Delivering High-Performance VNF Workloads in KubeVirt: Navigating Network Acceleration Low for Latency Requirements | Pooja Ghumre, Ashutosh Tiwari  | Contributors |
+| 15:10 | 10:10 | Delivering High-Performance VNF Workloads in KubeVirt: Navigating Network Acceleration for Low Latency Requirements | Pooja Ghumre, Ashutosh Tiwari  | Contributors |
 | 15:45 | 10:45 | Extending Kube-Burner to Support CRDs KubeVirt: An Open Source Benchmark Suite for Kubernetes Control Plane Analysis | Marcelo Amaral | Contributors |
 | 16:20 | 11:20 | Automatic configuration of mediated devices / vGPUs in KubeVirt | Vladik Romanovsky | Users
 | 16:55 | 11:55 | Volume Populator Support | Michael Henriksen | Users |
