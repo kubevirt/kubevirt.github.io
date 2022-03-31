@@ -64,7 +64,7 @@ KubeVirt can be installed using the KubeVirt operator, which manages the lifecyc
 
 ### Verify components
 
-By default KubeVirt will deploy 7 pods, 3 services, 1 daemonset, 3 deployment apps, 3 replica sets.
+By default KubeVirt will deploy 7 pods, 3 services, 1 daemonset, 3 deployment apps, 3 replica sets. It may take 30 seconds to a minute to see output from the following command.
 
 * Check the deployment:
 
