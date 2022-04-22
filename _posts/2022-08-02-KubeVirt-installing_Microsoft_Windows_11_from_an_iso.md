@@ -15,7 +15,7 @@ tags:
     Windows,
   ]
 title: "KubeVirt: installing Microsoft Windows 11 from an ISO"
-pub-date: May, 9
+pub-date: August, 2
 pub-year: 2022
 ---
 
