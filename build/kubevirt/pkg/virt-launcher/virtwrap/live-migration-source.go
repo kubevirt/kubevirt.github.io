@@ -48,6 +48,8 @@ import (
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice/sriov"
 	domainerrors "kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/errors"
+	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/stats"
+	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/statsconv"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/util"
 )
 
@@ -67,8 +69,8 @@ type migrationMonitor struct {
 
 	start              int64
 	lastProgressUpdate int64
-	progressWatermark  int64
-	remainingData      int64
+	progressWatermark  uint64
+	remainingData      uint64
 
 	progressTimeout          int64
 	acceptableCompletionTime int64
@@ -465,12 +467,25 @@ func (l *LibvirtDomainManager) initializeMigrationMetadata(vmi *v1.VirtualMachin
 }
 
 func (l *LibvirtDomainManager) cancelMigration(vmi *v1.VirtualMachineInstance) error {
-	if vmi.Status.MigrationState == nil || vmi.Status.MigrationState.Completed ||
-		vmi.Status.MigrationState.Failed || vmi.Status.MigrationState.StartTimestamp == nil {
+	domName := api.VMINamespaceKeyFunc(vmi)
+	dom, err := l.virConn.LookupDomainByName(domName)
+	if err != nil {
+		return err
+	}
+	defer dom.Free()
 
+	domain, err := util.GetDomainSpecWithRuntimeInfo(dom)
+	if err != nil {
+		return err
+	}
+
+	migration := domain.Metadata.KubeVirt.Migration
+	if migration == nil || migration.Completed ||
+		migration.Failed || migration.StartTimestamp == nil {
 		return fmt.Errorf("failed to cancel migration - vmi is not migrating")
 	}
-	err := l.setMigrationAbortStatus(vmi, v1.MigrationAbortInProgress)
+
+	err = l.setMigrationAbortStatus(vmi, v1.MigrationAbortInProgress)
 	if err != nil {
 		if err == domainerrors.MigrationAbortInProgressError {
 			return nil
@@ -580,16 +595,15 @@ func (l *LibvirtDomainManager) setMigrationAbortStatus(vmi *v1.VirtualMachineIns
 }
 
 func newMigrationMonitor(vmi *v1.VirtualMachineInstance, l *LibvirtDomainManager, options *cmdclient.MigrationOptions, migrationErr chan error) *migrationMonitor {
-
 	monitor := &migrationMonitor{
 		l:                        l,
 		vmi:                      vmi,
 		options:                  options,
 		migrationErr:             migrationErr,
-		progressWatermark:        int64(0),
-		remainingData:            int64(0),
+		progressWatermark:        0,
+		remainingData:            0,
 		progressTimeout:          options.ProgressTimeout,
-		acceptableCompletionTime: options.CompletionTimeoutPerGiB * getVMIMigrationDataSize(vmi),
+		acceptableCompletionTime: options.CompletionTimeoutPerGiB * getVMIMigrationDataSize(vmi, l.ephemeralDiskDir),
 	}
 
 	return monitor
@@ -630,9 +644,9 @@ func (m *migrationMonitor) isMigrationProgressing(domainSpec *api.DomainSpec) bo
 	now := time.Now().UTC().UnixNano()
 
 	// check if the migration is progressing
-	progressDelay := now - m.lastProgressUpdate
-	if m.progressTimeout != 0 && progressDelay/int64(time.Second) > m.progressTimeout {
-		logger.Warningf("Live migration stuck for %d sec", progressDelay)
+	progressDelay := (now - m.lastProgressUpdate) / int64(time.Second)
+	if m.progressTimeout != 0 && progressDelay > m.progressTimeout {
+		logger.Warningf("Live migration stuck for %d seconds", progressDelay)
 		return false
 	}
 
@@ -687,18 +701,18 @@ func (m *migrationMonitor) determineNonRunningMigrationStatus(dom cli.VirDomain)
 	return nil
 }
 
-func (m *migrationMonitor) processInflightMigration(dom cli.VirDomain) *inflightMigrationAborted {
+func (m *migrationMonitor) processInflightMigration(dom cli.VirDomain, stats *libvirt.DomainJobInfo) *inflightMigrationAborted {
 	logger := log.Log.Object(m.vmi)
 
 	// Migration is running
 	now := time.Now().UTC().UnixNano()
 	elapsed := now - m.start
 
-	if (m.progressWatermark == 0) ||
-		(m.progressWatermark > m.remainingData) {
-		m.progressWatermark = m.remainingData
+	m.l.migrateInfoStats = statsconv.Convert_libvirt_DomainJobInfo_To_stats_DomainJobInfo(stats)
+	if (m.progressWatermark == 0) || (m.remainingData < m.progressWatermark) {
 		m.lastProgressUpdate = now
 	}
+	m.progressWatermark = m.remainingData
 
 	domainSpec, err := m.l.getDomainSpec(dom)
 	if err != nil {
@@ -744,7 +758,7 @@ func (m *migrationMonitor) processInflightMigration(dom cli.VirDomain) *inflight
 
 		progressDelay := now - m.lastProgressUpdate
 		aborted := &inflightMigrationAborted{}
-		aborted.message = fmt.Sprintf("Live migration stuck for %d sec and has been aborted", progressDelay)
+		aborted.message = fmt.Sprintf("Live migration stuck for %d seconds and has been aborted", progressDelay/int64(time.Second))
 		aborted.abortStatus = v1.MigrationAbortSucceeded
 		return aborted
 	case m.shouldTriggerTimeout(elapsed, domainSpec):
@@ -760,7 +774,7 @@ func (m *migrationMonitor) processInflightMigration(dom cli.VirDomain) *inflight
 		}
 
 		aborted := &inflightMigrationAborted{}
-		aborted.message = fmt.Sprintf("Live migration is not completed after %d sec and has been aborted", m.acceptableCompletionTime)
+		aborted.message = fmt.Sprintf("Live migration is not completed after %d seconds and has been aborted", m.acceptableCompletionTime)
 		aborted.abortStatus = v1.MigrationAbortSucceeded
 		return aborted
 	}
@@ -789,6 +803,13 @@ func (m *migrationMonitor) startMonitor() {
 	m.lastProgressUpdate = m.start
 
 	logger := log.Log.Object(vmi)
+	defer func() {
+		m.l.migrateInfoStats = &stats.DomainJobInfo{
+			DataProcessed: 0,
+			DataRemaining: 0,
+			MemDirtyRate:  0,
+		}
+	}()
 
 	domName := api.VMINamespaceKeyFunc(vmi)
 	dom, err := m.l.virConn.LookupDomainByName(domName)
@@ -825,10 +846,14 @@ func (m *migrationMonitor) startMonitor() {
 				continue
 			}
 		}
-		m.remainingData = int64(stats.DataRemaining)
+
+		if stats.DataRemainingSet {
+			m.remainingData = stats.DataRemaining
+		}
+
 		switch stats.Type {
 		case libvirt.DOMAIN_JOB_UNBOUNDED:
-			aborted := m.processInflightMigration(dom)
+			aborted := m.processInflightMigration(dom, stats)
 			if aborted != nil {
 				logger.Errorf("Live migration abort detected with reason: %s", aborted.message)
 				m.l.setMigrationResult(vmi, true, aborted.message, aborted.abortStatus)

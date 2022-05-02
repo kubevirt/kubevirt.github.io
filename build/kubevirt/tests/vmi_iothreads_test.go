@@ -23,8 +23,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/kubevirt/tests/framework/checks"
@@ -40,6 +39,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 	"kubevirt.io/kubevirt/tests"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
+	"kubevirt.io/kubevirt/tests/libnode"
 )
 
 var _ = Describe("[sig-compute]IOThreads", func() {
@@ -61,7 +61,7 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 		var availableCPUs int
 
 		BeforeEach(func() {
-			availableCPUs = tests.GetHighestCPUNumberAmongNodes(virtClient)
+			availableCPUs = libnode.GetHighestCPUNumberAmongNodes(virtClient)
 		})
 
 		It("[test_id:4122]Should honor shared ioThreadsPolicy for single disk", func() {
@@ -87,7 +87,7 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 			expectedIOThreads := 1
 			Expect(int(domSpec.IOThreads.IOThreads)).To(Equal(expectedIOThreads))
 
-			Expect(len(newVMI.Spec.Domain.Devices.Disks)).To(Equal(1))
+			Expect(newVMI.Spec.Domain.Devices.Disks).To(HaveLen(1))
 		})
 
 		It("[test_id:864][ref_id:2065] Should honor a mix of shared and dedicated ioThreadsPolicy", func() {
@@ -97,8 +97,8 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 			// The disk that came with the VMI
 			vmi.Spec.Domain.Devices.Disks[0].DedicatedIOThread = &dedicated
 
-			tests.AddEphemeralDisk(vmi, "shr1", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
-			tests.AddEphemeralDisk(vmi, "shr2", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "shr1", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "shr2", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
 
 			By("Creating VMI with 1 dedicated and 2 shared ioThreadPolicies")
 			vmi, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
@@ -124,7 +124,7 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 			Expect(int(domSpec.IOThreads.IOThreads)).To(Equal(expectedIOThreads))
 
 			By("Ensuring there are the expected number of disks")
-			Expect(len(newVMI.Spec.Domain.Devices.Disks)).To(Equal(len(vmi.Spec.Domain.Devices.Disks)))
+			Expect(newVMI.Spec.Domain.Devices.Disks).To(HaveLen(len(vmi.Spec.Domain.Devices.Disks)))
 
 			By("Verifying the ioThread mapping for disks")
 			disk0, err := getDiskByName(domSpec, "disk0")
@@ -140,7 +140,7 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 			Expect(*disk0.Driver.IOThread).ToNot(Equal(*disk1.Driver.IOThread))
 		})
 
-		table.DescribeTable("[ref_id:2065] should honor auto ioThreadPolicy", func(numCpus int, expectedIOThreads int) {
+		DescribeTable("[ref_id:2065] should honor auto ioThreadPolicy", func(numCpus int, expectedIOThreads int) {
 			Expect(numCpus).To(BeNumerically("<=", availableCPUs),
 				fmt.Sprintf("Testing environment only has nodes with %d CPUs available, but required are %d CPUs", availableCPUs, numCpus),
 			)
@@ -150,13 +150,13 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 
 			vmi.Spec.Domain.Devices.Disks[0].DedicatedIOThread = &dedicated
 
-			tests.AddEphemeralDisk(vmi, "ded2", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "ded2", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
 			vmi.Spec.Domain.Devices.Disks[1].DedicatedIOThread = &dedicated
 
-			tests.AddEphemeralDisk(vmi, "shr1", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
-			tests.AddEphemeralDisk(vmi, "shr2", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
-			tests.AddEphemeralDisk(vmi, "shr3", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
-			tests.AddEphemeralDisk(vmi, "shr4", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "shr1", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "shr2", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "shr3", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "shr4", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
 
 			cpuReq := resource.MustParse(fmt.Sprintf("%d", numCpus))
 			vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceCPU] = cpuReq
@@ -184,7 +184,7 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 			Expect(int(domSpec.IOThreads.IOThreads)).To(Equal(expectedIOThreads))
 
 			By("Ensuring there are the expected number of disks")
-			Expect(len(newVMI.Spec.Domain.Devices.Disks)).To(Equal(len(vmi.Spec.Domain.Devices.Disks)))
+			Expect(newVMI.Spec.Domain.Devices.Disks).To(HaveLen(len(vmi.Spec.Domain.Devices.Disks)))
 
 			By("Verifying the ioThread mapping for disks")
 			disk0, err := getDiskByName(domSpec, "disk0")
@@ -219,12 +219,12 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 		},
 			// special case: there's always at least one thread for the shared pool:
 			// two dedicated and one shared thread is 3 threads.
-			table.Entry("[test_id:3097]for one CPU", 1, 3),
-			table.Entry("[test_id:856] for two CPUs", 2, 4),
-			table.Entry("[test_id:3095] for three CPUs", 3, 6),
+			Entry("[test_id:3097]for one CPU", 1, 3),
+			Entry("[test_id:856] for two CPUs", 2, 4),
+			Entry("[test_id:3095] for three CPUs", 3, 6),
 			// there's only 6 threads expected because there's 6 total disks, even
 			// though the limit would have supported 8.
-			table.Entry("[test_id:3096]for four CPUs", 4, 6),
+			Entry("[test_id:3096]for four CPUs", 4, 6),
 		)
 
 		// IOThread with Emulator Thread
@@ -240,8 +240,8 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 				IsolateEmulatorThread: true,
 			}
 
-			tests.AddEphemeralDisk(vmi, "disk1", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
-			tests.AddEphemeralDisk(vmi, "ded2", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "disk1", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "ded2", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
 			vmi.Spec.Domain.Devices.Disks[2].DedicatedIOThread = &dedicated
 
 			By("Starting a VirtualMachineInstance")
@@ -268,7 +268,7 @@ var _ = Describe("[sig-compute]IOThreads", func() {
 			Expect(int(domSpec.IOThreads.IOThreads)).To(Equal(expectedIOThreads))
 
 			By("Ensuring there are the expected number of disks")
-			Expect(len(newVMI.Spec.Domain.Devices.Disks)).To(Equal(len(vmi.Spec.Domain.Devices.Disks)))
+			Expect(newVMI.Spec.Domain.Devices.Disks).To(HaveLen(len(vmi.Spec.Domain.Devices.Disks)))
 
 			By("Verifying the ioThread mapping for disks")
 			disk0, err := getDiskByName(domSpec, "disk0")

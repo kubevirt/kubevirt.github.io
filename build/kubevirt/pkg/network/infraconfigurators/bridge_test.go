@@ -24,7 +24,7 @@ import (
 	"net"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/client-go/api"
@@ -65,10 +65,6 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 	BeforeEach(func() {
 		ctrl = gomock.NewController(GinkgoT())
 		handler = netdriver.NewMockNetworkHandler(ctrl)
-	})
-
-	AfterEach(func() {
-		ctrl.Finish()
 	})
 
 	const (
@@ -183,7 +179,6 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 		const (
 			ifaceName     = "eth0"
 			launcherPID   = 1000
-			macStr        = "AF:B3:1F:78:2A:CA"
 			mtu           = 1000
 			queueCount    = uint32(0)
 			tapDeviceName = "tap0"
@@ -193,7 +188,6 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 			bridgeIPAddr *netlink.Addr
 			iface        *v1.Interface
 			inPodBridge  *netlink.Bridge
-			mac          net.HardwareAddr
 			podLink      *netlink.GenericLink
 			podIP        netlink.Addr
 			vmi          *v1.VirtualMachineInstance
@@ -202,7 +196,6 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 		BeforeEach(func() {
 			iface = v1.DefaultBridgeNetworkInterface()
 			vmi = newVMIWithBridgeInterface("default", "vm1")
-			mac, _ = net.ParseMAC(macStr)
 			podLink = &netlink.GenericLink{LinkAttrs: netlink.LinkAttrs{Name: ifaceName, MTU: mtu}}
 		})
 
@@ -246,11 +239,11 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					podLink,
 					podIP,
 					withOriginalPodLinkDown(podLink),
-					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
-					withLinkAsBridgePort(inPodBridge, podLinkAfterNameChange),
 					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
-					withPodLinkRandomMac(podLinkAfterNameChange, mac),
 					withARPIgnore(),
+					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
+					withSwitchedPodLinkMac(podLinkAfterNameChange, inPodBridge),
+					withLinkAsBridgePort(inPodBridge, podLinkAfterNameChange),
 					withCreatedTapDevice(tapDeviceName, bridgeIfaceName, launcherPID, mtu, queueCount),
 					withDisabledTxOffloadChecksum(bridgeIfaceName),
 					withLinkLearningOff(podLinkAfterNameChange),
@@ -298,7 +291,6 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					podIP,
 					withOriginalPodLinkDown(podLink),
 					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
-					withPodLinkRandomMac(podLinkAfterNameChange, mac),
 					withARPIgnore(),
 					withErrorCreatingBridge(*inPodBridge, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
@@ -349,8 +341,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
 			})
 
-			It("network preparation fails when setting a random MAC in the pod link errors", func() {
-				const errorString = "failed to set a random mac in the renamed pod link"
+			It("network preparation fails when setting a bridge MAC in the pod link errors", func() {
+				const errorString = "failed to set a bridge mac in the renamed pod link"
 				bridgeConfigurator := newMockedBridgeConfiguratorForPreparePhase(
 					vmi,
 					iface,
@@ -362,7 +354,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					withOriginalPodLinkDown(podLink),
 					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
 					withARPIgnore(),
-					withErrorRandomizingPodLinkMac(podLinkAfterNameChange, errorString))
+					withAddedInPodBridgeLink(inPodBridge),
+					withErrorSwitchingPodLinkMac(podLinkAfterNameChange, inPodBridge, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
 			})
 
@@ -377,11 +370,11 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					podLink,
 					podIP,
 					withOriginalPodLinkDown(podLink),
+					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
+					withARPIgnore(),
+					withSwitchedPodLinkMac(podLinkAfterNameChange, inPodBridge),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
 					withLinkAsBridgePort(inPodBridge, podLinkAfterNameChange),
-					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
-					withPodLinkRandomMac(podLinkAfterNameChange, mac),
-					withARPIgnore(),
 					withDisabledTxOffloadChecksum(bridgeIfaceName),
 					withErrorCreatingTapDevice(tapDeviceName, mtu, launcherPID, queueCount, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
@@ -414,11 +407,11 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					podLink,
 					podIP,
 					withOriginalPodLinkDown(podLink),
+					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
+					withARPIgnore(),
+					withSwitchedPodLinkMac(podLinkAfterNameChange, inPodBridge),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
 					withLinkAsBridgePort(inPodBridge, podLinkAfterNameChange),
-					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
-					withPodLinkRandomMac(podLinkAfterNameChange, mac),
-					withARPIgnore(),
 					withCreatedTapDevice(tapDeviceName, bridgeIfaceName, launcherPID, mtu, queueCount),
 					withDisabledTxOffloadChecksum(bridgeIfaceName),
 					withErrorSettingPodLinkUp(podLinkAfterNameChange, errorString))
@@ -436,11 +429,11 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					podLink,
 					podIP,
 					withOriginalPodLinkDown(podLink),
-					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
-					withLinkAsBridgePort(inPodBridge, podLinkAfterNameChange),
 					withPodPrimaryLinkSwapped(podLink, podLinkAfterNameChange, dummySwap, podIP),
-					withPodLinkRandomMac(podLinkAfterNameChange, mac),
 					withARPIgnore(),
+					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
+					withSwitchedPodLinkMac(podLinkAfterNameChange, inPodBridge),
+					withLinkAsBridgePort(inPodBridge, podLinkAfterNameChange),
 					withCreatedTapDevice(tapDeviceName, bridgeIfaceName, launcherPID, mtu, queueCount),
 					withDisabledTxOffloadChecksum(bridgeIfaceName),
 					withLinkUp(podLinkAfterNameChange),
@@ -476,8 +469,9 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withLinkAsBridgePort(inPodBridge, podLink),
 					withCreatedTapDevice(tapDeviceName, bridgeIfaceName, launcherPID, mtu, queueCount),
 					withDisabledTxOffloadChecksum(bridgeIfaceName),
@@ -506,7 +500,7 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
 					withErrorCreatingBridge(*inPodBridge, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
 			})
@@ -519,7 +513,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withErrorAddingPodLinkToBridge(inPodBridge, podLink, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
 			})
@@ -532,7 +527,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withErrorSettingBridgeUp(inPodBridge, podLink, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
 			})
@@ -545,7 +541,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withErrorSettingBridgeIPAddress(inPodBridge, podLink, bridgeIPAddr, errorString))
 				Expect(bridgeConfigurator.PreparePodNetworkInterface()).To(MatchError(errorString))
 			})
@@ -558,7 +555,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
 					withLinkAsBridgePort(inPodBridge, podLink),
 					withErrorDisablingTXOffloadChecksum(inPodBridge.Name, errorString))
@@ -573,7 +571,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
 					withLinkAsBridgePort(inPodBridge, podLink),
 					withDisabledTxOffloadChecksum(inPodBridge.Name),
@@ -589,7 +588,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
 					withLinkAsBridgePort(inPodBridge, podLink),
 					withDisabledTxOffloadChecksum(inPodBridge.Name),
@@ -606,7 +606,8 @@ var _ = Describe("Bridge infrastructure configurator", func() {
 					handler,
 					bridgeIfaceName,
 					launcherPID,
-					withSwitchedPodLinkMac(podLink, mac),
+					withOriginalPodLinkDown(podLink),
+					withSwitchedPodLinkMac(podLink, inPodBridge),
 					withCreatedInPodBridge(inPodBridge, bridgeIPAddr),
 					withLinkAsBridgePort(inPodBridge, podLink),
 					withDisabledTxOffloadChecksum(inPodBridge.Name),
@@ -740,10 +741,10 @@ func withErrorOnIPRetrieval(link netlink.Link, expectedErrorString string) Optio
 	}
 }
 
-func withSwitchedPodLinkMac(link netlink.Link, mac net.HardwareAddr) Option {
+func withSwitchedPodLinkMac(link netlink.Link, bridge *netlink.Bridge) Option {
 	return func(handler *netdriver.MockNetworkHandler) {
-		handler.EXPECT().LinkSetDown(link)
-		handler.EXPECT().SetRandomMac(link.Attrs().Name).Return(mac, nil)
+		handler.EXPECT().LinkByName(bridge.Attrs().Name).Return(bridge, nil)
+		handler.EXPECT().LinkSetHardwareAddr(link, bridge.HardwareAddr)
 	}
 }
 
@@ -771,6 +772,12 @@ func withCreatedInPodBridge(bridge *netlink.Bridge, bridgeIP *netlink.Addr) Opti
 		handler.EXPECT().LinkSetUp(bridge)
 		handler.EXPECT().ParseAddr(bridgeIPStr).Return(bridgeIP, nil)
 		handler.EXPECT().AddrAdd(bridge, bridgeIP)
+	}
+}
+
+func withAddedInPodBridgeLink(bridge *netlink.Bridge) Option {
+	return func(handler *netdriver.MockNetworkHandler) {
+		handler.EXPECT().LinkAdd(bridge)
 	}
 }
 
@@ -866,15 +873,10 @@ func withPodPrimaryLinkSwapped(oldPodLink netlink.Link, renamedPodLink netlink.L
 	}
 }
 
-func withPodLinkRandomMac(link netlink.Link, mac net.HardwareAddr) Option {
+func withErrorSwitchingPodLinkMac(link netlink.Link, bridge *netlink.Bridge, errorString string) Option {
 	return func(handler *netdriver.MockNetworkHandler) {
-		handler.EXPECT().SetRandomMac(link.Attrs().Name).Return(mac, nil)
-	}
-}
-
-func withErrorRandomizingPodLinkMac(link netlink.Link, errorString string) Option {
-	return func(handler *netdriver.MockNetworkHandler) {
-		handler.EXPECT().SetRandomMac(link.Attrs().Name).Return(nil, fmt.Errorf(errorString))
+		handler.EXPECT().LinkByName(bridge.Attrs().Name).Return(bridge, nil)
+		handler.EXPECT().LinkSetHardwareAddr(link, bridge.HardwareAddr).Return(fmt.Errorf(errorString))
 	}
 }
 

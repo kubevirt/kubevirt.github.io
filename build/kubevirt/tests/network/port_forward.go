@@ -25,7 +25,7 @@ import (
 	"os/exec"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/kubevirt/tests/util"
@@ -35,9 +35,13 @@ import (
 	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
+	"kubevirt.io/kubevirt/tests/clientcmd"
 	"kubevirt.io/kubevirt/tests/console"
+	"kubevirt.io/kubevirt/tests/libnet"
 	"kubevirt.io/kubevirt/tests/libvmi"
 )
+
+const skipIPv6Message = "port-forwarding over ipv6 is not supported yet. Tracking issue https://github.com/kubevirt/kubevirt/issues/7276"
 
 var _ = SIGDescribe("Port-forward", func() {
 	var (
@@ -53,18 +57,24 @@ var _ = SIGDescribe("Port-forward", func() {
 	})
 
 	Context("VMI With masquerade binding", func() {
-		const localPort = 1500
 		var (
+			localPort         int
 			portForwardCmd    *exec.Cmd
-			vmi               *v1.VirtualMachineInstance
 			vmiHttpServerPort int
 			vmiDeclaredPorts  []v1.Port
 		)
 
-		JustBeforeEach(func() {
-			vmi = createCirrosVMIWithPortsAndBlockUntilReady(virtClient, vmiDeclaredPorts)
-			tests.StartHTTPServer(vmi, vmiHttpServerPort)
+		setup := func(ipFamily k8sv1.IPFamily) {
+			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, ipFamily)
 
+			if ipFamily == k8sv1.IPv6Protocol {
+				Skip(skipIPv6Message)
+			}
+
+			vmi := createCirrosVMIWithPortsAndBlockUntilReady(virtClient, vmiDeclaredPorts)
+			tests.StartHTTPServerWithSourceIp(vmi, vmiHttpServerPort, getMasqueradeInternalAddress(ipFamily), console.LoginToCirros)
+
+			localPort = 1500 + GinkgoParallelProcess()
 			vmiPod := tests.GetRunningPodByVirtualMachineInstance(vmi, util.NamespaceTestDefault)
 			Expect(vmiPod).ToNot(BeNil())
 			portForwardCmd, err = portForwardCommand(vmiPod, localPort, vmiHttpServerPort)
@@ -73,8 +83,8 @@ var _ = SIGDescribe("Port-forward", func() {
 			stdout, err := portForwardCmd.StdoutPipe()
 			Expect(err).NotTo(HaveOccurred())
 			Expect(portForwardCmd.Start()).To(Succeed())
-			waitForPortForwardCmd(stdout, localPort, vmiHttpServerPort)
-		})
+			waitForPortForwardCmd(ipFamily, stdout, localPort, vmiHttpServerPort)
+		}
 
 		AfterEach(func() {
 			Expect(killPortForwardCommand(portForwardCmd)).To(Succeed())
@@ -83,14 +93,18 @@ var _ = SIGDescribe("Port-forward", func() {
 		When("performing port-forward from a local port to a VMI's declared port", func() {
 			const declaredPort = 1501
 			BeforeEach(func() {
-				vmiDeclaredPorts = append(vmiDeclaredPorts, v1.Port{Port: declaredPort})
+				vmiDeclaredPorts = []v1.Port{{Port: declaredPort}}
 				vmiHttpServerPort = declaredPort
 			})
 
-			It("should reach the vmi", func() {
+			DescribeTable("should reach the vmi", func(ipFamily k8sv1.IPFamily) {
+				setup(ipFamily)
 				By(fmt.Sprintf("checking that service running on port %d can be reached", declaredPort))
-				Expect(testConnectivityThroughLocalPort(localPort)).To(Succeed())
-			})
+				Expect(testConnectivityThroughLocalPort(ipFamily, localPort)).To(Succeed())
+			},
+				Entry("IPv4", k8sv1.IPv4Protocol),
+				Entry("IPv6", k8sv1.IPv6Protocol),
+			)
 		})
 
 		When("performing port-forward from a local port to a VMI with no declared ports", func() {
@@ -100,30 +114,38 @@ var _ = SIGDescribe("Port-forward", func() {
 				vmiHttpServerPort = nonDeclaredPort
 			})
 
-			It("should reach the vmi", func() {
+			DescribeTable("should reach the vmi", func(ipFamily k8sv1.IPFamily) {
+				setup(ipFamily)
 				By(fmt.Sprintf("checking that service running on port %d can be reached", nonDeclaredPort))
-				Expect(testConnectivityThroughLocalPort(localPort)).To(Succeed())
-			})
+				Expect(testConnectivityThroughLocalPort(ipFamily, localPort)).To(Succeed())
+			},
+				Entry("IPv4", k8sv1.IPv4Protocol),
+				Entry("IPv6", k8sv1.IPv6Protocol),
+			)
 		})
 
 		When("performing port-forward from a local port to a VMI's non-declared port", func() {
 			const nonDeclaredPort = 1502
 			const declaredPort = 1501
 			BeforeEach(func() {
-				vmiDeclaredPorts = append(vmiDeclaredPorts, v1.Port{Port: declaredPort})
+				vmiDeclaredPorts = []v1.Port{{Port: declaredPort}}
 				vmiHttpServerPort = nonDeclaredPort
 			})
 
-			It("should not reach the vmi", func() {
+			DescribeTable("should not reach the vmi", func(ipFamily k8sv1.IPFamily) {
+				setup(ipFamily)
 				By(fmt.Sprintf("checking that service running on port %d can not be reached", nonDeclaredPort))
-				Expect(testConnectivityThroughLocalPort(localPort)).ToNot(Succeed())
-			})
+				Expect(testConnectivityThroughLocalPort(ipFamily, localPort)).ToNot(Succeed())
+			},
+				Entry("IPv4", k8sv1.IPv4Protocol),
+				Entry("IPv6", k8sv1.IPv6Protocol),
+			)
 		})
 	})
 })
 
 func portForwardCommand(pod *k8sv1.Pod, sourcePort, targetPort int) (*exec.Cmd, error) {
-	_, cmd, err := tests.CreateCommandWithNS(pod.Namespace, tests.GetK8sCmdClient(), "port-forward", pod.Name, fmt.Sprintf("%d:%d", sourcePort, targetPort))
+	_, cmd, err := clientcmd.CreateCommandWithNS(pod.Namespace, clientcmd.GetK8sCmdClient(), "port-forward", pod.Name, fmt.Sprintf("%d:%d", sourcePort, targetPort))
 
 	return cmd, err
 }
@@ -151,15 +173,22 @@ func createCirrosVMIWithPortsAndBlockUntilReady(virtClient kubecli.KubevirtClien
 	return vmi
 }
 
-func testConnectivityThroughLocalPort(portNumber int) error {
-	return exec.Command("curl", fmt.Sprintf("127.0.0.1:%d", portNumber)).Run()
+func testConnectivityThroughLocalPort(ipFamily k8sv1.IPFamily, portNumber int) error {
+	return exec.Command("curl", fmt.Sprintf("%s:%d", libnet.GetLoopbackAddressForUrl(ipFamily), portNumber)).Run()
 }
 
-func waitForPortForwardCmd(stdout io.ReadCloser, src, dst int) {
+func waitForPortForwardCmd(ipFamily k8sv1.IPFamily, stdout io.ReadCloser, src, dst int) {
 	Eventually(func() string {
 		tmp := make([]byte, 1024)
 		_, err := stdout.Read(tmp)
 		Expect(err).NotTo(HaveOccurred())
 		return string(tmp)
-	}, 30*time.Second, 1*time.Second).Should(ContainSubstring(fmt.Sprintf("Forwarding from 127.0.0.1:%d -> %d", src, dst)))
+	}, 30*time.Second, 1*time.Second).Should(ContainSubstring(fmt.Sprintf("Forwarding from %s:%d -> %d", libnet.GetLoopbackAddressForUrl(ipFamily), src, dst)))
+}
+
+func getMasqueradeInternalAddress(ipFamily k8sv1.IPFamily) string {
+	if ipFamily == k8sv1.IPv4Protocol {
+		return "10.0.2.2"
+	}
+	return "fd10:0:2::2"
 }

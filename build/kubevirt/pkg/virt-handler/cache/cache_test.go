@@ -29,7 +29,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -101,7 +101,6 @@ var _ = Describe("Domain informer", func() {
 		os.RemoveAll(podsDir)
 		os.RemoveAll(ghostCacheDir)
 		DeleteGhostRecord("test", "test")
-		ctrl.Finish()
 	})
 
 	verifyObj := func(key string, domain *api.Domain) {
@@ -231,7 +230,7 @@ var _ = Describe("Domain informer", func() {
 			listResults, err := d.listAllKnownDomains()
 			Expect(err).ToNot(HaveOccurred())
 
-			Expect(len(listResults)).To(Equal(1))
+			Expect(listResults).To(HaveLen(1))
 		})
 
 		It("should list current domains including inactive domains with ghost record", func() {
@@ -261,7 +260,7 @@ var _ = Describe("Domain informer", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			// includes both the domain with an active socket and the ghost record with deleted socket
-			Expect(len(listResults)).To(Equal(2))
+			Expect(listResults).To(HaveLen(2))
 		})
 		It("should detect active domains at startup.", func() {
 			var list []*api.Domain
@@ -359,7 +358,7 @@ var _ = Describe("Domain informer", func() {
 
 			Expect(timedOut).To(BeFalse())
 
-		}, 5)
+		})
 
 		It("should detect unresponsive sockets.", func() {
 
@@ -393,7 +392,7 @@ var _ = Describe("Domain informer", func() {
 
 			Expect(timedOut).To(BeFalse())
 
-		}, 6)
+		})
 
 		It("should detect responsive sockets and not mark for deletion.", func() {
 
@@ -437,7 +436,7 @@ var _ = Describe("Domain informer", func() {
 			}
 
 			Expect(timedOut).To(BeTrue())
-		}, 6)
+		})
 
 		It("should not return errors when encountering disconnected clients at startup.", func() {
 			var list []*api.Domain

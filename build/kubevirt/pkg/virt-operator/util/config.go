@@ -60,6 +60,9 @@ const (
 	AdditionalPropertiesMonitorNamespace = "MonitorNamespace"
 
 	// lookup key in AdditionalProperties
+	AdditionalPropertiesServiceMonitorNamespace = "ServiceMonitorNamespace"
+
+	// lookup key in AdditionalProperties
 	AdditionalPropertiesMonitorServiceAccount = "MonitorAccount"
 
 	// lookup key in AdditionalProperties
@@ -83,6 +86,9 @@ const (
 	// #nosec 101, the variable is not holding any credential
 	// Prefix for env vars that will be passed along
 	PassthroughEnvPrefix = "KV_IO_EXTRA_ENV_"
+
+	// DefaultInfraReplicas is the default number of replicas for virt-api and virt-controller
+	DefaultInfraReplicas = 2
 )
 
 // DefaultMonitorNamespaces holds a set of well known prometheus-operator namespaces.
@@ -427,7 +433,11 @@ func (c *KubeVirtDeploymentConfig) GetMigrationNetwork() *string {
 	}
 }
 
-func (c *KubeVirtDeploymentConfig) GetMonitorNamespaces() []string {
+/*
+if the monitoring namespace field is defiend in kubevirtCR than return it
+otherwise we return common monitoring namespaces.
+*/
+func (c *KubeVirtDeploymentConfig) GetPotentialMonitorNamespaces() []string {
 	p := c.AdditionalProperties[AdditionalPropertiesMonitorNamespace]
 	if p == "" {
 		return DefaultMonitorNamespaces
@@ -435,7 +445,12 @@ func (c *KubeVirtDeploymentConfig) GetMonitorNamespaces() []string {
 	return []string{p}
 }
 
-func (c *KubeVirtDeploymentConfig) GetMonitorServiceAccount() string {
+func (c *KubeVirtDeploymentConfig) GetServiceMonitorNamespace() string {
+	svcMonitorNs := c.AdditionalProperties[AdditionalPropertiesServiceMonitorNamespace]
+	return svcMonitorNs
+}
+
+func (c *KubeVirtDeploymentConfig) GetMonitorServiceAccountName() string {
 	p := c.AdditionalProperties[AdditionalPropertiesMonitorServiceAccount]
 	if p == "" {
 		return DefaultMonitorAccount

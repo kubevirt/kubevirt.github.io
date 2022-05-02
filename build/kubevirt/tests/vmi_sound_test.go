@@ -24,7 +24,7 @@ import (
 	"fmt"
 
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	v1 "kubevirt.io/api/core/v1"
@@ -32,7 +32,6 @@ import (
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/api"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
-	"kubevirt.io/kubevirt/tests/libnet"
 	"kubevirt.io/kubevirt/tests/libvmi"
 	"kubevirt.io/kubevirt/tests/util"
 )
@@ -54,7 +53,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 		BeforeEach(func() {
 			vmi, err = createSoundVMI(virtClient, "test-model-empty")
 			Expect(err).To(BeNil())
-			vmi = tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+			vmi = tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 		})
 
 		It("should create an ich9 sound device on empty model", func() {
@@ -66,7 +65,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 		BeforeEach(func() {
 			vmi, err = createSoundVMI(virtClient, "ich9")
 			Expect(err).To(BeNil())
-			vmi = tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+			vmi = tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 		})
 
 		It("should create ich9 sound device on ich9 model ", func() {
@@ -79,7 +78,7 @@ var _ = Describe("[crit:medium][vendor:cnv-qe@redhat.com][level:component][sig-c
 		BeforeEach(func() {
 			vmi, err = createSoundVMI(virtClient, "ac97")
 			Expect(err).To(BeNil())
-			vmi = tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+			vmi = tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 		})
 
 		It("should create ac97 sound device on ac97 model", func() {
@@ -116,7 +115,7 @@ func checkXMLSoundCard(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachine
 	Expect(err).ToNot(HaveOccurred())
 	domSpec := &api.DomainSpec{}
 	Expect(xml.Unmarshal([]byte(domain), domSpec)).To(Succeed())
-	Expect(len(domSpec.Devices.SoundCards)).To(Equal(1))
+	Expect(domSpec.Devices.SoundCards).To(HaveLen(1))
 	Expect(domSpec.Devices.SoundCards).To(ContainElement(api.SoundCard{
 		Alias: api.NewUserDefinedAlias("test-audio-device"),
 		Model: model,

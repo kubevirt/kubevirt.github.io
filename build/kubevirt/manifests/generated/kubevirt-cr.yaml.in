@@ -12,4 +12,6 @@ spec:
       -  []
   customizeComponents: {}
   imagePullPolicy: 
+  infra:
+    replicas: 
   workloadUpdateStrategy: {}

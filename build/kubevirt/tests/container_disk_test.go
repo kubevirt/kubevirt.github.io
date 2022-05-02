@@ -26,8 +26,7 @@ import (
 	"time"
 
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -58,13 +57,6 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		tests.BeforeTestCleanup()
 	})
 
-	LaunchVMI := func(vmi *v1.VirtualMachineInstance) runtime.Object {
-		By("Starting a VirtualMachineInstance")
-		obj, err := virtClient.RestClient().Post().Resource("virtualmachineinstances").Namespace(util.NamespaceTestDefault).Body(vmi).Do(context.Background()).Get()
-		Expect(err).To(BeNil())
-		return obj
-	}
-
 	verifyContainerDiskVMI := func(vmi *v1.VirtualMachineInstance, obj runtime.Object) {
 		_, ok := obj.(*v1.VirtualMachineInstance)
 		Expect(ok).To(BeTrue(), "Object is not of type *v1.VirtualMachineInstance")
@@ -92,7 +84,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		Expect(disksFound).To(Equal(1))
 	}
 
-	table.DescribeTable("should", func(image string, policy k8sv1.PullPolicy, expectedPolicy k8sv1.PullPolicy) {
+	DescribeTable("should", func(image string, policy k8sv1.PullPolicy, expectedPolicy k8sv1.PullPolicy) {
 		vmi := tests.NewRandomVMIWithEphemeralDisk(image)
 		vmi.Spec.Volumes[0].ContainerDisk.ImagePullPolicy = policy
 		vmi = tests.RunVMIAndExpectScheduling(vmi, 60)
@@ -101,11 +93,11 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		container := tests.GetContainerDiskContainerOfPod(pod, vmi.Spec.Volumes[0].Name)
 		Expect(container.ImagePullPolicy).To(Equal(expectedPolicy))
 	},
-		table.Entry("[test_id:3246]generate and set Always pull policy", "test", k8sv1.PullPolicy(""), k8sv1.PullAlways),
-		table.Entry("[test_id:3247]generate and set Always pull policy", "test:latest", k8sv1.PullPolicy(""), k8sv1.PullAlways),
-		table.Entry("[test_id:3248]generate and set IfNotPresent pull policy", "test@sha256:9c2b78e11c25b3fd0b24b0ed684a112052dff03eee4ca4bdcc4f3168f9a14396", k8sv1.PullPolicy(""), k8sv1.PullIfNotPresent),
-		table.Entry("[test_id:3249]pass through Never pull policy to the pod", "test@sha256:9c2b78e11c25b3fd0b24b0ed684a112052dff03eee4ca4bdcc4f3168f9a14396", k8sv1.PullNever, k8sv1.PullNever),
-		table.Entry("[test_id:3250]pass through IfNotPresent pull policy to the pod", "test:latest", k8sv1.PullIfNotPresent, k8sv1.PullIfNotPresent),
+		Entry("[test_id:3246]generate and set Always pull policy", "test", k8sv1.PullPolicy(""), k8sv1.PullAlways),
+		Entry("[test_id:3247]generate and set Always pull policy", "test:latest", k8sv1.PullPolicy(""), k8sv1.PullAlways),
+		Entry("[test_id:3248]generate and set IfNotPresent pull policy", "test@sha256:9c2b78e11c25b3fd0b24b0ed684a112052dff03eee4ca4bdcc4f3168f9a14396", k8sv1.PullPolicy(""), k8sv1.PullIfNotPresent),
+		Entry("[test_id:3249]pass through Never pull policy to the pod", "test@sha256:9c2b78e11c25b3fd0b24b0ed684a112052dff03eee4ca4bdcc4f3168f9a14396", k8sv1.PullNever, k8sv1.PullNever),
+		Entry("[test_id:3250]pass through IfNotPresent pull policy to the pod", "test:latest", k8sv1.PullIfNotPresent, k8sv1.PullIfNotPresent),
 	)
 
 	Describe("[rfe_id:273][crit:medium][vendor:cnv-qe@redhat.com][level:component]Starting and stopping the same VirtualMachineInstance", func() {
@@ -132,7 +124,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 	Describe("[rfe_id:273][crit:medium][vendor:cnv-qe@redhat.com][level:component]Starting a VirtualMachineInstance", func() {
 		Context("with ephemeral registry disk", func() {
 			It("[test_id:1464]should not modify the spec on status update", func() {
-				vmi := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
+				vmi := libvmi.NewCirros()
 				v1.SetObjectDefaults_VirtualMachineInstance(vmi)
 
 				By("Starting the VirtualMachineInstance")
@@ -158,7 +150,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 				Expect(err).To(BeNil())
 
 				By("Starting the VirtualMachineInstance")
-				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskCirros))
+				vmi := libvmi.NewCirros()
 				_, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
 				Expect(err).To(BeNil())
 				By("Checking that the VMI failed")
@@ -186,7 +178,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 					vmi := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
 					// FIXME if we give too much ram, the vmis really boot and eat all our memory (cache?)
 					vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("1M")
-					obj := LaunchVMI(vmi)
+					obj := tests.RunVMI(vmi, 10)
 					vmis = append(vmis, vmi)
 					objs = append(objs, obj)
 				}
@@ -208,9 +200,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 					}
 				}
 				By("Starting the VirtualMachineInstance")
-				obj, err := virtClient.RestClient().Post().Resource("virtualmachineinstances").Namespace(util.NamespaceTestDefault).Body(vmi).Do(context.Background()).Get()
-				Expect(err).To(BeNil())
-				tests.WaitForSuccessfulVMIStart(obj)
+				vmi = tests.RunVMIAndExpectLaunch(vmi, 60)
 			})
 		})
 
@@ -219,13 +209,9 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 	Describe("[rfe_id:273][crit:medium][vendor:cnv-qe@redhat.com][level:component]Starting with virtio-win", func() {
 		Context("with virtio-win as secondary disk", func() {
 			It("[test_id:1467]should boot and have the virtio as sata CDROM", func() {
-				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
-				tests.AddEphemeralCdrom(vmi, "disk4", "sata", cd.ContainerDiskFor(cd.ContainerDiskVirtio))
-
-				By("Starting the VirtualMachineInstance")
-				obj, err := virtClient.RestClient().Post().Resource("virtualmachineinstances").Namespace(util.NamespaceTestDefault).Body(vmi).Do(context.Background()).Get()
-				Expect(err).To(BeNil(), "expected vmi to start with no problem")
-				tests.WaitForSuccessfulVMIStart(obj)
+				vmi := libvmi.NewAlpine()
+				tests.AddEphemeralCdrom(vmi, "disk4", v1.DiskBusSATA, cd.ContainerDiskFor(cd.ContainerDiskVirtio))
+				vmi = tests.RunVMIAndExpectLaunch(vmi, 60)
 
 				By("Checking whether the second disk really contains virtio drivers")
 				Expect(console.LoginToAlpine(vmi)).To(Succeed(), "expected alpine to login properly")
@@ -250,12 +236,8 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 	Describe("[rfe_id:4052][crit:high][arm64][vendor:cnv-qe@redhat.com][level:component]VMI disk permissions", func() {
 		Context("with ephemeral registry disk", func() {
 			It("[test_id:4299]should not have world write permissions", func() {
-				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
-
-				By("Starting a New VMI")
-				vmi, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
-				Expect(err).ToNot(HaveOccurred())
-				tests.WaitForSuccessfulVMIStart(vmi)
+				vmi := libvmi.NewAlpine()
+				vmi = tests.RunVMIAndExpectLaunch(vmi, 60)
 
 				By("Ensuring VMI is running by logging in")
 				tests.WaitUntilVMIReady(vmi, console.LoginToAlpine)

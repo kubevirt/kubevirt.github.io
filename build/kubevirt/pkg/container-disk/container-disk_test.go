@@ -27,8 +27,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -82,12 +81,12 @@ var _ = Describe("ContainerDisk", func() {
 
 	Describe("container-disk", func() {
 		Context("verify helper functions", func() {
-			table.DescribeTable("by verifying mapping of ",
+			DescribeTable("by verifying mapping of ",
 				func(diskType string) {
 					VerifyDiskType(diskType)
 				},
-				table.Entry("qcow2 disk", "qcow2"),
-				table.Entry("raw disk", "raw"),
+				Entry("qcow2 disk", "qcow2"),
+				Entry("raw disk", "raw"),
 			)
 			It("by verifying error when no disk is present", func() {
 
@@ -218,7 +217,7 @@ var _ = Describe("ContainerDisk", func() {
 				containers := GenerateContainers(vmi, nil, "libvirt-runtime", "bin-volume")
 				Expect(err).ToNot(HaveOccurred())
 
-				Expect(len(containers)).To(Equal(2))
+				Expect(containers).To(HaveLen(2))
 				Expect(containers[0].ImagePullPolicy).To(Equal(k8sv1.PullAlways))
 				Expect(containers[1].ImagePullPolicy).To(Equal(k8sv1.PullAlways))
 			})
@@ -317,7 +316,7 @@ var _ = Describe("ContainerDisk", func() {
 				Expect(err.Error()).To(Equal(`failed to identify image digest for container "someimage:v1.2.3.4" with id "rubish"`))
 			})
 
-			table.DescribeTable("It should detect the image ID from", func(imageID string) {
+			DescribeTable("It should detect the image ID from", func(imageID string) {
 				expected := "myregistry.io/myimage@sha256:4gjffGJlg4"
 				res, err := toImageWithDigest("myregistry.io/myimage", imageID)
 				Expect(err).ToNot(HaveOccurred())
@@ -329,23 +328,23 @@ var _ = Describe("ContainerDisk", func() {
 				Expect(err).ToNot(HaveOccurred())
 				Expect(res).To(Equal(expected))
 			},
-				table.Entry("docker", "docker://sha256:4gjffGJlg4"),
-				table.Entry("dontainerd", "sha256:4gjffGJlg4"),
-				table.Entry("cri-o", "myregistry/myimage@sha256:4gjffGJlg4"),
+				Entry("docker", "docker://sha256:4gjffGJlg4"),
+				Entry("dontainerd", "sha256:4gjffGJlg4"),
+				Entry("cri-o", "myregistry/myimage@sha256:4gjffGJlg4"),
 			)
 
-			table.DescribeTable("It should detect the base image from", func(given, expected string) {
+			DescribeTable("It should detect the base image from", func(given, expected string) {
 				res, err := toImageWithDigest(given, "docker://sha256:4gjffGJlg4")
 				Expect(err).ToNot(HaveOccurred())
 				Expect(strings.Split(res, "@sha256:")[0]).To(Equal(expected))
 			},
-				table.Entry("image with registry and no tags or shasum", "myregistry.io/myimage", "myregistry.io/myimage"),
-				table.Entry("image with registry and tag", "myregistry.io/myimage:latest", "myregistry.io/myimage"),
-				table.Entry("image with registry and shasum", "myregistry.io/myimage@sha256:123534", "myregistry.io/myimage"),
-				table.Entry("image with registry and no tags or shasum and custom port", "myregistry.io:5000/myimage", "myregistry.io:5000/myimage"),
-				table.Entry("image with registry and tag and custom port", "myregistry.io:5000/myimage:latest", "myregistry.io:5000/myimage"),
-				table.Entry("image with registry and shasum and custom port", "myregistry.io:5000/myimage@sha256:123534", "myregistry.io:5000/myimage"),
-				table.Entry("image with registry and shasum and custom port and group", "myregistry.io:5000/mygroup/myimage@sha256:123534", "myregistry.io:5000/mygroup/myimage"),
+				Entry("image with registry and no tags or shasum", "myregistry.io/myimage", "myregistry.io/myimage"),
+				Entry("image with registry and tag", "myregistry.io/myimage:latest", "myregistry.io/myimage"),
+				Entry("image with registry and shasum", "myregistry.io/myimage@sha256:123534", "myregistry.io/myimage"),
+				Entry("image with registry and no tags or shasum and custom port", "myregistry.io:5000/myimage", "myregistry.io:5000/myimage"),
+				Entry("image with registry and tag and custom port", "myregistry.io:5000/myimage:latest", "myregistry.io:5000/myimage"),
+				Entry("image with registry and shasum and custom port", "myregistry.io:5000/myimage@sha256:123534", "myregistry.io:5000/myimage"),
+				Entry("image with registry and shasum and custom port and group", "myregistry.io:5000/mygroup/myimage@sha256:123534", "myregistry.io:5000/mygroup/myimage"),
 			)
 		})
 	})

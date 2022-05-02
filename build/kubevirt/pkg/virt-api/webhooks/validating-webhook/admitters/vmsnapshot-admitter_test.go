@@ -23,7 +23,7 @@ import (
 	"encoding/json"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	admissionv1 "k8s.io/api/admission/v1"
@@ -112,7 +112,7 @@ var _ = Describe("Validating VirtualMachineSnapshot Admitter", func() {
 			ar := createSnapshotAdmissionReview(snapshot)
 			resp := createTestVMSnapshotAdmitter(config, nil).Admit(ar)
 			Expect(resp.Allowed).To(BeFalse())
-			Expect(len(resp.Result.Details.Causes)).To(Equal(1))
+			Expect(resp.Result.Details.Causes).To(HaveLen(1))
 			Expect(resp.Result.Details.Causes[0].Field).To(Equal("spec.source.apiGroup"))
 		})
 
@@ -130,7 +130,7 @@ var _ = Describe("Validating VirtualMachineSnapshot Admitter", func() {
 			ar := createSnapshotAdmissionReview(snapshot)
 			resp := createTestVMSnapshotAdmitter(config, nil).Admit(ar)
 			Expect(resp.Allowed).To(BeFalse())
-			Expect(len(resp.Result.Details.Causes)).To(Equal(1))
+			Expect(resp.Result.Details.Causes).To(HaveLen(1))
 			Expect(resp.Result.Details.Causes[0].Field).To(Equal("spec.source.name"))
 		})
 
@@ -158,7 +158,7 @@ var _ = Describe("Validating VirtualMachineSnapshot Admitter", func() {
 			ar := createSnapshotUpdateAdmissionReview(oldSnapshot, snapshot)
 			resp := createTestVMSnapshotAdmitter(config, nil).Admit(ar)
 			Expect(resp.Allowed).To(BeFalse())
-			Expect(len(resp.Result.Details.Causes)).To(Equal(1))
+			Expect(resp.Result.Details.Causes).To(HaveLen(1))
 			Expect(resp.Result.Details.Causes[0].Field).To(Equal("spec"))
 		})
 
@@ -238,7 +238,7 @@ var _ = Describe("Validating VirtualMachineSnapshot Admitter", func() {
 				ar := createSnapshotAdmissionReview(snapshot)
 				resp := createTestVMSnapshotAdmitter(config, vm).Admit(ar)
 				Expect(resp.Allowed).To(BeFalse())
-				Expect(len(resp.Result.Details.Causes)).To(Equal(1))
+				Expect(resp.Result.Details.Causes).To(HaveLen(1))
 				Expect(resp.Result.Details.Causes[0].Field).To(Equal("spec.source.kind"))
 			})
 
@@ -260,7 +260,7 @@ var _ = Describe("Validating VirtualMachineSnapshot Admitter", func() {
 				ar := createSnapshotAdmissionReview(snapshot)
 				resp := createTestVMSnapshotAdmitter(config, vm).Admit(ar)
 				Expect(resp.Allowed).To(BeFalse())
-				Expect(len(resp.Result.Details.Causes)).To(Equal(1))
+				Expect(resp.Result.Details.Causes).To(HaveLen(1))
 				Expect(resp.Result.Details.Causes[0].Field).To(Equal("spec.source.apiGroup"))
 			})
 
@@ -337,9 +337,9 @@ func createTestVMSnapshotAdmitter(config *virtconfig.ClusterConfig, vm *v1.Virtu
 	virtClient.EXPECT().VirtualMachine(gomock.Any()).Return(vmInterface).AnyTimes()
 	if vm == nil {
 		err := errors.NewNotFound(schema.GroupResource{Group: "kubevirt.io", Resource: "virtualmachines"}, "foo")
-		vmInterface.EXPECT().Get(gomock.Any(), gomock.Any()).Return(nil, err)
+		vmInterface.EXPECT().Get(gomock.Any(), gomock.Any()).Return(nil, err).AnyTimes()
 	} else {
-		vmInterface.EXPECT().Get(vm.Name, gomock.Any()).Return(vm, nil)
+		vmInterface.EXPECT().Get(vm.Name, gomock.Any()).Return(vm, nil).AnyTimes()
 	}
 	return &VMSnapshotAdmitter{Config: config, Client: virtClient}
 }

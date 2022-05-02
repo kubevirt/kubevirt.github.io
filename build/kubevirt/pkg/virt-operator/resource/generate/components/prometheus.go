@@ -397,12 +397,16 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 						Expr:   intstr.FromString("kubevirt_vmi_memory_available_bytes-kubevirt_vmi_memory_usable_bytes"),
 					},
 					{
-						Record: "kubevirt_vm_container_free_memory_bytes",
-						Expr:   intstr.FromString("sum by(pod, container) ( kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container) container_memory_working_set_bytes{pod=~'virt-launcher-.*', container='compute'})"),
+						Record: "kubevirt_vm_container_free_memory_bytes_based_on_working_set_bytes",
+						Expr:   intstr.FromString("sum by(pod, container) (kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container) container_memory_working_set_bytes{pod=~'virt-launcher-.*', container='compute'})"),
+					},
+					{
+						Record: "kubevirt_vm_container_free_memory_bytes_based_on_rss",
+						Expr:   intstr.FromString("sum by(pod, container) (kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container) container_memory_rss{pod=~'virt-launcher-.*', container='compute'})"),
 					},
 					{
 						Alert: "KubevirtVmHighMemoryUsage",
-						Expr:  intstr.FromString("kubevirt_vm_container_free_memory_bytes < 20971520"),
+						Expr:  intstr.FromString("kubevirt_vm_container_free_memory_bytes_based_on_working_set_bytes < 20971520 or kubevirt_vm_container_free_memory_bytes_based_on_rss < 20971520"),
 						For:   "1m",
 						Annotations: map[string]string{
 							"description": "Container {{ $labels.container }} in pod {{ $labels.pod }} free memory is less than 20 MB and it is close to requested memory",
@@ -444,7 +448,7 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 					},
 					{
 						Alert: "KubeVirtComponentExceedsRequestedMemory",
-						Expr:  intstr.FromString(fmt.Sprintf(`((kube_pod_container_resource_requests{namespace="%s",container=~"virt-controller|virt-api|virt-handler|virt-operator",resource="memory"}) - on(pod) group_left(node) container_memory_usage_bytes{namespace="%s"}) < 0`, ns, ns)),
+						Expr:  intstr.FromString(fmt.Sprintf(`((kube_pod_container_resource_requests{namespace="%s",container=~"virt-controller|virt-api|virt-handler|virt-operator",resource="memory"}) - on(pod) group_left(node) container_memory_working_set_bytes{container="",namespace="%s"}) < 0`, ns, ns)),
 						For:   "5m",
 						Annotations: map[string]string{
 							"description": "Container {{ $labels.container }} in pod {{ $labels.pod }} memory usage exceeds the memory requested",
@@ -469,6 +473,18 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 						Labels: map[string]string{
 							severityAlertLabelKey: "warning",
 						},
+					},
+					{
+						Record: "kubevirt_vmsnapshot_persistentvolumeclaim_labels",
+						Expr:   intstr.FromString("label_replace(label_replace(kube_persistentvolumeclaim_labels{label_restore_kubevirt_io_source_vm_name!='', label_restore_kubevirt_io_source_vm_namespace!=''} == 1, 'vm_namespace', '$1', 'label_restore_kubevirt_io_source_vm_namespace', '(.*)'), 'vm_name', '$1', 'label_restore_kubevirt_io_source_vm_name', '(.*)')"),
+					},
+					{
+						Record: "kubevirt_vmsnapshot_disks_restored_from_source_total",
+						Expr:   intstr.FromString("sum by(vm_name, vm_namespace) (kubevirt_vmsnapshot_persistentvolumeclaim_labels)"),
+					},
+					{
+						Record: "kubevirt_vmsnapshot_disks_restored_from_source_bytes",
+						Expr:   intstr.FromString("sum by(vm_name, vm_namespace) (kube_persistentvolumeclaim_resource_requests_storage_bytes * on(persistentvolumeclaim, namespace) group_left(vm_name, vm_namespace) kubevirt_vmsnapshot_persistentvolumeclaim_labels)"),
 					},
 				},
 			},

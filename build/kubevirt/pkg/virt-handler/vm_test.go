@@ -44,8 +44,7 @@ import (
 	hotplug_volume "kubevirt.io/kubevirt/pkg/virt-handler/hotplug-disk"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -257,7 +256,6 @@ var _ = Describe("VirtualMachineInstance", func() {
 	AfterEach(func() {
 		close(stop)
 		wg.Wait()
-		ctrl.Finish()
 		os.RemoveAll(shareDir)
 		os.RemoveAll(privateDir)
 		os.RemoveAll(vmiShareDir)
@@ -410,7 +408,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMISignalDeletion)
-		}, 3)
+		})
 		It("should attempt graceful shutdown of Domain if trigger file exists.", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
 			vmi.UID = vmiTestUUID
@@ -432,7 +430,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIGracefulShutdown)
-		}, 3)
+		})
 
 		It("should attempt graceful shutdown of Domain if no cluster wide equivalent exists", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -450,7 +448,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIGracefulShutdown)
-		}, 3)
+		})
 
 		It("should do nothing if vmi and domain do not match", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -470,7 +468,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(mockQueue.GetRateLimitedEnqueueCount()).To(Equal(0))
 			_, err := os.Stat(mockWatchdog.File(oldVMI))
 			Expect(os.IsNotExist(err)).To(BeFalse())
-		}, 3)
+		})
 
 		It("should silently retry if the command socket is not yet ready", func() {
 			vmi := NewScheduledVMI(vmiTestUUID, "notexisingpoduid", host)
@@ -547,7 +545,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(os.IsNotExist(err)).To(BeTrue())
 			Expect(controller.netConf.SetupCompleted(vmi)).To(BeFalse())
 			Expect(controller.netConf.SetupCompleted(oldVMI)).To(BeFalse())
-		}, 3)
+		})
 
 		It("should cleanup if vmi is finalized and domain does not exist", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -565,7 +563,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			_, err := os.Stat(mockWatchdog.File(vmi))
 			Expect(os.IsNotExist(err)).To(BeTrue())
 			Expect(controller.netConf.SetupCompleted(vmi)).To(BeFalse())
-		}, 3)
+		})
 
 		It("should do final cleanup if vmi is being deleted and not finalized", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -594,7 +592,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(mockQueue.GetRateLimitedEnqueueCount()).To(Equal(0))
 			_, err := os.Stat(mockWatchdog.File(vmi))
 			Expect(os.IsNotExist(err)).To(BeFalse())
-		}, 3)
+		})
 
 		It("should attempt force terminate Domain if grace period expires", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -616,7 +614,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIStopping)
-		}, 3)
+		})
 
 		It("should immediately kill domain with grace period of 0", func() {
 			domain := api.NewMinimalDomainWithUUID("testvmi", vmiTestUUID)
@@ -633,7 +631,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			domainFeeder.Add(domain)
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIStopping)
-		}, 3)
+		})
 
 		It("should re-enqueue if the Key is unparseable", func() {
 			Expect(mockQueue.Len()).Should(Equal(0))
@@ -693,7 +691,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			vmiInterface.EXPECT().Update(gomock.Any()).DoAndReturn(func(obj interface{}) (*v1.VirtualMachineInstance, error) {
 				vmi := obj.(*v1.VirtualMachineInstance)
-				Expect(len(vmi.Status.PhaseTransitionTimestamps)).ToNot(Equal(0))
+				Expect(vmi.Status.PhaseTransitionTimestamps).ToNot(BeEmpty())
 				updatedVMI.Status.PhaseTransitionTimestamps = vmi.Status.PhaseTransitionTimestamps
 
 				Expect(vmi).To(Equal(updatedVMI))
@@ -1102,7 +1100,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			time.Sleep(2 * time.Second)
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMICrashed)
-		}, 2)
+		})
 
 		It("should move VirtualMachineInstance from Running to Failed if domain does not exist in cache", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1334,7 +1332,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 				Expect(hasHotplug).To(BeTrue())
 			})
 
-			table.DescribeTable("should generate a mount event, when able to move to mount", func(currentPhase v1.VolumePhase) {
+			DescribeTable("should generate a mount event, when able to move to mount", func(currentPhase v1.VolumePhase) {
 				vmi := api2.NewMinimalVMI("testvmi")
 				vmi.UID = vmiTestUUID
 				vmi.Status.Phase = v1.Running
@@ -1368,12 +1366,12 @@ var _ = Describe("VirtualMachineInstance", func() {
 				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
 				controller.updateVolumeStatusesFromDomain(vmi, domain)
 			},
-				table.Entry("When current phase is bound", v1.VolumeBound),
-				table.Entry("When current phase is pending", v1.VolumePending),
-				table.Entry("When current phase is bound for hotplug volume", v1.HotplugVolumeAttachedToNode),
+				Entry("When current phase is bound", v1.VolumeBound),
+				Entry("When current phase is pending", v1.VolumePending),
+				Entry("When current phase is bound for hotplug volume", v1.HotplugVolumeAttachedToNode),
 			)
 
-			table.DescribeTable("should generate an unmount event, when able to move to unmount", func(currentPhase v1.VolumePhase) {
+			DescribeTable("should generate an unmount event, when able to move to unmount", func(currentPhase v1.VolumePhase) {
 				vmi := api2.NewMinimalVMI("testvmi")
 				vmi.UID = vmiTestUUID
 				vmi.Status.Phase = v1.Running
@@ -1404,9 +1402,9 @@ var _ = Describe("VirtualMachineInstance", func() {
 				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(false, nil)
 				controller.updateVolumeStatusesFromDomain(vmi, domain)
 			},
-				table.Entry("When current phase is bound", v1.VolumeReady),
-				table.Entry("When current phase is pending", v1.HotplugVolumeMounted),
-				table.Entry("When current phase is bound for hotplug volume", v1.HotplugVolumeAttachedToNode),
+				Entry("When current phase is bound", v1.VolumeReady),
+				Entry("When current phase is pending", v1.HotplugVolumeMounted),
+				Entry("When current phase is bound for hotplug volume", v1.HotplugVolumeAttachedToNode),
 			)
 
 			It("Should generate a ready event when target is assigned", func() {
@@ -1466,15 +1464,15 @@ var _ = Describe("VirtualMachineInstance", func() {
 				testStatusMap["test"] = vmi.Status.VolumeStatus[0]
 				testStatusMap["test2"] = vmi.Status.VolumeStatus[0]
 				testStatusMap["test3"] = vmi.Status.VolumeStatus[0]
-				Expect(len(testStatusMap)).To(Equal(3))
+				Expect(testStatusMap).To(HaveLen(3))
 				controller.generateEventsForVolumeStatusChange(vmi, testStatusMap)
 				testutils.ExpectEvent(recorder, "message")
 				testutils.ExpectEvent(recorder, "message")
-				Expect(len(testStatusMap)).To(Equal(3))
+				Expect(testStatusMap).To(HaveLen(3))
 			})
 		})
 
-		table.DescribeTable("should leave the VirtualMachineInstance alone if it is in the final phase", func(phase v1.VirtualMachineInstancePhase) {
+		DescribeTable("should leave the VirtualMachineInstance alone if it is in the final phase", func(phase v1.VirtualMachineInstancePhase) {
 			vmi := api2.NewMinimalVMI("testvmi")
 			vmi.Status.Phase = phase
 			vmiFeeder.Add(vmi)
@@ -1483,8 +1481,8 @@ var _ = Describe("VirtualMachineInstance", func() {
 			// expect no errors and no mock interactions
 			Expect(mockQueue.NumRequeues("default/testvmi")).To(Equal(0))
 		},
-			table.Entry("succeeded", v1.Succeeded),
-			table.Entry("failed", v1.Failed),
+			Entry("succeeded", v1.Succeeded),
+			Entry("failed", v1.Failed),
 		)
 
 		It("should leave VirtualMachineInstance phase alone if not the current active node", func() {
@@ -1547,7 +1545,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(controller.netConf.SetupCompleted(vmi)).To(BeTrue())
 			testutils.ExpectEvent(recorder, VMIMigrationTargetPrepared)
 			testutils.ExpectEvent(recorder, "Migration Target is listening")
-		}, 3)
+		})
 
 		It("should signal target pod to early exit on failed migration", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1571,7 +1569,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			client.EXPECT().Ping()
 			client.EXPECT().SignalTargetPodCleanup(vmi)
 			controller.Execute()
-		}, 3)
+		})
 
 		It("should abort target prep if VMI is deleted", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1617,7 +1615,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			client.EXPECT().Close()
 			controller.Execute()
-		}, 3)
+		})
 
 		// handles case where a failed migration to this node has left overs still on local storage
 		It("should clean stale clients when preparing migration target", func() {
@@ -1665,7 +1663,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			exists = virtcache.HasGhostRecord(vmi.Namespace, vmi.Name)
 			Expect(exists).To(BeFalse())
 
-		}, 3)
+		})
 
 		It("should migrate vmi once target address is known", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1706,7 +1704,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			client.EXPECT().MigrateVirtualMachine(vmi, options)
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIMigrating)
-		}, 3)
+		})
 
 		It("should abort vmi migration vmi when migration object indicates deletion", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1747,7 +1745,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			vmiInterface.EXPECT().Update(gomock.Any())
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIAbortingMigration)
-		}, 3)
+		})
 
 		It("Handoff domain to other node after completed migration", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1794,7 +1792,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, "The VirtualMachineInstance migrated to node")
-		}, 3)
+		})
 
 		It("should apply post-migration operations on guest VM after migration completed", func() {
 			vmi := api2.NewMinimalVMI("testvmi")
@@ -1833,7 +1831,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			vmiInterface.EXPECT().Update(vmiUpdated)
 
 			controller.Execute()
-		}, 3)
+		})
 	})
 
 	Context("check if migratable", func() {
@@ -1864,7 +1862,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -1894,7 +1892,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -1931,7 +1929,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -1970,7 +1968,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2009,7 +2007,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2017,7 +2015,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk1",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2064,7 +2062,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2072,7 +2070,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk1",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2119,7 +2117,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "myvolume",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2151,7 +2149,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2159,7 +2157,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Name: "mydisk1",
 					DiskDevice: v1.DiskDevice{
 						Disk: &v1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				},
@@ -2193,7 +2191,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(blockMigrate).To(BeTrue())
 			Expect(err).To(Equal(fmt.Errorf("cannot migrate VMI with non-shared HostDisk")))
 		})
-		table.DescribeTable("when host model labels", func(toDefineHostModelLabels bool) {
+		DescribeTable("when host model labels", func(toDefineHostModelLabels bool) {
 			vmi := api2.NewMinimalVMI("testvmi")
 			vmi.Spec.Domain.CPU = &v1.CPU{Model: v1.CPUModeHostModel}
 
@@ -2221,8 +2219,8 @@ var _ = Describe("VirtualMachineInstance", func() {
 			}
 
 		},
-			table.Entry("exist migration should succeed", true),
-			table.Entry("don't exist migration should fail", false),
+			Entry("exist migration should succeed", true),
+			Entry("don't exist migration should fail", false),
 		)
 
 		It("should not be allowed to live-migrate if the VMI uses virtiofs ", func() {
@@ -2438,7 +2436,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 				return v1.Volume{Name: volumeAndDiskName, VolumeSource: v1.VolumeSource{ContainerDisk: &v1.ContainerDiskSource{}}}
 			}
 
-			table.DescribeTable("using", func(disk v1.Disk, volume v1.Volume, migrationMethod v1.VirtualMachineInstanceMigrationMethod) {
+			DescribeTable("using", func(disk v1.Disk, volume v1.Volume, migrationMethod v1.VirtualMachineInstanceMigrationMethod) {
 				migrationMethodExpected := fmt.Sprintf("Migration method is expected to be %s", migrationMethod)
 
 				vmi := api2.NewMinimalVMI("testvmi")
@@ -2456,9 +2454,9 @@ var _ = Describe("VirtualMachineInstance", func() {
 					Expect(true).To(BeFalse(), "Shouldn't reach here - BlockMigration and LiveMigration are the only migration methods supported")
 				}
 			},
-				table.Entry("CDROM", getCDRomDisk(nil), getContainerDiskVolume(), v1.LiveMigration),
-				table.Entry("CDROM with read-only=true", getCDRomDisk(pointer.BoolPtr(true)), getContainerDiskVolume(), v1.LiveMigration),
-				table.Entry("CDROM with read-only=false", getCDRomDisk(pointer.BoolPtr(false)), getContainerDiskVolume(), v1.BlockMigration),
+				Entry("CDROM", getCDRomDisk(nil), getContainerDiskVolume(), v1.LiveMigration),
+				Entry("CDROM with read-only=true", getCDRomDisk(pointer.BoolPtr(true)), getContainerDiskVolume(), v1.LiveMigration),
+				Entry("CDROM with read-only=false", getCDRomDisk(pointer.BoolPtr(false)), getContainerDiskVolume(), v1.BlockMigration),
 			)
 		})
 
@@ -2623,7 +2621,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 						File: "/var/run/kubevirt-private/vmi-disks/permvolume1/disk.img",
 					},
 					Target: api.DiskTarget{
-						Bus:    "virtio",
+						Bus:    v1.DiskBusVirtio,
 						Device: "vda",
 					},
 					Driver: &api.DiskDriver{
@@ -2640,7 +2638,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 						File: "/var/run/kubevirt/hotplug-disks/hpvolume1/disk.img",
 					},
 					Target: api.DiskTarget{
-						Bus:    "scsi",
+						Bus:    v1.DiskBusSCSI,
 						Device: "sda",
 					},
 					Driver: &api.DiskDriver{
@@ -2665,7 +2663,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			mockHotplugVolumeMounter.EXPECT().Unmount(gomock.Any()).Return(nil)
 			mockHotplugVolumeMounter.EXPECT().Mount(gomock.Any()).Return(nil)
 			vmiInterface.EXPECT().Update(gomock.Any()).Do(func(arg interface{}) {
-				Expect(len(arg.(*v1.VirtualMachineInstance).Status.VolumeStatus)).To(Equal(2))
+				Expect(arg.(*v1.VirtualMachineInstance).Status.VolumeStatus).To(HaveLen(2))
 				for _, status := range arg.(*v1.VirtualMachineInstance).Status.VolumeStatus {
 					if status.Name == "hpvolume" {
 						Expect(status.Target).To(Equal("sda"))

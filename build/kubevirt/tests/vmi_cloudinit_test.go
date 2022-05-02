@@ -30,8 +30,7 @@ import (
 	"time"
 
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pborman/uuid"
 	kubev1 "k8s.io/api/core/v1"
@@ -47,7 +46,7 @@ import (
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
-	"kubevirt.io/kubevirt/tests/libnet"
+	"kubevirt.io/kubevirt/tests/testsuite"
 )
 
 const (
@@ -91,7 +90,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 		By("Waiting the VirtualMachineInstance start")
 		vmi, ok := obj.(*v1.VirtualMachineInstance)
 		Expect(ok).To(BeTrue(), "Object is not of type *v1.VirtualMachineInstance")
-		Expect(tests.WaitForSuccessfulVMIStart(obj)).ToNot(BeEmpty())
+		Expect(tests.WaitForSuccessfulVMIStart(obj).Status.NodeName).ToNot(BeEmpty())
 		return vmi
 	}
 
@@ -216,7 +215,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				}, time.Second*120)
 
 				By("applying the hostname from meta-data")
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(console.LoginToCirros(vmi)).To(Succeed())
 
 				Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
 					&expect.BSnd{S: "hostname\n"},
@@ -239,7 +238,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				}, time.Second*120)
 
 				By("applying the hostname from meta-data")
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(console.LoginToCirros(vmi)).To(Succeed())
 
 				Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
 					&expect.BSnd{S: "hostname\n"},
@@ -270,7 +269,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 						Name:      secretID,
 						Namespace: vmi.Namespace,
 						Labels: map[string]string{
-							tests.SecretLabel: secretID,
+							testsuite.SecretLabel: secretID,
 						},
 					},
 					Type: "Opaque",
@@ -301,7 +300,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				vmi := tests.NewRandomVMIWithEphemeralDiskAndUserdataNetworkData(
 					cd.ContainerDiskFor(cd.ContainerDiskCirros), "", testNetworkData, false)
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceNoCloud)
 
@@ -316,7 +315,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				vmi := tests.NewRandomVMIWithEphemeralDiskAndUserdataNetworkData(
 					cd.ContainerDiskFor(cd.ContainerDiskCirros), "", testNetworkData, true)
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceNoCloud)
 
@@ -349,7 +348,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      secretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								tests.SecretLabel: secretID,
+								testsuite.SecretLabel: secretID,
 							},
 						},
 						Type: "Opaque",
@@ -365,7 +364,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				}
 
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceNoCloud)
 
@@ -392,7 +391,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 					cd.ContainerDiskFor(cd.ContainerDiskCirros), "", testNetworkData, false)
 
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceConfigDrive)
 
@@ -413,7 +412,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				}
 				vmi.Annotations[v1.FlavorAnnotation] = testFlavor
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceConfigDrive)
 
 				domXml, err := tests.GetRunningVirtualMachineInstanceDomainXML(virtClient, vmi)
@@ -459,7 +458,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				vmi := tests.NewRandomVMIWithEphemeralDiskAndConfigDriveUserdataNetworkData(
 					cd.ContainerDiskFor(cd.ContainerDiskCirros), "", testNetworkData, true)
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceConfigDrive)
 				By("mouting cloudinit iso")
@@ -492,7 +491,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      secretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								tests.SecretLabel: secretID,
+								testsuite.SecretLabel: secretID,
 							},
 						},
 						Type: "Opaque",
@@ -508,7 +507,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				}
 
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceConfigDrive)
 
@@ -525,7 +524,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				Expect(vmi.Spec.Volumes[idx].CloudInitConfigDrive.NetworkDataBase64).To(BeEmpty())
 			})
 
-			table.DescribeTable("[test_id:3187]should have cloud-init userdata and network-config from separate k8s secrets", func(userDataLabel string, networkDataLabel string) {
+			DescribeTable("[test_id:3187]should have cloud-init userdata and network-config from separate k8s secrets", func(userDataLabel string, networkDataLabel string) {
 				vmi := tests.NewRandomVMIWithEphemeralDiskAndConfigDriveUserdataNetworkData(
 					cd.ContainerDiskFor(cd.ContainerDiskCirros), "", "", false)
 
@@ -550,7 +549,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      uSecretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								tests.SecretLabel: uSecretID,
+								testsuite.SecretLabel: uSecretID,
 							},
 						},
 						Type: "Opaque",
@@ -565,7 +564,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      nSecretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								tests.SecretLabel: nSecretID,
+								testsuite.SecretLabel: nSecretID,
 							},
 						},
 						Type: "Opaque",
@@ -584,7 +583,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				}
 
 				LaunchVMI(vmi)
-				tests.WaitUntilVMIReady(vmi, libnet.WithIPv6(console.LoginToCirros))
+				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceConfigDrive)
 
@@ -605,8 +604,8 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 				Expect(vmi.Spec.Volumes[idx].CloudInitConfigDrive.NetworkData).To(BeEmpty())
 				Expect(vmi.Spec.Volumes[idx].CloudInitConfigDrive.NetworkDataBase64).To(BeEmpty())
 			},
-				table.Entry("with lowercase labels", "userdata", "networkdata"),
-				table.Entry("with camelCase labels", "userData", "networkData"),
+				Entry("with lowercase labels", "userdata", "networkdata"),
+				Entry("with camelCase labels", "userData", "networkData"),
 			)
 		})
 

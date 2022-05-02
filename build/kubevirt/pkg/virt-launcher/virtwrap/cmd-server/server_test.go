@@ -28,7 +28,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	v1 "kubevirt.io/api/core/v1"
@@ -76,7 +76,6 @@ var _ = Describe("Virt remote commands", func() {
 		if stopped == false {
 			close(stop)
 		}
-		ctrl.Finish()
 		client.Close()
 		os.RemoveAll(shareDir)
 	})
@@ -152,7 +151,7 @@ var _ = Describe("Virt remote commands", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(exists).To(BeTrue())
-			Expect(domain).ToNot(Equal(nil))
+			Expect(domain).ToNot(BeNil())
 			Expect(domain.ObjectMeta.Name).To(Equal("testvmi1"))
 			Expect(domain.Status.OSInfo).To(Equal(api.GuestOSInfo{}))
 			Expect(domain.Status.Interfaces).To(BeNil())
@@ -190,7 +189,7 @@ var _ = Describe("Virt remote commands", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(exists).To(BeFalse())
-			Expect(domain).ToNot(Equal(nil))
+			Expect(domain).ToNot(BeNil())
 		})
 
 		It("client should return disconnected after server stops", func() {
@@ -224,7 +223,7 @@ var _ = Describe("Virt remote commands", func() {
 			Expect(err).ToNot(HaveOccurred())
 
 			Expect(exists).To(BeTrue())
-			Expect(domStats).ToNot(Equal(nil))
+			Expect(domStats).ToNot(BeNil())
 			Expect(domStats.Name).To(Equal(list[0].Name))
 			Expect(domStats.UUID).To(Equal(list[0].UUID))
 		})
@@ -389,10 +388,6 @@ var _ = Describe("Virt remote commands", func() {
 		BeforeEach(func() {
 			ctrl = gomock.NewController(GinkgoT())
 			infoClient = info.NewMockCmdInfoClient(ctrl)
-		})
-
-		AfterEach(func() {
-			ctrl.Finish()
 		})
 
 		It("Should report error when server version mismatches", func() {

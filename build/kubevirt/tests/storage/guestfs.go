@@ -4,7 +4,7 @@ import (
 	"context"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	corev1 "k8s.io/api/core/v1"
@@ -14,6 +14,7 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/pkg/virtctl/guestfs"
 	"kubevirt.io/kubevirt/tests"
+	"kubevirt.io/kubevirt/tests/clientcmd"
 	"kubevirt.io/kubevirt/tests/util"
 )
 
@@ -70,7 +71,7 @@ var _ = SIGDescribe("[rfe_id:6364][[Serial]Guestfs", func() {
 
 	runGuestfsOnPVC := func(pvcClaim string) {
 		podName := libguestsTools + pvcClaim
-		guestfsCmd := tests.NewVirtctlCommand("guestfs",
+		guestfsCmd := clientcmd.NewVirtctlCommand("guestfs",
 			pvcClaim,
 			"--namespace", util.NamespaceTestDefault)
 		go func() {
@@ -105,8 +106,7 @@ var _ = SIGDescribe("[rfe_id:6364][[Serial]Guestfs", func() {
 			var err error
 			virtClient, err = kubecli.GetKubevirtClient()
 			Expect(err).ToNot(HaveOccurred())
-
-		}, 120)
+		})
 
 		AfterEach(func() {
 			err := virtClient.CoreV1().PersistentVolumeClaims(util.NamespaceTestDefault).Delete(context.Background(), pvcClaim, metav1.DeleteOptions{})
@@ -150,7 +150,7 @@ var _ = SIGDescribe("[rfe_id:6364][[Serial]Guestfs", func() {
 			pvcClaim = "pvc-fail-to-run-twice"
 			createPVCFilesystem(pvcClaim)
 			runGuestfsOnPVC(pvcClaim)
-			guestfsCmd := tests.NewVirtctlCommand("guestfs",
+			guestfsCmd := clientcmd.NewVirtctlCommand("guestfs",
 				pvcClaim,
 				"--namespace", util.NamespaceTestDefault)
 			Expect(guestfsCmd.Execute()).To(HaveOccurred())

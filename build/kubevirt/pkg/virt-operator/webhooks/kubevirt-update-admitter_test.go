@@ -20,20 +20,20 @@
 package webhooks
 
 import (
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	v1 "kubevirt.io/api/core/v1"
+	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
 )
 
 var _ = Describe("Validating KubeVirtUpdate Admitter", func() {
 
-	table.DescribeTable("test validateCustomizeComponents", func(cc v1.CustomizeComponents, expectedCauses int) {
+	DescribeTable("test validateCustomizeComponents", func(cc v1.CustomizeComponents, expectedCauses int) {
 		causes := validateCustomizeComponents(cc)
-		Expect(len(causes)).To(Equal(expectedCauses))
+		Expect(causes).To(HaveLen(expectedCauses))
 	},
-		table.Entry("invalid values rejected", v1.CustomizeComponents{
+		Entry("invalid values rejected", v1.CustomizeComponents{
 			Patches: []v1.CustomizeComponentsPatch{
 				{
 					ResourceName: "virt-api",
@@ -43,7 +43,7 @@ var _ = Describe("Validating KubeVirtUpdate Admitter", func() {
 				},
 			},
 		}, 1),
-		table.Entry("empty patch field rejected", v1.CustomizeComponents{
+		Entry("empty patch field rejected", v1.CustomizeComponents{
 			Patches: []v1.CustomizeComponentsPatch{
 				{
 					ResourceName: "virt-api",
@@ -53,7 +53,7 @@ var _ = Describe("Validating KubeVirtUpdate Admitter", func() {
 				},
 			},
 		}, 1),
-		table.Entry("valid values accepted", v1.CustomizeComponents{
+		Entry("valid values accepted", v1.CustomizeComponents{
 			Patches: []v1.CustomizeComponentsPatch{
 				{
 					ResourceName: "virt-api",
@@ -64,4 +64,71 @@ var _ = Describe("Validating KubeVirtUpdate Admitter", func() {
 			},
 		}, 0),
 	)
+
+	DescribeTable("should accept the WorkloadUpdateMethods", func(oldSpec, newSpec *v1.KubeVirtSpec) {
+		causes := validateWorkloadUpdateMethods(oldSpec, newSpec)
+		Expect(causes).To(BeEmpty())
+	},
+		Entry("should accept LiveMigrate feature gate enabled and workloadUpdateMethod LiveMigrate",
+			newKubeVirtSpec(),
+			newKubeVirtSpec(
+				withFeatureGate(virtconfig.LiveMigrationGate),
+				withWorkloadUpdateMethod(v1.WorkloadUpdateMethodLiveMigrate),
+			),
+		),
+		Entry("should accept LiveMigrate feature gate enabled and no workloadUpdateMethod",
+			newKubeVirtSpec(),
+			newKubeVirtSpec(
+				withFeatureGate(virtconfig.LiveMigrationGate),
+			),
+		),
+		Entry("should accept LiveMigrate feature gate disabled and no workloadUpdateMethod",
+			newKubeVirtSpec(),
+			newKubeVirtSpec(),
+		),
+		Entry("should accept if the misconfiguration was already present",
+			newKubeVirtSpec(
+				withWorkloadUpdateMethod(v1.WorkloadUpdateMethodLiveMigrate),
+			),
+			newKubeVirtSpec(
+				withWorkloadUpdateMethod(v1.WorkloadUpdateMethodLiveMigrate),
+			),
+		),
+	)
+
+	It("should reject LiveMigrate feature gate disabled and workloadUpdateMethod LiveMigrate", func() {
+		causes := validateWorkloadUpdateMethods(
+			newKubeVirtSpec(),
+			newKubeVirtSpec(
+				withWorkloadUpdateMethod(v1.WorkloadUpdateMethodLiveMigrate),
+			))
+		Expect(causes).NotTo(BeEmpty())
+	})
 })
+
+type kubevirtSpecOption func(*v1.KubeVirtSpec)
+
+func newKubeVirtSpec(opts ...kubevirtSpecOption) *v1.KubeVirtSpec {
+	kvSpec := &v1.KubeVirtSpec{
+		Configuration: v1.KubeVirtConfiguration{
+			DeveloperConfiguration: &v1.DeveloperConfiguration{},
+		},
+	}
+
+	for _, kvOptFunc := range opts {
+		kvOptFunc(kvSpec)
+	}
+	return kvSpec
+}
+
+func withFeatureGate(featureGate string) kubevirtSpecOption {
+	return func(kvSpec *v1.KubeVirtSpec) {
+		kvSpec.Configuration.DeveloperConfiguration.FeatureGates = append(kvSpec.Configuration.DeveloperConfiguration.FeatureGates, featureGate)
+	}
+}
+
+func withWorkloadUpdateMethod(method v1.WorkloadUpdateMethod) kubevirtSpecOption {
+	return func(kvSpec *v1.KubeVirtSpec) {
+		kvSpec.WorkloadUpdateStrategy.WorkloadUpdateMethods = append(kvSpec.WorkloadUpdateStrategy.WorkloadUpdateMethods, method)
+	}
+}

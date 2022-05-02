@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -38,6 +38,7 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/flags"
+	"kubevirt.io/kubevirt/tests/testsuite"
 )
 
 var _ = Describe("[sig-compute]Subresource Api", func() {
@@ -67,12 +68,12 @@ var _ = Describe("[sig-compute]Subresource Api", func() {
 		Context("with correct permissions", func() {
 			It("[test_id:3170]should be allowed to access subresource endpoint", func() {
 				testClientJob(virtCli, true, resource)
-			}, 15)
+			})
 		})
 		Context("Without permissions", func() {
 			It("[test_id:3171]should not be able to access subresource endpoint", func() {
 				testClientJob(virtCli, false, resource)
-			}, 15)
+			})
 		})
 	})
 
@@ -373,7 +374,7 @@ func testClientJob(virtCli kubecli.KubevirtClient, withServiceAccount bool, reso
 	}
 
 	if withServiceAccount {
-		job.Spec.ServiceAccountName = tests.SubresourceServiceAccountName
+		job.Spec.ServiceAccountName = testsuite.SubresourceServiceAccountName
 		expectedPhase = k8sv1.PodSucceeded
 	} else if resource == "version" {
 		expectedPhase = k8sv1.PodSucceeded

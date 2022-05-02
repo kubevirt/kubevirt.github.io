@@ -7,8 +7,7 @@ import (
 	"os/exec"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/client-go/log"
@@ -22,7 +21,9 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/tests"
+	"kubevirt.io/kubevirt/tests/clientcmd"
 	"kubevirt.io/kubevirt/tests/flags"
+	"kubevirt.io/kubevirt/tests/libstorage"
 )
 
 const (
@@ -67,7 +68,7 @@ var _ = SIGDescribe("[Serial]ImageUpload", func() {
 		if config.Status.UploadProxyURL == nil {
 			By("Setting up port forwarding")
 			portMapping := fmt.Sprintf("%d:%d", localUploadProxyPort, uploadProxyPort)
-			_, kubectlCmd, err = tests.CreateCommandWithNS(flags.ContainerizedDataImporterNamespace, "kubectl", "port-forward", uploadProxyService, portMapping)
+			_, kubectlCmd, err = clientcmd.CreateCommandWithNS(flags.ContainerizedDataImporterNamespace, "kubectl", "port-forward", uploadProxyService, portMapping)
 			Expect(err).ToNot(HaveOccurred())
 
 			err = kubectlCmd.Start()
@@ -143,14 +144,14 @@ var _ = SIGDescribe("[Serial]ImageUpload", func() {
 
 	Context("[storage-req] Upload an image and start a VMI with PVC", func() {
 		DescribeTable("[test_id:4621] Should succeed", func(resource, targetName string, validateFunc func(string, string), deleteFunc func(string), startVM bool) {
-			sc, exists := tests.GetRWOBlockStorageClass()
+			sc, exists := libstorage.GetRWOBlockStorageClass()
 			if !exists {
 				Skip("Skip test when RWOBlock storage class is not present")
 			}
 			defer deleteFunc(targetName)
 
 			By("Upload image")
-			virtctlCmd := tests.NewRepeatableVirtctlCommand(imageUpload,
+			virtctlCmd := clientcmd.NewRepeatableVirtctlCommand(imageUpload,
 				resource, targetName,
 				namespace, util.NamespaceTestDefault,
 				"--image-path", imagePath,
@@ -208,14 +209,14 @@ var _ = SIGDescribe("[Serial]ImageUpload", func() {
 
 	Context("Create upload volume with force-bind flag", func() {
 		DescribeTable("Should succeed", func(resource, targetName string, validateFunc func(string), deleteFunc func(string)) {
-			storageClass, exists := tests.GetRWOFileSystemStorageClass()
+			storageClass, exists := libstorage.GetRWOFileSystemStorageClass()
 			if !exists || !tests.IsStorageClassBindingModeWaitForFirstConsumer(storageClass) {
 				Skip("Skip no wffc storage class available")
 			}
 			defer deleteFunc(targetName)
 
 			By("Upload image")
-			virtctlCmd := tests.NewRepeatableVirtctlCommand(imageUpload,
+			virtctlCmd := clientcmd.NewRepeatableVirtctlCommand(imageUpload,
 				resource, targetName,
 				namespace, util.NamespaceTestDefault,
 				"--image-path", imagePath,
@@ -270,7 +271,7 @@ var _ = SIGDescribe("[Serial]ImageUpload", func() {
 			defer deleteFunc(targetName)
 
 			By("Upload archive content")
-			virtctlCmd := tests.NewRepeatableVirtctlCommand(imageUpload,
+			virtctlCmd := clientcmd.NewRepeatableVirtctlCommand(imageUpload,
 				resource, targetName,
 				namespace, util.NamespaceTestDefault,
 				"--archive-path", archivePath,

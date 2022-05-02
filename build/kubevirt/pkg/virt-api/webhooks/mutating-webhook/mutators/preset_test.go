@@ -22,7 +22,7 @@ package mutators
 import (
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -44,7 +44,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			preset.ObjectMeta.Name = "test-preset"
 
 			annotateVMI(&vmi, preset)
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 			Expect(vmi.Annotations["virtualmachinepreset.kubevirt.io/test-preset"]).To(Equal(v1.GroupVersion.String()))
 		})
 
@@ -57,7 +57,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			preset.ObjectMeta.Name = "preset-bar"
 			annotateVMI(&vmi, preset)
 
-			Expect(len(vmi.Annotations)).To(Equal(2))
+			Expect(vmi.Annotations).To(HaveLen(2))
 			Expect(vmi.Annotations["virtualmachinepreset.kubevirt.io/preset-foo"]).To(Equal(v1.GroupVersion.String()))
 			Expect(vmi.Annotations["virtualmachinepreset.kubevirt.io/preset-bar"]).To(Equal(v1.GroupVersion.String()))
 		})
@@ -96,7 +96,8 @@ var _ = Describe("Mutating Webhook Presets", func() {
 							Watchdog: &v1.Watchdog{Name: "testcase",
 								WatchdogDevice: v1.WatchdogDevice{I6300ESB: &v1.I6300ESBWatchdog{Action: v1.WatchdogActionReset}}},
 							Disks: []v1.Disk{{Name: "testdisk",
-								DiskDevice: v1.DiskDevice{Disk: &v1.DiskTarget{Bus: "virtio", ReadOnly: true}}}}},
+								DiskDevice: v1.DiskDevice{Disk: &v1.DiskTarget{
+									Bus: v1.DiskBusVirtio, ReadOnly: true}}}}},
 					},
 				},
 			}
@@ -132,7 +133,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			applyPresets(&vmi, presetInformer)
 
 			By("checking annotations were applied and CPU count remains the same")
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 			Expect(int(vmi.Spec.Domain.CPU.Cores)).To(Equal(4))
 
 			By("showing an override occurred")
@@ -146,7 +147,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			applyPresets(&vmi, presetInformer)
 
 			By("checking annotations were not applied and CPU count remains the same")
-			Expect(len(vmi.Annotations)).To(Equal(0))
+			Expect(vmi.Annotations).To(BeEmpty())
 			Expect(int(vmi.Spec.Domain.CPU.Cores)).To(Equal(4))
 		})
 
@@ -169,7 +170,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			memory, ok := vmi.Spec.Domain.Resources.Requests["memory"]
 			Expect(ok).To(BeTrue())
 			Expect(int(memory.Value())).To(Equal(64000000))
-			Expect(len(vmi.Annotations)).To(Equal(0))
+			Expect(vmi.Annotations).To(BeEmpty())
 
 			preset.Spec.Domain.Resources = v1.ResourceRequirements{Requests: k8sv1.ResourceList{
 				"memory": memory,
@@ -188,7 +189,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			memory, ok = vmi.Spec.Domain.Resources.Requests["memory"]
 			Expect(ok).To(BeTrue())
 			Expect(int(memory.Value())).To(Equal(64000000))
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 		})
 
 		It("Should detect Firmware overrides", func() {
@@ -206,7 +207,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(0))
+			Expect(vmi.Annotations).To(BeEmpty())
 			Expect(vmi.Spec.Domain.Firmware.UUID).To(Equal(matchUuid))
 
 			preset.Spec.Domain.Firmware = &v1.Firmware{UUID: matchUuid}
@@ -220,7 +221,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 			Expect(vmi.Spec.Domain.Firmware.UUID).To(Equal(matchUuid))
 		})
 
@@ -238,7 +239,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(0))
+			Expect(vmi.Annotations).To(BeEmpty())
 			Expect(vmi.Spec.Domain.Clock.Timer.HPET.TickPolicy).To(Equal(v1.HPETTickPolicyDelay))
 
 			preset.Spec.Domain.Clock = &v1.Clock{ClockOffset: v1.ClockOffset{},
@@ -254,7 +255,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			vmi.Annotations = map[string]string{}
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 			Expect(vmi.Spec.Domain.Clock.Timer.HPET.TickPolicy).To(Equal(v1.HPETTickPolicyDelay))
 		})
 
@@ -271,7 +272,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(0))
+			Expect(vmi.Annotations).To(BeEmpty())
 			Expect(*vmi.Spec.Domain.Features.ACPI.Enabled).To(BeTrue())
 
 			preset.Spec.Domain.Features = &v1.Features{ACPI: v1.FeatureState{Enabled: &truthy},
@@ -288,7 +289,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 			Expect(*vmi.Spec.Domain.Features.ACPI.Enabled).To(BeTrue())
 		})
 
@@ -304,7 +305,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(0))
+			Expect(vmi.Annotations).To(BeEmpty())
 			Expect(vmi.Spec.Domain.Devices.Watchdog.Name).To(Equal("testcase"))
 
 			preset.Spec.Domain.Devices.Watchdog = &v1.Watchdog{Name: "testcase", WatchdogDevice: v1.WatchdogDevice{I6300ESB: &v1.I6300ESBWatchdog{Action: v1.WatchdogActionReset}}}
@@ -318,7 +319,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(1))
+			Expect(vmi.Annotations).To(HaveLen(1))
 			Expect(vmi.Spec.Domain.Devices.Watchdog.Name).To(Equal("testcase"))
 		})
 
@@ -338,7 +339,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(0), "There should not be annotations if presets weren't applied")
+			Expect(vmi.Annotations).To(BeEmpty(), "There should not be annotations if presets weren't applied")
 			Expect(*vmi.Spec.Domain.IOThreadsPolicy).To(Equal(automaticPolicy), "IOThreads policy should not have been overridden")
 
 			preset.Spec.Domain.IOThreadsPolicy = &automaticPolicy
@@ -351,7 +352,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			presetInformer.GetIndexer().Add(preset)
 			applyPresets(&vmi, presetInformer)
 
-			Expect(len(vmi.Annotations)).To(Equal(1), "There should be an annotation indicating presets were applied")
+			Expect(vmi.Annotations).To(HaveLen(1), "There should be an annotation indicating presets were applied")
 			Expect(*vmi.Spec.Domain.IOThreadsPolicy).To(Equal(automaticPolicy), "IOThreadsPolicy should not have been changed")
 		})
 	})
@@ -511,7 +512,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			Expect(ok).To(BeTrue())
 
 			By("checking settings were applied")
-			Expect(len(vmi.Spec.Domain.Resources.Requests)).To(Equal(1))
+			Expect(vmi.Spec.Domain.Resources.Requests).To(HaveLen(1))
 			memory := vmi.Spec.Domain.Resources.Requests["memory"]
 			Expect(int(memory.Value())).To(Equal(64000000))
 
@@ -669,7 +670,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			allPresets := []v1.VirtualMachineInstancePreset{matchingPreset, nonmatchingPreset}
 			matchingPresets, err := filterPresets(allPresets, &vmi)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(matchingPresets)).To(Equal(1))
+			Expect(matchingPresets).To(HaveLen(1))
 			Expect(matchingPresets[0].Name).To(Equal(matchingPresetName))
 		})
 
@@ -677,7 +678,7 @@ var _ = Describe("Mutating Webhook Presets", func() {
 			allPresets := []v1.VirtualMachineInstancePreset{nonmatchingPreset}
 			matchingPresets, err := filterPresets(allPresets, &vmi)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(matchingPresets)).To(Equal(0))
+			Expect(matchingPresets).To(BeEmpty())
 		})
 
 		It("Should not ignore bogus selectors", func() {

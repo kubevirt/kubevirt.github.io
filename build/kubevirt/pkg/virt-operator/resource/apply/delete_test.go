@@ -20,7 +20,7 @@
 package apply
 
 import (
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -81,7 +81,7 @@ var _ = Describe("Deletion", func() {
 
 			needAdded := crdFilterNeedFinalizerAdded(crds)
 
-			Expect(len(needAdded)).To(Equal(1))
+			Expect(needAdded).To(HaveLen(1))
 			Expect(needAdded[0].Name).To(Equal("needs-finalizer"))
 		})
 
@@ -127,7 +127,7 @@ var _ = Describe("Deletion", func() {
 			}
 
 			needRemoved := crdFilterNeedFinalizerRemoved(crds)
-			Expect(len(needRemoved)).To(Equal(3))
+			Expect(needRemoved).To(HaveLen(3))
 		})
 
 		It("Should block finalizer removal until all CRD CRs are removed", func() {
@@ -166,7 +166,7 @@ var _ = Describe("Deletion", func() {
 			}
 
 			needRemoved := crdFilterNeedFinalizerRemoved(crds)
-			Expect(len(needRemoved)).To(Equal(0))
+			Expect(needRemoved).To(BeEmpty())
 		})
 	})
 })

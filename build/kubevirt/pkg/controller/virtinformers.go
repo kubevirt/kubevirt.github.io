@@ -29,13 +29,13 @@ import (
 	"kubevirt.io/api/flavor"
 
 	promv1 "github.com/coreos/prometheus-operator/pkg/apis/monitoring/v1"
-	vsv1beta1 "github.com/kubernetes-csi/external-snapshotter/v2/pkg/apis/volumesnapshot/v1beta1"
+	vsv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/apis/volumesnapshot/v1"
 	secv1 "github.com/openshift/api/security/v1"
 	admissionregistrationv1 "k8s.io/api/admissionregistration/v1"
 	appsv1 "k8s.io/api/apps/v1"
 	batchv1 "k8s.io/api/batch/v1"
 	k8sv1 "k8s.io/api/core/v1"
-	"k8s.io/api/policy/v1beta1"
+	policyv1 "k8s.io/api/policy/v1"
 	rbacv1 "k8s.io/api/rbac/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
@@ -728,6 +728,20 @@ func GetControllerRevisionInformerIndexers() cache.Indexers {
 
 			return nil, nil
 		},
+		"vmpool": func(obj interface{}) ([]string, error) {
+			cr, ok := obj.(*appsv1.ControllerRevision)
+			if !ok {
+				return nil, unexpectedObjectError
+			}
+
+			for _, ref := range cr.OwnerReferences {
+				if ref.Kind == "VirtualMachinePool" {
+					return []string{string(ref.UID)}, nil
+				}
+			}
+
+			return nil, nil
+		},
 	}
 }
 
@@ -984,8 +998,8 @@ func (f *kubeInformerFactory) OperatorPodDisruptionBudget() cache.SharedIndexInf
 			panic(err)
 		}
 
-		lw := NewListWatchFromClient(f.clientSet.PolicyV1beta1().RESTClient(), "poddisruptionbudgets", k8sv1.NamespaceAll, fields.Everything(), labelSelector)
-		return cache.NewSharedIndexInformer(lw, &v1beta1.PodDisruptionBudget{}, f.defaultResync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
+		lw := NewListWatchFromClient(f.clientSet.PolicyV1().RESTClient(), "poddisruptionbudgets", k8sv1.NamespaceAll, fields.Everything(), labelSelector)
+		return cache.NewSharedIndexInformer(lw, &policyv1.PodDisruptionBudget{}, f.defaultResync, cache.Indexers{cache.NamespaceIndex: cache.MetaNamespaceIndexFunc})
 	})
 }
 
@@ -1064,14 +1078,14 @@ func (f *kubeInformerFactory) Pod() cache.SharedIndexInformer {
 
 // VolumeSnapshotInformer returns an informer for VolumeSnapshots
 func VolumeSnapshotInformer(clientSet kubecli.KubevirtClient, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	restClient := clientSet.KubernetesSnapshotClient().SnapshotV1beta1().RESTClient()
+	restClient := clientSet.KubernetesSnapshotClient().SnapshotV1().RESTClient()
 	lw := cache.NewListWatchFromClient(restClient, "volumesnapshots", k8sv1.NamespaceAll, fields.Everything())
-	return cache.NewSharedIndexInformer(lw, &vsv1beta1.VolumeSnapshot{}, resyncPeriod, cache.Indexers{})
+	return cache.NewSharedIndexInformer(lw, &vsv1.VolumeSnapshot{}, resyncPeriod, cache.Indexers{})
 }
 
 // VolumeSnapshotClassInformer returns an informer for VolumeSnapshotClasses
 func VolumeSnapshotClassInformer(clientSet kubecli.KubevirtClient, resyncPeriod time.Duration) cache.SharedIndexInformer {
-	restClient := clientSet.KubernetesSnapshotClient().SnapshotV1beta1().RESTClient()
+	restClient := clientSet.KubernetesSnapshotClient().SnapshotV1().RESTClient()
 	lw := cache.NewListWatchFromClient(restClient, "volumesnapshotclasses", k8sv1.NamespaceAll, fields.Everything())
-	return cache.NewSharedIndexInformer(lw, &vsv1beta1.VolumeSnapshotClass{}, resyncPeriod, cache.Indexers{})
+	return cache.NewSharedIndexInformer(lw, &vsv1.VolumeSnapshotClass{}, resyncPeriod, cache.Indexers{})
 }

@@ -31,8 +31,7 @@ import (
 
 	restful "github.com/emicklei/go-restful"
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/tools/cache"
 
@@ -41,7 +40,7 @@ import (
 	appsv1 "k8s.io/api/apps/v1"
 	k8sv1 "k8s.io/api/core/v1"
 	kubev1 "k8s.io/api/core/v1"
-	"k8s.io/api/policy/v1beta1"
+	policyv1 "k8s.io/api/policy/v1"
 	"k8s.io/client-go/tools/record"
 
 	io_prometheus_client "github.com/prometheus/client_model/go"
@@ -89,7 +88,7 @@ var _ = Describe("Application", func() {
 		recorder.IncludeObject = true
 		config, _, _ := testutils.NewFakeClusterConfigUsingKVConfig(&v1.KubeVirtConfiguration{})
 
-		pdbInformer, _ := testutils.NewFakeInformerFor(&v1beta1.PodDisruptionBudget{})
+		pdbInformer, _ := testutils.NewFakeInformerFor(&policyv1.PodDisruptionBudget{})
 		migrationPolicyInformer, _ := testutils.NewFakeInformerFor(&migrationsv1.MigrationPolicy{})
 		podInformer, _ := testutils.NewFakeInformerFor(&k8sv1.Pod{})
 		pvcInformer, _ := testutils.NewFakeInformerFor(&k8sv1.PersistentVolumeClaim{})
@@ -204,7 +203,7 @@ var _ = Describe("Application", func() {
 	})
 
 	Describe("Reinitialization conditions", func() {
-		table.DescribeTable("Re-trigger initialization", func(hasCDIAtInit bool, addCrd bool, removeCrd bool, expectReInit bool) {
+		DescribeTable("Re-trigger initialization", func(hasCDIAtInit bool, addCrd bool, removeCrd bool, expectReInit bool) {
 			var reInitTriggered bool
 
 			app := VirtControllerApp{}
@@ -231,10 +230,10 @@ var _ = Describe("Application", func() {
 
 			Expect(reInitTriggered).To(Equal(expectReInit))
 		},
-			table.Entry("when CDI is introduced", false, true, false, true),
-			table.Entry("when CDI is removed", true, false, true, true),
-			table.Entry("not when nothing changed and cdi exists", true, true, false, false),
-			table.Entry("not when nothing changed and does not exist", false, false, true, false),
+			Entry("when CDI is introduced", false, true, false, true),
+			Entry("when CDI is removed", true, false, true, true),
+			Entry("not when nothing changed and cdi exists", true, true, false, false),
+			Entry("not when nothing changed and does not exist", false, false, true, false),
 		)
 	})
 

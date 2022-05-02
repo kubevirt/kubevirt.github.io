@@ -23,8 +23,7 @@ import (
 	"context"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	expect "github.com/google/goexpect"
@@ -55,6 +54,9 @@ var _ = SIGDescribe("Subdomain", func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		Expect(err).NotTo(HaveOccurred(), "Should successfully initialize an API client")
 
+		// Should be skipped as long as masquerade binding doesn't have dhcpv6 + ra (issue- https://github.com/kubevirt/kubevirt/issues/7184)
+		libnet.SkipWhenClusterNotSupportIpv4(virtClient)
+
 		tests.BeforeTestCleanup()
 	})
 
@@ -68,7 +70,7 @@ var _ = SIGDescribe("Subdomain", func() {
 			Expect(err).ToNot(HaveOccurred())
 		})
 
-		table.DescribeTable("VMI should have the expected FQDN", func(f func() *v1.VirtualMachineInstance, subdom string) {
+		DescribeTable("VMI should have the expected FQDN", func(f func() *v1.VirtualMachineInstance, subdom string) {
 			vmiSpec := f()
 			var expectedFQDN string
 			if subdom != "" {
@@ -85,10 +87,10 @@ var _ = SIGDescribe("Subdomain", func() {
 
 			Expect(assertFQDNinGuest(vmi, expectedFQDN)).To(Succeed(), "failed to get expected FQDN")
 		},
-			table.Entry("with Masquerade binding and subdomain", fedoraMasqueradeVMI, subdomain),
-			table.Entry("with Bridge binding and subdomain", fedoraBridgeBindingVMI, subdomain),
-			table.Entry("with Masquerade binding without subdomain", fedoraMasqueradeVMI, ""),
-			table.Entry("with Bridge binding without subdomain", fedoraBridgeBindingVMI, ""),
+			Entry("with Masquerade binding and subdomain", fedoraMasqueradeVMI, subdomain),
+			Entry("with Bridge binding and subdomain", fedoraBridgeBindingVMI, subdomain),
+			Entry("with Masquerade binding without subdomain", fedoraMasqueradeVMI, ""),
+			Entry("with Bridge binding without subdomain", fedoraBridgeBindingVMI, ""),
 		)
 
 		It("VMI with custom DNSPolicy should have the expected FQDN", func() {

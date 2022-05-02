@@ -1,6 +1,9 @@
 package libnet
 
 import (
+	"fmt"
+	"net"
+
 	k8sv1 "k8s.io/api/core/v1"
 	netutils "k8s.io/utils/net"
 
@@ -33,4 +36,28 @@ func getFamily(ip string) k8sv1.IPFamily {
 		return k8sv1.IPv6Protocol
 	}
 	return k8sv1.IPv4Protocol
+}
+
+func GetLoopbackAddress(family k8sv1.IPFamily) string {
+	if family == k8sv1.IPv4Protocol {
+		return "127.0.0.1"
+
+	}
+	return net.IPv6loopback.String()
+}
+
+func GetLoopbackAddressForUrl(family k8sv1.IPFamily) string {
+	address := GetLoopbackAddress(family)
+	if family == k8sv1.IPv6Protocol {
+		address = fmt.Sprintf("[%s]", address)
+	}
+	return address
+}
+
+func CidrToIP(cidr string) (string, error) {
+	ip, _, err := net.ParseCIDR(cidr)
+	if err != nil {
+		return "", err
+	}
+	return ip.String(), nil
 }

@@ -25,7 +25,7 @@ import (
 	"strings"
 	"time"
 
-	vsv1beta1 "github.com/kubernetes-csi/external-snapshotter/v2/pkg/apis/volumesnapshot/v1beta1"
+	vsv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/apis/volumesnapshot/v1"
 	corev1 "k8s.io/api/core/v1"
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
@@ -43,6 +43,10 @@ const (
 	vmSnapshotFinalizer = "snapshot.kubevirt.io/vmsnapshot-protection"
 
 	vmSnapshotContentFinalizer = "snapshot.kubevirt.io/vmsnapshotcontent-protection"
+
+	snapshotSourceNameLabel = "snapshot.kubevirt.io/source-vm-name"
+
+	snapshotSourceNamespaceLabel = "snapshot.kubevirt.io/source-vm-namespace"
 
 	defaultVolumeSnapshotClassAnnotation = "snapshot.storage.kubernetes.io/is-default-class"
 
@@ -103,7 +107,7 @@ func getVMSnapshotContentName(vmSnapshot *snapshotv1.VirtualMachineSnapshot) str
 	return fmt.Sprintf("%s-%s", "vmsnapshot-content", vmSnapshot.UID)
 }
 
-func translateError(e *vsv1beta1.VolumeSnapshotError) *snapshotv1.Error {
+func translateError(e *vsv1.VolumeSnapshotError) *snapshotv1.Error {
 	if e == nil {
 		return nil
 	}
@@ -360,7 +364,7 @@ func (ctrl *VMSnapshotController) updateVMSnapshotContent(content *snapshotv1.Vi
 func (ctrl *VMSnapshotController) createVolumeSnapshot(
 	content *snapshotv1.VirtualMachineSnapshotContent,
 	volumeBackup snapshotv1.VolumeBackup,
-) (*vsv1beta1.VolumeSnapshot, error) {
+) (*vsv1.VolumeSnapshot, error) {
 	log.Log.Infof("Attempting to create VolumeSnapshot %s", *volumeBackup.VolumeSnapshotName)
 
 	sc := volumeBackup.PersistentVolumeClaim.Spec.StorageClassName
@@ -376,9 +380,13 @@ func (ctrl *VMSnapshotController) createVolumeSnapshot(
 	}
 
 	t := true
-	snapshot := &vsv1beta1.VolumeSnapshot{
+	snapshot := &vsv1.VolumeSnapshot{
 		ObjectMeta: metav1.ObjectMeta{
 			Name: *volumeBackup.VolumeSnapshotName,
+			Labels: map[string]string{
+				snapshotSourceNameLabel:      content.Spec.Source.VirtualMachine.Name,
+				snapshotSourceNamespaceLabel: content.Spec.Source.VirtualMachine.Namespace,
+			},
 			OwnerReferences: []metav1.OwnerReference{
 				{
 					APIVersion:         snapshotv1.SchemeGroupVersion.String(),
@@ -390,15 +398,15 @@ func (ctrl *VMSnapshotController) createVolumeSnapshot(
 				},
 			},
 		},
-		Spec: vsv1beta1.VolumeSnapshotSpec{
-			Source: vsv1beta1.VolumeSnapshotSource{
+		Spec: vsv1.VolumeSnapshotSpec{
+			Source: vsv1.VolumeSnapshotSource{
 				PersistentVolumeClaimName: &volumeBackup.PersistentVolumeClaim.Name,
 			},
 			VolumeSnapshotClassName: &volumeSnapshotClass,
 		},
 	}
 
-	volumeSnapshot, err := ctrl.Client.KubernetesSnapshotClient().SnapshotV1beta1().
+	volumeSnapshot, err := ctrl.Client.KubernetesSnapshotClient().SnapshotV1().
 		VolumeSnapshots(content.Namespace).
 		Create(context.Background(), snapshot, metav1.CreateOptions{})
 	if err != nil {
@@ -464,7 +472,7 @@ func (ctrl *VMSnapshotController) createContent(vmSnapshot *snapshotv1.VirtualMa
 		vb := snapshotv1.VolumeBackup{
 			VolumeName: volumeName,
 			PersistentVolumeClaim: snapshotv1.PersistentVolumeClaim{
-				ObjectMeta: *pvc.ObjectMeta.DeepCopy(),
+				ObjectMeta: *getSimplifiedMetaObject(pvc.ObjectMeta),
 				Spec:       *pvc.Spec.DeepCopy(),
 			},
 			VolumeSnapshotName: &volumeSnapshotName,
@@ -548,7 +556,7 @@ func (ctrl *VMSnapshotController) getVolumeSnapshotClass(storageClassName string
 
 	storageClass := obj.(*storagev1.StorageClass).DeepCopy()
 
-	var matches []vsv1beta1.VolumeSnapshotClass
+	var matches []vsv1.VolumeSnapshotClass
 	volumeSnapshotClasses := ctrl.getVolumeSnapshotClasses()
 	for _, volumeSnapshotClass := range volumeSnapshotClasses {
 		if volumeSnapshotClass.Driver == storageClass.Provisioner {

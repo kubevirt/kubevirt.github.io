@@ -67,6 +67,7 @@ type templateData struct {
 	GsSha                  string
 	PriorityClassSpec      string
 	FeatureGates           []string
+	InfraReplicas          uint8
 	GeneratedManifests     map[string]string
 }
 
@@ -95,6 +96,7 @@ func main() {
 	virtLauncherSha := flag.String("virt-launcher-sha", "", "")
 	gsSha := flag.String("gs-sha", "", "")
 	featureGates := flag.String("feature-gates", "", "")
+	infraReplicas := flag.Uint("infra-replicas", 2, "")
 
 	pflag.CommandLine.AddGoFlagSet(flag.CommandLine)
 	pflag.CommandLine.ParseErrorsWhitelist.UnknownFlags = true
@@ -114,8 +116,9 @@ func main() {
 		GeneratedManifests: make(map[string]string),
 	}
 
-	if featureGates != nil && strings.Contains(*featureGates, "NonRoot") && !strings.Contains(*featureGates, "NonRootExperimental") {
-		*featureGates = *featureGates + ",NonRootExperimental"
+	if featureGates != nil {
+
+		*featureGates = strings.Replace(*featureGates, "NonRootExperimental", "NonRoot", 1)
 	}
 
 	if *processVars {
@@ -145,6 +148,7 @@ func main() {
 		if *featureGates != "" {
 			data.FeatureGates = strings.Split(*featureGates, ",")
 		}
+		data.InfraReplicas = uint8(*infraReplicas)
 
 		// operator deployment differs a bit in normal manifest and CSV
 		if strings.Contains(*inputFile, ".clusterserviceversion.yaml") {

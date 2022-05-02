@@ -459,6 +459,17 @@ type Devices struct {
 	Filesystems []FilesystemDevice `xml:"filesystem,omitempty"`
 	Redirs      []RedirectedDevice `xml:"redirdev,omitempty"`
 	SoundCards  []SoundCard        `xml:"sound,omitempty"`
+	TPMs        []TPM              `xml:"tpm,omitempty"`
+}
+
+type TPM struct {
+	Model   string     `xml:"model,attr"`
+	Backend TPMBackend `xml:"backend"`
+}
+
+type TPMBackend struct {
+	Type    string `xml:"type,attr"`
+	Version string `xml:"version,attr"`
 }
 
 // RedirectedDevice describes a device to be redirected
@@ -612,9 +623,9 @@ type DiskSource struct {
 }
 
 type DiskTarget struct {
-	Bus    string `xml:"bus,attr,omitempty"`
-	Device string `xml:"dev,attr,omitempty"`
-	Tray   string `xml:"tray,attr,omitempty"`
+	Bus    v1.DiskBus `xml:"bus,attr,omitempty"`
+	Device string     `xml:"dev,attr,omitempty"`
+	Tray   string     `xml:"tray,attr,omitempty"`
 }
 
 type DiskDriver struct {
@@ -963,7 +974,7 @@ type VideoModel struct {
 }
 
 type Graphics struct {
-	AutoPort      string          `xml:"autoPort,attr,omitempty"`
+	AutoPort      string          `xml:"autoport,attr,omitempty"`
 	DefaultMode   string          `xml:"defaultMode,attr,omitempty"`
 	Listen        *GraphicsListen `xml:"listen,omitempty"`
 	PasswdValidTo string          `xml:"passwdValidTo,attr,omitempty"`

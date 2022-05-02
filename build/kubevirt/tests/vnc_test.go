@@ -31,11 +31,11 @@ import (
 
 	"github.com/mitchellh/go-vnc"
 
+	"kubevirt.io/kubevirt/tests/clientcmd"
 	"kubevirt.io/kubevirt/tests/util"
 
 	"github.com/gorilla/websocket"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/client-go/rest"
 
@@ -127,7 +127,7 @@ var _ = Describe("[rfe_id:127][crit:medium][arm64][vendor:cnv-qe@redhat.com][lev
 			})
 		})
 
-		table.DescribeTable("[rfe_id:127][crit:medium][vendor:cnv-qe@redhat.com][level:component]should upgrade websocket connection which look like coming from a browser", func(subresource string) {
+		DescribeTable("[rfe_id:127][crit:medium][vendor:cnv-qe@redhat.com][level:component]should upgrade websocket connection which look like coming from a browser", func(subresource string) {
 			config, err := kubecli.GetKubevirtClientConfig()
 			Expect(err).ToNot(HaveOccurred())
 			// Browsers need a subprotocol, since they will have to use the subprotocol mechanism to forward the bearer token.
@@ -148,8 +148,8 @@ var _ = Describe("[rfe_id:127][crit:medium][arm64][vendor:cnv-qe@redhat.com][lev
 			Expect(err).ToNot(HaveOccurred())
 			Expect(rt.Response.Header.Get("Sec-Websocket-Protocol")).To(Equal(subresources.PlainStreamProtocolName))
 		},
-			table.Entry("[test_id:1612]for vnc", "vnc"),
-			table.Entry("[test_id:1613]for serial console", "console"),
+			Entry("[test_id:1612]for vnc", "vnc"),
+			Entry("[test_id:1613]for serial console", "console"),
 		)
 
 		It("[test_id:1614]should upgrade websocket connections without a subprotocol given", func() {
@@ -169,7 +169,7 @@ var _ = Describe("[rfe_id:127][crit:medium][arm64][vendor:cnv-qe@redhat.com][lev
 		It("[test_id:4272]should connect to vnc with --proxy-only flag", func() {
 
 			By("Invoking virtctl vnc with --proxy-only")
-			proxyOnlyCommand := tests.NewVirtctlCommand("vnc", "--proxy-only", "--namespace", vmi.Namespace, vmi.Name)
+			proxyOnlyCommand := clientcmd.NewVirtctlCommand("vnc", "--proxy-only", "--namespace", vmi.Namespace, vmi.Name)
 
 			r, w, _ := os.Pipe()
 			proxyOnlyCommand.SetOut(w)
@@ -208,7 +208,7 @@ var _ = Describe("[rfe_id:127][crit:medium][arm64][vendor:cnv-qe@redhat.com][lev
 			testPort := "33333"
 
 			By("Invoking virtctl vnc with --proxy-only")
-			proxyOnlyCommand := tests.NewVirtctlCommand("vnc", "--proxy-only", "--port", testPort, "--namespace", vmi.Namespace, vmi.Name)
+			proxyOnlyCommand := clientcmd.NewVirtctlCommand("vnc", "--proxy-only", "--port", testPort, "--namespace", vmi.Namespace, vmi.Name)
 
 			// Run this as go routine to keep proxy open in the background
 			go func() {

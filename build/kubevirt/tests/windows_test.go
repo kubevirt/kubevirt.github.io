@@ -22,13 +22,13 @@ package tests_test
 import (
 	"context"
 	"fmt"
-	"io/ioutil"
 	"net/http"
-	"os"
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	"kubevirt.io/kubevirt/tests/framework/checks"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -40,8 +40,10 @@ import (
 	"kubevirt.io/kubevirt/pkg/network/dns"
 	"kubevirt.io/kubevirt/pkg/testutils"
 	"kubevirt.io/kubevirt/tests"
+	"kubevirt.io/kubevirt/tests/clientcmd"
 	"kubevirt.io/kubevirt/tests/flags"
 	"kubevirt.io/kubevirt/tests/libnet"
+	"kubevirt.io/kubevirt/tests/libstorage"
 	"kubevirt.io/kubevirt/tests/libvmi"
 	"kubevirt.io/kubevirt/tests/util"
 )
@@ -95,8 +97,12 @@ var getWindowsVMISpec = func() v1.VirtualMachineInstanceSpec {
 			Devices: v1.Devices{
 				Disks: []v1.Disk{
 					{
-						Name:       windowsDisk,
-						DiskDevice: v1.DiskDevice{Disk: &v1.DiskTarget{Bus: "sata"}},
+						Name: windowsDisk,
+						DiskDevice: v1.DiskDevice{
+							Disk: &v1.DiskTarget{
+								Bus: v1.DiskBusSATA,
+							},
+						},
 					},
 				},
 			},
@@ -127,8 +133,8 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
 		tests.BeforeTestCleanup()
-		tests.SkipIfMissingRequiredImage(virtClient, tests.DiskWindows)
-		tests.CreatePVC(tests.OSWindows, "30Gi", tests.Config.StorageClassWindows, true)
+		checks.SkipIfMissingRequiredImage(virtClient, tests.DiskWindows)
+		tests.CreatePVC(tests.OSWindows, "30Gi", libstorage.Config.StorageClassWindows, true)
 		windowsVMI = tests.NewRandomVMI()
 		windowsVMI.Spec = getWindowsVMISpec()
 		tests.AddExplicitPodNetworkInterface(windowsVMI)
@@ -139,7 +145,7 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 		vmi, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(windowsVMI)
 		Expect(err).To(BeNil())
 		tests.WaitForSuccessfulVMIStartWithTimeout(vmi, 360)
-	}, 300)
+	})
 
 	It("[test_id:488]should succeed to stop a running vmi", func() {
 		By("Starting the vmi")
@@ -150,7 +156,7 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 		By("Stopping the vmi")
 		err = virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})
 		Expect(err).To(BeNil())
-	}, 300)
+	})
 
 	Context("with winrm connection", func() {
 		var winrmcliPod *k8sv1.Pod
@@ -201,7 +207,7 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 				}, time.Minute*5, time.Second*15).ShouldNot(HaveOccurred())
 				By("Checking that the Windows VirtualMachineInstance has expected UUID")
 				Expect(output).Should(ContainSubstring(strings.ToUpper(windowsFirmware)))
-			}, 360)
+			})
 
 			It("[test_id:3159]should have default masquerade IP", func() {
 				command := append(cli, "ipconfig /all")
@@ -218,7 +224,7 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 
 				By("Checking that the Windows VirtualMachineInstance has expected IP address")
 				Expect(output).Should(ContainSubstring("10.0.2.2"))
-			}, 360)
+			})
 
 			It("[test_id:3160]should have the domain set properly", func() {
 				searchDomain := getPodSearchDomain(windowsVMI)
@@ -229,7 +235,7 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 					cli,
 					"wmic nicconfig get dnsdomain",
 					`DNSDomain[\n\r\t ]+`+searchDomain+`[\n\r\t ]+`)
-			}, 360)
+			})
 		})
 
 		Context("VMI with subdomain is created", func() {
@@ -254,7 +260,7 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 					cli,
 					"wmic nicconfig get dnsdomain",
 					`DNSDomain[\n\r\t ]+`+expectedSearchDomain+`[\n\r\t ]+`)
-			}, 360)
+			})
 		})
 
 		Context("with bridge binding", func() {
@@ -303,32 +309,21 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 					)
 					return err
 				}, time.Minute*1, time.Second*15).Should(Succeed())
-			}, 360)
+			})
 		})
 	})
 
 	Context("[ref_id:142]with kubectl command", func() {
-		var workDir string
 		var yamlFile string
 		BeforeEach(func() {
-			tests.SkipIfNoCmd("kubectl")
-			workDir, err = ioutil.TempDir("", tests.TempDirPrefix+"-")
+			clientcmd.SkipIfNoCmd("kubectl")
+			yamlFile, err = tests.GenerateVMIJson(windowsVMI, GinkgoT().TempDir())
 			Expect(err).ToNot(HaveOccurred())
-			yamlFile, err = tests.GenerateVMIJson(windowsVMI, workDir)
-			Expect(err).ToNot(HaveOccurred())
-		})
-
-		AfterEach(func() {
-			if workDir != "" {
-				err = os.RemoveAll(workDir)
-				Expect(err).ToNot(HaveOccurred())
-				workDir = ""
-			}
 		})
 
 		It("[test_id:223]should succeed to start a vmi", func() {
 			By("Starting the vmi via kubectl command")
-			_, _, err = tests.RunCommand("kubectl", "create", "-f", yamlFile)
+			_, _, err = clientcmd.RunCommand("kubectl", "create", "-f", yamlFile)
 			Expect(err).ToNot(HaveOccurred())
 
 			tests.WaitForSuccessfulVMIStartWithTimeout(windowsVMI, 360)
@@ -336,14 +331,14 @@ var _ = Describe("[Serial][sig-compute]Windows VirtualMachineInstance", func() {
 
 		It("[test_id:239]should succeed to stop a vmi", func() {
 			By("Starting the vmi via kubectl command")
-			_, _, err = tests.RunCommand("kubectl", "create", "-f", yamlFile)
+			_, _, err = clientcmd.RunCommand("kubectl", "create", "-f", yamlFile)
 			Expect(err).ToNot(HaveOccurred())
 
 			tests.WaitForSuccessfulVMIStartWithTimeout(windowsVMI, 360)
 
 			podSelector := tests.UnfinishedVMIPodSelector(windowsVMI)
 			By("Deleting the vmi via kubectl command")
-			_, _, err = tests.RunCommand("kubectl", "delete", "-f", yamlFile)
+			_, _, err = clientcmd.RunCommand("kubectl", "delete", "-f", yamlFile)
 			Expect(err).ToNot(HaveOccurred())
 
 			By("Checking that the vmi does not exist anymore")

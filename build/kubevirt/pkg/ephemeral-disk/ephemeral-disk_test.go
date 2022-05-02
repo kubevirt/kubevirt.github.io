@@ -21,11 +21,10 @@ package ephemeraldisk
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 
@@ -37,7 +36,6 @@ import (
 
 var _ = Describe("ContainerDisk", func() {
 	var imageTempDirPath string
-	var backingTempDirPath string
 	var pvcBaseTempDirPath string
 	var blockDevBaseDir string
 	var creator *ephemeralDiskCreator
@@ -80,19 +78,9 @@ var _ = Describe("ContainerDisk", func() {
 	}
 
 	BeforeEach(func() {
-		var err error
-
-		backingTempDirPath, err = ioutil.TempDir("", "ephemeraldisk-backing")
-		Expect(err).NotTo(HaveOccurred())
-
-		imageTempDirPath, err = ioutil.TempDir("", "ephemeraldisk-image")
-		Expect(err).NotTo(HaveOccurred())
-
-		pvcBaseTempDirPath, err = ioutil.TempDir("", "pvc-base-dir-path")
-		Expect(err).NotTo(HaveOccurred())
-
-		blockDevBaseDir, err = ioutil.TempDir("", "block-dev-base-dir-path")
-		Expect(err).NotTo(HaveOccurred())
+		imageTempDirPath = GinkgoT().TempDir()
+		pvcBaseTempDirPath = GinkgoT().TempDir()
+		blockDevBaseDir = GinkgoT().TempDir()
 
 		creator = &ephemeralDiskCreator{
 			mountBaseDir:    imageTempDirPath,
@@ -100,12 +88,6 @@ var _ = Describe("ContainerDisk", func() {
 			blockDevBaseDir: blockDevBaseDir,
 			discCreateFunc:  fakeCreateBackingDisk,
 		}
-	})
-
-	AfterEach(func() {
-		os.RemoveAll(imageTempDirPath)
-		os.RemoveAll(backingTempDirPath)
-		os.RemoveAll(pvcBaseTempDirPath)
 	})
 
 	Describe("ephemeral-backed PVC", func() {

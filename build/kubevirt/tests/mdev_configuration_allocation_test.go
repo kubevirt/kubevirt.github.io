@@ -8,7 +8,7 @@ import (
 	"kubevirt.io/kubevirt/tests/framework/cleanup"
 
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -23,6 +23,7 @@ import (
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
 	. "kubevirt.io/kubevirt/tests/framework/matcher"
+	"kubevirt.io/kubevirt/tests/libnode"
 )
 
 var _ = Describe("[Serial][sig-compute]MediatedDevices", func() {
@@ -133,7 +134,7 @@ var _ = Describe("[Serial][sig-compute]MediatedDevices", func() {
 			cleanupConfiguredMdevs()
 		})
 
-		It("Should successfully passthrough a mediated device", func() {
+		It("[QUARANTINE]Should successfully passthrough a mediated device", func() {
 
 			By("Creating a Fedora VMI")
 			vmi = tests.NewRandomFedoraVMIWithGuestAgent()
@@ -193,7 +194,7 @@ var _ = Describe("[Serial][sig-compute]MediatedDevices", func() {
 			Expect(domXml).ToNot(MatchRegexp(`<hostdev .*display=.?on.?`), "Display should not be enabled")
 			Expect(domXml).ToNot(MatchRegexp(`<hostdev .*ramfb=.?on.?`), "RamFB should not be enabled")
 		})
-		It("Should override default mdev configuration on a specific node", func() {
+		It("[QUARANTINE]Should override default mdev configuration on a specific node", func() {
 			newDesiredMdevTypeName := "nvidia-223"
 			newExpectedInstancesNum := 8
 			By("Creating a configuration for mediated devices")
@@ -213,8 +214,8 @@ var _ = Describe("[Serial][sig-compute]MediatedDevices", func() {
 
 			By("Adding a mdevTestLabel1 that should trigger mdev config change")
 			// There should be only one node in this lane
-			singleNode := util.GetAllSchedulableNodes(virtClient).Items[0]
-			tests.AddLabelToNode(singleNode.Name, cleanup.TestLabelForNamespace(util.NamespaceTestDefault), mdevTestLabel)
+			singleNode := libnode.GetAllSchedulableNodes(virtClient).Items[0]
+			libnode.AddLabelToNode(singleNode.Name, cleanup.TestLabelForNamespace(util.NamespaceTestDefault), mdevTestLabel)
 
 			By("Creating a Fedora VMI")
 			vmi = tests.NewRandomFedoraVMIWithGuestAgent()

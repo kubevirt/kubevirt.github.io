@@ -19,16 +19,18 @@
 package watch
 
 import (
+	"encoding/json"
 	"fmt"
 	"time"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
+	appsv1 "k8s.io/api/apps/v1"
 	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/runtime"
+	k8sfake "k8s.io/client-go/kubernetes/fake"
 	"k8s.io/client-go/testing"
 	"k8s.io/client-go/tools/cache"
 	framework "k8s.io/client-go/tools/cache/testing"
@@ -46,7 +48,7 @@ import (
 
 var _ = Describe("Pool", func() {
 
-	table.DescribeTable("Calculate new VM names on scale out", func(existing []string, expected []string, count int) {
+	DescribeTable("Calculate new VM names on scale out", func(existing []string, expected []string, count int) {
 
 		namespace := "test"
 		baseName := "my-pool"
@@ -62,15 +64,15 @@ var _ = Describe("Pool", func() {
 
 		newNames := calculateNewVMNames(count, baseName, namespace, vmInformer.GetStore())
 
-		Expect(len(newNames)).To(Equal(len(expected)))
+		Expect(newNames).To(HaveLen(len(expected)))
 		Expect(newNames).To(Equal(expected))
 
 	},
-		table.Entry("should fill in name gaps",
+		Entry("should fill in name gaps",
 			[]string{"my-pool-1", "my-pool-3"},
 			[]string{"my-pool-0", "my-pool-2", "my-pool-4"},
 			3),
-		table.Entry("should append to end if no name gaps exist",
+		Entry("should append to end if no name gaps exist",
 			[]string{"my-pool-0", "my-pool-1", "my-pool-2"},
 			[]string{"my-pool-3", "my-pool-4"},
 			2),
@@ -83,6 +85,9 @@ var _ = Describe("Pool", func() {
 		)
 
 		var ctrl *gomock.Controller
+
+		var crInformer cache.SharedIndexInformer
+		var crSource *framework.FakeControllerSource
 
 		var vmInterface *kubecli.MockVirtualMachineInterface
 		var vmiInterface *kubecli.MockVirtualMachineInstanceInterface
@@ -98,12 +103,20 @@ var _ = Describe("Pool", func() {
 		var recorder *record.FakeRecorder
 		var mockQueue *testutils.MockWorkQueue
 		var client *kubevirtfake.Clientset
+		var k8sClient *k8sfake.Clientset
 
 		syncCaches := func(stop chan struct{}) {
 			go vmiInformer.Run(stop)
 			go vmInformer.Run(stop)
 			go poolInformer.Run(stop)
-			Expect(cache.WaitForCacheSync(stop, vmiInformer.HasSynced, vmInformer.HasSynced, poolInformer.HasSynced)).To(BeTrue())
+			go crInformer.Run(stop)
+			Expect(cache.WaitForCacheSync(stop, vmiInformer.HasSynced, vmInformer.HasSynced, poolInformer.HasSynced, crInformer.HasSynced)).To(BeTrue())
+		}
+
+		addCR := func(cr *appsv1.ControllerRevision) {
+			mockQueue.ExpectAdds(1)
+			crSource.Add(cr)
+			mockQueue.Wait()
 		}
 
 		addVM := func(vm *virtv1.VirtualMachine) {
@@ -137,10 +150,23 @@ var _ = Describe("Pool", func() {
 			recorder = record.NewFakeRecorder(100)
 			recorder.IncludeObject = true
 
+			crInformer, crSource = testutils.NewFakeInformerWithIndexersFor(&appsv1.ControllerRevision{}, cache.Indexers{
+				"vmpool": func(obj interface{}) ([]string, error) {
+					cr := obj.(*appsv1.ControllerRevision)
+					for _, ref := range cr.OwnerReferences {
+						if ref.Kind == "VirtualMachinePool" {
+							return []string{string(ref.UID)}, nil
+						}
+					}
+					return nil, nil
+				},
+			})
+
 			controller = NewPoolController(virtClient,
 				vmiInformer,
 				vmInformer,
 				poolInformer,
+				crInformer,
 				recorder,
 				uint(10))
 			// Wrap our workqueue to have a way to detect when we are done processing updates
@@ -160,6 +186,13 @@ var _ = Describe("Pool", func() {
 				return true, nil, nil
 			})
 
+			k8sClient = k8sfake.NewSimpleClientset()
+			k8sClient.Fake.PrependReactor("*", "*", func(action testing.Action) (handled bool, obj runtime.Object, err error) {
+				Expect(action).To(BeNil())
+				return true, nil, nil
+			})
+			virtClient.EXPECT().AppsV1().Return(k8sClient.AppsV1()).AnyTimes()
+
 			syncCaches(stop)
 		})
 
@@ -169,34 +202,52 @@ var _ = Describe("Pool", func() {
 			mockQueue.Wait()
 		}
 
-		It("should compute the same hash", func() {
-			pool, vm := DefaultPool(1)
+		createPoolRevision := func(pool *poolv1.VirtualMachinePool) *appsv1.ControllerRevision {
+			bytes, err := json.Marshal(&pool.Spec)
+			Expect(err).To(BeNil())
 
-			vmHash := hashVMTemplate(pool)
-			vmiHash := hashVMITemplate(pool)
-			vm = injectHashIntoVM(vm, vmHash, vmiHash)
-
-			for i := int32(0); i < 100; i++ {
-
-				// modify something not related to VM or VMI template to make sure it
-				// doesn't impact hash
-				pool.Labels["some-label"] = fmt.Sprintf("%d", i)
-				pool.Spec.Replicas = &i
-				vmHash := hashVMTemplate(pool)
-				vmiHash := hashVMITemplate(pool)
-
-				oldVMHash, _ := vm.Labels[virtv1.VirtualMachineTemplateHash]
-				oldVMIHash, _ := vm.Spec.Template.ObjectMeta.Labels[virtv1.VirtualMachineInstanceTemplateHash]
-
-				Expect(vmiHash).To(Equal(oldVMIHash))
-				Expect(vmHash).To(Equal(oldVMHash))
+			return &appsv1.ControllerRevision{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:            getRevisionName(pool),
+					Namespace:       pool.Namespace,
+					OwnerReferences: []metav1.OwnerReference{poolOwnerRef(pool)},
+				},
+				Data:     runtime.RawExtension{Raw: bytes},
+				Revision: pool.Generation,
 			}
-		})
+		}
+
+		expectControllerRevisionDeletion := func(poolRevision *appsv1.ControllerRevision) {
+			k8sClient.Fake.PrependReactor("delete", "controllerrevisions", func(action testing.Action) (handled bool, obj runtime.Object, err error) {
+				deleted, ok := action.(testing.DeleteAction)
+				Expect(ok).To(BeTrue())
+
+				delName := deleted.GetName()
+				Expect(delName).To(Equal(poolRevision.Name))
+
+				return true, nil, nil
+			})
+		}
+
+		expectControllerRevisionCreation := func(poolRevision *appsv1.ControllerRevision) {
+			k8sClient.Fake.PrependReactor("create", "controllerrevisions", func(action testing.Action) (handled bool, obj runtime.Object, err error) {
+				created, ok := action.(testing.CreateAction)
+				Expect(ok).To(BeTrue())
+
+				createObj := created.GetObject().(*appsv1.ControllerRevision)
+				Expect(createObj.Name).To(Equal(poolRevision.Name))
+
+				return true, created.GetObject(), nil
+			})
+		}
 
 		It("should create missing VMs", func() {
 			pool, vm := DefaultPool(3)
 
 			addPool(pool)
+
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
 
 			vmInterface.EXPECT().Create(gomock.Any()).Times(3).Do(func(arg interface{}) {
 				Expect(arg.(*v1.VirtualMachine).ObjectMeta.Name).To(HavePrefix(fmt.Sprintf("%s-", pool.Name)))
@@ -212,12 +263,14 @@ var _ = Describe("Pool", func() {
 		It("should update VM when VM template changes, but not VMI unless VMI template changes", func() {
 			pool, vm := DefaultPool(1)
 			pool.Status.Replicas = 1
+			poolRevision := createPoolRevision(pool)
+
+			pool.Generation = 123
+			newPoolRevision := createPoolRevision(pool)
 
 			vm.Name = fmt.Sprintf("%s-0", pool.Name)
 
-			vmHash := hashVMTemplate(pool)
-			vmiHash := hashVMITemplate(pool)
-			vm = injectHashIntoVM(vm, "madeup", vmiHash)
+			vm = injectPoolRevisionLabelsIntoVM(vm, poolRevision.Name)
 
 			vmi := api.NewMinimalVMI(vm.Name)
 			vmi.Spec = vm.Spec.Template.Spec
@@ -235,19 +288,33 @@ var _ = Describe("Pool", func() {
 
 			addPool(pool)
 			addVM(vm)
-			// not expecting vmi to cause enqueue of pool because VMI hash matches the vm's vmi template hash
+			addCR(poolRevision)
+			// not expecting vmi to cause enqueue of pool because VMI and VM use the same pool revision
 			addVMI(vmi, false)
 
-			vmiInterface.EXPECT().Delete(gomock.Any(), gomock.Any()).Times(0)
-			vmInterface.EXPECT().Update(gomock.Any()).Times(1).Do(func(arg interface{}) {
-				newVM := arg.(*v1.VirtualMachine)
-				hash := newVM.Labels[virtv1.VirtualMachineTemplateHash]
-				Expect(hash).To(Equal(vmHash))
+			expectControllerRevisionCreation(newPoolRevision)
 
-				hash = newVM.Spec.Template.ObjectMeta.Labels[virtv1.VirtualMachineInstanceTemplateHash]
-				Expect(hash).To(Equal(vmiHash))
+			vmiInterface.EXPECT().Delete(gomock.Any(), gomock.Any()).Times(0)
+			vmInterface.EXPECT().Update(gomock.Any()).MaxTimes(1).Do(func(arg interface{}) {
+				newVM := arg.(*v1.VirtualMachine)
+				revisionName := newVM.Labels[virtv1.VirtualMachinePoolRevisionName]
+				Expect(revisionName).To(Equal(newPoolRevision.Name))
 			}).Return(vm, nil)
 
+			controller.Execute()
+		})
+
+		It("should delete controller revisions when pool is being deleted", func() {
+			pool, _ := DefaultPool(1)
+			pool.Status.Replicas = 0
+			pool.DeletionTimestamp = now()
+
+			poolRevision := createPoolRevision(pool)
+
+			addPool(pool)
+			addCR(poolRevision)
+
+			expectControllerRevisionDeletion(poolRevision)
 			controller.Execute()
 		})
 
@@ -255,11 +322,16 @@ var _ = Describe("Pool", func() {
 			pool, vm := DefaultPool(1)
 			pool.Status.Replicas = 1
 
-			vm.Name = fmt.Sprintf("%s-0", pool.Name)
+			oldPoolRevision := createPoolRevision(pool)
 
-			vmHash := hashVMTemplate(pool)
-			vmiHash := hashVMITemplate(pool)
-			vm = injectHashIntoVM(vm, vmHash, vmiHash)
+			pool.Generation = 123
+
+			pool.Spec.VirtualMachineTemplate.Spec.Template.ObjectMeta.Labels = map[string]string{}
+			pool.Spec.VirtualMachineTemplate.Spec.Template.ObjectMeta.Labels["newkey"] = "newval"
+			newPoolRevision := createPoolRevision(pool)
+
+			vm = injectPoolRevisionLabelsIntoVM(vm, newPoolRevision.Name)
+			vm.Name = fmt.Sprintf("%s-0", pool.Name)
 
 			vmi := api.NewMinimalVMI(vm.Name)
 			vmi.Spec = vm.Spec.Template.Spec
@@ -275,14 +347,17 @@ var _ = Describe("Pool", func() {
 				BlockOwnerDeletion: &t,
 			}}
 
-			vmi.Labels[virtv1.VirtualMachineInstanceTemplateHash] = "madeup"
+			vmi.Labels[virtv1.VirtualMachinePoolRevisionName] = oldPoolRevision.Name
 
 			addPool(pool)
 			addVM(vm)
 			addVMI(vmi, true)
+			addCR(oldPoolRevision)
+			addCR(newPoolRevision)
+
+			expectControllerRevisionCreation(newPoolRevision)
 
 			vmiInterface.EXPECT().Delete(gomock.Any(), gomock.Any()).Times(1).Return(nil)
-			vmInterface.EXPECT().Update(gomock.Any()).Times(0).Do(func(arg interface{}) {}).Return(vm, nil)
 
 			controller.Execute()
 
@@ -293,15 +368,34 @@ var _ = Describe("Pool", func() {
 			pool, vm := DefaultPool(1)
 			vm.Name = fmt.Sprintf("%s-0", pool.Name)
 
-			vmHash := hashVMTemplate(pool)
-			vmiHash := hashVMITemplate(pool)
-
-			vm = injectHashIntoVM(vm, vmHash, vmiHash)
+			poolRevision := createPoolRevision(pool)
+			vm = injectPoolRevisionLabelsIntoVM(vm, poolRevision.Name)
 
 			pool.Status.Replicas = 1
 			addPool(pool)
 			addVM(vm)
+			addCR(poolRevision)
 
+			controller.Execute()
+		})
+
+		It("should prune unused controller revisions", func() {
+			pool, vm := DefaultPool(1)
+			vm.Name = fmt.Sprintf("%s-0", pool.Name)
+
+			poolRevision := createPoolRevision(pool)
+			vm = injectPoolRevisionLabelsIntoVM(vm, poolRevision.Name)
+
+			oldPoolRevision := poolRevision.DeepCopy()
+			oldPoolRevision.Name = "madeup"
+
+			pool.Status.Replicas = 1
+			addPool(pool)
+			addVM(vm)
+			addCR(poolRevision)
+			addCR(oldPoolRevision)
+
+			expectControllerRevisionDeletion(oldPoolRevision)
 			controller.Execute()
 		})
 
@@ -323,7 +417,7 @@ var _ = Describe("Pool", func() {
 				Expect(ok).To(BeTrue())
 				updateObj := update.GetObject().(*poolv1.VirtualMachinePool)
 				Expect(updateObj.Status.Replicas).To(Equal(int32(0)))
-				Expect(len(updateObj.Status.Conditions)).To(Equal(1))
+				Expect(updateObj.Status.Conditions).To(HaveLen(1))
 				Expect(updateObj.Status.Conditions[0].Type).To(Equal(poolv1.VirtualMachinePoolReplicaPaused))
 				Expect(updateObj.Status.Conditions[0].Status).To(Equal(k8sv1.ConditionTrue))
 				return true, update.GetObject(), nil
@@ -350,11 +444,14 @@ var _ = Describe("Pool", func() {
 				Expect(ok).To(BeTrue())
 				updateObj := update.GetObject().(*poolv1.VirtualMachinePool)
 				Expect(updateObj.Status.Replicas).To(Equal(int32(0)))
-				Expect(len(updateObj.Status.Conditions)).To(Equal(1))
+				Expect(updateObj.Status.Conditions).To(HaveLen(1))
 				Expect(updateObj.Status.Conditions[0].Type).To(Equal(poolv1.VirtualMachinePoolReplicaFailure))
 				Expect(updateObj.Status.Conditions[0].Status).To(Equal(k8sv1.ConditionTrue))
 				return true, update.GetObject(), nil
 			})
+
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
 
 			controller.Execute()
 
@@ -384,7 +481,7 @@ var _ = Describe("Pool", func() {
 				update, ok := action.(testing.UpdateAction)
 				Expect(ok).To(BeTrue())
 				updateObj := update.GetObject().(*poolv1.VirtualMachinePool)
-				Expect(len(updateObj.Status.Conditions)).To(Equal(0))
+				Expect(updateObj.Status.Conditions).To(BeEmpty())
 				return true, update.GetObject(), nil
 			})
 
@@ -417,9 +514,12 @@ var _ = Describe("Pool", func() {
 				update, ok := action.(testing.UpdateAction)
 				Expect(ok).To(BeTrue())
 				updateObj := update.GetObject().(*poolv1.VirtualMachinePool)
-				Expect(len(updateObj.Status.Conditions)).To(Equal(0))
+				Expect(updateObj.Status.Conditions).To(BeEmpty())
 				return true, update.GetObject(), nil
 			})
+
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
 
 			controller.Execute()
 
@@ -438,6 +538,9 @@ var _ = Describe("Pool", func() {
 			vmInterface.EXPECT().Create(gomock.Any()).Times(10).Do(func(arg interface{}) {
 				Expect(arg.(*v1.VirtualMachine).ObjectMeta.Name).To(HavePrefix(fmt.Sprintf("%s-", pool.Name)))
 			}).Return(vm, nil)
+
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
 
 			controller.Execute()
 
@@ -534,6 +637,9 @@ var _ = Describe("Pool", func() {
 				Expect(arg.(*v1.VirtualMachine).ObjectMeta.GenerateName).To(Equal(""))
 			}).Return(vm, nil)
 
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
+
 			controller.Execute()
 			testutils.ExpectEvent(recorder, SuccessfulCreateVirtualMachineReason)
 			testutils.ExpectEvent(recorder, SuccessfulCreateVirtualMachineReason)
@@ -563,6 +669,9 @@ var _ = Describe("Pool", func() {
 				return true, update.GetObject(), nil
 			})
 
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
+
 			controller.Execute()
 			testutils.ExpectEvent(recorder, SuccessfulCreateVirtualMachineReason)
 			testutils.ExpectEvent(recorder, SuccessfulCreateVirtualMachineReason)
@@ -585,6 +694,9 @@ var _ = Describe("Pool", func() {
 				Expect(ok).To(BeTrue())
 				return true, update.GetObject(), nil
 			})
+
+			poolRevision := createPoolRevision(pool)
+			expectControllerRevisionCreation(poolRevision)
 
 			controller.Execute()
 			testutils.ExpectEvent(recorder, SuccessfulCreateVirtualMachineReason)
@@ -622,6 +734,7 @@ func PoolFromVM(name string, vm *v1.VirtualMachine, replicas int32) *poolv1.Virt
 
 func DefaultPool(replicas int32) (*poolv1.VirtualMachinePool, *v1.VirtualMachine) {
 	vmi := api.NewMinimalVMI("testvmi")
+	vmi.Labels = map[string]string{}
 	vm := VirtualMachineFromVMI(vmi.Name, vmi, true)
 	vm.Labels = map[string]string{}
 	vm.Labels["selector"] = "value"

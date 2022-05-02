@@ -27,7 +27,9 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	"kubevirt.io/kubevirt/tests/framework/checks"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -38,6 +40,7 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/flags"
+	"kubevirt.io/kubevirt/tests/libstorage"
 	"kubevirt.io/kubevirt/tests/util"
 )
 
@@ -243,11 +246,11 @@ var getWindowsSysprepVMISpec = func() v1.VirtualMachineInstanceSpec {
 				Disks: []v1.Disk{
 					{
 						Name:       windowsSealedDisk,
-						DiskDevice: v1.DiskDevice{Disk: &v1.DiskTarget{Bus: "sata"}},
+						DiskDevice: v1.DiskDevice{Disk: &v1.DiskTarget{Bus: v1.DiskBusSATA}},
 					},
 					{
 						Name:       "sysprep",
-						DiskDevice: v1.DiskDevice{CDRom: &v1.CDRomTarget{Bus: "sata"}},
+						DiskDevice: v1.DiskDevice{CDRom: &v1.CDRomTarget{Bus: v1.DiskBusSATA}},
 					},
 				},
 			},
@@ -293,8 +296,8 @@ var _ = Describe("[Serial][Sysprep][sig-compute]Syspreped VirtualMachineInstance
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
 		tests.BeforeTestCleanup()
-		tests.SkipIfMissingRequiredImage(virtClient, tests.DiskWindowsSysprep)
-		tests.CreatePVC(tests.OSWindowsSysprep, "35Gi", tests.Config.StorageClassWindows, true)
+		checks.SkipIfMissingRequiredImage(virtClient, tests.DiskWindowsSysprep)
+		tests.CreatePVC(tests.OSWindowsSysprep, "35Gi", libstorage.Config.StorageClassWindows, true)
 		answerFileWithKey := insertProductKeyToAnswerFileTemplate(answerFileTemplate)
 		tests.CreateConfigMap("sysprepautounattend", map[string]string{"Autounattend.xml": answerFileWithKey, "Unattend.xml": answerFileWithKey})
 		windowsVMI = tests.NewRandomVMI()
@@ -361,6 +364,6 @@ var _ = Describe("[Serial][Sysprep][sig-compute]Syspreped VirtualMachineInstance
 			}, time.Minute*10, time.Second*60).ShouldNot(HaveOccurred())
 			By("Checking that the Windows VirtualMachineInstance has expected UUID")
 			Expect(output).Should(ContainSubstring("works"))
-		}, 720)
+		})
 	})
 })

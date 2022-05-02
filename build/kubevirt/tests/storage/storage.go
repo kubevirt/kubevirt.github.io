@@ -27,6 +27,8 @@ import (
 	"strings"
 	"time"
 
+	"kubevirt.io/kubevirt/tests/libvmi"
+
 	"k8s.io/apimachinery/pkg/api/errors"
 
 	"kubevirt.io/kubevirt/tests/framework/checks"
@@ -35,8 +37,7 @@ import (
 	"kubevirt.io/kubevirt/tests/util"
 
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/pborman/uuid"
 	k8sv1 "k8s.io/api/core/v1"
@@ -44,6 +45,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/rand"
 
+	v1 "kubevirt.io/api/core/v1"
 	virtv1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
@@ -55,6 +57,8 @@ import (
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
 	. "kubevirt.io/kubevirt/tests/framework/matcher"
 	"kubevirt.io/kubevirt/tests/libnet"
+	"kubevirt.io/kubevirt/tests/libstorage"
+	"kubevirt.io/kubevirt/tests/testsuite"
 )
 
 const (
@@ -89,7 +93,7 @@ var _ = SIGDescribe("Storage", func() {
 
 		BeforeEach(func() {
 			vmi = nil
-			targetImagePath = tests.HostPathAlpine
+			targetImagePath = testsuite.HostPathAlpine
 		})
 
 		createNFSPvAndPvc := func(ipFamily k8sv1.IPFamily, nfsPod *k8sv1.Pod) string {
@@ -132,10 +136,10 @@ var _ = SIGDescribe("Storage", func() {
 				tests.RemoveSCSIDisk(nodeName, address)
 			})
 
-			It(" [QUARANTINE]should pause VMI on IO error", func() {
+			It(" should pause VMI on IO error", func() {
 				By("Creating VMI with faulty disk")
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
-				vmi = tests.AddPVCDisk(vmi, "pvc-disk", "virtio", pvc.Name)
+				vmi = tests.AddPVCDisk(vmi, "pvc-disk", v1.DiskBusVirtio, pvc.Name)
 				_, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
 				Expect(err).To(BeNil(), failedCreateVMI)
 
@@ -214,7 +218,7 @@ var _ = SIGDescribe("Storage", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It(" [QUARANTINE]should pause VMI on IO error", func() {
+			It(" should pause VMI on IO error", func() {
 				By("Creating VMI with faulty disk")
 				vmi := tests.NewRandomVMIWithPVC(pvc.Name)
 				_, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
@@ -248,16 +252,13 @@ var _ = SIGDescribe("Storage", func() {
 				var pvName string
 				var nfsPod *k8sv1.Pod
 				AfterEach(func() {
-					if targetImagePath != tests.HostPathAlpine {
+					if targetImagePath != testsuite.HostPathAlpine {
 						tests.DeleteAlpineWithNonQEMUPermissions()
 					}
 				})
-				table.DescribeTable("started", func(newVMI VMICreationFunc, storageEngine string, family k8sv1.IPFamily, imageOwnedByQEMU bool) {
-					if family == k8sv1.IPv6Protocol {
-						libnet.SkipWhenNotDualStackCluster(virtClient)
-					}
+				DescribeTable("started", func(newVMI VMICreationFunc, storageEngine string, family k8sv1.IPFamily, imageOwnedByQEMU bool) {
+					libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
 
-					var ignoreWarnings bool
 					var nodeName string
 					// Start the VirtualMachineInstance with the PVC attached
 					if storageEngine == "nfs" {
@@ -267,26 +268,29 @@ var _ = SIGDescribe("Storage", func() {
 						}
 						nfsPod = storageframework.InitNFS(targetImage, nodeName)
 						pvName = createNFSPvAndPvc(family, nfsPod)
-						ignoreWarnings = true
 					} else {
 						pvName = tests.DiskAlpineHostPath
 					}
 					vmi = newVMI(pvName)
 
-					tests.RunVMIAndExpectLaunchWithIgnoreWarningArg(vmi, 180, ignoreWarnings)
+					if storageEngine == "nfs" {
+						tests.RunVMIAndExpectLaunchIgnoreWarnings(vmi, 180)
+					} else {
+						tests.RunVMIAndExpectLaunch(vmi, 180)
+					}
 
 					By(checkingVMInstanceConsoleOut)
 					Expect(console.LoginToAlpine(vmi)).To(Succeed())
 				},
-					table.Entry("[test_id:3130]with Disk PVC", tests.NewRandomVMIWithPVC, "", nil, true),
-					table.Entry("[test_id:3131]with CDRom PVC", tests.NewRandomVMIWithCDRom, "", nil, true),
-					table.Entry("[test_id:4618]with NFS Disk PVC using ipv4 address of the NFS pod", tests.NewRandomVMIWithPVC, "nfs", k8sv1.IPv4Protocol, true),
-					table.Entry("[Serial]with NFS Disk PVC using ipv6 address of the NFS pod", tests.NewRandomVMIWithPVC, "nfs", k8sv1.IPv6Protocol, true),
-					table.Entry("[Serial]with NFS Disk PVC using ipv4 address of the NFS pod not owned by qemu", tests.NewRandomVMIWithPVC, "nfs", k8sv1.IPv4Protocol, false),
+					Entry("[test_id:3130]with Disk PVC", tests.NewRandomVMIWithPVC, "", nil, true),
+					Entry("[test_id:3131]with CDRom PVC", tests.NewRandomVMIWithCDRom, "", nil, true),
+					Entry("[test_id:4618]with NFS Disk PVC using ipv4 address of the NFS pod", tests.NewRandomVMIWithPVC, "nfs", k8sv1.IPv4Protocol, true),
+					Entry("[Serial]with NFS Disk PVC using ipv6 address of the NFS pod", tests.NewRandomVMIWithPVC, "nfs", k8sv1.IPv6Protocol, true),
+					Entry("[Serial]with NFS Disk PVC using ipv4 address of the NFS pod not owned by qemu", tests.NewRandomVMIWithPVC, "nfs", k8sv1.IPv4Protocol, false),
 				)
 			})
 
-			table.DescribeTable("should be successfully started and stopped multiple times", func(newVMI VMICreationFunc) {
+			DescribeTable("should be successfully started and stopped multiple times", func(newVMI VMICreationFunc) {
 				vmi = newVMI(tests.DiskAlpineHostPath)
 
 				num := 3
@@ -306,8 +310,8 @@ var _ = SIGDescribe("Storage", func() {
 					tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 120)
 				}
 			},
-				table.Entry("[test_id:3132]with Disk PVC", tests.NewRandomVMIWithPVC),
-				table.Entry("[test_id:3133]with CDRom PVC", tests.NewRandomVMIWithCDRom),
+				Entry("[test_id:3132]with Disk PVC", tests.NewRandomVMIWithPVC),
+				Entry("[test_id:3133]with CDRom PVC", tests.NewRandomVMIWithCDRom),
 			)
 		})
 
@@ -321,7 +325,7 @@ var _ = SIGDescribe("Storage", func() {
 					Name: "emptydisk1",
 					DiskDevice: virtv1.DiskDevice{
 						Disk: &virtv1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				})
@@ -335,7 +339,7 @@ var _ = SIGDescribe("Storage", func() {
 				})
 				vmi = tests.RunVMIAndExpectLaunch(vmi, 90)
 
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(console.LoginToCirros(vmi)).To(Succeed())
 
 				By("Checking that /dev/vdc has a capacity of 1G, aligned to 4k")
 				Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
@@ -359,13 +363,15 @@ var _ = SIGDescribe("Storage", func() {
 			It("[test_id:3135]should create a writeable emptyDisk with the specified serial number", func() {
 
 				// Start the VirtualMachineInstance with the empty disk attached
-				vmi = tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "echo hi!")
+				vmi = libvmi.NewAlpineWithTestTooling(
+					libvmi.WithMasqueradeNetworking()...,
+				)
 				vmi.Spec.Domain.Devices.Disks = append(vmi.Spec.Domain.Devices.Disks, virtv1.Disk{
 					Name:   "emptydisk1",
 					Serial: diskSerial,
 					DiskDevice: virtv1.DiskDevice{
 						Disk: &virtv1.DiskTarget{
-							Bus: "virtio",
+							Bus: v1.DiskBusVirtio,
 						},
 					},
 				})
@@ -379,11 +385,11 @@ var _ = SIGDescribe("Storage", func() {
 				})
 				vmi = tests.RunVMIAndExpectLaunch(vmi, 90)
 
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(console.LoginToAlpine(vmi)).To(Succeed())
 
 				By("Checking for the specified serial number")
 				Expect(console.SafeExpectBatch(vmi, []expect.Batcher{
-					&expect.BSnd{S: "sudo find /sys -type f -regex \".*/block/.*/serial\" | xargs cat\n"},
+					&expect.BSnd{S: "find /sys -type f -regex \".*/block/.*/serial\" | xargs cat\n"},
 					&expect.BExp{R: diskSerial},
 				}, 10)).To(Succeed())
 			})
@@ -395,15 +401,15 @@ var _ = SIGDescribe("Storage", func() {
 
 			BeforeEach(func() {
 				checks.SkipTestIfNoFeatureGate(virtconfig.VirtIOFSGate)
-				tests.SkipIfNonRoot(virtClient, "VirtioFS")
-				tests.CreateHostPathPv(pvc, filepath.Join(tests.HostPathBase, pvc))
+				checks.SkipIfNonRoot("VirtioFS")
+				tests.CreateHostPathPv(pvc, filepath.Join(testsuite.HostPathBase, pvc))
 				tests.CreateHostPathPVC(pvc, "1G")
-			}, 120)
+			})
 
 			AfterEach(func() {
 				tests.DeletePVC(pvc)
 				tests.DeletePV(pvc)
-			}, 120)
+			})
 
 			It("should be successfully started and virtiofs could be accessed", func() {
 				pvcName := fmt.Sprintf("disk-%s", pvc)
@@ -428,7 +434,7 @@ var _ = SIGDescribe("Storage", func() {
 				tests.WaitAgentConnected(virtClient, vmi)
 
 				By(checkingVMInstanceConsoleOut)
-				Expect(libnet.WithIPv6(console.LoginToFedora)(vmi)).To(Succeed(), "Should be able to login to the Fedora VM")
+				Expect(console.LoginToFedora(vmi)).To(Succeed(), "Should be able to login to the Fedora VM")
 
 				virtioFsFileTestCmd := fmt.Sprintf("test -f /run/kubevirt-private/vmi-disks/%s/virtiofs_test && echo exist", fs.Name)
 				pod := tests.GetRunningPodByVirtualMachineInstance(vmi, util.NamespaceTestDefault)
@@ -446,11 +452,11 @@ var _ = SIGDescribe("Storage", func() {
 			var dataVolume *cdiv1.DataVolume
 			BeforeEach(func() {
 				checks.SkipTestIfNoFeatureGate(virtconfig.VirtIOFSGate)
-				tests.SkipIfNonRoot(virtClient, "VirtioFS")
-				if !tests.HasCDI() {
+				checks.SkipIfNonRoot("VirtioFS")
+				if !libstorage.HasCDI() {
 					Skip("Skip DataVolume tests when CDI is not present")
 				}
-				dataVolume = tests.NewRandomDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dataVolume = libstorage.NewRandomDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
 			})
 			AfterEach(func() {
 				err = virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Delete(context.Background(), dataVolume.Name, metav1.DeleteOptions{})
@@ -462,7 +468,7 @@ var _ = SIGDescribe("Storage", func() {
 				_, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Create(context.Background(), dataVolume, metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
 				By("Waiting until the DataVolume is ready")
-				if tests.IsStorageClassBindingModeWaitForFirstConsumer(tests.Config.StorageRWOFileSystem) {
+				if tests.IsStorageClassBindingModeWaitForFirstConsumer(libstorage.Config.StorageRWOFileSystem) {
 					Eventually(ThisDV(dataVolume), 30).Should(BeInPhase(cdiv1.WaitForFirstConsumer))
 				}
 				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse("512Mi")
@@ -488,7 +494,7 @@ var _ = SIGDescribe("Storage", func() {
 				tests.WaitAgentConnected(virtClient, vmi)
 
 				By(checkingVMInstanceConsoleOut)
-				Expect(libnet.WithIPv6(console.LoginToFedora)(vmi)).To(Succeed(), "Should be able to login to the Fedora VM")
+				Expect(console.LoginToFedora(vmi)).To(Succeed(), "Should be able to login to the Fedora VM")
 
 				By("Checking that virtio-fs is mounted")
 				listVirtioFSDisk := fmt.Sprintf("ls -l %s/*disk* | wc -l\n", virtiofsMountPath)
@@ -547,28 +553,30 @@ var _ = SIGDescribe("Storage", func() {
 				})
 
 				// The following case is mostly similar to the alpine PVC test above, except using different VirtualMachineInstance.
-				table.DescribeTable("started", func(newVMI VMICreationFunc, storageEngine string, family k8sv1.IPFamily) {
-					if family == k8sv1.IPv6Protocol {
-						libnet.SkipWhenNotDualStackCluster(virtClient)
-					}
-					var ignoreWarnings bool
+				DescribeTable("started", func(newVMI VMICreationFunc, storageEngine string, family k8sv1.IPFamily) {
+					libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+
 					// Start the VirtualMachineInstance with the PVC attached
 					if storageEngine == "nfs" {
-						nfsPod = storageframework.InitNFS(tests.HostPathAlpine, "")
+						nfsPod = storageframework.InitNFS(testsuite.HostPathAlpine, "")
 						pvName = createNFSPvAndPvc(family, nfsPod)
-						ignoreWarnings = true
 					} else {
 						pvName = tests.DiskAlpineHostPath
 					}
 					vmi = newVMI(pvName)
-					vmi = tests.RunVMIAndExpectLaunchWithIgnoreWarningArg(vmi, 120, ignoreWarnings)
+
+					if storageEngine == "nfs" {
+						vmi = tests.RunVMIAndExpectLaunchIgnoreWarnings(vmi, 120)
+					} else {
+						vmi = tests.RunVMIAndExpectLaunch(vmi, 120)
+					}
 
 					By(checkingVMInstanceConsoleOut)
 					Expect(console.LoginToAlpine(vmi)).To(Succeed())
 				},
-					table.Entry("[test_id:3136]with Ephemeral PVC", tests.NewRandomVMIWithEphemeralPVC, "", nil),
-					table.Entry("[test_id:4619]with Ephemeral PVC from NFS using ipv4 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv4Protocol),
-					table.Entry("with Ephemeral PVC from NFS using ipv6 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv6Protocol),
+					Entry("[test_id:3136]with Ephemeral PVC", tests.NewRandomVMIWithEphemeralPVC, "", nil),
+					Entry("[test_id:4619]with Ephemeral PVC from NFS using ipv4 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv4Protocol),
+					Entry("with Ephemeral PVC from NFS using ipv6 address of the NFS pod", tests.NewRandomVMIWithEphemeralPVC, "nfs", k8sv1.IPv6Protocol),
 				)
 			})
 
@@ -632,14 +640,14 @@ var _ = SIGDescribe("Storage", func() {
 		Context("[rfe_id:3106][crit:medium][vendor:cnv-qe@redhat.com][level:component]With VirtualMachineInstance with two PVCs", func() {
 			BeforeEach(func() {
 				// Setup second PVC to use in this context
-				tests.CreateHostPathPv(tests.CustomHostPath, tests.HostPathCustom)
+				tests.CreateHostPathPv(tests.CustomHostPath, testsuite.HostPathCustom)
 				tests.CreateHostPathPVC(tests.CustomHostPath, "1Gi")
-			}, 120)
+			})
 
 			// Not a candidate for testing on NFS because the VMI is restarted and NFS PVC can't be re-used
 			It("[test_id:3138]should start vmi multiple times", func() {
 				vmi = tests.NewRandomVMIWithPVC(tests.DiskAlpineHostPath)
-				tests.AddPVCDisk(vmi, "disk1", "virtio", tests.DiskCustomHostPath)
+				tests.AddPVCDisk(vmi, "disk1", v1.DiskBusVirtio, tests.DiskCustomHostPath)
 
 				num := 3
 				By("Starting and stopping the VirtualMachineInstance number of times")
@@ -729,7 +737,7 @@ var _ = SIGDescribe("Storage", func() {
 						diskPath = filepath.Join(hostDiskDir, diskName)
 					})
 
-					table.DescribeTable("Should create a disk image and start", func(driver string) {
+					DescribeTable("Should create a disk image and start", func(driver v1.DiskBus) {
 						By(startingVMInstance)
 						// do not choose a specific node to run the test
 						vmi = tests.NewRandomVMIWithHostDisk(diskPath, virtv1.HostDiskExistsOrCreate, "")
@@ -749,8 +757,8 @@ var _ = SIGDescribe("Storage", func() {
 						Expect(err).ToNot(HaveOccurred())
 						Expect(output).To(ContainSubstring(hostdisk.GetMountedHostDiskPath(hostDiskName, diskPath)))
 					},
-						table.Entry("[test_id:851]with virtio driver", "virtio"),
-						table.Entry("[test_id:3057]with sata driver", "sata"),
+						Entry("[test_id:851]with virtio driver", v1.DiskBusVirtio),
+						Entry("[test_id:3057]with sata driver", v1.DiskBusSATA),
 					)
 
 					It("[test_id:3107]should start with multiple hostdisks in the same directory", func() {
@@ -858,7 +866,7 @@ var _ = SIGDescribe("Storage", func() {
 						pvcs = append(pvcs, fmt.Sprintf("empty-pvc-%d-%s", i, rand.String(5)))
 					}
 					for _, pvc := range pvcs {
-						hostpath := filepath.Join(tests.HostPathBase, pvc)
+						hostpath := filepath.Join(testsuite.HostPathBase, pvc)
 						node = tests.CreateHostPathPv(pvc, hostpath)
 						tests.CreateHostPathPVC(pvc, "1G")
 						if checks.HasFeature(virtconfig.NonRoot) {
@@ -871,14 +879,14 @@ var _ = SIGDescribe("Storage", func() {
 							tests.RunPodAndExpectCompletion(pod)
 						}
 					}
-				}, 120)
+				})
 
 				AfterEach(func() {
 					for _, pvc := range pvcs {
 						tests.DeletePVC(pvc)
 						tests.DeletePV(pvc)
 					}
-				}, 120)
+				})
 
 				// Not a candidate for NFS testing because multiple VMIs are started
 				It("[test_id:868] Should initialize an empty PVC by creating a disk.img", func() {
@@ -1014,7 +1022,7 @@ var _ = SIGDescribe("Storage", func() {
 
 			BeforeEach(func() {
 				// create a new PV and PVC (PVs can't be reused)
-				dataVolume = tests.NewRandomBlockDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dataVolume = libstorage.NewRandomBlockDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
 
 				_, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Create(context.Background(), dataVolume, metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
@@ -1037,7 +1045,7 @@ var _ = SIGDescribe("Storage", func() {
 				vmi = tests.RunVMIAndExpectLaunch(vmi, 90)
 
 				By(checkingVMInstanceConsoleOut)
-				Expect(libnet.WithIPv6(console.LoginToCirros)(vmi)).To(Succeed())
+				Expect(console.LoginToCirros(vmi)).To(Succeed())
 			})
 		})
 
@@ -1110,7 +1118,7 @@ var _ = SIGDescribe("Storage", func() {
 					Name: "emptydisk1",
 					DiskDevice: virtv1.DiskDevice{
 						Disk: &virtv1.DiskTarget{
-							Bus: "scsi",
+							Bus: v1.DiskBusSCSI,
 						},
 					},
 				})
@@ -1118,7 +1126,7 @@ var _ = SIGDescribe("Storage", func() {
 					Name: "emptydisk2",
 					DiskDevice: virtv1.DiskDevice{
 						Disk: &virtv1.DiskTarget{
-							Bus: "sata",
+							Bus: v1.DiskBusSATA,
 						},
 					},
 				})
@@ -1161,7 +1169,7 @@ var _ = SIGDescribe("Storage", func() {
 			var dataVolume *cdiv1.DataVolume
 
 			BeforeEach(func() {
-				dataVolume = tests.NewRandomBlockDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dataVolume = libstorage.NewRandomBlockDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
 
 				_, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(dataVolume.Namespace).Create(context.Background(), dataVolume, metav1.CreateOptions{})
 				Expect(err).ToNot(HaveOccurred())
@@ -1211,7 +1219,7 @@ var _ = SIGDescribe("Storage", func() {
 				vmi1, vmi2 *virtv1.VirtualMachineInstance
 			)
 			BeforeEach(func() {
-				dv = tests.NewRandomDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
+				dv = libstorage.NewRandomDataVolumeWithRegistryImport(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault, k8sv1.ReadWriteOnce)
 				_, err := virtClient.CdiClient().CdiV1beta1().DataVolumes(util.NamespaceTestDefault).Create(context.Background(), dv, metav1.CreateOptions{})
 				Expect(err).To(BeNil())
 				labelKey := "testshareablekey"
@@ -1299,8 +1307,8 @@ var _ = SIGDescribe("Storage", func() {
 				pvcClaim := "pvc-test-disk1"
 				size, _ := resource.ParseQuantity("500Mi")
 				tests.CreateBlockPVC(virtClient, pvcClaim, size)
-				tests.AddPVCDisk(vmi1, diskName, "virtio", pvcClaim)
-				tests.AddPVCDisk(vmi2, diskName, "virtio", pvcClaim)
+				tests.AddPVCDisk(vmi1, diskName, v1.DiskBusVirtio, pvcClaim)
+				tests.AddPVCDisk(vmi2, diskName, v1.DiskBusVirtio, pvcClaim)
 
 				setShareable(vmi1, diskName)
 				setShareable(vmi2, diskName)
@@ -1339,7 +1347,7 @@ var _ = SIGDescribe("Storage", func() {
 					Name: deviceName,
 					DiskDevice: virtv1.DiskDevice{
 						LUN: &virtv1.LunTarget{
-							Bus:      "scsi",
+							Bus:      v1.DiskBusSCSI,
 							ReadOnly: false,
 						},
 					},

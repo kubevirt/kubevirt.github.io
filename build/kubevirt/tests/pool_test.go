@@ -24,15 +24,16 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/api/errors"
 	k8smetav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	v12 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/util/rand"
 
+	"kubevirt.io/kubevirt/tests/libvmi"
 	"kubevirt.io/kubevirt/tests/util"
 
 	v1 "kubevirt.io/api/core/v1"
@@ -89,11 +90,10 @@ var _ = Describe("[sig-compute]VirtualMachinePool", func() {
 		Expect(err).ToNot(HaveOccurred())
 		Expect(tests.NotDeletedVMs(vms)).To(HaveLen(int(scale)))
 	}
-	newVirtualMachinePoolWithTemplate := func(template *v1.VirtualMachineInstance, running bool) *poolv1.VirtualMachinePool {
-		newPool := tests.NewRandomPoolFromVMI(template, int32(0), running)
-		newPool, err = virtClient.VirtualMachinePool(util.NamespaceTestDefault).Create(context.Background(), newPool, metav1.CreateOptions{})
+	createVirtualMachinePool := func(pool *poolv1.VirtualMachinePool) *poolv1.VirtualMachinePool {
+		pool, err = virtClient.VirtualMachinePool(util.NamespaceTestDefault).Create(context.Background(), pool, metav1.CreateOptions{})
 		Expect(err).ToNot(HaveOccurred())
-		return newPool
+		return pool
 	}
 
 	newPersistentStorageVirtualMachinePool := func() *poolv1.VirtualMachinePool {
@@ -101,11 +101,13 @@ var _ = Describe("[sig-compute]VirtualMachinePool", func() {
 
 		vm := tests.NewRandomVMWithDataVolume(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskCirros), util.NamespaceTestDefault)
 
-		newPool := tests.NewRandomPoolFromVMI(&v1.VirtualMachineInstance{
+		newPool := newPoolFromVMI(&v1.VirtualMachineInstance{
 			ObjectMeta: vm.Spec.Template.ObjectMeta,
 			Spec:       vm.Spec.Template.Spec,
-		}, int32(0), true)
+		})
 		newPool.Spec.VirtualMachineTemplate.Spec.DataVolumeTemplates = vm.Spec.DataVolumeTemplates
+		running := true
+		newPool.Spec.VirtualMachineTemplate.Spec.Running = &running
 		newPool, err = virtClient.VirtualMachinePool(util.NamespaceTestDefault).Create(context.Background(), newPool, metav1.CreateOptions{})
 		Expect(err).ToNot(HaveOccurred())
 
@@ -114,24 +116,26 @@ var _ = Describe("[sig-compute]VirtualMachinePool", func() {
 
 	newVirtualMachinePool := func() *poolv1.VirtualMachinePool {
 		By("Create a new VirtualMachinePool")
-		template := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
-		return newVirtualMachinePoolWithTemplate(template, true)
-	}
-	newOfflineVirtualMachinePool := func() *poolv1.VirtualMachinePool {
-		By("Create a new VirtualMachinePool")
-		template := tests.NewRandomVMIWithEphemeralDiskAndUserdata(cd.ContainerDiskFor(cd.ContainerDiskCirros), "#!/bin/bash\necho 'hello'\n")
-		return newVirtualMachinePoolWithTemplate(template, false)
+		pool := newPoolFromVMI(libvmi.NewCirros())
+		running := true
+		pool.Spec.VirtualMachineTemplate.Spec.Running = &running
+		return createVirtualMachinePool(pool)
 	}
 
-	table.DescribeTable("[Serial]pool should scale", func(startScale int, stopScale int) {
+	newOfflineVirtualMachinePool := func() *poolv1.VirtualMachinePool {
+		By("Create a new VirtualMachinePool")
+		return createVirtualMachinePool(newPoolFromVMI(libvmi.NewCirros()))
+	}
+
+	DescribeTable("[Serial]pool should scale", func(startScale int, stopScale int) {
 		newPool := newVirtualMachinePool()
 		doScale(newPool.ObjectMeta.Name, int32(startScale))
 		doScale(newPool.ObjectMeta.Name, int32(stopScale))
 		doScale(newPool.ObjectMeta.Name, int32(0))
 
 	},
-		table.Entry("[QUARANTINE]to three, to two and then to zero replicas", 3, 2),
-		table.Entry("[QUARANTINE]to five, to six and then to zero replicas", 5, 6),
+		Entry("[QUARANTINE]to three, to two and then to zero replicas", 3, 2),
+		Entry("[QUARANTINE]to five, to six and then to zero replicas", 5, 6),
 	)
 
 	It("should be rejected on POST if spec is invalid", func() {
@@ -311,7 +315,7 @@ var _ = Describe("[sig-compute]VirtualMachinePool", func() {
 		vms, err := virtClient.VirtualMachine(newPool.ObjectMeta.Namespace).List(&v12.ListOptions{})
 
 		Expect(err).To(BeNil())
-		Expect(len(vms.Items)).To(Equal(1))
+		Expect(vms.Items).To(HaveLen(1))
 
 		name := vms.Items[0].Name
 		vmi, err := virtClient.VirtualMachineInstance(newPool.Namespace).Get(name, &metav1.GetOptions{})
@@ -364,7 +368,7 @@ var _ = Describe("[sig-compute]VirtualMachinePool", func() {
 		vms, err := virtClient.VirtualMachine(newPool.ObjectMeta.Namespace).List(&v12.ListOptions{})
 
 		Expect(err).To(BeNil())
-		Expect(len(vms.Items)).To(Equal(1))
+		Expect(vms.Items).To(HaveLen(1))
 
 		name := vms.Items[0].Name
 		vmi, err := virtClient.VirtualMachineInstance(newPool.Namespace).Get(name, &metav1.GetOptions{})
@@ -506,3 +510,33 @@ var _ = Describe("[sig-compute]VirtualMachinePool", func() {
 		}, 10*time.Second, 1*time.Second).Should(Equal(int32(1)))
 	})
 })
+
+func newPoolFromVMI(vmi *v1.VirtualMachineInstance) *poolv1.VirtualMachinePool {
+	selector := "pool" + rand.String(5)
+	running := false
+	replicas := int32(0)
+	pool := &poolv1.VirtualMachinePool{
+		ObjectMeta: metav1.ObjectMeta{Name: "pool" + rand.String(5)},
+		Spec: poolv1.VirtualMachinePoolSpec{
+			Replicas: &replicas,
+			Selector: &metav1.LabelSelector{
+				MatchLabels: map[string]string{"select": selector},
+			},
+			VirtualMachineTemplate: &poolv1.VirtualMachineTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Labels: map[string]string{"select": selector},
+				},
+				Spec: v1.VirtualMachineSpec{
+					Running: &running,
+					Template: &v1.VirtualMachineInstanceTemplateSpec{
+						ObjectMeta: metav1.ObjectMeta{
+							Labels: map[string]string{"select": selector},
+						},
+						Spec: vmi.Spec,
+					},
+				},
+			},
+		},
+	}
+	return pool
+}

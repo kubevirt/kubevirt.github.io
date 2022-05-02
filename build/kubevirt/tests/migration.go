@@ -13,7 +13,7 @@ import (
 	"kubevirt.io/kubevirt/tests/flags"
 	"kubevirt.io/kubevirt/tests/util"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	k8snetworkplumbingwgv1 "github.com/k8snetworkplumbingwg/network-attachment-definition-client/pkg/apis/k8s.cni.cncf.io/v1"
@@ -160,7 +160,7 @@ func GenerateMigrationCNINetworkAttachmentDefinition() *k8snetworkplumbingwgv1.N
       "cniVersion": "0.3.1",
       "name": "migration-bridge",
       "type": "macvlan",
-      "master": "eth1",
+      "master": "` + flags.MigrationNetworkNIC + `",
       "mode": "bridge",
       "ipam": {
         "type": "whereabouts",

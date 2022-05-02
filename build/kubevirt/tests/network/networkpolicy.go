@@ -7,7 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	"kubevirt.io/kubevirt/tests/framework/checks"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/kubevirt/tests/util"
@@ -24,6 +26,7 @@ import (
 	"kubevirt.io/kubevirt/tests/console"
 	"kubevirt.io/kubevirt/tests/libnet"
 	"kubevirt.io/kubevirt/tests/libvmi"
+	"kubevirt.io/kubevirt/tests/testsuite"
 )
 
 var _ = SIGDescribe("[rfe_id:150][crit:high][vendor:cnv-qe@redhat.com][level:component]Networkpolicy", func() {
@@ -38,13 +41,13 @@ var _ = SIGDescribe("[rfe_id:150][crit:high][vendor:cnv-qe@redhat.com][level:com
 		virtClient, err = kubecli.GetKubevirtClient()
 		Expect(err).ToNot(HaveOccurred(), "should succeed retrieving the kubevirt client")
 
-		tests.SkipIfUseFlannel(virtClient)
+		checks.SkipIfUseFlannel(virtClient)
 		skipNetworkPolicyRunningOnKindInfra()
 
 		serverVMILabels = map[string]string{"type": "test"}
 	})
 
-	Context("when three cirros VMs with default networking are started and serverVMI start an HTTP server on port 80 and 81", func() {
+	Context("when three alpine VMs with default networking are started and serverVMI start an HTTP server on port 80 and 81", func() {
 		var serverVMI, clientVMI *v1.VirtualMachineInstance
 
 		BeforeEach(func() {
@@ -128,7 +131,7 @@ var _ = SIGDescribe("[rfe_id:150][crit:high][vendor:cnv-qe@redhat.com][level:com
 
 				BeforeEach(func() {
 					var err error
-					clientVMIAlternativeNamespace, err = createClientVmi(tests.NamespaceTestAlternative, virtClient)
+					clientVMIAlternativeNamespace, err = createClientVmi(testsuite.NamespaceTestAlternative, virtClient)
 					Expect(err).ToNot(HaveOccurred())
 					assertIPsNotEmptyForVMI(clientVMIAlternativeNamespace)
 				})
@@ -169,7 +172,7 @@ var _ = SIGDescribe("[rfe_id:150][crit:high][vendor:cnv-qe@redhat.com][level:com
 
 				BeforeEach(func() {
 					var err error
-					clientVMIAlternativeNamespace, err = createClientVmi(tests.NamespaceTestAlternative, virtClient)
+					clientVMIAlternativeNamespace, err = createClientVmi(testsuite.NamespaceTestAlternative, virtClient)
 					Expect(err).ToNot(HaveOccurred())
 					assertIPsNotEmptyForVMI(clientVMIAlternativeNamespace)
 				})
@@ -198,7 +201,7 @@ var _ = SIGDescribe("[rfe_id:150][crit:high][vendor:cnv-qe@redhat.com][level:com
 
 					BeforeEach(func() {
 						var err error
-						clientVMIAlternativeNamespace, err = createClientVmi(tests.NamespaceTestAlternative, virtClient)
+						clientVMIAlternativeNamespace, err = createClientVmi(testsuite.NamespaceTestAlternative, virtClient)
 						Expect(err).ToNot(HaveOccurred())
 						assertIPsNotEmptyForVMI(clientVMIAlternativeNamespace)
 					})
@@ -386,10 +389,10 @@ func checkHTTPPingAndStopOnFailure(fromVmi, toVmi *v1.VirtualMachineInstance, po
 }
 
 func checkHTTPPing(vmi *v1.VirtualMachineInstance, ip string, port int) error {
-	const curlCheckCmd = "curl --head %s --connect-timeout 5\n"
+	const wgetCheckCmd = "wget -S --spider %s -T 5\n"
 	url := fmt.Sprintf("http://%s", net.JoinHostPort(ip, strconv.Itoa(port)))
-	curlCheck := fmt.Sprintf(curlCheckCmd, url)
-	err := console.RunCommand(vmi, curlCheck, 10*time.Second)
+	wgetCheck := fmt.Sprintf(wgetCheckCmd, url)
+	err := console.RunCommand(vmi, wgetCheck, 10*time.Second)
 	if err != nil {
 		return fmt.Errorf("failed HTTP ping from vmi(%s/%s) to url(%s): %v", vmi.Namespace, vmi.Name, url, err)
 	}
@@ -401,21 +404,20 @@ func assertIPsNotEmptyForVMI(vmi *v1.VirtualMachineInstance) {
 }
 
 func createClientVmi(namespace string, virtClient kubecli.KubevirtClient) (*v1.VirtualMachineInstance, error) {
-	clientVMI := libvmi.NewCirros(libvmi.WithInterface(libvmi.InterfaceDeviceWithMasqueradeBinding()),
-		libvmi.WithNetwork(v1.DefaultPodNetwork()))
+	clientVMI := libvmi.NewAlpineWithTestTooling(libvmi.WithMasqueradeNetworking()...)
 	var err error
 	clientVMI, err = virtClient.VirtualMachineInstance(namespace).Create(clientVMI)
 	if err != nil {
 		return nil, err
 	}
 
-	clientVMI = tests.WaitUntilVMIReady(clientVMI, libnet.WithIPv6(console.LoginToCirros))
+	clientVMI = tests.WaitUntilVMIReady(clientVMI, console.LoginToAlpine)
 	return clientVMI, nil
 }
 
 func createServerVmi(virtClient kubecli.KubevirtClient, namespace string, serverVMILabels map[string]string) (*v1.VirtualMachineInstance, error) {
-	serverVMI := libvmi.NewCirros(
-		libvmi.WithInterface(libvmi.InterfaceDeviceWithMasqueradeBinding(
+	serverVMI := libvmi.NewAlpineWithTestTooling(
+		libvmi.WithMasqueradeNetworking(
 			v1.Port{
 				Name:     "http80",
 				Port:     80,
@@ -426,15 +428,14 @@ func createServerVmi(virtClient kubecli.KubevirtClient, namespace string, server
 				Port:     81,
 				Protocol: "TCP",
 			},
-		)),
-		libvmi.WithNetwork(v1.DefaultPodNetwork()),
+		)...,
 	)
 	serverVMI.Labels = serverVMILabels
 	serverVMI, err := virtClient.VirtualMachineInstance(namespace).Create(serverVMI)
 	if err != nil {
 		return nil, err
 	}
-	serverVMI = tests.WaitUntilVMIReady(serverVMI, libnet.WithIPv6(console.LoginToCirros))
+	serverVMI = tests.WaitUntilVMIReady(serverVMI, console.LoginToAlpine)
 
 	By("Start HTTP server at serverVMI on ports 80 and 81")
 	tests.HTTPServer.Start(serverVMI, 80)

@@ -29,8 +29,7 @@ import (
 	"kubevirt.io/client-go/log"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/client-go/api"
@@ -47,6 +46,7 @@ import (
 	hotplugdisk "kubevirt.io/kubevirt/pkg/hotplug-disk"
 	"kubevirt.io/kubevirt/pkg/virt-handler/cgroup"
 
+	diskutils "kubevirt.io/kubevirt/pkg/ephemeral-disk-utils"
 	"kubevirt.io/kubevirt/pkg/virt-handler/isolation"
 )
 
@@ -74,6 +74,7 @@ var _ = Describe("HotplugVolume", func() {
 		ctrl               *gomock.Controller
 		expectedCgroupRule *devices.Rule
 		cgroupManagerMock  *cgroup.MockManager
+		ownershipManager   *diskutils.MockOwnershipManagerInterface
 	)
 
 	expectCgroupRule := func(t devices.Type, major, minor int64, allow bool) {
@@ -126,10 +127,7 @@ var _ = Describe("HotplugVolume", func() {
 		cgroupManagerMock = cgroup.NewMockManager(ctrl)
 		cgroupManagerMock.EXPECT().GetCgroupVersion().AnyTimes()
 		expectedCgroupRule = nil
-	})
-
-	AfterEach(func() {
-		ctrl.Finish()
+		ownershipManager = diskutils.NewMockOwnershipManagerInterface(ctrl)
 	})
 
 	Context("mount target records", func() {
@@ -260,6 +258,7 @@ var _ = Describe("HotplugVolume", func() {
 				mountStateDir:      tempDir,
 				skipSafetyCheck:    true,
 				hotplugDiskManager: hotplugdisk.NewHotplugDiskWithOptions(tempDir),
+				ownershipManager:   ownershipManager,
 			}
 
 			deviceBasePath = func(sourceUID types.UID) string {
@@ -336,6 +335,9 @@ var _ = Describe("HotplugVolume", func() {
 			err = ioutil.WriteFile(deviceFile, []byte("test"), 0644)
 			Expect(err).ToNot(HaveOccurred())
 
+			targetDevicePath := filepath.Join(targetPodPath, "testvolume")
+			ownershipManager.EXPECT().SetFileOwnership(targetDevicePath)
+
 			By("Mounting and validating expected rule is set")
 			setExpectedCgroupRuns(2)
 			expectCgroupRule(devices.BlockDevice, 6, 6, true)
@@ -344,7 +346,7 @@ var _ = Describe("HotplugVolume", func() {
 
 			By("Unmounting, we verify the reverse process happens")
 			expectCgroupRule(devices.BlockDevice, 6, 6, false)
-			err = m.unmountBlockHotplugVolumes(filepath.Join(targetPodPath, "testvolume"), vmi)
+			err = m.unmountBlockHotplugVolumes(targetDevicePath, vmi)
 			Expect(err).ToNot(HaveOccurred())
 		})
 
@@ -402,7 +404,7 @@ var _ = Describe("HotplugVolume", func() {
 			Expect(m.isBlockFile(testFileName)).To(BeFalse())
 		})
 
-		table.DescribeTable("Should return proper values", func(stat func(fileName string) ([]byte, error), major, minor int, perm string, expectErr bool) {
+		DescribeTable("Should return proper values", func(stat func(fileName string) ([]byte, error), major, minor int, perm string, expectErr bool) {
 			testFileName := "test-file"
 			statCommand = stat
 			majorRes, minorRes, permRes, err := m.getBlockFileMajorMinor(testFileName)
@@ -416,22 +418,22 @@ var _ = Describe("HotplugVolume", func() {
 			Expect(int64(minor)).To(Equal(minorRes))
 			Expect(perm).To(Equal(permRes))
 		},
-			table.Entry("Should return values if stat command successful", func(fileName string) ([]byte, error) {
+			Entry("Should return values if stat command successful", func(fileName string) ([]byte, error) {
 				return []byte("245,32,0664,block special file"), nil
 			}, 581, 50, "0664", false),
-			table.Entry("Should not return values if stat command errors", func(fileName string) ([]byte, error) {
+			Entry("Should not return values if stat command errors", func(fileName string) ([]byte, error) {
 				return []byte("245,32,0664,block special file"), fmt.Errorf("Error")
 			}, -1, -1, "", true),
-			table.Entry("Should not return values if stat command doesn't return 4 fields", func(fileName string) ([]byte, error) {
+			Entry("Should not return values if stat command doesn't return 4 fields", func(fileName string) ([]byte, error) {
 				return []byte("245,32,0664"), nil
 			}, -1, -1, "", true),
-			table.Entry("Should not return values if stat command doesn't return block special file", func(fileName string) ([]byte, error) {
+			Entry("Should not return values if stat command doesn't return block special file", func(fileName string) ([]byte, error) {
 				return []byte("245,32,0664, block file"), nil
 			}, -1, -1, "", true),
-			table.Entry("Should not return values if stat command doesn't int major", func(fileName string) ([]byte, error) {
+			Entry("Should not return values if stat command doesn't int major", func(fileName string) ([]byte, error) {
 				return []byte("kk,32,0664,block special file"), nil
 			}, -1, -1, "", true),
-			table.Entry("Should not return values if stat command doesn't int minor", func(fileName string) ([]byte, error) {
+			Entry("Should not return values if stat command doesn't int minor", func(fileName string) ([]byte, error) {
 				return []byte("254,gg,0664,block special file"), nil
 			}, -1, -1, "", true),
 		)
@@ -547,6 +549,7 @@ var _ = Describe("HotplugVolume", func() {
 				mountRecords:       make(map[types.UID]*vmiMountTargetRecord),
 				mountStateDir:      tempDir,
 				hotplugDiskManager: hotplugdisk.NewHotplugDiskWithOptions(tempDir),
+				ownershipManager:   ownershipManager,
 			}
 
 			deviceBasePath = func(sourceUID types.UID) string {
@@ -672,10 +675,11 @@ var _ = Describe("HotplugVolume", func() {
 				Expect(targetPath).To(Equal(targetFilePath))
 				return []byte("Success"), nil
 			}
+			ownershipManager.EXPECT().SetFileOwnership(targetFilePath)
 
 			err = m.mountFileSystemHotplugVolume(vmi, "testvolume", types.UID(sourcePodUID), record)
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(record.MountTargetEntries)).To(Equal(1))
+			Expect(record.MountTargetEntries).To(HaveLen(1))
 			Expect(record.MountTargetEntries[0].TargetFile).To(Equal(targetFilePath))
 
 			unmountCommand = func(diskPath string) ([]byte, error) {
@@ -759,6 +763,7 @@ var _ = Describe("HotplugVolume", func() {
 				mountStateDir:      tempDir,
 				skipSafetyCheck:    true,
 				hotplugDiskManager: hotplugdisk.NewHotplugDiskWithOptions(tempDir),
+				ownershipManager:   ownershipManager,
 			}
 
 			deviceBasePath = func(sourceUID types.UID) string {
@@ -858,6 +863,15 @@ var _ = Describe("HotplugVolume", func() {
 				Expect(targetPath).To(Equal(targetFilePath))
 				return []byte("Success"), nil
 			}
+
+			expectedPaths := []string{targetFilePath, blockVolume}
+			capturedPaths := []string{}
+
+			ownershipManager.EXPECT().SetFileOwnership(gomock.Any()).Times(2).DoAndReturn(func(path string) error {
+				capturedPaths = append(capturedPaths, path)
+				return nil
+			})
+
 			err = m.Mount(vmi)
 			Expect(err).ToNot(HaveOccurred())
 			By("Verifying there are 2 records in tempDir/1234")
@@ -880,6 +894,7 @@ var _ = Describe("HotplugVolume", func() {
 			Expect(err).ToNot(HaveOccurred())
 			_, err = os.Stat(blockVolume)
 			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedPaths).To(ContainElements(expectedPaths))
 
 			volumeStatuses = make([]v1.VolumeStatus, 0)
 			volumeStatuses = append(volumeStatuses, v1.VolumeStatus{
@@ -971,8 +986,17 @@ var _ = Describe("HotplugVolume", func() {
 				Expect(targetPath).To(Equal(targetFilePath))
 				return []byte("Success"), nil
 			}
+
+			expectedPaths := []string{blockVolume, targetFilePath}
+			capturedPaths := []string{}
+			ownershipManager.EXPECT().SetFileOwnership(gomock.Any()).Times(2).DoAndReturn(func(path string) error {
+				capturedPaths = append(capturedPaths, path)
+				return nil
+			})
+
 			err = m.Mount(vmi)
 			Expect(err).ToNot(HaveOccurred())
+
 			By("Verifying there are 2 records in tempDir/1234")
 			record := &vmiMountTargetRecord{
 				MountTargetEntries: []vmiMountTargetEntry{
@@ -991,6 +1015,7 @@ var _ = Describe("HotplugVolume", func() {
 			Expect(bytes).To(Equal(expectedBytes))
 			_, err = os.Stat(targetFilePath)
 			Expect(err).ToNot(HaveOccurred())
+			Expect(capturedPaths).To(ContainElements(expectedPaths))
 
 			err = m.UnmountAll(vmi)
 			Expect(err).ToNot(HaveOccurred())

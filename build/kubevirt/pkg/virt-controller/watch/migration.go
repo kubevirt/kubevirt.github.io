@@ -32,7 +32,7 @@ import (
 	"kubevirt.io/api/migrations/v1alpha1"
 
 	k8sv1 "k8s.io/api/core/v1"
-	"k8s.io/api/policy/v1beta1"
+	policyv1 "k8s.io/api/policy/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -44,6 +44,7 @@ import (
 	"k8s.io/client-go/tools/record"
 	"k8s.io/client-go/util/workqueue"
 
+	"kubevirt.io/kubevirt/pkg/util"
 	"kubevirt.io/kubevirt/pkg/util/pdbs"
 	"kubevirt.io/kubevirt/pkg/util/status"
 
@@ -484,7 +485,9 @@ func (c *MigrationController) updateStatus(migration *virtv1.VirtualMachineInsta
 				}
 			}
 		case virtv1.MigrationScheduled:
-			if vmi.Status.MigrationState != nil && vmi.Status.MigrationState.TargetNode != "" {
+			if vmi.Status.MigrationState != nil &&
+				vmi.Status.MigrationState.MigrationUID == migration.UID &&
+				vmi.Status.MigrationState.TargetNode != "" {
 				migrationCopy.Status.Phase = virtv1.MigrationPreparingTarget
 			}
 		case virtv1.MigrationPreparingTarget:
@@ -593,7 +596,7 @@ func (c *MigrationController) createTargetPod(migration *virtv1.VirtualMachineIn
 	return nil
 }
 
-func (c *MigrationController) expandPDB(pdb *v1beta1.PodDisruptionBudget, vmi *virtv1.VirtualMachineInstance, vmim *virtv1.VirtualMachineInstanceMigration) error {
+func (c *MigrationController) expandPDB(pdb *policyv1.PodDisruptionBudget, vmi *virtv1.VirtualMachineInstance, vmim *virtv1.VirtualMachineInstanceMigration) error {
 	minAvailable := 2
 
 	if pdb.Spec.MinAvailable.IntValue() == minAvailable && pdb.Labels[virtv1.MigrationNameLabel] == vmim.Name {
@@ -603,7 +606,7 @@ func (c *MigrationController) expandPDB(pdb *v1beta1.PodDisruptionBudget, vmi *v
 
 	patch := []byte(fmt.Sprintf(`{"spec":{"minAvailable": %d},"metadata":{"labels":{"%s": "%s"}}}`, minAvailable, virtv1.MigrationNameLabel, vmim.Name))
 
-	_, err := c.clientset.PolicyV1beta1().PodDisruptionBudgets(pdb.Namespace).Patch(context.Background(), pdb.Name, types.StrategicMergePatchType, patch, v1.PatchOptions{})
+	_, err := c.clientset.PolicyV1().PodDisruptionBudgets(pdb.Namespace).Patch(context.Background(), pdb.Name, types.StrategicMergePatchType, patch, v1.PatchOptions{})
 	if err != nil {
 		c.recorder.Eventf(vmi, k8sv1.EventTypeWarning, failedUpdatePodDisruptionBudgetReason, "Error expanding the PodDisruptionBudget %s: %v", pdb.Name, err)
 		return err
@@ -670,9 +673,14 @@ func (c *MigrationController) handleTargetPodHandoff(migration *virtv1.VirtualMa
 		}
 	}
 
-	err := c.matchMigrationPolicy(vmiCopy, c.clusterConfig.GetMigrationConfiguration())
+	clusterMigrationConfigs := c.clusterConfig.GetMigrationConfiguration().DeepCopy()
+	err := c.matchMigrationPolicy(vmiCopy, clusterMigrationConfigs)
 	if err != nil {
 		return fmt.Errorf("failed to match migration policy: %v", err)
+	}
+
+	if !c.isMigrationPolicyMatched(vmiCopy) {
+		vmiCopy.Status.MigrationState.MigrationConfiguration = clusterMigrationConfigs
 	}
 
 	err = c.patchVMI(vmi, vmiCopy)
@@ -714,12 +722,12 @@ func (c *MigrationController) handleSignalMigrationAbort(migration *virtv1.Virtu
 	return nil
 }
 
-func isMigrationProtected(pdb *v1beta1.PodDisruptionBudget) bool {
+func isMigrationProtected(pdb *policyv1.PodDisruptionBudget) bool {
 	return pdb.Status.DesiredHealthy == 2 && pdb.Generation == pdb.Status.ObservedGeneration
 }
 
-func filterOutOldPDBs(pdbList []*v1beta1.PodDisruptionBudget) []*v1beta1.PodDisruptionBudget {
-	var filteredPdbs []*v1beta1.PodDisruptionBudget
+func filterOutOldPDBs(pdbList []*policyv1.PodDisruptionBudget) []*policyv1.PodDisruptionBudget {
+	var filteredPdbs []*policyv1.PodDisruptionBudget
 
 	for i := range pdbList {
 		if !pdbs.IsPDBFromOldMigrationController(pdbList[i]) {
@@ -1011,6 +1019,16 @@ func (c *MigrationController) sync(key string, migration *virtv1.VirtualMachineI
 				// will be marked as failed too.
 				return nil
 			}
+			if c.clusterConfig.NonRootEnabled() && util.CanBeNonRoot(vmi) == nil {
+				if vmi.Status.RuntimeUser != 107 {
+					patch := fmt.Sprintf(`[{ "op": "replace", "path": "/status/runtimeUser", "value": %s }]`, "107")
+					vmi, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte(patch), &v1.PatchOptions{})
+					if err != nil {
+						return fmt.Errorf("failed to mark VMI as nonroot: %v", err)
+					}
+				}
+
+			}
 			return c.handleTargetPodCreation(key, migration, vmi, sourcePod)
 		} else if isPodReady(pod) {
 			if controller.VMIHasHotplugVolumes(vmi) {
@@ -1247,8 +1265,8 @@ func (c *MigrationController) deletePod(obj interface{}) {
 }
 
 func (c *MigrationController) updatePDB(old, cur interface{}) {
-	curPDB := cur.(*v1beta1.PodDisruptionBudget)
-	oldPDB := old.(*v1beta1.PodDisruptionBudget)
+	curPDB := cur.(*policyv1.PodDisruptionBudget)
+	oldPDB := old.(*policyv1.PodDisruptionBudget)
 	if curPDB.ResourceVersion == oldPDB.ResourceVersion {
 		return
 	}
@@ -1577,17 +1595,25 @@ func (c *MigrationController) matchMigrationPolicy(vmi *virtv1.VirtualMachineIns
 		return nil
 	}
 
-	migrationConfigCopy := *clusterMigrationConfiguration
-	isUpdated, err := matchedPolicy.GetMigrationConfByPolicy(&migrationConfigCopy)
+	isUpdated, err := matchedPolicy.GetMigrationConfByPolicy(clusterMigrationConfiguration)
 	if err != nil {
 		return err
 	}
 
 	if isUpdated {
 		vmi.Status.MigrationState.MigrationPolicyName = &matchedPolicy.Name
-		vmi.Status.MigrationState.MigrationConfiguration = &migrationConfigCopy
+		vmi.Status.MigrationState.MigrationConfiguration = clusterMigrationConfiguration
 		log.Log.Object(vmi).Infof("migration is updated by migration policy named %s.", matchedPolicy.Name)
 	}
 
 	return nil
+}
+
+func (c *MigrationController) isMigrationPolicyMatched(vmi *virtv1.VirtualMachineInstance) bool {
+	if vmi == nil {
+		return false
+	}
+
+	migrationPolicyName := vmi.Status.MigrationState.MigrationPolicyName
+	return migrationPolicyName != nil && *migrationPolicyName != ""
 }

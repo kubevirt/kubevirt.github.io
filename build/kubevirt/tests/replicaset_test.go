@@ -26,8 +26,10 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	"kubevirt.io/kubevirt/tests/clientcmd"
+	"kubevirt.io/kubevirt/tests/framework/checks"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	autov1 "k8s.io/api/autoscaling/v1"
 	v13 "k8s.io/api/core/v1"
@@ -126,29 +128,29 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		return newReplicaSetWithTemplate(template)
 	}
 
-	table.DescribeTable("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:component]should scale", func(startScale int, stopScale int) {
+	DescribeTable("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:component]should scale", func(startScale int, stopScale int) {
 		newRS := newReplicaSet()
 		doScale(newRS.ObjectMeta.Name, int32(startScale))
 		doScale(newRS.ObjectMeta.Name, int32(stopScale))
 		doScale(newRS.ObjectMeta.Name, int32(0))
 
 	},
-		table.Entry("[test_id:1405]to three, to two and then to zero replicas", 3, 2),
-		table.Entry("[test_id:1406]to five, to six and then to zero replicas", 5, 6),
+		Entry("[test_id:1405]to three, to two and then to zero replicas", 3, 2),
+		Entry("[test_id:1406]to five, to six and then to zero replicas", 5, 6),
 	)
 
-	table.DescribeTable("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:component]should scale with scale subresource", func(startScale int, stopScale int) {
+	DescribeTable("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:component]should scale with scale subresource", func(startScale int, stopScale int) {
 		newRS := newReplicaSet()
 		libreplicaset.DoScaleWithScaleSubresource(virtClient, newRS.ObjectMeta.Name, int32(startScale))
 		libreplicaset.DoScaleWithScaleSubresource(virtClient, newRS.ObjectMeta.Name, int32(stopScale))
 		libreplicaset.DoScaleWithScaleSubresource(virtClient, newRS.ObjectMeta.Name, int32(0))
 	},
-		table.Entry("[test_id:1407]to three, to two and then to zero replicas", 3, 2),
-		table.Entry("[test_id:1408]to five, to six and then to zero replicas", 5, 6),
+		Entry("[test_id:1407]to three, to two and then to zero replicas", 3, 2),
+		Entry("[test_id:1408]to five, to six and then to zero replicas", 5, 6),
 	)
 
-	table.DescribeTable("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:component]should scale with the horizontal pod autoscaler", func(startScale int, stopScale int) {
-		tests.SkipIfVersionBelow("HPA only works with CRs with multiple versions starting from 1.13", "1.13")
+	DescribeTable("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:component]should scale with the horizontal pod autoscaler", func(startScale int, stopScale int) {
+		checks.SkipIfVersionBelow("HPA only works with CRs with multiple versions starting from 1.13", "1.13")
 		template := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskCirros))
 		newRS := tests.NewRandomReplicaSetFromVMI(template, int32(1))
 		newRS, err = virtClient.ReplicaSet(util.NamespaceTestDefault).Create(newRS)
@@ -158,8 +160,8 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		doScaleWithHPA(newRS.ObjectMeta.Name, int32(1), int32(1), int32(1))
 
 	},
-		table.Entry("[test_id:1409]to three, to two and then to one replicas", 3, 2),
-		table.Entry("[test_id:1410]to five, to six and then to one replicas", 5, 6),
+		Entry("[test_id:1409]to three, to two and then to one replicas", 3, 2),
+		Entry("[test_id:1410]to five, to six and then to one replicas", 5, 6),
 	)
 
 	It("[test_id:1411]should be rejected on POST if spec is invalid", func() {
@@ -208,7 +210,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		err = json.Unmarshal(body, reviewResponse)
 		Expect(err).To(BeNil())
 
-		Expect(len(reviewResponse.Details.Causes)).To(Equal(1))
+		Expect(reviewResponse.Details.Causes).To(HaveLen(1))
 		Expect(reviewResponse.Details.Causes[0].Field).To(Equal("spec.template.spec.domain.devices.disks[2].name"))
 	})
 	It("[test_id:1413]should update readyReplicas once VMIs are up", func() {
@@ -224,7 +226,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 	})
 
 	It("[test_id:1414]should return the correct data when using server-side printing", func() {
-		tests.SkipIfVersionBelow("server-side printing is only enabled by default from 1.11 on", "1.11")
+		checks.SkipIfVersionBelow("server-side printing is only enabled by default from 1.11 on", "1.11")
 		newRS := newReplicaSet()
 		doScale(newRS.ObjectMeta.Name, 2)
 
@@ -381,7 +383,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		vmi := vmis.Items[0]
 		pods, err := virtClient.CoreV1().Pods(util.NamespaceTestDefault).List(context.Background(), tests.UnfinishedVMIPodSelector(&vmi))
 		Expect(err).ToNot(HaveOccurred())
-		Expect(len(pods.Items)).To(Equal(1))
+		Expect(pods.Items).To(HaveLen(1))
 		pod := pods.Items[0]
 
 		By("Deleting one of the RS VMS pods")
@@ -400,7 +402,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		By("Checking number of RS VM's to see that we got a replacement")
 		vmis, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).List(&v12.ListOptions{})
 		Expect(err).ToNot(HaveOccurred())
-		Expect(len(vmis.Items)).Should(Equal(2))
+		Expect(vmis.Items).Should(HaveLen(2))
 	})
 
 	It("should replace a VMI immediately when a virt-launcher pod gets deleted", func() {
@@ -428,7 +430,7 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 		vmi := &vmis.Items[0]
 		pods, err := virtClient.CoreV1().Pods(util.NamespaceTestDefault).List(context.Background(), tests.UnfinishedVMIPodSelector(vmi))
 		Expect(err).ToNot(HaveOccurred())
-		Expect(len(pods.Items)).To(Equal(1))
+		Expect(pods.Items).To(HaveLen(1))
 		pod := pods.Items[0]
 
 		By("Deleting one of the RS VMS pods, which will take some time to really stop the VMI")
@@ -459,13 +461,13 @@ var _ = Describe("[rfe_id:588][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 	})
 
 	It("[test_id:4121]should create and verify kubectl/oc output for vm replicaset", func() {
-		k8sClient := tests.GetK8sCmdClient()
-		tests.SkipIfNoCmd(k8sClient)
+		k8sClient := clientcmd.GetK8sCmdClient()
+		clientcmd.SkipIfNoCmd(k8sClient)
 
 		newRS := newReplicaSet()
 		doScale(newRS.ObjectMeta.Name, 2)
 
-		result, _, _ := tests.RunCommand(k8sClient, "get", "virtualmachineinstancereplicaset")
+		result, _, _ := clientcmd.RunCommand(k8sClient, "get", "virtualmachineinstancereplicaset")
 		Expect(result).ToNot(BeNil())
 		resultFields := strings.Fields(result)
 		expectedHeader := []string{"NAME", "DESIRED", "CURRENT", "READY", "AGE"}

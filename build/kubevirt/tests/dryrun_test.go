@@ -24,7 +24,7 @@ import (
 	"fmt"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	corev1 "k8s.io/api/core/v1"
@@ -491,7 +491,7 @@ var _ = Describe("[sig-compute]Dry-Run requests", func() {
 			Expect(errors.IsNotFound(err)).To(BeTrue())
 		})
 
-		It("[test_id:7648]delete a KubeVirt CR", func() {
+		It("[Serial][test_id:7648]delete a KubeVirt CR", func() {
 			By("Make a Dry-Run request to delete a KubeVirt CR")
 			deletePolicy := metav1.DeletePropagationForeground
 			opts := metav1.DeleteOptions{

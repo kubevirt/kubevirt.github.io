@@ -38,8 +38,6 @@ import (
 	"sync"
 	"time"
 
-	util2 "kubevirt.io/kubevirt/pkg/util"
-
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice/generic"
 	"kubevirt.io/kubevirt/pkg/virt-launcher/virtwrap/device/hostdevice/gpu"
 
@@ -91,17 +89,9 @@ const (
 const (
 	PCI_RESOURCE_PREFIX  = "PCI_RESOURCE"
 	MDEV_RESOURCE_PREFIX = "MDEV_PCI_RESOURCE"
-
-	baseEphemeralDiskDir = "/var/run/kubevirt-ephemeral-disks/"
 )
 
 const maxConcurrentHotplugHostDevices = 1
-
-var (
-	getEphemeralDiskBaseDir = func() string {
-		return baseEphemeralDiskDir
-	}
-)
 
 type contextStore struct {
 	ctx    context.Context
@@ -148,6 +138,7 @@ type LibvirtDomainManager struct {
 	hotplugHostDevicesInProgress chan struct{}
 
 	virtShareDir             string
+	ephemeralDiskDir         string
 	paused                   pausedVMIs
 	agentData                *agentpoller.AsyncAgentStore
 	cloudInitDataStore       *cloudinit.CloudInitData
@@ -158,6 +149,7 @@ type LibvirtDomainManager struct {
 	directIOChecker          converter.DirectIOChecker
 	disksInfo                map[string]*cmdv1.DiskInfo
 	cancelSafetyUnfreezeChan chan struct{}
+	migrateInfoStats         *stats.DomainJobInfo
 }
 
 type pausedVMIs struct {
@@ -183,15 +175,16 @@ func (s pausedVMIs) contains(uid types.UID) bool {
 	return ok
 }
 
-func NewLibvirtDomainManager(connection cli.Connection, virtShareDir string, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface) (DomainManager, error) {
+func NewLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralDiskDir string, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface) (DomainManager, error) {
 	directIOChecker := converter.NewDirectIOChecker()
-	return newLibvirtDomainManager(connection, virtShareDir, agentStore, ovmfPath, ephemeralDiskCreator, directIOChecker)
+	return newLibvirtDomainManager(connection, virtShareDir, ephemeralDiskDir, agentStore, ovmfPath, ephemeralDiskCreator, directIOChecker)
 }
 
-func newLibvirtDomainManager(connection cli.Connection, virtShareDir string, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface, directIOChecker converter.DirectIOChecker) (DomainManager, error) {
+func newLibvirtDomainManager(connection cli.Connection, virtShareDir, ephemeralDiskDir string, agentStore *agentpoller.AsyncAgentStore, ovmfPath string, ephemeralDiskCreator ephemeraldisk.EphemeralDiskCreatorInterface, directIOChecker converter.DirectIOChecker) (DomainManager, error) {
 	manager := LibvirtDomainManager{
-		virConn:      connection,
-		virtShareDir: virtShareDir,
+		virConn:          connection,
+		virtShareDir:     virtShareDir,
+		ephemeralDiskDir: ephemeralDiskDir,
 		paused: pausedVMIs{
 			paused: make(map[types.UID]bool, 0),
 		},
@@ -201,6 +194,7 @@ func newLibvirtDomainManager(connection cli.Connection, virtShareDir string, age
 		directIOChecker:          directIOChecker,
 		disksInfo:                map[string]*cmdv1.DiskInfo{},
 		cancelSafetyUnfreezeChan: make(chan struct{}),
+		migrateInfoStats:         &stats.DomainJobInfo{},
 	}
 
 	manager.hotplugHostDevicesInProgress = make(chan struct{}, maxConcurrentHotplugHostDevices)
@@ -394,10 +388,9 @@ func (l *LibvirtDomainManager) GuestPing(domainName string) error {
 	return err
 }
 
-func getVMIEphemeralDisksTotalSize() *resource.Quantity {
-	baseDir := getEphemeralDiskBaseDir()
+func getVMIEphemeralDisksTotalSize(ephemeralDiskDir string) *resource.Quantity {
 	totalSize := int64(0)
-	err := filepath.Walk(baseDir, func(path string, f os.FileInfo, err error) error {
+	err := filepath.Walk(ephemeralDiskDir, func(path string, f os.FileInfo, err error) error {
 		if err != nil {
 			return err
 		}
@@ -414,7 +407,7 @@ func getVMIEphemeralDisksTotalSize() *resource.Quantity {
 	return resource.NewScaledQuantity(totalSize, 0)
 }
 
-func getVMIMigrationDataSize(vmi *v1.VirtualMachineInstance) int64 {
+func getVMIMigrationDataSize(vmi *v1.VirtualMachineInstance, ephemeralDiskDir string) int64 {
 	var memory resource.Quantity
 
 	// Take memory from the requested memory
@@ -426,9 +419,9 @@ func getVMIMigrationDataSize(vmi *v1.VirtualMachineInstance) int64 {
 		memory = *vmi.Spec.Domain.Memory.Guest
 	}
 
-	//get total data Size
+	// get total data Size
 	if vmi.Status.MigrationMethod == v1.BlockMigration {
-		disksSize := getVMIEphemeralDisksTotalSize()
+		disksSize := getVMIEphemeralDisksTotalSize(ephemeralDiskDir)
 		memory.Add(*disksSize)
 	}
 	return memory.ScaledValue(resource.Giga)
@@ -651,7 +644,7 @@ func expandDiskImageOffline(imagePath string, size int64) error {
 	} else {
 		preallocateFlag = "--preallocation=off"
 	}
-	size = util2.AlignImageSizeTo1MiB(size, log.Log.With("image", imagePath))
+	size = kutil.AlignImageSizeTo1MiB(size, log.Log.With("image", imagePath))
 	if size == 0 {
 		return fmt.Errorf("%s must be at least 1MiB", imagePath)
 	}
@@ -679,7 +672,7 @@ func possibleGuestSize(disk api.Disk) (int64, bool) {
 		return 0, false
 	}
 	size := int64((1 - filesystemOverhead) * float64(preferredSize))
-	size = util2.AlignImageSizeTo1MiB(size, log.DefaultLogger())
+	size = kutil.AlignImageSizeTo1MiB(size, log.DefaultLogger())
 	if size == 0 {
 		return 0, false
 	}
@@ -915,7 +908,7 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
 		return nil, err
 	}
 
-	//Look up all the disks to detach
+	// Look up all the disks to detach
 	for _, detachDisk := range getDetachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
 		logger.V(1).Infof("Detaching disk %s, target %s", detachDisk.Alias.GetName(), detachDisk.Target.Device)
 		detachBytes, err := xml.Marshal(detachDisk)
@@ -929,7 +922,7 @@ func (l *LibvirtDomainManager) SyncVMI(vmi *v1.VirtualMachineInstance, allowEmul
 			return nil, err
 		}
 	}
-	//Look up all the disks to attach
+	// Look up all the disks to attach
 	for _, attachDisk := range getAttachedDisks(oldSpec.Devices.Disks, domain.Spec.Devices.Disks) {
 		allowAttach, err := checkIfDiskReadyToUse(getSourceFile(attachDisk))
 		if err != nil {
@@ -1228,22 +1221,31 @@ func (l *LibvirtDomainManager) cancelSafetyUnfreeze() {
 	}
 }
 
+func (l *LibvirtDomainManager) getParsedFSStatus(domainName string) (string, error) {
+	cmdResult, err := l.virConn.QemuAgentCommand(`{"execute":"`+string(agentpoller.GET_FSFREEZE_STATUS)+`"}`, domainName)
+	if err != nil {
+		return "", err
+	}
+	fsfreezeStatus, err := agentpoller.ParseFSFreezeStatus(cmdResult)
+	if err != nil {
+		return "", err
+	}
+
+	return fsfreezeStatus.Status, nil
+}
+
 func (l *LibvirtDomainManager) FreezeVMI(vmi *v1.VirtualMachineInstance, unfreezeTimeoutSeconds int32) error {
 	domainName := api.VMINamespaceKeyFunc(vmi)
 	safetyUnfreezeTimeout := time.Duration(unfreezeTimeoutSeconds) * time.Second
 
-	cmdResult, err := l.virConn.QemuAgentCommand(`{"execute":"`+string(agentpoller.GET_FSFREEZE_STATUS)+`"}`, domainName)
+	fsfreezeStatus, err := l.getParsedFSStatus(domainName)
 	if err != nil {
-		log.Log.Errorf("Failed to get status before freeze vmi, %s", err.Error())
+		log.Log.Errorf("Failed to get fs status before freeze vmi %s, %s", vmi.Name, err.Error())
 		return err
 	}
-	fsfreezeStatus, err := agentpoller.ParseFSFreezeStatus(cmdResult)
-	if err != nil {
-		log.Log.Errorf("Failed to parse status before freeze vmi, %s", err.Error())
-		return err
-	}
+
 	// idempotent - prevent failuer in case fs is already frozen
-	if fsfreezeStatus.Status == api.FSFrozen {
+	if fsfreezeStatus == api.FSFrozen {
 		return nil
 	}
 	_, err = l.virConn.QemuAgentCommand(`{"execute":"guest-fsfreeze-freeze"}`, domainName)
@@ -1262,8 +1264,15 @@ func (l *LibvirtDomainManager) FreezeVMI(vmi *v1.VirtualMachineInstance, unfreez
 func (l *LibvirtDomainManager) UnfreezeVMI(vmi *v1.VirtualMachineInstance) error {
 	l.cancelSafetyUnfreeze()
 	domainName := api.VMINamespaceKeyFunc(vmi)
-	// fs thaw is idempotent by itself
-	_, err := l.virConn.QemuAgentCommand(`{"execute":"guest-fsfreeze-thaw"}`, domainName)
+	fsfreezeStatus, err := l.getParsedFSStatus(domainName)
+	if err == nil {
+		// prevent initating fs thaw to prevent rerunning the thaw hook
+		if fsfreezeStatus == api.FSThawed {
+			return nil
+		}
+	}
+	// even if failed we should still try to unfreeze the fs
+	_, err = l.virConn.QemuAgentCommand(`{"execute":"guest-fsfreeze-thaw"}`, domainName)
 	if err != nil {
 		log.Log.Errorf("Failed to unfreeze vmi, %s", err.Error())
 		return err
@@ -1509,10 +1518,10 @@ func (l *LibvirtDomainManager) setDomainSpecWithHooks(vmi *v1.VirtualMachineInst
 }
 
 func (l *LibvirtDomainManager) GetDomainStats() ([]*stats.DomainStats, error) {
-	statsTypes := libvirt.DOMAIN_STATS_BALLOON | libvirt.DOMAIN_STATS_CPU_TOTAL | libvirt.DOMAIN_STATS_VCPU | libvirt.DOMAIN_STATS_INTERFACE | libvirt.DOMAIN_STATS_BLOCK
+	statsTypes := libvirt.DOMAIN_STATS_BALLOON | libvirt.DOMAIN_STATS_CPU_TOTAL | libvirt.DOMAIN_STATS_VCPU | libvirt.DOMAIN_STATS_INTERFACE | libvirt.DOMAIN_STATS_BLOCK | libvirt.DOMAIN_STATS_DIRTYRATE
 	flags := libvirt.CONNECT_GET_ALL_DOMAINS_STATS_RUNNING
 
-	return l.virConn.GetDomainStats(statsTypes, flags)
+	return l.virConn.GetDomainStats(statsTypes, l.migrateInfoStats, flags)
 }
 
 func formatPCIAddressStr(address *api.Address) string {

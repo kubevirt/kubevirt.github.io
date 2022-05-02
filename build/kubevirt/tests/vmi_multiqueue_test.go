@@ -23,7 +23,7 @@ import (
 	"encoding/xml"
 	"fmt"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/kubevirt/tests/util"
@@ -38,7 +38,7 @@ import (
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
-	"kubevirt.io/kubevirt/tests/libnet"
+	"kubevirt.io/kubevirt/tests/libnode"
 	"kubevirt.io/kubevirt/tests/libvmi"
 )
 
@@ -57,7 +57,7 @@ var _ = Describe("[sig-compute]MultiQueue", func() {
 		var availableCPUs int
 
 		BeforeEach(func() {
-			availableCPUs = tests.GetHighestCPUNumberAmongNodes(virtClient)
+			availableCPUs = libnode.GetHighestCPUNumberAmongNodes(virtClient)
 		})
 
 		It("[test_id:4599]should be able to successfully boot fedora to the login prompt with networking mutiqueues enabled without being blocked by selinux", func() {
@@ -78,7 +78,7 @@ var _ = Describe("[sig-compute]MultiQueue", func() {
 			tests.WaitForSuccessfulVMIStartWithTimeout(vmi, 360)
 
 			By("Checking if we can login")
-			Expect(libnet.WithIPv6(console.LoginToFedora)(vmi)).To(Succeed())
+			Expect(console.LoginToFedora(vmi)).To(Succeed())
 		})
 
 		It("[test_id:959][rfe_id:2065] Should honor multiQueue requests", func() {
@@ -93,7 +93,7 @@ var _ = Describe("[sig-compute]MultiQueue", func() {
 			cpuReq := resource.MustParse(fmt.Sprintf("%d", numCpus))
 			vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceCPU] = cpuReq
 
-			tests.AddEphemeralDisk(vmi, "disk1", "virtio", cd.ContainerDiskFor(cd.ContainerDiskCirros))
+			tests.AddEphemeralDisk(vmi, "disk1", v1.DiskBusVirtio, cd.ContainerDiskFor(cd.ContainerDiskCirros))
 
 			By("Creating VMI with 2 disks, 3 CPUs and multi-queue enabled")
 			vmi, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)

@@ -21,14 +21,16 @@ package tests_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	"kubevirt.io/kubevirt/tests/clientcmd"
+	"kubevirt.io/kubevirt/tests/framework/checks"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/api/errors"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -40,6 +42,7 @@ import (
 	"kubevirt.io/client-go/kubecli"
 	"kubevirt.io/kubevirt/tests"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
+	"kubevirt.io/kubevirt/tests/libstorage"
 	vmsgen "kubevirt.io/kubevirt/tools/vms-generator/utils"
 )
 
@@ -64,21 +67,12 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
 
-		tests.SkipIfNoCmd("oc")
+		clientcmd.SkipIfNoCmd("oc")
 		tests.BeforeTestCleanup()
 		SetDefaultEventuallyTimeout(120 * time.Second)
 		SetDefaultEventuallyPollingInterval(2 * time.Second)
 
-		workDir, err = ioutil.TempDir("", tests.TempDirPrefix+"-")
-		Expect(err).ToNot(HaveOccurred())
-	})
-
-	AfterEach(func() {
-		if workDir != "" {
-			err := os.RemoveAll(workDir)
-			Expect(err).ToNot(HaveOccurred())
-			workDir = ""
-		}
+		workDir = GinkgoT().TempDir()
 	})
 
 	Describe("Creating VM from Template", func() {
@@ -156,7 +150,7 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 				for param, value := range templateParams {
 					ocProcessCommand = append(ocProcessCommand, "-p", fmt.Sprintf("%s=%s", param, value))
 				}
-				out, stderr, err := tests.RunCommandPipe(ocProcessCommand, []string{"oc", "create", "-f", "-"})
+				out, stderr, err := clientcmd.RunCommandPipe(ocProcessCommand, []string{"oc", "create", "-f", "-"})
 				ExpectWithOffset(1, err).ToNot(HaveOccurred(), "failed to create VirtualMachine %q via command \"%s | oc create -f -\": %s: %v", vmName, strings.Join(ocProcessCommand, " "), out+stderr, err)
 				ExpectWithOffset(1, out).To(MatchRegexp(`"?%s"? created\n`, vmName), "command \"%s | oc create -f -\" did not print expected message: %s", strings.Join(ocProcessCommand, " "), out+stderr)
 				By("Checking if the VirtualMachine exists")
@@ -174,7 +168,7 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 				for param, value := range templateParams {
 					ocProcessCommand = append(ocProcessCommand, "-p", fmt.Sprintf("%s=%s", param, value))
 				}
-				out, stderr, err := tests.RunCommandPipe(ocProcessCommand, []string{"oc", "create", "-f", "-"})
+				out, stderr, err := clientcmd.RunCommandPipe(ocProcessCommand, []string{"oc", "create", "-f", "-"})
 				ExpectWithOffset(1, err).To(HaveOccurred(), "creation of VirtualMachine %q via command \"%s | oc create -f -\" succeeded: %s: %v", vmName, strings.Join(ocProcessCommand, " "), out+stderr, err)
 			}
 		}
@@ -182,7 +176,7 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 		AssertVMDeletionSuccess := func() func() {
 			return func() {
 				By("Deleting the VirtualMachine via oc command")
-				out, stderr, err := tests.RunCommand("oc", "delete", "vm", vmName)
+				out, stderr, err := clientcmd.RunCommand("oc", "delete", "vm", vmName)
 				ExpectWithOffset(1, err).ToNot(HaveOccurred(), "failed to delete VirtualMachine via command \"oc delete vm %s\": %s: %v", vmName, out+stderr, err)
 				ExpectWithOffset(1, out).To(MatchRegexp(`"?%s"? deleted\n`, vmName), "command \"oc delete vm %s\" did not print expected message: %s", vmName, out)
 
@@ -197,7 +191,7 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 		AssertVMDeletionFailure := func() func() {
 			return func() {
 				By("Deleting the VirtualMachine via oc command")
-				out, stderr, err := tests.RunCommand("oc", "delete", "vm", vmName)
+				out, stderr, err := clientcmd.RunCommand("oc", "delete", "vm", vmName)
 				ExpectWithOffset(1, err).To(HaveOccurred(), "failed to delete VirtualMachine via command \"oc delete vm %s\": %s: %v", vmName, out+stderr, err)
 			}
 		}
@@ -208,13 +202,13 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 				case "oc":
 					By("Starting VirtualMachine via oc command")
 					patch := `{"spec":{"running":true}}`
-					out, stderr, err := tests.RunCommand("oc", "patch", "vm", vmName, "--type=merge", "-p", patch)
+					out, stderr, err := clientcmd.RunCommand("oc", "patch", "vm", vmName, "--type=merge", "-p", patch)
 					ExpectWithOffset(1, err).ToNot(HaveOccurred(), "failed schedule VirtualMachine %q start via command \"oc patch vm %s --type=merge -p '%s'\": %s: %v", vmName, vmName, patch, out+stderr, err)
 					ExpectWithOffset(1, out).To(MatchRegexp(`"?%s"? patched\n`, vmName), "command \"oc patch vm %s --type=merge -p '%s'\" did not print expected message: %s", vmName, patch, out+stderr)
 
 				case "virtctl":
 					By("Starting VirtualMachine via virtctl command")
-					out, stderr, err := tests.RunCommand("virtctl", "start", vmName)
+					out, stderr, err := clientcmd.RunCommand("virtctl", "start", vmName)
 					ExpectWithOffset(1, err).ToNot(HaveOccurred(), "failed to schedule VirtualMachine %q start via command \"virtctl start %s\": %s: %v", vmName, vmName, out+stderr, err)
 					ExpectWithOffset(1, out).To(ContainSubstring("%s was scheduled to start\n", vmName), "command \"virtctl start %s\" did not print expected message: %s", vmName, out+stderr)
 				}
@@ -272,8 +266,8 @@ var _ = Describe("[Serial][sig-compute]Templates", func() {
 
 		Context("[rfe_id:273][crit:medium][vendor:cnv-qe@redhat.com][level:component]with RHEL Template", func() {
 			BeforeEach(func() {
-				tests.SkipIfNoRhelImage(virtClient)
-				tests.CreatePVC(tests.OSRhel, "15Gi", tests.Config.StorageClassRhel, true)
+				checks.SkipIfNoRhelImage(virtClient)
+				tests.CreatePVC(tests.OSRhel, "15Gi", libstorage.Config.StorageClassRhel, true)
 				AssertTemplateSetupSuccess(vmsgen.GetTestTemplateRHEL7(), nil)()
 			})
 

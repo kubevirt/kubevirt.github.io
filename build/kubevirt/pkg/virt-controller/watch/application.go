@@ -31,7 +31,7 @@ import (
 	"kubevirt.io/kubevirt/pkg/flavor"
 
 	"github.com/emicklei/go-restful"
-	vsv1beta1 "github.com/kubernetes-csi/external-snapshotter/v2/pkg/apis/volumesnapshot/v1beta1"
+	vsv1 "github.com/kubernetes-csi/external-snapshotter/client/v4/apis/volumesnapshot/v1"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	flag "github.com/spf13/pflag"
@@ -232,7 +232,7 @@ type VirtControllerApp struct {
 var _ service.Service = &VirtControllerApp{}
 
 func init() {
-	vsv1beta1.AddToScheme(scheme.Scheme)
+	vsv1.AddToScheme(scheme.Scheme)
 	snapshotv1.AddToScheme(scheme.Scheme)
 	poolv1.AddToScheme(scheme.Scheme)
 
@@ -326,7 +326,7 @@ func Execute() {
 	app.persistentVolumeClaimInformer = app.informerFactory.PersistentVolumeClaim()
 	app.persistentVolumeClaimCache = app.persistentVolumeClaimInformer.GetStore()
 
-	app.pdbInformer = app.informerFactory.K8SInformerFactory().Policy().V1beta1().PodDisruptionBudgets().Informer()
+	app.pdbInformer = app.informerFactory.K8SInformerFactory().Policy().V1().PodDisruptionBudgets().Informer()
 
 	app.vmInformer = app.informerFactory.VirtualMachine()
 
@@ -544,6 +544,7 @@ func (vca *VirtControllerApp) initPool() {
 		vca.vmiInformer,
 		vca.vmInformer,
 		vca.poolInformer,
+		vca.controllerRevisionInformer,
 		recorder,
 		controller.BurstReplicas)
 }

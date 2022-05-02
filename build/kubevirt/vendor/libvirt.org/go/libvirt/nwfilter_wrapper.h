@@ -28,7 +28,7 @@
 
 #include <libvirt/libvirt.h>
 #include <libvirt/virterror.h>
-
+#include "nwfilter_compat.h"
 
 int
 virNWFilterFreeWrapper(virNWFilterPtr nwfilter,

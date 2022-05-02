@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -128,7 +128,7 @@ var _ = Describe("[Serial][sig-compute]GPU", func() {
 			Expect(err).ToNot(HaveOccurred())
 			addrList := parseDeviceAddress(gpuOutput)
 
-			Expect(len(addrList)).To(Equal(len(domSpec.Devices.HostDevices)))
+			Expect(addrList).To(HaveLen(len(domSpec.Devices.HostDevices)))
 			for n, addr := range addrList {
 				Expect(domSpec.Devices.HostDevices[n].Type).To(Equal("pci"))
 				Expect(domSpec.Devices.HostDevices[n].Managed).To(Equal("yes"))

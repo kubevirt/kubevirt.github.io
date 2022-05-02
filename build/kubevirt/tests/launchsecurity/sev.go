@@ -2,7 +2,7 @@ package launchsecurity
 
 import (
 	expect "github.com/google/goexpect"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
@@ -20,7 +20,8 @@ var _ = Describe("[sig-compute]AMD Secure Encrypted Virtualization (SEV)", func(
 	})
 
 	It("should start a SEV VM", func() {
-		vmi := libvmi.NewSEVFedora()
+		const secureBoot = false
+		vmi := libvmi.NewFedora(libvmi.WithUefi(secureBoot), libvmi.WithSEV())
 		vmi = tests.RunVMIAndExpectLaunch(vmi, 240)
 
 		By("Expecting the VirtualMachineInstance console")

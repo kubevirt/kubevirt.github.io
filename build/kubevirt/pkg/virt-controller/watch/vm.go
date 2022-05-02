@@ -88,7 +88,7 @@ func NewVMController(vmiInformer cache.SharedIndexInformer,
 	dataVolumeInformer cache.SharedIndexInformer,
 	pvcInformer cache.SharedIndexInformer,
 	crInformer cache.SharedIndexInformer,
-	flaovrMethods flavor.Methods,
+	flavorMethods flavor.Methods,
 	recorder record.EventRecorder,
 	clientset kubecli.KubevirtClient) *VMController {
 
@@ -101,7 +101,7 @@ func NewVMController(vmiInformer cache.SharedIndexInformer,
 		dataVolumeInformer:     dataVolumeInformer,
 		pvcInformer:            pvcInformer,
 		crInformer:             crInformer,
-		flavorMethods:          flaovrMethods,
+		flavorMethods:          flavorMethods,
 		recorder:               recorder,
 		clientset:              clientset,
 		expectations:           controller.NewUIDTrackingControllerExpectations(controller.NewControllerExpectations()),
@@ -723,8 +723,10 @@ func (c *VMController) startStop(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualM
 			return nil
 		}
 		log.Log.Object(vm).Infof("%s with VMI in phase %s due to runStrategy: %s", stoppingVmMsg, vmi.Status.Phase, runStrategy)
-		err := c.stopVMI(vm, vmi)
-		return &syncErrorImpl{fmt.Errorf(failureDeletingVmiErrFormat, err), VMIFailedDeleteReason}
+		if err := c.stopVMI(vm, vmi); err != nil {
+			return &syncErrorImpl{fmt.Errorf(failureDeletingVmiErrFormat, err), VMIFailedDeleteReason}
+		}
+		return nil
 	case virtv1.RunStrategyOnce:
 		if vmi == nil {
 			log.Log.Object(vm).Infof("%s due to start request and runStrategy: %s", startingVmMsg, runStrategy)
@@ -1125,21 +1127,25 @@ func (c *VMController) setupVMIFromVM(vm *virtv1.VirtualMachine) *virtv1.Virtual
 }
 
 func (c *VMController) applyFlavorToVmi(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance) error {
-	flavorProfile, err := c.flavorMethods.FindProfile(vm)
+
+	flavorSpec, err := c.flavorMethods.FindFlavorSpec(vm)
+
 	if err != nil {
 		return err
 	}
 
-	if flavorProfile == nil {
+	if flavorSpec == nil {
 		return nil
 	}
 
-	conflicts := c.flavorMethods.ApplyToVmi(k8sfield.NewPath("spec"), flavorProfile, vm, vmi)
+	flavor.AddFlavorNameAnnotations(vm, vmi)
+
+	conflicts := c.flavorMethods.ApplyToVmi(k8sfield.NewPath("spec"), flavorSpec, &vmi.Spec)
 	if len(conflicts) == 0 {
 		return nil
 	}
 
-	return fmt.Errorf("VMI conflicts with flavor profile in fields: [%s]", conflicts.String())
+	return fmt.Errorf("VMI conflicts with flavor spec in fields: [%s]", conflicts.String())
 }
 
 func hasStartPausedRequest(vm *virtv1.VirtualMachine) bool {

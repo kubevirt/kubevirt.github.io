@@ -26,7 +26,7 @@ import (
 	"path/filepath"
 
 	gomock "github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
@@ -115,7 +115,7 @@ var _ = Describe("Virt remote commands", func() {
 			// listing all sockets should detect both the new and legacy sockets
 			sockets, err := ListAllSockets()
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(sockets)).To(Equal(2))
+			Expect(sockets).To(HaveLen(2))
 		})
 
 		It("Detect unresponsive socket", func() {
@@ -167,9 +167,6 @@ var _ = Describe("Virt remote commands", func() {
 				ctrl = gomock.NewController(GinkgoT())
 				mockCmdClient = cmdv1.NewMockCmdClient(ctrl)
 				client = newV1Client(mockCmdClient, nil)
-			})
-			AfterEach(func() {
-				ctrl.Finish()
 			})
 
 			var (

@@ -12,7 +12,7 @@ fi
 
 fail_if_cri_bin_missing
 
-KUBEVIRT_BUILDER_IMAGE="quay.io/kubevirt/builder:2202010936-905b3aae5"
+KUBEVIRT_BUILDER_IMAGE="quay.io/kubevirt/builder:2204080957-4342896e3"
 
 SYNC_OUT=${SYNC_OUT:-true}
 
@@ -102,9 +102,8 @@ mkdir -p "${HOME}/.docker/secrets"
 volumes="$volumes -v ${HOME}/.docker/secrets:/root/.docker/secrets:ro,z"
 
 # Use a bind-mount to expose docker/podman auth file to the container
-ID=$(id -u)
-if [[ $KUBEVIRT_CRI = "podman" ]] && [[ -f "/tmp/podman-run-${ID}/containers/auth.json" ]]; then
-    volumes="$volumes --mount type=bind,source=/tmp/podman-run-${ID}/containers/auth.json,target=/root/.docker/config.json,readonly"
+if [[ $KUBEVIRT_CRI = podman* ]] && [[ -f "${XDG_RUNTIME_DIR}/containers/auth.json" ]]; then
+    volumes="$volumes --mount type=bind,source=${XDG_RUNTIME_DIR}/containers/auth.json,target=/root/.docker/config.json,readonly"
 elif [[ -f "${HOME}/.docker/config.json" ]]; then
     volumes="$volumes --mount type=bind,source=${HOME}/.docker/config.json,target=/root/.docker/config.json,readonly"
 fi
@@ -148,8 +147,7 @@ fi
 
 # Run the command
 test -t 1 && USE_TTY="-it"
-EXEC_ENV_VARS="--env KUBEVIRT_CRI=${KUBEVIRT_CRI}"
-if ! $KUBEVIRT_CRI exec $EXEC_ENV_VARS ${USE_TTY} ${BUILDER}-bazel-server /entrypoint.sh "$@"; then
+if ! $KUBEVIRT_CRI exec ${USE_TTY} ${BUILDER}-bazel-server /entrypoint.sh "$@"; then
     # Copy the build output out of the container, make sure that _out exactly matches the build result
     if [ "$SYNC_OUT" = "true" ]; then
         _rsync --delete "rsync://root@127.0.0.1:${RSYNCD_PORT}/out" ${OUT_DIR}
@@ -176,6 +174,7 @@ _rsync \
     ${KUBEVIRT_DIR}/
 
 _rsync --delete "rsync://root@127.0.0.1:${RSYNCD_PORT}/build/manifests/generated/" "${KUBEVIRT_DIR}/manifests/generated"
+_rsync --delete "rsync://root@127.0.0.1:${RSYNCD_PORT}/build/staging/src/kubevirt.io/client-go/generated/" "${KUBEVIRT_DIR}/staging/src/kubevirt.io/client-go/generated"
 _rsync --delete "rsync://root@127.0.0.1:${RSYNCD_PORT}/build/examples/" "${KUBEVIRT_DIR}/examples"
 if [ "$SYNC_VENDOR" = "true" ]; then
     _rsync --delete "rsync://root@127.0.0.1:${RSYNCD_PORT}/vendor" "${VENDOR_DIR}/"

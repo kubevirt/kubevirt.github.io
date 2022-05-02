@@ -70,8 +70,8 @@ client-gen --clientset-name versioned \
     --go-header-file ${KUBEVIRT_DIR}/hack/boilerplate/boilerplate.go.txt
 
 client-gen --clientset-name versioned \
-    --input-base github.com/kubernetes-csi/external-snapshotter/v2/pkg/apis \
-    --input volumesnapshot/v1beta1 \
+    --input-base github.com/kubernetes-csi/external-snapshotter/client/v4/apis \
+    --input volumesnapshot/v1 \
     --output-base ${KUBEVIRT_DIR}/staging/src \
     --output-package ${CLIENT_GEN_BASE}/external-snapshotter/clientset \
     --go-header-file ${KUBEVIRT_DIR}/hack/boilerplate/boilerplate.go.txt
@@ -134,7 +134,8 @@ rm -f ${KUBEVIRT_DIR}/examples/*
 ResourceDir=${KUBEVIRT_DIR}/manifests/generated
 ${KUBEVIRT_DIR}/tools/resource-generator/resource-generator --type=priorityclass >${ResourceDir}/kubevirt-priority-class.yaml
 ${KUBEVIRT_DIR}/tools/resource-generator/resource-generator --type=kv >${ResourceDir}/kv-resource.yaml
-${KUBEVIRT_DIR}/tools/resource-generator/resource-generator --type=kv-cr --namespace='{{.Namespace}}' --pullPolicy='{{.ImagePullPolicy}}' --featureGates='{{.FeatureGates}}' >${ResourceDir}/kubevirt-cr.yaml.in
+${KUBEVIRT_DIR}/tools/resource-generator/resource-generator --type=kv-cr --namespace='{{.Namespace}}' --pullPolicy='{{.ImagePullPolicy}}' \
+    --featureGates='{{.FeatureGates}}' --infraReplicas='{{.InfraReplicas}}' >${ResourceDir}/kubevirt-cr.yaml.in
 ${KUBEVIRT_DIR}/tools/resource-generator/resource-generator --type=operator-rbac --namespace='{{.Namespace}}' >${ResourceDir}/rbac-operator.authorization.k8s.yaml.in
 
 # used for Image fields in manifests

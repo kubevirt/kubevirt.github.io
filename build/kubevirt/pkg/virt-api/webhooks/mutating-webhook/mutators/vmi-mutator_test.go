@@ -24,8 +24,9 @@ import (
 	"fmt"
 	rt "runtime"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	"k8s.io/utils/pointer"
+
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	admissionv1 "k8s.io/api/admission/v1"
 	v12 "k8s.io/api/authentication/v1"
@@ -57,8 +58,6 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 	var namespaceLimitInformer cache.SharedIndexInformer
 	var kvInformer cache.SharedIndexInformer
 	var mutator *VMIsMutator
-	var _true bool = true
-	var _false bool = false
 
 	memoryLimit := "128M"
 	cpuModelFromConfig := "Haswell"
@@ -82,25 +81,27 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		return mutator.Mutate(ar)
 	}
 
-	getVMISpecMetaFromResponse := func() (*v1.VirtualMachineInstanceSpec, *k8smetav1.ObjectMeta) {
+	getMetaSpecStatusFromAdmit := func() (*k8smetav1.ObjectMeta, *v1.VirtualMachineInstanceSpec, *v1.VirtualMachineInstanceStatus) {
 		resp := admitVMI()
 		Expect(resp.Allowed).To(BeTrue())
 
 		By("Getting the VMI spec from the response")
 		vmiSpec := &v1.VirtualMachineInstanceSpec{}
 		vmiMeta := &k8smetav1.ObjectMeta{}
+		vmiStatus := &v1.VirtualMachineInstanceStatus{}
 		patch := []utiltypes.PatchOperation{
 			{Value: vmiSpec},
 			{Value: vmiMeta},
+			{Value: vmiStatus},
 		}
 		err := json.Unmarshal(resp.Patch, &patch)
 		Expect(err).ToNot(HaveOccurred())
 		Expect(patch).NotTo(BeEmpty())
 
-		return vmiSpec, vmiMeta
+		return vmiMeta, vmiSpec, vmiStatus
 	}
 
-	getVMIStatusFromResponse := func(oldVMI *v1.VirtualMachineInstance, newVMI *v1.VirtualMachineInstance, user string) *v1.VirtualMachineInstanceStatus {
+	getVMIStatusFromResponseWithUpdate := func(oldVMI *v1.VirtualMachineInstance, newVMI *v1.VirtualMachineInstance, user string) *v1.VirtualMachineInstanceStatus {
 		oldVMIBytes, err := json.Marshal(oldVMI)
 		Expect(err).ToNot(HaveOccurred())
 		newVMIBytes, err := json.Marshal(newVMI)
@@ -188,20 +189,20 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 	})
 
 	It("should apply presets on VMI create", func() {
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.CPU).ToNot(BeNil())
 		Expect(vmiSpec.Domain.CPU.Cores).To(Equal(uint32(4)))
 	})
 
 	It("should apply namespace limit ranges on VMI create", func() {
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.Resources.Limits.Memory().String()).To(Equal(memoryLimit))
 	})
 
 	It("should apply defaults on VMI create", func() {
 		// no limits wanted on this test, to not copy the limit to requests
 		mutator.NamespaceLimitsInformer, _ = testutils.NewFakeInformerFor(&k8sv1.LimitRange{})
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		if webhooks.IsPPC64() {
 			Expect(vmiSpec.Domain.Machine.Type).To(Equal("pseries"))
 			Expect(vmiSpec.Domain.CPU.Model).To(Equal(v1.DefaultCPUModel))
@@ -232,18 +233,18 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 			},
 		})
 
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.CPU.Model).To(Equal(cpuModelFromConfig))
 		Expect(vmiSpec.Domain.Machine.Type).To(Equal(machineTypeFromConfig))
 		Expect(*vmiSpec.Domain.Resources.Requests.Cpu()).To(Equal(cpuReq))
 	})
 
-	table.DescribeTable("it should", func(given []v1.Volume, expected []v1.Volume) {
+	DescribeTable("it should", func(given []v1.Volume, expected []v1.Volume) {
 		vmi.Spec.Volumes = given
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Volumes).To(Equal(expected))
 	},
-		table.Entry("set the ImagePullPolicy to Always if :latest is specified",
+		Entry("set the ImagePullPolicy to Always if :latest is specified",
 			[]v1.Volume{
 				{
 					Name: "a",
@@ -266,7 +267,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				},
 			},
 		),
-		table.Entry("set the ImagePullPolicy to Always if no tag or shasum is specified",
+		Entry("set the ImagePullPolicy to Always if no tag or shasum is specified",
 			[]v1.Volume{
 				{
 					Name: "a",
@@ -289,7 +290,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				},
 			},
 		),
-		table.Entry("set the ImagePullPolicy to IfNotPresent if arbitrary tags are specified",
+		Entry("set the ImagePullPolicy to IfNotPresent if arbitrary tags are specified",
 			[]v1.Volume{
 				{
 					Name: "a",
@@ -312,7 +313,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				},
 			},
 		),
-		table.Entry("set the right ImagePullPolicy on a mixture of sources",
+		Entry("set the right ImagePullPolicy on a mixture of sources",
 			[]v1.Volume{
 				{
 					Name: "a",
@@ -407,7 +408,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		),
 	)
 
-	table.DescribeTable("should add the default network interface",
+	DescribeTable("should add the default network interface",
 		func(iface string) {
 			expectedIface := "bridge"
 			switch iface {
@@ -429,7 +430,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				},
 			})
 
-			vmiSpec, _ := getVMISpecMetaFromResponse()
+			_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 			switch expectedIface {
 			case "bridge":
 				Expect(vmiSpec.Domain.Devices.Interfaces[0].Bridge).NotTo(BeNil())
@@ -439,15 +440,15 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				Expect(vmiSpec.Domain.Devices.Interfaces[0].Slirp).NotTo(BeNil())
 			}
 		},
-		table.Entry("as bridge", "bridge"),
-		table.Entry("as masquerade", "masquerade"),
-		table.Entry("as slirp", "slirp"),
+		Entry("as bridge", "bridge"),
+		Entry("as masquerade", "masquerade"),
+		Entry("as slirp", "slirp"),
 	)
 
-	table.DescribeTable("should not add the default interfaces if", func(interfaces []v1.Interface, networks []v1.Network) {
+	DescribeTable("should not add the default interfaces if", func(interfaces []v1.Interface, networks []v1.Network) {
 		vmi.Spec.Domain.Devices.Interfaces = append([]v1.Interface{}, interfaces...)
 		vmi.Spec.Networks = append([]v1.Network{}, networks...)
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		if len(interfaces) == 0 {
 			Expect(vmiSpec.Domain.Devices.Interfaces).To(BeNil())
 		} else {
@@ -459,9 +460,9 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 			Expect(vmiSpec.Networks).To(Equal(networks))
 		}
 	},
-		table.Entry("interfaces and networks are non-empty", []v1.Interface{{Name: "a"}}, []v1.Network{{Name: "b"}}),
-		table.Entry("interfaces is non-empty", []v1.Interface{{Name: "a"}}, []v1.Network{}),
-		table.Entry("networks is non-empty", []v1.Interface{}, []v1.Network{{Name: "b"}}),
+		Entry("interfaces and networks are non-empty", []v1.Interface{{Name: "a"}}, []v1.Network{{Name: "b"}}),
+		Entry("interfaces is non-empty", []v1.Interface{{Name: "a"}}, []v1.Network{}),
+		Entry("networks is non-empty", []v1.Interface{}, []v1.Network{{Name: "b"}}),
 	)
 
 	It("should not override specified properties with defaults on VMI create", func() {
@@ -482,7 +483,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Model: "EPYC"}
 		vmi.Spec.Domain.Machine = &v1.Machine{Type: "q35"}
 
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.CPU.Model).To(Equal(vmi.Spec.Domain.CPU.Model))
 		Expect(vmiSpec.Domain.Machine.Type).To(Equal(vmi.Spec.Domain.Machine.Type))
 		Expect(vmiSpec.Domain.Resources.Requests.Cpu()).To(Equal(vmi.Spec.Domain.Resources.Requests.Cpu()))
@@ -494,7 +495,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.Resources.Requests = k8sv1.ResourceList{
 			k8sv1.ResourceCPU: resource.MustParse("2200m"),
 		}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 
 		Expect(vmiSpec.Domain.CPU.Cores).To(Equal(uint32(1)), "Expect cores")
 		Expect(vmiSpec.Domain.CPU.Sockets).To(Equal(uint32(3)), "Expect sockets")
@@ -506,7 +507,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.Resources.Requests = k8sv1.ResourceList{
 			k8sv1.ResourceCPU: resource.MustParse("2.3"),
 		}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 
 		Expect(vmiSpec.Domain.CPU.Cores).To(Equal(uint32(1)), "Expect cores")
 		Expect(vmiSpec.Domain.CPU.Sockets).To(Equal(uint32(3)), "Expect sockets")
@@ -528,7 +529,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 
 		guestMemory := resource.MustParse("3072M")
 		vmi.Spec.Domain.Memory = &v1.Memory{Guest: &guestMemory}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.Memory.Guest.String()).To(Equal("3072M"))
 		Expect(vmiSpec.Domain.Resources.Requests.Memory().String()).To(Equal("2048M"))
 	})
@@ -537,7 +538,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		// no limits wanted on this test, to not copy the limit to requests
 		mutator.NamespaceLimitsInformer, _ = testutils.NewFakeInformerFor(&k8sv1.LimitRange{})
 		vmi.Spec.Domain.Memory = &v1.Memory{Hugepages: &v1.Hugepages{PageSize: "3072M"}}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.Memory.Hugepages.PageSize).To(Equal("3072M"))
 		Expect(vmiSpec.Domain.Resources.Requests.Memory().String()).To(Equal("3072M"))
 	})
@@ -548,13 +549,13 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		}
 		guestMemory := resource.MustParse("4096M")
 		vmi.Spec.Domain.Memory = &v1.Memory{Guest: &guestMemory}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.Resources.Requests.Memory().String()).To(Equal("512M"))
 		Expect(vmiSpec.Domain.Memory.Guest.String()).To(Equal("4096M"))
 	})
 
 	It("should apply foreground finalizer on VMI create", func() {
-		_, vmiMeta := getVMISpecMetaFromResponse()
+		vmiMeta, _, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiMeta.Finalizers).To(ContainElement(v1.VirtualMachineInstanceFinalizer))
 	})
 
@@ -565,7 +566,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				k8sv1.ResourceCPU: resource.MustParse("1"),
 			},
 		}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.Resources.Requests.Cpu().String()).To(Equal("1"))
 		Expect(vmiSpec.Domain.Resources.Limits.Cpu().String()).To(Equal("1"))
 	})
@@ -577,7 +578,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				k8sv1.ResourceMemory: resource.MustParse("64M"),
 			},
 		}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.Domain.Resources.Requests.Memory().String()).To(Equal("64M"))
 		Expect(vmiSpec.Domain.Resources.Limits.Memory().String()).To(Equal("64M"))
 	})
@@ -586,11 +587,11 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.Features = &v1.Features{
 			Hyperv: &v1.FeatureHyperv{
 				SyNICTimer: &v1.SyNICTimer{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 			},
 		}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(*(vmiSpec.Domain.Features.Hyperv.VPIndex.Enabled)).To(BeTrue())
 		Expect(*(vmiSpec.Domain.Features.Hyperv.SyNIC.Enabled)).To(BeTrue())
 		Expect(*(vmiSpec.Domain.Features.Hyperv.SyNICTimer.Enabled)).To(BeTrue())
@@ -626,13 +627,13 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.Features = &v1.Features{
 			Hyperv: &v1.FeatureHyperv{
 				Relaxed: &v1.FeatureState{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 				Runtime: &v1.FeatureState{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 				Reset: &v1.FeatureState{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 			},
 		}
@@ -641,13 +642,13 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 
 		hyperv := v1.FeatureHyperv{
 			Relaxed: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			Runtime: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			Reset: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 		}
 
@@ -665,10 +666,10 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.Features = &v1.Features{
 			Hyperv: &v1.FeatureHyperv{
 				Relaxed: &v1.FeatureState{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 				SyNICTimer: &v1.SyNICTimer{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 			},
 		}
@@ -677,16 +678,16 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 
 		hyperv := v1.FeatureHyperv{
 			Relaxed: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			VPIndex: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			SyNIC: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			SyNICTimer: &v1.SyNICTimer{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 		}
 
@@ -704,14 +705,14 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		vmi.Spec.Domain.Features = &v1.Features{
 			Hyperv: &v1.FeatureHyperv{
 				VPIndex: &v1.FeatureState{
-					Enabled: &_false,
+					Enabled: pointer.Bool(false),
 				},
 				// should enable SyNIC
 				SyNICTimer: &v1.SyNICTimer{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 				EVMCS: &v1.FeatureState{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 			},
 		}
@@ -723,19 +724,19 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 
 		hyperv := v1.FeatureHyperv{
 			VPIndex: &v1.FeatureState{
-				Enabled: &_false,
+				Enabled: pointer.Bool(false),
 			},
 			SyNIC: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			SyNICTimer: &v1.SyNICTimer{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			EVMCS: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 			VAPIC: &v1.FeatureState{
-				Enabled: &_true,
+				Enabled: pointer.Bool(true),
 			},
 		}
 
@@ -747,7 +748,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		}
 		Expect(ok).To(BeTrue())
 	})
-	table.DescribeTable("modify the VMI status", func(user string, shouldChange bool) {
+	DescribeTable("modify the VMI status", func(user string, shouldChange bool) {
 		oldVMI := &v1.VirtualMachineInstance{}
 		oldVMI.Status = v1.VirtualMachineInstanceStatus{
 			Phase: v1.Running,
@@ -756,15 +757,15 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		newVMI.Status = v1.VirtualMachineInstanceStatus{
 			Phase: v1.Failed,
 		}
-		status := getVMIStatusFromResponse(oldVMI, newVMI, user)
+		status := getVMIStatusFromResponseWithUpdate(oldVMI, newVMI, user)
 		if shouldChange {
 			Expect(&newVMI.Status).To(Equal(status))
 		} else {
 			Expect(&oldVMI.Status).To(Equal(status))
 		}
 	},
-		table.Entry("if our service accounts modfies it", privilegedUser, true),
-		table.Entry("not if the user is not one of ours", "unknown", false),
+		Entry("if our service accounts modfies it", privilegedUser, true),
+		Entry("not if the user is not one of ours", "unknown", false),
 	)
 
 	// Check following convert for ARM64
@@ -776,7 +777,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		defer func() {
 			webhooks.Arch = rt.GOARCH
 		}()
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(*(vmiSpec.Domain.Firmware.Bootloader.EFI.SecureBoot)).To(BeFalse())
 		Expect(vmiSpec.Domain.CPU.Model).To(Equal("host-passthrough"))
 	})
@@ -791,7 +792,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		}
 	)
 
-	table.DescribeTable("modify the VMI cpu feature ", func(vmi *v1.VirtualMachineInstance, hyperv *v1.FeatureHyperv, resultCPUTopology *v1.CPU) {
+	DescribeTable("modify the VMI cpu feature ", func(vmi *v1.VirtualMachineInstance, hyperv *v1.FeatureHyperv, resultCPUTopology *v1.CPU) {
 		vmi.Spec.Domain.Features = &v1.Features{
 			Hyperv: hyperv,
 		}
@@ -804,21 +805,21 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		}
 
 	},
-		table.Entry("if hyperV doesn't contain EVMCS", api.NewMinimalVMI("testvmi"),
+		Entry("if hyperV doesn't contain EVMCS", api.NewMinimalVMI("testvmi"),
 			&v1.FeatureHyperv{
 				Relaxed: &v1.FeatureState{
-					Enabled: &_true,
+					Enabled: pointer.Bool(true),
 				},
 			}, nil),
 
-		table.Entry("if hyperV does contain EVMCS", api.NewMinimalVMI("testvmi"),
+		Entry("if hyperV does contain EVMCS", api.NewMinimalVMI("testvmi"),
 			&v1.FeatureHyperv{
 				EVMCS: &v1.FeatureState{},
 			}, &v1.CPU{
 				Features: cpuFeatures,
 			}),
 
-		table.Entry("if hyperV does contain EVMCS and cpu sockets ", &v1.VirtualMachineInstance{
+		Entry("if hyperV does contain EVMCS and cpu sockets ", &v1.VirtualMachineInstance{
 			Spec: v1.VirtualMachineInstanceSpec{
 				Domain: v1.DomainSpec{
 					CPU: &v1.CPU{
@@ -834,7 +835,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				Features: cpuFeatures,
 			}),
 
-		table.Entry("if hyperV does contain EVMCS and 0 cpu features ", &v1.VirtualMachineInstance{
+		Entry("if hyperV does contain EVMCS and 0 cpu features ", &v1.VirtualMachineInstance{
 			Spec: v1.VirtualMachineInstanceSpec{
 				Domain: v1.DomainSpec{
 					CPU: &v1.CPU{
@@ -849,7 +850,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				Features: cpuFeatures,
 			}),
 
-		table.Entry("if hyperV does contain EVMCS and 1 different cpu feature ", &v1.VirtualMachineInstance{
+		Entry("if hyperV does contain EVMCS and 1 different cpu feature ", &v1.VirtualMachineInstance{
 			Spec: v1.VirtualMachineInstanceSpec{
 				Domain: v1.DomainSpec{
 					CPU: &v1.CPU{
@@ -875,7 +876,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 				},
 			}),
 
-		table.Entry("if hyperV does contain EVMCS and disabled vmx cpu feature ", &v1.VirtualMachineInstance{
+		Entry("if hyperV does contain EVMCS and disabled vmx cpu feature ", &v1.VirtualMachineInstance{
 			Spec: v1.VirtualMachineInstanceSpec{
 				Domain: v1.DomainSpec{
 					CPU: &v1.CPU{
@@ -894,7 +895,7 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 			}, &v1.CPU{
 				Features: cpuFeatures,
 			}),
-		table.Entry("if hyperV does contain EVMCS and enabled vmx cpu feature ", &v1.VirtualMachineInstance{
+		Entry("if hyperV does contain EVMCS and enabled vmx cpu feature ", &v1.VirtualMachineInstance{
 			Spec: v1.VirtualMachineInstanceSpec{
 				Domain: v1.DomainSpec{
 					CPU: &v1.CPU{
@@ -930,9 +931,8 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 		})
 
 		It("Should tag vmi as non-root ", func() {
-			_, meta := getVMISpecMetaFromResponse()
-			Expect(meta.Annotations).NotTo(BeNil())
-			Expect(meta.Annotations).To(HaveKeyWithValue("kubevirt.io/nonroot", ""))
+			_, _, status := getMetaSpecStatusFromAdmit()
+			Expect(status.RuntimeUser).NotTo(BeZero())
 		})
 
 		It("Should reject VirtioFS vmi", func() {
@@ -948,26 +948,26 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 
 	It("should add realtime node label selector with realtime workload", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Realtime: &v1.Realtime{}}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).NotTo(BeNil())
 		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.RealtimeLabel: ""}))
 	})
 	It("should not add realtime node label selector when no realtime workload", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Realtime: nil}
 		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true"}))
 	})
 	It("should not overwrite existing node label selectors with realtime workload", func() {
 		vmi.Spec.Domain.CPU = &v1.CPU{Realtime: &v1.Realtime{}}
 		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true", v1.RealtimeLabel: ""}))
 	})
 
 	It("should add SEV node label selector with SEV workload", func() {
 		vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{SEV: &v1.SEV{}}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).NotTo(BeNil())
 		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.SEVLabel: ""}))
 	})
@@ -975,14 +975,14 @@ var _ = Describe("VirtualMachineInstance Mutator", func() {
 	It("should not add SEV node label selector when no SEV workload", func() {
 		vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{}
 		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true"}))
 	})
 
 	It("should not overwrite existing node label selectors with SEV workload", func() {
 		vmi.Spec.Domain.LaunchSecurity = &v1.LaunchSecurity{SEV: &v1.SEV{}}
 		vmi.Spec.NodeSelector = map[string]string{v1.NodeSchedulable: "true"}
-		vmiSpec, _ := getVMISpecMetaFromResponse()
+		_, vmiSpec, _ := getMetaSpecStatusFromAdmit()
 		Expect(vmiSpec.NodeSelector).To(BeEquivalentTo(map[string]string{v1.NodeSchedulable: "true", v1.SEVLabel: ""}))
 	})
 })

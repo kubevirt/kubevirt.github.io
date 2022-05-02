@@ -30,6 +30,10 @@ import (
 	"os"
 	"path/filepath"
 
+	"kubevirt.io/kubevirt/tests/clientcmd"
+	"kubevirt.io/kubevirt/tests/framework/checks"
+	"kubevirt.io/kubevirt/tests/testsuite"
+
 	"kubevirt.io/kubevirt/pkg/virt-operator/resource/apply"
 	. "kubevirt.io/kubevirt/tests/framework/matcher"
 	util2 "kubevirt.io/kubevirt/tests/util"
@@ -39,8 +43,7 @@ import (
 	"time"
 
 	jsonpatch "github.com/evanphx/json-patch"
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v12 "k8s.io/api/apps/v1"
 	k8sv1 "k8s.io/api/core/v1"
@@ -52,6 +55,7 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/runtime/schema"
+	"k8s.io/apimachinery/pkg/selection"
 	"k8s.io/apimachinery/pkg/types"
 	"k8s.io/apimachinery/pkg/util/rand"
 	"k8s.io/client-go/util/retry"
@@ -71,7 +75,7 @@ import (
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
 	"kubevirt.io/kubevirt/tests/flags"
-	"kubevirt.io/kubevirt/tests/libnet"
+	"kubevirt.io/kubevirt/tests/libstorage"
 )
 
 type vmSnapshotDef struct {
@@ -145,14 +149,14 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 		fetchVirtHandlerCommand                func() string
 	)
 
-	tests.BeforeAll(func() {
+	tests.DeprecatedBeforeAll(func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		util2.PanicOnError(err)
-		config, err := kubecli.GetConfig()
+		config, err := kubecli.GetKubevirtClientConfig()
 		util2.PanicOnError(err)
 		aggregatorClient = aggregatorclient.NewForConfigOrDie(config)
 
-		k8sClient = tests.GetK8sCmdClient()
+		k8sClient = clientcmd.GetK8sCmdClient()
 
 		copyOriginalCDI = func() *cdiv1.CDI {
 			newCDI := &cdiv1.CDI{
@@ -361,8 +365,20 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 				}
 
 				if !available || progressing || degraded || !created {
+					if kv.Status.ObservedGeneration != nil {
+						if *kv.Status.ObservedGeneration == kv.ObjectMeta.Generation {
+							return fmt.Errorf("observed generation must not match the current configuration")
+						}
+					}
 					return fmt.Errorf("Waiting for conditions to indicate deployment (conditions: %+v)", kv.Status.Conditions)
 				}
+
+				if kv.Status.ObservedGeneration != nil {
+					if *kv.Status.ObservedGeneration != kv.ObjectMeta.Generation {
+						return fmt.Errorf("the observed generation must match the current generation")
+					}
+				}
+
 				return nil
 			}, time.Duration(timeoutSeconds)*time.Second, 1*time.Second).ShouldNot(HaveOccurred())
 		}
@@ -508,8 +524,8 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 			image = daemonSet.Spec.Template.Spec.Containers[0].Image
 			imageRegEx := regexp.MustCompile(fmt.Sprintf("%s%s%s", `^(.*)/(.*)`, name, `([@:].*)?$`))
 			matches := imageRegEx.FindAllStringSubmatch(image, 1)
-			Expect(len(matches)).To(Equal(1))
-			Expect(len(matches[0])).To(Equal(4))
+			Expect(matches).To(HaveLen(1))
+			Expect(matches[0]).To(HaveLen(4))
 			registry = matches[0][1]
 			imagePrefix = matches[0][2]
 			version = matches[0][3]
@@ -519,8 +535,8 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 		parseImage = func(name, image string) (registry, imagePrefix, version string) {
 			imageRegEx := regexp.MustCompile(fmt.Sprintf("%s%s%s", `^(.*)/(.*)`, name, `([@:].*)?$`))
 			matches := imageRegEx.FindAllStringSubmatch(image, 1)
-			Expect(len(matches)).To(Equal(1))
-			Expect(len(matches[0])).To(Equal(4))
+			Expect(matches).To(HaveLen(1))
+			Expect(matches[0]).To(HaveLen(4))
 			registry = matches[0][1]
 			imagePrefix = matches[0][2]
 			version = matches[0][3]
@@ -588,7 +604,7 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 
 		installOperator = func(manifestPath string) {
 			// namespace is already hardcoded within the manifests
-			_, _, err = tests.RunCommandWithNS(metav1.NamespaceNone, k8sClient, "apply", "-f", manifestPath)
+			_, _, err = clientcmd.RunCommandWithNS(metav1.NamespaceNone, k8sClient, "apply", "-f", manifestPath)
 			Expect(err).ToNot(HaveOccurred())
 
 			By("Waiting for KubeVirt CRD to be created")
@@ -602,7 +618,7 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 		}
 
 		deleteOperator = func(manifestPath string) {
-			_, _, err = tests.RunCommandWithNS(metav1.NamespaceNone, k8sClient, "delete", "-f", manifestPath)
+			_, _, err = clientcmd.RunCommandWithNS(metav1.NamespaceNone, k8sClient, "delete", "-f", manifestPath)
 			Expect(err).ToNot(HaveOccurred())
 		}
 
@@ -672,10 +688,10 @@ var _ = Describe("[Serial][sig-operator]Operator", func() {
 			originalOperatorVersion = strings.TrimPrefix(version, ":")
 		}
 
-		if tests.HasDataVolumeCRD() {
+		if libstorage.HasDataVolumeCRD() {
 			cdiList, err := virtClient.CdiClient().CdiV1beta1().CDIs().List(context.Background(), metav1.ListOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(len(cdiList.Items)).To(Equal(1))
+			Expect(cdiList.Items).To(HaveLen(1))
 
 			originalCDI = &cdiList.Items[0]
 		}
@@ -1004,8 +1020,7 @@ spec:
 	BeforeEach(func() {
 		tests.BeforeTestCleanup()
 
-		workDir, err = ioutil.TempDir("", tests.TempDirPrefix+"-")
-		Expect(err).ToNot(HaveOccurred())
+		workDir = GinkgoT().TempDir()
 
 		vmYamls = make(map[string]*vmYamlDefinition)
 
@@ -1030,12 +1045,6 @@ spec:
 		By("Waiting for original KV to stabilize")
 		waitForKvWithTimeout(originalKv, 420)
 		allPodsAreReady(originalKv)
-
-		if workDir != "" {
-			err = os.RemoveAll(workDir)
-			workDir = ""
-			Expect(err).ToNot(HaveOccurred())
-		}
 
 		// repost original CDI object if it doesn't still exist
 		// in order to restore original environment
@@ -1089,7 +1098,7 @@ spec:
 		waitForKv(kv)
 	})
 
-	Describe("should reconcile components", func() {
+	Describe("[Serial]should reconcile components", func() {
 
 		deploymentName := "virt-controller"
 		daemonSetName := "virt-handler"
@@ -1098,7 +1107,7 @@ spec:
 		crdName := "virtualmachines.kubevirt.io"
 		shortNameAdded := "new"
 
-		table.DescribeTable("checking updating resource is reverted to original state for ", func(changeResource func(), getResource func() runtime.Object, compareResource func() bool) {
+		DescribeTable("checking updating resource is reverted to original state for ", func(changeResource func(), getResource func() runtime.Object, compareResource func() bool) {
 			resource := getResource()
 			By("Updating KubeVirt Object")
 			changeResource()
@@ -1128,7 +1137,7 @@ spec:
 			}, 30*time.Second, 5*time.Second).Should(Equal(generation))
 		},
 
-			table.Entry("[test_id:6254] deployments",
+			Entry("[test_id:6254] deployments",
 
 				func() {
 
@@ -1169,7 +1178,7 @@ spec:
 					return true
 				}),
 
-			table.Entry("[test_id:6255] customresourcedefinitions",
+			Entry("[test_id:6255] customresourcedefinitions",
 				func() {
 					vmcrd, err := virtClient.ExtensionsClient().ApiextensionsV1().CustomResourceDefinitions().Get(context.Background(), crdName, metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
@@ -1202,9 +1211,9 @@ spec:
 
 					return true
 				}),
-			table.Entry("[test_id:6256] poddisruptionbudgets",
+			Entry("[test_id:6256] poddisruptionbudgets",
 				func() {
-					pdb, err := virtClient.PolicyV1beta1().PodDisruptionBudgets(originalKv.Namespace).Get(context.Background(), "virt-controller-pdb", metav1.GetOptions{})
+					pdb, err := virtClient.PolicyV1().PodDisruptionBudgets(originalKv.Namespace).Get(context.Background(), "virt-controller-pdb", metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
 
 					pdb.Spec.Selector.MatchLabels = map[string]string{
@@ -1212,7 +1221,7 @@ spec:
 					}
 
 					err = retry.RetryOnConflict(retry.DefaultRetry, func() error {
-						pdb, err = virtClient.PolicyV1beta1().PodDisruptionBudgets(originalKv.Namespace).Update(context.Background(), pdb, metav1.UpdateOptions{})
+						pdb, err = virtClient.PolicyV1().PodDisruptionBudgets(originalKv.Namespace).Update(context.Background(), pdb, metav1.UpdateOptions{})
 						return err
 					})
 					Expect(err).ToNot(HaveOccurred())
@@ -1220,18 +1229,18 @@ spec:
 				},
 
 				func() runtime.Object {
-					pdb, err := virtClient.PolicyV1beta1().PodDisruptionBudgets(originalKv.Namespace).Get(context.Background(), "virt-controller-pdb", metav1.GetOptions{})
+					pdb, err := virtClient.PolicyV1().PodDisruptionBudgets(originalKv.Namespace).Get(context.Background(), "virt-controller-pdb", metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
 					return pdb
 				},
 
 				func() bool {
-					pdb, err := virtClient.PolicyV1beta1().PodDisruptionBudgets(originalKv.Namespace).Get(context.Background(), "virt-controller-pdb", metav1.GetOptions{})
+					pdb, err := virtClient.PolicyV1().PodDisruptionBudgets(originalKv.Namespace).Get(context.Background(), "virt-controller-pdb", metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
 
 					return pdb.Spec.Selector.MatchLabels["kubevirt.io"] != "dne"
 				}),
-			table.Entry("[test_id:6308] daemonsets",
+			Entry("[test_id:6308] daemonsets",
 				func() {
 					vc, err := virtClient.AppsV1().DaemonSets(originalKv.Namespace).Get(context.Background(), daemonSetName, metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
@@ -1326,7 +1335,7 @@ spec:
 			labelSelector := fmt.Sprintf(v1.CreatedByLabel + "=" + string(uid))
 			pods, err := virtClient.CoreV1().Pods(util2.NamespaceTestDefault).List(context.Background(), metav1.ListOptions{LabelSelector: labelSelector})
 			Expect(err).ToNot(HaveOccurred(), "Should list pods")
-			Expect(len(pods.Items)).To(Equal(1))
+			Expect(pods.Items).To(HaveLen(1))
 			Expect(usesSha(pods.Items[0].Spec.Containers[0].Image)).To(BeTrue(), "launcher pod should use shasum")
 
 		})
@@ -1363,9 +1372,9 @@ spec:
 		})
 	})
 
-	Describe("[test_id:4744]should apply component customization", func() {
+	Describe("[test_id:4744][Serial]should apply component customization", func() {
 
-		It("[QUARANTINE]test applying and removing a patch", func() {
+		It("test applying and removing a patch", func() {
 			annotationPatchValue := "new-annotation-value"
 			annotationPatchKey := "applied-patch"
 
@@ -1430,8 +1439,8 @@ spec:
 		// running a VM/VMI using that previous release
 		// Updating KubeVirt to the target tested code
 		// Ensuring VM/VMI is still operational after the update from previous release.
-		table.DescribeTable("[release-blocker][test_id:3145]from previous release to target tested release", func(updateOperator bool) {
-			if !tests.HasCDI() {
+		DescribeTable("[release-blocker][test_id:3145]from previous release to target tested release", func(updateOperator bool) {
+			if !libstorage.HasCDI() {
 				Skip("Skip update test when CDI is not present")
 			}
 
@@ -1537,12 +1546,12 @@ spec:
 			for _, vmYaml := range vmYamls {
 				By(fmt.Sprintf("Creating VM with %s api", vmYaml.vmName))
 				// NOTE: using kubectl to post yaml directly
-				_, _, err = tests.RunCommand(k8sClient, "create", "-f", vmYaml.yamlFile, "--cache-dir", oldClientCacheDir)
+				_, _, err = clientcmd.RunCommand(k8sClient, "create", "-f", vmYaml.yamlFile, "--cache-dir", oldClientCacheDir)
 				Expect(err).ToNot(HaveOccurred())
 
 				for _, vmSnapshot := range vmYaml.vmSnapshots {
 					By(fmt.Sprintf("Creating VM snapshot %s for vm %s", vmSnapshot.vmSnapshotName, vmYaml.vmName))
-					_, _, err = tests.RunCommand(k8sClient, "create", "-f", vmSnapshot.yamlFile, "--cache-dir", oldClientCacheDir)
+					_, _, err = clientcmd.RunCommand(k8sClient, "create", "-f", vmSnapshot.yamlFile, "--cache-dir", oldClientCacheDir)
 					Expect(err).ToNot(HaveOccurred())
 				}
 
@@ -1550,7 +1559,7 @@ spec:
 				// NOTE: we are using virtctl explicitly here because we want to start the VM
 				// using the subresource endpoint in the same way virtctl performs this.
 				By("Starting VM with virtctl")
-				startCommand := tests.NewRepeatableVirtctlCommand("start", "--namespace", util2.NamespaceTestDefault, vmYaml.vmName)
+				startCommand := clientcmd.NewRepeatableVirtctlCommand("start", "--namespace", util2.NamespaceTestDefault, vmYaml.vmName)
 				Expect(startCommand()).To(Succeed())
 
 				By(fmt.Sprintf("Waiting for VM with %s api to become ready", vmYaml.apiVersion))
@@ -1631,14 +1640,14 @@ spec:
 				Eventually(func() error {
 					vmi, err := virtClient.VirtualMachineInstance(util2.NamespaceTestDefault).Get(vmYaml.vmName, &metav1.GetOptions{})
 					Expect(err).ToNot(HaveOccurred())
-					if err := libnet.WithIPv6(console.LoginToCirros)(vmi); err != nil {
+					if err := console.LoginToCirros(vmi); err != nil {
 						return err
 					}
 					return nil
 				}, 60*time.Second, 1*time.Second).Should(BeNil())
 
 				By("Stopping VM with virtctl")
-				stopFn := tests.NewRepeatableVirtctlCommand("stop", "--namespace", util2.NamespaceTestDefault, vmYaml.vmName)
+				stopFn := clientcmd.NewRepeatableVirtctlCommand("stop", "--namespace", util2.NamespaceTestDefault, vmYaml.vmName)
 				Eventually(func() error {
 					return stopFn()
 				}, 30*time.Second, 1*time.Second).Should(BeNil())
@@ -1694,7 +1703,7 @@ spec:
 
 				By(fmt.Sprintf("Ensure vm %s can be restored from vmsnapshots", vmYaml.vmName))
 				for _, snapshot := range vmYaml.vmSnapshots {
-					_, _, err = tests.RunCommand(k8sClient, "create", "-f", snapshot.restoreYamlFile, "--cache-dir", newClientCacheDir)
+					_, _, err = clientcmd.RunCommand(k8sClient, "create", "-f", snapshot.restoreYamlFile, "--cache-dir", newClientCacheDir)
 					Expect(err).ToNot(HaveOccurred())
 					Eventually(func() bool {
 						r, err := virtClient.VirtualMachineRestore(util2.NamespaceTestDefault).Get(context.Background(), snapshot.restoreName, metav1.GetOptions{})
@@ -1706,7 +1715,7 @@ spec:
 				}
 
 				By(fmt.Sprintf("Deleting VM with %s api", vmYaml.apiVersion))
-				_, _, err = tests.RunCommand(k8sClient, "delete", "-f", vmYaml.yamlFile, "--cache-dir", newClientCacheDir)
+				_, _, err = clientcmd.RunCommand(k8sClient, "delete", "-f", vmYaml.yamlFile, "--cache-dir", newClientCacheDir)
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Waiting for VM to be removed")
@@ -1734,8 +1743,8 @@ spec:
 			By("Deleting KubeVirt object")
 			deleteAllKvAndWait(false)
 		},
-			table.Entry("by patching KubeVirt CR", false),
-			table.Entry("by updating virt-operator", true),
+			Entry("by patching KubeVirt CR", false),
+			Entry("by updating virt-operator", true),
 		)
 	})
 
@@ -1757,14 +1766,14 @@ spec:
 			sanityCheckDeploymentsDeleted()
 
 			By("ensuring that namespaces can be successfully created and deleted")
-			_, err := virtClient.CoreV1().Namespaces().Create(context.Background(), &k8sv1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: tests.NamespaceTestOperator}}, metav1.CreateOptions{})
+			_, err := virtClient.CoreV1().Namespaces().Create(context.Background(), &k8sv1.Namespace{ObjectMeta: metav1.ObjectMeta{Name: testsuite.NamespaceTestOperator}}, metav1.CreateOptions{})
 			if err != nil && !errors.IsAlreadyExists(err) {
 				Expect(err).ToNot(HaveOccurred())
 			}
-			err = virtClient.CoreV1().Namespaces().Delete(context.Background(), tests.NamespaceTestOperator, metav1.DeleteOptions{})
+			err = virtClient.CoreV1().Namespaces().Delete(context.Background(), testsuite.NamespaceTestOperator, metav1.DeleteOptions{})
 			Expect(err).ToNot(HaveOccurred())
 			Eventually(func() bool {
-				_, err := virtClient.CoreV1().Namespaces().Get(context.Background(), tests.NamespaceTestOperator, metav1.GetOptions{})
+				_, err := virtClient.CoreV1().Namespaces().Get(context.Background(), testsuite.NamespaceTestOperator, metav1.GetOptions{})
 				return errors.IsNotFound(err)
 			}, 60*time.Second, 1*time.Second).Should(BeTrue())
 
@@ -2054,7 +2063,7 @@ spec:
 		It("[test_id:4612]should create non-namespaces resources without owner references", func() {
 			crd, err := virtClient.ExtensionsClient().ApiextensionsV1().CustomResourceDefinitions().Get(context.Background(), "virtualmachineinstances.kubevirt.io", metav1.GetOptions{})
 			Expect(err).ToNot(HaveOccurred())
-			Expect(crd.ObjectMeta.OwnerReferences).To(HaveLen(0))
+			Expect(crd.ObjectMeta.OwnerReferences).To(BeEmpty())
 		})
 
 		It("[test_id:4613]should remove owner references on non-namespaces resources when updating a resource", func() {
@@ -2096,7 +2105,7 @@ spec:
 				Expect(err).ToNot(HaveOccurred())
 				return crd.OwnerReferences
 			}, 20*time.Second, 1*time.Second).Should(BeEmpty())
-			Expect(crd.ObjectMeta.OwnerReferences).To(HaveLen(0))
+			Expect(crd.ObjectMeta.OwnerReferences).To(BeEmpty())
 		})
 
 		It("[test_id:5010]should be able to update product related labels of kubevirt install", func() {
@@ -2134,7 +2143,7 @@ spec:
 		Context("[rfe_id:2897][crit:medium][vendor:cnv-qe@redhat.com][level:component]With OpenShift cluster", func() {
 
 			BeforeEach(func() {
-				if !tests.IsOpenShift() {
+				if !checks.IsOpenShift() {
 					Skip("OpenShift operator tests should not be started on k8s")
 				}
 			})
@@ -2178,7 +2187,7 @@ spec:
 				labelSelector := fmt.Sprintf(v1.CreatedByLabel + "=" + string(uid))
 				pods, err = virtClient.CoreV1().Pods(util2.NamespaceTestDefault).List(context.Background(), metav1.ListOptions{LabelSelector: labelSelector})
 				Expect(err).ToNot(HaveOccurred(), "Should get virt-launcher")
-				Expect(len(pods.Items)).To(Equal(1))
+				Expect(pods.Items).To(HaveLen(1))
 				Expect(pods.Items[0].Annotations[OpenShiftSCCLabel]).To(
 					Equal("kubevirt-controller"), "Should virt-launcher be assigned to kubevirt-controller SCC",
 				)
@@ -2207,10 +2216,10 @@ spec:
 		})
 
 		It("[test_id:3153]Ensure infra can handle dynamically detecting DataVolume Support", func() {
-			if !tests.HasDataVolumeCRD() {
+			if !libstorage.HasDataVolumeCRD() {
 				Skip("Can't test DataVolume support when DataVolume CRD isn't present")
 			}
-			tests.SkipIfVersionBelow("Skipping dynamic cdi test in versions below 1.13 because crd garbage collection is broken", "1.13")
+			checks.SkipIfVersionBelow("Skipping dynamic cdi test in versions below 1.13 because crd garbage collection is broken", "1.13")
 
 			// This tests starting infrastructure with and without the DataVolumes feature gate
 			vm = tests.NewRandomVMWithDataVolume(cd.DataVolumeImportUrlForContainerDisk(cd.ContainerDiskAlpine), util2.NamespaceTestDefault)
@@ -2490,6 +2499,28 @@ spec:
 			errMsg := fmt.Sprintf("Unsupported value: \"%s\"", incorrectOperator)
 			patchKvWorkloads(&incorrectWorkload, true, errMsg)
 		})
+
+		It("[test_id:8235]should check if kubevirt components have linux node selector", func() {
+			By("Listing only kubevirt components")
+			labelReq, err := labels.NewRequirement("app.kubernetes.io/component", selection.In, []string{"kubevirt"})
+
+			if err != nil {
+				panic(err)
+			}
+
+			pods, err := virtClient.CoreV1().Pods(flags.KubeVirtInstallNamespace).List(context.Background(), metav1.ListOptions{
+				LabelSelector: labels.NewSelector().Add(
+					*labelReq,
+				).String(),
+			})
+			Expect(err).NotTo(HaveOccurred())
+			Expect(pods.Items).NotTo(BeEmpty())
+
+			By("Checking nodeselector")
+			for _, pod := range pods.Items {
+				Expect(pod.Spec.NodeSelector).To(HaveKeyWithValue(k8sv1.LabelOSStable, "linux"), fmt.Sprintf("pod %s does not have linux node selector", pod.Name))
+			}
+		})
 	})
 
 	Context("Replicas", func() {
@@ -2527,7 +2558,7 @@ spec:
 					By(fmt.Sprintf("Expecting PDBs to disppear"))
 					Eventually(func() bool {
 						for _, name := range []string{"virt-api", "virt-controller"} {
-							_, err := virtClient.PolicyV1beta1().PodDisruptionBudgets(flags.KubeVirtInstallNamespace).Get(context.Background(), name+"-pdb", metav1.GetOptions{})
+							_, err := virtClient.PolicyV1().PodDisruptionBudgets(flags.KubeVirtInstallNamespace).Get(context.Background(), name+"-pdb", metav1.GetOptions{})
 							if err == nil {
 								return false
 							}
@@ -2538,7 +2569,7 @@ spec:
 					By(fmt.Sprintf("Expecting minAvailable to become %d on the PDBs", replicas-1))
 					Eventually(func() bool {
 						for _, name := range []string{"virt-api", "virt-controller"} {
-							pdb, err := virtClient.PolicyV1beta1().PodDisruptionBudgets(flags.KubeVirtInstallNamespace).Get(context.Background(), name+"-pdb", metav1.GetOptions{})
+							pdb, err := virtClient.PolicyV1().PodDisruptionBudgets(flags.KubeVirtInstallNamespace).Get(context.Background(), name+"-pdb", metav1.GetOptions{})
 							Expect(err).ToNot(HaveOccurred())
 							if pdb.Spec.MinAvailable.IntValue() != int(replicas-1) {
 								return false
@@ -2659,6 +2690,52 @@ spec:
 			patchKvCertConfigExpectError(kv.Name, certConfig)
 		})
 	})
+
+	Context("Obsolete ConfigMap", func() {
+		ctx := context.Background()
+		virtOpLabelSelector := metav1.ListOptions{
+			LabelSelector: "kubevirt.io=virt-operator",
+		}
+
+		AfterEach(func() {
+			// cleanup the obsolete configMap
+			_ = virtClient.CoreV1().ConfigMaps(flags.KubeVirtInstallNamespace).Delete(ctx, "kubevirt-config", metav1.DeleteOptions{})
+
+			// make sure virt-operators are up before leaving
+			Eventually(ThisDeploymentWith(flags.KubeVirtInstallNamespace, components.VirtOperatorName), 180*time.Second, 1*time.Second).Should(HaveReadyReplicasNumerically(">", 0))
+		})
+
+		It("should emit event if the obsolete kubevirt-config configMap still exists", func() {
+			cm := &k8sv1.ConfigMap{
+				ObjectMeta: metav1.ObjectMeta{
+					Name:      "kubevirt-config",
+					Namespace: flags.KubeVirtInstallNamespace,
+				},
+				Data: map[string]string{
+					"test": "data",
+				},
+			}
+
+			_, err := virtClient.CoreV1().ConfigMaps(flags.KubeVirtInstallNamespace).Create(ctx, cm, metav1.CreateOptions{})
+			Expect(err).ToNot(HaveOccurred())
+
+			err = virtClient.CoreV1().Pods(flags.KubeVirtInstallNamespace).DeleteCollection(ctx, metav1.DeleteOptions{}, virtOpLabelSelector)
+			Expect(err).ToNot(HaveOccurred())
+			Eventually(ThisDeploymentWith(flags.KubeVirtInstallNamespace, components.VirtOperatorName), 180*time.Second, 1*time.Second).Should(HaveReadyReplicasNumerically("==", 0))
+
+			Eventually(func() int {
+				events, err := virtClient.CoreV1().Events(flags.KubeVirtInstallNamespace).List(
+					context.Background(),
+					metav1.ListOptions{
+						FieldSelector: "involvedObject.kind=ConfigMap,involvedObject.name=kubevirt-config,type=Warning,reason=ObsoleteConfigMapExists",
+					},
+				)
+				Expect(err).ToNot(HaveOccurred())
+				return events.Size()
+			}, time.Minute*5, time.Second*10).ShouldNot(BeZero())
+		})
+	})
+
 })
 
 func patchCRD(orig *extv1.CustomResourceDefinition, modified *extv1.CustomResourceDefinition) []byte {

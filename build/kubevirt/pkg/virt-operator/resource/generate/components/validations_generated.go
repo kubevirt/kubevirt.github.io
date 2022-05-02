@@ -341,6 +341,10 @@ var CRDsValidation map[string]string = map[string]string{
                   description: BackingFile is the path to the virtual hard disk to
                     migrate from vCenter/ESXi
                   type: string
+                initImageURL:
+                  description: InitImageURL is an optional URL to an image containing
+                    an extracted VDDK library, overrides v2v-vmware config map
+                  type: string
                 secretRef:
                   description: SecretRef provides a reference to a secret containing
                     the username and password needed to access the vCenter or ESXi
@@ -1898,9 +1902,10 @@ var CRDsValidation map[string]string = map[string]string{
                   type: array
               type: object
             replicas:
-              description: replicas indicates how many replicas should be created
+              description: 'replicas indicates how many replicas should be created
                 for each KubeVirt infrastructure component (like virt-api or virt-controller).
-                Defaults to 2.
+                Defaults to 2. WARNING: this is an advanced feature that prevents
+                auto-scaling for core kubevirt components. Please use with caution!'
               type: integer
           type: object
         monitorAccount:
@@ -1924,6 +1929,11 @@ var CRDsValidation map[string]string = map[string]string{
           description: Designate the apps.kubevirt.io/version label for KubeVirt components.
             Useful if KubeVirt is included as part of a product. If ProductVersion
             is not specified, KubeVirt's version will be used.
+          type: string
+        serviceMonitorNamespace:
+          description: The namespace the service monitor will be deployed  When ServiceMonitorNamespace
+            is set, then we'll install the service monitor object in that namespace
+            otherwise we will use the monitoring namespace.
           type: string
         uninstallStrategy:
           description: Specifies if kubevirt can be deleted if workloads are still
@@ -2858,9 +2868,10 @@ var CRDsValidation map[string]string = map[string]string{
                   type: array
               type: object
             replicas:
-              description: replicas indicates how many replicas should be created
+              description: 'replicas indicates how many replicas should be created
                 for each KubeVirt infrastructure component (like virt-api or virt-controller).
-                Defaults to 2.
+                Defaults to 2. WARNING: this is an advanced feature that prevents
+                auto-scaling for core kubevirt components. Please use with caution!'
               type: integer
           type: object
       type: object
@@ -2931,6 +2942,9 @@ var CRDsValidation map[string]string = map[string]string{
           type: string
         observedDeploymentID:
           type: string
+        observedGeneration:
+          format: int64
+          type: integer
         observedKubeVirtRegistry:
           type: string
         observedKubeVirtVersion:
@@ -3474,6 +3488,11 @@ var CRDsValidation map[string]string = map[string]string{
                             description: BackingFile is the path to the virtual hard
                               disk to migrate from vCenter/ESXi
                             type: string
+                          initImageURL:
+                            description: InitImageURL is an optional URL to an image
+                              containing an extracted VDDK library, overrides v2v-vmware
+                              config map
+                            type: string
                           secretRef:
                             description: SecretRef provides a reference to a secret
                               containing the username and password needed to access
@@ -3656,10 +3675,6 @@ var CRDsValidation map[string]string = map[string]string{
               type: string
             name:
               description: Name is the name of the VirtualMachineFlavor or VirtualMachineClusterFlavor
-              type: string
-            profile:
-              description: Profile is the name of a custom profile in the flavor.
-                If left empty, the default profile is used.
               type: string
           required:
           - name
@@ -4902,8 +4917,8 @@ var CRDsValidation map[string]string = map[string]string{
                             disks.
                           type: boolean
                         disks:
-                          description: Disks describes disks, cdroms, floppy and luns
-                            which are connected to the vmi.
+                          description: Disks describes disks, cdroms and luns which
+                            are connected to the vmi.
                           items:
                             properties:
                               blockSize:
@@ -4984,18 +4999,6 @@ var CRDsValidation map[string]string = map[string]string{
                                   readonly:
                                     description: ReadOnly. Defaults to false.
                                     type: boolean
-                                type: object
-                              floppy:
-                                description: Attach a volume as a floppy to the vmi.
-                                properties:
-                                  readonly:
-                                    description: ReadOnly. Defaults to false.
-                                    type: boolean
-                                  tray:
-                                    description: Tray indicates if the tray of the
-                                      device is open or closed. Allowed values are
-                                      "open" and "closed". Defaults to closed.
-                                    type: string
                                 type: object
                               io:
                                 description: 'IO specifies which QEMU disk IO mode
@@ -5147,6 +5150,8 @@ var CRDsValidation map[string]string = map[string]string{
                                   without a boot order are not tried.
                                 type: integer
                               bridge:
+                                description: InterfaceBridge connects to a given network
+                                  via a linux bridge.
                                 type: object
                               dhcpOptions:
                                 description: If specified the network interface will
@@ -5192,8 +5197,13 @@ var CRDsValidation map[string]string = map[string]string{
                                   de:ad:00:00:be:af or DE-AD-00-00-BE-AF.'
                                 type: string
                               macvtap:
+                                description: InterfaceMacvtap connects to a given
+                                  network by extending the Kubernetes node's L2 networks
+                                  via a macvtap interface.
                                 type: object
                               masquerade:
+                                description: InterfaceMasquerade connects to a given
+                                  network using netfilter rules to nat the traffic.
                                 type: object
                               model:
                                 description: 'Interface model. One of: e1000, e1000e,
@@ -5240,8 +5250,12 @@ var CRDsValidation map[string]string = map[string]string{
                                   type: object
                                 type: array
                               slirp:
+                                description: InterfaceSlirp connects to a given network
+                                  using QEMU user networking mode.
                                 type: object
                               sriov:
+                                description: InterfaceSRIOV connects to a given network
+                                  by passing-through an SR-IOV PCI device via vfio.
                                 type: object
                               tag:
                                 description: If specified, the virtual network interface
@@ -5276,6 +5290,9 @@ var CRDsValidation map[string]string = map[string]string{
                               type: string
                           required:
                           - name
+                          type: object
+                        tpm:
+                          description: Whether to emulate a TPM device.
                           type: object
                         useVirtioTransitional:
                           description: Fall back to legacy virtio 0.9 support if virtio
@@ -6621,18 +6638,6 @@ var CRDsValidation map[string]string = map[string]string{
                             description: ReadOnly. Defaults to false.
                             type: boolean
                         type: object
-                      floppy:
-                        description: Attach a volume as a floppy to the vmi.
-                        properties:
-                          readonly:
-                            description: ReadOnly. Defaults to false.
-                            type: boolean
-                          tray:
-                            description: Tray indicates if the tray of the device
-                              is open or closed. Allowed values are "open" and "closed".
-                              Defaults to closed.
-                            type: string
-                        type: object
                       io:
                         description: 'IO specifies which QEMU disk IO mode should
                           be used. Supported values are: native, default, threads.'
@@ -6793,107 +6798,91 @@ var CRDsValidation map[string]string = map[string]string{
       type: string
     metadata:
       type: object
-    profiles:
-      items:
-        description: VirtualMachineFlavorProfile contains definitions that will be
-          applied to VirtualMachine.
-        properties:
-          cpu:
-            description: CPU allows specifying the CPU topology.
-            properties:
-              cores:
-                description: Cores specifies the number of cores inside the vmi. Must
-                  be a value greater or equal 1.
-                format: int32
-                type: integer
-              dedicatedCpuPlacement:
-                description: DedicatedCPUPlacement requests the scheduler to place
-                  the VirtualMachineInstance on a node with enough dedicated pCPUs
-                  and pin the vCPUs to it.
-                type: boolean
-              features:
-                description: Features specifies the CPU features list inside the VMI.
-                items:
-                  description: CPUFeature allows specifying a CPU feature.
-                  properties:
-                    name:
-                      description: Name of the CPU feature
-                      type: string
-                    policy:
-                      description: 'Policy is the CPU feature attribute which can
-                        have the following attributes: force    - The virtual CPU
-                        will claim the feature is supported regardless of it being
-                        supported by host CPU. require  - Guest creation will fail
-                        unless the feature is supported by the host CPU or the hypervisor
-                        is able to emulate it. optional - The feature will be supported
-                        by virtual CPU if and only if it is supported by host CPU.
-                        disable  - The feature will not be supported by virtual CPU.
-                        forbid   - Guest creation will fail if the feature is supported
-                        by host CPU. Defaults to require'
-                      type: string
-                  required:
-                  - name
-                  type: object
-                type: array
-              isolateEmulatorThread:
-                description: IsolateEmulatorThread requests one more dedicated pCPU
-                  to be allocated for the VMI to place the emulator thread on it.
-                type: boolean
-              model:
-                description: Model specifies the CPU model inside the VMI. List of
-                  available models https://github.com/libvirt/libvirt/tree/master/src/cpu_map.
-                  It is possible to specify special cases like "host-passthrough"
-                  to get the same CPU as the node and "host-model" to get CPU closest
-                  to the node one. Defaults to host-model.
-                type: string
-              numa:
-                description: NUMA allows specifying settings for the guest NUMA topology
+    spec:
+      description: VirtualMachineFlavorSpec for the flavor
+      properties:
+        cpu:
+          description: CPU allows specifying the CPU topology.
+          properties:
+            cores:
+              description: Cores specifies the number of cores inside the vmi. Must
+                be a value greater or equal 1.
+              format: int32
+              type: integer
+            dedicatedCpuPlacement:
+              description: DedicatedCPUPlacement requests the scheduler to place the
+                VirtualMachineInstance on a node with enough dedicated pCPUs and pin
+                the vCPUs to it.
+              type: boolean
+            features:
+              description: Features specifies the CPU features list inside the VMI.
+              items:
+                description: CPUFeature allows specifying a CPU feature.
                 properties:
-                  guestMappingPassthrough:
-                    description: GuestMappingPassthrough will create an efficient
-                      guest topology based on host CPUs exclusively assigned to a
-                      pod. The created topology ensures that memory and CPUs on the
-                      virtual numa nodes never cross boundaries of host numa nodes.
-                    type: object
-                type: object
-              realtime:
-                description: Realtime instructs the virt-launcher to tune the VMI
-                  for lower latency, optional for real time workloads
-                properties:
-                  mask:
-                    description: 'Mask defines the vcpu mask expression that defines
-                      which vcpus are used for realtime. Format matches libvirt''s
-                      expressions. Example: "0-3,^1","0,2,3","2-3"'
+                  name:
+                    description: Name of the CPU feature
                     type: string
+                  policy:
+                    description: 'Policy is the CPU feature attribute which can have
+                      the following attributes: force    - The virtual CPU will claim
+                      the feature is supported regardless of it being supported by
+                      host CPU. require  - Guest creation will fail unless the feature
+                      is supported by the host CPU or the hypervisor is able to emulate
+                      it. optional - The feature will be supported by virtual CPU
+                      if and only if it is supported by host CPU. disable  - The feature
+                      will not be supported by virtual CPU. forbid   - Guest creation
+                      will fail if the feature is supported by host CPU. Defaults
+                      to require'
+                    type: string
+                required:
+                - name
                 type: object
-              sockets:
-                description: Sockets specifies the number of sockets inside the vmi.
-                  Must be a value greater or equal 1.
-                format: int32
-                type: integer
-              threads:
-                description: Threads specifies the number of threads inside the vmi.
-                  Must be a value greater or equal 1.
-                format: int32
-                type: integer
-            type: object
-          default:
-            description: Default specifies if this VirtualMachineFlavorProfile is
-              the default for the VirtualMachineFlavor. Zero or one profile can be
-              set to default.
-            type: boolean
-          name:
-            description: Name specifies the name of this custom profile.
-            type: string
-        required:
-        - name
-        type: object
-      type: array
-      x-kubernetes-list-map-keys:
-      - name
-      x-kubernetes-list-type: map
+              type: array
+            isolateEmulatorThread:
+              description: IsolateEmulatorThread requests one more dedicated pCPU
+                to be allocated for the VMI to place the emulator thread on it.
+              type: boolean
+            model:
+              description: Model specifies the CPU model inside the VMI. List of available
+                models https://github.com/libvirt/libvirt/tree/master/src/cpu_map.
+                It is possible to specify special cases like "host-passthrough" to
+                get the same CPU as the node and "host-model" to get CPU closest to
+                the node one. Defaults to host-model.
+              type: string
+            numa:
+              description: NUMA allows specifying settings for the guest NUMA topology
+              properties:
+                guestMappingPassthrough:
+                  description: GuestMappingPassthrough will create an efficient guest
+                    topology based on host CPUs exclusively assigned to a pod. The
+                    created topology ensures that memory and CPUs on the virtual numa
+                    nodes never cross boundaries of host numa nodes.
+                  type: object
+              type: object
+            realtime:
+              description: Realtime instructs the virt-launcher to tune the VMI for
+                lower latency, optional for real time workloads
+              properties:
+                mask:
+                  description: 'Mask defines the vcpu mask expression that defines
+                    which vcpus are used for realtime. Format matches libvirt''s expressions.
+                    Example: "0-3,^1","0,2,3","2-3"'
+                  type: string
+              type: object
+            sockets:
+              description: Sockets specifies the number of sockets inside the vmi.
+                Must be a value greater or equal 1.
+              format: int32
+              type: integer
+            threads:
+              description: Threads specifies the number of threads inside the vmi.
+                Must be a value greater or equal 1.
+              format: int32
+              type: integer
+          type: object
+      type: object
   required:
-  - profiles
+  - spec
   type: object
 `,
 	"virtualmachineflavor": `openAPIV3Schema:
@@ -6912,107 +6901,91 @@ var CRDsValidation map[string]string = map[string]string{
       type: string
     metadata:
       type: object
-    profiles:
-      items:
-        description: VirtualMachineFlavorProfile contains definitions that will be
-          applied to VirtualMachine.
-        properties:
-          cpu:
-            description: CPU allows specifying the CPU topology.
-            properties:
-              cores:
-                description: Cores specifies the number of cores inside the vmi. Must
-                  be a value greater or equal 1.
-                format: int32
-                type: integer
-              dedicatedCpuPlacement:
-                description: DedicatedCPUPlacement requests the scheduler to place
-                  the VirtualMachineInstance on a node with enough dedicated pCPUs
-                  and pin the vCPUs to it.
-                type: boolean
-              features:
-                description: Features specifies the CPU features list inside the VMI.
-                items:
-                  description: CPUFeature allows specifying a CPU feature.
-                  properties:
-                    name:
-                      description: Name of the CPU feature
-                      type: string
-                    policy:
-                      description: 'Policy is the CPU feature attribute which can
-                        have the following attributes: force    - The virtual CPU
-                        will claim the feature is supported regardless of it being
-                        supported by host CPU. require  - Guest creation will fail
-                        unless the feature is supported by the host CPU or the hypervisor
-                        is able to emulate it. optional - The feature will be supported
-                        by virtual CPU if and only if it is supported by host CPU.
-                        disable  - The feature will not be supported by virtual CPU.
-                        forbid   - Guest creation will fail if the feature is supported
-                        by host CPU. Defaults to require'
-                      type: string
-                  required:
-                  - name
-                  type: object
-                type: array
-              isolateEmulatorThread:
-                description: IsolateEmulatorThread requests one more dedicated pCPU
-                  to be allocated for the VMI to place the emulator thread on it.
-                type: boolean
-              model:
-                description: Model specifies the CPU model inside the VMI. List of
-                  available models https://github.com/libvirt/libvirt/tree/master/src/cpu_map.
-                  It is possible to specify special cases like "host-passthrough"
-                  to get the same CPU as the node and "host-model" to get CPU closest
-                  to the node one. Defaults to host-model.
-                type: string
-              numa:
-                description: NUMA allows specifying settings for the guest NUMA topology
+    spec:
+      description: VirtualMachineFlavorSpec for the flavor
+      properties:
+        cpu:
+          description: CPU allows specifying the CPU topology.
+          properties:
+            cores:
+              description: Cores specifies the number of cores inside the vmi. Must
+                be a value greater or equal 1.
+              format: int32
+              type: integer
+            dedicatedCpuPlacement:
+              description: DedicatedCPUPlacement requests the scheduler to place the
+                VirtualMachineInstance on a node with enough dedicated pCPUs and pin
+                the vCPUs to it.
+              type: boolean
+            features:
+              description: Features specifies the CPU features list inside the VMI.
+              items:
+                description: CPUFeature allows specifying a CPU feature.
                 properties:
-                  guestMappingPassthrough:
-                    description: GuestMappingPassthrough will create an efficient
-                      guest topology based on host CPUs exclusively assigned to a
-                      pod. The created topology ensures that memory and CPUs on the
-                      virtual numa nodes never cross boundaries of host numa nodes.
-                    type: object
-                type: object
-              realtime:
-                description: Realtime instructs the virt-launcher to tune the VMI
-                  for lower latency, optional for real time workloads
-                properties:
-                  mask:
-                    description: 'Mask defines the vcpu mask expression that defines
-                      which vcpus are used for realtime. Format matches libvirt''s
-                      expressions. Example: "0-3,^1","0,2,3","2-3"'
+                  name:
+                    description: Name of the CPU feature
                     type: string
+                  policy:
+                    description: 'Policy is the CPU feature attribute which can have
+                      the following attributes: force    - The virtual CPU will claim
+                      the feature is supported regardless of it being supported by
+                      host CPU. require  - Guest creation will fail unless the feature
+                      is supported by the host CPU or the hypervisor is able to emulate
+                      it. optional - The feature will be supported by virtual CPU
+                      if and only if it is supported by host CPU. disable  - The feature
+                      will not be supported by virtual CPU. forbid   - Guest creation
+                      will fail if the feature is supported by host CPU. Defaults
+                      to require'
+                    type: string
+                required:
+                - name
                 type: object
-              sockets:
-                description: Sockets specifies the number of sockets inside the vmi.
-                  Must be a value greater or equal 1.
-                format: int32
-                type: integer
-              threads:
-                description: Threads specifies the number of threads inside the vmi.
-                  Must be a value greater or equal 1.
-                format: int32
-                type: integer
-            type: object
-          default:
-            description: Default specifies if this VirtualMachineFlavorProfile is
-              the default for the VirtualMachineFlavor. Zero or one profile can be
-              set to default.
-            type: boolean
-          name:
-            description: Name specifies the name of this custom profile.
-            type: string
-        required:
-        - name
-        type: object
-      type: array
-      x-kubernetes-list-map-keys:
-      - name
-      x-kubernetes-list-type: map
+              type: array
+            isolateEmulatorThread:
+              description: IsolateEmulatorThread requests one more dedicated pCPU
+                to be allocated for the VMI to place the emulator thread on it.
+              type: boolean
+            model:
+              description: Model specifies the CPU model inside the VMI. List of available
+                models https://github.com/libvirt/libvirt/tree/master/src/cpu_map.
+                It is possible to specify special cases like "host-passthrough" to
+                get the same CPU as the node and "host-model" to get CPU closest to
+                the node one. Defaults to host-model.
+              type: string
+            numa:
+              description: NUMA allows specifying settings for the guest NUMA topology
+              properties:
+                guestMappingPassthrough:
+                  description: GuestMappingPassthrough will create an efficient guest
+                    topology based on host CPUs exclusively assigned to a pod. The
+                    created topology ensures that memory and CPUs on the virtual numa
+                    nodes never cross boundaries of host numa nodes.
+                  type: object
+              type: object
+            realtime:
+              description: Realtime instructs the virt-launcher to tune the VMI for
+                lower latency, optional for real time workloads
+              properties:
+                mask:
+                  description: 'Mask defines the vcpu mask expression that defines
+                    which vcpus are used for realtime. Format matches libvirt''s expressions.
+                    Example: "0-3,^1","0,2,3","2-3"'
+                  type: string
+              type: object
+            sockets:
+              description: Sockets specifies the number of sockets inside the vmi.
+                Must be a value greater or equal 1.
+              format: int32
+              type: integer
+            threads:
+              description: Threads specifies the number of threads inside the vmi.
+                Must be a value greater or equal 1.
+              format: int32
+              type: integer
+          type: object
+      type: object
   required:
-  - profiles
+  - spec
   type: object
 `,
 	"virtualmachineinstance": `openAPIV3Schema:
@@ -8168,8 +8141,8 @@ var CRDsValidation map[string]string = map[string]string{
                   description: DisableHotplug disabled the ability to hotplug disks.
                   type: boolean
                 disks:
-                  description: Disks describes disks, cdroms, floppy and luns which
-                    are connected to the vmi.
+                  description: Disks describes disks, cdroms and luns which are connected
+                    to the vmi.
                   items:
                     properties:
                       blockSize:
@@ -8245,18 +8218,6 @@ var CRDsValidation map[string]string = map[string]string{
                           readonly:
                             description: ReadOnly. Defaults to false.
                             type: boolean
-                        type: object
-                      floppy:
-                        description: Attach a volume as a floppy to the vmi.
-                        properties:
-                          readonly:
-                            description: ReadOnly. Defaults to false.
-                            type: boolean
-                          tray:
-                            description: Tray indicates if the tray of the device
-                              is open or closed. Allowed values are "open" and "closed".
-                              Defaults to closed.
-                            type: string
                         type: object
                       io:
                         description: 'IO specifies which QEMU disk IO mode should
@@ -8402,6 +8363,8 @@ var CRDsValidation map[string]string = map[string]string{
                           unique value. Interfaces without a boot order are not tried.
                         type: integer
                       bridge:
+                        description: InterfaceBridge connects to a given network via
+                          a linux bridge.
                         type: object
                       dhcpOptions:
                         description: If specified the network interface will pass
@@ -8447,8 +8410,13 @@ var CRDsValidation map[string]string = map[string]string{
                           or DE-AD-00-00-BE-AF.'
                         type: string
                       macvtap:
+                        description: InterfaceMacvtap connects to a given network
+                          by extending the Kubernetes node's L2 networks via a macvtap
+                          interface.
                         type: object
                       masquerade:
+                        description: InterfaceMasquerade connects to a given network
+                          using netfilter rules to nat the traffic.
                         type: object
                       model:
                         description: 'Interface model. One of: e1000, e1000e, ne2k_pci,
@@ -8492,8 +8460,12 @@ var CRDsValidation map[string]string = map[string]string{
                           type: object
                         type: array
                       slirp:
+                        description: InterfaceSlirp connects to a given network using
+                          QEMU user networking mode.
                         type: object
                       sriov:
+                        description: InterfaceSRIOV connects to a given network by
+                          passing-through an SR-IOV PCI device via vfio.
                         type: object
                       tag:
                         description: If specified, the virtual network interface address
@@ -8526,6 +8498,9 @@ var CRDsValidation map[string]string = map[string]string{
                       type: string
                   required:
                   - name
+                  type: object
+                tpm:
+                  description: Whether to emulate a TPM device.
                   type: object
                 useVirtioTransitional:
                   description: Fall back to legacy virtio 0.9 support if virtio bus
@@ -9879,6 +9854,11 @@ var CRDsValidation map[string]string = map[string]string{
           description: A brief CamelCase message indicating details about why the
             VMI is in this state. e.g. 'NodeUnresponsive'
           type: string
+        runtimeUser:
+          description: RuntimeUser is used to determine what user will be used in
+            launcher
+          format: int64
+          type: integer
         topologyHints:
           properties:
             tscFrequency:
@@ -10285,8 +10265,8 @@ var CRDsValidation map[string]string = map[string]string{
                   description: DisableHotplug disabled the ability to hotplug disks.
                   type: boolean
                 disks:
-                  description: Disks describes disks, cdroms, floppy and luns which
-                    are connected to the vmi.
+                  description: Disks describes disks, cdroms and luns which are connected
+                    to the vmi.
                   items:
                     properties:
                       blockSize:
@@ -10362,18 +10342,6 @@ var CRDsValidation map[string]string = map[string]string{
                           readonly:
                             description: ReadOnly. Defaults to false.
                             type: boolean
-                        type: object
-                      floppy:
-                        description: Attach a volume as a floppy to the vmi.
-                        properties:
-                          readonly:
-                            description: ReadOnly. Defaults to false.
-                            type: boolean
-                          tray:
-                            description: Tray indicates if the tray of the device
-                              is open or closed. Allowed values are "open" and "closed".
-                              Defaults to closed.
-                            type: string
                         type: object
                       io:
                         description: 'IO specifies which QEMU disk IO mode should
@@ -10519,6 +10487,8 @@ var CRDsValidation map[string]string = map[string]string{
                           unique value. Interfaces without a boot order are not tried.
                         type: integer
                       bridge:
+                        description: InterfaceBridge connects to a given network via
+                          a linux bridge.
                         type: object
                       dhcpOptions:
                         description: If specified the network interface will pass
@@ -10564,8 +10534,13 @@ var CRDsValidation map[string]string = map[string]string{
                           or DE-AD-00-00-BE-AF.'
                         type: string
                       macvtap:
+                        description: InterfaceMacvtap connects to a given network
+                          by extending the Kubernetes node's L2 networks via a macvtap
+                          interface.
                         type: object
                       masquerade:
+                        description: InterfaceMasquerade connects to a given network
+                          using netfilter rules to nat the traffic.
                         type: object
                       model:
                         description: 'Interface model. One of: e1000, e1000e, ne2k_pci,
@@ -10609,8 +10584,12 @@ var CRDsValidation map[string]string = map[string]string{
                           type: object
                         type: array
                       slirp:
+                        description: InterfaceSlirp connects to a given network using
+                          QEMU user networking mode.
                         type: object
                       sriov:
+                        description: InterfaceSRIOV connects to a given network by
+                          passing-through an SR-IOV PCI device via vfio.
                         type: object
                       tag:
                         description: If specified, the virtual network interface address
@@ -10643,6 +10622,9 @@ var CRDsValidation map[string]string = map[string]string{
                       type: string
                   required:
                   - name
+                  type: object
+                tpm:
+                  description: Whether to emulate a TPM device.
                   type: object
                 useVirtioTransitional:
                   description: Fall back to legacy virtio 0.9 support if virtio bus
@@ -12353,8 +12335,8 @@ var CRDsValidation map[string]string = map[string]string{
                             disks.
                           type: boolean
                         disks:
-                          description: Disks describes disks, cdroms, floppy and luns
-                            which are connected to the vmi.
+                          description: Disks describes disks, cdroms and luns which
+                            are connected to the vmi.
                           items:
                             properties:
                               blockSize:
@@ -12435,18 +12417,6 @@ var CRDsValidation map[string]string = map[string]string{
                                   readonly:
                                     description: ReadOnly. Defaults to false.
                                     type: boolean
-                                type: object
-                              floppy:
-                                description: Attach a volume as a floppy to the vmi.
-                                properties:
-                                  readonly:
-                                    description: ReadOnly. Defaults to false.
-                                    type: boolean
-                                  tray:
-                                    description: Tray indicates if the tray of the
-                                      device is open or closed. Allowed values are
-                                      "open" and "closed". Defaults to closed.
-                                    type: string
                                 type: object
                               io:
                                 description: 'IO specifies which QEMU disk IO mode
@@ -12598,6 +12568,8 @@ var CRDsValidation map[string]string = map[string]string{
                                   without a boot order are not tried.
                                 type: integer
                               bridge:
+                                description: InterfaceBridge connects to a given network
+                                  via a linux bridge.
                                 type: object
                               dhcpOptions:
                                 description: If specified the network interface will
@@ -12643,8 +12615,13 @@ var CRDsValidation map[string]string = map[string]string{
                                   de:ad:00:00:be:af or DE-AD-00-00-BE-AF.'
                                 type: string
                               macvtap:
+                                description: InterfaceMacvtap connects to a given
+                                  network by extending the Kubernetes node's L2 networks
+                                  via a macvtap interface.
                                 type: object
                               masquerade:
+                                description: InterfaceMasquerade connects to a given
+                                  network using netfilter rules to nat the traffic.
                                 type: object
                               model:
                                 description: 'Interface model. One of: e1000, e1000e,
@@ -12691,8 +12668,12 @@ var CRDsValidation map[string]string = map[string]string{
                                   type: object
                                 type: array
                               slirp:
+                                description: InterfaceSlirp connects to a given network
+                                  using QEMU user networking mode.
                                 type: object
                               sriov:
+                                description: InterfaceSRIOV connects to a given network
+                                  by passing-through an SR-IOV PCI device via vfio.
                                 type: object
                               tag:
                                 description: If specified, the virtual network interface
@@ -12727,6 +12708,9 @@ var CRDsValidation map[string]string = map[string]string{
                               type: string
                           required:
                           - name
+                          type: object
+                        tpm:
+                          description: Whether to emulate a TPM device.
                           type: object
                         useVirtioTransitional:
                           description: Fall back to legacy virtio 0.9 support if virtio
@@ -14405,6 +14389,11 @@ var CRDsValidation map[string]string = map[string]string{
                                     description: BackingFile is the path to the virtual
                                       hard disk to migrate from vCenter/ESXi
                                     type: string
+                                  initImageURL:
+                                    description: InitImageURL is an optional URL to
+                                      an image containing an extracted VDDK library,
+                                      overrides v2v-vmware config map
+                                    type: string
                                   secretRef:
                                     description: SecretRef provides a reference to
                                       a secret containing the username and password
@@ -14597,10 +14586,6 @@ var CRDsValidation map[string]string = map[string]string{
                     name:
                       description: Name is the name of the VirtualMachineFlavor or
                         VirtualMachineClusterFlavor
-                      type: string
-                    profile:
-                      description: Profile is the name of a custom profile in the
-                        flavor. If left empty, the default profile is used.
                       type: string
                   required:
                   - name
@@ -15953,8 +15938,8 @@ var CRDsValidation map[string]string = map[string]string{
                                     to hotplug disks.
                                   type: boolean
                                 disks:
-                                  description: Disks describes disks, cdroms, floppy
-                                    and luns which are connected to the vmi.
+                                  description: Disks describes disks, cdroms and luns
+                                    which are connected to the vmi.
                                   items:
                                     properties:
                                       blockSize:
@@ -16043,20 +16028,6 @@ var CRDsValidation map[string]string = map[string]string{
                                           readonly:
                                             description: ReadOnly. Defaults to false.
                                             type: boolean
-                                        type: object
-                                      floppy:
-                                        description: Attach a volume as a floppy to
-                                          the vmi.
-                                        properties:
-                                          readonly:
-                                            description: ReadOnly. Defaults to false.
-                                            type: boolean
-                                          tray:
-                                            description: Tray indicates if the tray
-                                              of the device is open or closed. Allowed
-                                              values are "open" and "closed". Defaults
-                                              to closed.
-                                            type: string
                                         type: object
                                       io:
                                         description: 'IO specifies which QEMU disk
@@ -16217,6 +16188,8 @@ var CRDsValidation map[string]string = map[string]string{
                                           a boot order are not tried.
                                         type: integer
                                       bridge:
+                                        description: InterfaceBridge connects to a
+                                          given network via a linux bridge.
                                         type: object
                                       dhcpOptions:
                                         description: If specified the network interface
@@ -16265,8 +16238,14 @@ var CRDsValidation map[string]string = map[string]string{
                                           de:ad:00:00:be:af or DE-AD-00-00-BE-AF.'
                                         type: string
                                       macvtap:
+                                        description: InterfaceMacvtap connects to
+                                          a given network by extending the Kubernetes
+                                          node's L2 networks via a macvtap interface.
                                         type: object
                                       masquerade:
+                                        description: InterfaceMasquerade connects
+                                          to a given network using netfilter rules
+                                          to nat the traffic.
                                         type: object
                                       model:
                                         description: 'Interface model. One of: e1000,
@@ -16317,8 +16296,14 @@ var CRDsValidation map[string]string = map[string]string{
                                           type: object
                                         type: array
                                       slirp:
+                                        description: InterfaceSlirp connects to a
+                                          given network using QEMU user networking
+                                          mode.
                                         type: object
                                       sriov:
+                                        description: InterfaceSRIOV connects to a
+                                          given network by passing-through an SR-IOV
+                                          PCI device via vfio.
                                         type: object
                                       tag:
                                         description: If specified, the virtual network
@@ -16356,6 +16341,9 @@ var CRDsValidation map[string]string = map[string]string{
                                       type: string
                                   required:
                                   - name
+                                  type: object
+                                tpm:
+                                  description: Whether to emulate a TPM device.
                                   type: object
                                 useVirtioTransitional:
                                   description: Fall back to legacy virtio 0.9 support
@@ -17653,6 +17641,16 @@ var CRDsValidation map[string]string = map[string]string{
     spec:
       description: VirtualMachineRestoreSpec is the spec for a VirtualMachineRestoreresource
       properties:
+        patches:
+          description: "If the target for the restore does not exist, it will be created.
+            Patches holds JSON patches that would be applied to the target manifest
+            before it's created. Patches should fit the target's Kind. \n Example
+            for a patch: {\"op\": \"replace\", \"path\": \"/metadata/name\", \"value\":
+            \"new-vm-name\"}"
+          items:
+            type: string
+          type: array
+          x-kubernetes-list-type: atomic
         target:
           description: initially only VirtualMachine type supported
           properties:
@@ -17879,28 +17877,13 @@ var CRDsValidation map[string]string = map[string]string{
             snapshotted
           properties:
             virtualMachine:
-              description: VirtualMachine handles the VirtualMachines that are not
-                running or are in a stopped state The VirtualMachine contains the
-                template to create the VirtualMachineInstance. It also mirrors the
-                running state of the created VirtualMachineInstance in its status.
               properties:
-                apiVersion:
-                  description: 'APIVersion defines the versioned schema of this representation
-                    of an object. Servers should convert recognized schemas to the
-                    latest internal value, and may reject unrecognized values. More
-                    info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources'
-                  type: string
-                kind:
-                  description: 'Kind is a string value representing the REST resource
-                    this object represents. Servers may infer this from the endpoint
-                    the client submits requests to. Cannot be updated. In CamelCase.
-                    More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds'
-                  type: string
                 metadata:
+                  nullable: true
                   type: object
+                  x-kubernetes-preserve-unknown-fields: true
                 spec:
-                  description: Spec contains the specification of VirtualMachineInstance
-                    created
+                  description: VirtualMachineSpec contains the VirtualMachine specification.
                   properties:
                     dataVolumeTemplates:
                       description: dataVolumeTemplates is a list of dataVolumes that
@@ -18304,6 +18287,11 @@ var CRDsValidation map[string]string = map[string]string{
                                         description: BackingFile is the path to the
                                           virtual hard disk to migrate from vCenter/ESXi
                                         type: string
+                                      initImageURL:
+                                        description: InitImageURL is an optional URL
+                                          to an image containing an extracted VDDK
+                                          library, overrides v2v-vmware config map
+                                        type: string
                                       secretRef:
                                         description: SecretRef provides a reference
                                           to a secret containing the username and
@@ -18505,10 +18493,6 @@ var CRDsValidation map[string]string = map[string]string{
                         name:
                           description: Name is the name of the VirtualMachineFlavor
                             or VirtualMachineClusterFlavor
-                          type: string
-                        profile:
-                          description: Profile is the name of a custom profile in
-                            the flavor. If left empty, the default profile is used.
                           type: string
                       required:
                       - name
@@ -19937,9 +19921,8 @@ var CRDsValidation map[string]string = map[string]string{
                                         to hotplug disks.
                                       type: boolean
                                     disks:
-                                      description: Disks describes disks, cdroms,
-                                        floppy and luns which are connected to the
-                                        vmi.
+                                      description: Disks describes disks, cdroms and
+                                        luns which are connected to the vmi.
                                       items:
                                         properties:
                                           blockSize:
@@ -20031,21 +20014,6 @@ var CRDsValidation map[string]string = map[string]string{
                                                 description: ReadOnly. Defaults to
                                                   false.
                                                 type: boolean
-                                            type: object
-                                          floppy:
-                                            description: Attach a volume as a floppy
-                                              to the vmi.
-                                            properties:
-                                              readonly:
-                                                description: ReadOnly. Defaults to
-                                                  false.
-                                                type: boolean
-                                              tray:
-                                                description: Tray indicates if the
-                                                  tray of the device is open or closed.
-                                                  Allowed values are "open" and "closed".
-                                                  Defaults to closed.
-                                                type: string
                                             type: object
                                           io:
                                             description: 'IO specifies which QEMU
@@ -20212,6 +20180,8 @@ var CRDsValidation map[string]string = map[string]string{
                                               without a boot order are not tried.
                                             type: integer
                                           bridge:
+                                            description: InterfaceBridge connects
+                                              to a given network via a linux bridge.
                                             type: object
                                           dhcpOptions:
                                             description: If specified the network
@@ -20261,8 +20231,15 @@ var CRDsValidation map[string]string = map[string]string{
                                               example: de:ad:00:00:be:af or DE-AD-00-00-BE-AF.'
                                             type: string
                                           macvtap:
+                                            description: InterfaceMacvtap connects
+                                              to a given network by extending the
+                                              Kubernetes node's L2 networks via a
+                                              macvtap interface.
                                             type: object
                                           masquerade:
+                                            description: InterfaceMasquerade connects
+                                              to a given network using netfilter rules
+                                              to nat the traffic.
                                             type: object
                                           model:
                                             description: 'Interface model. One of:
@@ -20316,8 +20293,14 @@ var CRDsValidation map[string]string = map[string]string{
                                               type: object
                                             type: array
                                           slirp:
+                                            description: InterfaceSlirp connects to
+                                              a given network using QEMU user networking
+                                              mode.
                                             type: object
                                           sriov:
+                                            description: InterfaceSRIOV connects to
+                                              a given network by passing-through an
+                                              SR-IOV PCI device via vfio.
                                             type: object
                                           tag:
                                             description: If specified, the virtual
@@ -20356,6 +20339,9 @@ var CRDsValidation map[string]string = map[string]string{
                                           type: string
                                       required:
                                       - name
+                                      type: object
+                                    tpm:
+                                      description: Whether to emulate a TPM device.
                                       type: object
                                     useVirtioTransitional:
                                       description: Fall back to legacy virtio 0.9
@@ -21825,19 +21811,6 @@ var CRDsValidation map[string]string = map[string]string{
                                         description: ReadOnly. Defaults to false.
                                         type: boolean
                                     type: object
-                                  floppy:
-                                    description: Attach a volume as a floppy to the
-                                      vmi.
-                                    properties:
-                                      readonly:
-                                        description: ReadOnly. Defaults to false.
-                                        type: boolean
-                                      tray:
-                                        description: Tray indicates if the tray of
-                                          the device is open or closed. Allowed values
-                                          are "open" and "closed". Defaults to closed.
-                                        type: string
-                                    type: object
                                   io:
                                     description: 'IO specifies which QEMU disk IO
                                       mode should be used. Supported values are: native,
@@ -21984,8 +21957,6 @@ var CRDsValidation map[string]string = map[string]string{
                         type: object
                       type: array
                   type: object
-              required:
-              - spec
               type: object
           type: object
         virtualMachineSnapshotName:

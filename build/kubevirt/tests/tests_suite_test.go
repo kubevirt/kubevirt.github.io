@@ -26,15 +26,14 @@ import (
 	"strconv"
 	"testing"
 
-	. "github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/config"
-	ginkgo_reporters "github.com/onsi/ginkgo/reporters"
+	. "github.com/onsi/ginkgo/v2"
+	ginkgo_reporters "github.com/onsi/ginkgo/v2/reporters"
 
 	"kubevirt.io/kubevirt/tests/flags"
-
 	"kubevirt.io/kubevirt/tests/reporter"
+	"kubevirt.io/kubevirt/tests/testsuite"
 
-	"kubevirt.io/kubevirt/tests"
+	v1reporter "kubevirt.io/client-go/reporter"
 	qe_reporters "kubevirt.io/qe-tools/pkg/ginkgo-reporters"
 
 	vmsgeneratorutils "kubevirt.io/kubevirt/tools/vms-generator/utils"
@@ -45,51 +44,54 @@ import (
 	_ "kubevirt.io/kubevirt/tests/numa"
 	_ "kubevirt.io/kubevirt/tests/performance"
 	_ "kubevirt.io/kubevirt/tests/realtime"
+	_ "kubevirt.io/kubevirt/tests/scale"
 	_ "kubevirt.io/kubevirt/tests/storage"
-	_ "kubevirt.io/kubevirt/tests/virtoperatorbasic"
+	_ "kubevirt.io/kubevirt/tests/virtctl"
 )
 
-var justAfterEachReporter = []reporter.JustAfterEachReporter{}
+var afterSuiteReporters = []Reporter{}
+var k8sReporter *reporter.KubernetesReporter
 
 func TestTests(t *testing.T) {
 	flags.NormalizeFlags()
-	tests.CalculateNamespaces()
+	testsuite.CalculateNamespaces()
 	maxFails := getMaxFailsFromEnv()
 	artifactsPath := filepath.Join(flags.ArtifactsDir, "k8s-reporter")
 	junitOutput := filepath.Join(flags.ArtifactsDir, "junit.functest.xml")
 	if qe_reporters.JunitOutput != "" {
 		junitOutput = qe_reporters.JunitOutput
 	}
-	if config.GinkgoConfig.ParallelTotal > 1 {
-		artifactsPath = filepath.Join(artifactsPath, strconv.Itoa(config.GinkgoConfig.ParallelNode))
-		junitOutput = filepath.Join(flags.ArtifactsDir, fmt.Sprintf("partial.junit.functest.%d.xml", config.GinkgoConfig.ParallelNode))
+
+	suiteConfig, _ := GinkgoConfiguration()
+	if suiteConfig.ParallelTotal > 1 {
+		artifactsPath = filepath.Join(artifactsPath, strconv.Itoa(GinkgoParallelProcess()))
+		junitOutput = filepath.Join(flags.ArtifactsDir, fmt.Sprintf("partial.junit.functest.%d.xml", GinkgoParallelProcess()))
 	}
 
 	outputEnricherReporter := reporter.NewCapturedOutputEnricher(
-		ginkgo_reporters.NewJUnitReporter(junitOutput),
+		v1reporter.NewV1JUnitReporter(junitOutput),
 	)
-	k8sReporter := reporter.NewKubernetesReporter(artifactsPath, maxFails)
-	justAfterEachReporter = append(justAfterEachReporter, outputEnricherReporter, k8sReporter)
-	reporters := []Reporter{
-		outputEnricherReporter,
-		k8sReporter,
-	}
+	afterSuiteReporters = append(afterSuiteReporters, outputEnricherReporter)
+
 	if qe_reporters.Polarion.Run {
-		if config.GinkgoConfig.ParallelTotal > 1 {
-			qe_reporters.Polarion.Filename = filepath.Join(flags.ArtifactsDir, fmt.Sprintf("partial.polarion.functest.%d.xml", config.GinkgoConfig.ParallelNode))
+		if suiteConfig.ParallelTotal > 1 {
+			qe_reporters.Polarion.Filename = filepath.Join(flags.ArtifactsDir, fmt.Sprintf("partial.polarion.functest.%d.xml", GinkgoParallelProcess()))
 		}
-		reporters = append(reporters, &qe_reporters.Polarion)
+		afterSuiteReporters = append(afterSuiteReporters, &qe_reporters.Polarion)
 	}
+
+	k8sReporter = reporter.NewKubernetesReporter(artifactsPath, maxFails)
+	k8sReporter.Cleanup()
 
 	vmsgeneratorutils.DockerPrefix = flags.KubeVirtUtilityRepoPrefix
 	vmsgeneratorutils.DockerTag = flags.KubeVirtVersionTag
 
-	RunSpecsWithDefaultAndCustomReporters(t, "Tests Suite", reporters)
+	RunSpecs(t, "Tests Suite")
 }
 
-var _ = SynchronizedBeforeSuite(tests.SynchronizedBeforeTestSetup, tests.BeforeTestSuitSetup)
+var _ = SynchronizedBeforeSuite(testsuite.SynchronizedBeforeTestSetup, testsuite.BeforeTestSuitSetup)
 
-var _ = SynchronizedAfterSuite(tests.AfterTestSuitCleanup, tests.SynchronizedAfterTestSuiteCleanup)
+var _ = SynchronizedAfterSuite(testsuite.AfterTestSuitCleanup, testsuite.SynchronizedAfterTestSuiteCleanup)
 
 func getMaxFailsFromEnv() int {
 	maxFailsEnv := os.Getenv("REPORTER_MAX_FAILS")
@@ -106,10 +108,16 @@ func getMaxFailsFromEnv() int {
 	return maxFails
 }
 
-// Collect info directly after each `It` execution with our reporters
-// to collect the state directly after the spec.
-var _ = JustAfterEach(func() {
-	for _, reporter := range justAfterEachReporter {
-		reporter.JustAfterEach(CurrentGinkgoTestDescription())
+var _ = ReportAfterSuite("TestTests", func(report Report) {
+	for _, reporter := range afterSuiteReporters {
+		ginkgo_reporters.ReportViaDeprecatedReporter(reporter, report)
 	}
+})
+
+var _ = ReportBeforeEach(func(specReport SpecReport) {
+	k8sReporter.JustBeforeEach(CurrentSpecReport())
+})
+
+var _ = ReportAfterEach(func(specReport SpecReport) {
+	k8sReporter.JustAfterEach(CurrentSpecReport())
 })

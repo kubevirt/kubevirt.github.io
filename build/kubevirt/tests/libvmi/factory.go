@@ -33,46 +33,13 @@ const (
 
 // NewFedora instantiates a new Fedora based VMI configuration,
 // building its extra properties based on the specified With* options.
+// This image has tooling for the guest agent, stress, SR-IOV and more.
 func NewFedora(opts ...Option) *kvirtv1.VirtualMachineInstance {
-	return NewTestToolingFedora(opts...)
-}
-
-// NewTestToolingFedora instantiates a new Fedora based VMI configuration,
-// building its extra properties based on the specified With* options.
-// This image has tooling for the guest agent, stress, and more
-func NewTestToolingFedora(opts ...Option) *kvirtv1.VirtualMachineInstance {
-	return newFedora(cd.ContainerDiskFedoraTestTooling, opts...)
-}
-
-// NewSriovFedora instantiates a new Fedora based VMI configuration,
-// building its extra properties based on the specified With* options, the
-// image used include Guest Agent and some moduled needed by SRIOV.
-func NewSriovFedora(opts ...Option) *kvirtv1.VirtualMachineInstance {
-	return newFedora(cd.ContainerDiskFedoraTestTooling, opts...)
-}
-
-// NewSEVFedora instantiates a new Fedora based VMI configuration,
-// building its extra properties based on the specified With* options, the
-// image used is configured for UEFI boot and it supports AMD SEV.
-func NewSEVFedora(opts ...Option) *kvirtv1.VirtualMachineInstance {
-	const secureBoot = false
-	sevOptions := []Option{
-		WithUefi(secureBoot),
-		WithSEV(),
-	}
-	opts = append(sevOptions, opts...)
-	return newFedora(cd.ContainerDiskFedoraTestTooling, opts...)
-}
-
-// NewFedora instantiates a new Fedora based VMI configuration with specified
-// containerDisk, building its extra properties based on the specified With*
-// options.
-func newFedora(containerDisk cd.ContainerDisk, opts ...Option) *kvirtv1.VirtualMachineInstance {
 	fedoraOptions := []Option{
 		WithTerminationGracePeriod(DefaultTestGracePeriod),
 		WithResourceMemory("512M"),
 		WithRng(),
-		WithContainerImage(cd.ContainerDiskFor(containerDisk)),
+		WithContainerImage(cd.ContainerDiskFor(cd.ContainerDiskFedoraTestTooling)),
 	}
 	opts = append(fedoraOptions, opts...)
 	return New(RandName(DefaultVmiName), opts...)
@@ -80,9 +47,12 @@ func newFedora(containerDisk cd.ContainerDisk, opts ...Option) *kvirtv1.VirtualM
 
 // NewCirros instantiates a new CirrOS based VMI configuration
 func NewCirros(opts ...Option) *kvirtv1.VirtualMachineInstance {
+	// Supplied with no user data, Cirros image takes 230s to allow login
+	withNonEmptyUserData := WithCloudInitNoCloudUserData("#!/bin/bash\necho hello\n", true)
+
 	cirrosOpts := []Option{
 		WithContainerImage(cd.ContainerDiskFor(cd.ContainerDiskCirros)),
-		WithCloudInitNoCloudUserData("#!/bin/bash\necho 'hello'\n", true),
+		withNonEmptyUserData,
 		WithResourceMemory("128Mi"),
 		WithTerminationGracePeriod(DefaultTestGracePeriod),
 	}
@@ -94,7 +64,17 @@ func NewCirros(opts ...Option) *kvirtv1.VirtualMachineInstance {
 func NewAlpine(opts ...Option) *kvirtv1.VirtualMachineInstance {
 	alpineOpts := []Option{
 		WithContainerImage(cd.ContainerDiskFor(cd.ContainerDiskAlpine)),
-		WithCloudInitNoCloudUserData("#!/bin/bash\necho 'hello'\n", true),
+		WithResourceMemory("128Mi"),
+		WithRng(),
+		WithTerminationGracePeriod(DefaultTestGracePeriod),
+	}
+	alpineOpts = append(alpineOpts, opts...)
+	return New(RandName(DefaultVmiName), alpineOpts...)
+}
+
+func NewAlpineWithTestTooling(opts ...Option) *kvirtv1.VirtualMachineInstance {
+	alpineOpts := []Option{
+		WithContainerImage(cd.ContainerDiskFor(cd.ContainerDiskAlpineTestTooling)),
 		WithResourceMemory("128Mi"),
 		WithRng(),
 		WithTerminationGracePeriod(DefaultTestGracePeriod),

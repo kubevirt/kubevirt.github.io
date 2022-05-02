@@ -641,6 +641,14 @@
 <lastmod>2022-02-09T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2022/changelog-v0.51.0.html</loc>
+<lastmod>2022-03-08T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>https://kubevirt.io//2022/changelog-v0.52.0.html</loc>
+<lastmod>2022-04-08T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -723,6 +731,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/news</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//node-maintenance-operator/</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//privacy/</loc>

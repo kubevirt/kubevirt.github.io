@@ -27,6 +27,8 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/kubectl/pkg/cmd/util/podcmd"
+
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -84,6 +86,7 @@ const (
 	CAP_NET_RAW          = "NET_RAW"
 	CAP_SYS_ADMIN        = "SYS_ADMIN"
 	CAP_SYS_NICE         = "SYS_NICE"
+	CAP_SYS_PTRACE       = "SYS_PTRACE"
 )
 
 // LibvirtStartupDelay is added to custom liveness and readiness probes initial delay value.
@@ -118,6 +121,14 @@ const ENV_VAR_POD_NAME = "POD_NAME"
 const EXT_LOG_VERBOSITY_THRESHOLD = 5
 
 const ephemeralStorageOverheadSize = "50M"
+
+const (
+	VirtLauncherMonitorOverhead = "25Mi" // The `ps` RSS for virt-launcher-monitor
+	VirtLauncherOverhead        = "75Mi" // The `ps` RSS for the virt-launcher process
+	VirtlogdOverhead            = "16Mi" // The `ps` RSS for virtlogd
+	LibvirtdOverhead            = "33Mi" // The `ps` RSS for libvirtd
+	QemuOverhead                = "30Mi" // The `ps` RSS for qemu, minus the RAM of its (stressed) guest, minus the virtual page table
+)
 
 type TemplateService interface {
 	RenderMigrationManifest(vmi *v1.VirtualMachineInstance, sourcePod *k8sv1.Pod) (*k8sv1.Pod, error)
@@ -1043,7 +1054,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, i
 			"-c",
 			"echo", "bound PVCs"}
 	} else {
-		command = []string{"/usr/bin/virt-launcher",
+		command = []string{"/usr/bin/virt-launcher-monitor",
 			"--qemu-timeout", generateQemuTimeoutWithJitter(t.launcherQemuTimeout),
 			"--name", domain,
 			"--uid", string(vmi.UID),
@@ -1094,8 +1105,6 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, i
 	// Add ports from interfaces to the pod manifest
 	ports := getPortsFromVMI(vmi)
 
-	capabilities := getRequiredCapabilities(vmi, t.clusterConfig)
-
 	networkToResourceMap, err := getNetworkToResourceMap(t.virtClient, vmi)
 	if err != nil {
 		return nil, err
@@ -1138,7 +1147,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, i
 			RunAsUser:  &userId,
 			Privileged: &privileged,
 			Capabilities: &k8sv1.Capabilities{
-				Add:  capabilities,
+				Add:  getRequiredCapabilities(vmi),
 				Drop: []k8sv1.Capability{CAP_NET_RAW},
 			},
 		},
@@ -1298,6 +1307,8 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, i
 		nodeSelector[k] = v
 	}
 
+	hostName := dns.SanitizeHostname(vmi)
+
 	podLabels := map[string]string{}
 
 	for k, v := range vmi.Labels {
@@ -1305,6 +1316,7 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, i
 	}
 	podLabels[v1.AppLabel] = "virt-launcher"
 	podLabels[v1.CreatedByLabel] = string(vmi.UID)
+	podLabels[v1.VirtualMachineNameLabel] = hostName
 
 	for i, requestedHookSidecar := range requestedHookSidecarList {
 		resources := k8sv1.ResourceRequirements{}
@@ -1339,8 +1351,6 @@ func (t *templateService) renderLaunchManifest(vmi *v1.VirtualMachineInstance, i
 		}
 		containers = append(containers, sidecar)
 	}
-
-	hostName := dns.SanitizeHostname(vmi)
 
 	podAnnotations, err := generatePodAnnotations(vmi)
 	if err != nil {
@@ -1785,39 +1795,23 @@ func getVirtiofsCapabilities() []k8sv1.Capability {
 	}
 }
 
-func requireDHCP(vmi *v1.VirtualMachineInstance) bool {
-	for _, iface := range vmi.Spec.Domain.Devices.Interfaces {
-		if iface.Bridge != nil || iface.Masquerade != nil {
-			return true
+func getRequiredCapabilities(vmi *v1.VirtualMachineInstance) []k8sv1.Capability {
+	// These capabilies are always required because we set them on virt-launcher binary
+	// add CAP_SYS_PTRACE capability needed by libvirt + swtpm
+	// TODO: drop SYS_PTRACE after updating libvirt to a release containing:
+	// https://github.com/libvirt/libvirt/commit/a9c500d2b50c5c041a1bb6ae9724402cf1cec8fe
+	capabilities := []k8sv1.Capability{CAP_NET_BIND_SERVICE, CAP_SYS_PTRACE}
+
+	if !util.IsNonRootVMI(vmi) {
+		// add a CAP_SYS_NICE capability to allow setting cpu affinity
+		capabilities = append(capabilities, CAP_SYS_NICE)
+		// add CAP_SYS_ADMIN capability to allow virtiofs
+		if util.IsVMIVirtiofsEnabled(vmi) {
+			capabilities = append(capabilities, CAP_SYS_ADMIN)
+			capabilities = append(capabilities, getVirtiofsCapabilities()...)
 		}
 	}
-	return false
-}
 
-func haveSlirp(vmi *v1.VirtualMachineInstance) bool {
-	for _, iface := range vmi.Spec.Domain.Devices.Interfaces {
-		if iface.Slirp != nil {
-			return true
-		}
-	}
-	return false
-}
-
-func getRequiredCapabilities(vmi *v1.VirtualMachineInstance, config *virtconfig.ClusterConfig) []k8sv1.Capability {
-	if util.IsNonRootVMI(vmi) {
-		return []k8sv1.Capability{CAP_NET_BIND_SERVICE}
-	}
-	capabilities := []k8sv1.Capability{}
-	if requireDHCP(vmi) || haveSlirp(vmi) {
-		capabilities = append(capabilities, CAP_NET_BIND_SERVICE)
-	}
-	// add a CAP_SYS_NICE capability to allow setting cpu affinity
-	capabilities = append(capabilities, CAP_SYS_NICE)
-	// add CAP_SYS_ADMIN capability to allow virtiofs
-	if util.IsVMIVirtiofsEnabled(vmi) {
-		capabilities = append(capabilities, CAP_SYS_ADMIN)
-		capabilities = append(capabilities, getVirtiofsCapabilities()...)
-	}
 	return capabilities
 }
 
@@ -1866,9 +1860,14 @@ func GetMemoryOverhead(vmi *v1.VirtualMachineInstance, cpuArch string) *resource
 	pagetableMemory.Set(pagetableMemory.Value() / 512)
 	overhead.Add(*pagetableMemory)
 
-	// Add fixed overhead for shared libraries and such
-	// TODO account for the overhead of kubevirt components running in the pod
-	overhead.Add(resource.MustParse("138Mi"))
+	// Add fixed overhead for KubeVirt components, as seen in a random run, rounded up to the nearest MiB
+	// Note: shared libraries are included in the size, so every library is counted (wrongly) as many times as there are
+	//   processes using it. However, the extra memory is only in the order of 10MiB and makes for a nice safety margin.
+	overhead.Add(resource.MustParse(VirtLauncherMonitorOverhead))
+	overhead.Add(resource.MustParse(VirtLauncherOverhead))
+	overhead.Add(resource.MustParse(VirtlogdOverhead))
+	overhead.Add(resource.MustParse(LibvirtdOverhead))
+	overhead.Add(resource.MustParse(QemuOverhead))
 
 	// Add CPU table overhead (8 MiB per vCPU and 8 MiB per IO thread)
 	// overhead per vcpu in MiB
@@ -1930,6 +1929,12 @@ func GetMemoryOverhead(vmi *v1.VirtualMachineInstance, cpuArch string) *resource
 	// Additional information can be found here: https://libvirt.org/kbase/launch_security_sev.html#memory
 	if util.IsSEVVMI(vmi) {
 		overhead.Add(resource.MustParse("256Mi"))
+	}
+
+	// Having a TPM device will spawn a swtpm process
+	// In `ps`, swtpm has VSZ of 53808 and RSS of 3496, so 53Mi should do
+	if vmi.Spec.Domain.Devices.TPM != nil {
+		overhead.Add(resource.MustParse("53Mi"))
 	}
 
 	return overhead
@@ -2174,6 +2179,8 @@ func generatePodAnnotations(vmi *v1.VirtualMachineInstance) (map[string]string, 
 	for k, v := range filterVMIAnnotationsForPod(vmi.Annotations) {
 		annotationsSet[k] = v
 	}
+
+	annotationsSet[podcmd.DefaultContainerAnnotationName] = "compute"
 
 	multusAnnotation, err := generateMultusCNIAnnotation(vmi)
 	if err != nil {

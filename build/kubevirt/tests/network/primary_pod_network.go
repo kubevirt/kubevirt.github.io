@@ -22,7 +22,7 @@ package network
 import (
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
 	"kubevirt.io/kubevirt/tests/util"
@@ -90,6 +90,7 @@ var _ = SIGDescribe("Primary Pod Network", func() {
 					}
 				)
 				BeforeEach(func() {
+					libnet.SkipWhenClusterNotSupportIpv4(virtClient)
 					var err error
 
 					vmi, err = newFedoraWithGuestAgentAndDefaultInterface(libvmi.InterfaceDeviceWithBridgeBinding(libvmi.DefaultInterfaceName))
@@ -231,7 +232,7 @@ func newFedoraWithGuestAgentAndDefaultInterface(iface v1.Interface) (*v1.Virtual
 		return nil, err
 	}
 
-	vmi := libvmi.NewTestToolingFedora(
+	vmi := libvmi.NewFedora(
 		libvmi.WithInterface(iface),
 		libvmi.WithNetwork(v1.DefaultPodNetwork()),
 		libvmi.WithCloudInitNoCloudNetworkData(networkData, false),

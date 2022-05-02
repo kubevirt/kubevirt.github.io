@@ -25,7 +25,7 @@ import (
 	"path"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -43,9 +43,11 @@ const (
 	x86PenrynXml = "x86_Penryn.xml"
 )
 
-var _ = Describe("Node-labeller config", func() {
-	var nlController *NodeLabeller
-	var virtClient *kubecli.MockKubevirtClient
+var nlController *NodeLabeller
+
+var _ = BeforeSuite(func() {
+	ctrl := gomock.NewController(GinkgoT())
+	virtClient := kubecli.NewMockKubevirtClient(ctrl)
 
 	kv := &kubevirtv1.KubeVirt{
 		ObjectMeta: metav1.ObjectMeta{
@@ -62,21 +64,18 @@ var _ = Describe("Node-labeller config", func() {
 
 	clusterConfig, _, _ := testutils.NewFakeClusterConfigUsingKV(kv)
 
-	BeforeSuite(func() {
-		ctrl := gomock.NewController(GinkgoT())
-		virtClient = kubecli.NewMockKubevirtClient(ctrl)
+	nlController = &NodeLabeller{
+		namespace:               k8sv1.NamespaceDefault,
+		clientset:               virtClient,
+		clusterConfig:           clusterConfig,
+		logger:                  log.DefaultLogger(),
+		volumePath:              "testdata",
+		domCapabilitiesFileName: "virsh_domcapabilities.xml",
+		hostCPUModel:            hostCPUModel{requiredFeatures: make(map[string]bool, 0)},
+	}
+})
 
-		nlController = &NodeLabeller{
-			namespace:               k8sv1.NamespaceDefault,
-			clientset:               virtClient,
-			clusterConfig:           clusterConfig,
-			logger:                  log.DefaultLogger(),
-			volumePath:              "testdata",
-			domCapabilitiesFileName: "virsh_domcapabilities.xml",
-			hostCPUModel:            hostCPUModel{requiredFeatures: make(map[string]bool, 0)},
-		}
-	})
-
+var _ = Describe("Node-labeller config", func() {
 	It("should return correct cpu file path", func() {
 		p := getPathCPUFeatures(nlController.volumePath, x86PenrynXml)
 		correctPath := path.Join(nlController.volumePath, "cpu_map", x86PenrynXml)
@@ -111,9 +110,9 @@ var _ = Describe("Node-labeller config", func() {
 		cpuModels := nlController.getSupportedCpuModels()
 		cpuFeatures := nlController.getSupportedCpuFeatures()
 
-		Expect(len(cpuModels)).To(Equal(3), "number of models must match")
+		Expect(cpuModels).To(HaveLen(3), "number of models must match")
 
-		Expect(len(cpuFeatures)).To(Equal(2), "number of features must match")
+		Expect(cpuFeatures).To(HaveLen(2), "number of features must match")
 		counter, err := nlController.capabilities.GetTSCCounter()
 		Expect(err).ToNot(HaveOccurred())
 		Expect(counter).ToNot(BeNil())
@@ -132,9 +131,9 @@ var _ = Describe("Node-labeller config", func() {
 		cpuModels := nlController.getSupportedCpuModels()
 		cpuFeatures := nlController.getSupportedCpuFeatures()
 
-		Expect(len(cpuModels)).To(Equal(0), "number of models doesn't match")
+		Expect(cpuModels).To(BeEmpty(), "number of models doesn't match")
 
-		Expect(len(cpuFeatures)).To(Equal(2), "number of features doesn't match")
+		Expect(cpuFeatures).To(HaveLen(2), "number of features doesn't match")
 	})
 
 	Context("should return correct host cpu", func() {

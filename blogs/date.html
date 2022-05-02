@@ -19,6 +19,7 @@
     <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
     <meta name="go-import" content="kubevirt.io/containerized-data-importer-api git https://github.com/kubevirt/containerized-data-importer-api">
     <meta name="go-import" content="kubevirt.io/api git https://github.com/kubevirt/api">
+    <meta name="go-import" content="kubevirt.io/node-maintenance-operator git https://github.com/kubevirt/node-maintenance-operator">
     <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
@@ -46,7 +47,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2022-02-17 20:26:35 +0000" >
+    <meta property="og:article:published_time" content="2022-05-02 15:06:52 +0000" >
     <meta name="twitter:title" content="Grouped by Date | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -487,8 +488,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
       
         
+      
+
+    
+
+      
+      
+      
+
+      
         
         
+        
 
     
 
@@ -499,6 +510,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
     
     
+
+    
+
+      
+      
+      
+
+      
+        
+      
 
     
 
@@ -3470,7 +3491,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <h2>Post calendar</h2>
 <table class="table table-striped blogcalendar">
   <tbody>
-    <tr><th></th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th></tr><tr><th>2022</th><td><a href="#2022-1">3</a></td><td><a href="#2022-2">1</a></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><th>2021</th><td><a href="#2021-1">2</a></td><td><a href="#2021-2">1</a></td><td><a href="#2021-3">2</a></td><td><a href="#2021-4">3</a></td><td><a href="#2021-5">1</a></td><td><a href="#2021-6">1</a></td><td><a href="#2021-7">2</a></td><td><a href="#2021-8">2</a></td><td><a href="#2021-9">2</a></td><td><a href="#2021-10">2</a></td><td>&nbsp;</td><td><a href="#2021-12">1</a></td></tr><tr><th>2020</th><td><a href="#2020-1">3</a></td><td><a href="#2020-2">5</a></td><td><a href="#2020-3">2</a></td><td><a href="#2020-4">4</a></td><td><a href="#2020-5">3</a></td><td><a href="#2020-6">2</a></td><td><a href="#2020-7">3</a></td><td><a href="#2020-8">2</a></td><td><a href="#2020-9">1</a></td><td><a href="#2020-10">2</a></td><td><a href="#2020-11">1</a></td><td><a href="#2020-12">4</a></td></tr><tr><th>2019</th><td><a href="#2019-1">3</a></td><td><a href="#2019-2">2</a></td><td><a href="#2019-3">2</a></td><td><a href="#2019-4">2</a></td><td><a href="#2019-5">2</a></td><td><a href="#2019-6">2</a></td><td><a href="#2019-7">5</a></td><td><a href="#2019-8">3</a></td><td><a href="#2019-9">2</a></td><td><a href="#2019-10">7</a></td><td><a href="#2019-11">5</a></td><td><a href="#2019-12">4</a></td></tr><tr><th>2018</th><td><a href="#2018-1">5</a></td><td><a href="#2018-2">2</a></td><td><a href="#2018-3">3</a></td><td><a href="#2018-4">4</a></td><td><a href="#2018-5">8</a></td><td><a href="#2018-6">6</a></td><td><a href="#2018-7">3</a></td><td><a href="#2018-8">1</a></td><td><a href="#2018-9">3</a></td><td><a href="#2018-10">4</a></td><td><a href="#2018-11">4</a></td><td><a href="#2018-12">2</a></td></tr><tr><th>2017</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td><a href="#2017-7">2</a></td><td>&nbsp;</td><td><a href="#2017-9">4</a></td><td><a href="#2017-10">4</a></td><td><a href="#2017-11">5</a></td><td><a href="#2017-12">4</a></td></tr>
+    <tr><th></th><th>Jan</th><th>Feb</th><th>Mar</th><th>Apr</th><th>May</th><th>Jun</th><th>Jul</th><th>Aug</th><th>Sep</th><th>Oct</th><th>Nov</th><th>Dec</th></tr><tr><th>2022</th><td><a href="#2022-1">3</a></td><td><a href="#2022-2">1</a></td><td><a href="#2022-3">1</a></td><td><a href="#2022-4">1</a></td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr><tr><th>2021</th><td><a href="#2021-1">2</a></td><td><a href="#2021-2">1</a></td><td><a href="#2021-3">2</a></td><td><a href="#2021-4">3</a></td><td><a href="#2021-5">1</a></td><td><a href="#2021-6">1</a></td><td><a href="#2021-7">2</a></td><td><a href="#2021-8">2</a></td><td><a href="#2021-9">2</a></td><td><a href="#2021-10">2</a></td><td>&nbsp;</td><td><a href="#2021-12">1</a></td></tr><tr><th>2020</th><td><a href="#2020-1">3</a></td><td><a href="#2020-2">5</a></td><td><a href="#2020-3">2</a></td><td><a href="#2020-4">4</a></td><td><a href="#2020-5">3</a></td><td><a href="#2020-6">2</a></td><td><a href="#2020-7">3</a></td><td><a href="#2020-8">2</a></td><td><a href="#2020-9">1</a></td><td><a href="#2020-10">2</a></td><td><a href="#2020-11">1</a></td><td><a href="#2020-12">4</a></td></tr><tr><th>2019</th><td><a href="#2019-1">3</a></td><td><a href="#2019-2">2</a></td><td><a href="#2019-3">2</a></td><td><a href="#2019-4">2</a></td><td><a href="#2019-5">2</a></td><td><a href="#2019-6">2</a></td><td><a href="#2019-7">5</a></td><td><a href="#2019-8">3</a></td><td><a href="#2019-9">2</a></td><td><a href="#2019-10">7</a></td><td><a href="#2019-11">5</a></td><td><a href="#2019-12">4</a></td></tr><tr><th>2018</th><td><a href="#2018-1">5</a></td><td><a href="#2018-2">2</a></td><td><a href="#2018-3">3</a></td><td><a href="#2018-4">4</a></td><td><a href="#2018-5">8</a></td><td><a href="#2018-6">6</a></td><td><a href="#2018-7">3</a></td><td><a href="#2018-8">1</a></td><td><a href="#2018-9">3</a></td><td><a href="#2018-10">4</a></td><td><a href="#2018-11">4</a></td><td><a href="#2018-12">2</a></td></tr><tr><th>2017</th><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td><a href="#2017-7">2</a></td><td>&nbsp;</td><td><a href="#2017-9">4</a></td><td><a href="#2017-10">4</a></td><td><a href="#2017-11">5</a></td><td><a href="#2017-12">4</a></td></tr>
   </tbody>
 </table>
 
@@ -3655,12 +3676,36 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
       
         
+      
+    
+      
+      
+      
+
+      
+        
         
         
 
     
 
     
+    
+
+      
+      
+      
+
+      
+
+      <h4 id="2022-4">April</h4>
+      <ul style="list-style: none;">
+      
+        <li>
+          📅 08: <a href="/2022/changelog-v0.52.0.html">KubeVirt v0.52.0</a>
+        </li>
+      
+      </ul>
     
 
 
@@ -3675,12 +3720,36 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
       
         
+      
+    
+      
+      
+      
+
+      
+        
         
         
 
     
 
     
+    
+
+      
+      
+      
+
+      
+
+      <h4 id="2022-3">March</h4>
+      <ul style="list-style: none;">
+      
+        <li>
+          📅 08: <a href="/2022/changelog-v0.51.0.html">KubeVirt v0.51.0</a>
+        </li>
+      
+      </ul>
     
 
 

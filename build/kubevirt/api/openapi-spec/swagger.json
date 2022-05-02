@@ -12593,7 +12593,7 @@
       "$ref": "#/definitions/v1.NodePlacement"
      },
      "replicas": {
-      "description": "replicas indicates how many replicas should be created for each KubeVirt infrastructure component (like virt-api or virt-controller). Defaults to 2.",
+      "description": "replicas indicates how many replicas should be created for each KubeVirt infrastructure component (like virt-api or virt-controller). Defaults to 2. WARNING: this is an advanced feature that prevents auto-scaling for core kubevirt components. Please use with caution!",
       "type": "integer",
       "format": "byte"
      }
@@ -12877,7 +12877,7 @@
       "type": "boolean"
      },
      "disks": {
-      "description": "Disks describes disks, cdroms, floppy and luns which are connected to the vmi.",
+      "description": "Disks describes disks, cdroms and luns which are connected to the vmi.",
       "type": "array",
       "items": {
        "$ref": "#/definitions/v1.Disk"
@@ -12933,6 +12933,10 @@
       "description": "Whether to emulate a sound device.",
       "$ref": "#/definitions/v1.SoundDevice"
      },
+     "tpm": {
+      "description": "Whether to emulate a TPM device.",
+      "$ref": "#/definitions/v1.TPMDevice"
+     },
      "useVirtioTransitional": {
       "description": "Fall back to legacy virtio 0.9 support if virtio bus is selected on devices. This is helpful for old machines like CentOS6 or RHEL6 which do not understand virtio_non_transitional (virtio 1.0).",
       "type": "boolean"
@@ -12973,10 +12977,6 @@
      "disk": {
       "description": "Attach a volume as a disk to the vmi.",
       "$ref": "#/definitions/v1.DiskTarget"
-     },
-     "floppy": {
-      "description": "Attach a volume as a floppy to the vmi.",
-      "$ref": "#/definitions/v1.FloppyTarget"
      },
      "io": {
       "description": "IO specifies which QEMU disk IO mode should be used. Supported values are: native, default, threads.",
@@ -13367,23 +13367,6 @@
      "name": {
       "description": "Name is the name of the VirtualMachineFlavor or VirtualMachineClusterFlavor",
       "type": "string"
-     },
-     "profile": {
-      "description": "Profile is the name of a custom profile in the flavor. If left empty, the default profile is used.",
-      "type": "string"
-     }
-    }
-   },
-   "v1.FloppyTarget": {
-    "type": "object",
-    "properties": {
-     "readonly": {
-      "description": "ReadOnly. Defaults to false.",
-      "type": "boolean"
-     },
-     "tray": {
-      "description": "Tray indicates if the tray of the device is open or closed. Allowed values are \"open\" and \"closed\". Defaults to closed.",
-      "type": "string"
      }
     }
    },
@@ -13675,18 +13658,23 @@
     }
    },
    "v1.InterfaceBridge": {
+    "description": "InterfaceBridge connects to a given network via a linux bridge.",
     "type": "object"
    },
    "v1.InterfaceMacvtap": {
+    "description": "InterfaceMacvtap connects to a given network by extending the Kubernetes node's L2 networks via a macvtap interface.",
     "type": "object"
    },
    "v1.InterfaceMasquerade": {
+    "description": "InterfaceMasquerade connects to a given network using netfilter rules to nat the traffic.",
     "type": "object"
    },
    "v1.InterfaceSRIOV": {
+    "description": "InterfaceSRIOV connects to a given network by passing-through an SR-IOV PCI device via vfio.",
     "type": "object"
    },
    "v1.InterfaceSlirp": {
+    "description": "InterfaceSlirp connects to a given network using QEMU user networking mode.",
     "type": "object"
    },
    "v1.KVMTimer": {
@@ -14000,6 +13988,10 @@
       "description": "Designate the apps.kubevirt.io/version label for KubeVirt components. Useful if KubeVirt is included as part of a product. If ProductVersion is not specified, KubeVirt's version will be used.",
       "type": "string"
      },
+     "serviceMonitorNamespace": {
+      "description": "The namespace the service monitor will be deployed\n When ServiceMonitorNamespace is set, then we'll install the service monitor object in that namespace\notherwise we will use the monitoring namespace.",
+      "type": "string"
+     },
      "uninstallStrategy": {
       "description": "Specifies if kubevirt can be deleted if workloads are still present. This is mainly a precaution to avoid accidental data loss",
       "type": "string"
@@ -14037,6 +14029,10 @@
      },
      "observedDeploymentID": {
       "type": "string"
+     },
+     "observedGeneration": {
+      "type": "integer",
+      "format": "int64"
      },
      "observedKubeVirtRegistry": {
       "type": "string"
@@ -14937,6 +14933,9 @@
       "$ref": "#/definitions/k8s.io.api.core.v1.LocalObjectReference"
      }
     }
+   },
+   "v1.TPMDevice": {
+    "type": "object"
    },
    "v1.Timer": {
     "description": "Represents all available timers in a vmi.",
@@ -16052,6 +16051,11 @@
       "description": "A brief CamelCase message indicating details about why the VMI is in this state. e.g. 'NodeUnresponsive'",
       "type": "string"
      },
+     "runtimeUser": {
+      "description": "RuntimeUser is used to determine what user will be used in launcher",
+      "type": "integer",
+      "format": "int64"
+     },
      "topologyHints": {
       "$ref": "#/definitions/v1.TopologyHints"
      },
@@ -16557,7 +16561,23 @@
     "type": "object",
     "properties": {
      "virtualMachine": {
-      "$ref": "#/definitions/v1.VirtualMachine"
+      "$ref": "#/definitions/v1alpha1.VirtualMachine"
+     }
+    }
+   },
+   "v1alpha1.VirtualMachine": {
+    "type": "object",
+    "properties": {
+     "metadata": {
+      "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta"
+     },
+     "spec": {
+      "description": "VirtualMachineSpec contains the VirtualMachine specification.",
+      "$ref": "#/definitions/v1.VirtualMachineSpec"
+     },
+     "status": {
+      "description": "Status holds the current state of the controller and brief information about its associated VirtualMachineInstance",
+      "$ref": "#/definitions/v1.VirtualMachineStatus"
      }
     }
    },
@@ -16565,7 +16585,7 @@
     "description": "VirtualMachineClusterFlavor is a cluster scoped version of VirtualMachineFlavor resource.",
     "type": "object",
     "required": [
-     "profiles"
+     "spec"
     ],
     "properties": {
      "apiVersion": {
@@ -16579,15 +16599,9 @@
      "metadata": {
       "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta"
      },
-     "profiles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/definitions/v1alpha1.VirtualMachineFlavorProfile"
-      },
-      "x-kubernetes-list-map-keys": [
-       "name"
-      ],
-      "x-kubernetes-list-type": "map"
+     "spec": {
+      "description": "VirtualMachineFlavorSpec for the flavor",
+      "$ref": "#/definitions/v1alpha1.VirtualMachineFlavorSpec"
      }
     }
    },
@@ -16621,7 +16635,7 @@
     "description": "VirtualMachineFlavor resource contains common VirtualMachine configuration that can be used by multiple VirtualMachine resources.",
     "type": "object",
     "required": [
-     "profiles"
+     "spec"
     ],
     "properties": {
      "apiVersion": {
@@ -16635,15 +16649,9 @@
      "metadata": {
       "$ref": "#/definitions/k8s.io.apimachinery.pkg.apis.meta.v1.ObjectMeta"
      },
-     "profiles": {
-      "type": "array",
-      "items": {
-       "$ref": "#/definitions/v1alpha1.VirtualMachineFlavorProfile"
-      },
-      "x-kubernetes-list-map-keys": [
-       "name"
-      ],
-      "x-kubernetes-list-type": "map"
+     "spec": {
+      "description": "VirtualMachineFlavorSpec for the flavor",
+      "$ref": "#/definitions/v1alpha1.VirtualMachineFlavorSpec"
      }
     }
    },
@@ -16673,23 +16681,12 @@
      }
     }
    },
-   "v1alpha1.VirtualMachineFlavorProfile": {
-    "description": "VirtualMachineFlavorProfile contains definitions that will be applied to VirtualMachine.",
+   "v1alpha1.VirtualMachineFlavorSpec": {
+    "description": "VirtualMachineFlavorSpec",
     "type": "object",
-    "required": [
-     "name"
-    ],
     "properties": {
      "cpu": {
       "$ref": "#/definitions/v1.CPU"
-     },
-     "default": {
-      "description": "Default specifies if this VirtualMachineFlavorProfile is the default for the VirtualMachineFlavor. Zero or one profile can be set to default.",
-      "type": "boolean"
-     },
-     "name": {
-      "description": "Name specifies the name of this custom profile.",
-      "type": "string"
      }
     }
    },
@@ -16886,6 +16883,14 @@
      "virtualMachineSnapshotName"
     ],
     "properties": {
+     "patches": {
+      "description": "If the target for the restore does not exist, it will be created. Patches holds JSON patches that would be applied to the target manifest before it's created. Patches should fit the target's Kind.\n\nExample for a patch: {\"op\": \"replace\", \"path\": \"/metadata/name\", \"value\": \"new-vm-name\"}",
+      "type": "array",
+      "items": {
+       "type": "string"
+      },
+      "x-kubernetes-list-type": "atomic"
+     },
      "target": {
       "description": "initially only VirtualMachine type supported",
       "$ref": "#/definitions/k8s.io.api.core.v1.TypedLocalObjectReference"

@@ -26,7 +26,7 @@ import (
 	"runtime"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	"github.com/vishvananda/netlink"
 
@@ -56,7 +56,6 @@ var _ = Describe("Pod Network", func() {
 	})
 
 	AfterEach(func() {
-		ctrl.Finish()
 		os.RemoveAll(tmpDir)
 	})
 
@@ -77,8 +76,8 @@ var _ = Describe("Pod Network", func() {
 				specGenerator := NewSlirpLibvirtSpecGenerator(&vmi.Spec.Domain.Devices.Interfaces[0], domain)
 				Expect(specGenerator.Generate()).To(Succeed())
 
-				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(0))
-				Expect(len(domain.Spec.QEMUCmd.QEMUArg)).To(Equal(2))
+				Expect(domain.Spec.Devices.Interfaces).To(BeEmpty())
+				Expect(domain.Spec.QEMUCmd.QEMUArg).To(HaveLen(2))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[0]).To(Equal(api.Arg{Value: "-device"}))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[1]).To(Equal(api.Arg{Value: "e1000,netdev=default,id=default"}))
 			})
@@ -88,8 +87,8 @@ var _ = Describe("Pod Network", func() {
 				specGenerator := NewSlirpLibvirtSpecGenerator(&vmi.Spec.Domain.Devices.Interfaces[0], domain)
 				Expect(specGenerator.Generate()).To(Succeed())
 
-				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(0))
-				Expect(len(domain.Spec.QEMUCmd.QEMUArg)).To(Equal(2))
+				Expect(domain.Spec.Devices.Interfaces).To(BeEmpty())
+				Expect(domain.Spec.QEMUCmd.QEMUArg).To(HaveLen(2))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[0]).To(Equal(api.Arg{Value: "-device"}))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[1]).To(Equal(api.Arg{Value: "e1000,netdev=default,id=default,mac=de-ad-00-00-be-af"}))
 			})
@@ -107,8 +106,8 @@ var _ = Describe("Pod Network", func() {
 				specGenerator := NewSlirpLibvirtSpecGenerator(&vmi.Spec.Domain.Devices.Interfaces[0], domain)
 				Expect(specGenerator.Generate()).To(Succeed())
 
-				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(1))
-				Expect(len(domain.Spec.QEMUCmd.QEMUArg)).To(Equal(2))
+				Expect(domain.Spec.Devices.Interfaces).To(HaveLen(1))
+				Expect(domain.Spec.QEMUCmd.QEMUArg).To(HaveLen(2))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[0]).To(Equal(api.Arg{Value: "-device"}))
 				Expect(domain.Spec.QEMUCmd.QEMUArg[1]).To(Equal(api.Arg{Value: "e1000,netdev=default,id=default"}))
 			})
@@ -134,7 +133,7 @@ var _ = Describe("Pod Network", func() {
 			It("Should pass a non-privileged macvtap interface to qemu", func() {
 				Expect(specGenerator.Generate()).To(Succeed())
 
-				Expect(len(domain.Spec.Devices.Interfaces)).To(Equal(1), "should have a single interface")
+				Expect(domain.Spec.Devices.Interfaces).To(HaveLen(1), "should have a single interface")
 				Expect(domain.Spec.Devices.Interfaces[0].Target).To(Equal(&api.InterfaceTarget{Device: primaryPodIfaceName, Managed: "no"}), "should have an unmanaged interface")
 				Expect(domain.Spec.Devices.Interfaces[0].MAC).To(Equal(&api.MAC{MAC: fakeMac.String()}), "should have the expected MAC address")
 				Expect(domain.Spec.Devices.Interfaces[0].MTU).To(Equal(&api.MTU{Size: "1410"}), "should have the expected MTU")

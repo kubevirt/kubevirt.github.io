@@ -18,9 +18,8 @@ import (
 	virt_chroot "kubevirt.io/kubevirt/pkg/virt-handler/virt-chroot"
 
 	expect "github.com/google/goexpect"
-	"github.com/onsi/ginkgo"
-	"github.com/onsi/ginkgo/config"
-	"github.com/onsi/ginkgo/types"
+	. "github.com/onsi/ginkgo/v2"
+	"github.com/onsi/ginkgo/v2/types"
 	v1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/discovery"
@@ -31,8 +30,10 @@ import (
 	"kubevirt.io/client-go/log"
 	apicdi "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/tests"
+	"kubevirt.io/kubevirt/tests/clientcmd"
 	"kubevirt.io/kubevirt/tests/console"
 	"kubevirt.io/kubevirt/tests/flags"
+	"kubevirt.io/kubevirt/tests/testsuite"
 )
 
 const (
@@ -63,10 +64,6 @@ const (
 	networkAttachmentDefinitionEntity = "network-attachment-definitions"
 )
 
-type JustAfterEachReporter interface {
-	JustAfterEach(specSummary ginkgo.GinkgoTestDescription)
-}
-
 type KubernetesReporter struct {
 	failureCount int
 	artifactsDir string
@@ -86,25 +83,15 @@ func NewKubernetesReporter(artifactsDir string, maxFailures int) *KubernetesRepo
 	}
 }
 
-func (r *KubernetesReporter) SpecSuiteWillBegin(_ config.GinkgoConfigType, _ *types.SuiteSummary) {
-
+func (r *KubernetesReporter) JustBeforeEach(specReport types.SpecReport) {
+	fmt.Fprintf(GinkgoWriter, "On failure, artifacts will be collected in %s/%d_*\n", r.artifactsDir, r.failureCount+1)
 }
 
-func (r *KubernetesReporter) BeforeSuiteDidRun(_ *types.SetupSummary) {
-	r.Cleanup()
-}
-
-func (r *KubernetesReporter) SpecWillRun(_ *types.SpecSummary) {
-	fmt.Fprintf(ginkgo.GinkgoWriter, "On failure, artifacts will be collected in %s/%d_*\n", r.artifactsDir, r.failureCount+1)
-}
-
-func (r *KubernetesReporter) SpecDidComplete(_ *types.SpecSummary) {}
-
-func (r *KubernetesReporter) JustAfterEach(specSummary ginkgo.GinkgoTestDescription) {
+func (r *KubernetesReporter) JustAfterEach(specReport types.SpecReport) {
 	if r.failureCount > r.maxFails {
 		return
 	}
-	if specSummary.Failed {
+	if specReport.Failed() {
 		r.failureCount++
 	} else {
 		return
@@ -114,11 +101,11 @@ func (r *KubernetesReporter) JustAfterEach(specSummary ginkgo.GinkgoTestDescript
 	if r.artifactsDir == "" {
 		return
 	}
-	r.DumpTestNamespaces(specSummary.Duration)
+	r.DumpTestNamespaces(specReport.RunTime)
 }
 
 func (r *KubernetesReporter) DumpTestNamespaces(duration time.Duration) {
-	r.dumpNamespaces(duration, tests.TestNamespaces)
+	r.dumpNamespaces(duration, testsuite.TestNamespaces)
 }
 
 func (r *KubernetesReporter) DumpAllNamespaces(duration time.Duration) {
@@ -168,6 +155,7 @@ func (r *KubernetesReporter) dumpNamespaces(duration time.Duration, vmiNamespace
 	r.logVMs(virtCli)
 	r.logDVs(virtCli)
 	r.logDeployments(virtCli)
+	r.logDaemonsets(virtCli)
 
 	r.logAuditLogs(virtCli, nodesDir, nodesWithVirtLauncher, since)
 	r.logDMESG(virtCli, nodesDir, nodesWithVirtLauncher, since)
@@ -183,7 +171,7 @@ func (r *KubernetesReporter) dumpNamespaces(duration time.Duration, vmiNamespace
 
 	r.logSRIOVInfo(virtCli)
 
-	r.logNodeCommands(virtCli, virtHandlerPods)
+	r.logNodeCommands(virtCli, nodesWithVirtLauncher)
 	r.logVirtLauncherCommands(virtCli, networkPodsDir)
 	r.logVirtLauncherPrivilegedCommands(virtCli, networkPodsDir, virtHandlerPods)
 	r.logVMICommands(virtCli, vmiNamespaces)
@@ -508,20 +496,20 @@ func (r *KubernetesReporter) logVirtLauncherCommands(virtCli kubecli.KubevirtCli
 	}
 }
 
-func (r *KubernetesReporter) logNodeCommands(virtCli kubecli.KubevirtClient, virtHandlerPods *v1.PodList) {
-
-	if virtHandlerPods == nil {
-		fmt.Fprintf(os.Stderr, "virt-handler pod list is empty, skipping logNodeCommands\n")
-		return
-	}
-
+func (r *KubernetesReporter) logNodeCommands(virtCli kubecli.KubevirtClient, nodes []string) {
 	logsdir := filepath.Join(r.artifactsDir, "network", "nodes")
 	if err := os.MkdirAll(logsdir, 0777); err != nil {
 		fmt.Fprintf(os.Stderr, failedCreateLogsDirectoryFmt, logsdir, err)
 		return
 	}
 
-	for _, pod := range virtHandlerPods.Items {
+	for _, node := range nodes {
+		pod, err := kubecli.NewVirtHandlerClient(virtCli).Namespace(flags.KubeVirtInstallNamespace).ForNode(node).Pod()
+		if err != nil {
+			fmt.Fprintf(os.Stderr, failedGetVirtHandlerPodFmt, node, err)
+			continue
+		}
+
 		if pod.Status.Phase != "Running" {
 			fmt.Fprintf(os.Stderr, "skipping node's pod %s, phase is not Running\n", pod.ObjectMeta.Name)
 			continue
@@ -697,6 +685,16 @@ func (r *KubernetesReporter) logDeployments(virtCli kubecli.KubevirtClient) {
 	}
 
 	r.logObjects(virtCli, deployments, "deployments")
+}
+
+func (r *KubernetesReporter) logDaemonsets(virtCli kubecli.KubevirtClient) {
+	daemonsets, err := virtCli.AppsV1().DaemonSets(flags.KubeVirtInstallNamespace).List(context.Background(), metav1.ListOptions{})
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to fetch daemonsets: %v\n", err)
+		return
+	}
+
+	r.logObjects(virtCli, daemonsets, "daemonsets")
 }
 
 func (r *KubernetesReporter) logDVs(virtCli kubecli.KubevirtClient) {
@@ -987,14 +985,10 @@ func (r *KubernetesReporter) dumpK8sEntityToFile(virtCli kubecli.KubevirtClient,
 }
 
 func (r *KubernetesReporter) AfterSuiteDidRun(setupSummary *types.SetupSummary) {
-	if setupSummary.State.IsFailure() {
+	if setupSummary.State.Is(types.SpecStateFailureStates) {
 		r.failureCount++
 		r.DumpTestNamespaces(setupSummary.RunTime)
 	}
-}
-
-func (r *KubernetesReporter) SpecSuiteDidEnd(_ *types.SuiteSummary) {
-
 }
 
 func (r *KubernetesReporter) logClusterOverview() {
@@ -1007,7 +1001,7 @@ func (r *KubernetesReporter) logClusterOverview() {
 		return
 	}
 
-	stdout, stderr, err := tests.RunCommandWithNS("", binary, "get", "all", "--all-namespaces", "-o", "wide")
+	stdout, stderr, err := clientcmd.RunCommandWithNS("", binary, "get", "all", "--all-namespaces", "-o", "wide")
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "failed to fetch cluster overview: %v, %s\n", err, stderr)
 		return
@@ -1100,7 +1094,7 @@ func podHasComputeContainer(pod v1.Pod) bool {
 	return false
 }
 
-func (r *KubernetesReporter) executeNodeCommands(virtCli kubecli.KubevirtClient, logsdir string, pod v1.Pod) {
+func (r *KubernetesReporter) executeNodeCommands(virtCli kubecli.KubevirtClient, logsdir string, pod *v1.Pod) {
 	const networkPrefix = "nsenter -t 1 -n -- "
 	hostPrefix := fmt.Sprintf("%s --mount %s exec -- ", virt_chroot.GetChrootBinaryPath(), virt_chroot.GetChrootMountNamespace())
 
@@ -1117,7 +1111,7 @@ func (r *KubernetesReporter) executeNodeCommands(virtCli kubecli.KubevirtClient,
 		{command: "[ -e /dev/vfio ] && ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
 	}
 
-	r.executeContainerCommands(virtCli, logsdir, &pod, virtHandlerName, cmds)
+	r.executeContainerCommands(virtCli, logsdir, pod, virtHandlerName, cmds)
 }
 
 func (r *KubernetesReporter) executeVirtLauncherCommands(virtCli kubecli.KubevirtClient, logsdir string, pod v1.Pod) {
@@ -1279,7 +1273,7 @@ func getVirtLauncherPID(virtCli kubecli.KubevirtClient, virtHandlerPod *v1.Pod, 
 }
 
 func isDataVolumeEnabled(clientset kubecli.KubevirtClient) (bool, error) {
-	apis, err := clientset.DiscoveryClient().ServerResources()
+	_, apis, err := clientset.DiscoveryClient().ServerGroupsAndResources()
 	if err != nil && !discovery.IsGroupDiscoveryFailedError(err) {
 		return false, err
 	}

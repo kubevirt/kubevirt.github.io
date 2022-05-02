@@ -171,13 +171,13 @@ func ValidateVirtualMachineInstanceSpec(field *k8sfield.Path, spec *v1.VirtualMa
 		causes = appendStatusCauseForPodNetworkDefinedWithMultusDefaultNetworkDefined(field, causes)
 	}
 
-	networkInterfaceMap, vifMQ, isVirtioNicRequested, newCauses, done := validateNetworksMatchInterfaces(field, spec, config, networkNameMap, bootOrderMap)
+	networkInterfaceMap, vifMQ, isMultiQueueAllowed, newCauses, done := validateNetworksMatchInterfaces(field, spec, config, networkNameMap, bootOrderMap)
 	causes = append(causes, newCauses...)
 	if done {
 		return causes
 	}
 
-	causes = append(causes, validateNetworkInterfaceMultiqueue(field, vifMQ, isVirtioNicRequested)...)
+	causes = append(causes, validateNetworkInterfaceMultiqueue(field, vifMQ, isMultiQueueAllowed)...)
 	causes = append(causes, validateNetworksAssignedToInterfaces(field, spec, networkInterfaceMap)...)
 
 	causes = append(causes, validateInputDevices(field, spec)...)
@@ -209,7 +209,7 @@ func ValidateVirtualMachineInstanceSpec(field *k8sfield.Path, spec *v1.VirtualMa
 	return causes
 }
 
-func validateNetworksMatchInterfaces(field *k8sfield.Path, spec *v1.VirtualMachineInstanceSpec, config *virtconfig.ClusterConfig, networkNameMap map[string]*v1.Network, bootOrderMap map[uint]bool) (networkInterfaceMap map[string]struct{}, vifMQ *bool, isVirtioNicRequested bool, causes []metav1.StatusCause, done bool) {
+func validateNetworksMatchInterfaces(field *k8sfield.Path, spec *v1.VirtualMachineInstanceSpec, config *virtconfig.ClusterConfig, networkNameMap map[string]*v1.Network, bootOrderMap map[uint]bool) (networkInterfaceMap map[string]struct{}, vifMQ *bool, isMultiQueueAllowed bool, causes []metav1.StatusCause, done bool) {
 
 	done = false
 
@@ -220,7 +220,7 @@ func validateNetworksMatchInterfaces(field *k8sfield.Path, spec *v1.VirtualMachi
 	portForwardMap := make(map[string]struct{})
 
 	vifMQ = spec.Domain.Devices.NetworkInterfaceMultiQueue
-	isVirtioNicRequested = false
+	isMultiQueueAllowed = virtioNicRequested(spec.Domain.Devices.Interfaces) || len(spec.Domain.Devices.Interfaces) == 0
 
 	// Validate that each interface has a matching network
 	for idx, iface := range spec.Domain.Devices.Interfaces {
@@ -247,13 +247,9 @@ func validateNetworksMatchInterfaces(field *k8sfield.Path, spec *v1.VirtualMachi
 			return nil, nil, false, causes, done
 		}
 
-		if iface.Model == "virtio" || iface.Model == "" {
-			isVirtioNicRequested = true
-		}
-
 		causes = append(causes, validateDHCPNTPServersAreValidIPv4Addresses(field, iface, idx)...)
 	}
-	return networkInterfaceMap, vifMQ, isVirtioNicRequested, causes, done
+	return networkInterfaceMap, vifMQ, isMultiQueueAllowed, causes, done
 }
 
 func validateInterfaceNetworkBasics(field *k8sfield.Path, networkExists bool, idx int, iface v1.Interface, networkData *v1.Network, config *virtconfig.ClusterConfig) (causes []metav1.StatusCause) {
@@ -569,8 +565,8 @@ func validateInterfaceNameUnique(field *k8sfield.Path, networkInterfaceMap map[s
 	return causes
 }
 
-func validateNetworkInterfaceMultiqueue(field *k8sfield.Path, vifMQ *bool, isVirtioNicRequested bool) (causes []metav1.StatusCause) {
-	if vifMQ != nil && *vifMQ && !isVirtioNicRequested {
+func validateNetworkInterfaceMultiqueue(field *k8sfield.Path, vifMQ *bool, isMultiQueueAllowed bool) (causes []metav1.StatusCause) {
+	if vifMQ != nil && *vifMQ && !isMultiQueueAllowed {
 
 		causes = append(causes, metav1.StatusCause{
 			Type:    metav1.CauseTypeFieldValueInvalid,
@@ -712,29 +708,34 @@ func podNetworkRequiredStatusCause(field *k8sfield.Path) metav1.StatusCause {
 	}
 }
 
+func isValidEvictionStrategy(evictionStrategy *v1.EvictionStrategy) bool {
+	return evictionStrategy == nil ||
+		*evictionStrategy == v1.EvictionStrategyLiveMigrate ||
+		*evictionStrategy == v1.EvictionStrategyNone ||
+		*evictionStrategy == v1.EvictionStrategyExternal
+
+}
+
 func validateLiveMigration(field *k8sfield.Path, spec *v1.VirtualMachineInstanceSpec, config *virtconfig.ClusterConfig) (causes []metav1.StatusCause) {
 	evictionStrategy := config.GetConfig().EvictionStrategy
 
 	if spec.EvictionStrategy != nil {
 		evictionStrategy = spec.EvictionStrategy
 	}
-	if !config.LiveMigrationEnabled() && evictionStrategy != nil &&
-		*evictionStrategy != v1.EvictionStrategyNone {
+	if !config.LiveMigrationEnabled() &&
+		evictionStrategy != nil &&
+		*evictionStrategy == v1.EvictionStrategyLiveMigrate {
 		causes = append(causes, metav1.StatusCause{
 			Type:    metav1.CauseTypeFieldValueInvalid,
 			Message: "LiveMigration feature gate is not enabled",
 			Field:   field.Child("evictionStrategy").String(),
 		})
-	} else if evictionStrategy != nil {
-		if *evictionStrategy != v1.EvictionStrategyLiveMigrate &&
-			*evictionStrategy != v1.EvictionStrategyNone {
-			causes = append(causes, metav1.StatusCause{
-				Type:    metav1.CauseTypeFieldValueInvalid,
-				Message: fmt.Sprintf("%s is set with an unrecognized option: %s", field.Child("evictionStrategy").String(), *spec.EvictionStrategy),
-				Field:   field.Child("evictionStrategy").String(),
-			})
-		}
-
+	} else if !isValidEvictionStrategy(evictionStrategy) {
+		causes = append(causes, metav1.StatusCause{
+			Type:    metav1.CauseTypeFieldValueInvalid,
+			Message: fmt.Sprintf("%s is set with an unrecognized option: %s", field.Child("evictionStrategy").String(), *spec.EvictionStrategy),
+			Field:   field.Child("evictionStrategy").String(),
+		})
 	}
 	return causes
 }
@@ -949,7 +950,7 @@ func validateBootOrder(field *k8sfield.Path, spec *v1.VirtualMachineInstanceSpec
 					Message: fmt.Sprintf("DownwardMetrics volume must be mapped to a disk, but disk is not set on %v.", field.Child("domain", "devices", "disks").Index(idx).Child("disk").String()),
 					Field:   field.Child("domain", "devices", "disks").Index(idx).Child("disk").String(),
 				})
-			} else if disk.Disk != nil && disk.Disk.Bus != "virtio" && disk.Disk.Bus != "" {
+			} else if disk.Disk != nil && disk.Disk.Bus != v1.DiskBusVirtio && disk.Disk.Bus != "" {
 				causes = append(causes, metav1.StatusCause{
 					Type:    metav1.CauseTypeFieldValueInvalid,
 					Message: fmt.Sprintf("DownwardMetrics volume must be mapped to virtio bus, but %v is set to %v", field.Child("domain", "devices", "disks").Index(idx).Child("disk").Child("bus").String(), disk.Disk.Bus),
@@ -1705,7 +1706,7 @@ func validateDomainSpec(field *k8sfield.Path, spec *v1.DomainSpec) []metav1.Stat
 
 	if spec.Firmware != nil && spec.Firmware.Bootloader != nil && spec.Firmware.Bootloader.EFI != nil &&
 		(spec.Firmware.Bootloader.EFI.SecureBoot == nil || *spec.Firmware.Bootloader.EFI.SecureBoot) &&
-		(spec.Features == nil || spec.Features.SMM == nil || !*spec.Features.SMM.Enabled) {
+		(spec.Features == nil || spec.Features.SMM == nil || (spec.Features.SMM.Enabled != nil && !*spec.Features.SMM.Enabled)) {
 		causes = append(causes, metav1.StatusCause{
 			Type:    metav1.CauseTypeFieldValueInvalid,
 			Message: fmt.Sprintf("%s has EFI SecureBoot enabled. SecureBoot requires SMM, which is currently disabled.", field.String()),
@@ -1835,16 +1836,6 @@ func validateAccessCredentials(field *k8sfield.Path, accessCredentials []v1.Acce
 func validateVolumes(field *k8sfield.Path, volumes []v1.Volume, config *virtconfig.ClusterConfig) []metav1.StatusCause {
 	var causes []metav1.StatusCause
 	nameMap := make(map[string]int)
-
-	if len(volumes) > arrayLenMax {
-		causes = append(causes, metav1.StatusCause{
-			Type:    metav1.CauseTypeFieldValueInvalid,
-			Message: fmt.Sprintf(listExceedsLimitMessagePattern, field.String(), arrayLenMax),
-			Field:   field.String(),
-		})
-		// We won't process anything over the limit
-		return causes
-	}
 
 	// check that we have max 1 instance of below disks
 	serviceAccountVolumeCount := 0
@@ -2159,16 +2150,6 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 	var causes []metav1.StatusCause
 	nameMap := make(map[string]int)
 
-	if len(disks) > arrayLenMax {
-		causes = append(causes, metav1.StatusCause{
-			Type:    metav1.CauseTypeFieldValueInvalid,
-			Message: fmt.Sprintf(listExceedsLimitMessagePattern, field.String(), arrayLenMax),
-			Field:   field.String(),
-		})
-		// We won't process anything over the limit
-		return causes
-	}
-
 	for idx, disk := range disks {
 		// verify name is unique
 		otherIdx, ok := nameMap[disk.Name]
@@ -2182,18 +2163,10 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 			})
 		}
 
-		// Reject Floppy disks
-		if disk.Floppy != nil {
-			causes = append(causes, metav1.StatusCause{
-				Type:    metav1.CauseTypeFieldValueNotSupported,
-				Message: "Floppy disks are deprecated and will be removed from the API soon.",
-				Field:   field.Index(idx).Child("name").String(),
-			})
-		}
-
 		// Verify only a single device type is set.
 		deviceTargetSetCount := 0
-		var diskType, bus string
+		var diskType string
+		var bus v1.DiskBus
 		if disk.Disk != nil {
 			deviceTargetSetCount++
 			diskType = "disk"
@@ -2203,9 +2176,6 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 			deviceTargetSetCount++
 			diskType = "lun"
 			bus = disk.LUN.Bus
-		}
-		if disk.Floppy != nil {
-			deviceTargetSetCount++
 		}
 		if disk.CDRom != nil {
 			deviceTargetSetCount++
@@ -2225,7 +2195,7 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 
 		// Verify pci address
 		if disk.Disk != nil && disk.Disk.PciAddress != "" {
-			if disk.Disk.Bus != "virtio" {
+			if disk.Disk.Bus != v1.DiskBusVirtio {
 				causes = append(causes, metav1.StatusCause{
 					Type:    metav1.CauseTypeFieldValueInvalid,
 					Message: fmt.Sprintf("disk %s - setting a PCI address is only possible with bus type virtio.", field.Child("domain", "devices", "disks", "disk").Index(idx).Child("name").String()),
@@ -2261,7 +2231,7 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 					Field:   field.Index(idx).Child(diskType, "bus").String(),
 				})
 			} else {
-				buses := []string{"virtio", "sata", "scsi"}
+				buses := []v1.DiskBus{v1.DiskBusVirtio, v1.DiskBusSCSI, v1.DiskBusSATA}
 				validBus := false
 				for _, b := range buses {
 					if b == bus {
@@ -2277,7 +2247,7 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 				}
 
 				// special case. virtio is incompatible with CD-ROM for q35 machine types
-				if diskType == "cdrom" && bus == "virtio" {
+				if diskType == "cdrom" && bus == v1.DiskBusVirtio {
 					causes = append(causes, metav1.StatusCause{
 						Type:    metav1.CauseTypeFieldValueInvalid,
 						Message: fmt.Sprintf("Bus type %s is invalid for CD-ROM device", bus),
@@ -2290,7 +2260,7 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 			// Reject defining DedicatedIOThread to a disk with SATA bus since this configuration
 			// is not supported in libvirt.
 			isIOThreadsWithSataBus := disk.DedicatedIOThread != nil && *disk.DedicatedIOThread &&
-				(disk.DiskDevice.Disk != nil) && strings.EqualFold(disk.DiskDevice.Disk.Bus, "sata")
+				(disk.DiskDevice.Disk != nil) && (disk.DiskDevice.Disk.Bus == v1.DiskBusSATA)
 			if isIOThreadsWithSataBus {
 				causes = append(causes, metav1.StatusCause{
 					Type:    metav1.CauseTypeFieldValueNotSupported,
@@ -2401,7 +2371,18 @@ func validateDisks(field *k8sfield.Path, disks []v1.Disk) []metav1.StatusCause {
 
 // Rejects kernel boot defined with initrd/kernel path but without an image
 func validateKernelBoot(field *k8sfield.Path, kernelBoot *v1.KernelBoot) (causes []metav1.StatusCause) {
-	if kernelBoot == nil || kernelBoot.Container == nil {
+	if kernelBoot == nil {
+		return
+	}
+
+	if kernelBoot.Container == nil {
+		if kernelBoot.KernelArgs != "" {
+			causes = append(causes, metav1.StatusCause{
+				Type:    metav1.CauseTypeFieldValueInvalid,
+				Message: "kernel arguments cannot be provided without an external kernel",
+				Field:   field.Child("kernelArgs").String(),
+			})
+		}
 		return
 	}
 
@@ -2425,4 +2406,14 @@ func validateKernelBoot(field *k8sfield.Path, kernelBoot *v1.KernelBoot) (causes
 	}
 
 	return
+}
+
+func virtioNicRequested(interfaces []v1.Interface) bool {
+	for _, iface := range interfaces {
+		if iface.Model == "virtio" || iface.Model == "" {
+			return true
+		}
+	}
+
+	return false
 }

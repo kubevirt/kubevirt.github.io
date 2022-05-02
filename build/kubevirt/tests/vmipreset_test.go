@@ -26,7 +26,7 @@ import (
 	"strings"
 	"time"
 
-	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	k8sv1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
@@ -36,12 +36,10 @@ import (
 
 	"kubevirt.io/api/core"
 
-	"kubevirt.io/kubevirt/tests/framework/checks"
 	"kubevirt.io/kubevirt/tests/util"
 
 	v1 "kubevirt.io/api/core/v1"
 	"kubevirt.io/client-go/kubecli"
-	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
 	"kubevirt.io/kubevirt/tests"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
 )
@@ -135,7 +133,7 @@ var _ = Describe("[rfe_id:609][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 			err = json.Unmarshal(body, reviewResponse)
 			Expect(err).To(BeNil())
 
-			Expect(len(reviewResponse.Details.Causes)).To(Equal(1))
+			Expect(reviewResponse.Details.Causes).To(HaveLen(1))
 			Expect(reviewResponse.Details.Causes[0].Field).To(Equal("spec.domain.devices.disks[1]"))
 		})
 	})
@@ -379,11 +377,7 @@ var _ = Describe("[rfe_id:609][crit:medium][vendor:cnv-qe@redhat.com][level:comp
 			Expect(err).ToNot(HaveOccurred())
 
 			By("Verifying VMI")
-			if checks.HasFeature(virtconfig.NonRoot) {
-				Expect(newVmi.Annotations).To(Equal(map[string]string{"kubevirt.io/nonroot": ""}))
-			} else {
-				Expect(newVmi.Annotations).To(BeNil())
-			}
+			Expect(newVmi.Annotations).To(BeNil())
 
 			label, ok := vmi.Labels[overrideKey]
 			Expect(ok).To(BeTrue())

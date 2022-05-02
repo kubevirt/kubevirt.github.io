@@ -12,8 +12,7 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
-	. "github.com/onsi/ginkgo/extensions/table"
+	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 	v1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/resource"
@@ -29,6 +28,7 @@ import (
 	cdiv1 "kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1"
 	"kubevirt.io/kubevirt/pkg/virtctl/imageupload"
 	"kubevirt.io/kubevirt/tests"
+	"kubevirt.io/kubevirt/tests/clientcmd"
 )
 
 const (
@@ -86,7 +86,6 @@ var _ = Describe("ImageUpload", func() {
 	})
 
 	AfterEach(func() {
-		ctrl.Finish()
 		os.Remove(imagePath)
 		os.Remove(archiveFilePath)
 	})
@@ -449,7 +448,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("PVC does not exist deprecated args", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "--pvc-name", targetName, "--pvc-size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "--pvc-name", targetName, "--pvc-size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(pvcCreateCalled.IsTrue()).To(BeTrue())
@@ -458,7 +457,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("PVC exists deprecated args", func() {
 			testInit(http.StatusOK, pvcSpec())
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "--pvc-name", targetName, "--no-create",
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "--pvc-name", targetName, "--no-create",
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(pvcCreateCalled.IsTrue()).To(BeFalse())
@@ -467,7 +466,7 @@ var _ = Describe("ImageUpload", func() {
 
 		DescribeTable("DV does not exist", func(async bool) {
 			testInitAsync(http.StatusOK, async)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -480,7 +479,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("upload archive file DV doest not exist", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--archive-path", archiveFilePath)
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -490,7 +489,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("DV does not exist --pvc-size", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--pvc-size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--pvc-size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -500,7 +499,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("DV does not exist --force-bind", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--pvc-size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--pvc-size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath, "--force-bind")
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -510,7 +509,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("DV does not exist and --no-create", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--pvc-size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--pvc-size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath, "--no-create")
 			err := cmd()
 			Expect(err).ToNot(BeNil())
@@ -520,7 +519,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("Use CDI Config UploadProxyURL", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -530,7 +529,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("Create a VolumeMode=Block PVC", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--insecure", "--image-path", imagePath, "--block-volume")
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -541,7 +540,7 @@ var _ = Describe("ImageUpload", func() {
 		It("Create a non-default storage class PVC", func() {
 			testInit(http.StatusOK)
 			expectedStorageClass := "non-default-sc"
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--insecure", "--image-path", imagePath, "--storage-class", expectedStorageClass)
 			Expect(cmd()).To(BeNil())
 			Expect(dvCreateCalled.IsTrue()).To(BeTrue())
@@ -550,7 +549,7 @@ var _ = Describe("ImageUpload", func() {
 
 		DescribeTable("PVC does not exist", func(async bool) {
 			testInitAsync(http.StatusOK, async)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "pvc", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "pvc", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(pvcCreateCalled.IsTrue()).To(BeTrue())
@@ -562,7 +561,7 @@ var _ = Describe("ImageUpload", func() {
 
 		DescribeTable("PVC does exist", func(pvc *v1.PersistentVolumeClaim) {
 			testInit(http.StatusOK, pvc)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "pvc", targetName,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "pvc", targetName,
 				"--uploadproxy-url", server.URL, "--no-create", "--insecure", "--image-path", imagePath)
 			Expect(cmd()).To(BeNil())
 			Expect(pvcCreateCalled.IsTrue()).To(BeFalse())
@@ -575,7 +574,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("Archive upload PVC does not exist", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "pvc", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "pvc", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--archive-path", archiveFilePath)
 			Expect(cmd()).To(BeNil())
 			Expect(pvcCreateCalled.IsTrue()).To(BeTrue())
@@ -586,7 +585,7 @@ var _ = Describe("ImageUpload", func() {
 			pvc := pvcSpecWithUploadAnnotation()
 			pvc.Annotations[contentTypeAnnotation] = string(cdiv1.DataVolumeArchive)
 			testInit(http.StatusOK, pvc)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "pvc", targetName,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "pvc", targetName,
 				"--uploadproxy-url", server.URL, "--no-create", "--insecure", "--archive-path", archiveFilePath)
 			Expect(cmd()).To(BeNil())
 			Expect(pvcCreateCalled.IsTrue()).To(BeFalse())
@@ -595,7 +594,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("Show error when uploading to ReadOnly volume", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--insecure", "--image-path", imagePath, "--access-mode", string(v1.ReadOnlyMany))
 			err := cmd()
 			Expect(err).To(HaveOccurred())
@@ -611,7 +610,7 @@ var _ = Describe("ImageUpload", func() {
 	Context("Upload fails", func() {
 		It("PVC already uploaded", func() {
 			testInit(http.StatusOK, pvcSpecWithUploadSucceeded())
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			err := cmd()
 			Expect(err).NotTo(BeNil())
@@ -620,7 +619,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("PVC exists without archive contentType for archive upload", func() {
 			testInit(http.StatusOK, pvcSpecWithUploadAnnotation())
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "pvc", targetName,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "pvc", targetName,
 				"--uploadproxy-url", server.URL, "--no-create", "--insecure", "--archive-path", archiveFilePath)
 			err := cmd()
 			Expect(err).NotTo(BeNil())
@@ -634,7 +633,7 @@ var _ = Describe("ImageUpload", func() {
 				[]runtime.Object{pvcSpecWithUploadAnnotation()},
 				[]runtime.Object{dvSpecWithWaitForFirstConsumer()},
 			)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			err := cmd()
 			Expect(err).NotTo(BeNil())
@@ -643,7 +642,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("uploadProxyURL not configured", func() {
 			testInit(http.StatusOK)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--insecure", "--image-path", imagePath)
 			config, err := cdiClient.CdiV1beta1().CDIConfigs().Get(context.Background(), configName, metav1.GetOptions{})
 			Expect(err).To(BeNil())
@@ -654,7 +653,7 @@ var _ = Describe("ImageUpload", func() {
 
 		It("Upload fails", func() {
 			testInit(http.StatusInternalServerError)
-			cmd := tests.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
+			cmd := clientcmd.NewRepeatableVirtctlCommand(commandName, "dv", targetName, "--size", pvcSize,
 				"--uploadproxy-url", server.URL, "--insecure", "--image-path", imagePath)
 			Expect(cmd()).NotTo(BeNil())
 		})
@@ -662,7 +661,7 @@ var _ = Describe("ImageUpload", func() {
 		DescribeTable("Bad args", func(errString string, args []string) {
 			testInit(http.StatusOK)
 			args = append([]string{commandName}, args...)
-			cmd := tests.NewRepeatableVirtctlCommand(args...)
+			cmd := clientcmd.NewRepeatableVirtctlCommand(args...)
 			err := cmd()
 			Expect(err).NotTo(BeNil())
 			Expect(err.Error()).Should(Equal(errString))
