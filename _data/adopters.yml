@@ -19,3 +19,4 @@ adopters:
   - {link: 'https://platform9.com/managed-kubevirt/', logo: PLATFORM9.png, name: PLATFORM9}
   - {link: 'https://www.redhat.com', logo: RedHatInc.png, name: 'Red Hat, Inc.'}
   - {link: 'https://www.suse.com/', logo: SUSE.png, name: SUSE}
+  - {link: 'https://puzl.ee/', logo: puzl.png, name: 'puzl.ee'}
