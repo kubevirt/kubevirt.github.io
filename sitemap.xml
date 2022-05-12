@@ -649,6 +649,10 @@
 <lastmod>2022-04-08T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2022/changelog-v0.53.0.html</loc>
+<lastmod>2022-05-09T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1505,5 +1509,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page32/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page33/</loc>
 </url>
 </urlset>

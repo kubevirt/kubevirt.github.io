@@ -55,11 +55,6 @@ const (
 )
 
 const (
-	sriovEntityURITemplate            = "/apis/sriovnetwork.openshift.io/v1/namespaces/%s/%s/"
-	sriovNetworksEntity               = "sriovnetworks"
-	sriovNodeNetworkPolicyEntity      = "sriovnetworknodepolicies"
-	sriovNodeStateEntity              = "sriovnetworknodestates"
-	sriovOperatorConfigsEntity        = "sriovoperatorconfigs"
 	k8sCNICNCFEntityURLTemplate       = "/apis/k8s.cni.cncf.io/v1/namespaces/%s/%s/"
 	networkAttachmentDefinitionEntity = "network-attachment-definitions"
 )
@@ -168,8 +163,6 @@ func (r *KubernetesReporter) dumpNamespaces(duration time.Duration, vmiNamespace
 	r.logDomainXMLs(virtCli, vmis)
 
 	r.logVMIMs(virtCli, vmims)
-
-	r.logSRIOVInfo(virtCli)
 
 	r.logNodeCommands(virtCli, nodesWithVirtLauncher)
 	r.logVirtLauncherCommands(virtCli, networkPodsDir)
@@ -365,39 +358,26 @@ func (r *KubernetesReporter) logAuditLogs(virtCli kubecli.KubevirtClient, logsdi
 }
 
 func (r *KubernetesReporter) logVMICommands(virtCli kubecli.KubevirtClient, vmiNamespaces []string) {
+	runningVMIs := getRunningVMIs(virtCli, vmiNamespaces)
 
-	logsdir := filepath.Join(r.artifactsDir, "network", "vmis")
-	if err := os.MkdirAll(logsdir, 0777); err != nil {
+	if len(runningVMIs) < 1 {
+		return
+	}
+
+	logsDir := filepath.Join(r.artifactsDir, "network", "vmis")
+	if err := os.MkdirAll(logsDir, 0777); err != nil {
 		fmt.Fprintf(os.Stderr, failedCreateDirectoryFmt, err)
 		return
 	}
 
-	for _, ns := range vmiNamespaces {
-		vmis, err := virtCli.VirtualMachineInstance(ns).List(&metav1.ListOptions{})
+	for _, vmi := range runningVMIs {
+		vmiType, err := getVmiType(vmi)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to get vmis: %v\n", err)
+			fmt.Fprintf(os.Stderr, "skipping vmi %s/%s: failed to get vmi type: %v\n", vmi.Namespace, vmi.Name, err)
 			continue
 		}
 
-		for _, vmi := range vmis.Items {
-			if vmi.Status.Phase != "Running" {
-				fmt.Fprintf(os.Stderr, "skipping vmi %s, phase is not Running\n", vmi.ObjectMeta.Name)
-				continue
-			}
-
-			vmiType, err := getVmiType(vmi)
-			if err != nil {
-				fmt.Fprintf(os.Stderr, "failed to get vmi type: %v\n", err)
-				continue
-			}
-
-			if err := prepareVmiConsole(vmi, vmiType); err != nil {
-				fmt.Fprintf(os.Stderr, "failed to login to vmi: %v\n", err)
-				continue
-			}
-
-			r.executeVMICommands(vmi, logsdir, vmiType)
-		}
+		r.executeVMICommands(vmi, logsDir, vmiType)
 	}
 }
 
@@ -824,6 +804,18 @@ func getRunningVMIs(virtCli kubecli.KubevirtClient, namespace []string) []v12.Vi
 				continue
 			}
 
+			isPaused := false
+			for _, cond := range vmi.Status.Conditions {
+				if cond.Type == v12.VirtualMachineInstancePaused && cond.Status == v1.ConditionTrue {
+					isPaused = true
+					break
+				}
+			}
+			if isPaused {
+				fmt.Fprintf(os.Stderr, "skipping paused vmi %s\n", vmi.ObjectMeta.Name)
+				continue
+			}
+
 			vmiType, err := getVmiType(vmi)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "skipping vmi %s/%s: failed to get vmi type: %v\n", vmi.Namespace, vmi.Name, err)
@@ -916,39 +908,6 @@ func (r *KubernetesReporter) logEvents(virtCli kubecli.KubevirtClient, since tim
 	}
 
 	r.logObjects(virtCli, eventsToPrint, "events")
-}
-
-func (r *KubernetesReporter) logSRIOVInfo(virtCli kubecli.KubevirtClient) {
-	sriovOutputDir := filepath.Join(r.artifactsDir, "sriov")
-	if err := os.MkdirAll(sriovOutputDir, 0777); err != nil {
-		fmt.Fprintf(os.Stderr, failedCreateDirectoryFmt, err)
-		return
-	}
-
-	r.logSRIOVNodeState(virtCli, sriovOutputDir)
-	r.logSRIOVNodeNetworkPolicies(virtCli, sriovOutputDir)
-	r.logSRIOVNetworks(virtCli, sriovOutputDir)
-	r.logSRIOVOperatorConfigs(virtCli, sriovOutputDir)
-}
-
-func (r *KubernetesReporter) logSRIOVNodeState(virtCli kubecli.KubevirtClient, outputFolder string) {
-	nodeStateLogPath := filepath.Join(outputFolder, fmt.Sprintf("%d_nodestate.log", r.failureCount))
-	r.dumpK8sEntityToFile(virtCli, sriovNodeStateEntity, v1.NamespaceAll, sriovEntityURITemplate, nodeStateLogPath)
-}
-
-func (r *KubernetesReporter) logSRIOVNodeNetworkPolicies(virtCli kubecli.KubevirtClient, outputFolder string) {
-	nodeNetworkPolicyLogPath := filepath.Join(outputFolder, fmt.Sprintf("%d_nodenetworkpolicies.log", r.failureCount))
-	r.dumpK8sEntityToFile(virtCli, sriovNodeNetworkPolicyEntity, v1.NamespaceAll, sriovEntityURITemplate, nodeNetworkPolicyLogPath)
-}
-
-func (r *KubernetesReporter) logSRIOVNetworks(virtCli kubecli.KubevirtClient, outputFolder string) {
-	networksPath := filepath.Join(outputFolder, fmt.Sprintf("%d_networks.log", r.failureCount))
-	r.dumpK8sEntityToFile(virtCli, sriovNetworksEntity, v1.NamespaceAll, sriovEntityURITemplate, networksPath)
-}
-
-func (r *KubernetesReporter) logSRIOVOperatorConfigs(virtCli kubecli.KubevirtClient, outputFolder string) {
-	operatorConfigPath := filepath.Join(outputFolder, fmt.Sprintf("%d_operatorconfigs.log", r.failureCount))
-	r.dumpK8sEntityToFile(virtCli, sriovOperatorConfigsEntity, v1.NamespaceAll, sriovEntityURITemplate, operatorConfigPath)
 }
 
 func (r *KubernetesReporter) logNetworkAttachmentDefinitionInfo(virtCli kubecli.KubevirtClient) {
@@ -1108,7 +1067,7 @@ func (r *KubernetesReporter) executeNodeCommands(virtCli kubecli.KubevirtClient,
 		{command: networkPrefix + "nft list ruleset", fileNameSuffix: "nftlist"},
 
 		{command: hostPrefix + "/usr/bin/" + networkPrefix + "/usr/sbin/iptables --list -v", fileNameSuffix: "iptables"},
-		{command: "[ -e /dev/vfio ] && ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
+		{command: "ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
 	}
 
 	r.executeContainerCommands(virtCli, logsdir, pod, virtHandlerName, cmds)
@@ -1122,9 +1081,8 @@ func (r *KubernetesReporter) executeVirtLauncherCommands(virtCli kubecli.Kubevir
 		{command: ipNeighShow, fileNameSuffix: "ipneigh"},
 		{command: bridgeJVlanShow, fileNameSuffix: "brvlan"},
 		{command: bridgeFdb, fileNameSuffix: "brfdb"},
-		{command: "lspci", fileNameSuffix: "lspci"},
 		{command: "env", fileNameSuffix: "env"},
-		{command: "[ -e /dev/vfio ] && ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
+		{command: "ls -lsh -Z -St /dev/vfio", fileNameSuffix: "vfio-devices"},
 	}
 
 	r.executeContainerCommands(virtCli, logsdir, &pod, "compute", cmds)

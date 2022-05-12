@@ -224,6 +224,7 @@ rules:
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
+  - virtualmachineinstances/portforward
   verbs:
   - update
   - get
@@ -618,6 +619,7 @@ rules:
   - subresources.kubevirt.io
   resources:
   - version
+  - guestfs
   verbs:
   - get
   - list
@@ -641,6 +643,7 @@ rules:
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
+  - virtualmachineinstances/portforward
   verbs:
   - update
 - apiGroups:
@@ -740,6 +743,7 @@ rules:
   - virtualmachineinstances/freeze
   - virtualmachineinstances/unfreeze
   - virtualmachineinstances/softreboot
+  - virtualmachineinstances/portforward
   verbs:
   - update
 - apiGroups:

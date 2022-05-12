@@ -1705,6 +1705,10 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				By("Checking that the VirtualMachineInstance console has expected output")
 				Expect(loginFunc(vmi)).To(Succeed())
 
+				vmi, err := ThisVMI(vmi)()
+				Expect(err).ToNot(HaveOccurred())
+				Expect(vmi.Annotations).To(HaveKey(v1.DeprecatedNonRootVMIAnnotation))
+
 				By("Deleting the VMI")
 				Expect(virtClient.VirtualMachineInstance(vmi.Namespace).Delete(vmi.Name, &metav1.DeleteOptions{})).To(Succeed())
 
@@ -1712,23 +1716,23 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
 
 			},
-				Entry("with simple VMI", func() *v1.VirtualMachineInstance {
+				Entry("[test_id:8609] with simple VMI", func() *v1.VirtualMachineInstance {
 					return libvmi.NewAlpine(
 						libvmi.WithInterface(libvmi.InterfaceDeviceWithMasqueradeBinding()),
 						libvmi.WithNetwork(v1.DefaultPodNetwork()))
 				}, console.LoginToAlpine),
 
-				Entry("with DataVolume", func() *v1.VirtualMachineInstance {
+				Entry("[test_id:8610] with DataVolume", func() *v1.VirtualMachineInstance {
 					createDataVolumePVCAndChangeDiskImgPermissions()
 					// Use the DataVolume
 					return tests.NewRandomVMIWithDataVolume(pvName)
 				}, console.LoginToAlpine),
 
-				Entry("with CD + CloudInit + SA + ConfigMap + Secret + DownwardAPI + Kernel Boot", func() *v1.VirtualMachineInstance {
+				Entry("[test_id:8611] with CD + CloudInit + SA + ConfigMap + Secret + DownwardAPI + Kernel Boot", func() *v1.VirtualMachineInstance {
 					return prepareVMIWithAllVolumeSources()
 				}, console.LoginToFedora),
 
-				Entry("with PVC", func() *v1.VirtualMachineInstance {
+				Entry("[test_id:8612] with PVC", func() *v1.VirtualMachineInstance {
 					createDataVolumePVCAndChangeDiskImgPermissions()
 					// Use the Underlying PVC
 					return tests.NewRandomVMIWithPVC(pvName)
@@ -2056,7 +2060,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 240)
 			})
 
-			It("[test_id:8482] Migration Metrics exposed to prometheus during VM migration", func() {
+			It("[QUARANTINE][test_id:8482] Migration Metrics exposed to prometheus during VM migration", func() {
 				vmi := tests.NewRandomFedoraVMIWithGuestAgent()
 				vmi.Spec.Domain.Resources.Requests[k8sv1.ResourceMemory] = resource.MustParse(fedoraVMSize)
 

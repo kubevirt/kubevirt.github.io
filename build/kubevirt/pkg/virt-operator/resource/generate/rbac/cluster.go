@@ -74,6 +74,7 @@ func newDefaultClusterRole() *rbacv1.ClusterRole {
 				},
 				Resources: []string{
 					"version",
+					"guestfs",
 				},
 				Verbs: []string{
 					"get", "list",
@@ -159,6 +160,7 @@ func newAdminClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/freeze",
 					"virtualmachineinstances/unfreeze",
 					"virtualmachineinstances/softreboot",
+					"virtualmachineinstances/portforward",
 				},
 				Verbs: []string{
 					"update",
@@ -286,6 +288,7 @@ func newEditClusterRole() *rbacv1.ClusterRole {
 					"virtualmachineinstances/freeze",
 					"virtualmachineinstances/unfreeze",
 					"virtualmachineinstances/softreboot",
+					"virtualmachineinstances/portforward",
 				},
 				Verbs: []string{
 					"update",

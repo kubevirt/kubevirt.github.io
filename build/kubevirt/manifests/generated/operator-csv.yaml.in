@@ -331,6 +331,7 @@ spec:
           - virtualmachineinstances/freeze
           - virtualmachineinstances/unfreeze
           - virtualmachineinstances/softreboot
+          - virtualmachineinstances/portforward
           verbs:
           - update
           - get
@@ -725,6 +726,7 @@ spec:
           - subresources.kubevirt.io
           resources:
           - version
+          - guestfs
           verbs:
           - get
           - list
@@ -748,6 +750,7 @@ spec:
           - virtualmachineinstances/freeze
           - virtualmachineinstances/unfreeze
           - virtualmachineinstances/softreboot
+          - virtualmachineinstances/portforward
           verbs:
           - update
         - apiGroups:
@@ -847,6 +850,7 @@ spec:
           - virtualmachineinstances/freeze
           - virtualmachineinstances/unfreeze
           - virtualmachineinstances/softreboot
+          - virtualmachineinstances/portforward
           verbs:
           - update
         - apiGroups:
