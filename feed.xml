@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-05-12T19:06:08+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.53.0</title><link href="https://kubevirt.io//2022/changelog-v0.53.0.html" rel="alternate" type="text/html" title="KubeVirt v0.53.0" /><published>2022-05-09T00:00:00+00:00</published><updated>2022-05-09T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.53.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.53.0.html"><![CDATA[<h2 id="v0530">v0.53.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-05-23T10:57:02+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.53.0</title><link href="https://kubevirt.io//2022/changelog-v0.53.0.html" rel="alternate" type="text/html" title="KubeVirt v0.53.0" /><published>2022-05-09T00:00:00+00:00</published><updated>2022-05-09T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.53.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.53.0.html"><![CDATA[<h2 id="v0530">v0.53.0</h2>
 
 <p>Released on: Mon May 9 14:02:20 2022 +0000</p>
 
@@ -49,7 +49,233 @@
   <li>[PR #7288][raspbeep] Users now don’t need to specify container for <code class="language-plaintext highlighter-rouge">kubectl logs &lt;vmi-pod&gt;</code> and <code class="language-plaintext highlighter-rouge">kubectl exec &lt;vmi-pod&gt;</code>.</li>
   <li>[PR #6709][xpivarc] Workloads will be migrated to nonroot implementation if NonRoot feature gate is set. (Except VirtioFS)</li>
   <li>[PR #7241][lyarwood] Fixed a bug that prevents only a unattend.xml configmap or secret being provided as contents for a sysprep disk. (#7240, @lyarwood)</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.52.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.51.0</title><link href="https://kubevirt.io//2022/changelog-v0.51.0.html" rel="alternate" type="text/html" title="KubeVirt v0.51.0" /><published>2022-03-08T00:00:00+00:00</published><updated>2022-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.51.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.51.0.html"><![CDATA[<h2 id="v0510">v0.51.0</h2>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.52.0 changes]]></summary></entry><entry><title type="html">Load-balancer for virtual machines on bare metal Kubernetes clusters</title><link href="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html" rel="alternate" type="text/html" title="Load-balancer for virtual machines on bare metal Kubernetes clusters" /><published>2022-04-03T00:00:00+00:00</published><updated>2022-04-03T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Virtual-Machines-with-MetalLB</id><content type="html" xml:base="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+
+<p>Over the last year, Kubevirt and MetalLB have shown to be powerful duo in order to support fault-tolerant access to an application on virtual machines through an external IP address. 
+As a Cluster administrator using an on-prem cluster without a network load-balancer, now it’s possible to use MetalLB operator to provide load-balancer capabilities (with Services of type <code class="language-plaintext highlighter-rouge">LoadBalancer</code>) to virtual machines.</p>
+
+<h2 id="metallb">MetalLB</h2>
+
+<p><a href="https://metallb.universe.tf/">MetalLB</a> allows you to create Kubernetes services of type <code class="language-plaintext highlighter-rouge">LoadBalancer</code>, and provides network load-balancer implementation in on-prem clusters that don’t run on a cloud provider.
+MetalLB is responsible for assigning/unassigning an external IP Address to your service, using IPs from pre-configured pools. In order for the external IPs to be announced externally, MetalLB works in 2 modes, Layer 2 and BGP:</p>
+
+<ul>
+  <li>
+    <p>Layer 2 mode (ARP/NDP):</p>
+
+    <p>This mode - which actually does not implement real load-balancing behavior - provides a failover mechanism where a single node owns the <code class="language-plaintext highlighter-rouge">LoadBalancer</code> service, until it fails, triggering another node to be chosen as the service owner. This configuration mode makes the IPs reachable from the local network.<br />
+In this method, the MetalLB speaker pod announces the IPs in ARP (for IPv4) and NDP (for IPv6) protocols over the host network. From a network perspective, the node owning the service appears to have multiple IP addresses assigned to a network interface. After traffic is routed to the node, the service proxy sends the traffic to the application pods.</p>
+  </li>
+  <li>
+    <p>BGP mode:</p>
+
+    <p>This mode provides real load-balancing behavior, by establishing BGP peering sessions with the network routers - which advertise the external IPs of the <code class="language-plaintext highlighter-rouge">LoadBalancer</code> service, distributing the load over the nodes.</p>
+  </li>
+</ul>
+
+<p>To read more on MetalLB concepts, implementation and limitations, please read <a href="https://metallb.universe.tf/concepts/">its documentation</a>.</p>
+
+<h2 id="demo-virtual-machine-with-external-ip-and-metallb-load-balancer">Demo: Virtual machine with external IP and MetalLB load-balancer</h2>
+
+<p>With the following recipe we will end up with a nginx server running on a virtual machine, accessible outside the cluster using MetalLB load-balancer with Layer 2 mode.</p>
+
+<h3 id="demo-environment-setup">Demo environment setup</h3>
+
+<p>We are going to use <a href="https://kind.sigs.k8s.io">kind</a> provider as an ephemeral Kubernetes cluster.</p>
+
+<p>Prerequirements:</p>
+<ul>
+  <li>First install kind on your machine following its <a href="https://kind.sigs.k8s.io/docs/user/quick-start/#installation">installation guide</a>.</li>
+  <li>To use kind, you will also need to <a href="https://docs.docker.com/install/">install docker</a>.</li>
+</ul>
+
+<h4 id="external-ips-on-macos-and-windows">External IPs on macOS and Windows</h4>
+
+<p>This demo runs Docker on Linux, which allows sending traffic directly to the load-balancer’s external IP if the IP space is within the docker IP space.
+On macOS and Windows however, docker does not expose the docker network to the host, rendering the external IP unreachable from other kind nodes. In order to workaround this, one could expose pods and services using extra port mappings as shown in the extra port mappings section of kind’s <a href="https://kind.sigs.k8s.io/docs/user/configuration#extra-port-mappings">Configuration Guide</a>.</p>
+
+<h3 id="deploying-cluster">Deploying cluster</h3>
+
+<p>To start a kind cluster:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kind create cluster
+</code></pre></div></div>
+
+<p>In order to interact with the specific cluster created:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl cluster-info <span class="nt">--context</span> kind-kind
+</code></pre></div></div>
+
+<h3 id="installing-components">Installing components</h3>
+
+<h4 id="installing-metallb-on-the-cluster">Installing MetalLB on the cluster</h4>
+
+<p>There are <a href="https://metallb.universe.tf/installation/">many ways</a> to install MetalLB. For the sake of this example, we will install MetalLB via manifests. To do this, follow this <a href="https://metallb.universe.tf/installation/#installation-by-manifest">guide</a>. 
+Confirm successful installation by waiting for MetalLB pods to have a status of Running:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> metallb-system <span class="nt">--watch</span>
+</code></pre></div></div>
+
+<h4 id="installing-kubevirt-on-the-cluster">Installing Kubevirt on the cluster</h4>
+
+<p>Following Kubevirt <a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a> to install released version v0.51.0</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span>v0.51.0
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
+kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>360s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
+</code></pre></div></div>
+
+<p>Now we have a Kubernetes cluster with all the pieces to start the Demo.</p>
+
+<h3 id="network-resources-configuration">Network resources configuration</h3>
+
+<h4 id="setting-address-pool-to-be-used-by-the-loadbalancer">Setting Address Pool to be used by the LoadBalancer</h4>
+
+<p>In order to complete the Layer 2 mode configuration, we need to set a range of IP addresses for the LoadBalancer to use.
+On Linux we can use the docker kind network (macOS and Windows users see <a href="#external-ips-on-macos-and-windows">External IPs Prerequirement</a>), so by using this command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker network inspect <span class="nt">-f</span> <span class="s1">''</span> kind
+</code></pre></div></div>
+
+<p>You should get the subclass you can set the IP range from. The output should contain a cidr such as 172.18.0.0/16.
+Using this result we will create the following Layer 2 address pool with 172.18.1.1-172.18.1.16 range:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl apply -f -</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">metallb-system</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">config</span>
+<span class="na">data</span><span class="pi">:</span>
+  <span class="na">config</span><span class="pi">:</span> <span class="pi">|</span>
+    <span class="s">address-pools:</span>
+    <span class="s">- name: addresspool-sample1</span>
+      <span class="s">protocol: layer2</span>
+      <span class="s">addresses:</span>
+      <span class="s">- 172.18.1.1-172.18.1.16</span>
+<span class="s">EOF</span>
+</code></pre></div></div>
+
+<h3 id="network-utilization">Network utilization</h3>
+
+<h4 id="spin-up-a-virtual-machine-running-nginx">Spin up a Virtual Machine running Nginx</h4>
+
+<p>Now it’s time to start-up a virtual machine running nginx using the following yaml.
+The virtual machine has a <code class="language-plaintext highlighter-rouge">metallb-service=nginx</code> we created to use when creating the service.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl apply -f -</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-nginx</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">metallb-service</span><span class="pi">:</span> <span class="s">nginx</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">metallb-service</span><span class="pi">:</span> <span class="s">nginx</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">masquerade</span><span class="pi">:</span> <span class="pi">{}</span>
+              <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/fedora-cloud-container-disk-demo</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+        <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+              <span class="s">packages:</span>
+                <span class="s">- nginx</span>
+              <span class="s">runcmd:</span>
+                <span class="s">- [ "systemctl", "enable", "--now", "nginx" ]</span>
+          <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+<span class="s">EOF</span>
+</code></pre></div></div>
+
+<h4 id="expose-the-virtual-machine-with-a-typed-loadbalancer-service">Expose the virtual machine with a typed <code class="language-plaintext highlighter-rouge">LoadBalancer</code> service</h4>
+
+<p>When creating the <code class="language-plaintext highlighter-rouge">LoadBalancer</code> typed service, we need to remember annotating the address-pool we want to use 
+<code class="language-plaintext highlighter-rouge">addresspool-sample1</code> and also add the selector <code class="language-plaintext highlighter-rouge">metallb-service: nginx</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl apply -f -</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">metallb-nginx-svc</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
+  <span class="na">annotations</span><span class="pi">:</span>
+    <span class="na">metallb.universe.tf/address-pool</span><span class="pi">:</span> <span class="s">addresspool-sample1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">externalTrafficPolicy</span><span class="pi">:</span> <span class="s">Local</span>
+  <span class="na">ipFamilies</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">IPv4</span>
+  <span class="na">ports</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">tcp-5678</span>
+      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
+      <span class="na">port</span><span class="pi">:</span> <span class="m">5678</span>
+      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">80</span>
+  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
+  <span class="na">selector</span><span class="pi">:</span>
+    <span class="na">metallb-service</span><span class="pi">:</span> <span class="s">nginx</span>
+<span class="s">EOF</span>
+</code></pre></div></div>
+
+<p>Notice that the service got assigned with an external IP from the range assigned by the address pool:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get service <span class="nt">-n</span> default metallb-nginx-svc
+</code></pre></div></div>
+
+<p>Example output:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                TYPE           CLUSTER-IP      EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>          AGE
+metallb-nginx-svc   LoadBalancer   10.96.254.136   172.18.1.1    5678:32438/TCP   53s
+</code></pre></div></div>
+
+<h4 id="access-the-virtual-machine-from-outside-the-cluster">Access the virtual machine from outside the cluster</h4>
+
+<p>Finally, we can check that the nginx server is accessible from outside the cluster:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-s</span> <span class="nt">-o</span> /dev/null 172.18.1.1:5678 <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"URL exists"</span>
+</code></pre></div></div>
+
+<p>Example output:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>URL exists
+</code></pre></div></div>
+<p>Note that it may take a short while for the URL to work after setting the service.</p>
+
+<h2 id="doing-this-on-your-own-cluster">Doing this on your own cluster</h2>
+
+<p>Moving outside the demo example, one who would like use MetalLB on their real life cluster, should also take other considerations in mind:</p>
+<ul>
+  <li>User privileges: you should have <code class="language-plaintext highlighter-rouge">cluster-admin</code> privileges on the cluster - in order to install MetalLB.</li>
+  <li>IP Ranges for MetalLB: getting IP Address pools allocation for MetalLB depends on your cluster environment:
+    <ul>
+      <li>If you’re running a bare-metal cluster in a shared host environment, you need to first reserve this IP Address pool from your hosting provider.</li>
+      <li>Alternatively, if you’re running on a private cluster, you can use one of the private IP Address spaces (a.k.a RFC1918 addresses). Such addresses are free, and work fine as long as you’re only providing cluster services to your LAN.</li>
+    </ul>
+  </li>
+</ul>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this blog post we used MetalLB to expose a service using an external IP assigned to a virtual machine. 
+This illustrates how virtual machine traffic can be load-balanced via a service.</p>]]></content><author><name>Ram Lavi</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="load-balancer" /><category term="MetalLB" /><summary type="html"><![CDATA[This post illustrates setting up a virtual machine with MetalLB LoadBalancer service.]]></summary></entry><entry><title type="html">KubeVirt v0.51.0</title><link href="https://kubevirt.io//2022/changelog-v0.51.0.html" rel="alternate" type="text/html" title="KubeVirt v0.51.0" /><published>2022-03-08T00:00:00+00:00</published><updated>2022-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.51.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.51.0.html"><![CDATA[<h2 id="v0510">v0.51.0</h2>
 
 <p>Released on: Tue Mar 8 21:06:59 2022 +0000</p>
 
@@ -349,29 +575,4 @@ All you need is to define the right environment variables before starting the cl
 
 <h2 id="key-takeaways">Key Takeaways</h2>
 
-<p>Being able to run real-time workloads in KubeVirt with lower CPU latency opens new possibilities and expands the use cases where KubeVirt can assist in migrating legacy VMs into the cloud. Real-time workloads are extremely sensitive to the amount of layers between the bare metal and its runtime: the more layers in between, the higher the latency will be. The changes introduced in KubeVirt help reduce such waste and provide lower CPU latencies as the hardware is more efficiently tuned.</p>]]></content><author><name>Jordi Gil</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="real-time" /><category term="NUMA" /><category term="CPUManager" /><summary type="html"><![CDATA[This blog post details the various enhancements made to improve the performance of real-time workloads in KubeVirt]]></summary></entry><entry><title type="html">KubeVirt v0.46.0</title><link href="https://kubevirt.io//2021/changelog-v0.46.0.html" rel="alternate" type="text/html" title="KubeVirt v0.46.0" /><published>2021-10-08T00:00:00+00:00</published><updated>2021-10-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.46.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.46.0.html"><![CDATA[<h2 id="v0460">v0.46.0</h2>
-
-<p>Released on: Fri Oct 8 21:12:33 2021 +0000</p>
-
-<ul>
-  <li>[PR #6425][awels] Hotplug disks are possible when iothreads are enabled.</li>
-  <li>[PR #6297][acardace] mutate migration PDBs instead of creating an additional one for the duration of the migration.</li>
-  <li>[PR #6464][awels] BugFix: Fixed hotplug race between kubelet and virt-handler when virt-launcher dies unexpectedly.</li>
-  <li>[PR #6465][salanki] Fix corrupted DHCP Gateway Option from local DHCP server, leading to rejected IP configuration on Windows VMs.</li>
-  <li>[PR #6458][vladikr] Tagged SR-IOV interfaces will now appear in the config drive metadata</li>
-  <li>[PR #6446][brybacki] Access mode for virtctl image upload is now optional. This version of virtctl now requires CDI v1.34 or greater</li>
-  <li>[PR #6391][zcahana] Cleanup obsolete permissions from virt-operator’s ClusterRole</li>
-  <li>[PR #6419][rthallisey] Fix virt-controller panic caused by lots of deleted VMI events</li>
-  <li>[PR #5972][kwiesmueller] Add a <code class="language-plaintext highlighter-rouge">ssh</code> command to <code class="language-plaintext highlighter-rouge">virtctl</code> that can be used to open SSH sessions to VMs/VMIs.</li>
-  <li>[PR #6403][jrife] Removed go module pinning to an old version (v0.3.0) of github.com/go-kit/kit</li>
-  <li>[PR #6367][brybacki] virtctl imageupload now uses DataVolume.spec.storage</li>
-  <li>[PR #6198][iholder-redhat] Fire a Prometheus alert when a lot of REST failures are detected in virt-api</li>
-  <li>[PR #6211][davidvossel] cluster-profiler pprof gathering tool and corresponding “ClusterProfiler” feature gate</li>
-  <li>[PR #6323][vladikr] switch live migration to use unix sockets</li>
-  <li>[PR #6374][vladikr] Fix the default setting of CPU requests on vmipods</li>
-  <li>[PR #6283][rthallisey] Record the time it takes to delete a VMI and expose it as a metric</li>
-  <li>[PR #6251][rmohr] Better place vcpu threads on host cpus to form more efficient passthrough architectures</li>
-  <li>[PR #6377][rmohr] Don’t fail on failed selinux relabel attempts if selinux is permissive</li>
-  <li>[PR #6308][awels] BugFix: hotplug was broken when using it with a hostpath volume that was on a separate device.</li>
-  <li>[PR #6186][davidvossel] Add resource and verb labels to rest_client_requests_total metric</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.46.0 changes]]></summary></entry></feed>
+<p>Being able to run real-time workloads in KubeVirt with lower CPU latency opens new possibilities and expands the use cases where KubeVirt can assist in migrating legacy VMs into the cloud. Real-time workloads are extremely sensitive to the amount of layers between the bare metal and its runtime: the more layers in between, the higher the latency will be. The changes introduced in KubeVirt help reduce such waste and provide lower CPU latencies as the hardware is more efficiently tuned.</p>]]></content><author><name>Jordi Gil</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="real-time" /><category term="NUMA" /><category term="CPUManager" /><summary type="html"><![CDATA[This blog post details the various enhancements made to improve the performance of real-time workloads in KubeVirt]]></summary></entry></feed>

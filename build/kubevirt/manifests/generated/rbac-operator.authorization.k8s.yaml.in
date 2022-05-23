@@ -333,6 +333,8 @@ rules:
   resources:
   - virtualmachineflavors
   - virtualmachineclusterflavors
+  - virtualmachinepreferences
+  - virtualmachineclusterpreferences
   verbs:
   - list
   - watch
@@ -534,6 +536,8 @@ rules:
   resources:
   - virtualmachineflavors
   - virtualmachineclusterflavors
+  - virtualmachinepreferences
+  - virtualmachineclusterpreferences
   verbs:
   - list
   - watch
@@ -693,6 +697,8 @@ rules:
   resources:
   - virtualmachineflavors
   - virtualmachineclusterflavors
+  - virtualmachinepreferences
+  - virtualmachineclusterpreferences
   verbs:
   - get
   - delete
@@ -791,6 +797,8 @@ rules:
   resources:
   - virtualmachineflavors
   - virtualmachineclusterflavors
+  - virtualmachinepreferences
+  - virtualmachineclusterpreferences
   verbs:
   - get
   - delete
@@ -861,6 +869,8 @@ rules:
   resources:
   - virtualmachineflavors
   - virtualmachineclusterflavors
+  - virtualmachinepreferences
+  - virtualmachineclusterpreferences
   verbs:
   - get
   - list
