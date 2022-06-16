@@ -22,21 +22,19 @@ import (
 	"fmt"
 	"strings"
 
-	"kubevirt.io/kubevirt/pkg/virt-operator/util"
-
 	"kubevirt.io/api/flavor"
 
 	"kubevirt.io/api/migrations"
 
 	migrationsv1 "kubevirt.io/api/migrations/v1alpha1"
 
-	corev1 "k8s.io/api/core/v1"
 	schedulingv1 "k8s.io/api/scheduling/v1"
 	extv1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	k8syaml "k8s.io/apimachinery/pkg/util/yaml"
 
 	virtv1 "kubevirt.io/api/core/v1"
+	exportv1 "kubevirt.io/api/export/v1alpha1"
 	flavorv1alpha1 "kubevirt.io/api/flavor/v1alpha1"
 	poolv1 "kubevirt.io/api/pool/v1alpha1"
 	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
@@ -59,6 +57,7 @@ var (
 	VIRTUALMACHINEPOOL               = "virtualmachinepools." + poolv1.SchemeGroupVersion.Group
 	VIRTUALMACHINESNAPSHOT           = "virtualmachinesnapshots." + snapshotv1.SchemeGroupVersion.Group
 	VIRTUALMACHINESNAPSHOTCONTENT    = "virtualmachinesnapshotcontents." + snapshotv1.SchemeGroupVersion.Group
+	VIRTUALMACHINEEXPORT             = "virtualmachineexports." + exportv1.SchemeGroupVersion.Group
 	MIGRATIONPOLICY                  = "migrationpolicies." + migrationsv1.MigrationPolicyKind.Group
 )
 
@@ -522,6 +521,45 @@ func NewVirtualMachineRestoreCrd() (*extv1.CustomResourceDefinition, error) {
 	return crd, nil
 }
 
+func NewVirtualMachineExportCrd() (*extv1.CustomResourceDefinition, error) {
+	crd := newBlankCrd()
+
+	crd.ObjectMeta.Name = "virtualmachineexports." + exportv1.SchemeGroupVersion.Group
+	crd.Spec = extv1.CustomResourceDefinitionSpec{
+		Group: exportv1.SchemeGroupVersion.Group,
+		Versions: []extv1.CustomResourceDefinitionVersion{
+			{
+				Name:    exportv1.SchemeGroupVersion.Version,
+				Served:  true,
+				Storage: true,
+			},
+		},
+		Scope: "Namespaced",
+		Names: extv1.CustomResourceDefinitionNames{
+			Plural:     "virtualmachineexports",
+			Singular:   "virtualmachineexport",
+			Kind:       "VirtualMachineExport",
+			ShortNames: []string{"vmexport", "vmexports"},
+			Categories: []string{
+				"all",
+			},
+		},
+	}
+	err := addFieldsToAllVersions(crd, []extv1.CustomResourceColumnDefinition{
+		{Name: "SourceKind", Type: "string", JSONPath: ".spec.source.kind"},
+		{Name: "SourceName", Type: "string", JSONPath: ".spec.source.name"},
+		{Name: "Phase", Type: "string", JSONPath: phaseJSONPath},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	if err = patchValidationForAllVersions(crd); err != nil {
+		return nil, err
+	}
+	return crd, nil
+}
+
 func NewVirtualMachineFlavorCrd() (*extv1.CustomResourceDefinition, error) {
 	crd := newBlankCrd()
 
@@ -665,39 +703,6 @@ func NewMigrationPolicyCrd() (*extv1.CustomResourceDefinition, error) {
 		return nil, err
 	}
 	return crd, nil
-}
-
-// Used by manifest generation
-func NewKubeVirtCR(namespace string, pullPolicy corev1.PullPolicy, featureGates string, infraReplicas uint8) *virtv1.KubeVirt {
-	cr := &virtv1.KubeVirt{
-		TypeMeta: metav1.TypeMeta{
-			APIVersion: virtv1.GroupVersion.String(),
-			Kind:       "KubeVirt",
-		},
-		ObjectMeta: metav1.ObjectMeta{
-			Namespace: namespace,
-			Name:      "kubevirt",
-		},
-		Spec: virtv1.KubeVirtSpec{
-			ImagePullPolicy: pullPolicy,
-		},
-	}
-
-	if featureGates != "" {
-		cr.Spec.Configuration = virtv1.KubeVirtConfiguration{
-			DeveloperConfiguration: &virtv1.DeveloperConfiguration{
-				FeatureGates: strings.Split(featureGates, ","),
-			},
-		}
-	}
-
-	if infraReplicas != util.DefaultInfraReplicas {
-		cr.Spec.Infra = &virtv1.ComponentConfig{
-			Replicas: &infraReplicas,
-		}
-	}
-
-	return cr
 }
 
 // NewKubeVirtPriorityClassCR is used for manifest generation

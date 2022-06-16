@@ -252,7 +252,7 @@ var _ = Describe("Migration watcher", func() {
 		config, _, _ := testutils.NewFakeClusterConfigUsingKVConfig(kvConfig)
 
 		controller = NewMigrationController(
-			services.NewTemplateService("a", 240, "b", "c", "d", "e", "f", "g", pvcInformer.GetStore(), virtClient, config, qemuGid),
+			services.NewTemplateService("a", 240, "b", "c", "d", "e", "f", "g", pvcInformer.GetStore(), virtClient, config, qemuGid, "h"),
 			vmiInformer,
 			podInformer,
 			migrationInformer,
@@ -1312,6 +1312,7 @@ var _ = Describe("Migration watcher", func() {
 			if toDefineHostModelCPU {
 				node.ObjectMeta.Labels = map[string]string{
 					virtv1.HostModelCPULabel + "fake":              "true",
+					virtv1.SupportedHostModelMigrationCPU + "fake": "true",
 					virtv1.HostModelRequiredFeaturesLabel + "fake": "true",
 				}
 			}
@@ -1323,7 +1324,7 @@ var _ = Describe("Migration watcher", func() {
 			expectPodToHaveProperNodeSelector := func(pod *k8sv1.Pod) {
 				podHasCpuModeLabelSelector := false
 				for key, _ := range pod.Spec.NodeSelector {
-					if strings.Contains(key, virtv1.CPUModelLabel) {
+					if strings.Contains(key, virtv1.SupportedHostModelMigrationCPU) {
 						podHasCpuModeLabelSelector = true
 						break
 					}
@@ -1469,7 +1470,7 @@ var _ = Describe("Migration watcher", func() {
 				}
 
 				policyList := kubecli.NewMinimalMigrationPolicyList(policies...)
-				actualMatchedPolicy := policyList.MatchPolicy(vmi, &namespace)
+				actualMatchedPolicy := MatchPolicy(policyList, vmi, &namespace)
 
 				Expect(actualMatchedPolicy.Name).To(Equal(expectedMatchedPolicyName))
 			},
@@ -1487,20 +1488,20 @@ var _ = Describe("Migration watcher", func() {
 				const labelValue = "mp-value-0"
 
 				policy := tests.GetPolicyMatchedToVmi("testpolicy", vmi, &namespace, 4, 3)
-				_, exists := policy.Spec.Selectors.VirtualMachineInstanceSelector.MatchLabels[labelKey]
+				_, exists := policy.Spec.Selectors.VirtualMachineInstanceSelector[labelKey]
 				Expect(exists).To(BeTrue())
 
 				By("Changing one of the policy's labels to it won't match to VMI")
-				policy.Spec.Selectors.VirtualMachineInstanceSelector.MatchLabels[labelKey] = labelValue + "XYZ"
+				policy.Spec.Selectors.VirtualMachineInstanceSelector[labelKey] = labelValue + "XYZ"
 				policyList := kubecli.NewMinimalMigrationPolicyList(*policy)
 
-				matchedPolicy := policyList.MatchPolicy(vmi, &namespace)
+				matchedPolicy := MatchPolicy(policyList, vmi, &namespace)
 				Expect(matchedPolicy).To(BeNil())
 			})
 
 			It("when no policies exist, MatchPolicy() should return nil", func() {
 				policyList := kubecli.NewMinimalMigrationPolicyList()
-				matchedPolicy := policyList.MatchPolicy(vmi, &namespace)
+				matchedPolicy := MatchPolicy(policyList, vmi, &namespace)
 				Expect(matchedPolicy).To(BeNil())
 			})
 
@@ -1514,7 +1515,7 @@ var _ = Describe("Migration watcher", func() {
 				policyList := kubecli.NewMinimalMigrationPolicyList(*policyWithNSLabels, *policyWithVmiLabels)
 
 				By("Expecting VMI labels policy to be matched")
-				matchedPolicy := policyList.MatchPolicy(vmi, &namespace)
+				matchedPolicy := MatchPolicy(policyList, vmi, &namespace)
 				Expect(matchedPolicy.Name).To(Equal(policyWithVmiLabels.Name), "policy with VMI labels should match")
 			})
 		})

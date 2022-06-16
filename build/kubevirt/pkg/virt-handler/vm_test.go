@@ -35,8 +35,9 @@ import (
 	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/testing"
 
-	api2 "kubevirt.io/client-go/api"
+	virtcontroller "kubevirt.io/kubevirt/pkg/controller"
 
+	api2 "kubevirt.io/client-go/api"
 	netcache "kubevirt.io/kubevirt/pkg/network/cache"
 	neterrors "kubevirt.io/kubevirt/pkg/network/errors"
 	"kubevirt.io/kubevirt/pkg/util"
@@ -1473,6 +1474,145 @@ var _ = Describe("VirtualMachineInstance", func() {
 			})
 		})
 
+		Context("memory dump status events", func() {
+			It("Should trigger memory dump and generate InProgress event once mounted", func() {
+				vmi := api2.NewMinimalVMI("testvmi")
+				vmi.UID = vmiTestUUID
+				vmi.Status.Phase = v1.Running
+				vmi.Spec.Volumes = append(vmi.Spec.Volumes, v1.Volume{
+					Name: "test",
+				})
+				volumeStatus := v1.VolumeStatus{
+					Name:    "test",
+					Phase:   v1.HotplugVolumeMounted,
+					Reason:  "reason",
+					Message: "message",
+					HotplugVolume: &v1.HotplugVolumeStatus{
+						AttachPodName: "testpod",
+						AttachPodUID:  "1234",
+					},
+					MemoryDumpVolume: &v1.DomainMemoryDumpInfo{
+						ClaimName: "test",
+					},
+				}
+				vmi.Status.VolumeStatus = append(vmi.Status.VolumeStatus, volumeStatus)
+				domain := api.NewMinimalDomainWithUUID("testvmi", vmiTestUUID)
+				domain.Status.Status = api.Running
+				vmiFeeder.Add(vmi)
+				domainFeeder.Add(domain)
+
+				updatedVolumeStatus := *volumeStatus.DeepCopy()
+				updatedVolumeStatus.MemoryDumpVolume.TargetFileName = dumpTargetFile(volumeStatus.Name)
+				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
+				hasHotplug := controller.updateVolumeStatusesFromDomain(vmi, domain)
+				Expect(hasHotplug).To(BeTrue())
+
+				Expect(vmi.Status.VolumeStatus[0].Phase).To(Equal(v1.MemoryDumpVolumeInProgress))
+				Expect(vmi.Status.VolumeStatus[0].MemoryDumpVolume.TargetFileName).To(Equal(dumpTargetFile(volumeStatus.Name)))
+				testutils.ExpectEvent(recorder, "Memory dump Volume test is attached, getting memory dump")
+				By("Calling it again with updated status, no new events are generated as long as memory dump not completed")
+				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
+				controller.updateVolumeStatusesFromDomain(vmi, domain)
+			})
+
+			It("Should generate memory dump completed event once memory dump completed", func() {
+				vmi := api2.NewMinimalVMI("testvmi")
+				vmi.UID = vmiTestUUID
+				vmi.Status.Phase = v1.Running
+				vmi.Spec.Volumes = append(vmi.Spec.Volumes, v1.Volume{
+					Name: "test",
+				})
+				volumeStatus := v1.VolumeStatus{
+					Name:    "test",
+					Phase:   v1.MemoryDumpVolumeInProgress,
+					Reason:  "reason",
+					Message: "message",
+					HotplugVolume: &v1.HotplugVolumeStatus{
+						AttachPodName: "testpod",
+						AttachPodUID:  "1234",
+					},
+					MemoryDumpVolume: &v1.DomainMemoryDumpInfo{
+						ClaimName:      "test",
+						TargetFileName: dumpTargetFile("test"),
+					},
+				}
+				vmi.Status.VolumeStatus = append(vmi.Status.VolumeStatus, volumeStatus)
+				domain := api.NewMinimalDomainWithUUID("testvmi", vmiTestUUID)
+				now := metav1.Now()
+				domain.Spec.Metadata.KubeVirt.MemoryDump = &api.MemoryDumpMetadata{
+					FileName:       dumpTargetFile("test"),
+					StartTimestamp: &now,
+					EndTimestamp:   &now,
+					Completed:      true,
+				}
+				domain.Status.Status = api.Running
+				vmiFeeder.Add(vmi)
+				domainFeeder.Add(domain)
+
+				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
+				hasHotplug := controller.updateVolumeStatusesFromDomain(vmi, domain)
+				Expect(hasHotplug).To(BeTrue())
+
+				Expect(vmi.Status.VolumeStatus[0].Phase).To(Equal(v1.MemoryDumpVolumeCompleted))
+				Expect(vmi.Status.VolumeStatus[0].MemoryDumpVolume.StartTimestamp).ToNot(BeNil())
+				Expect(vmi.Status.VolumeStatus[0].MemoryDumpVolume.EndTimestamp).ToNot(BeNil())
+				testutils.ExpectEvent(recorder, "Memory dump to Volume test has completed successfully")
+				By("Calling it again with updated status, no new events are generated as long as memory dump not completed")
+				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
+				controller.updateVolumeStatusesFromDomain(vmi, domain)
+			})
+
+			It("Should generate memory dump failed event if memory dump failed", func() {
+				vmi := api2.NewMinimalVMI("testvmi")
+				vmi.UID = vmiTestUUID
+				vmi.Status.Phase = v1.Running
+				vmi.Spec.Volumes = append(vmi.Spec.Volumes, v1.Volume{
+					Name: "test",
+				})
+				volumeStatus := v1.VolumeStatus{
+					Name:    "test",
+					Phase:   v1.MemoryDumpVolumeInProgress,
+					Reason:  "reason",
+					Message: "message",
+					HotplugVolume: &v1.HotplugVolumeStatus{
+						AttachPodName: "testpod",
+						AttachPodUID:  "1234",
+					},
+					MemoryDumpVolume: &v1.DomainMemoryDumpInfo{
+						ClaimName:      "test",
+						TargetFileName: dumpTargetFile("test"),
+					},
+				}
+				vmi.Status.VolumeStatus = append(vmi.Status.VolumeStatus, volumeStatus)
+				domain := api.NewMinimalDomainWithUUID("testvmi", vmiTestUUID)
+				domain.Status.Status = api.Running
+				now := metav1.Now()
+				failureReason := "memory dump failed"
+				domain.Spec.Metadata.KubeVirt.MemoryDump = &api.MemoryDumpMetadata{
+					FileName:       dumpTargetFile("test"),
+					StartTimestamp: &now,
+					EndTimestamp:   &now,
+					Failed:         true,
+					FailureReason:  failureReason,
+				}
+				vmiFeeder.Add(vmi)
+				domainFeeder.Add(domain)
+
+				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
+				hasHotplug := controller.updateVolumeStatusesFromDomain(vmi, domain)
+				Expect(hasHotplug).To(BeTrue())
+
+				Expect(vmi.Status.VolumeStatus[0].Phase).To(Equal(v1.MemoryDumpVolumeFailed))
+				Expect(vmi.Status.VolumeStatus[0].MemoryDumpVolume.StartTimestamp).ToNot(BeNil())
+				Expect(vmi.Status.VolumeStatus[0].MemoryDumpVolume.EndTimestamp).ToNot(BeNil())
+				testutils.ExpectEvent(recorder, fmt.Sprintf("Memory dump to pvc %s failed: %s", volumeStatus.Name, failureReason))
+				By("Calling it again with updated status, no new events are generated as long as memory dump not completed")
+				mockHotplugVolumeMounter.EXPECT().IsMounted(vmi, "test", gomock.Any()).Return(true, nil)
+				controller.updateVolumeStatusesFromDomain(vmi, domain)
+			})
+
+		})
+
 		DescribeTable("should leave the VirtualMachineInstance alone if it is in the final phase", func(phase v1.VirtualMachineInstancePhase) {
 			vmi := api2.NewMinimalVMI("testvmi")
 			vmi.Status.Phase = phase
@@ -1534,7 +1674,6 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			destSrcPorts := controller.migrationProxy.GetTargetListenerPorts(string(vmi.UID))
-			fmt.Println("destSrcPorts: ", destSrcPorts)
 			updatedVmi := vmi.DeepCopy()
 			updatedVmi.Status.MigrationState.TargetNodeAddress = controller.migrationIpAddress
 			updatedVmi.Status.MigrationState.TargetDirectMigrationNodePorts = destSrcPorts
@@ -1608,7 +1747,6 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(err).NotTo(HaveOccurred())
 
 			destSrcPorts := controller.migrationProxy.GetTargetListenerPorts(string(vmi.UID))
-			fmt.Println("destSrcPorts: ", destSrcPorts)
 			updatedVmi := vmi.DeepCopy()
 			updatedVmi.Status.MigrationState.TargetNodeAddress = controller.migrationIpAddress
 			updatedVmi.Status.MigrationState.TargetDirectMigrationNodePorts = destSrcPorts
@@ -1705,6 +1843,44 @@ var _ = Describe("VirtualMachineInstance", func() {
 			client.EXPECT().MigrateVirtualMachine(vmi, options)
 			controller.Execute()
 			testutils.ExpectEvent(recorder, VMIMigrating)
+		})
+
+		It("should not try to migrate a vmi twice", func() {
+			vmi := api2.NewMinimalVMI("testvmi")
+			vmi.UID = vmiTestUUID
+			vmi.ObjectMeta.ResourceVersion = "1"
+			vmi.Status.Phase = v1.Running
+			vmi.Labels = make(map[string]string)
+			vmi.Status.NodeName = host
+			vmi.Labels[v1.MigrationTargetNodeNameLabel] = "othernode"
+			vmi.Status.Interfaces = make([]v1.VirtualMachineInstanceNetworkInterface, 0)
+			startTimestamp := metav1.Now()
+			vmi.Status.MigrationState = &v1.VirtualMachineInstanceMigrationState{
+				TargetNode:                     "othernode",
+				TargetNodeAddress:              "127.0.0.1:12345",
+				SourceNode:                     host,
+				MigrationUID:                   "123",
+				TargetDirectMigrationNodePorts: map[string]int{"49152": 12132},
+				StartTimestamp:                 &startTimestamp,
+			}
+			vmi.Status.Conditions = []v1.VirtualMachineInstanceCondition{
+				{
+					Type:   v1.VirtualMachineInstanceIsMigratable,
+					Status: k8sv1.ConditionTrue,
+				},
+			}
+			vmi = addActivePods(vmi, podTestUUID, host)
+
+			mockWatchdog.CreateFile(vmi)
+			domain := api.NewMinimalDomainWithUUID("testvmi", vmiTestUUID)
+			domain.Status.Status = api.Running
+			domain.Spec.Metadata.KubeVirt.Migration = &api.MigrationMetadata{
+				StartTimestamp: &startTimestamp,
+				UID:            "123",
+			}
+			domainFeeder.Add(domain)
+			vmiFeeder.Add(vmi)
+			controller.Execute()
 		})
 
 		It("should abort vmi migration vmi when migration object indicates deletion", func() {
@@ -2227,8 +2403,23 @@ var _ = Describe("VirtualMachineInstance", func() {
 			Expect(condition.Reason).To(Equal(v1.VirtualMachineInstanceReasonVirtIOFSNotMigratable))
 		})
 
+		It("should not be allowed to live-migrate if the VMI does not use masquerade to connect to the pod network", func() {
+			vmi := api2.NewMinimalVMI("testvmi")
+
+			strategy := v1.EvictionStrategyLiveMigrate
+			vmi.Spec.EvictionStrategy = &strategy
+
+			vmi.Spec.Domain.Devices.Interfaces = []v1.Interface{*v1.DefaultBridgeNetworkInterface()}
+			vmi.Spec.Networks = []v1.Network{*v1.DefaultPodNetwork()}
+
+			conditionManager := virtcontroller.NewVirtualMachineInstanceConditionManager()
+			controller.updateLiveMigrationConditions(vmi, conditionManager)
+
+			testutils.ExpectEvent(recorder, "cannot migrate VMI which does not use masquerade to connect to the pod network")
+		})
+
 		Context("check that migration is not supported when using Host Devices", func() {
-			envName := util.ResourceNameToEnvVar("PCI_RESOURCE", "dev1")
+			envName := util.ResourceNameToEnvVar(v1.PCIResourcePrefix, "dev1")
 
 			BeforeEach(func() {
 				_ = os.Setenv(envName, "0000:81:01.0")
@@ -2255,7 +2446,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 			})
 
 			It("should not be allowed to live-migrate if the VMI uses PCI GPU", func() {
-				envName := util.ResourceNameToEnvVar("PCI_RESOURCE", "dev1")
+				envName := util.ResourceNameToEnvVar(v1.PCIResourcePrefix, "dev1")
 				_ = os.Setenv(envName, "0000:81:01.0")
 				defer func() {
 					_ = os.Unsetenv(envName)
@@ -2671,6 +2862,7 @@ var _ = Describe("VirtualMachineInstance", func() {
 		var vmiWithSSH *v1.VirtualMachineInstance
 		var basicCommands []v1.GuestAgentCommandInfo
 		var allCommands []v1.GuestAgentCommandInfo
+		const agentSupported = "This guest agent is supported"
 
 		BeforeEach(func() {
 			vmi = &v1.VirtualMachineInstance{}
@@ -2728,33 +2920,39 @@ var _ = Describe("VirtualMachineInstance", func() {
 		})
 
 		It("should succeed with empty VMI and basic commands", func() {
-			result := isGuestAgentSupported(vmi, basicCommands)
+			result, reason := isGuestAgentSupported(vmi, basicCommands)
 			Expect(result).To(BeTrue())
+			Expect(reason).To(Equal(agentSupported))
 		})
 
 		It("should succeed with empty VMI and all commands", func() {
-			result := isGuestAgentSupported(vmi, allCommands)
+			result, reason := isGuestAgentSupported(vmi, allCommands)
 			Expect(result).To(BeTrue())
+			Expect(reason).To(Equal(agentSupported))
 		})
 
 		It("should fail with password and basic commands", func() {
-			result := isGuestAgentSupported(vmiWithPassword, basicCommands)
+			result, reason := isGuestAgentSupported(vmiWithPassword, basicCommands)
 			Expect(result).To(BeFalse())
+			Expect(reason).To(Equal("This guest agent doesn't support required password commands"))
 		})
 
 		It("should succeed with password and all commands", func() {
-			result := isGuestAgentSupported(vmiWithPassword, allCommands)
+			result, reason := isGuestAgentSupported(vmiWithPassword, allCommands)
 			Expect(result).To(BeTrue())
+			Expect(reason).To(Equal(agentSupported))
 		})
 
 		It("should fail with SSH and basic commands", func() {
-			result := isGuestAgentSupported(vmiWithSSH, basicCommands)
+			result, reason := isGuestAgentSupported(vmiWithSSH, basicCommands)
 			Expect(result).To(BeFalse())
+			Expect(reason).To(Equal("This guest agent doesn't support required public key commands"))
 		})
 
 		It("should succeed with SSH and all commands", func() {
-			result := isGuestAgentSupported(vmiWithSSH, allCommands)
+			result, reason := isGuestAgentSupported(vmiWithSSH, allCommands)
 			Expect(result).To(BeTrue())
+			Expect(reason).To(Equal(agentSupported))
 		})
 	})
 })

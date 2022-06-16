@@ -85,6 +85,7 @@ import (
 	"kubevirt.io/kubevirt/tests/flags"
 	"kubevirt.io/kubevirt/tests/libnet"
 	"kubevirt.io/kubevirt/tests/libstorage"
+	"kubevirt.io/kubevirt/tests/watcher"
 )
 
 const (
@@ -1096,7 +1097,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				tests.ConfirmVMIPostMigration(virtClient, vmi, migrationUID)
 
 				// ensure the libvirt domain is persistent
-				persistent, err := tests.LibvirtDomainIsPersistent(virtClient, vmi)
+				persistent, err := libvirtDomainIsPersistent(virtClient, vmi)
 				Expect(err).ToNot(HaveOccurred(), "Should list libvirt domains successfully")
 				Expect(persistent).To(BeTrue(), "The VMI was not found in the list of libvirt persistent domains")
 				tests.EnsureNoMigrationMetadataInPersistentXML(vmi)
@@ -1187,11 +1188,10 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				By("Should receive warning event that target pod is currently unschedulable")
 				ctx, cancel := context.WithCancel(context.Background())
 				defer cancel()
-				tests.
-					NewObjectEventWatcher(migration).
+				watcher.New(migration).
 					Timeout(60*time.Second).
 					SinceWatchedObjectResourceVersion().
-					WaitFor(ctx, tests.WarningEvent, "migrationTargetPodUnschedulable")
+					WaitFor(ctx, watcher.WarningEvent, "migrationTargetPodUnschedulable")
 
 				By("Migration should observe a timeout period before canceling unschedulable target pod")
 				Consistently(func() error {
@@ -2405,11 +2405,16 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 										continue
 									}
 									// Wait for the iso to be created
-									Eventually(func() string {
+									Eventually(func() error {
 										output, err := tests.RunCommandOnVmiTargetPod(vmi, []string{"/bin/bash", "-c", "[[ -f " + volPath + " ]] && echo found || true"})
-										Expect(err).ToNot(HaveOccurred())
-										return output
-									}, 30*time.Second, time.Second).Should(ContainSubstring("found"), volPath+" never appeared")
+										if err != nil {
+											return err
+										}
+										if !strings.Contains(output, "found") {
+											return fmt.Errorf("%s never appeared", volPath)
+										}
+										return nil
+									}, 30*time.Second, time.Second).Should(Not(HaveOccurred()))
 									output, err := tests.RunCommandOnVmiTargetPod(vmi, []string{"/bin/bash", "-c", "/usr/bin/stat --printf=%s " + volPath})
 									Expect(err).ToNot(HaveOccurred())
 									Expect(strconv.Atoi(output)).To(Equal(int(volStatus.Size)), "ISO file for volume %s is not the right size", volume.Name)
@@ -2505,11 +2510,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 					Spec: v1alpha1.MigrationPolicySpec{
 						BandwidthPerMigration: &quantity,
 						Selectors: &v1alpha1.Selectors{
-							NamespaceSelector: &metav1.LabelSelector{
-								MatchLabels: map[string]string{
-									cleanup.TestLabelForNamespace(util.NamespaceTestDefault): "",
-								},
-							},
+							NamespaceSelector: v1alpha1.LabelSelector{cleanup.TestLabelForNamespace(util.NamespaceTestDefault): ""},
 						},
 					},
 				}
@@ -2689,7 +2690,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 
 				By("Ensuring that target pod has correct nodeSelector label")
 				vmiPod := tests.GetRunningPodByVirtualMachineInstance(vmi, vmi.Namespace)
-				Expect(vmiPod.Spec.NodeSelector).To(HaveKey(v1.CPUModelLabel+hostModel),
+				Expect(vmiPod.Spec.NodeSelector).To(HaveKey(v1.SupportedHostModelMigrationCPU+hostModel),
 					"target pod is expected to have correct nodeSelector label defined")
 
 				By("Ensuring that target node has correct CPU mode & features")
@@ -2699,7 +2700,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				expectFeatureToBeSupportedOnNode(newNode, requiredFeatures)
 			})
 
-			Context("[Serial]Should trigger event", func() {
+			Context("[Serial]Should trigger event if vmi with host-model start on source node with uniq host-model", func() {
 
 				var originalNodeLabels map[string]string
 				var originalNodeAnnotations map[string]string
@@ -2760,6 +2761,89 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 						labelValue, ok := node.Labels[v1.HostModelCPULabel+"fake-model"]
 						return ok && labelValue == "true"
 					}, 10*time.Second, 1*time.Second).Should(BeTrue(), "Node should have fake host model")
+
+					By("Starting the migration")
+					migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
+					_ = tests.RunMigration(virtClient, migration)
+
+					By("Expecting for an alert to be triggered")
+					Eventually(func() []k8sv1.Event {
+						events, err := virtClient.CoreV1().Events(vmi.Namespace).List(
+							context.Background(),
+							metav1.ListOptions{
+								FieldSelector: fmt.Sprintf("type=%s,reason=%s", k8sv1.EventTypeWarning, watch.NoSuitableNodesForHostModelMigration),
+							},
+						)
+						Expect(err).ToNot(HaveOccurred())
+
+						return events.Items
+					}, 30*time.Second, 1*time.Second).Should(HaveLen(1), "Exactly one alert is expected")
+				})
+
+			})
+
+			Context("[Serial]Should trigger event if the nodes doesn't contain MigrationSelectorLabel for the vmi host-model type", func() {
+
+				var originalNodeLabels []map[string]string
+				var originalNodeAnnotations []map[string]string
+				var vmi *v1.VirtualMachineInstance
+				var backupNodes []k8sv1.Node
+
+				BeforeEach(func() {
+					backupNodes = libnode.GetAllSchedulableNodes(virtClient).Items
+					if len(backupNodes) == 1 || len(backupNodes) > 10 {
+						Skip("This test can't run with single node and it's too slow to run with more than 10 nodes")
+					}
+					originalNodeLabels = make([]map[string]string, len(backupNodes))
+					originalNodeAnnotations = make([]map[string]string, len(backupNodes))
+					By("Creating a VMI with default CPU mode")
+					vmi = alpineVMIWithEvictionStrategy()
+					vmi.Spec.Domain.CPU = &v1.CPU{Model: v1.CPUModeHostModel}
+
+					By("Starting the VirtualMachineInstance")
+					vmi = runVMIAndExpectLaunch(vmi, 240)
+
+					for indx, node := range backupNodes {
+						originalNodeLabels[indx] = copyMap(node.Labels)
+						originalNodeAnnotations[indx] = copyMap(node.Annotations)
+						disableNodeLabeller(&node, virtClient)
+					}
+				})
+
+				AfterEach(func() {
+					By("Restore node to its original state")
+					for indx, node := range backupNodes {
+						currNode, err := virtClient.CoreV1().Nodes().Get(context.Background(), node.Name, metav1.GetOptions{})
+						Expect(err).ShouldNot(HaveOccurred())
+						currNode.Labels = originalNodeLabels[indx]
+						currNode.Annotations = originalNodeAnnotations[indx]
+						_, err = virtClient.CoreV1().Nodes().Update(context.Background(), currNode, metav1.UpdateOptions{})
+						Expect(err).ShouldNot(HaveOccurred())
+					}
+					for indx, node := range backupNodes {
+						var currNode *k8sv1.Node
+						Eventually(func() map[string]string {
+							currNode, err = virtClient.CoreV1().Nodes().Get(context.Background(), node.Name, metav1.GetOptions{})
+							Expect(err).ShouldNot(HaveOccurred())
+							return currNode.Labels
+						}, 10*time.Second, 1*time.Second).Should(Equal(originalNodeLabels[indx]), "Node should have original labels")
+						Expect(currNode.Annotations).To(Equal(originalNodeAnnotations[indx]))
+					}
+
+				})
+
+				It(" no node contain suited SupportedHostModelMigrationCPU label", func() {
+					By("Changing node labels to support fake host model")
+					// Remove all supported host models
+					for _, node := range backupNodes {
+						currNode, err := virtClient.CoreV1().Nodes().Get(context.Background(), node.Name, metav1.GetOptions{})
+						Expect(err).ShouldNot(HaveOccurred())
+						for key, _ := range currNode.Labels {
+							if strings.HasPrefix(key, v1.SupportedHostModelMigrationCPU) {
+								delete(currNode.Labels, key)
+							}
+						}
+					}
 
 					By("Starting the migration")
 					migration := tests.NewRandomMigration(vmi.Name, vmi.Namespace)
@@ -3011,7 +3095,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				By("Verifying at least once that both pods are protected")
 				for _, pod := range pods.Items {
 					err := virtClient.CoreV1().Pods(vmi.Namespace).EvictV1beta1(context.Background(), &policyv1beta1.Eviction{ObjectMeta: metav1.ObjectMeta{Name: pod.Name}})
-					Expect(errors.IsTooManyRequests(err)).To(BeTrue())
+					Expect(errors.IsTooManyRequests(err)).To(BeTrue(), "expected TooManyRequests error, got: %v", err)
 				}
 				By("Verifying that both pods are protected by the PodDisruptionBudget for the whole migration")
 				getOptions := metav1.GetOptions{}
@@ -3028,8 +3112,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 						deleteOptions := &metav1.DeleteOptions{Preconditions: &metav1.Preconditions{ResourceVersion: &pod.ResourceVersion}}
 						eviction := &policyv1beta1.Eviction{ObjectMeta: metav1.ObjectMeta{Name: pod.Name}, DeleteOptions: deleteOptions}
 						err = virtClient.CoreV1().Pods(vmi.Namespace).EvictV1beta1(context.Background(), eviction)
-						Expect(errors.IsTooManyRequests(err)).To(BeTrue())
-
+						Expect(errors.IsTooManyRequests(err)).To(BeTrue(), "expected TooManyRequests error, got: %v", err)
 					}
 					return currentMigration.Status.Phase
 				}, 180*time.Second, 500*time.Millisecond).Should(Equal(v1.MigrationSucceeded))
@@ -3040,7 +3123,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 				BeforeEach(func() {
 					// Taints defined by k8s are special and can't be applied manually.
 					// Temporarily configure KubeVirt to use something else for the duration of these tests.
-					if tests.IsUsingBuiltinNodeDrainKey() {
+					if libnode.GetNodeDrainKey() == "node.kubernetes.io/unschedulable" {
 						drain := "kubevirt.io/drain"
 						cfg := getCurrentKv()
 						cfg.MigrationConfiguration.NodeDrainTaintKey = &drain
@@ -3922,7 +4005,7 @@ var _ = Describe("[rfe_id:393][crit:high][vendor:cnv-qe@redhat.com][level:system
 			Expect(err).ToNot(HaveOccurred())
 
 			By("determining cgroups version")
-			cgroupVersion = tests.GetVMIsCgroupVersion(vmi, virtClient)
+			cgroupVersion = getVMIsCgroupVersion(vmi, virtClient)
 
 			By("ensuring the VMI started on the correct node")
 			Expect(vmi.Status.NodeName).To(Equal(nodes[0].Name))
@@ -4127,4 +4210,55 @@ func disableNodeLabeller(node *k8sv1.Node, virtClient kubecli.KubevirtClient) *k
 	}, 30*time.Second, time.Second).Should(BeTrue())
 
 	return node
+}
+
+func libvirtDomainIsPersistent(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineInstance) (bool, error) {
+	vmiPod := tests.GetRunningPodByVirtualMachineInstance(vmi, util.NamespaceTestDefault)
+	found := false
+	containerIdx := 0
+	for idx, container := range vmiPod.Spec.Containers {
+		if container.Name == "compute" {
+			containerIdx = idx
+			found = true
+		}
+	}
+	if !found {
+		return false, fmt.Errorf(tests.CouldNotFindComputeContainer)
+	}
+
+	stdout, stderr, err := tests.ExecuteCommandOnPodV2(
+		virtClient,
+		vmiPod,
+		vmiPod.Spec.Containers[containerIdx].Name,
+		[]string{"virsh", "--quiet", "list", "--persistent", "--name"},
+	)
+	if err != nil {
+		return false, fmt.Errorf("could not dump libvirt domxml (remotely on pod): %v: %s", err, stderr)
+	}
+	return strings.Contains(stdout, vmi.Namespace+"_"+vmi.Name), nil
+}
+
+func getVMIsCgroupVersion(vmi *v1.VirtualMachineInstance, virtClient kubecli.KubevirtClient) cgroup.CgroupVersion {
+	pod, err := tests.GetRunningPodByLabel(string(vmi.GetUID()), v1.CreatedByLabel, vmi.Namespace, vmi.Status.NodeName)
+	Expect(err).ToNot(HaveOccurred())
+
+	return getPodsCgroupVersion(pod, virtClient)
+}
+
+func getPodsCgroupVersion(pod *k8sv1.Pod, virtClient kubecli.KubevirtClient) cgroup.CgroupVersion {
+	stdout, stderr, err := tests.ExecuteCommandOnPodV2(virtClient,
+		pod,
+		"compute",
+		[]string{"stat", "/sys/fs/cgroup/", "-f", "-c", "%T"})
+
+	Expect(err).ToNot(HaveOccurred())
+	Expect(stderr).To(BeEmpty())
+
+	cgroupFsType := strings.TrimSpace(stdout)
+
+	if cgroupFsType == "cgroup2fs" {
+		return cgroup.V2
+	} else {
+		return cgroup.V1
+	}
 }

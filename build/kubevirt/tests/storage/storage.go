@@ -59,6 +59,7 @@ import (
 	"kubevirt.io/kubevirt/tests/libnet"
 	"kubevirt.io/kubevirt/tests/libstorage"
 	"kubevirt.io/kubevirt/tests/testsuite"
+	"kubevirt.io/kubevirt/tests/watcher"
 )
 
 const (
@@ -136,7 +137,7 @@ var _ = SIGDescribe("Storage", func() {
 				tests.RemoveSCSIDisk(nodeName, address)
 			})
 
-			It(" should pause VMI on IO error", func() {
+			It("[QUARANTINE] should pause VMI on IO error", func() {
 				By("Creating VMI with faulty disk")
 				vmi := tests.NewRandomVMIWithEphemeralDisk(cd.ContainerDiskFor(cd.ContainerDiskAlpine))
 				vmi = tests.AddPVCDisk(vmi, "pvc-disk", v1.DiskBusVirtio, pvc.Name)
@@ -218,7 +219,7 @@ var _ = SIGDescribe("Storage", func() {
 				Expect(err).ToNot(HaveOccurred())
 			})
 
-			It(" should pause VMI on IO error", func() {
+			It("[QUARANTINE] should pause VMI on IO error", func() {
 				By("Creating VMI with faulty disk")
 				vmi := tests.NewRandomVMIWithPVC(pvc.Name)
 				_, err := virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(vmi)
@@ -968,7 +969,7 @@ var _ = SIGDescribe("Storage", func() {
 						tests.WaitForVirtualMachineToDisappearWithTimeout(vmi, 120)
 					}
 					Expect(virtClient.CoreV1().Pods(pod.Namespace).Delete(context.Background(), pod.Name, metav1.DeleteOptions{})).To(Succeed())
-					tests.WaitForPodToDisappearWithTimeout(pod.Name, 120)
+					waitForPodToDisappearWithTimeout(pod.Name, 120)
 				})
 
 				configureToleration := func(toleration int) {
@@ -989,10 +990,10 @@ var _ = SIGDescribe("Storage", func() {
 					tests.RunVMI(vmi, 30)
 
 					By("Checking events")
-					objectEventWatcher := tests.NewObjectEventWatcher(vmi).SinceWatchedObjectResourceVersion().Timeout(time.Duration(120) * time.Second)
+					objectEventWatcher := watcher.New(vmi).SinceWatchedObjectResourceVersion().Timeout(time.Duration(120) * time.Second)
 					ctx, cancel := context.WithCancel(context.Background())
 					defer cancel()
-					objectEventWatcher.WaitFor(ctx, tests.WarningEvent, virtv1.SyncFailed.String())
+					objectEventWatcher.WaitFor(ctx, watcher.WarningEvent, virtv1.SyncFailed.String())
 
 				})
 
@@ -1007,12 +1008,12 @@ var _ = SIGDescribe("Storage", func() {
 					tests.RunVMIAndExpectLaunch(vmi, 30)
 
 					By("Checking events")
-					objectEventWatcher := tests.NewObjectEventWatcher(vmi).SinceWatchedObjectResourceVersion().Timeout(time.Duration(30) * time.Second)
-					wp := tests.WarningsPolicy{FailOnWarnings: true}
+					objectEventWatcher := watcher.New(vmi).SinceWatchedObjectResourceVersion().Timeout(time.Duration(30) * time.Second)
+					wp := watcher.WarningsPolicy{FailOnWarnings: true}
 					objectEventWatcher.SetWarningsPolicy(wp)
 					ctx, cancel := context.WithCancel(context.Background())
 					defer cancel()
-					objectEventWatcher.WaitFor(ctx, tests.EventType(hostdisk.EventTypeToleratedSmallPV), hostdisk.EventReasonToleratedSmallPV)
+					objectEventWatcher.WaitFor(ctx, watcher.EventType(hostdisk.EventTypeToleratedSmallPV), hostdisk.EventReasonToleratedSmallPV)
 				})
 			})
 		})
@@ -1393,3 +1394,12 @@ var _ = SIGDescribe("Storage", func() {
 		})
 	})
 })
+
+func waitForPodToDisappearWithTimeout(podName string, seconds int) {
+	virtClient, err := kubecli.GetKubevirtClient()
+	ExpectWithOffset(1, err).ToNot(HaveOccurred())
+	EventuallyWithOffset(1, func() bool {
+		_, err := virtClient.CoreV1().Pods(util.NamespaceTestDefault).Get(context.Background(), podName, metav1.GetOptions{})
+		return errors.IsNotFound(err)
+	}, seconds, 1*time.Second).Should(BeTrue())
+}

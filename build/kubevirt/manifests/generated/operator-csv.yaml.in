@@ -365,6 +365,12 @@ spec:
           - patch
           - update
         - apiGroups:
+          - ""
+          resources:
+          - persistentvolumeclaims
+          verbs:
+          - get
+        - apiGroups:
           - kubevirt.io
           resources:
           - virtualmachines/status
@@ -478,6 +484,7 @@ spec:
           - pods
           - configmaps
           - endpoints
+          - services
           verbs:
           - get
           - list
@@ -493,6 +500,12 @@ spec:
           - update
           - create
           - patch
+        - apiGroups:
+          - ""
+          resources:
+          - secrets
+          verbs:
+          - create
         - apiGroups:
           - ""
           resources:
@@ -550,6 +563,12 @@ spec:
           - patch
         - apiGroups:
           - snapshot.kubevirt.io
+          resources:
+          - '*'
+          verbs:
+          - '*'
+        - apiGroups:
+          - export.kubevirt.io
           resources:
           - '*'
           verbs:
@@ -765,6 +784,8 @@ spec:
           - virtualmachines/restart
           - virtualmachines/addvolume
           - virtualmachines/removevolume
+          - virtualmachines/migrate
+          - virtualmachines/memorydump
           verbs:
           - update
         - apiGroups:
@@ -867,6 +888,8 @@ spec:
           - virtualmachines/restart
           - virtualmachines/addvolume
           - virtualmachines/removevolume
+          - virtualmachines/migrate
+          - virtualmachines/memorydump
           verbs:
           - update
         - apiGroups:

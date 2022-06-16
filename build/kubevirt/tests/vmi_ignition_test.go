@@ -26,6 +26,7 @@ import (
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 
+	"kubevirt.io/kubevirt/tests/framework/checks"
 	"kubevirt.io/kubevirt/tests/util"
 
 	v1 "kubevirt.io/api/core/v1"
@@ -47,7 +48,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 		util.PanicOnError(err)
 		tests.BeforeTestCleanup()
 
-		if !tests.HasExperimentalIgnitionSupport() {
+		if !checks.HasFeature("ExperimentalIgnitionSupport") {
 			Skip("ExperimentalIgnitionSupport feature gate is not enabled in kubevirt-config")
 		}
 	})

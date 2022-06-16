@@ -398,18 +398,18 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 					},
 					{
 						Record: "kubevirt_vm_container_free_memory_bytes_based_on_working_set_bytes",
-						Expr:   intstr.FromString("sum by(pod, container) (kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container) container_memory_working_set_bytes{pod=~'virt-launcher-.*', container='compute'})"),
+						Expr:   intstr.FromString("sum by(pod, container, namespace) (kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container, namespace) container_memory_working_set_bytes{pod=~'virt-launcher-.*', container='compute'})"),
 					},
 					{
 						Record: "kubevirt_vm_container_free_memory_bytes_based_on_rss",
-						Expr:   intstr.FromString("sum by(pod, container) (kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container) container_memory_rss{pod=~'virt-launcher-.*', container='compute'})"),
+						Expr:   intstr.FromString("sum by(pod, container, namespace) (kube_pod_container_resource_requests{pod=~'virt-launcher-.*', container='compute', resource='memory'}- on(pod,container, namespace) container_memory_rss{pod=~'virt-launcher-.*', container='compute'})"),
 					},
 					{
 						Alert: "KubevirtVmHighMemoryUsage",
 						Expr:  intstr.FromString("kubevirt_vm_container_free_memory_bytes_based_on_working_set_bytes < 20971520 or kubevirt_vm_container_free_memory_bytes_based_on_rss < 20971520"),
 						For:   "1m",
 						Annotations: map[string]string{
-							"description": "Container {{ $labels.container }} in pod {{ $labels.pod }} free memory is less than 20 MB and it is close to requested memory",
+							"description": "Container {{ $labels.container }} in pod {{ $labels.pod }} in namespace {{ $labels.namespace }} free memory is less than 20 MB and it is close to requested memory",
 							"summary":     "VM is at risk of being evicted and in serious cases of memory exhaustion being terminated by the runtime.",
 							"runbook_url": runbookUrlBasePath + "KubevirtVmHighMemoryUsage",
 						},
@@ -485,6 +485,19 @@ func NewPrometheusRuleSpec(ns string, workloadUpdatesEnabled bool) *v1.Prometheu
 					{
 						Record: "kubevirt_vmsnapshot_disks_restored_from_source_bytes",
 						Expr:   intstr.FromString("sum by(vm_name, vm_namespace) (kube_persistentvolumeclaim_resource_requests_storage_bytes * on(persistentvolumeclaim, namespace) group_left(vm_name, vm_namespace) kubevirt_vmsnapshot_persistentvolumeclaim_labels)"),
+					},
+					{
+						Alert: "KubeVirtVMIExcessiveMigrations",
+						Expr:  intstr.FromString("floor(increase(sum by (vmi) (kubevirt_migrate_vmi_succeeded_total)[1d:1m])) >= 12"),
+						For:   "1m",
+						Annotations: map[string]string{
+							"description": "VirtualMachineInstance {{ $labels.vmi }} has been migrated more than 12 times during the last 24 hours",
+							"summary":     "An excessive amount of migrations have been detected on a VirtualMachineInstance in the last 24 hours.",
+							"runbook_url": runbookUrlBasePath + "KubeVirtVMIExcessiveMigrations",
+						},
+						Labels: map[string]string{
+							severityAlertLabelKey: "warning",
+						},
 					},
 				},
 			},

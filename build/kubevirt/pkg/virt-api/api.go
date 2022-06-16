@@ -458,6 +458,23 @@ func (app *virtAPIApp) composeSubresources() {
 			Returns(http.StatusOK, "OK", "").
 			Returns(http.StatusBadRequest, httpStatusBadRequestMessage, ""))
 
+		subws.Route(subws.PUT(rest.NamespacedResourcePath(subresourcesvmGVR)+rest.SubResourcePath("memorydump")).
+			To(subresourceApp.MemoryDumpVMRequestHandler).
+			Reads(v1.VirtualMachineMemoryDumpRequest{}).
+			Param(rest.NamespaceParam(subws)).Param(rest.NameParam(subws)).
+			Operation(version.Version+"MemoryDump").
+			Doc("Dumps a VirtualMachineInstance memory.").
+			Returns(http.StatusOK, "OK", "").
+			Returns(http.StatusInternalServerError, httpStatusInternalServerError, ""))
+
+		subws.Route(subws.PUT(rest.NamespacedResourcePath(subresourcesvmGVR)+rest.SubResourcePath("removememorydump")).
+			To(subresourceApp.RemoveMemoryDumpVMRequestHandler).
+			Param(rest.NamespaceParam(subws)).Param(rest.NameParam(subws)).
+			Operation(version.Version+"RemoveMemoryDump").
+			Doc("Remove memory dump association.").
+			Returns(http.StatusOK, "OK", "").
+			Returns(http.StatusInternalServerError, httpStatusInternalServerError, ""))
+
 		// Return empty api resource list.
 		// K8s expects to be able to retrieve a resource list for each aggregated
 		// app in order to discover what resources it provides. Without returning
@@ -755,6 +772,9 @@ func (app *virtAPIApp) registerValidatingWebhooks(informers *webhooks.Informers)
 	})
 	http.HandleFunc(components.VMRestoreValidatePath, func(w http.ResponseWriter, r *http.Request) {
 		validating_webhook.ServeVMRestores(w, r, app.clusterConfig, app.virtCli, informers)
+	})
+	http.HandleFunc(components.VMExportValidatePath, func(w http.ResponseWriter, r *http.Request) {
+		validating_webhook.ServeVMExports(w, r, app.clusterConfig)
 	})
 	http.HandleFunc(components.VMFlavorValidatePath, func(w http.ResponseWriter, r *http.Request) {
 		validating_webhook.ServeVmFlavors(w, r, app.clusterConfig, app.virtCli)

@@ -352,11 +352,21 @@ type KubeVirtMetadata struct {
 	GracePeriod      *GracePeriodMetadata      `xml:"graceperiod,omitempty"`
 	Migration        *MigrationMetadata        `xml:"migration,omitempty"`
 	AccessCredential *AccessCredentialMetadata `xml:"accessCredential,omitempty"`
+	MemoryDump       *MemoryDumpMetadata       `xml:"memoryDump,omitempty"`
 }
 
 type AccessCredentialMetadata struct {
 	Succeeded bool   `xml:"succeeded,omitempty"`
 	Message   string `xml:"message,omitempty"`
+}
+
+type MemoryDumpMetadata struct {
+	FileName       string       `xml:"fileName,omitempty"`
+	StartTimestamp *metav1.Time `xml:"startTimestamp,omitempty"`
+	EndTimestamp   *metav1.Time `xml:"endTimestamp,omitempty"`
+	Completed      bool         `xml:"completed,omitempty"`
+	Failed         bool         `xml:"failed,omitempty"`
+	FailureReason  string       `xml:"failureReason,omitempty"`
 }
 
 type MigrationMetadata struct {
@@ -528,7 +538,7 @@ type Input struct {
 	Type    string   `xml:"type,attr"`
 	Bus     string   `xml:"bus,attr"`
 	Alias   *Alias   `xml:"alias,omitempty"`
-	Address *Address `xml:"address,emitempty"`
+	Address *Address `xml:"address,omitempty"`
 	Model   string   `xml:"model,attr,omitempty"`
 }
 
@@ -541,7 +551,7 @@ type HostDevice struct {
 	Managed   string           `xml:"managed,attr"`
 	Mode      string           `xml:"mode,attr,omitempty"`
 	Model     string           `xml:"model,attr,omitempty"`
-	Address   *Address         `xml:"address,emitempty"`
+	Address   *Address         `xml:"address,omitempty"`
 	Alias     *Alias           `xml:"alias,omitempty"`
 	Display   string           `xml:"display,attr,omitempty"`
 	RamFB     string           `xml:"ramfb,attr,omitempty"`
@@ -562,7 +572,7 @@ type Controller struct {
 	Model   string            `xml:"model,attr,omitempty"`
 	Driver  *ControllerDriver `xml:"driver,omitempty"`
 	Alias   *Alias            `xml:"alias,omitempty"`
-	Address *Address          `xml:"address,emitempty"`
+	Address *Address          `xml:"address,omitempty"`
 }
 
 // END Controller -----------------------------
@@ -1011,8 +1021,8 @@ type Stats struct {
 type MemBalloon struct {
 	Model   string            `xml:"model,attr"`
 	Stats   *Stats            `xml:"stats,omitempty"`
-	Address *Address          `xml:"address,emitempty"`
-	Driver  *MemBalloonDriver `xml:"driver,emitempty"`
+	Address *Address          `xml:"address,omitempty"`
+	Driver  *MemBalloonDriver `xml:"driver,omitempty"`
 }
 
 type MemBalloonDriver struct {
@@ -1023,7 +1033,7 @@ type Watchdog struct {
 	Model   string   `xml:"model,attr"`
 	Action  string   `xml:"action,attr"`
 	Alias   *Alias   `xml:"alias,omitempty"`
-	Address *Address `xml:"address,emitempty"`
+	Address *Address `xml:"address,omitempty"`
 }
 
 // Rng represents the source of entropy from host to VM
@@ -1032,8 +1042,8 @@ type Rng struct {
 	Model string `xml:"model,attr"`
 	// Backend specifies the source of entropy to be used
 	Backend *RngBackend `xml:"backend,omitempty"`
-	Address *Address    `xml:"address,emitempty"`
-	Driver  *RngDriver  `xml:"driver,emitempty"`
+	Address *Address    `xml:"address,omitempty"`
+	Driver  *RngDriver  `xml:"driver,omitempty"`
 }
 
 type RngDriver struct {
