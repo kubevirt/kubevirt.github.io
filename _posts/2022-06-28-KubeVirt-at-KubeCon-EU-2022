@@ -13,7 +13,7 @@ tags:
   ]
 comments: true
 title: KubeVirt at KubeCon EU 2022
-pub-date: June 17
+pub-date: June 28
 pub-year: 2022
 ---
 
@@ -25,7 +25,7 @@ The KubeVirt community presented two sessions, both on Wednesday May 18th:
 
 ## Virtual Open Office Hours
 
-This was a 45-minute project virtual sesion, hosted by the CNCF. This was on the Bevy platform (which will be familiar to KubeVirt Summit attendees from the past two years) and we had five lovely people from the KubeVirt community ready with a variety of demos and presentations and to answer questions from attendees:+
+This was a 45-minute project virtual session, hosted by the CNCF. This was on the Bevy platform (which will be familiar to KubeVirt Summit attendees from the past two years) and we had five lovely people from the KubeVirt community ready with a variety of demos and presentations and to answer questions from attendees:+
 Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki
  
 This was an opportunity for KubeCon attendees (virtual and physical) to ask questions and discuss any topics, and our presenters covered the following: Introduction to KubeVirt, live migration, Istio integration, and CDI hotplug/resize.
@@ -37,7 +37,7 @@ A huge thanks to the presenters for their time and collaboration in preparing fo
 ## Maintainer Track
 
 Later that day, on the Maintainer Track, Alice also gave an in-depth breakdown of a whole slew of new KubeVirt features and showed a demo with the KubeVirt Cluster API: deploying Kubernetes on top of Kubernetes.
-You can watch [the CNCNF recording here](https://youtu.be/L9H0pz5PpKo).
+You can watch [the CNCF recording here](https://youtu.be/L9H0pz5PpKo).
 
 There was a healthy amount of questions, both during Q&A and after the talk. The participants were particularly interested to know how to prepare and customize VM disks with KubeVirt, and how to run Windows VM, especially combined with GPUs. There were additional questions on the status of TPM support and VM migration when the hosting node goes down. 
 
@@ -49,6 +49,6 @@ And everyone who attended the sessions, listened, and asked great questions.
 
 If you're interested in seeing more photos and recordings from the event:
 * [CNCF's Photo album (Flickr) of the event](https://www.flickr.com/photos/143247548@N03/albums/72177720298987342)
-* [The CNCF video recordings (Youtube) of the sessions](https://www.youtube.com/c/cloudnativefdn)
+* [The CNCF video recordings of the sessions on Youtube](https://www.youtube.com/c/cloudnativefdn)
 * And [the event schedule](https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/program/schedule/)
 
