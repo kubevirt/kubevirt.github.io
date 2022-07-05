@@ -1,4 +1,41 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-07-05T16:20:20+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Load-balancer for virtual machines on bare metal Kubernetes clusters</title><link href="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html" rel="alternate" type="text/html" title="Load-balancer for virtual machines on bare metal Kubernetes clusters" /><published>2022-04-03T00:00:00+00:00</published><updated>2022-04-03T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Virtual-Machines-with-MetalLB</id><content type="html" xml:base="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-07-05T20:52:30+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
+
+<p>The KubeVirt community presented two sessions, both on Wednesday May 18th:</p>
+<ol>
+  <li>A Virtual Open Office Hours session, and</li>
+  <li>A Maintainer Track session: ‘It’s All for the Users. More Durable, Secure, and Pluggable. KubeVirt v0.53’</li>
+</ol>
+
+<h2 id="virtual-open-office-hours">Virtual Open Office Hours</h2>
+
+<p>This was a 45-minute project virtual session, hosted by the CNCF. This was on the Bevy platform (which will be familiar to KubeVirt Summit attendees from the past two years) and we had five lovely people from the KubeVirt community ready with a variety of demos and presentations and to answer questions from attendees:+
+Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki</p>
+
+<p>This was an opportunity for KubeCon attendees (virtual and physical) to ask questions and discuss any topics, and our presenters covered the following: Introduction to KubeVirt, live migration, Istio integration, and CDI hotplug/resize.
+Despite some initial technical issues and improvised changes, this session went really well. We had about ~25 consistent attendees, and we received a good range of Q&amp;A and interaction with the attendees on all topics presented. It was a very solid 45 minutes.
+Unfortunately, due to a miscommunication, there is no recording of this session.</p>
+
+<p>A huge thanks to the presenters for their time and collaboration in preparing for this.</p>
+
+<h2 id="maintainer-track">Maintainer Track</h2>
+
+<p>Later that day, on the Maintainer Track, Alice also gave an in-depth breakdown of a whole slew of new KubeVirt features and showed a demo with the KubeVirt Cluster API: deploying Kubernetes on top of Kubernetes.
+You can watch <a href="https://youtu.be/L9H0pz5PpKo">the CNCF recording here</a>, and download the <a href="https://kccnceu2022.sched.com/event/ytu1">demo video and slides</a> that are available from the schedule.</p>
+
+<p>There was a healthy amount of questions, both during Q&amp;A and after the talk. The participants were particularly interested to know how to prepare and customize VM disks with KubeVirt, how to run Windows VM, especially combined with GPUs, and how to expose the Kubernetes API service of a deployed cluster to the KubeVirt cluster API provider outside of the KubeVirt VM. There were additional questions on the status of TPM support and VM migration when the hosting node goes down.</p>
+
+<h2 id="thank-you">Thank you!</h2>
+<p>Big thanks again to our presenters: Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki.
+And everyone who attended the sessions, listened, and asked great questions.</p>
+
+<h2 id="want-to-see-more-from-kubecon-eu-2022">Want to see more from KubeCon EU 2022?</h2>
+
+<p>If you’re interested in seeing more photos and recordings from the event:</p>
+<ul>
+  <li><a href="https://www.flickr.com/photos/143247548@N03/albums/72177720298987342">CNCF’s Photo album (Flickr) of the event</a>.</li>
+  <li><a href="https://www.youtube.com/c/cloudnativefdn">The CNCF video recordings of the sessions on Youtube</a>.</li>
+  <li>And <a href="https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/program/schedule/">the event schedule</a> to help you find sessions.</li>
+</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry><entry><title type="html">Load-balancer for virtual machines on bare metal Kubernetes clusters</title><link href="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html" rel="alternate" type="text/html" title="Load-balancer for virtual machines on bare metal Kubernetes clusters" /><published>2022-04-03T00:00:00+00:00</published><updated>2022-04-03T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Virtual-Machines-with-MetalLB</id><content type="html" xml:base="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 
 <p>Over the last year, Kubevirt and MetalLB have shown to be powerful duo in order to support fault-tolerant access to an application on virtual machines through an external IP address. 
 As a Cluster administrator using an on-prem cluster without a network load-balancer, now it’s possible to use MetalLB operator to provide load-balancer capabilities (with Services of type <code class="language-plaintext highlighter-rouge">LoadBalancer</code>) to virtual machines.</p>
@@ -2204,42 +2241,4 @@ You need to replace PVC_NAME with <code class="language-plaintext highlighter-ro
   <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer">YAML files used in this example</a></li>
   <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a></li>
   <li><a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a></li>
-</ul>]]></content><author><name>Filip Křepinský</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Tekton Pipelines" /><category term="KubeVirt Tekton Tasks" /><category term="Windows" /><summary type="html"><![CDATA[This blog shows how KubeVirt Tekton Tasks can be utilized to automatically install and setup Windows VMs from scratch]]></summary></entry><entry><title type="html">The KubeVirt Summit 2021 is a wrap!</title><link href="https://kubevirt.io//2021/KubeVirt-Summit-Wrap-Up.html" rel="alternate" type="text/html" title="The KubeVirt Summit 2021 is a wrap!" /><published>2021-03-03T00:00:00+00:00</published><updated>2021-03-03T00:00:00+00:00</updated><id>https://kubevirt.io//2021/KubeVirt-Summit-Wrap-Up</id><content type="html" xml:base="https://kubevirt.io//2021/KubeVirt-Summit-Wrap-Up.html"><![CDATA[<p>Just a few weeks ago, the KubeVirt community had their first ever dedicated
-online event, the <a href="/summit/">KubeVirt Summit</a>!</p>
-
-<p>We are very happy to have had this opportunity to meet so many community
-members, hear from users, vendors and contributors, and learn so many things
-about KubeVirt.</p>
-
-<p>If you missed the event, or if you were there and want to remember the great
-time we had, the <a href="https://youtube.com/playlist?list=PLnLpXX8KHIYyQi7Phsf5-73r5fj1AOBox">session recordings</a>
-are available in the <a href="https://www.youtube.com/c/KubeVirt">KubeVirt YouTube channel</a>.</p>
-
-<p>The landing page about the <a href="/summit/">KubeVirt Summit</a>
-contains a detailed list of all the sessions, with information about the
-contents, presenters, and direct links to each session recording and slides
-(where available).</p>
-
-<h2 id="thanks">Thanks</h2>
-
-<p>We would like to thank everyone who contributed to make this event happen: all
-the presenters / session leads, everyone who proposed a session, the various
-community members who contributed to the organization, all the attendees, and
-the <a href="https://cncf.io/">Container-native Computing Foundation</a> who sponsored the
-event.</p>
-
-<h2 id="i-want-more">I want more</h2>
-
-<p>We are just wrapping up this first edition. Based on this experience, we really
-hope to have more community events of this type in the future, but it is still a
-bit early to say when/where how.</p>
-
-<p>For now, please keep the conversations going through the various community channels:</p>
-
-<ul>
-  <li>The <a href="https://groups.google.com/forum/#!forum/kubevirt-dev">mailing list</a></li>
-  <li>The <a href="https://kubernetes.slack.com/archives/C8ED7RKFE">#virtualization Slack channel</a> in <a href="https://slack.k8s.io/">Kubernetes Slack</a></li>
-  <li>Our <a href="https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&amp;ctz=Etc%2FGMT">community meetings</a></li>
-  <li>The <a href="https://github.com/kubevirt">github repositories</a></li>
-  <li>Twitter: <a href="https://twitter.com/kubevirt">@kubevirt</a></li>
-</ul>]]></content><author><name>Pep Turró Mauri</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[The KubeVirt community held their first dedicated online event last month.]]></summary></entry></feed>
+</ul>]]></content><author><name>Filip Křepinský</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Tekton Pipelines" /><category term="KubeVirt Tekton Tasks" /><category term="Windows" /><summary type="html"><![CDATA[This blog shows how KubeVirt Tekton Tasks can be utilized to automatically install and setup Windows VMs from scratch]]></summary></entry></feed>
