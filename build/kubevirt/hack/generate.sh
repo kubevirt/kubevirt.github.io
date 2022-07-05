@@ -17,8 +17,9 @@ swagger-doc -in ${KUBEVIRT_DIR}/staging/src/kubevirt.io/api/flavor/v1alpha1/type
 swagger-doc -in ${KUBEVIRT_DIR}/staging/src/kubevirt.io/api/pool/v1alpha1/types.go
 swagger-doc -in ${KUBEVIRT_DIR}/staging/src/kubevirt.io/api/migrations/v1alpha1/types.go
 swagger-doc -in ${KUBEVIRT_DIR}/staging/src/kubevirt.io/api/export/v1alpha1/types.go
+swagger-doc -in ${KUBEVIRT_DIR}/staging/src/kubevirt.io/api/clone/v1alpha1/types.go
 
-deepcopy-gen --input-dirs kubevirt.io/api/snapshot/v1alpha1,kubevirt.io/api/export/v1alpha1,kubevirt.io/api/flavor/v1alpha1,kubevirt.io/api/pool/v1alpha1,kubevirt.io/api/migrations/v1alpha1,kubevirt.io/api/core/v1 \
+deepcopy-gen --input-dirs kubevirt.io/api/snapshot/v1alpha1,kubevirt.io/api/export/v1alpha1,kubevirt.io/api/flavor/v1alpha1,kubevirt.io/api/pool/v1alpha1,kubevirt.io/api/migrations/v1alpha1,kubevirt.io/api/clone/v1alpha1,kubevirt.io/api/core/v1 \
     --bounding-dirs kubevirt.io/api \
     --go-header-file ${KUBEVIRT_DIR}/hack/boilerplate/boilerplate.go.txt
 
@@ -27,7 +28,7 @@ defaulter-gen --input-dirs kubevirt.io/api/core/v1 \
     --output-package kubevirt.io/api/core/v1 \
     --go-header-file ${KUBEVIRT_DIR}/hack/boilerplate/boilerplate.go.txt
 
-openapi-gen --input-dirs kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1,k8s.io/apimachinery/pkg/util/intstr,k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/api/core/v1,k8s.io/apimachinery/pkg/apis/meta/v1,kubevirt.io/api/core/v1,kubevirt.io/api/export/v1alpha1,kubevirt.io/api/snapshot/v1alpha1,kubevirt.io/api/flavor/v1alpha1,kubevirt.io/api/pool/v1alpha1,kubevirt.io/api/migrations/v1alpha1 \
+openapi-gen --input-dirs kubevirt.io/containerized-data-importer-api/pkg/apis/core/v1beta1,k8s.io/apimachinery/pkg/util/intstr,k8s.io/apimachinery/pkg/api/resource,k8s.io/apimachinery/pkg/apis/meta/v1,k8s.io/apimachinery/pkg/runtime,k8s.io/api/core/v1,k8s.io/apimachinery/pkg/apis/meta/v1,kubevirt.io/api/core/v1,kubevirt.io/api/export/v1alpha1,kubevirt.io/api/snapshot/v1alpha1,kubevirt.io/api/flavor/v1alpha1,kubevirt.io/api/pool/v1alpha1,kubevirt.io/api/migrations/v1alpha1,kubevirt.io/api/clone/v1alpha1 \
     --output-base ${KUBEVIRT_DIR}/staging/src \
     --output-package kubevirt.io/client-go/api/ \
     --go-header-file ${KUBEVIRT_DIR}/hack/boilerplate/boilerplate.go.txt >${KUBEVIRT_DIR}/api/api-rule-violations.list
@@ -43,7 +44,7 @@ fi
 
 client-gen --clientset-name versioned \
     --input-base kubevirt.io/api \
-    --input export/v1alpha1,snapshot/v1alpha1,flavor/v1alpha1,pool/v1alpha1,migrations/v1alpha1 \
+    --input export/v1alpha1,snapshot/v1alpha1,flavor/v1alpha1,pool/v1alpha1,migrations/v1alpha1,clone/v1alpha1 \
     --output-base ${KUBEVIRT_DIR}/staging/src \
     --output-package ${CLIENT_GEN_BASE}/kubevirt/clientset \
     --go-header-file ${KUBEVIRT_DIR}/hack/boilerplate/boilerplate.go.txt
@@ -104,6 +105,9 @@ deepcopy-gen --input-dirs ./pkg/virt-launcher/virtwrap/api \
     #include migrations
     GOFLAGS= controller-gen crd paths=../api/migrations/v1alpha1/
 
+    #include clone
+    GOFLAGS= controller-gen crd paths=../api/clone/v1alpha1/
+
     #remove some weird stuff from controller-gen
     cd config/crd
     for file in *; do
@@ -151,6 +155,8 @@ virtcontroller_version=$(getVersion ".VirtControllerSha")
 virthandler_version=$(getVersion ".VirtHandlerSha")
 virtlauncher_version=$(getVersion ".VirtLauncherSha")
 virtoperator_version=$(getVersion ".VirtOperatorSha")
+virtexportproxy_version=$(getVersion ".VirtExportProxySha")
+virtexportserver_version=$(getVersion ".VirtExportServerSha")
 
 # used as env var for operator
 function getShasum() {
@@ -165,12 +171,16 @@ virtapi_sha=$(getShasum ".VirtApiSha")
 virtcontroller_sha=$(getShasum ".VirtControllerSha")
 virthandler_sha=$(getShasum ".VirtHandlerSha")
 virtlauncher_sha=$(getShasum ".VirtLauncherSha")
+virtexportproxy_sha=$(getShasum ".VirtExportProxySha")
+virtexportserver_sha=$(getShasum ".VirtExportServerSha")
 gs_sha=$(getShasum ".GsSha")
 
 virtapi_rawsha=$(getRawShasum ".VirtApiSha")
 virtcontroller_rawsha=$(getRawShasum ".VirtControllerSha")
 virthandler_rawsha=$(getRawShasum ".VirtHandlerSha")
 virtlauncher_rawsha=$(getRawShasum ".VirtLauncherSha")
+virtexportproxy_rawsha=$(getRawShasum ".VirtExportProxySha")
+virtexportserver_rawsha=$(getRawShasum ".VirtExportServerSha")
 gs_rawsha=$(getRawShasum ".GsSha")
 
 # The generation code for CSV requires a valid semver to be used.
@@ -180,7 +190,7 @@ gs_rawsha=$(getRawShasum ".GsSha")
 # values after the file is generated.
 _fake_replaces_csv_version="1111.1111.1111"
 _fake_csv_version="2222.2222.2222"
-${KUBEVIRT_DIR}/tools/csv-generator/csv-generator --namespace={{.CSVNamespace}} --dockerPrefix={{.DockerPrefix}} --operatorImageVersion="$virtoperator_version" --pullPolicy={{.ImagePullPolicy}} --verbosity={{.Verbosity}} --apiSha="$virtapi_rawsha" --controllerSha="$virtcontroller_rawsha" --handlerSha="$virthandler_rawsha" --launcherSha="$virtlauncher_rawsha" --gsSha="$gs_rawsha" --kubevirtLogo={{.KubeVirtLogo}} --csvVersion="$_fake_csv_version" --replacesCsvVersion="$_fake_replaces_csv_version" --csvCreatedAtTimestamp={{.CreatedAt}} --kubeVirtVersion={{.DockerTag}} >${KUBEVIRT_DIR}/manifests/generated/operator-csv.yaml.in
+${KUBEVIRT_DIR}/tools/csv-generator/csv-generator --namespace={{.CSVNamespace}} --dockerPrefix={{.DockerPrefix}} --operatorImageVersion="$virtoperator_version" --pullPolicy={{.ImagePullPolicy}} --verbosity={{.Verbosity}} --apiSha="$virtapi_rawsha" --controllerSha="$virtcontroller_rawsha" --handlerSha="$virthandler_rawsha" --launcherSha="$virtlauncher_rawsha" --exportProxySha="$virtexportproxy_rawsha" --exportServerSha="$virtexportserver_rawsha" --gsSha="$gs_rawsha" --kubevirtLogo={{.KubeVirtLogo}} --csvVersion="$_fake_csv_version" --replacesCsvVersion="$_fake_replaces_csv_version" --csvCreatedAtTimestamp={{.CreatedAt}} --kubeVirtVersion={{.DockerTag}} >${KUBEVIRT_DIR}/manifests/generated/operator-csv.yaml.in
 sed -i "s/$_fake_csv_version/{{.CsvVersion}}/g" ${KUBEVIRT_DIR}/manifests/generated/operator-csv.yaml.in
 sed -i "s/$_fake_replaces_csv_version/{{.ReplacesCsvVersion}}/g" ${KUBEVIRT_DIR}/manifests/generated/operator-csv.yaml.in
 

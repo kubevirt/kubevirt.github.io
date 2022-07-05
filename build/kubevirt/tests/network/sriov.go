@@ -91,10 +91,6 @@ var _ = Describe("[Serial]SRIOV", func() {
 		}
 	})
 
-	BeforeEach(func() {
-		tests.BeforeTestCleanup()
-	})
-
 	Context("VirtualMachineInstance with sriov plugin interface", func() {
 
 		getSriovVmi := func(networks []string, cloudInitNetworkData string) *v1.VirtualMachineInstance {
@@ -277,7 +273,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 				metadataStruct := cloudinit.ConfigDriveMetadata{
 					InstanceID: fmt.Sprintf("%s.%s", vmi.Name, vmi.Namespace),
 					Hostname:   dns.SanitizeHostname(vmi),
-					UUID:       string(vmi.UID),
+					UUID:       string(vmi.Spec.Domain.Firmware.UUID),
 					Devices:    &deviceData,
 				}
 
@@ -340,7 +336,7 @@ var _ = Describe("[Serial]SRIOV", func() {
 					InstanceID:   fmt.Sprintf("%s.%s", vmi.Name, vmi.Namespace),
 					InstanceType: testFlavor,
 					Hostname:     dns.SanitizeHostname(vmi),
-					UUID:         string(vmi.UID),
+					UUID:         string(vmi.Spec.Domain.Firmware.UUID),
 					Devices:      &deviceData,
 				}
 
@@ -694,7 +690,7 @@ func findIfaceByMAC(virtClient kubecli.KubevirtClient, vmi *v1.VirtualMachineIns
 		return true, nil
 	})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("could not find interface with MAC %q on VMI %q: %v", mac, vmi.Name, err)
 	}
 	return ifaceName, nil
 }

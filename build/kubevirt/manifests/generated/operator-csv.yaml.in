@@ -449,6 +449,7 @@ spec:
           - virtualmachinepreferences
           - virtualmachineclusterpreferences
           verbs:
+          - get
           - list
           - watch
         - apiGroups:
@@ -459,6 +460,14 @@ spec:
           - get
           - list
           - watch
+        - apiGroups:
+          - apps
+          resources:
+          - controllerrevisions
+          verbs:
+          - create
+          - list
+          - get
         - apiGroups:
           - ""
           resources:
@@ -549,6 +558,7 @@ spec:
           - list
           - create
           - delete
+          - get
         - apiGroups:
           - ""
           resources:
@@ -665,6 +675,7 @@ spec:
           - virtualmachinepreferences
           - virtualmachineclusterpreferences
           verbs:
+          - get
           - list
           - watch
         - apiGroups:
@@ -675,6 +686,28 @@ spec:
           - get
           - list
           - watch
+        - apiGroups:
+          - clone.kubevirt.io
+          resources:
+          - virtualmachineclones
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
+        - apiGroups:
+          - clone.kubevirt.io
+          resources:
+          - virtualmachineclones/status
+          verbs:
+          - get
+          - list
+          - watch
+          - update
+          - patch
+          - delete
         - apiGroups:
           - ""
           resources:
@@ -739,6 +772,24 @@ spec:
           - watch
         - apiGroups:
           - ""
+          resources:
+          - configmaps
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - export.kubevirt.io
+          resources:
+          - virtualmachineexports
+          verbs:
+          - get
+          - list
+          - watch
+        - apiGroups:
+          - ""
+          resourceNames:
+          - kubevirt-export-ca
           resources:
           - configmaps
           verbs:
@@ -1088,6 +1139,10 @@ spec:
                   value: 
                 - name: VIRT_LAUNCHER_SHASUM
                   value: 
+                - name: VIRT_EXPORTPROXY_SHASUM
+                  value: 
+                - name: VIRT_EXPORTSERVER_SHASUM
+                  value: 
                 - name: GS_SHASUM
                   value: 
                 image: /virt-operator@:
@@ -1155,6 +1210,23 @@ spec:
           - watch
           - patch
           - delete
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          verbs:
+          - create
+          - get
+          - list
+          - watch
+          - patch
+          - delete
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes/custom-host
+          verbs:
+          - create
         serviceAccountName: kubevirt-operator
     strategy: deployment
   installModes:

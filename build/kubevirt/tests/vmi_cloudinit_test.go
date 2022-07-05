@@ -36,6 +36,7 @@ import (
 	kubev1 "k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
+	"kubevirt.io/kubevirt/tests/libvmi"
 	"kubevirt.io/kubevirt/tests/util"
 
 	v1 "kubevirt.io/api/core/v1"
@@ -46,7 +47,6 @@ import (
 	"kubevirt.io/kubevirt/tests"
 	"kubevirt.io/kubevirt/tests/console"
 	cd "kubevirt.io/kubevirt/tests/containerdisk"
-	"kubevirt.io/kubevirt/tests/testsuite"
 )
 
 const (
@@ -74,7 +74,6 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 	BeforeEach(func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
-		tests.BeforeTestCleanup()
 
 		// from default virt-launcher flag: do we need to make this configurable in some cases?
 		cloudinit.SetLocalDirectoryOnly("/var/run/kubevirt-ephemeral-disks/cloud-init-data")
@@ -199,6 +198,58 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 					}, time.Second*300)
 				})
 			})
+
+			It("cloud-init instance-id should be stable", func() {
+				getInstanceId := func(vmi *v1.VirtualMachineInstance) (string, error) {
+					cmd := "cat /var/lib/cloud/data/instance-id"
+					instanceId, err := console.RunCommandAndStoreOutput(vmi, cmd, time.Second*30)
+					return instanceId, err
+				}
+
+				userData := fmt.Sprintf(
+					"#cloud-config\npassword: %s\nchpasswd: { expire: False }",
+					fedoraPassword,
+				)
+				vmi := libvmi.NewFedora(libvmi.WithCloudInitConfigDriveData(userData, false))
+				// runStrategy := v1.RunStrategyManual
+				vm := &v1.VirtualMachine{
+					ObjectMeta: vmi.ObjectMeta,
+					Spec: v1.VirtualMachineSpec{
+						Running: tests.NewBool(false),
+						Template: &v1.VirtualMachineInstanceTemplateSpec{
+							Spec: vmi.Spec,
+						},
+					},
+				}
+
+				By("Start VM")
+				vm, err := virtClient.VirtualMachine(util.NamespaceTestDefault).Create(vm)
+				Expect(vm.Namespace).ToNot(BeEmpty())
+				Expect(err).ToNot(HaveOccurred())
+				vm = tests.StartVirtualMachine(vm)
+				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+				vmi = tests.WaitUntilVMIReady(vmi, console.LoginToFedora)
+
+				By("Get VM cloud-init instance-id")
+				instanceId, err := getInstanceId(vmi)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(instanceId).ToNot(BeEmpty())
+
+				By("Restart VM")
+				vm = tests.StopVirtualMachine(vm)
+				tests.StartVirtualMachine(vm)
+				vmi, err = virtClient.VirtualMachineInstance(vm.Namespace).Get(vm.Name, &metav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+				vmi = tests.WaitUntilVMIReady(vmi, console.LoginToFedora)
+
+				By("Get VM cloud-init instance-id after restart")
+				newInstanceId, err := getInstanceId(vmi)
+				Expect(err).ToNot(HaveOccurred())
+
+				By("Make sure the instance-ids match")
+				Expect(instanceId).To(Equal(newInstanceId))
+			})
 		})
 
 		Context("with cloudInitNoCloud userData source", func() {
@@ -269,7 +320,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 						Name:      secretID,
 						Namespace: vmi.Namespace,
 						Labels: map[string]string{
-							testsuite.SecretLabel: secretID,
+							util.SecretLabel: secretID,
 						},
 					},
 					Type: "Opaque",
@@ -348,7 +399,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      secretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								testsuite.SecretLabel: secretID,
+								util.SecretLabel: secretID,
 							},
 						},
 						Type: "Opaque",
@@ -411,7 +462,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 					vmi.Annotations = make(map[string]string)
 				}
 				vmi.Annotations[v1.FlavorAnnotation] = testFlavor
-				LaunchVMI(vmi)
+				vmi = LaunchVMI(vmi)
 				tests.WaitUntilVMIReady(vmi, console.LoginToCirros)
 				CheckCloudInitIsoSize(vmi, cloudinit.DataSourceConfigDrive)
 
@@ -439,7 +490,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 					InstanceID:   fmt.Sprintf("%s.%s", vmi.Name, vmi.Namespace),
 					InstanceType: testFlavor,
 					Hostname:     dns.SanitizeHostname(vmi),
-					UUID:         string(vmi.UID),
+					UUID:         string(vmi.Spec.Domain.Firmware.UUID),
 					Devices:      &deviceData,
 				}
 
@@ -491,7 +542,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      secretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								testsuite.SecretLabel: secretID,
+								util.SecretLabel: secretID,
 							},
 						},
 						Type: "Opaque",
@@ -549,7 +600,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      uSecretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								testsuite.SecretLabel: uSecretID,
+								util.SecretLabel: uSecretID,
 							},
 						},
 						Type: "Opaque",
@@ -564,7 +615,7 @@ var _ = Describe("[rfe_id:151][crit:high][vendor:cnv-qe@redhat.com][level:compon
 							Name:      nSecretID,
 							Namespace: vmi.Namespace,
 							Labels: map[string]string{
-								testsuite.SecretLabel: nSecretID,
+								util.SecretLabel: nSecretID,
 							},
 						},
 						Type: "Opaque",

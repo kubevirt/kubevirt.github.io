@@ -73,8 +73,6 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 	)
 
 	BeforeEach(func() {
-		tests.BeforeTestCleanup()
-
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
 
@@ -257,16 +255,17 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 
 		Context("VirtualMachineInstance with default interface model", func() {
 			BeforeEach(func() {
-				inboundVMI = libvmi.NewAlpine()
-				outboundVMI = libvmi.NewAlpine()
+				libnet.SkipWhenClusterNotSupportIpv4(virtClient)
+				inboundVMI = libvmi.NewCirros()
+				outboundVMI = libvmi.NewCirros()
 
 				inboundVMI, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(inboundVMI)
 				Expect(err).ToNot(HaveOccurred())
 				outboundVMI, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(outboundVMI)
 				Expect(err).ToNot(HaveOccurred())
 
-				inboundVMI = tests.WaitUntilVMIReady(inboundVMI, console.LoginToAlpine)
-				outboundVMI = tests.WaitUntilVMIReady(outboundVMI, console.LoginToAlpine)
+				inboundVMI = tests.WaitUntilVMIReady(inboundVMI, console.LoginToCirros)
+				outboundVMI = tests.WaitUntilVMIReady(outboundVMI, console.LoginToCirros)
 			})
 
 			// Unless an explicit interface model is specified, the default interface model is virtio.
@@ -287,7 +286,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 					// Create a virtual machine with an unsupported interface model
 					masqIface := libvmi.InterfaceDeviceWithMasqueradeBinding()
 					masqIface.Model = "gibberish"
-					customIfVMI := libvmi.NewAlpine(
+					customIfVMI := libvmi.NewCirros(
 						libvmi.WithInterface(masqIface),
 						libvmi.WithNetwork(v1.DefaultPodNetwork()),
 					)
@@ -361,17 +360,18 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 
 	Context("VirtualMachineInstance with custom MAC address in non-conventional format", func() {
 		It("[test_id:1772]should configure custom MAC address", func() {
+			libnet.SkipWhenClusterNotSupportIpv4(virtClient)
 			By(checkingEth0MACAddr)
 			masqIface := libvmi.InterfaceDeviceWithMasqueradeBinding()
 			masqIface.MacAddress = "BE-AF-00-00-DE-AD"
-			beafdeadVMI := libvmi.NewAlpine(
+			beafdeadVMI := libvmi.NewCirros(
 				libvmi.WithInterface(masqIface),
 				libvmi.WithNetwork(v1.DefaultPodNetwork()),
 			)
 			beafdeadVMI, err = virtClient.VirtualMachineInstance(util.NamespaceTestDefault).Create(beafdeadVMI)
 			Expect(err).ToNot(HaveOccurred())
 
-			tests.WaitUntilVMIReady(beafdeadVMI, console.LoginToAlpine)
+			tests.WaitUntilVMIReady(beafdeadVMI, console.LoginToCirros)
 			checkMacAddress(beafdeadVMI, "be:af:00:00:de:ad")
 		})
 	})
@@ -663,7 +663,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 			const cidrWithLeadingZeros = "10.10.010.0/24"
 
 			verifyClientServerConnectivity := func(clientVMI *v1.VirtualMachineInstance, serverVMI *v1.VirtualMachineInstance, tcpPort int, ipFamily k8sv1.IPFamily) error {
-				serverIP := libnet.GetVmiPrimaryIpByFamily(serverVMI, ipFamily)
+				serverIP := libnet.GetVmiPrimaryIPByFamily(serverVMI, ipFamily)
 				err := libnet.PingFromVMConsole(clientVMI, serverIP)
 				if err != nil {
 					return err
@@ -874,7 +874,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 				Expect(err).ToNot(HaveOccurred())
 
 				By("Check connectivity")
-				podIP := libnet.GetPodIpByFamily(virtHandlerPod, k8sv1.IPv4Protocol)
+				podIP := libnet.GetPodIPByFamily(virtHandlerPod, k8sv1.IPv4Protocol)
 				Expect(ping(podIP)).To(Succeed())
 
 				By("Execute migration")
@@ -916,7 +916,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 				Expect(configureIpv6(vmi, api.DefaultVMIpv6CIDR)).ToNot(HaveOccurred())
 
 				By("Check connectivity")
-				podIP := libnet.GetPodIpByFamily(virtHandlerPod, k8sv1.IPv6Protocol)
+				podIP := libnet.GetPodIPByFamily(virtHandlerPod, k8sv1.IPv6Protocol)
 				Expect(ping(podIP)).To(Succeed())
 
 				By("Execute migration")
@@ -986,7 +986,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 			})
 
 			DescribeTable("should have the correct MTU", func(ipFamily k8sv1.IPFamily) {
-				libnet.SkipWhenClusterNotSupportIpFamily(virtClient, ipFamily)
+				libnet.SkipWhenClusterNotSupportIPFamily(virtClient, ipFamily)
 
 				By("checking k6t-eth0 MTU inside the pod")
 				vmiPod := tests.GetRunningPodByVirtualMachineInstance(vmi, vmi.Namespace)
@@ -1016,7 +1016,7 @@ var _ = SIGDescribe("[rfe_id:694][crit:medium][vendor:cnv-qe@redhat.com][level:c
 					ipHeaderSize = 40
 				}
 				payloadSize := primaryIfaceMtu - ipHeaderSize - icmpHeaderSize
-				addr := libnet.GetVmiPrimaryIpByFamily(anotherVmi, ipFamily)
+				addr := libnet.GetVmiPrimaryIPByFamily(anotherVmi, ipFamily)
 				Expect(libnet.PingFromVMConsole(vmi, addr, "-c 1", "-w 5", fmt.Sprintf("-s %d", payloadSize), "-M do")).To(Succeed())
 
 				By("checking the VirtualMachineInstance cannot send bigger than MTU sized frames to another VirtualMachineInstance")

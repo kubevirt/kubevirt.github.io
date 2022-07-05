@@ -797,6 +797,9 @@ func (app *virtAPIApp) registerValidatingWebhooks(informers *webhooks.Informers)
 	http.HandleFunc(components.MigrationPolicyCreateValidatePath, func(w http.ResponseWriter, r *http.Request) {
 		validating_webhook.ServeMigrationPolicies(w, r, app.virtCli)
 	})
+	http.HandleFunc(components.VMCloneCreateValidatePath, func(w http.ResponseWriter, r *http.Request) {
+		validating_webhook.ServeVirtualMachineClones(w, r, app.clusterConfig, app.virtCli)
+	})
 }
 
 func (app *virtAPIApp) registerMutatingWebhook(informers *webhooks.Informers) {
@@ -809,6 +812,9 @@ func (app *virtAPIApp) registerMutatingWebhook(informers *webhooks.Informers) {
 	})
 	http.HandleFunc(components.MigrationMutatePath, func(w http.ResponseWriter, r *http.Request) {
 		mutating_webhook.ServeMigrationCreate(w, r)
+	})
+	http.HandleFunc(components.VMCloneCreateMutatePath, func(w http.ResponseWriter, r *http.Request) {
+		mutating_webhook.ServeClones(w, r)
 	})
 }
 
@@ -964,12 +970,6 @@ func (app *virtAPIApp) Run() {
 		log.Log.Infof("CDI not detected, DataSource integration disabled")
 	}
 
-	flavorInformer := kubeInformerFactory.VirtualMachineFlavor()
-	clusterFlavorInformer := kubeInformerFactory.VirtualMachineClusterFlavor()
-
-	preferenceInformer := kubeInformerFactory.VirtualMachinePreference()
-	clusterPreferenceInformer := kubeInformerFactory.VirtualMachineClusterPreference()
-
 	// It is safe to call kubeInformerFactory.Start multiple times.
 	// The function is idempotent and will only start the informers that
 	// have not been started yet
@@ -977,14 +977,10 @@ func (app *virtAPIApp) Run() {
 	kubeInformerFactory.WaitForCacheSync(stopChan)
 
 	webhookInformers := &webhooks.Informers{
-		VMIPresetInformer:         vmiPresetInformer,
-		NamespaceLimitsInformer:   namespaceLimitsInformer,
-		VMRestoreInformer:         vmRestoreInformer,
-		DataSourceInformer:        dataSourceInformer,
-		FlavorInformer:            flavorInformer,
-		ClusterFlavorInformer:     clusterFlavorInformer,
-		PreferenceInformer:        preferenceInformer,
-		ClusterPreferenceInformer: clusterPreferenceInformer,
+		VMIPresetInformer:       vmiPresetInformer,
+		NamespaceLimitsInformer: namespaceLimitsInformer,
+		VMRestoreInformer:       vmRestoreInformer,
+		DataSourceInformer:      dataSourceInformer,
 	}
 
 	// Build webhook subresources

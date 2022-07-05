@@ -32,6 +32,7 @@ import (
 	storagev1 "k8s.io/api/storage/v1"
 	"k8s.io/apimachinery/pkg/api/equality"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/apimachinery/pkg/util/sets"
 
 	kubevirtv1 "kubevirt.io/api/core/v1"
 	snapshotv1 "kubevirt.io/api/snapshot/v1alpha1"
@@ -230,8 +231,14 @@ func (ctrl *VMRestoreController) reconcileVolumeRestores(vmRestore *snapshotv1.V
 		return false, err
 	}
 
+	noRestore := volumesNotForRestore(content)
+
 	var restores []snapshotv1.VolumeRestore
 	for _, vb := range content.Spec.VolumeBackups {
+		if noRestore.Has(vb.VolumeName) {
+			continue
+		}
+
 		found := false
 		for _, vr := range vmRestore.Status.Restores {
 			if vb.VolumeName == vr.VolumeName {
@@ -266,14 +273,17 @@ func (ctrl *VMRestoreController) reconcileVolumeRestores(vmRestore *snapshotv1.V
 
 	createdPVC := false
 	waitingPVC := false
-	for i, restore := range restores {
+	for _, restore := range restores {
 		pvc, err := ctrl.getPVC(vmRestore.Namespace, restore.PersistentVolumeClaimName)
 		if err != nil {
 			return false, err
 		}
 
 		if pvc == nil {
-			backup := content.Spec.VolumeBackups[i]
+			backup, err := getRestoreVolumeBackup(restore.VolumeName, content)
+			if err != nil {
+				return false, err
+			}
 			if err = ctrl.createRestorePVC(vmRestore, target, backup, restore, content.Spec.Source.VirtualMachine.Name, content.Spec.Source.VirtualMachine.Namespace); err != nil {
 				return false, err
 			}
@@ -326,6 +336,9 @@ func (t *vmRestoreTarget) UpdateDoneRestore() (bool, error) {
 	vmCopy := t.vm.DeepCopy()
 
 	vmCopy.Status.RestoreInProgress = nil
+	if vmCopy.Status.MemoryDumpRequest != nil {
+		vmCopy.Status.MemoryDumpRequest = nil
+	}
 	return true, t.controller.vmStatusUpdater.UpdateStatus(vmCopy)
 }
 
@@ -380,6 +393,20 @@ func (t *vmRestoreTarget) Ready() (bool, error) {
 	return !exists, nil
 }
 
+func stripIdentityInfo(vm *kubevirtv1.VirtualMachine) {
+	vmTemplate := vm.Spec.Template
+	if vmTemplate == nil {
+		return
+	}
+
+	fw := vmTemplate.Spec.Domain.Firmware
+	if fw == nil {
+		return
+	}
+
+	fw.UUID = ""
+}
+
 func (t *vmRestoreTarget) Reconcile() (bool, error) {
 	log.Log.Object(t.vmRestore).V(3).Info("Reconciling VM")
 
@@ -402,7 +429,7 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 	}
 
 	var newTemplates = make([]kubevirtv1.DataVolumeTemplateSpec, len(snapshotVM.Spec.DataVolumeTemplates))
-	var newVolumes = make([]kubevirtv1.Volume, len(snapshotVM.Spec.Template.Spec.Volumes))
+	var newVolumes []kubevirtv1.Volume
 	var deletedDataVolumes []string
 	updatedStatus := false
 
@@ -410,15 +437,12 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 		t.DeepCopyInto(&newTemplates[i])
 	}
 
-	for i, v := range snapshotVM.Spec.Template.Spec.Volumes {
-		v.DeepCopyInto(&newVolumes[i])
-	}
-
-	for j, v := range snapshotVM.Spec.Template.Spec.Volumes {
-		if v.DataVolume != nil || v.PersistentVolumeClaim != nil {
+	for _, v := range snapshotVM.Spec.Template.Spec.Volumes {
+		nv := v.DeepCopy()
+		if nv.DataVolume != nil || nv.PersistentVolumeClaim != nil {
 			for k := range t.vmRestore.Status.Restores {
 				vr := &t.vmRestore.Status.Restores[k]
-				if vr.VolumeName != v.Name {
+				if vr.VolumeName != nv.Name {
 					continue
 				}
 
@@ -431,7 +455,7 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 					return false, fmt.Errorf("pvc %s/%s does not exist and should", t.vmRestore.Namespace, vr.PersistentVolumeClaimName)
 				}
 
-				if v.DataVolume != nil {
+				if nv.DataVolume != nil {
 					templateIndex := -1
 					for i, dvt := range snapshotVM.Spec.DataVolumeTemplates {
 						if v.DataVolume.Name == dvt.Name {
@@ -466,13 +490,11 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 						dv.Name = *vr.DataVolumeName
 						newTemplates[templateIndex] = *dv
 
-						nv := v.DeepCopy()
 						nv.DataVolume.Name = *vr.DataVolumeName
-						newVolumes[j] = *nv
 					} else {
 						// convert to PersistentVolumeClaim volume
-						nv := kubevirtv1.Volume{
-							Name: v.Name,
+						nv = &kubevirtv1.Volume{
+							Name: nv.Name,
 							VolumeSource: kubevirtv1.VolumeSource{
 								PersistentVolumeClaim: &kubevirtv1.PersistentVolumeClaimVolumeSource{
 									PersistentVolumeClaimVolumeSource: corev1.PersistentVolumeClaimVolumeSource{
@@ -481,15 +503,16 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 								},
 							},
 						}
-						newVolumes[j] = nv
 					}
 				} else {
-					nv := v.DeepCopy()
 					nv.PersistentVolumeClaim.ClaimName = vr.PersistentVolumeClaimName
-					newVolumes[j] = *nv
 				}
 			}
+		} else if nv.MemoryDump != nil {
+			// don't restore memory dump volume in the new spec
+			continue
 		}
+		newVolumes = append(newVolumes, *nv)
 	}
 
 	if t.doesTargetVMExist() && updatedStatus {
@@ -523,6 +546,8 @@ func (t *vmRestoreTarget) Reconcile() (bool, error) {
 			Spec:   *snapshotVM.Spec.DeepCopy(),
 			Status: kubevirtv1.VirtualMachineStatus{},
 		}
+
+		stripIdentityInfo(newVM)
 	} else {
 		newVM = t.vm.DeepCopy()
 		newVM.Spec = *snapshotVM.Spec.DeepCopy()
@@ -660,24 +685,25 @@ func patchVM(vm *kubevirtv1.VirtualMachine, patches []string) (*kubevirtv1.Virtu
 
 	marshalledVM, err := json.Marshal(vm)
 	if err != nil {
-		return nil, fmt.Errorf("cannot marshall VM %s: %v", vm.Name, err)
+		return vm, fmt.Errorf("cannot marshall VM %s: %v", vm.Name, err)
 	}
 
 	jsonPatch := "[\n" + strings.Join(patches, ",\n") + "\n]"
 
 	patch, err := jsonpatch.DecodePatch([]byte(jsonPatch))
 	if err != nil {
-		return nil, fmt.Errorf("cannot decode vm patches %s: %v", jsonPatch, err)
+		return vm, fmt.Errorf("cannot decode vm patches %s: %v", jsonPatch, err)
 	}
 
 	modifiedMarshalledVM, err := patch.Apply(marshalledVM)
 	if err != nil {
-		return nil, fmt.Errorf("failed to apply patch for VM %s: %v", jsonPatch, err)
+		return vm, fmt.Errorf("failed to apply patch for VM %s: %v", jsonPatch, err)
 	}
 
+	vm = &kubevirtv1.VirtualMachine{}
 	err = json.Unmarshal(modifiedMarshalledVM, vm)
 	if err != nil {
-		return nil, fmt.Errorf("cannot unmarshal modified marshalled vm %s: %v", string(modifiedMarshalledVM), err)
+		return vm, fmt.Errorf("cannot unmarshal modified marshalled vm %s: %v", string(modifiedMarshalledVM), err)
 	}
 
 	log.Log.V(3).Object(vm).Infof("patching restore target completed. Modified VM: %s", string(modifiedMarshalledVM))
@@ -740,6 +766,24 @@ func (ctrl *VMRestoreController) createRestorePVC(
 		return fmt.Errorf("missing VolumeSnapshot name")
 	}
 
+	volumeSnapshot, err := ctrl.VolumeSnapshotProvider.GetVolumeSnapshot(vmRestore.Namespace, *volumeBackup.VolumeSnapshotName)
+	if err != nil {
+		return err
+	}
+
+	if volumeSnapshot == nil {
+		log.Log.Errorf("VolumeSnapshot %s is missing", *volumeBackup.VolumeSnapshotName)
+		return fmt.Errorf("missing VolumeSnapshot %s", *volumeBackup.VolumeSnapshotName)
+	}
+
+	if volumeSnapshot.Status != nil && volumeSnapshot.Status.RestoreSize != nil {
+		restorePVCSize, ok := pvc.Spec.Resources.Requests[corev1.ResourceStorage]
+		// Update restore pvc size to be the maximum between the source PVC and the restore size
+		if !ok || restorePVCSize.Cmp(*volumeSnapshot.Status.RestoreSize) < 0 {
+			pvc.Spec.Resources.Requests[corev1.ResourceStorage] = *volumeSnapshot.Status.RestoreSize
+		}
+	}
+
 	if pvc.Labels == nil {
 		pvc.Labels = make(map[string]string)
 	}
@@ -768,7 +812,7 @@ func (ctrl *VMRestoreController) createRestorePVC(
 
 	target.Own(pvc)
 
-	_, err := ctrl.Client.CoreV1().PersistentVolumeClaims(vmRestore.Namespace).Create(context.Background(), pvc, metav1.CreateOptions{})
+	_, err = ctrl.Client.CoreV1().PersistentVolumeClaims(vmRestore.Namespace).Create(context.Background(), pvc, metav1.CreateOptions{})
 	if err != nil {
 		return err
 	}
@@ -778,4 +822,28 @@ func (ctrl *VMRestoreController) createRestorePVC(
 
 func updateRestoreCondition(r *snapshotv1.VirtualMachineRestore, c snapshotv1.Condition) {
 	r.Status.Conditions = updateCondition(r.Status.Conditions, c, true)
+}
+
+// Returns a set of volumes not for restore
+// Currently only memory dump volumes should not be restored
+func volumesNotForRestore(content *snapshotv1.VirtualMachineSnapshotContent) sets.String {
+	volumes := content.Spec.Source.VirtualMachine.Spec.Template.Spec.Volumes
+	noRestore := sets.NewString()
+
+	for _, volume := range volumes {
+		if volume.MemoryDump != nil {
+			noRestore.Insert(volume.Name)
+		}
+	}
+
+	return noRestore
+}
+
+func getRestoreVolumeBackup(volName string, content *snapshotv1.VirtualMachineSnapshotContent) (snapshotv1.VolumeBackup, error) {
+	for _, vb := range content.Spec.VolumeBackups {
+		if vb.VolumeName == volName {
+			return vb, nil
+		}
+	}
+	return snapshotv1.VolumeBackup{}, fmt.Errorf("volume backup for volume %s not found", volName)
 }

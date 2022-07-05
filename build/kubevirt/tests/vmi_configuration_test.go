@@ -107,8 +107,6 @@ var _ = Describe("[sig-compute]Configurations", func() {
 	BeforeEach(func() {
 		virtClient, err = kubecli.GetKubevirtClient()
 		util.PanicOnError(err)
-
-		tests.BeforeTestCleanup()
 	})
 
 	Context("with all devices on the root PCI bus", func() {
@@ -280,7 +278,7 @@ var _ = Describe("[sig-compute]Configurations", func() {
 				if computeContainer == nil {
 					util.PanicOnError(fmt.Errorf("could not find the compute container"))
 				}
-				Expect(computeContainer.Resources.Requests.Memory().ToDec().ScaledValue(resource.Mega)).To(Equal(int64(340)))
+				Expect(computeContainer.Resources.Requests.Memory().ToDec().ScaledValue(resource.Mega)).To(Equal(int64(366)))
 
 				Expect(err).ToNot(HaveOccurred())
 			})

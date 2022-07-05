@@ -540,6 +540,8 @@ func (c *MigrationController) updateStatus(migration *virtv1.VirtualMachineInsta
 		}
 	}
 
+	controller.SetVMIMigrationPhaseTransitionTimestamp(migration, migrationCopy)
+
 	if !equality.Semantic.DeepEqual(migration.Status, migrationCopy.Status) {
 		err := c.statusUpdater.UpdateStatus(migrationCopy)
 		if err != nil {
@@ -732,17 +734,15 @@ func (c *MigrationController) handleSignalMigrationAbort(migration *virtv1.Virtu
 
 	vmiCopy.Status.MigrationState.AbortRequested = true
 	if !equality.Semantic.DeepEqual(vmi.Status, vmiCopy.Status) {
-		newStatus, err := json.Marshal(vmiCopy.Status)
+
+		newStatus := vmiCopy.Status
+		oldStatus := vmi.Status
+		patch, err := kubevirttypes.GenerateTestReplacePatch("/status", oldStatus, newStatus)
 		if err != nil {
 			return err
 		}
-		oldStatus, err := json.Marshal(vmi.Status)
-		if err != nil {
-			return err
-		}
-		test := fmt.Sprintf(`{ "op": "test", "path": "/status", "value": %s }`, string(oldStatus))
-		patch := fmt.Sprintf(`{ "op": "replace", "path": "/status", "value": %s }`, string(newStatus))
-		_, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, []byte(fmt.Sprintf("[ %s, %s ]", test, patch)), &v1.PatchOptions{})
+
+		_, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, patch, &v1.PatchOptions{})
 		if err != nil {
 			msg := fmt.Sprintf("failed to set MigrationState in VMI status. :%v", err)
 			c.recorder.Eventf(migration, k8sv1.EventTypeWarning, FailedAbortMigrationReason, msg)
@@ -1052,9 +1052,11 @@ func (c *MigrationController) sync(key string, migration *virtv1.VirtualMachineI
 				// will be marked as failed too.
 				return nil
 			}
-			if c.clusterConfig.NonRootEnabled() && util.CanBeNonRoot(vmi) == nil {
-				patches := []string{}
 
+			var patches []string
+			if c.clusterConfig.NonRootEnabled() && util.CanBeNonRoot(vmi) == nil {
+				// The cluster is configured for non-root VMs, ensure the VMI is non-root.
+				// If the VMI is root, the migration will be a root -> non-root migration.
 				if vmi.Status.RuntimeUser != util.NonRootUID {
 					patches = append(patches, fmt.Sprintf(`{ "op": "replace", "path": "/status/runtimeUser", "value": %d }`, util.NonRootUID))
 				}
@@ -1064,18 +1066,27 @@ func (c *MigrationController) sync(key string, migration *virtv1.VirtualMachineI
 					patches = append(patches, fmt.Sprintf(`{ "op": "add", "path": "/metadata/annotations", "value":  { "%s": "true"} }`, virtv1.DeprecatedNonRootVMIAnnotation))
 				} else if _, ok := vmi.Annotations[virtv1.DeprecatedNonRootVMIAnnotation]; !ok {
 					patches = append(patches, fmt.Sprintf(`{ "op": "add", "path": "/metadata/annotations/%s", "value": "true"}`, controller.EscapeJSONPointer(virtv1.DeprecatedNonRootVMIAnnotation)))
-
+				}
+			} else {
+				// The cluster is configured for root VMs, ensure the VMI is root.
+				// If the VMI is non-root, the migration will be a non-root -> root migration.
+				if vmi.Status.RuntimeUser != util.RootUser {
+					patches = append(patches, fmt.Sprintf(`{ "op": "replace", "path": "/status/runtimeUser", "value": %d }`, util.RootUser))
 				}
 
-				if len(patches) != 0 {
-					vmi, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, controller.GeneratePatchBytes(patches), &v1.PatchOptions{})
-					if err != nil {
-						return fmt.Errorf("failed to mark VMI as nonroot: %v", err)
-
+				if vmi.Annotations != nil {
+					if _, ok := vmi.Annotations[virtv1.DeprecatedNonRootVMIAnnotation]; ok {
+						patches = append(patches, fmt.Sprintf(`{ "op": "remove", "path": "/metadata/annotations/%s"}`, controller.EscapeJSONPointer(virtv1.DeprecatedNonRootVMIAnnotation)))
 					}
 				}
-
 			}
+			if len(patches) != 0 {
+				vmi, err = c.clientset.VirtualMachineInstance(vmi.Namespace).Patch(vmi.Name, types.JSONPatchType, controller.GeneratePatchBytes(patches), &v1.PatchOptions{})
+				if err != nil {
+					return fmt.Errorf("failed to set VMI RuntimeUser: %v", err)
+				}
+			}
+
 			return c.handleTargetPodCreation(key, migration, vmi, sourcePod)
 		} else if isPodReady(pod) {
 			if controller.VMIHasHotplugVolumes(vmi) {

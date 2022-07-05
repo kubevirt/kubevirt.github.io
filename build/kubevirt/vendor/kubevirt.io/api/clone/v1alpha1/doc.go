@@ -17,9 +17,8 @@
  *
  */
 
-package testsuite
+// +k8s:deepcopy-gen=package
+// +groupName=clone.kubevirt.io
+// +k8s:openapi-gen=true
 
-const (
-	KubevirtIoTest = "kubevirt.io/test"
-	SecretLabel    = "kubevirt.io/secret"
-)
+package v1alpha1

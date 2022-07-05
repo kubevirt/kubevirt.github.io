@@ -105,11 +105,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 	})
 
 	Describe("changes to the kubernetes client", func() {
-
-		BeforeEach(func() {
-			tests.BeforeTestCleanup()
-		})
-
 		scheduledToRunning := func(vmis []v1.VirtualMachineInstance) time.Duration {
 			var duration time.Duration
 			for _, vmi := range vmis {
@@ -161,7 +156,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			By("first getting the basetime for a replicaset")
 			targetNode := libnode.GetAllSchedulableNodes(virtClient).Items[0]
 			vmi := libvmi.New(
-				libvmi.RandName(),
 				libvmi.WithResourceMemory("1Mi"),
 				libvmi.WithNodeSelectorFor(&targetNode),
 			)
@@ -248,10 +242,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 	})
 
 	Describe("[rfe_id:4102][crit:medium][vendor:cnv-qe@redhat.com][level:component]certificates", func() {
-
-		BeforeEach(func() {
-			tests.BeforeTestCleanup()
-		})
 
 		It("[test_id:4099] should be rotated when a new CA is created", func() {
 			By("checking that the config-map gets the new CA bundle attached")
@@ -699,8 +689,11 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			return nodeName
 		}
 
-		tests.DeprecatedBeforeAll(func() {
-			tests.BeforeTestCleanup()
+		BeforeEach(func() {
+			preparedVMIs = []*v1.VirtualMachineInstance{}
+			pod = nil
+			handlerMetricIPs = []string{}
+			controllerMetricIPs = []string{}
 
 			By("Finding the virt-controller prometheus endpoint")
 			virtControllerLeaderPodName := getLeader()
@@ -840,7 +833,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		})
 
 		DescribeTable("should throttle the Prometheus metrics access", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -886,7 +879,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include the metrics for a running VM", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -902,7 +895,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include the storage metrics for a running VM", func(family k8sv1.IPFamily, metricSubstring, operator string) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -940,7 +933,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include metrics for a running VM", func(family k8sv1.IPFamily, metricSubstring, operator string) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -966,7 +959,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include VMI infos for a running VM", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -1003,7 +996,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include VMI phase metrics for all running VMs", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -1022,7 +1015,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include VMI eviction blocker status for all running VMs", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(controllerMetricIPs, family)
 
@@ -1040,7 +1033,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		)
 
 		DescribeTable("should include kubernetes labels to VMI metrics", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -1063,7 +1056,7 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 
 		// explicit test fo swap metrics as test_id:4144 doesn't catch if they are missing
 		DescribeTable("should include swap metrics", func(family k8sv1.IPFamily) {
-			libnet.SkipWhenClusterNotSupportIpFamily(virtClient, family)
+			libnet.SkipWhenClusterNotSupportIPFamily(virtClient, family)
 
 			ip := getSupportedIP(handlerMetricIPs, family)
 
@@ -1090,10 +1083,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 	})
 
 	Describe("Start a VirtualMachineInstance", func() {
-		BeforeEach(func() {
-			tests.BeforeTestCleanup()
-		})
-
 		Context("when the controller pod is not running and an election happens", func() {
 			It("[test_id:4642]should succeed afterwards", func() {
 				// This test needs at least 2 controller pods. Skip on single-replica.
@@ -1151,7 +1140,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 		}
 
 		BeforeEach(func() {
-			tests.BeforeTestCleanup()
 			nodesWithKVM = libnode.GetNodesWithKVM()
 			if len(nodesWithKVM) == 0 {
 				Skip("Skip testing with node-labeller, because there are no nodes with kvm")
@@ -1161,31 +1149,41 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			nodesWithKVM = libnode.GetNodesWithKVM()
 
 			for _, node := range nodesWithKVM {
-				delete(node.Labels, nonExistingCPUModelLabel)
+				libnode.RemoveLabelFromNode(node.Name, nonExistingCPUModelLabel)
+				libnode.RemoveAnnotationFromNode(node.Name, v1.LabellerSkipNodeAnnotation)
+			}
+			wakeNodeLabellerUp(virtClient)
 
-				p := []patch{
-					{
-						Op:    "replace",
-						Path:  "/metadata/labels",
-						Value: node.Labels,
-					},
-				}
+			for _, node := range nodesWithKVM {
+				Eventually(func() error {
+					node, err = virtClient.CoreV1().Nodes().Get(context.Background(), node.Name, metav1.GetOptions{})
+					Expect(err).ToNot(HaveOccurred())
 
-				delete(node.Annotations, v1.LabellerSkipNodeAnnotation)
+					if _, exists := node.Labels[nonExistingCPUModelLabel]; exists {
+						return fmt.Errorf("node %s is expected to not have label key %s", node.Name, nonExistingCPUModelLabel)
+					}
 
-				p = append(p, patch{
-					Op:    "replace",
-					Path:  "/metadata/annotations",
-					Value: node.Annotations,
-				})
+					if _, exists := node.Annotations[v1.LabellerSkipNodeAnnotation]; exists {
+						return fmt.Errorf("node %s is expected to not have annotation key %s", node.Name, v1.LabellerSkipNodeAnnotation)
+					}
 
-				payloadBytes, err := json.Marshal(p)
-				Expect(err).ToNot(HaveOccurred())
-
-				_, err = virtClient.CoreV1().Nodes().Patch(context.Background(), node.Name, types.JSONPatchType, payloadBytes, metav1.PatchOptions{})
-				Expect(err).ToNot(HaveOccurred())
+					return nil
+				}, 30*time.Second, 2*time.Second).ShouldNot(HaveOccurred())
 			}
 		})
+
+		expectNodeLabels := func(nodeName string, labelValidation func(map[string]string) (valid bool, errorMsg string)) {
+			var errorMsg string
+
+			EventuallyWithOffset(1, func() (isValid bool) {
+				node, err := virtClient.CoreV1().Nodes().Get(context.Background(), nodeName, metav1.GetOptions{})
+				Expect(err).ToNot(HaveOccurred())
+
+				isValid, errorMsg = labelValidation(node.Labels)
+
+				return isValid
+			}, 30*time.Second, 2*time.Second).Should(BeTrue(), errorMsg)
+		}
 
 		Context("basic labelling", func() {
 			It("skip node reconciliation when node has skip annotation", func() {
@@ -1285,14 +1283,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 				}
 			})
 
-			It("[test_id:6248] should set default min cpu model filter when min-cpu is not set in kubevirt config", func() {
-				node := nodesWithKVM[0]
-
-				for key := range node.Labels {
-					Expect(key).ToNot(Equal(v1.CPUFeatureLabel+"apic"), "Node can't contain label with apic feature (it is feature of default min cpu)")
-				}
-			})
-
 			It("[test_id:6995]should expose tsc frequency and tsc scalability", func() {
 				node := nodesWithKVM[0]
 				Expect(node.Labels).To(HaveKey("cpu-timer.node.kubevirt.io/tsc-frequency"))
@@ -1332,17 +1322,11 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 
 				tests.UpdateKubeVirtConfigValueAndWait(*kvConfig)
 
-				node, err = virtClient.CoreV1().Nodes().Get(context.Background(), nodesWithKVM[0].Name, metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
-				found := false
-				for key := range node.Labels {
-					if key == (v1.CPUModelLabel + obsoleteModel) {
-						found = true
-						break
-					}
-				}
-
-				Expect(found).To(Equal(false), "Node can't contain label "+v1.CPUModelLabel+obsoleteModel)
+				labelKeyExpectedToBeMissing := v1.CPUModelLabel + obsoleteModel
+				expectNodeLabels(node.Name, func(m map[string]string) (valid bool, errorMsg string) {
+					_, exists := m[labelKeyExpectedToBeMissing]
+					return !exists, fmt.Sprintf("node %s is expected to not have label key %s", node.Name, labelKeyExpectedToBeMissing)
+				})
 			})
 
 			It("[test_id:6250] should update node with new cpu model vendor label", func() {
@@ -1357,22 +1341,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 				}
 
 				Fail("No node contains label " + v1.CPUModelVendorLabel)
-			})
-
-			It("[test_id:6251] should update node with new cpu feature label set", func() {
-				node := nodesWithKVM[0]
-
-				numberOfLabelsBeforeUpdate := len(node.Labels)
-				minCPU := "Haswell"
-
-				kvConfig := originalKubeVirt.Spec.Configuration.DeepCopy()
-				kvConfig.MinCPUModel = minCPU
-				tests.UpdateKubeVirtConfigValueAndWait(*kvConfig)
-
-				node, err = virtClient.CoreV1().Nodes().Get(context.Background(), nodesWithKVM[0].Name, metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
-
-				Expect(numberOfLabelsBeforeUpdate).ToNot(Equal(len(node.Labels)), "Node should have different number of labels")
 			})
 
 			It("[test_id:6252] should remove all cpu model labels (all cpu model are in obsolete list)", func() {
@@ -1393,19 +1361,19 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 				kvConfig.ObsoleteCPUModels = obsoleteModels
 				tests.UpdateKubeVirtConfigValueAndWait(*kvConfig)
 
-				node, err = virtClient.CoreV1().Nodes().Get(context.Background(), nodesWithKVM[0].Name, metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
-				found := false
-				label := ""
-				for key := range node.Labels {
-					if strings.Contains(key, v1.CPUModelLabel) || strings.Contains(key, v1.SupportedHostModelMigrationCPU) {
-						found = true
-						label = key
-						break
+				expectNodeLabels(node.Name, func(m map[string]string) (valid bool, errorMsg string) {
+					found := false
+					label := ""
+					for key := range m {
+						if strings.Contains(key, v1.CPUModelLabel) || strings.Contains(key, v1.SupportedHostModelMigrationCPU) {
+							found = true
+							label = key
+							break
+						}
 					}
-				}
 
-				Expect(found).To(Equal(false), "Node can't contain any label "+label)
+					return !found, fmt.Sprintf("node %s should not contain any cpu model label, but contains %s", node.Name, label)
+				})
 			})
 		})
 
@@ -1414,7 +1382,6 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 			var originalKubeVirt *v1.KubeVirt
 
 			BeforeEach(func() {
-				tests.BeforeTestCleanup()
 				originalKubeVirt = util.GetCurrentKv(virtClient)
 
 			})
@@ -1484,36 +1451,47 @@ var _ = Describe("[Serial][sig-compute]Infrastructure", func() {
 				kvConfig.ObsoleteCPUModels = map[string]bool{"486": true}
 				tests.UpdateKubeVirtConfigValueAndWait(*kvConfig)
 
-				time.Sleep(time.Second * 10)
-				node, err = virtClient.CoreV1().Nodes().Get(context.Background(), nodesWithKVM[0].Name, metav1.GetOptions{})
-				Expect(err).ToNot(HaveOccurred())
+				expectNodeLabels(node.Name, func(m map[string]string) (valid bool, errorMsg string) {
+					foundSpecialLabel := false
 
-				foundSpecialLabel := false
-				for key := range node.Labels {
-					Expect(key).ToNot(ContainSubstring(nodelabellerutil.DeprecatedLabelNamespace+nodelabellerutil.DeprecatedcpuModelPrefix), "Node can't contain any label with prefix "+nodelabellerutil.DeprecatedLabelNamespace+nodelabellerutil.DeprecatedcpuModelPrefix)
-					Expect(key).ToNot(ContainSubstring(nodelabellerutil.DeprecatedLabelNamespace+nodelabellerutil.DeprecatedcpuFeaturePrefix), "Node can't contain any label with prefix "+nodelabellerutil.DeprecatedLabelNamespace+nodelabellerutil.DeprecatedcpuFeaturePrefix)
-					Expect(key).ToNot(ContainSubstring(nodelabellerutil.DeprecatedLabelNamespace+nodelabellerutil.DeprecatedHyperPrefix), "Node can't contain any label with prefix "+nodelabellerutil.DeprecatedLabelNamespace+nodelabellerutil.DeprecatedHyperPrefix)
+					for key := range m {
+						for _, deprecatedPrefix := range []string{nodelabellerutil.DeprecatedcpuModelPrefix, nodelabellerutil.DeprecatedcpuFeaturePrefix, nodelabellerutil.DeprecatedHyperPrefix} {
+							fullDeprecationLabel := nodelabellerutil.DeprecatedLabelNamespace + deprecatedPrefix
+							if strings.Contains(key, fullDeprecationLabel) {
+								return false, fmt.Sprintf("node %s should not contain any label with prefix %s", node.Name, fullDeprecationLabel)
+							}
+						}
 
-					if key == nfdLabel {
-						foundSpecialLabel = true
+						if key == nfdLabel {
+							foundSpecialLabel = true
+						}
 					}
-				}
-				Expect(foundSpecialLabel).To(Equal(true), "Labeller should not delete NFD labels")
 
-				for key := range node.Annotations {
-					Expect(key).ToNot(ContainSubstring(nodelabellerutil.DeprecatedLabellerNamespaceAnnotation), "Node can't contain any annotations with prefix "+nodelabellerutil.DeprecatedLabellerNamespaceAnnotation)
+					if !foundSpecialLabel {
+						return false, "labeller should not delete NFD labels"
+					}
 
-				}
+					return true, ""
+				})
+
+				Eventually(func() error {
+					node, err = virtClient.CoreV1().Nodes().Get(context.Background(), nodesWithKVM[0].Name, metav1.GetOptions{})
+					Expect(err).ToNot(HaveOccurred())
+
+					for key := range node.Annotations {
+						if strings.Contains(key, nodelabellerutil.DeprecatedLabellerNamespaceAnnotation) {
+							return fmt.Errorf("node %s shouldn't contain any annotations with prefix %s, but found annotation key %s", node.Name, nodelabellerutil.DeprecatedLabellerNamespaceAnnotation, key)
+						}
+					}
+
+					return nil
+				}, 30*time.Second, 2*time.Second).ShouldNot(HaveOccurred())
 			})
 
 		})
 	})
 
 	Describe("cluster profiler for pprof data aggregation", func() {
-		BeforeEach(func() {
-			tests.BeforeTestCleanup()
-		})
-
 		Context("when ClusterProfiler feature gate", func() {
 			It("is disabled it should prevent subresource access", func() {
 				tests.DisableFeatureGate("ClusterProfiler")
@@ -1639,7 +1617,7 @@ func validatedHTTPResponses(errorsChan chan error, concurrency int) error {
 }
 
 func getSupportedIP(ips []string, family k8sv1.IPFamily) string {
-	ip := libnet.GetIp(ips, family)
+	ip := libnet.GetIP(ips, family)
 	ExpectWithOffset(1, ip).NotTo(BeEmpty())
 
 	return ip

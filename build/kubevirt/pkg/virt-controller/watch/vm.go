@@ -51,10 +51,12 @@ import (
 	cdiclone "kubevirt.io/containerized-data-importer/pkg/clone"
 	"kubevirt.io/kubevirt/pkg/controller"
 	"kubevirt.io/kubevirt/pkg/flavor"
+	"kubevirt.io/kubevirt/pkg/util"
 	"kubevirt.io/kubevirt/pkg/util/migrations"
 	"kubevirt.io/kubevirt/pkg/util/status"
 	traceUtils "kubevirt.io/kubevirt/pkg/util/trace"
 	typesutil "kubevirt.io/kubevirt/pkg/util/types"
+	virtconfig "kubevirt.io/kubevirt/pkg/virt-config"
 )
 
 const (
@@ -73,6 +75,7 @@ const (
 	failedCreateCRforVmErrMsg             = "Failed to create controller revision for VirtualMachine."
 	failedProcessDeleteNotificationErrMsg = "Failed to process delete notification"
 	failureDeletingVmiErrFormat           = "Failure attempting to delete VMI: %v"
+	failedMemoryDump                      = "Memory dump failed"
 )
 
 const (
@@ -92,7 +95,8 @@ func NewVMController(vmiInformer cache.SharedIndexInformer,
 	crInformer cache.SharedIndexInformer,
 	flavorMethods flavor.Methods,
 	recorder record.EventRecorder,
-	clientset kubecli.KubevirtClient) *VMController {
+	clientset kubecli.KubevirtClient,
+	clusterConfig *virtconfig.ClusterConfig) *VMController {
 
 	proxy := &sarProxy{client: clientset}
 
@@ -112,6 +116,7 @@ func NewVMController(vmiInformer cache.SharedIndexInformer,
 			return cdiclone.CanServiceAccountClonePVC(proxy, pvcNamespace, pvcName, saNamespace, saName)
 		},
 		statusUpdater: status.NewVMStatusUpdater(clientset),
+		clusterConfig: clusterConfig,
 	}
 
 	c.vmInformer.AddEventHandler(cache.ResourceEventHandlerFuncs{
@@ -157,6 +162,7 @@ type VMController struct {
 	dataVolumeExpectations *controller.UIDTrackingControllerExpectations
 	cloneAuthFunc          CloneAuthFunc
 	statusUpdater          *status.VMStatusUpdater
+	clusterConfig          *virtconfig.ClusterConfig
 }
 
 func (c *VMController) Run(threadiness int, stopCh <-chan struct{}) {
@@ -619,6 +625,43 @@ func (c *VMController) generateVMIMemoryDumpVolumePatch(vmi *virtv1.VirtualMachi
 	return err
 }
 
+func needUpdatePVCMemoryDumpAnnotation(pvc *k8score.PersistentVolumeClaim, request *virtv1.VirtualMachineMemoryDumpRequest) bool {
+	if pvc.GetAnnotations() == nil {
+		return true
+	}
+	annotation, hasAnnotation := pvc.Annotations[virtv1.PVCMemoryDumpAnnotation]
+	return !hasAnnotation || (request.Phase == virtv1.MemoryDumpUnmounting && annotation != *request.FileName) || (request.Phase == virtv1.MemoryDumpFailed && annotation != failedMemoryDump)
+}
+
+func (c *VMController) updatePVCMemoryDumpAnnotation(vm *virtv1.VirtualMachine) error {
+	request := vm.Status.MemoryDumpRequest
+	pvc, err := c.getPersistentVolumeClaimFromCache(vm.Namespace, request.ClaimName)
+	if err != nil {
+		log.Log.Object(vm).Errorf("Error getting PersistentVolumeClaim to update memory dump annotation: %v", err)
+		return err
+	}
+	if pvc == nil {
+		log.Log.Object(vm).Errorf("Error getting PersistentVolumeClaim to update memory dump annotation: %v", err)
+		return fmt.Errorf("Error when trying to update memory dump annotation, pvc %s not found", request.ClaimName)
+	}
+
+	if needUpdatePVCMemoryDumpAnnotation(pvc, request) {
+		if pvc.GetAnnotations() == nil {
+			pvc.SetAnnotations(make(map[string]string))
+		}
+		if request.Phase == virtv1.MemoryDumpUnmounting {
+			pvc.Annotations[virtv1.PVCMemoryDumpAnnotation] = *request.FileName
+		} else if request.Phase == virtv1.MemoryDumpFailed {
+			pvc.Annotations[virtv1.PVCMemoryDumpAnnotation] = failedMemoryDump
+		}
+		if _, err = c.clientset.CoreV1().PersistentVolumeClaims(pvc.Namespace).Update(context.Background(), pvc, v1.UpdateOptions{}); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (c *VMController) handleMemoryDumpRequest(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance) error {
 	if vm.Status.MemoryDumpRequest == nil {
 		return nil
@@ -647,6 +690,9 @@ func (c *VMController) handleMemoryDumpRequest(vm *virtv1.VirtualMachine, vmi *v
 			return err
 		}
 	case virtv1.MemoryDumpUnmounting, virtv1.MemoryDumpFailed:
+		if err := c.updatePVCMemoryDumpAnnotation(vm); err != nil {
+			return err
+		}
 		// Check if the memory dump is in the vmi list of volumes,
 		// if it still there remove it to make it unmount from virt launcher
 		if _, exists := vmiVolumeMap[vm.Status.MemoryDumpRequest.ClaimName]; !exists {
@@ -954,6 +1000,13 @@ func (c *VMController) startVMI(vm *virtv1.VirtualMachine) error {
 	// the VMI before it is deleted
 	vmi.Finalizers = append(vmi.Finalizers, virtv1.VirtualMachineControllerFinalizer)
 
+	err = c.clusterConfig.SetVMIDefaultNetworkInterface(vmi)
+	if err != nil {
+		return err
+	}
+
+	util.SetDefaultVolumeDisk(vmi)
+
 	err = c.applyFlavorToVmi(vm, vmi)
 	if err != nil {
 		log.Log.Object(vm).Infof("Failed to apply flavor to VirtualMachineInstance: %s/%s", vmi.Namespace, vmi.Name)
@@ -1260,13 +1313,11 @@ func (c *VMController) setupVMIFromVM(vm *virtv1.VirtualMachine) *virtv1.Virtual
 func (c *VMController) applyFlavorToVmi(vm *virtv1.VirtualMachine, vmi *virtv1.VirtualMachineInstance) error {
 
 	flavorSpec, err := c.flavorMethods.FindFlavorSpec(vm)
-
 	if err != nil {
 		return err
 	}
 
 	preferenceSpec, err := c.flavorMethods.FindPreferenceSpec(vm)
-
 	if err != nil {
 		return err
 	}
@@ -1279,11 +1330,16 @@ func (c *VMController) applyFlavorToVmi(vm *virtv1.VirtualMachine, vmi *virtv1.V
 	flavor.AddPreferenceNameAnnotations(vm, vmi)
 
 	conflicts := c.flavorMethods.ApplyToVmi(k8sfield.NewPath("spec"), flavorSpec, preferenceSpec, &vmi.Spec)
-	if len(conflicts) == 0 {
-		return nil
+	if len(conflicts) > 0 {
+		return fmt.Errorf("VMI conflicts with flavor spec in fields: [%s]", conflicts.String())
 	}
 
-	return fmt.Errorf("VMI conflicts with flavor spec in fields: [%s]", conflicts.String())
+	err = c.flavorMethods.StoreControllerRevisions(vm)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func hasStartPausedRequest(vm *virtv1.VirtualMachine) bool {
