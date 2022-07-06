@@ -22,18 +22,17 @@ The event will take place online during two half-days (5 hours each day):
 
 KubeVirt Summit is hosted on Community.CNCF.io.  Because of how that platform works, you need to register for each of the two days of the summit independantly:
 
-* [Register for Day 1](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/) 
-* [Register for Day 2](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/) 
+- [Register for Day 1](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/)
+- [Register for Day 2](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/)
 
 You will need to create an account with CNCF.io if you have not before. Attendance is free.
 
 ## Schedule
 
-
 ## [DAY 1](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-1/) Wednesday, February 16
 
 | Time (UTC) | Time (EST) | Session | Speaker | Track |
-| ------- | ------- | ----------------------------- | ------- | ------ | 
+| ------- | ------- | ----------------------------- | ------- | ------ |
 | 14:00 | 9:00 | Keynote/Intro | Fabian Deutch | General |
 | 14:25 | 9:25 | "KubeVirt on Arm64 (Progress, Troubles and Plans)" | Howard Zhang | Contributors |
 | 15:00 | 10:00 | EdgeStack and Singulus: Complete VM network implementation with KubeVirt CNI  | Sangho Shin, Jian Li | Users |
@@ -43,11 +42,10 @@ You will need to create an account with CNCF.io if you have not before. Attendan
 | 17:45 | 12:45 | Network interface hotplug for KubeVirt | Miguel Duarte Barroso | Contributors |
 | 18:20 | 13:20 | A few bugs and findings from VMI Churn at NVIDIA | Fan Zhang | Contributors |
 
-
 ## [DAY 2](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2022-day-2/) Thursday, February 17
 
 | Time (UTC) | Time (EST) | Session | Speaker | Track |
-| ------- | ------- | ----------------------------- | ------- | ------ | 
+| ------- | ------- | ----------------------------- | ------- | ------ |
 | 14:00 | 9:00 | KubeVirt Scale and Performance with SIG-Scale | Ryan Hallisey, Marcelo Amaral | Users |
 | 14:35 | 9:35 | Benchmarking the performance of CPU pinning using different virtual CPU topologies: a KVM vs. KubeVirt analysis | Guoqing Li, Marcelo Amaral | Contributors |
 | 15:10 | 10:10 | Delivering High-Performance VNF Workloads in KubeVirt: Navigating Network Acceleration for Low Latency Requirements | Pooja Ghumre, Ashutosh Tiwari  | Contributors |
@@ -56,7 +54,6 @@ You will need to create an account with CNCF.io if you have not before. Attendan
 | 16:55 | 11:55 | Volume Populator Support | Michael Henriksen | Users |
 | 17:30 | 12:30 | KubeVirt Performance Visualization at Nvidia | Qian Xiao | Users |
 | 18:05 | 13:05 | Closing Session | Fabian Deutch | General |
-
 
 ## Sponsors
 
