@@ -10,8 +10,6 @@ tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]
 
 # Experiment with KubeVirt Upgrades
 
-You can experiment this lab online at [![Katacoda](/assets/images/katacoda-logo.png)](https://katacoda.com/kubevirt/scenarios/kubevirt-upgrades)
-
 #### Deploy KubeVirt
 
 **_NOTE_**: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you're already using latest, please start with an older KubeVirt version and follow [Lab1]({{ site.baseurl }}/labs/kubernetes/lab1) to deploy KubeVirt on it, but using version `v0.20.1` instead.
