@@ -141,7 +141,7 @@ check_links: | envvar stop
 
 
 ## Check links/selectors to userguide on website content
-check_links_selectors:
+check_links_selectors: | envvar stop
 	@echo "${GREEN}Makefile: Check url selectors to user-guide${RESET}"
 #BEGIN BIG SHELL SCRIPT
 	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors' | sed -n -e '/HTML-Proofer finished successfully./,$$p' | grep -v 'HTML-Proofer finished successfully.' > links 2> /dev/null; \
@@ -149,7 +149,7 @@ check_links_selectors:
 	  "for i in \`cat ./links\`; do \
 			echo -n 'File: ' && echo \"\$${i}\" | cut -d',' -f 2; \
 			echo -n 'Link: ' && echo \"\$${i}\" | cut -d',' -f 1; \
-			OPENSSL_CONF=/etc/ssl casperjs test --concise --arg=\"\$${i}\" /src/check_selectors.js; \
+			OPENSSL_CONF=/dev/null casperjs test --concise --arg=\"\$${i}\" /src/check_selectors.js; \
 			if [ \"\$$?\" != 0 ]; then break; fi; \
 			echo; \
 		done" > RETVAL; \
@@ -209,7 +209,9 @@ check_spelling: | envvar stop
 run: | envvar stop
 	@echo "${GREEN}Makefile: Run site${RESET}"
 	for i in .jekyll-cache _site Gemfile.lock; do rm -rf ./"$${i}" 2> /dev/null; echo -n; done
-	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock:rw${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache --workdir=/srv ${IMGTAG} /bin/bash -c "jekyll serve --host=0.0.0.0 --trace --force_polling --future"
+	$(eval TEMP_GEMLOCK := $(shell mktemp))
+	${CONTAINER_ENGINE} run -d --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v ${TEMP_GEMLOCK}:/srv/Gemfile.lock:rw${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache --workdir=/srv ${IMGTAG} /bin/bash -c "jekyll serve --host=0.0.0.0 --trace --force_polling --future"
+	rm -f ${TEMP_GEMLOCK}
 	@echo
 
 
