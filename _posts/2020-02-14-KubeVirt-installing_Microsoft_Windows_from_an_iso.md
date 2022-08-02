@@ -19,6 +19,10 @@ pub-date: February, 14
 pub-year: 2020
 ---
 
+> warning "Warning!"
+> While this post still contains valuable information, a lot of it is outdated.
+> For more up-to-date information, including Windows 11 installation, please refer to [this post](https://kubevirt.io/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html)
+
 Hello! nowadays each operating system vendor has its cloud image available to download ready to import and deploy a new Virtual Machine (VM) inside Kubernetes with KubeVirt,
 but what if you want to follow the traditional way of installing a VM using an existing iso attached as a CD-ROM?
 
