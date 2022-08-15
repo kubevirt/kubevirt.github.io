@@ -19,6 +19,8 @@ tags:
 
 # Use KubeVirt
 
+- You can experiment with this lab online at [Killercoda](https://killercoda.com/kubevirt/scenario/kubevirt-101)
+
 ### Create a Virtual Machine
 
 Download the VM manifest and explore it. Note it uses a [container disk](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk) and as such doesn't persist data. Such container disks currently exist for alpine, cirros and fedora.

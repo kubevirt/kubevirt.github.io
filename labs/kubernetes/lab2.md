@@ -10,6 +10,8 @@ tags: [laboratory, importer, vm import, containerized data importer, CDI, lab]
 
 # Experiment with the Containerized Data Importer (CDI)
 
+- You can experiment with this lab online at [Killercoda](https://killercoda.com/kubevirt/scenario/kubevirt-cdi)
+
 [CDI](https://github.com/kubevirt/containerized-data-importer) is a utility designed to import Virtual Machine images for use with Kubevirt.
 
 At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named _disk.img_ with the desired content into the associated PVC.
