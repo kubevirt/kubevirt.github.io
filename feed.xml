@@ -1,4 +1,467 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-07-08T16:45:58+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="http://0.0.0.0:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://0.0.0.0:4000/" rel="alternate" type="text/html" /><updated>2022-08-17T13:47:59+00:00</updated><id>http://0.0.0.0:4000/feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Simplifying KubeVirt’s `VirtualMachine` UX with Instancetypes and Preferences</title><link href="http://0.0.0.0:4000/2022/KubeVirt-Introduction-of-instancetypes.html" rel="alternate" type="text/html" title="Simplifying KubeVirt’s `VirtualMachine` UX with Instancetypes and Preferences" /><published>2022-08-12T00:00:00+00:00</published><updated>2022-08-12T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2022/KubeVirt-Introduction-of-instancetypes</id><content type="html" xml:base="http://0.0.0.0:4000/2022/KubeVirt-Introduction-of-instancetypes.html"><![CDATA[<p>KubeVirt’s <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> API contains many advanced options for tuning a virtual machine’s resources and performance that go beyond what typical users need to be aware of. Users have until now been unable to simply define the storage/network they want assigned to their VM and then declare in broad terms what quality of resources and kind of performance they need for their VM. Instead, the user has to be keenly aware how to request specific compute resources alongside all of the performance tunings available on the <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> API and how those tunings impact their guest’s operating system in order to get a desired result.</p>
+
+<p>A common pattern for IaaS is to have abstractions separating the resource sizing and performance of a workload from the user-defined values related to launching their custom application. This pattern is evident across all the major cloud providers (also known as hyperscalers) as well as open source IaaS projects like OpenStack. AWS has <a href="https://aws.amazon.com/ec2/instance-types/">instance types</a>, GCP has <a href="https://cloud.google.com/compute/docs/machine-types#custom_machine_types">machine types</a>, Azure has <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/sizes">instance VM sizes</a>, and OpenStack has <a href="https://docs.openstack.org/nova/latest/user/flavors.html">flavors</a>.</p>
+
+<p>Let’s take AWS for example to help visualize what this abstraction enables. Launching an EC2 instance only requires a few top level arguments; the disk image, instance type, keypair, security group, and subnet:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws ec2 run-instances <span class="nt">--image-id</span> ami-xxxxxxxx <span class="se">\</span>
+                        <span class="nt">--count</span> 1 <span class="se">\</span>
+                        <span class="nt">--instance-type</span> c4.xlarge <span class="se">\</span>
+                        <span class="nt">--key-name</span> MyKeyPair <span class="se">\</span>
+                        <span class="nt">--security-group-ids</span> sg-903004f8 <span class="se">\</span>
+                        <span class="nt">--subnet-id</span> subnet-6e7f829e
+</code></pre></div></div>
+
+<p>When creating the EC2 instance the user doesn’t define the amount of resources, what processor to use, how to optimize the performance of the instance, or what hardware to schedule the instance on. Instead, all of that information is wrapped up in that single <code class="language-plaintext highlighter-rouge">--instance-type c4.xlarge</code> CLI argument. <code class="language-plaintext highlighter-rouge">c4</code> denotes a specific performance profile version, in this case from the <code class="language-plaintext highlighter-rouge">Compute Optimized</code> family and <code class="language-plaintext highlighter-rouge">xlarge</code> denotes a specific amount of compute resources provided by the instance type, in this case 4 vCPUs, 7.5 GiB of RAM, 750 Mbps EBS bandwidth, etc.</p>
+
+<p>While hyperscalers can provide predefined types with performance profiles and compute resources already assigned IaaS and virtualization projects such as OpenStack and KubeVirt can only provide the raw abstractions for operators, admins, and even vendors to then create instances of these abstractions specific to each deployment.</p>
+
+<h2 id="instancetype-api">Instancetype API</h2>
+
+<p>The recently renamed instancetype API and associated <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a> aim to address this by providing KubeVirt users with a set of APIs and abstractions that allow them to make fewer choices when creating a <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> while still ending up with a working, performant guest at runtime.</p>
+
+<h2 id="virtualmachineinstancetype">VirtualMachineInstancetype</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstancetype</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-instancetype</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">cpu</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">memory</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="s">128Mi</span>
+</code></pre></div></div>
+
+<p>KubeVirt now provides two instancetype based <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a>, a cluster wide <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineclusterinstancetype"><code class="language-plaintext highlighter-rouge">VirtualMachineClusterInstancetype</code></a> and a namespaced <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineinstancetype"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancetype</code></a>. These <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a> encapsulate the following resource related characteristics of a <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> through a shared <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineinstancetypespec"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancetypeSpec</code></a>:</p>
+
+<ul>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_cpuinstancetype">CPU</a> : Required number of vCPUs presented to the guest</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_memoryinstancetype">Memory</a> : Required amount of memory presented to the guest</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1_gpu">GPUs</a> : Optional list of vGPUs to passthrough</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1_hostdevice">HostDevices</a>: Optional list of HostDevices to passthrough</li>
+  <li><a href="`string`">IOThreadsPolicy</a> : Optional IOThreadsPolicy to be used</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1_launchsecurity">LaunchSecurity</a>: Optional LaunchSecurity to be used</li>
+</ul>
+
+<p>Anything provided within an instancetype cannot be overridden within a <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a>. For example, <code class="language-plaintext highlighter-rouge">CPU</code> and <code class="language-plaintext highlighter-rouge">Memory</code> are both required attributes of an instancetype. If a user makes any requests for <code class="language-plaintext highlighter-rouge">CPU</code> or <code class="language-plaintext highlighter-rouge">Memory</code> resources within their <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a>, the instancetype will conflict and the request will be rejected.</p>
+
+<h2 id="virtualmachinepreference">VirtualMachinePreference</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachinePreference</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-preference</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">devices</span><span class="pi">:</span>
+    <span class="na">preferredDiskBus</span><span class="pi">:</span> <span class="s">virtio</span>
+    <span class="na">preferredInterfaceModel</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+
+<p>KubeVirt also provides two further preference based <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a>, again a cluster-wide <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineclusterpreference"><code class="language-plaintext highlighter-rouge">VirtualMachineClusterPreference</code></a> and namespaced <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachinepreference"><code class="language-plaintext highlighter-rouge">VirtualMachinePreference</code></a>. These <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a> encapsulate the preferred value of any remaining attributes of a <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> required to run a given workload, again this is through a shared <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachinepreferencespec"><code class="language-plaintext highlighter-rouge">VirtualMachinePreferenceSpec</code></a>.</p>
+
+<p>Unlike instancetypes, preferences only represent the preferred values and as such can be overridden by values in the <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> provided by the user.</p>
+
+<h2 id="virtualmachineinstancetypepreferencematcher">VirtualMachine{Instancetype,Preference}Matcher</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-vm</span>
+<span class="na">spec</span><span class="pi">:</span>
+<span class="pi">[</span><span class="nv">..</span><span class="pi">]</span>
+  <span class="na">instancetype</span><span class="pi">:</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstancetype</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">example-instancetype</span>
+  <span class="na">preference</span><span class="pi">:</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachinePreference</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">example-preference</span>
+<span class="pi">[</span><span class="nv">..</span><span class="pi">]</span>
+</code></pre></div></div>
+
+<p>The previous instancetype and preference CRDs are matched to a given <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> through the use of a matcher. Each matcher consists of the following:</p>
+
+<ul>
+  <li>Name (string): Name of the resource being referenced</li>
+  <li>Kind (string):  Optional, defaults to the cluster wide CRD kinds of <code class="language-plaintext highlighter-rouge">VirtualMachineClusterInstancetype</code> or <code class="language-plaintext highlighter-rouge">VirtualMachineClusterPreference</code></li>
+  <li>RevisionName (string) : Optional, name of a <a href="https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/controller-revision-v1/">ControllerRevision</a> containing a copy of the <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineinstancetypespec"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancetypeSpec</code></a> or <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachinepreferencespec"><code class="language-plaintext highlighter-rouge">VirtualMachinePreferenceSpec</code></a> taken when the <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> is first started.</li>
+</ul>
+
+<h2 id="virtualmachineinstancepreset-deprecation">VirtualMachineInstancePreset Deprecation</h2>
+
+<p>The new instancetype API and CRDs conflict somewhat with the existing <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachineinstancepreset"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancePreset</code></a> CRD. The approach taken by the CRD has also been removed in core k8s so, as advertised on the <a href="https://groups.google.com/g/kubevirt-dev/c/eM7JaDV_EU8">mailing list</a>, I have started the <a href="https://github.com/kubevirt/kubevirt/pull/8069">process of deprecating</a> <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachineinstancepreset"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancePreset</code></a> in favor of the Instancetype CRDs listed above.</p>
+
+<h2 id="examples">Examples</h2>
+
+<p>The following example is taken from the <a href="https://kubevirt.io/user-guide/virtual_machines/instancetypes/">KubeVirt User Guide</a>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">$ cat &lt;&lt; EOF | kubectl apply -f -</span> 
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstancetype</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">cmedium</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">cpu</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">memory</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="s">1Gi</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachinePreference</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">devices</span><span class="pi">:</span>
+    <span class="na">preferredDiskBus</span><span class="pi">:</span> <span class="s">virtio</span>
+    <span class="na">preferredInterfaceModel</span><span class="pi">:</span> <span class="s">virtio</span>
+    <span class="na">preferredRng</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">features</span><span class="pi">:</span>
+    <span class="na">preferredAcpi</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">preferredSmm</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">firmware</span><span class="pi">:</span>
+    <span class="na">preferredUseEfi</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">preferredUseSecureBoot</span><span class="pi">:</span> <span class="no">true</span>    
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">instancetype</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cmedium</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">virtualMachineInstancetype</span>
+  <span class="na">preference</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">fedora</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">virtualMachinePreference</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/containerdisks/fedora:latest</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+            <span class="s">#cloud-config</span>
+            <span class="s">users:</span>
+              <span class="s">- name: admin</span>
+                <span class="s">sudo: ALL=(ALL) NOPASSWD:ALL</span>
+                <span class="s">ssh_authorized_keys:</span>
+                  <span class="s">- ssh-rsa AAAA...</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinit</span>
+<span class="s">EOF</span>
+</code></pre></div></div>
+
+<p>We can compare the original <code class="language-plaintext highlighter-rouge">VirtualMachine</code> spec with that of the running <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> to confirm our instancetype and preferences have been applied using the following <code class="language-plaintext highlighter-rouge">diff</code> command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>diff <span class="nt">--color</span> <span class="nt">-u</span> &lt;<span class="o">(</span> kubectl get vms/fedora <span class="nt">-o</span> json | jq .spec.template.spec<span class="o">)</span> &lt;<span class="o">(</span> kubectl get vmis/fedora <span class="nt">-o</span> json | jq .spec<span class="o">)</span>
+<span class="o">[</span>..]
+ <span class="o">{</span>
+   <span class="s2">"domain"</span>: <span class="o">{</span>
+-    <span class="s2">"devices"</span>: <span class="o">{}</span>,
++    <span class="s2">"cpu"</span>: <span class="o">{</span>
++      <span class="s2">"cores"</span>: 1,
++      <span class="s2">"model"</span>: <span class="s2">"host-model"</span>,
++      <span class="s2">"sockets"</span>: 1,
++      <span class="s2">"threads"</span>: 1
++    <span class="o">}</span>,
++    <span class="s2">"devices"</span>: <span class="o">{</span>
++      <span class="s2">"disks"</span>: <span class="o">[</span>
++        <span class="o">{</span>
++          <span class="s2">"disk"</span>: <span class="o">{</span>
++            <span class="s2">"bus"</span>: <span class="s2">"virtio"</span>
++          <span class="o">}</span>,
++          <span class="s2">"name"</span>: <span class="s2">"containerdisk"</span>
++        <span class="o">}</span>,
++        <span class="o">{</span>
++          <span class="s2">"disk"</span>: <span class="o">{</span>
++            <span class="s2">"bus"</span>: <span class="s2">"virtio"</span>
++          <span class="o">}</span>,
++          <span class="s2">"name"</span>: <span class="s2">"cloudinit"</span>
++        <span class="o">}</span>
++      <span class="o">]</span>,
++      <span class="s2">"interfaces"</span>: <span class="o">[</span>
++        <span class="o">{</span>
++          <span class="s2">"bridge"</span>: <span class="o">{}</span>,
++          <span class="s2">"model"</span>: <span class="s2">"virtio"</span>,
++          <span class="s2">"name"</span>: <span class="s2">"default"</span>
++        <span class="o">}</span>
++      <span class="o">]</span>,
++      <span class="s2">"rng"</span>: <span class="o">{}</span>
++    <span class="o">}</span>,
++    <span class="s2">"features"</span>: <span class="o">{</span>
++      <span class="s2">"acpi"</span>: <span class="o">{</span>
++        <span class="s2">"enabled"</span>: <span class="nb">true</span>
++      <span class="o">}</span>,
++      <span class="s2">"smm"</span>: <span class="o">{</span>
++        <span class="s2">"enabled"</span>: <span class="nb">true</span>
++      <span class="o">}</span>
++    <span class="o">}</span>,
++    <span class="s2">"firmware"</span>: <span class="o">{</span>
++      <span class="s2">"bootloader"</span>: <span class="o">{</span>
++        <span class="s2">"efi"</span>: <span class="o">{</span>
++          <span class="s2">"secureBoot"</span>: <span class="nb">true</span>
++        <span class="o">}</span>
++      <span class="o">}</span>,
++      <span class="s2">"uuid"</span>: <span class="s2">"98f07cdd-96da-5880-b6c7-1a5700b73dc4"</span>
++    <span class="o">}</span>,
+     <span class="s2">"machine"</span>: <span class="o">{</span>
+       <span class="s2">"type"</span>: <span class="s2">"q35"</span>
+     <span class="o">}</span>,
+-    <span class="s2">"resources"</span>: <span class="o">{}</span>
++    <span class="s2">"memory"</span>: <span class="o">{</span>
++      <span class="s2">"guest"</span>: <span class="s2">"1Gi"</span>
++    <span class="o">}</span>,
++    <span class="s2">"resources"</span>: <span class="o">{</span>
++      <span class="s2">"requests"</span>: <span class="o">{</span>
++        <span class="s2">"memory"</span>: <span class="s2">"1Gi"</span>
++      <span class="o">}</span>
++    <span class="o">}</span>
+   <span class="o">}</span>,
++  <span class="s2">"networks"</span>: <span class="o">[</span>
++    <span class="o">{</span>
++      <span class="s2">"name"</span>: <span class="s2">"default"</span>,
++      <span class="s2">"pod"</span>: <span class="o">{}</span>
++    <span class="o">}</span>
++  <span class="o">]</span>,
+   <span class="s2">"volumes"</span>: <span class="o">[</span>
+     <span class="o">{</span>
+       <span class="s2">"containerDisk"</span>: <span class="o">{</span>
+-        <span class="s2">"image"</span>: <span class="s2">"quay.io/containerdisks/fedora:latest"</span>
++        <span class="s2">"image"</span>: <span class="s2">"quay.io/containerdisks/fedora:latest"</span>,
++        <span class="s2">"imagePullPolicy"</span>: <span class="s2">"Always"</span>
+       <span class="o">}</span>,
+       <span class="s2">"name"</span>: <span class="s2">"containerdisk"</span>
+     <span class="o">}</span>,
+</code></pre></div></div>
+
+<h2 id="future-work">Future work</h2>
+
+<p>There’s still plenty of work required before the API and CRDs can move from their current <code class="language-plaintext highlighter-rouge">alpha</code> version to <code class="language-plaintext highlighter-rouge">beta</code>. We have a specific <a href="https://github.com/kubevirt/kubevirt/issues/8235"><code class="language-plaintext highlighter-rouge">kubevirt/kubevirt</code> issue tracking our progress to <code class="language-plaintext highlighter-rouge">beta</code></a>. As set out there and in the <a href="https://github.com/kubevirt/community/blob/main/docs/api-graduation-guidelines.md">KubeVirt community API Graduation Phase Expecations</a>, part of this work is to seek feedback from the wider community so please do feel free to chime in there with any and all feedback on the API and CRDs.</p>
+
+<p>You can also track our work on this API through the <a href="https://github.com/kubevirt/kubevirt/labels/area%2Finstancetype"><code class="language-plaintext highlighter-rouge">area/instancetype</code> tag</a> or my <a href="https://blog.yarwood.me.uk/tags/instancetypes/">personal blog</a> where I will be posting <a href="https://blog.yarwood.me.uk/2022/07/21/kubevirt_instancetype_update_2/">regular updates</a> and <a href="https://blog.yarwood.me.uk/2022/08/03/kubevirt_instancetype_demo_2/">demos</a> for instancetypes.</p>]]></content><author><name>Lee Yarwood</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="instancetypes" /><category term="preferences" /><category term="VirtualMachine" /><category term="VirtualMachineInstancetype" /><category term="VirtualMachinePreference" /><summary type="html"><![CDATA[An introduction to Instancetypes and preferences in KubeVirt]]></summary></entry><entry><title type="html">KubeVirt: installing Microsoft Windows 11 from an ISO</title><link href="http://0.0.0.0:4000/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows 11 from an ISO" /><published>2022-08-02T00:00:00+00:00</published><updated>2022-08-02T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso</id><content type="html" xml:base="http://0.0.0.0:4000/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html"><![CDATA[<p>This blog post describes a simple way to deploy a Windows 11 VM with KubeVirt, using an installation ISO as a starting point.<br />
+Although only tested with Windows 11, the steps described here should also work to deploy other recent versions of Windows.</p>
+
+<h2 id="pre-requisites">Pre-requisites</h2>
+
+<ul>
+  <li>You’ll need a Kubernetes cluster with worker node(s) that have at least 6GB of available memory</li>
+  <li><a href="https://kubevirt.io/user-guide">KubeVirt</a> and <a href="https://github.com/kubevirt/containerized-data-importer/blob/main/README.md">CDI</a> both deployed on the cluster</li>
+  <li>A storage backend, such as <a href="https://ceph.com/">Rook Ceph</a></li>
+  <li>A Windows iso. One can be found at <a href="https://www.microsoft.com/software-download/windows11">https://www.microsoft.com/software-download/windows11</a></li>
+</ul>
+
+<p>A suitable test cluster can easily be deployed thanks to KubeVirtCI by running the following commands from the <a href="https://github.com/kubevirt/kubevirt">KubeVirt source repository</a>:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_MEMORY_SIZE</span><span class="o">=</span>8192M
+<span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_STORAGE</span><span class="o">=</span>rook-ceph-default
+<span class="nv">$ </span>make cluster-up <span class="o">&amp;&amp;</span> make cluster-sync
+</code></pre></div></div>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>Before the virtual machine can be created, we need to setup storage volumes for the ISO and the drive, and write the appropriate VM(I) yaml.</p>
+
+<ol>
+  <li>
+    <p>Uploading the ISO to a PVC</p>
+
+    <p>KubeVirt provides a simple tool that is able to do that for us: <code class="language-plaintext highlighter-rouge">virtctl</code>.<br />
+Here’s the command to upload the ISO, just replace <code class="language-plaintext highlighter-rouge">/storage/win11.iso</code> with the path to your Windows 11 ISO:
+<code class="language-plaintext highlighter-rouge">virtctl image-upload pvc win11cd-pvc --size 6Gi --image-path=/storage/win11.iso --insecure</code></p>
+  </li>
+  <li>
+    <p>Creating a persistent volume to use as the Windows drive</p>
+
+    <p>This will depend on the storage configuration of your cluster.
+The following yaml, to apply to the cluster using <code class="language-plaintext highlighter-rouge">kubectl create</code>, should work just fine on a KubeVirtCI cluster:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolume</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">task-pv-volume</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">local</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+  <span class="na">capacity</span><span class="pi">:</span>
+    <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">hostPath</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/tmp/hostImages/win11"</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Microsoft actually <a href="https://docs.microsoft.com/en-us/windows/whats-new/windows-11-requirements">recommends</a> at least 64GB of storage.
+But, unlike some other requirements, the installer will accept smaller disks.
+This is convenient when testing with KubeVirtCI, as nodes only have about 20GB of free space.
+However, please bear in mind that such a small drive should only be used for testing purposes, and might lead to instabilities.</p>
+
+
+</div></div>
+<ol>
+  <li>
+    <p>Creating a persistent volume claim (PVC) for the drive</p>
+
+    <p>Once again, your milage may vary, but the following PVC yaml works fine on KubeVirtCI:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">disk-windows</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+</code></pre></div>    </div>
+
+    <p>The name of PVC, <code class="language-plaintext highlighter-rouge">disk-windows</code> here, will be used in the yaml of the VM(I) as the main volume.</p>
+  </li>
+  <li>
+    <p>Creating the VM(I) yaml file</p>
+
+    <p>KubeVirt already includes an example <a href="https://github.com/kubevirt/kubevirt/blob/main/examples/vmi-windows.yaml">Windows VMI yaml file</a>, which we’ll use as a starting point here for convenience.<br />
+Using a VMI yaml is more than enough for testing purposes, however for more serious applications you might want to consider changing it into a VM.</p>
+
+    <p>First, in the yaml above, bump the memory up to 4Gi, which is a hard requirement of Windows 11. (Windows 10 is happy with 2Gi).</p>
+
+    <p>Then, let’s add the ISO created above.
+Add is as a cdrom in the disks section:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+</code></pre></div>    </div>
+    <p>And the corresponding volume at the bottom:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">win11cd-pvc</span>
+</code></pre></div>    </div>
+    <p>Note that the names should match, and that the <code class="language-plaintext highlighter-rouge">claimName</code> is what we used in the <code class="language-plaintext highlighter-rouge">virtctl</code> command above.</p>
+
+    <p>Here is what the VMI looks like after those changes:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">special</span><span class="pi">:</span> <span class="s">vmi-windows</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vmi-windows</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">clock</span><span class="pi">:</span>
+      <span class="na">timer</span><span class="pi">:</span>
+        <span class="na">hpet</span><span class="pi">:</span>
+          <span class="na">present</span><span class="pi">:</span> <span class="no">false</span>
+        <span class="na">hyperv</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">pit</span><span class="pi">:</span>
+          <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">delay</span>
+        <span class="na">rtc</span><span class="pi">:</span>
+          <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">catchup</span>
+      <span class="na">utc</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">cpu</span><span class="pi">:</span>
+      <span class="na">cores</span><span class="pi">:</span> <span class="m">2</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">pvcdisk</span>
+      <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+      <span class="na">interfaces</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">masquerade</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">model</span><span class="pi">:</span> <span class="s">e1000</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+      <span class="na">tpm</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">features</span><span class="pi">:</span>
+      <span class="na">acpi</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">apic</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">hyperv</span><span class="pi">:</span>
+        <span class="na">relaxed</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">spinlocks</span><span class="pi">:</span>
+          <span class="na">spinlocks</span><span class="pi">:</span> <span class="m">8191</span>
+        <span class="na">vapic</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">smm</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">firmware</span><span class="pi">:</span>
+      <span class="na">bootloader</span><span class="pi">:</span>
+        <span class="na">efi</span><span class="pi">:</span>
+          <span class="na">secureBoot</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">uuid</span><span class="pi">:</span> <span class="s">5d307ca9-b3ef-428c-8861-06e72d69f223</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s">4Gi</span>
+  <span class="na">networks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+    <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pvcdisk</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">disk-windows</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">win11cd-pvc</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>When customizing this VMI definition or creating your own, please keep in mind that the TPM device and the UEFI firmware with SecureBoot are both hard requirements of Windows 11.
+Not having them will cause the Windows 11 installation to fail early. Please also note that the SMM CPU feature is required for UEFI + SecureBoot.
+However, they can all be omitted in the case of a Windows 10 VM(I).
+Finally, we do not currently support TPM persistence, so any secret stored in the emulated TPM will be lost next time you boot the VMI.
+For example, do not enable BitLocker, as it will fail to find the encryption key next boot and you will have to manually enter the (55 characters!) recovery key each boot.</p>
+
+
+</div></div>
+<h2 id="windows-installation">Windows installation</h2>
+
+<p>You should now be able to create the VMI and start the Windows installation process.<br />
+Just use kubectl to start the VMI created above: <code class="language-plaintext highlighter-rouge">kubectl create -f vmi-windows.yaml</code>.<br />
+Shortly after, open a VNC session to it using <code class="language-plaintext highlighter-rouge">virtctl vnc vmi-windows</code> (keep trying until the VMI is running and the VNC session pops up).<br />
+You should now see the boot screen, and shortly after a prompt to “Press any key to boot from CD or DVD…”. You have a few seconds to do so or the VM will fail to boot.
+Then just follow the steps to install Windows.</p>
+
+<h2 id="virtio-drivers-installation-optional">VirtIO drivers installation (optional)</h2>
+
+<p>Once Windows is installed, it’s a good ideas to install the <a href="http://www.linux-kvm.org/page/Virtio">VirtIO</a> drivers inside the VM, as they can drastically improve performance.
+The latest version can be downloaded <a href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/">here</a>.
+<code class="language-plaintext highlighter-rouge">virtio-win-gt-x64.msi</code> is the simplest package to install, as you just have to run it as Administrator.</p>
+
+<p>Alternatively, KubeVirt has a containerdisk image that can be mounted inside the VM.<br />
+To use it, just add a simple cdrom disk to the VMI, like:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+<p>and the volume:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+<p>When using KubeVirtCI, a local copy of the image is also available at <code class="language-plaintext highlighter-rouge">registry:5000/kubevirt/virtio-container-disk:devel</code>.</p>
+
+<h2 id="further-performance-improvements">Further performance improvements</h2>
+
+<p>Windows is quite resource-hungry, and you might find that the VM created above is too slow, even with the VirtIO drivers installed.<br />
+Here are a few steps you can take to improve things:</p>
+<ul>
+  <li>Increasing the RAM is always a good idea, if you have enough available of course.</li>
+  <li>Increasing the number of CPUs, and/or using CPUManager to assign dedicated CPU to the VM should also help a lot.</li>
+  <li>Once the VirtIO drivers are installed, the main drive can also be switched from <code class="language-plaintext highlighter-rouge">sata</code> to <code class="language-plaintext highlighter-rouge">virtio</code>, and the attached CDROMs can be removed.</li>
+</ul>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html"><![CDATA[This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt]]></summary></entry><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="http://0.0.0.0:4000/2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="http://0.0.0.0:4000/2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
 
 <p>The KubeVirt community presented two sessions, both on Wednesday May 18th:</p>
 <ol>
@@ -35,72 +498,7 @@ And everyone who attended the sessions, listened, and asked great questions.</p>
   <li><a href="https://www.flickr.com/photos/143247548@N03/albums/72177720298987342">CNCF’s Photo album (Flickr) of the event</a>.</li>
   <li><a href="https://www.youtube.com/c/cloudnativefdn">The CNCF video recordings of the sessions on Youtube</a>.</li>
   <li>And <a href="https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/program/schedule/">the event schedule</a> to help you find sessions.</li>
-</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry><entry><title type="html">KubeVirt v0.54.0</title><link href="https://kubevirt.io//2022/changelog-v0.54.0.html" rel="alternate" type="text/html" title="KubeVirt v0.54.0" /><published>2022-06-08T00:00:00+00:00</published><updated>2022-06-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.54.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.54.0.html"><![CDATA[<h2 id="v0540">v0.54.0</h2>
-
-<p>Released on: Wed Jun 8 14:15:43 2022 +0000</p>
-
-<ul>
-  <li>[PR #7757][orenc1] new alert for excessive number of VMI migrations in a period of time.</li>
-  <li>[PR #7517][ShellyKa13] Add virtctl Memory Dump command</li>
-  <li>[PR #7801][VirrageS] Empty (<code class="language-plaintext highlighter-rouge">nil</code> values) of <code class="language-plaintext highlighter-rouge">Address</code> and <code class="language-plaintext highlighter-rouge">Driver</code> fields in XML will be omitted.</li>
-  <li>[PR #7475][raspbeep] Adds the reason of a live-migration failure to a recorded event in case EvictionStrategy is set but live-migration is blocked due to its limitations.</li>
-  <li>[PR #7739][fossedihelm] Allow <code class="language-plaintext highlighter-rouge">virtualmachines/migrate</code> subresource to admin/edit users</li>
-  <li>[PR #7618][lyarwood] The requirement to define a <code class="language-plaintext highlighter-rouge">Disk</code> or <code class="language-plaintext highlighter-rouge">Filesystem</code> for each <code class="language-plaintext highlighter-rouge">Volume</code> associated with a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> has been removed. Any <code class="language-plaintext highlighter-rouge">Volumes</code> without a <code class="language-plaintext highlighter-rouge">Disk</code> or <code class="language-plaintext highlighter-rouge">Filesystem</code> defined will have a <code class="language-plaintext highlighter-rouge">Disk</code> defined within the <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> at runtime.</li>
-  <li>[PR #7529][xpivarc] NoReadyVirtController and NoReadyVirtOperator should be properly fired.</li>
-  <li>[PR #7465][machadovilaca] Add metrics for migrations and respective phases</li>
-  <li>[PR #7592][akalenyu] BugFix: virtctl guestfs incorrectly assumes image name</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.54.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.53.0</title><link href="https://kubevirt.io//2022/changelog-v0.53.0.html" rel="alternate" type="text/html" title="KubeVirt v0.53.0" /><published>2022-05-09T00:00:00+00:00</published><updated>2022-05-09T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.53.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.53.0.html"><![CDATA[<h2 id="v0530">v0.53.0</h2>
-
-<p>Released on: Mon May 9 14:02:20 2022 +0000</p>
-
-<ul>
-  <li>[PR #7533][akalenyu] Add several VM snapshot metrics</li>
-  <li>[PR #7574][rmohr] Pull in cdi dependencies with minimized transitive dependencies to ease API adoption</li>
-  <li>[PR #7318][iholder-redhat] Snapshot restores now support restoring to a target VM different than the source</li>
-  <li>[PR #7474][borod108] Added the following metrics for live migration: kubevirt_migrate_vmi_data_processed_bytes, kubevirt_migrate_vmi_data_remaining_bytes, kubevirt_migrate_vmi_dirty_memory_rate_bytes</li>
-  <li>[PR #7441][rmohr] Add <code class="language-plaintext highlighter-rouge">virtctl scp</code> to ease copying files from and to VMs and VMIs</li>
-  <li>[PR #7265][rthallisey] Support steady-state job types in the load-generator tool</li>
-  <li>[PR #7544][fossedihelm] Upgraded go version to 1.17.8</li>
-  <li>[PR #7582][acardace] Fix failed reported migrations when actually they were successful.</li>
-  <li>[PR #7546][0xFelix] Update virtio-container-disk to virtio-win version 0.1.217-1</li>
-  <li>[PR #7530][iholder-redhat] [External Kernel Boot]: Disallow kernel args without providing custom kernel</li>
-  <li>[PR #7493][davidvossel] Adds new EvictionStrategy “External” for blocking eviction which is handled by an external controller</li>
-  <li>[PR #7563][akalenyu] Switch VolumeSnapshot to v1</li>
-  <li>[PR #7406][acardace] Reject <code class="language-plaintext highlighter-rouge">LiveMigrate</code> as a workload-update strategy if the <code class="language-plaintext highlighter-rouge">LiveMigration</code> feature gate is not enabled.</li>
-  <li>[PR #7103][jean-edouard] Non-persistent vTPM now supported. Keep in mind that the state of the TPM is wiped after each shutdown. Do not enable Bitlocker!</li>
-  <li>[PR #7277][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 8.0.0 and QEMU 6.2.0.</li>
-  <li>[PR #7130][Barakmor1] Add field to kubevirtCR to set Prometheus ServiceMonitor object’s namespace</li>
-  <li>[PR #7401][iholder-redhat] virt-api deployment is now scalable - replicas are determined by the number of nodes in the cluster</li>
-  <li>[PR #7500][awels] BugFix: Fixed RBAC for admin/edit user to allow virtualmachine/addvolume and removevolume. This allows for persistent disks</li>
-  <li>[PR #7328][apoorvajagtap] Don’t ignore –identity-file when setting –local-ssh=true on <code class="language-plaintext highlighter-rouge">virtctl ssh</code></li>
-  <li>[PR #7469][xpivarc] Users can now enable the NonRoot feature gate instead of NonRootExperimental</li>
-  <li>[PR #7451][fossedihelm] Reduce virt-launcher memory usage by splitting monitoring and launcher processes</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.53.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.52.0</title><link href="https://kubevirt.io//2022/changelog-v0.52.0.html" rel="alternate" type="text/html" title="KubeVirt v0.52.0" /><published>2022-04-08T00:00:00+00:00</published><updated>2022-04-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.52.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.52.0.html"><![CDATA[<h2 id="v0520">v0.52.0</h2>
-
-<p>Released on: Fri Apr 8 16:17:56 2022 +0000</p>
-
-<ul>
-  <li>[PR #7024][fossedihelm] Add an warning message if the client and server virtctl versions are not aligned</li>
-  <li>[PR #7486][rmohr] Move stable.txt location to a more appropriate path</li>
-  <li>[PR #7372][saschagrunert] Fixed <code class="language-plaintext highlighter-rouge">KubeVirtComponentExceedsRequestedMemory</code> alert complaining about many-to-many matching not allowed.</li>
-  <li>[PR #7426][iholder-redhat] Add warning for manually determining core-component replica count in Kubevirt CR</li>
-  <li>[PR #7424][maiqueb] Provide interface binding types descriptions, which will be featured in the KubeVirt API.</li>
-  <li>[PR #7422][orelmisan] Fixed setting custom guest pciAddress and bootOrder parameter(s) to a list of SR-IOV NICs.</li>
-  <li>[PR #7421][rmohr] Fix knowhosts file corruption for virtctl ssh</li>
-  <li>[PR #6854][rmohr] Make virtctl ssh work with ssh-rsa+ preauthentication</li>
-  <li>[PR #7267][iholder-redhat] Applied migration configurations can now be found in VMI’s status</li>
-  <li>[PR #7321][iholder-redhat] [Migration Policies]: precedence to VMI labels over Namespace labels</li>
-  <li>[PR #7326][oshoval] The Ginkgo dependency has been upgraded to v2.1.3 (major version upgrade)</li>
-  <li>[PR #7361][SeanKnight] Fixed a bug that prevents virtctl from working with clusters accessed via Rancher authentication proxy, or any other cluster where the server URL contains a path component. (#3760)</li>
-  <li>[PR #7255][tyleraharrison] Users are now able to specify <code class="language-plaintext highlighter-rouge">--address [ip_address]</code> when using <code class="language-plaintext highlighter-rouge">virtctl vnc</code> rather than only using 127.0.0.1</li>
-  <li>[PR #7275][enp0s3] Add observedGeneration to virt-operator to have a race-free way to detect KubeVirt config rollouts</li>
-  <li>[PR #7233][xpivarc] Bug fix: Successfully aborted migrations should be reported now</li>
-  <li>[PR #7158][AlonaKaplan] Add masquerade VMs support to single stack IPv6.</li>
-  <li>[PR #7227][rmohr] Remove VMI informer from virt-api to improve scaling characteristics of virt-api</li>
-  <li>[PR #7288][raspbeep] Users now don’t need to specify container for <code class="language-plaintext highlighter-rouge">kubectl logs &lt;vmi-pod&gt;</code> and <code class="language-plaintext highlighter-rouge">kubectl exec &lt;vmi-pod&gt;</code>.</li>
-  <li>[PR #6709][xpivarc] Workloads will be migrated to nonroot implementation if NonRoot feature gate is set. (Except VirtioFS)</li>
-  <li>[PR #7241][lyarwood] Fixed a bug that prevents only a unattend.xml configmap or secret being provided as contents for a sysprep disk. (#7240, @lyarwood)</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.52.0 changes]]></summary></entry><entry><title type="html">Load-balancer for virtual machines on bare metal Kubernetes clusters</title><link href="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html" rel="alternate" type="text/html" title="Load-balancer for virtual machines on bare metal Kubernetes clusters" /><published>2022-04-03T00:00:00+00:00</published><updated>2022-04-03T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Virtual-Machines-with-MetalLB</id><content type="html" xml:base="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry><entry><title type="html">Load-balancer for virtual machines on bare metal Kubernetes clusters</title><link href="http://0.0.0.0:4000/2022/Virtual-Machines-with-MetalLB.html" rel="alternate" type="text/html" title="Load-balancer for virtual machines on bare metal Kubernetes clusters" /><published>2022-04-03T00:00:00+00:00</published><updated>2022-04-03T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2022/Virtual-Machines-with-MetalLB</id><content type="html" xml:base="http://0.0.0.0:4000/2022/Virtual-Machines-with-MetalLB.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 
 <p>Over the last year, Kubevirt and MetalLB have shown to be powerful duo in order to support fault-tolerant access to an application on virtual machines through an external IP address. 
 As a Cluster administrator using an on-prem cluster without a network load-balancer, now it’s possible to use MetalLB operator to provide load-balancer capabilities (with Services of type <code class="language-plaintext highlighter-rouge">LoadBalancer</code>) to virtual machines.</p>
@@ -326,48 +724,7 @@ metallb-nginx-svc   LoadBalancer   10.96.254.136   172.18.1.1    5678:32438/TCP 
 <h2 id="conclusion">Conclusion</h2>
 
 <p>In this blog post we used MetalLB to expose a service using an external IP assigned to a virtual machine. 
-This illustrates how virtual machine traffic can be load-balanced via a service.</p>]]></content><author><name>Ram Lavi</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="load-balancer" /><category term="MetalLB" /><summary type="html"><![CDATA[This post illustrates setting up a virtual machine with MetalLB LoadBalancer service.]]></summary></entry><entry><title type="html">KubeVirt v0.51.0</title><link href="https://kubevirt.io//2022/changelog-v0.51.0.html" rel="alternate" type="text/html" title="KubeVirt v0.51.0" /><published>2022-03-08T00:00:00+00:00</published><updated>2022-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.51.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.51.0.html"><![CDATA[<h2 id="v0510">v0.51.0</h2>
-
-<p>Released on: Tue Mar 8 21:06:59 2022 +0000</p>
-
-<ul>
-  <li>[PR #7102][machadovilaca] Add Virtual Machine name label to virt-launcher pod</li>
-  <li>[PR #7139][davidvossel] Fixes inconsistent VirtualMachinePool VM/VMI updates by using controller revisions</li>
-  <li>[PR #6754][jean-edouard] New and resized disks are now always 1MiB-aligned</li>
-  <li>[PR #7086][acardace] Add ‘EvictionStrategy’ as a cluster-wide setting in the KubeVirt CR</li>
-  <li>[PR #7232][rmohr] Properly format the PDB scale event during migrations</li>
-  <li>[PR #7223][Barakmor1] Add a name label to virt-operator pods</li>
-  <li>[PR #7221][davidvossel] RunStrategy: Once - allows declaring a VM should run once to a finalized state</li>
-  <li>[PR #7091][EdDev] SR-IOV interfaces are now reported in the VMI status even without an active guest-agent.</li>
-  <li>[PR #7169][rmohr] Improve device plugin de-registration in virt-handler and some test stabilizations</li>
-  <li>[PR #6604][alicefr] Add shareable option to identify if the disk is shared with other VMs</li>
-  <li>[PR #7144][davidvossel] Garbage collect finalized migration objects only leaving the most recent 5 objects</li>
-  <li>[PR #6110][xpivarc] [Nonroot] SRIOV is now available.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.51.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.50.0</title><link href="https://kubevirt.io//2022/changelog-v0.50.0.html" rel="alternate" type="text/html" title="KubeVirt v0.50.0" /><published>2022-02-09T00:00:00+00:00</published><updated>2022-02-09T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.50.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.50.0.html"><![CDATA[<h2 id="v0500">v0.50.0</h2>
-
-<p>Released on: Wed Feb 9 18:01:08 2022 +0000</p>
-
-<ul>
-  <li>[PR #7056][fossedihelm] Update k8s dependencies to 0.23.1</li>
-  <li>[PR #7135][davidvossel] Switch from reflects.DeepEquals to equality.Semantic.DeepEquals() across the entire project</li>
-  <li>[PR #7052][sradco] Updated recording rule “kubevirt_vm_container_free_memory_bytes”</li>
-  <li>[PR #7000][iholder-redhat] Adds a possibility to override default libvirt log filters though VMI annotations</li>
-  <li>[PR #7064][davidvossel] Fixes issue associated with blocked uninstalls when VMIs exist during removal</li>
-  <li>[PR #7097][iholder-redhat] [Bug fix] VMI with kernel boot stuck on “Terminating” status if more disks are defined</li>
-  <li>[PR #6700][VirrageS] Simplify replacing <code class="language-plaintext highlighter-rouge">time.Ticker</code> in agent poller and fix default values for <code class="language-plaintext highlighter-rouge">qemu-*-interval</code> flags</li>
-  <li>[PR #6581][ormergi] SRIOV network interfaces are now hot-plugged when disconnected manually or due to aborted migrations.</li>
-  <li>[PR #6924][EdDev] Support for legacy GPU definition is removed. Please see https://kubevirt.io/user-guide/virtual_machines/host-devices on how to define host-devices.</li>
-  <li>[PR #6735][uril] The command <code class="language-plaintext highlighter-rouge">migrate_cancel</code> was added to virtctl. It cancels an active VM migration.</li>
-  <li>[PR #6883][rthallisey] Add instance-type to cloud-init metadata</li>
-  <li>[PR #6999][maya-r] When expanding disk images, take the minimum between the request and the capacity - avoid using the full underlying file system on storage like NFS, local.</li>
-  <li>[PR #6946][vladikr] Numa information of an assigned device will be presented in the devices metadata</li>
-  <li>[PR #6042][iholder-redhat] Fully support cgroups v2, include a new cohesive package and perform major refactoring.</li>
-  <li>[PR #6968][vladikr] Added Writeback disk cache support</li>
-  <li>[PR #6995][sradco] Alert OrphanedVirtualMachineImages name was changed to OrphanedVirtualMachineInstances.</li>
-  <li>[PR #6923][rhrazdil] Fix issue with ssh being unreachable on VMIs with Istio proxy</li>
-  <li>[PR #6821][jean-edouard] Migrating VMIs that contain dedicated CPUs will now have properly dedicated CPUs on target</li>
-  <li>[PR #6793][oshoval] Add infoSource field to vmi.status.interfaces.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.50.0 changes]]></summary></entry><entry><title type="html">Dedicated migration network in KubeVirt</title><link href="https://kubevirt.io//2022/Dedicated-migration-network.html" rel="alternate" type="text/html" title="Dedicated migration network in KubeVirt" /><published>2022-01-25T00:00:00+00:00</published><updated>2022-01-25T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Dedicated-migration-network</id><content type="html" xml:base="https://kubevirt.io//2022/Dedicated-migration-network.html"><![CDATA[<p>Since version 0.49, KubeVirt supports live migrating VMIs over a separate network than the one Kubernetes is running on.</p>
+This illustrates how virtual machine traffic can be load-balanced via a service.</p>]]></content><author><name>Ram Lavi</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="load-balancer" /><category term="MetalLB" /><summary type="html"><![CDATA[This post illustrates setting up a virtual machine with MetalLB LoadBalancer service.]]></summary></entry><entry><title type="html">Dedicated migration network in KubeVirt</title><link href="http://0.0.0.0:4000/2022/Dedicated-migration-network.html" rel="alternate" type="text/html" title="Dedicated migration network in KubeVirt" /><published>2022-01-25T00:00:00+00:00</published><updated>2022-01-25T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2022/Dedicated-migration-network</id><content type="html" xml:base="http://0.0.0.0:4000/2022/Dedicated-migration-network.html"><![CDATA[<p>Since version 0.49, KubeVirt supports live migrating VMIs over a separate network than the one Kubernetes is running on.</p>
 
 <p>Running migrations over a dedicated network is a great way to increase migration bandwidth and reliability.</p>
 
@@ -403,7 +760,7 @@ All you need is to define the right environment variables before starting the cl
 
 <p>Here is a quick <a href="https://asciinema.org/a/464272">example</a> of a dual-node KubeVirtCI cluster running a migration over a secondary network.</p>
 
-<p>The description of the clip includes more detailed information about the steps involved.</p>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="live migration" /><category term="dedicated network" /><summary type="html"><![CDATA[KubeVirt now supports using a separate network for live migrations]]></summary></entry><entry><title type="html">KubeVirt Summit is coming back!</title><link href="https://kubevirt.io//2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Summit-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
+<p>The description of the clip includes more detailed information about the steps involved.</p>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="live migration" /><category term="dedicated network" /><summary type="html"><![CDATA[KubeVirt now supports using a separate network for live migrations]]></summary></entry><entry><title type="html">KubeVirt Summit is coming back!</title><link href="http://0.0.0.0:4000/2022/KubeVirt-Summit-2022.html" rel="alternate" type="text/html" title="KubeVirt Summit is coming back!" /><published>2022-01-24T00:00:00+00:00</published><updated>2022-01-24T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2022/KubeVirt-Summit-2022</id><content type="html" xml:base="http://0.0.0.0:4000/2022/KubeVirt-Summit-2022.html"><![CDATA[<p>The second online <a href="/summit/">KubeVirt Summit</a> is coming on February 16, 2022!</p>
 
 <h2 id="when">When</h2>
 
@@ -429,33 +786,843 @@ All you need is to define the right environment variables before starting the cl
 
 <p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
 
-<p>We are looking forward to meeting you there!</p>]]></content><author><name>Chandler Wilkerson</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's second annual dedicated online event]]></summary></entry><entry><title type="html">KubeVirt v0.49.0</title><link href="https://kubevirt.io//2022/changelog-v0.49.0.html" rel="alternate" type="text/html" title="KubeVirt v0.49.0" /><published>2022-01-11T00:00:00+00:00</published><updated>2022-01-11T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.49.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.49.0.html"><![CDATA[<h2 id="v0490">v0.49.0</h2>
+<p>We are looking forward to meeting you there!</p>]]></content><author><name>Chandler Wilkerson</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's second annual dedicated online event]]></summary></entry><entry><title type="html">Running real-time workloads with improved performance</title><link href="http://0.0.0.0:4000/2021/Running-Realtime-Workloads.html" rel="alternate" type="text/html" title="Running real-time workloads with improved performance" /><published>2021-10-13T00:00:00+00:00</published><updated>2021-10-13T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2021/Running-Realtime-Workloads</id><content type="html" xml:base="http://0.0.0.0:4000/2021/Running-Realtime-Workloads.html"><![CDATA[<h2 id="motivation">Motivation</h2>
 
-<p>Released on: Tue Jan 11 17:27:09 2022 +0000</p>
+<p>It has been possible in KubeVirt for some time already to run a VM running with a RT kernel, however the performance of such workloads never achieved parity against running on top of a bare metal host virtualized. With the availability of NUMA and CPUManager as features in KubeVirt, we were close to a point where we had almost all the ingredients to deliver the <a href="https://www.libvirt.org/kbase/kvm-realtime.html">recommended</a> tunings in libvirt for achieving the low CPU latency needed for such workloads. We were missing two important settings:</p>
+<ul>
+  <li>The ability to configure the VCPUs to run with real-time scheduling policy.</li>
+  <li>Lock the VMs huge pages in RAM to prevent swapping.</li>
+</ul>
+
+<h2 id="setting-up-the-environment">Setting up the Environment</h2>
+<p>To achieve the lowest latency possible in a given environment, first it needs to be configured to allow its resources to be consumed efficiently.</p>
+
+<h3 id="the-cluster">The Cluster</h3>
+<p>The target node has to be configured to reserve memory for hugepages and the kernel to allow threads to run with real-time scheduling policy. The memory can be reserved as a <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html">kernel boot parameter</a> or by changing the kernel’s page count at <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html">runtime</a>.</p>
+
+<p>The kernel’s runtime scheduling limit can be adjusted either by installing a real-time kernel in the node (the recommended option), or changing the kernel’s setting <code class="language-plaintext highlighter-rouge">kernel.sched_rt_runtime_us</code> to equal -1, to allow for unlimited runtime of real-time scheduled threads. This kernel setting defines the time period to be devoted to running real-time threads. KubeVirt will detect if the node has been configured with unlimited runtime and will label the node with <code class="language-plaintext highlighter-rouge">kubevirt.io/realtime</code> to highlight the capacity of running real-time workloads. Later on we’ll come back to this label when we talk about how the workload is scheduled.</p>
+
+<p>It is also recommended tuning the node’s BIOS settings for optimal real-time performance is also recommended to achieve even lower CPU latencies. Consult with your hardware provider to obtain the information on how to best tune your equipment.</p>
+
+<h3 id="kubevirt">KubeVirt</h3>
+<p>The VM will require to be granted fully dedicated CPUs and be able to use huge pages. These requirements can be achieved in KubeVirt by enabling the feature gates of CPUManager and NUMA in the KubeVirt CR. There is no dedicated feature gate to enable the new real-time optimizations.</p>
+
+<h2 id="the-manifest">The Manifest</h2>
+<p>With the cluster configured to provide the dedicated resources for the workload, it’s time to review an example of a VM manifest using the optimizations for low CPU latency. The first focus is to reduce the VM’s I/O by limiting it’s devices to only serial console:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.devices.autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
+<span class="na">spec.domain.devices.autoattachMemBalloon</span><span class="pi">:</span> <span class="no">false</span>
+<span class="na">spec.domain.devices.autoattachGraphicsDevice</span><span class="pi">:</span> <span class="no">false</span>
+</code></pre></div></div>
+
+<p>The pod needs to have a guaranteed QoS for its memory and CPU resources, to make sure that the CPU manager will dedicate the requested CPUs to the pod.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.resources.request.cpu</span><span class="pi">:</span> <span class="m">2</span>
+<span class="na">spec.domain.resources.request.memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+<span class="na">spec.domain.resources.limits.cpu</span><span class="pi">:</span> <span class="m">2</span>
+<span class="na">spec.domain.resources.limits.memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+</code></pre></div></div>
+
+<p>Still on the CPU front, we add the settings to instruct the KVM to give a clear visibility of the host’s features to the guest, request the CPU manager in the node to isolate the assigned CPUs and to make sure that the emulator and IO threads in the VM run in their own dedicated VCPU rather than sharing the computational time with the workload.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.model</span><span class="pi">:</span> <span class="s">host-passthrough</span>
+<span class="na">spec.domain.cpu.dedicateCpuPlacement</span><span class="pi">:</span> <span class="no">true</span>
+<span class="na">spec.domain.cpu.isolateEmulatorThread</span><span class="pi">:</span> <span class="no">true</span>
+<span class="na">spec.domain.cpu.ioThreadsPolicy</span><span class="pi">:</span> <span class="s">auto</span>
+</code></pre></div></div>
+
+<p>We also request the huge pages size and guaranteed NUMA topology that will pin the CPU and memory resources to a single NUMA node in the host. The Kubernetes scheduler will perform due diligence to schedule the pod in a node with enough free huge pages of the given size.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.numa.guestMappingPassthrough</span><span class="pi">:</span> <span class="pi">{}</span>
+<span class="na">spec.domain.memory.hugepages.pageSize</span><span class="pi">:</span> <span class="s">1Gi</span>
+</code></pre></div></div>
+
+<p>Lastly, we define the new real-time settings to instruct KubeVirt to apply the real-time scheduling policy for the pinned VCPUs and lock the process memory to avoid from being swapped by the host. In this example, we’ll configure the workload to only apply the real-time scheduling policy to VCPU 0.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.realtime.mask</span><span class="pi">:</span> <span class="m">0</span>
+</code></pre></div></div>
+
+<p>Alternatively, if no <code class="language-plaintext highlighter-rouge">mask</code> value is specified, all requested CPUs will be configured for real-time scheduling.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.realtime</span><span class="pi">:</span> <span class="pi">{}</span>
+</code></pre></div></div>
+
+<p>The following yaml is a complete manifest including all the settings we just reviewed.</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">fedora-realtime</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-realtime</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">poc</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">labels</span><span class="pi">:</span>
+        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">fedora-realtime</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
+          <span class="na">autoattachMemBalloon</span><span class="pi">:</span> <span class="no">false</span>
+          <span class="na">autoattachGraphicsDevice</span><span class="pi">:</span> <span class="no">false</span>
+          <span class="na">disks</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>      
+          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+            <span class="na">cpu</span><span class="pi">:</span> <span class="m">2</span>
+          <span class="na">limits</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
+            <span class="na">cpu</span><span class="pi">:</span> <span class="m">2</span>
+        <span class="na">cpu</span><span class="pi">:</span>
+          <span class="na">model</span><span class="pi">:</span> <span class="s">host-passthrough</span>
+          <span class="na">dedicatedCpuPlacement</span><span class="pi">:</span> <span class="no">true</span>
+          <span class="na">isolateEmulatorThread</span><span class="pi">:</span> <span class="no">true</span>
+          <span class="na">ioThreadsPolicy</span><span class="pi">:</span> <span class="s">auto</span>
+          <span class="na">features</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">tsc-deadline</span>
+              <span class="na">policy</span><span class="pi">:</span> <span class="s">require</span>
+          <span class="na">numa</span><span class="pi">:</span>
+            <span class="na">guestMappingPassthrough</span><span class="pi">:</span> <span class="pi">{}</span>
+          <span class="na">realtime</span><span class="pi">:</span>
+            <span class="na">mask</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
+        <span class="na">memory</span><span class="pi">:</span>
+          <span class="na">hugepages</span><span class="pi">:</span>
+            <span class="na">pageSize</span><span class="pi">:</span> <span class="s">1Gi</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-realtime-container-disk:20211008_5a22acb18</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+            <span class="s">#cloud-config</span>
+            <span class="s">password: fedora</span>
+            <span class="s">chpasswd: { expire: False }</span>
+            <span class="s">bootcmd:</span>
+              <span class="s">- tuned-adm profile realtime</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+</code></pre></div></div>
+
+<h2 id="the-deployment">The Deployment</h2>
+<p>Because the manifest has enabled the real-time setting, when deployed KubeVirt applies the node label selector so that the Kubernetes scheduler will place the deployment in a node that is able to run threads with real-time scheduling policy (node label <code class="language-plaintext highlighter-rouge">kubevirt.io/realtime</code>). But there’s more, because the manifest also specifies the pod’s resource need of dedicated CPUs, KubeVirt will also add the node selector of <code class="language-plaintext highlighter-rouge">cpumanager=true</code> to guarantee that the pod is able to use the assigned CPUs alone. And finally, the scheduler also takes care of guaranteeing that the target node has sufficient free huge pages of the specified size (1Gi in our example) to satisfy the memory requested. With all these validations checked, the pod is successfully scheduled.</p>
+
+<h2 id="key-takeaways">Key Takeaways</h2>
+
+<p>Being able to run real-time workloads in KubeVirt with lower CPU latency opens new possibilities and expands the use cases where KubeVirt can assist in migrating legacy VMs into the cloud. Real-time workloads are extremely sensitive to the amount of layers between the bare metal and its runtime: the more layers in between, the higher the latency will be. The changes introduced in KubeVirt help reduce such waste and provide lower CPU latencies as the hardware is more efficiently tuned.</p>]]></content><author><name>Jordi Gil</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="real-time" /><category term="NUMA" /><category term="CPUManager" /><summary type="html"><![CDATA[This blog post details the various enhancements made to improve the performance of real-time workloads in KubeVirt]]></summary></entry><entry><title type="html">Import AWS AMIs as KubeVirt Golden Images</title><link href="http://0.0.0.0:4000/2021/Importing-EC2-to-KubeVirt.html" rel="alternate" type="text/html" title="Import AWS AMIs as KubeVirt Golden Images" /><published>2021-09-21T00:00:00+00:00</published><updated>2021-09-21T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2021/Importing-EC2-to-KubeVirt</id><content type="html" xml:base="http://0.0.0.0:4000/2021/Importing-EC2-to-KubeVirt.html"><![CDATA[<h2 id="breaking-out">Breaking Out</h2>
+
+<p>There comes a point where an operations team has invested so heavily in a Iaas platform that they are effectively locked into that platform. For example, here’s one scenario outlining how this can happen. An operations team has created automation around building VM images and keeping images up-to-date. In AWS that automation likely involves starting an EC2 instance, injecting some application logic into that instance, sealing the instance’s boot source as an AMI, and finally copying that AMI around to all the AWS regions the team deploys in.</p>
+
+<p>If the team was interested in evaluating KubeVirt as an alternative Iaas platform to AWS’s EC2, given the team’s existing tooling there’s not a clear path for doing this. It’s that scenario where the tooling in the <a href="https://github.com/davidvossel/kubevirt-cloud-import">kubevirt-cloud-import</a> project comes into play.</p>
+
+<h2 id="kubevirt-cloud-import">Kubevirt Cloud Import</h2>
+
+<p>The <a href="https://github.com/davidvossel/kubevirt-cloud-import">KubeVirt Cloud Import</a> project explores the practicality of transitioning VMs from various cloud providers into KubeVirt. As of writing this, automation for exporting AMIs from EC2 into KubeVirt works, and it’s really not all that complicated.</p>
+
+<p>This blog post will explore the fundamentals of how AMIs are exported, and how the KubeVirt Cloud Import project leverages these techniques to build automation pipelines.</p>
+
+<h2 id="nuts-and-bolts-of-importing-amis">Nuts and Bolts of Importing AMIs</h2>
+
+<h3 id="official-aws-ami-export-support">Official AWS AMI Export Support</h3>
+
+<p>AWS supports an <a href="https://docs.aws.amazon.com/vm-import/latest/userguide/vmexport_image.html">api</a> for exporting AMIs as a file to an s3 bucket. This support works quite well, however there’s a long list of <a href="https://docs.aws.amazon.com/vm-import/latest/userguide/vmexport_image.html#limits-image-export">limitations</a> that impact what AMIs are eligible for export. The most limiting of those items is the one that prevents any image built from an AMI on the marketplace from being eligible for the official export support.</p>
+
+<h3 id="unofficial-aws-export-support">Unofficial AWS export Support</h3>
+
+<p>Regardless of what AWS officially supports or not, there’s absolutely nothing preventing someone from exporting an AMI’s contents themselves. The technique just involves creating an EC2 instance, attaching an EBS volume (containing the AMI contents) as a block device, then streaming that block devices contents where ever you want.</p>
+
+<p>Theoretically, the steps roughly look like this.</p>
 
 <ul>
-  <li>[PR #7004][iholder-redhat] Bugfix: Avoid setting block migration for volumes used by read-only disks</li>
-  <li>[PR #6959][enp0s3] generate event when target pod enters unschedulable phase</li>
-  <li>[PR #6888][assafad] Added common labels into alert definitions</li>
-  <li>[PR #6166][vasiliy-ul] Experimental support of AMD SEV</li>
-  <li>[PR #6980][vasiliy-ul] Updated the dependencies to include the fix for CVE-2021-43565 (KubeVirt is not affected)</li>
-  <li>[PR #6944][iholder-redhat] Remove disabling TLS configuration from Live Migration Policies</li>
-  <li>[PR #6800][jean-edouard] CPU pinning doesn’t require hardware-assisted virtualization anymore</li>
-  <li>[PR #6501][ShellyKa13] Use virtctl image-upload to upload archive content</li>
-  <li>[PR #6918][iholder-redhat] Bug fix: Unscheduable host-model VMI alert is now properly triggered</li>
-  <li>[PR #6796][Barakmor1] ‘kubevirt-operator’ changed to ‘virt-operator’ on ‘managed-by’ label in kubevirt’s components made by virt-operator</li>
-  <li>[PR #6036][jean-edouard] Migrations can now be done over a dedicated multus network</li>
-  <li>[PR #6933][erkanerol] Add a new lane for monitoring tests</li>
-  <li>[PR #6949][jean-edouard] KubeVirt components should now be successfully removed on CR deletion, even when using only 1 replica for virt-api and virt-controller</li>
-  <li>[PR #6954][maiqueb] Update the <code class="language-plaintext highlighter-rouge">virtctl</code> exposed services <code class="language-plaintext highlighter-rouge">IPFamilyPolicyType</code> default to <code class="language-plaintext highlighter-rouge">IPFamilyPolicyPreferDualStack</code></li>
-  <li>[PR #6931][fossedihelm] added DryRun to AddVolumeOptions and RemoveVolumeOptions</li>
-  <li>[PR #6379][nunnatsa] Fix issue https://bugzilla.redhat.com/show_bug.cgi?id=1945593</li>
-  <li>[PR #6399][iholder-redhat] Introduce live migration policies that allow system-admins to have fine-grained control over migration configuration for different sets of VMs.</li>
-  <li>[PR #6880][iholder-redhat] Add full Podman support for <code class="language-plaintext highlighter-rouge">make</code> and <code class="language-plaintext highlighter-rouge">make test</code></li>
-  <li>[PR #6702][acardace] implement virt-handler canary upgrade and rollback for faster and safer rollouts</li>
-  <li>[PR #6717][davidvossel] Introducing the VirtualMachinePools feature for managing stateful VMs at scale</li>
-  <li>[PR #6698][rthallisey] Add tracing to the virt-controller work queue</li>
-  <li>[PR #6762][fossedihelm] added DryRun mode to virtcl to migrate command</li>
-  <li>[PR #6891][rmohr] Fix “Make raw terminal failed: The handle is invalid?” issue with “virtctl console” when not executed in a pty</li>
-  <li>[PR #6783][rmohr] Skip SSH RSA auth if no RSA key was explicitly provided and not key exists at the default location</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.49.0 changes]]></summary></entry></feed>
+  <li>Convert AMI to a volume by finding the underlying AMI’s snapshot and converting it to an EBS volume.</li>
+  <li>Create an EC2 instance with the EBS volume containing the AMI contents as a secondary data device.</li>
+  <li>Within the EC2 guest, copy the EBS device’s contents as a disk img <code class="language-plaintext highlighter-rouge">dd if=/dev/xvda of=/tmp/disk/disk.img</code></li>
+  <li>Then upload the disk image to an object store like s3. <code class="language-plaintext highlighter-rouge">aws s3 cp /tmp/disk/disk.img s3://my-b1-bucket/ upload: ../tmp/disk/disk.img to s3://my-b1-bucket/disk.img</code></li>
+</ul>
+
+<h3 id="basics-of-importing-data-into-kubevirt">Basics of Importing Data into KubeVirt</h3>
+
+<p>Once a disk image is in s3, a KubeVirt companion project called the <a href="https://github.com/kubevirt/containerized-data-importer">Containerized Data Importer</a> (or CDI for short) can be used to import the disk from s3 into a PVC within the KubeVirt cluster. This import flow can be expressed as a CDI DataVolume custom resource.</p>
+
+<p>Below is an example yaml for importing s3 contents into a PVC using a DataVolume</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">cdi.kubevirt.io/v1beta1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">DataVolume</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s2">"</span><span class="s">example-import-dv"</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">source</span><span class="pi">:</span>
+      <span class="na">s3</span><span class="pi">:</span>
+         <span class="na">url</span><span class="pi">:</span> <span class="s2">"</span><span class="s">https://s3.us-west-2.amazonaws.com/my-ami-exports/kubevirt-image-exports/export-ami-0dc4e69702f74df50.vmdk"</span>
+         <span class="na">secretRef</span><span class="pi">:</span> <span class="s2">"</span><span class="s">my-s3-credentials"</span>
+  <span class="na">pvc</span><span class="pi">:</span>
+    <span class="na">accessModes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">storage</span><span class="pi">:</span> <span class="s2">"</span><span class="s">6Gi"</span>
+</code></pre></div></div>
+
+<p>Once the AMI file content is stored in a PVC, CDI can be used further to clone that AMI’s PVC on a per VM basis. This effectively recreates the AMI to EC2 relationship that exists in AWS. You can find more information about CDI <a href="https://github.com/kubevirt/containerized-data-importer">here</a></p>
+
+<h2 id="automating-ami-import">Automating AMI import</h2>
+
+<p>Using the technique of exporting an AMI to an s3 bucket and importing the AMI from s3 into a KubeVirt cluster using CDI, the Kubevirt Cloud Import project provides the glue necessary for tying all of these pieces together in the form of the <code class="language-plaintext highlighter-rouge">import-ami</code> cli command and a Tekton task.</p>
+
+<h2 id="automation-using-the-import-ami-cli-command">Automation using the import-ami CLI command</h2>
+
+<p>The <code class="language-plaintext highlighter-rouge">import-ami</code> takes a set of arguments related to the AMI you wish to import into KubeVirt and the name of the PVC you’d like the AMI to be imported into. Upon execution, import-ami will call all the appropriate AWS and KubeVirt APIs to make this work. The result is a PVC with the AMI contents that is capable of being launched by a KubeVirt VM.</p>
+
+<p>In the example below, A publicly shared <a href="https://alt.fedoraproject.org/cloud/">fedora34 AMI</a> is imported into the KubeVirt cluster as a PVC called fedora34-golden-image</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nb">export </span><span class="nv">S3_BUCKET</span><span class="o">=</span>my-bucket
+<span class="nb">export </span><span class="nv">S3_SECRET</span><span class="o">=</span>s3-readonly-cred
+<span class="nb">export </span><span class="nv">AWS_REGION</span><span class="o">=</span>us-west-2
+<span class="nb">export </span><span class="nv">AMI_ID</span><span class="o">=</span>ami-00a4fdd3db8bb2851
+<span class="nb">export </span><span class="nv">PVC_STORAGECLASS</span><span class="o">=</span>rook-ceph-block
+<span class="nb">export </span><span class="nv">PVC_NAME</span><span class="o">=</span>fedora34-golden-image
+
+import-ami <span class="nt">--s3-bucket</span> <span class="nv">$S3_BUCKET</span> <span class="nt">--region</span> <span class="nv">$AWS_REGION</span> <span class="nt">--ami-id</span> <span class="nv">$AMI_ID</span> <span class="nt">--pvc-storageclass</span> <span class="nv">$PVC_STORAGECLASS</span> <span class="nt">--s3-secret</span> <span class="nv">$S3_SECRET</span> <span class="nt">--pvc-name</span> <span class="nv">$PVC_NAME</span>
+
+</code></pre></div></div>
+
+<h2 id="automation-using-the-import-ami-tekton-task">Automation using the import-ami Tekton Task</h2>
+
+<p>In addition to the <code class="language-plaintext highlighter-rouge">import-ami</code> cli command, the KubeVirt Cloud Import project also includes a <a href="https://github.com/davidvossel/kubevirt-cloud-import/blob/main/tasks/import-ami/manifests/import-ami.yaml">Tekton task</a> which wraps the cli command and allows integrating AMI import into a Tekton pipeline.</p>
+
+<p>Using a Tekton pipeline, someone can combine the task of importing an AMI into KubeVirt with the task of starting a VM using that AMI. An example pipeline can be found <a href="https://raw.githubusercontent.com/davidvossel/kubevirt-cloud-import/main/examples/create-vm-from-ami-pipeline.yaml">here</a> which outlines how this is accomplished.</p>
+
+<p>Below is a pipeline run that uses the example pipeline to import the publicly shared fedora34 AMI into a PVC, then starts a VM using that imported AMI.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>
+<span class="nb">cat</span> <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh"> &gt; pipeline-run.yaml
+apiVersion: tekton.dev/v1beta1
+kind: PipelineRun
+metadata:
+  name: my-vm-creation-pipeline
+  namespace: default
+spec:
+  serviceAccountName: my-kubevirt-service-account
+  pipelineRef:
+    name: create-vm-pipeline 
+  params:
+    - name: vmName
+      value: vm-fedora34
+    - name: s3Bucket
+      value: my-kubevirt-exports
+    - name: s3ReadCredentialsSecret
+      value: my-s3-read-only-credentials
+    - name: awsRegion
+      value: us-west-2
+    - name: amiId 
+      value: ami-00a4fdd3db8bb2851
+    - name: pvcStorageClass 
+      value: rook-ceph-block
+    - name: pvcName
+      value: fedora34
+    - name: pvcNamespace
+      value: default
+    - name: pvcSize
+      value: 6Gi
+    - name: pvcAccessMode
+      value: ReadWriteOnce
+    - name: awsCredentialsSecret
+      value: my-aws-credentials
+</span><span class="no">EOF
+
+</span>kubectl create <span class="nt">-f</span> pipeline-run.yaml
+</code></pre></div></div>
+
+<p>After posting the pipeline run, watch for the pipeline run to complete.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pipelinerun
+selecting docker as container runtime
+NAME                      SUCCEEDED   REASON      STARTTIME   COMPLETIONTIME
+my-vm-creation-pipeline   True        Succeeded   11m         9m54s
+</code></pre></div></div>
+
+<p>Then observe that the resulting VM is online</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmi
+selecting docker as container runtime
+NAME          AGE   PHASE     IP               NODENAME   READY
+vm-fedora34   11m   Running   10.244.196.175   node01     True
+</code></pre></div></div>
+
+<p>For more detailed and up-to-date information about how to automate AMI import using Tekton, view the KubeVirt Cloud Import <a href="https://github.com/davidvossel/kubevirt-cloud-import/blob/main/README.md">README.md</a></p>
+
+<h2 id="key-takeaways">Key Takeaways</h2>
+
+<p>The portability of workloads across different environments is becoming increasingly important and operations teams need to be vigilant about avoiding vendor lock in. For containers, Kubernetes is an attractive option because it provides a consistent API layer that can run across multiple cloud platforms. KubeVirt can provide that same level of consistency for VMs. As a community we need to invest further into automation tools that allow people to make the transition to KubeVirt.</p>]]></content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="AWS" /><category term="EC2" /><category term="AMI" /><summary type="html"><![CDATA[This blog post outlines the fundamentals for how to import VMs from AWS into KubeVirt]]></summary></entry><entry><title type="html">Running virtual machines in Istio service mesh</title><link href="http://0.0.0.0:4000/2021/Virtual-machines-in-Istio-service-mesh.html" rel="alternate" type="text/html" title="Running virtual machines in Istio service mesh" /><published>2021-08-13T00:00:00+00:00</published><updated>2021-08-13T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2021/Virtual-machines-in-Istio-service-mesh</id><content type="html" xml:base="http://0.0.0.0:4000/2021/Virtual-machines-in-Istio-service-mesh.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+
+<p>This blog post demonstrates running virtual machines in <a href="https://istio.io/">Istio</a> service mesh.</p>
+
+<p>Istio service mesh allows to monitor, visualize, and manage traffic between pods and external services by
+injecting a proxy container - a sidecar - which forwards inbound and outbound traffic of a pod/virtual machine.
+This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it. For more in-depth information about the Istio proxy mechanism, see <a href="https://medium.com/open-5g-hypercore/episode-iii-meshville-7f0bb7ca0e3b">this blog post</a> published by Dough Smith et al.</p>
+
+<p>The main features of Istio are traffic shifting (migrating traffic from an old to new version of a service), dynamic request routing, fault injection or traffic mirroring for testing/debugging purposes, and more.
+Visit <a href="https://istio.io/latest/docs/tasks/">Istio documentation</a> to learn about all its features.
+Istio featureset may be further extended by installing addons. Kiali, for example, is a UI dashboard that provides traffic information
+of all microservices in a mesh, capable of composing communication graph between all microservices.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<ul>
+  <li>KubeVirt <code class="language-plaintext highlighter-rouge">v0.43.0</code></li>
+  <li>CRI-O <code class="language-plaintext highlighter-rouge">v1.19.0</code></li>
+</ul>
+
+<h2 id="limitations">Limitations</h2>
+
+<p>Istio is only supported with masquerade network binding and pod network over IPv4.</p>
+
+<h2 id="demo">Demo</h2>
+
+<p>This section covers deployment of a local cluster with Istio service mesh, KubeVirt installation and creation of an Istio-enabled virtual machine.
+Finally, Kiali dashboard is used to examine both inbound and outbound traffic of the created virtual machine.</p>
+
+<h3 id="run-kubernetes-cluster">Run Kubernetes cluster</h3>
+
+<p>In this blog post, we are going to use <a href="https://github.com/kubevirt/kubevirtci">kubevirtci</a> as our Kubernetes ephemeral cluster provider.</p>
+
+<p>Follow these steps to deploy a local cluster with pre-installed Istio service mesh:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/kubevirt/kubevirtci
+<span class="nb">cd </span>kubevirtci
+<span class="nb">export </span><span class="nv">KUBEVIRTCI_TAG</span><span class="o">=</span>2108222252-0007793
+<span class="c"># Pin to version used in this blog post in case</span>
+<span class="c"># k8s-1.21 provider version disappears in the future</span>
+git checkout <span class="nv">$KUBEVIRTCI_TAG</span>
+<span class="nb">export </span><span class="nv">KUBEVIRT_NUM_NODES</span><span class="o">=</span>2
+<span class="nb">export </span><span class="nv">KUBEVIRT_PROVIDER</span><span class="o">=</span>k8s-1.21
+<span class="nb">export </span><span class="nv">KUBEVIRT_DEPLOY_ISTIO</span><span class="o">=</span><span class="nb">true
+export </span><span class="nv">KUBEVIRT_WITH_CNAO</span><span class="o">=</span><span class="nb">true
+</span>make cluster-up
+<span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span>./cluster-up/kubeconfig.sh<span class="si">)</span>
+</code></pre></div></div>
+
+<p>For details about Istio configuration, see Istio kubevirtci <a href="https://github.com/kubevirt/kubevirtci/blob/2108081530-91f55e3/cluster-provision/k8s/1.21/istio.sh">install script</a>.</p>
+
+<h3 id="install-kubevirt">Install Kubevirt</h3>
+
+<p>Following KubeVirt <a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a> to install released version <code class="language-plaintext highlighter-rouge">v0.43.0</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span>v0.43.0
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
+kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>180s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
+</code></pre></div></div>
+
+<h3 id="install-istio-addons">Install Istio addons</h3>
+
+<p>While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
+Download Istio manifests and client binary by running the following command:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span>1.10.0
+curl <span class="nt">-L</span> https://istio.io/downloadIstio | sh -
+</code></pre></div></div>
+
+<p>and export path to the istioctl binary by following the output of the above command.</p>
+
+<p>Finally, deploy Kiali, Jaeger and Prometheus addons:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/kiali.yaml
+kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/jaeger.yaml
+kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/prometheus.yaml
+</code></pre></div></div>
+
+<p><strong>Note:</strong> If there are errors when installing the addons, try running the command again. There may be timing issues which will be resolved when the command is run again.</p>
+
+<h3 id="prepare-target-namespace">Prepare target namespace</h3>
+
+<p>Before creating virtual machines, the target namespace needs to be configured for the Istio sidecar to be injected and working properly.
+This involves adding a label and creating a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> in the target namespace.</p>
+
+<h4 id="istio-sidecar-injection">Istio sidecar injection</h4>
+
+<p>Istio supports <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/">two ways of injecting</a> a sidecar to a pod - automatic and manual. For simplicity, we will only consider automatic sidecar injection in this demo, which is enabled by adding <code class="language-plaintext highlighter-rouge">istio-injection=enabled</code> label to target namespace:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl label namespace default istio-injection<span class="o">=</span>enabled
+</code></pre></div></div>
+
+<h4 id="network-attachment-definiton">Network attachment definiton</h4>
+
+<p>When Multus is installed in k8s cluster, a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> called <code class="language-plaintext highlighter-rouge">istio-cni</code> <strong>must</strong> be created in <strong>each</strong> namespace where Istio sidecar containers are to be used:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: istio-cni
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>The <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> spec is empty, as its only purpose is to trigger the <code class="language-plaintext highlighter-rouge">istio-cni</code> binary, which configures the in-pod traffic routing.</p>
+
+<h3 id="topology">Topology</h3>
+
+<p>To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">istio-vmi</code> repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080,</li>
+  <li><code class="language-plaintext highlighter-rouge">cirros-vmi</code> repeatedly request the HTTP service running on the <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI.</li>
+</ul>
+
+<p>With this setup, both inbound and outbound
+traffic metrics can be observed in Kiali dashboard for <code class="language-plaintext highlighter-rouge">istio-vmi</code>.</p>
+
+<h3 id="create-vmi-resources">Create VMI resources</h3>
+
+<p>An Istio aware virtual machine <strong>must</strong> be annotated with <code class="language-plaintext highlighter-rouge">sidecar.istio.io/inject: "true"</code>, regardless of used Istio injection mechanism.
+Without this annotation, traffic would not be properly routed through the istio proxy sidecar.
+Additonally, Istio uses <code class="language-plaintext highlighter-rouge">app</code> label for adding contextual information to the collected telemetry.
+Both, the annotation and label can be seen in the following virtual machine example:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  annotations:
+    sidecar.istio.io/inject: "true"
+  labels:
+    app: istio-vmi
+  name: istio-vmi
+spec:
+  domain:
+    devices:
+      interfaces:
+        - name: default
+          masquerade: {}
+          ports:
+            - port: 8080
+      disks:
+        - disk:
+            bus: virtio
+          name: containerdisk
+        - disk:
+            bus: virtio
+          name: cloudinitdisk
+    resources:
+      requests:
+        memory: 1024M
+  networks:
+    - name: default
+      pod: {}
+  readinessProbe:
+    httpGet:
+      port: 8080
+    initialDelaySeconds: 120
+    periodSeconds: 10
+    timeoutSeconds: 5
+    failureThreshold: 3
+    successThreshold: 3
+  terminationGracePeriodSeconds: 0
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: kubevirt/fedora-cloud-container-disk-demo:devel
+    - cloudInitNoCloud:
+        userData: |
+          #cloud-config
+          password: fedora
+          chpasswd: { expire: False }
+          runcmd:
+          - dnf install -y screen nc
+          - while true ; do sh -c "nc -lp 8080 -c  </span><span class="se">\"</span><span class="sh">echo -e 'HTTP/1.1 200 OK</span><span class="se">\n\n</span><span class="sh">Hello'</span><span class="se">\"</span><span class="sh"> " ; done &amp;
+          - while true ; do curl kubevirt.io &gt;out 2&gt;/dev/null ; sleep 1 ; done &amp;
+      name: cloudinitdisk
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>The cloud init section of the VMI runs two loops requesting <code class="language-plaintext highlighter-rouge">kubevirt.io</code> website every second to generate outbound traffic (from the VMI) and serving simple HTTP server on port <code class="language-plaintext highlighter-rouge">8080</code>, which will be used for monitoring of inbound traffic (to the VMI).</p>
+
+<p>Let’s also create a service for the VMI that will be used to access the http server in <code class="language-plaintext highlighter-rouge">istio-vmi</code>:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f-
+apiVersion: v1
+kind: Service
+metadata:
+  name: istio-vmi-svc
+spec:
+  selector:
+    app: istio-vmi
+  ports:
+  - port: 8080
+    protocol: TCP
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Finally, create the <code class="language-plaintext highlighter-rouge">cirros-vmi</code> VMI, for the purpose of generating inbound traffic to <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstance
+metadata:
+  annotations:
+    sidecar.istio.io/inject: "true"
+  name: cirros-vmi
+  labels:
+    app: cirros-vmi
+spec:
+  domain:
+    devices:
+      interfaces:
+        - name: default
+          masquerade: {}
+      disks:
+        - disk:
+            bus: virtio
+          name: containerdisk
+        - disk:
+            bus: virtio
+          name: cloudinitdisk
+    resources:
+      requests:
+        memory: 128M
+  networks:
+    - name: default
+      pod: {}
+  terminationGracePeriodSeconds: 0
+  volumes:
+    - name: containerdisk
+      containerDisk:
+        image: kubevirt/cirros-container-disk-demo:devel
+    - name: cloudinitdisk
+      cloudInitNoCloud:
+        userData: |
+          #!/bin/sh
+          while true ; do curl istio-vmi-svc.default.svc.cluster.local:8080 ; sleep 1 ; done
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Wait for the <code class="language-plaintext highlighter-rouge">istio-vmi</code> to be ready:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">condition</span><span class="o">=</span>ready <span class="nt">--timeout</span><span class="o">=</span>180s pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>istio-vmi
+</code></pre></div></div>
+
+<p>After creating the VMIs, the corresponding virt-launcher pods should have 3 ready containers, as shown in the snippet below:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods
+NAME                             READY   STATUS    RESTARTS   AGE
+virt-launcher-istio-vmi-XYZ      3/3     Running   0          4m13s
+virt-launcher-cirros-vmi-XYZ     3/3     Running   0          2m21s
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">Istioctl proxy-status</code> should report that the sidecar proxies running inside the virt-launcher pods have synced with Istio control plane:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl proxy-status
+NAME                                          CDS        LDS        EDS        RDS          ISTIOD                      VERSION
+virt-launcher-cirros-vmi-9f765.default        SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-5d79g     1.10.0
+virt-launcher-istio-vmi-99t8t.default         SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
+</code></pre></div></div>
+
+<p><strong>Note:</strong> Displaying only relevant VMI entities.</p>
+
+<h3 id="monitor-traffic-in-kiali-dashboard">Monitor traffic in Kiali dashboard</h3>
+
+<p>With both VMIs up and running, we can open the Kiali dashboard and observe the traffic metrics.
+Run the following command, to access Kiali dashboard:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl dashboard kiali
+</code></pre></div></div>
+
+<h4 id="topology-graph">Topology graph</h4>
+
+<p>Let’s start by navigating to the topology graph by clicking the Graph menu item.</p>
+
+<p><br /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+    <a href="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/topology-graph.png" itemprop="contentUrl" data-size="800x530">
+      <img src="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/topology-graph.png" itemprop="thumbnail" width="100%" alt="Topology graph" />
+    </a>
+    <figcaption itemprop="Topology graph of deployed VMIs showing the traffic flows"></figcaption>
+  </figure>
+</div>
+
+<p>In the topology graph, we can observe the following traffic flows:</p>
+
+<ul>
+  <li>requests from <code class="language-plaintext highlighter-rouge">cirros-vmi</code> to <code class="language-plaintext highlighter-rouge">istio-vmi</code> via <code class="language-plaintext highlighter-rouge">istio-vmi-svc</code> service,</li>
+  <li>requests from <code class="language-plaintext highlighter-rouge">istio-vmi</code> to <code class="language-plaintext highlighter-rouge">PasstroughCluster</code>. The <code class="language-plaintext highlighter-rouge">PastroughCluster</code> marks  destinations external to our service mesh.</li>
+</ul>
+
+<h4 id="workloads">Workloads</h4>
+
+<p>Navigate to <code class="language-plaintext highlighter-rouge">istio-vmi</code> workload overview by clicking the <code class="language-plaintext highlighter-rouge">Workloads</code> menu item and selecting <code class="language-plaintext highlighter-rouge">istio-vmi</code> from the list.</p>
+
+<p>The overview page presents partial topology graph with traffic related to <code class="language-plaintext highlighter-rouge">istio-vmi</code>. In our case, this graph is the same as the graph of our entire mesh.</p>
+
+<p>Navigate to Inbound Metrics tab to see metrics charts of inbound traffic.</p>
+
+<p><br /></p>
+<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
+  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
+    <a href="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/istio-blog-vmi-istio-inbound-traffic.png" itemprop="contentUrl" data-size="800x530">
+      <img src="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/istio-blog-vmi-istio-inbound-traffic.png" itemprop="thumbnail" width="100%" alt="Inbound traffic metrics" />
+    </a>
+    <figcaption itemprop="Inbound traffic metrics for `istio-vmi`"></figcaption>
+  </figure>
+</div>
+
+<p>In Request volume chart we can see that number of requests stabilizes at around <code class="language-plaintext highlighter-rouge">1 ops</code>, which matches our loop sending one reqest per second. Request throughput chart reveals that the requests consume around <code class="language-plaintext highlighter-rouge">4 kbit/s</code> of bandwidth.
+Remaining two charts provide information about Request duration and size.</p>
+
+<p>The same metrics are collected for outbound traffic as well, which can be seen in Outbound Metrics tab.</p>
+
+<h2 id="cluster-teardown">Cluster teardown</h2>
+
+<p>Run the following command to deprovision the ephemeral cluster:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make cluster-down
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>KubeVirt introduced <a href="https://kubevirt.io/user-guide/virtual_machines/istio_service_mesh/">support for Istio</a>, allowing virtual machines to be part of a service mesh.</p>
+
+<p>This blog post covered running KubeVirt virtual machine in Istio service mesh using an ephemeral kubevirtci cluster. Kiali dashboard was used to observe inbound and outbound traffic of a virtual machine.</p>]]></content><author><name>Radim Hrazdil</name></author><category term="news" /><category term="kubevirt" /><category term="istio" /><category term="virtual machine" /><category term="VM" /><category term="service mesh" /><category term="mesh" /><summary type="html"><![CDATA[This blog post demonstrates running virtual machines in Istio service mesh.]]></summary></entry><entry><title type="html">Kubernetes Authentication Options using KubeVirt Client Library</title><link href="http://0.0.0.0:4000/2021/kubevirt-api-auth.html" rel="alternate" type="text/html" title="Kubernetes Authentication Options using KubeVirt Client Library" /><published>2021-07-16T00:00:00+00:00</published><updated>2021-07-16T00:00:00+00:00</updated><id>http://0.0.0.0:4000/2021/kubevirt-api-auth</id><content type="html" xml:base="http://0.0.0.0:4000/2021/kubevirt-api-auth.html"><![CDATA[<ul>
+  <li><a href="#introduction">Introduction</a></li>
+  <li><a href="#requirements">Requirements</a></li>
+  <li><a href="#setup">Setup</a>
+    <ul>
+      <li><a href="#compiling-our-test-application">Compiling our test application</a></li>
+    </ul>
+  </li>
+  <li><a href="#running-our-application-externally-leveraging-a-kubeconfig-file">Running our application externally leveraging a kubeconfig file</a>
+    <ul>
+      <li><a href="#using-the-default-kubeconfig">Using the default kubeconfig</a></li>
+      <li><a href="#creating-a-kubeconfig-for-the-service-account">Creating a kubeconfig for the service account</a></li>
+    </ul>
+  </li>
+  <li><a href="#running-in-a-kubernetes-cluster">Running in a Kubernetes Cluster</a></li>
+  <li><a href="#extending-rbac-role-across-namespaces">Extending RBAC Role across Namespaces</a></li>
+  <li><a href="#creating-custom-rbac-roles">Creating Custom RBAC Roles</a></li>
+  <li><a href="#conclusion">Conclusion</a></li>
+  <li><a href="#references">References</a></li>
+</ul>
+
+<h2 id="introduction">Introduction</h2>
+
+<p>Most interaction with the KubeVirt service can be handled using the <em>virtctl</em> command, or raw yaml applied to your Kubernetes cluster. But what if you want to have more direct programmatic control over the instantiation and management of those virtual machines? The KubeVirt project supplies a Go client library for interacting with KubeVirt called <a href="https://github.com/kubevirt/client-go">client-go</a>. This library allows you to write your own applications that interact directly with the KubeVirt api quickly and easily.</p>
+
+<p>In this post, we will use a simple application to demonstrate how the KubeVirt client library authenticates with your Kubernetes cluster both in and out of your cluster. This application is based on the example application in the “client-go” library with a few small modifications to it, to allow for running both locally and within in the cluster. This tutorial assumes you have some knowledge of Go, and is not meant to be a Go training doc.</p>
+
+<h2 id="requirements">Requirements</h2>
+
+<p>In order to compile and run the test application locally you will need to have the Go programming language installed on your machine. If you do not have the latest version of Go installed, follow the steps on the <a href="https://golang.org/dl/">Downloads</a> page of the Go  web site before proceeding with the rest of the steps in this blog. The steps listed here were tested with Go version 1.16.</p>
+
+<p>You will need a Kubernetes cluster running with the KubeVirt operator installed. If you do not have a cluster available, the easiest way to do this is to follow the steps outlined in the <a href="https://kubevirt.io/quickstart_minikube/">Quick Start with Minikube</a> lab.</p>
+
+<p>The example application we will be using to demonstrate the authentication methods lists out the VMI and VM instances in your cluster in the current namespace. If you do not have any running VMs in your cluster, be sure to create at least one new virtual machine instance in your cluster. For guidance in creating a quick test vm see the <a href="https://kubevirt.io/labs/kubernetes/lab1.html">Use KubeVirt</a> lab.</p>
+
+<h2 id="setup">Setup</h2>
+
+<h3 id="compiling-our-test-application">Compiling our test application</h3>
+
+<p>Start by cloning the example application repo <a href="https://github.com/xphyr/kubevirt-apiauth">https://github.com/xphyr/kubevirt-apiauth</a> and compiling our test application:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/xphyr/kubevirt-apiauth.git
+<span class="nb">cd </span>kubevirt-apiauth/listvms
+go build
+</code></pre></div></div>
+
+<p>Once the program compiles, test to ensure that the application compiled correctly. If you have a working Kubernetes context, running this command may return some values. If you do not have a current context, you will get an error. This is OK, we will discuss authentication next.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./listvms
+2021/06/23 16:51:28 cannot obtain KubeVirt vm list: Get <span class="s2">"http://localhost:8080/apis/kubevirt.io/v1alpha3/namespaces/default/virtualmachines"</span>: dial tcp 127.0.0.1:8080: connect: connection refused
+</code></pre></div></div>
+
+<p>As long as the program runs, you are all set to move onto the next step.</p>
+
+<h2 id="running-our-application-externally-leveraging-a-kubeconfig-file">Running our application externally leveraging a kubeconfig file</h2>
+
+<p>The default authentication file for Kubernetes is the <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/">kubeconfig</a> file. We will not be going into details of this file, but you can click the link to goto the documentation on the kubeconfig file to learn more about it. All you need to know at this time is that when you use the <em>kubectl</em> command you are using a kubeconfig file for your authentication.</p>
+
+<h3 id="using-the-default-kubeconfig">Using the default kubeconfig</h3>
+
+<p>If you haven’t already done so, validate that you have a successful connection to your cluster with the “<em>kubectl</em>” command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get nodes
+NAME       STATUS   ROLES                  AGE     VERSION
+minikube   Ready    control-plane,master   5d21h   v1.20.7
+</code></pre></div></div>
+
+<p>We now have a valid kubeconfig. On *nix OS such as Linux and OSX, this file is stored in your home directory at <code class="language-plaintext highlighter-rouge">~/.kube/config</code>. You should now be able to run our test application and get some results (assuming you have some running vms in your cluster).</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>./listvms/listvms
+Type                       Name       Namespace     Status
+VirtualMachine             testvm     default       <span class="nb">false
+</span>VirtualMachineInstance     testvm     default       Scheduled
+</code></pre></div></div>
+
+<p>This is great, but there is an issue. The authentication method we used is your primary Kubernetes authentication. It has roles and permissions to do many different things in your k8s cluster. Wouldn’t it be better if we could scope that authentication and ensure that your application had a dedicated account, with only the proper permissions to interact with just what your application will need. This is what Kubernetes <strong>Service Accounts</strong> are for.</p>
+
+<p><a href="https://kubernetes.io/docs/reference/access-authn-authz/service-accounts-admin/">Service Accounts</a> are accounts for processes as opposed to users. By default they are scoped to a namespace, but you can give service accounts access to other namespaces through RBAC rules that we will discuss later. In this demo, we will be using the “<em>default</em>” project/namespace, so the service account we create will be initially scoped only to this namespace.</p>
+
+<p>Start by creating a new service account called “mykubevirtrunner” using your default Kubernetes account:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create sa mykubevirtrunner
+<span class="nv">$ </span>kubectl describe sa mykubevirtrunner
+Name:                mykubevirtrunner
+Namespace:           default
+Labels:              &lt;none&gt;
+Annotations:         &lt;none&gt;
+Image pull secrets:  &lt;none&gt;
+Mountable secrets:   mykubevirtrunner-token-pd2mq
+Tokens:              mykubevirtrunner-token-pd2mq
+Events:              &lt;none&gt;
+</code></pre></div></div>
+
+<p>In the describe output you can see that a token and a mountable secret have been created. Let’s take a look at the contents of the secret:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl describe secret mykubevirtrunner-token-pd2mq
+Name:         mykubevirtrunner-token-pd2mq
+Namespace:    default
+Labels:       &lt;none&gt;
+Annotations:  kubernetes.io/service-account.name: mykubevirtrunner
+              kubernetes.io/service-account.uid: f401493b-658a-489d-bcce-0ccce39160a0
+
+Type:  kubernetes.io/service-account-token
+
+Data
+<span class="o">====</span>
+namespace:  7 bytes
+token:      eyJhbGciOiJS...
+ca.crt:     1111 bytes
+
+</code></pre></div></div>
+
+<p>The data listed for the “token” key is the information we will use in the next step, your output will be much longer, it has been truncated for this document. Ensure when copying the value that you get the entire token value.</p>
+
+<h3 id="creating-a-kubeconfig-for-the-service-account">Creating a kubeconfig for the service account</h3>
+
+<p>We will create a new kubeconfig file that leverages the service account and token we just created. The easiest way to do this is to create an empty kubeconfig file, and use the “<em>kubectl</em>” command to log in with the new token. Open a NEW terminal window. This will be the window we use for the service account. In this new terminal window start by setting the KUBECONFIG environment variable to point to a file in our local directory, and then using the “<em>kubectl</em>” command to generate a new kubeconfig file:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/sa-kubeconfig
+kubectl config set-cluster minikube <span class="nt">--server</span><span class="o">=</span>https://&lt;update IP address&gt;:8443 <span class="nt">--insecure-skip-tls-verify</span>
+kubectl config set-credentials mykubevirtrunner <span class="nt">--token</span><span class="o">=</span>&lt;<span class="nb">paste </span>token from last step here&gt;
+kubectl config set-context minikube <span class="nt">--cluster</span><span class="o">=</span>minikube <span class="nt">--namespace</span><span class="o">=</span>default <span class="nt">--user</span><span class="o">=</span>mykubevirtrunner
+kubectl config use-context minikube
+</code></pre></div></div>
+
+<p>We can test that the new kubeconfig file is working by running a kubectl command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods
+Error from server <span class="o">(</span>Forbidden<span class="o">)</span>: pods is forbidden: User <span class="s2">"system:serviceaccount:default:mykubevirtrunner"</span> cannot list resource <span class="s2">"pods"</span> <span class="k">in </span>API group <span class="s2">""</span> <span class="k">in </span>the namespace <span class="s2">"default"</span>
+</code></pre></div></div>
+
+<p>Note that the “User” is now listed as “<em>system:serviceaccount:default:mykubevirtrunner</em>” so we know we are using our new service account. Now try running our test program and note that it is using the service account as well:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>listvms/listvms
+2021/07/07 14:53:23 cannot obtain KubeVirt vm list: virtualmachines.kubevirt.io is forbidden: User <span class="s2">"system:serviceaccount:default:mykubevirtrunner"</span> cannot list resource <span class="s2">"virtualmachines"</span> <span class="k">in </span>API group <span class="s2">"kubevirt.io"</span> <span class="k">in </span>the namespace <span class="s2">"default"</span>
+</code></pre></div></div>
+
+<p>You can see we are now using our service account in our application, but that service account doesn’t have the right permissions… We now need to assign a role to our service account to give it the proper API access. We will start simple and give the service account the <strong>kubevirt.io:view</strong> role, which will allow the service account to see the KubeVirt objects within the “<em>default</em>” namespace:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create clusterrolebinding kubevirt-viewer <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:view <span class="nt">--serviceaccount</span><span class="o">=</span>default:mykubevirtrunner
+clusterrolebinding.rbac.authorization.k8s.io/kubevirt-viewer created
+</code></pre></div></div>
+
+<p>Now run the <em>listvms</em> command again:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>./listvms/listvms
+Type                       Name                    Namespace     Status
+VirtualMachineInstance     vm-fedora-ephemeral     myvms         Running
+</code></pre></div></div>
+
+<p>Success! Our application is now using the service account that we created for authentication to the cluster. The service account can be extended by adding additional default roles to the account, or by creating custom roles that limit the scope of the service account to only the exact actions you want to take. When you install KubeVirt you get a set of default roles including “View”, “Edit” and “Admin”. Additional details about these roles are available here: <a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>
+
+<h2 id="running-in-a-kubernetes-cluster">Running in a Kubernetes Cluster</h2>
+
+<p>So all of this is great if you want to run the application outside of your cluster … but what if you want your application to run INSIDE you cluster. You could create a kubeconfig file, and add it to your namespace as a secret and then mount that secret as a volume inside your pod, but there is an easier way that continues to leverage the service account that we created. By default Kubernetes creates a few environment variables for every pod that indicate that the container is running within Kubernetes, and it makes a Kubernetes authentication token for the service account that the container is running as available at /var/run/secrets/kubernetes.io/serviceaccount/token. The client-go KubeVirt library can detect that it is running inside a Kubernetes hosted container and will transparently use the authentication token provided with no additional configuration needed.</p>
+
+<p>A container image with the listvms binary is available at <strong>quay.io/markd/listvms</strong>. We can start a copy of this container using the deployment yaml file located in the ‘listvms/listvms_deployment.yaml’ file.</p>
+
+<p>Switch back to your original terminal window that is using your primary kubeconfig file, and using the “<em>kubectl</em>” command deploy one instance of the test pod, and then check the logs of the pod:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> listvms/listvms_deployment.yaml
+<span class="nv">$ </span>kubectl get pods
+NAME                                      READY   STATUS    RESTARTS   AGE
+listvms-7b8f865c8d-2zqqn                  1/1     Running   0          7m30s
+virt-launcher-vm-fedora-ephemeral-4ljg4   2/2     Running   0          24h
+<span class="nv">$ </span>kubectl logs listvms-7b8f865c8d-2zqqn
+2021/07/07 19:06:42 cannot obtain KubeVirt vm list: virtualmachines.kubevirt.io is forbidden: User <span class="s2">"system:serviceaccount:default:default"</span> cannot list resource <span class="s2">"virtualmachines"</span> <span class="k">in </span>API group <span class="s2">"kubevirt.io"</span> <span class="k">in </span>the namespace <span class="s2">"default"</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p><strong>NOTE:</strong> Be sure to deploy this demo application in a namespace that contains at least one running VM or VMI.</p>
+</blockquote>
+
+<p>The application is unable to run the operation, because it is running as the default service account in the “<em>default</em>” namespace. If you remember previously we created a service account in this namespace called “mykubevirtrunner”. We need only update the deployment to use this service account and we should see some success. Use the “kubectl edit deployment/listvms” command to update the container spec to include the “serviceAccount: mykubevirtrunner” line as show below:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">containers</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">listvms</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/markd/listvms</span>
+      <span class="na">serviceAccount</span><span class="pi">:</span> <span class="s">mykubevirtrunner</span>
+      <span class="na">securityContext</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">schedulerName</span><span class="pi">:</span> <span class="s">default-scheduler</span>
+</code></pre></div></div>
+
+<p>This change will trigger Kubernetes to redeploy your pod, using the new serviceAccount. We should now see some output from our program:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get pods
+NAME                                      READY   STATUS    RESTARTS   AGE
+listvms-7b8f865c8d-2qzzn                  1/1     Running   0          7m30s
+virt-launcher-vm-fedora-ephemeral-4ljg4   2/2     Running   0          24h
+<span class="nv">$ </span>kubectl logs listvms-7b8f865c8d-2qzzn
+Type                       Name                    Namespace     Status
+VirtualMachineInstance     vm-fedora-ephemeral     myvms         Running
+awaiting signal
+</code></pre></div></div>
+
+<h2 id="extending-rbac-role-across-namespaces">Extending RBAC Role across Namespaces</h2>
+
+<p>As currently configured, the mykubevirtrunner service account can only “view” KubeVirt resources within its own namespace. If we want to extend that ability to other namespaces, we can add the view role for other namespaces to the mykubevirtrunner serviceAccount.</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create namespace myvms
+&lt;launch an addition vm here&gt;
+kubectl create clusterrolebinding kubevirt-viewer <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:view <span class="nt">--serviceaccount</span><span class="o">=</span>default:mykubevirtrunner <span class="nt">-n</span> myvms
+</code></pre></div></div>
+
+<p>We can test that the ServiceAccount has been updated to also have permissions to view in the “myvms” namespace by running our listvms command one more time, this time passing in the optional flag <em>–namespaces</em>. Switch to your terminal window that is using the service account kubeconfig file and run the following command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>listvms/listvms <span class="nt">--namespaces</span> myvms
+additional namespaces to check are:  myvms
+Checking the following namespaces:  <span class="o">[</span>default myvms]
+Type                       Name       Namespace     Status
+VirtualMachine             testvm     default       <span class="nb">false
+</span>VirtualMachineInstance     testvm     default       Scheduled
+VirtualMachine             testvm     myvms         <span class="nb">false</span>
+</code></pre></div></div>
+
+<p>You can see that now, the ServiceAccount can view the vm and vmi that are in both the default namespace as well as the <em>myvms</em> namespace.</p>
+
+<h2 id="creating-custom-rbac-roles">Creating Custom RBAC Roles</h2>
+
+<p>In this demo we used RBAC roles created as part of the KubeVirt install. You can also create custom RBAC roles for KubeVirt. Documentation on how this can be done is available in the KubeVirt documentation <a href="https://kubevirt.io/user-guide/operations/authorization/#creating-custom-rbac-roles">Creating Custom RBAC Roles</a></p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>It is possible to control and manage your KubeVirt machines with the use of Kubernetes service accounts and the “client-go” library. When using service accounts, you want to ensure that the account has the minimum role or permissions to do it’s job to ensure the security of your cluster. The “client-go” library gives you options on how you authenticate with your Kubernetes cluster, allowing you to deploy your application both in and out of your Kubernetes cluster.</p>
+
+<h2 id="references">References</h2>
+
+<p><a href="https://github.com/kubevirt/client-go">KubeVirt Client Go</a></p>
+
+<p><a href="https://kubevirt.io/2018/KubeVirt-API-Access-Control.html">KubeVirt API Access Control</a></p>
+
+<p><a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="go" /><category term="api" /><category term="authentication" /><summary type="html"><![CDATA[This blog post discusses authentication methods that can be used with the KubeVirt client-go library.]]></summary></entry></feed>

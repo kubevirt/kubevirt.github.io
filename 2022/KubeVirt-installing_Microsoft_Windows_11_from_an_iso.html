@@ -1,0 +1,611 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
+    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
+    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
+    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
+    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
+    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
+    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
+    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
+    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
+    <meta name="go-import" content="kubevirt.io/containerized-data-importer-api git https://github.com/kubevirt/containerized-data-importer-api">
+    <meta name="go-import" content="kubevirt.io/api git https://github.com/kubevirt/api">
+    <meta name="go-import" content="kubevirt.io/node-maintenance-operator git https://github.com/kubevirt/node-maintenance-operator">
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="http://0.0.0.0:4000/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>KubeVirt: installing Microsoft Windows 11 from an ISO | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="Jed Lejosne" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt">
+    <meta name="keywords" content="kubevirt, kubernetes, virtual machine, Microsoft Windows kubernetes, Microsoft Windows container, Windows" >
+    <meta property="og:title" content="KubeVirt: installing Microsoft Windows 11 from an ISO | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="http://0.0.0.0:4000/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html" >
+    <meta property="og:image" content="http://0.0.0.0:4000/assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="Jed Lejosne" >
+    <meta property="og:article:published_time" content="2022-08-02 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt: installing Microsoft Windows 11 from an ISO | KubeVirt.io">
+    <meta name="twitter:description" content="This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt">
+
+    <link type="application/atom+xml" rel="alternate" href="http://0.0.0.0:4000/feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "noVNC", "console", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", "AWS", "EC2", "AMI", "real-time", "CPUManager", "live migration", "dedicated network", "Kubevirt", "load-balancer", "MetalLB", "instancetypes", "preferences", "VirtualMachineInstancetype", "VirtualMachinePreference", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt: installing Microsoft Windows 11 from an ISO</h1>
+          <div class="post-info">
+            <span class="post-author">Author: Jed Lejosne</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">kubevirt</a>&nbsp;|&nbsp;<a href="/tag/kubernetes">kubernetes</a>&nbsp;|&nbsp;<a href="/tag/virtual-machine">virtual machine</a>&nbsp;|&nbsp;<a href="/tag/microsoft-windows-kubernetes">Microsoft Windows kubernetes</a>&nbsp;|&nbsp;<a href="/tag/microsoft-windows-container">Microsoft Windows container</a>&nbsp;|&nbsp;<a href="/tag/windows">Windows</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: August 2, 2022  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <p>This blog post describes a simple way to deploy a Windows 11 VM with KubeVirt, using an installation ISO as a starting point.<br />
+Although only tested with Windows 11, the steps described here should also work to deploy other recent versions of Windows.</p>
+
+<h2 id="pre-requisites">Pre-requisites</h2>
+
+<ul>
+  <li>You’ll need a Kubernetes cluster with worker node(s) that have at least 6GB of available memory</li>
+  <li><a href="https://kubevirt.io/user-guide">KubeVirt</a> and <a href="https://github.com/kubevirt/containerized-data-importer/blob/main/README.md">CDI</a> both deployed on the cluster</li>
+  <li>A storage backend, such as <a href="https://ceph.com/">Rook Ceph</a></li>
+  <li>A Windows iso. One can be found at <a href="https://www.microsoft.com/software-download/windows11">https://www.microsoft.com/software-download/windows11</a></li>
+</ul>
+
+<p>A suitable test cluster can easily be deployed thanks to KubeVirtCI by running the following commands from the <a href="https://github.com/kubevirt/kubevirt">KubeVirt source repository</a>:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_MEMORY_SIZE</span><span class="o">=</span>8192M
+<span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_STORAGE</span><span class="o">=</span>rook-ceph-default
+<span class="nv">$ </span>make cluster-up <span class="o">&amp;&amp;</span> make cluster-sync
+</code></pre></div></div>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>Before the virtual machine can be created, we need to setup storage volumes for the ISO and the drive, and write the appropriate VM(I) yaml.</p>
+
+<ol>
+  <li>
+    <p>Uploading the ISO to a PVC</p>
+
+    <p>KubeVirt provides a simple tool that is able to do that for us: <code class="language-plaintext highlighter-rouge">virtctl</code>.<br />
+Here’s the command to upload the ISO, just replace <code class="language-plaintext highlighter-rouge">/storage/win11.iso</code> with the path to your Windows 11 ISO:
+<code class="language-plaintext highlighter-rouge">virtctl image-upload pvc win11cd-pvc --size 6Gi --image-path=/storage/win11.iso --insecure</code></p>
+  </li>
+  <li>
+    <p>Creating a persistent volume to use as the Windows drive</p>
+
+    <p>This will depend on the storage configuration of your cluster.
+The following yaml, to apply to the cluster using <code class="language-plaintext highlighter-rouge">kubectl create</code>, should work just fine on a KubeVirtCI cluster:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolume</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">task-pv-volume</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">local</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+  <span class="na">capacity</span><span class="pi">:</span>
+    <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">hostPath</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/tmp/hostImages/win11"</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Microsoft actually <a href="https://docs.microsoft.com/en-us/windows/whats-new/windows-11-requirements">recommends</a> at least 64GB of storage.
+But, unlike some other requirements, the installer will accept smaller disks.
+This is convenient when testing with KubeVirtCI, as nodes only have about 20GB of free space.
+However, please bear in mind that such a small drive should only be used for testing purposes, and might lead to instabilities.</p>
+
+
+</div></div>
+<ol>
+  <li>
+    <p>Creating a persistent volume claim (PVC) for the drive</p>
+
+    <p>Once again, your milage may vary, but the following PVC yaml works fine on KubeVirtCI:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">disk-windows</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+</code></pre></div>    </div>
+
+    <p>The name of PVC, <code class="language-plaintext highlighter-rouge">disk-windows</code> here, will be used in the yaml of the VM(I) as the main volume.</p>
+  </li>
+  <li>
+    <p>Creating the VM(I) yaml file</p>
+
+    <p>KubeVirt already includes an example <a href="https://github.com/kubevirt/kubevirt/blob/main/examples/vmi-windows.yaml">Windows VMI yaml file</a>, which we’ll use as a starting point here for convenience.<br />
+Using a VMI yaml is more than enough for testing purposes, however for more serious applications you might want to consider changing it into a VM.</p>
+
+    <p>First, in the yaml above, bump the memory up to 4Gi, which is a hard requirement of Windows 11. (Windows 10 is happy with 2Gi).</p>
+
+    <p>Then, let’s add the ISO created above.
+Add is as a cdrom in the disks section:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+</code></pre></div>    </div>
+    <p>And the corresponding volume at the bottom:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">win11cd-pvc</span>
+</code></pre></div>    </div>
+    <p>Note that the names should match, and that the <code class="language-plaintext highlighter-rouge">claimName</code> is what we used in the <code class="language-plaintext highlighter-rouge">virtctl</code> command above.</p>
+
+    <p>Here is what the VMI looks like after those changes:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">special</span><span class="pi">:</span> <span class="s">vmi-windows</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vmi-windows</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">clock</span><span class="pi">:</span>
+      <span class="na">timer</span><span class="pi">:</span>
+        <span class="na">hpet</span><span class="pi">:</span>
+          <span class="na">present</span><span class="pi">:</span> <span class="no">false</span>
+        <span class="na">hyperv</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">pit</span><span class="pi">:</span>
+          <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">delay</span>
+        <span class="na">rtc</span><span class="pi">:</span>
+          <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">catchup</span>
+      <span class="na">utc</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">cpu</span><span class="pi">:</span>
+      <span class="na">cores</span><span class="pi">:</span> <span class="m">2</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">pvcdisk</span>
+      <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+      <span class="na">interfaces</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">masquerade</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">model</span><span class="pi">:</span> <span class="s">e1000</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+      <span class="na">tpm</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">features</span><span class="pi">:</span>
+      <span class="na">acpi</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">apic</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">hyperv</span><span class="pi">:</span>
+        <span class="na">relaxed</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">spinlocks</span><span class="pi">:</span>
+          <span class="na">spinlocks</span><span class="pi">:</span> <span class="m">8191</span>
+        <span class="na">vapic</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">smm</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">firmware</span><span class="pi">:</span>
+      <span class="na">bootloader</span><span class="pi">:</span>
+        <span class="na">efi</span><span class="pi">:</span>
+          <span class="na">secureBoot</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">uuid</span><span class="pi">:</span> <span class="s">5d307ca9-b3ef-428c-8861-06e72d69f223</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s">4Gi</span>
+  <span class="na">networks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+    <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pvcdisk</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">disk-windows</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">win11cd-pvc</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>When customizing this VMI definition or creating your own, please keep in mind that the TPM device and the UEFI firmware with SecureBoot are both hard requirements of Windows 11.
+Not having them will cause the Windows 11 installation to fail early. Please also note that the SMM CPU feature is required for UEFI + SecureBoot.
+However, they can all be omitted in the case of a Windows 10 VM(I).
+Finally, we do not currently support TPM persistence, so any secret stored in the emulated TPM will be lost next time you boot the VMI.
+For example, do not enable BitLocker, as it will fail to find the encryption key next boot and you will have to manually enter the (55 characters!) recovery key each boot.</p>
+
+
+</div></div>
+<h2 id="windows-installation">Windows installation</h2>
+
+<p>You should now be able to create the VMI and start the Windows installation process.<br />
+Just use kubectl to start the VMI created above: <code class="language-plaintext highlighter-rouge">kubectl create -f vmi-windows.yaml</code>.<br />
+Shortly after, open a VNC session to it using <code class="language-plaintext highlighter-rouge">virtctl vnc vmi-windows</code> (keep trying until the VMI is running and the VNC session pops up).<br />
+You should now see the boot screen, and shortly after a prompt to “Press any key to boot from CD or DVD…”. You have a few seconds to do so or the VM will fail to boot.
+Then just follow the steps to install Windows.</p>
+
+<h2 id="virtio-drivers-installation-optional">VirtIO drivers installation (optional)</h2>
+
+<p>Once Windows is installed, it’s a good ideas to install the <a href="http://www.linux-kvm.org/page/Virtio">VirtIO</a> drivers inside the VM, as they can drastically improve performance.
+The latest version can be downloaded <a href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/">here</a>.
+<code class="language-plaintext highlighter-rouge">virtio-win-gt-x64.msi</code> is the simplest package to install, as you just have to run it as Administrator.</p>
+
+<p>Alternatively, KubeVirt has a containerdisk image that can be mounted inside the VM.<br />
+To use it, just add a simple cdrom disk to the VMI, like:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+<p>and the volume:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+<p>When using KubeVirtCI, a local copy of the image is also available at <code class="language-plaintext highlighter-rouge">registry:5000/kubevirt/virtio-container-disk:devel</code>.</p>
+
+<h2 id="further-performance-improvements">Further performance improvements</h2>
+
+<p>Windows is quite resource-hungry, and you might find that the VM created above is too slow, even with the VirtIO drivers installed.<br />
+Here are a few steps you can take to improve things:</p>
+<ul>
+  <li>Increasing the RAM is always a good idea, if you have enough available of course.</li>
+  <li>Increasing the number of CPUs, and/or using CPUManager to assign dedicated CPU to the VM should also help a lot.</li>
+  <li>Once the VirtIO drivers are installed, the main drive can also be switched from <code class="language-plaintext highlighter-rouge">sata</code> to <code class="language-plaintext highlighter-rouge">virtio</code>, and the attached CDROMs can be removed.</li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt: installing Microsoft Windows 11 from an ISO&url=https://www.kubevirt.io/2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> sandbox project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2022 The KubeVirt Contributors<br>
+      Copyright 2022 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>
