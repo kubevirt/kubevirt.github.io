@@ -1,4 +1,30 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-07-08T16:45:58+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.54.0</title><link href="https://kubevirt.io//2022/changelog-v0.54.0.html" rel="alternate" type="text/html" title="KubeVirt v0.54.0" /><published>2022-06-08T00:00:00+00:00</published><updated>2022-06-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.54.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.54.0.html"><![CDATA[<h2 id="v0540">v0.54.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-08-17T23:03:11+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.55.0</title><link href="https://kubevirt.io//2022/changelog-v0.55.0.html" rel="alternate" type="text/html" title="KubeVirt v0.55.0" /><published>2022-07-14T00:00:00+00:00</published><updated>2022-07-14T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.55.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.55.0.html"><![CDATA[<h2 id="v0550">v0.55.0</h2>
+
+<p>Released on: Thu Jul 14 16:33:25 2022 +0000</p>
+
+<ul>
+  <li>[PR #7336][iholder-redhat] Introduce clone CRD, controller and API</li>
+  <li>[PR #7791][iholder-redhat] Introduction of an initial deprecation policy</li>
+  <li>[PR #7875][lyarwood] <code class="language-plaintext highlighter-rouge">ControllerRevisions</code> of any <code class="language-plaintext highlighter-rouge">VirtualMachineFlavorSpec</code> or <code class="language-plaintext highlighter-rouge">VirtualMachinePreferenceSpec</code> are stored during the initial start of a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> and used for subsequent restarts ensuring changes to the original <code class="language-plaintext highlighter-rouge">VirtualMachineFlavor</code> or <code class="language-plaintext highlighter-rouge">VirtualMachinePreference</code> do not modify the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> and the <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> it creates.</li>
+  <li>[PR #8011][fossedihelm] Increase virt-launcher memory overhead</li>
+  <li>[PR #7963][qinqon] Bump alpine_with_test_tooling</li>
+  <li>[PR #7881][ShellyKa13] Enable memory dump to be included in VMSnapshot</li>
+  <li>[PR #7926][qinqon] tests: Move main clean function to global AfterEach and create a VM per each infra_test.go Entry.</li>
+  <li>[PR #7845][janeczku] Fixed a bug that caused <code class="language-plaintext highlighter-rouge">make generate</code> to fail when API code comments contain backticks. (#7844, @janeczku)</li>
+  <li>[PR #7932][marceloamaral] Addition of kubevirt_vmi_migration_phase_transition_time_from_creation_seconds metric to monitor how long it takes to transition a VMI Migration object to a specific phase from creation time.</li>
+  <li>[PR #7879][marceloamaral] Faster VM phase transitions thanks to an increased virt-controller QPS/Burst</li>
+  <li>[PR #7807][acardace] make cloud-init ‘instance-id’ persistent across reboots</li>
+  <li>[PR #7928][iholder-redhat] bugfix: node-labeller now removes “host-model-cpu.node.kubevirt.io/” and “host-model-required-features.node.kubevirt.io/” prefixes</li>
+  <li>[PR #7841][jean-edouard] Non-root VMs will now migrate to root VMs after a cluster disables non-root.</li>
+  <li>[PR #7933][akalenyu] BugFix: Fix vm restore in case of restore size bigger then PVC requested size</li>
+  <li>[PR #7919][lyarwood] Device preferences are now applied to any default network interfaces or missing volume disks added to a <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> at runtime.</li>
+  <li>[PR #7910][qinqon] tests: Create the expected readiness probe instead of liveness</li>
+  <li>[PR #7732][acardace] Prevent virt-handler from starting a migration twice</li>
+  <li>[PR #7594][alicefr] Enable to run libguestfs-tools pod to run as noroot user</li>
+  <li>[PR #7811][raspbeep] User now gets information about the type of commands which the guest agent does not support.</li>
+  <li>[PR #7590][awels] VMExport allows filesystem PVCs to be exported as either disks or directories.</li>
+  <li>[PR #7683][alicefr] Add –command and –local-ssh-opts” options to virtctl ssh to execute remote command using local ssh method</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.55.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.54.0</title><link href="https://kubevirt.io//2022/changelog-v0.54.0.html" rel="alternate" type="text/html" title="KubeVirt v0.54.0" /><published>2022-06-08T00:00:00+00:00</published><updated>2022-06-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.54.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.54.0.html"><![CDATA[<h2 id="v0540">v0.54.0</h2>
 
 <p>Released on: Wed Jun 8 14:15:43 2022 +0000</p>
 
@@ -210,39 +236,4 @@
   <li>[PR #6176][kwiesmueller] Fix goroutine leak in virt-handler, potentially causing issues with a high turnover of VMIs.</li>
   <li>[PR #6047][ShellyKa13] Add phases to the vm snapshot api, specifically a failure phase</li>
   <li>[PR #6138][ansijain] NA</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.45.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.44.0</title><link href="https://kubevirt.io//2021/changelog-v0.44.0.html" rel="alternate" type="text/html" title="KubeVirt v0.44.0" /><published>2021-08-09T00:00:00+00:00</published><updated>2021-08-09T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.44.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.44.0.html"><![CDATA[<h2 id="v0440">v0.44.0</h2>
-
-<p>Released on: Mon Aug 9 14:20:14 2021 +0000</p>
-
-<ul>
-  <li>[PR #6058][acardace] Fix virt-launcher exit pod race condition</li>
-  <li>[PR #6035][davidvossel] Addition of perfscale-audit tool for auditing performance of control plane during stress tests</li>
-  <li>[PR #6145][acardace] virt-launcher: disable unencrypted TCP socket for libvirtd.</li>
-  <li>[PR #6163][davidvossel] Handle qemu processes in defunc (zombie) state</li>
-  <li>[PR #6105][ashleyschuett] Add VirtualMachineInstancesPerNode to KubeVirt CR under Spec.Configuration</li>
-  <li>[PR #6104][zcahana] Report FailedUnschedulable VM status when scheduling errors occur</li>
-  <li>[PR #5905][davidvossel] VM CrashLoop detection and Exponential Backoff</li>
-  <li>[PR #6070][acardace] Initiate Live-Migration using a unix socket (exposed by virt-handler) instead of an additional TCP&lt;-&gt;Unix migration proxy started by virt-launcher</li>
-  <li>[PR #5728][vasiliy-ul] Live migration of VMs with hotplug volumes is now enabled</li>
-  <li>[PR #6109][rmohr] Fix virt-controller SCC: Reflect the need for NET_BIND_SERVICE in the virt-controller SCC.</li>
-  <li>[PR #5942][ShellyKa13] Integrate guest agent to online VM snapshot</li>
-  <li>[PR #6034][ashleyschuett] Go version updated to version 1.16.6</li>
-  <li>[PR #6040][yuhaohaoyu] Improved debuggability by keeping the environment of a failed VMI alive.</li>
-  <li>[PR #6068][dhiller] Add check that not all tests have been skipped</li>
-  <li>[PR #6041][xpivarc] [Experimental] Virt-launcher can run as non-root user</li>
-  <li>[PR #6062][iholder-redhat] replace dead “stress” binary with new, maintained, “stress-ng” binary</li>
-  <li>[PR #6029][mhenriks] CDI to 1.36.0 with DataSource support</li>
-  <li>[PR #4089][victortoso] Add support to USB Redirection with usbredir</li>
-  <li>[PR #5946][vatsalparekh] Add guest-agent based ping probe</li>
-  <li>[PR #6005][acardace] make containerDisk validation memory usage limit configurable</li>
-  <li>[PR #5791][zcahana] Added a READY column to the tabular output of “kubectl get vm/vmi”</li>
-  <li>[PR #6006][awels] DataVolumes created by DataVolumeTemplates will follow the associated VMs priority class.</li>
-  <li>[PR #5982][davidvossel] Reduce vmi Update collisions (http code 409) during startup</li>
-  <li>[PR #5891][akalenyu] BugFix: Pending VMIs when creating concurrent bulk of VMs backed by WFFC DVs</li>
-  <li>[PR #5925][rhrazdil] Fix issue with Windows VMs not being assigned IP address configured in network-attachment-definition IPAM.</li>
-  <li>[PR #6007][rmohr] Fix: The bandwidth limitation on migrations is no longer ignored. Caution: The default bandwidth limitation of 64Mi is changed to “unlimited” to not break existing installations.</li>
-  <li>[PR #4944][kwiesmueller] Add <code class="language-plaintext highlighter-rouge">/portforward</code> subresource to <code class="language-plaintext highlighter-rouge">VirtualMachine</code> and <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> that can tunnel TCP traffic through the API Server using a websocket stream.</li>
-  <li>[PR #5402][alicefr] Integration of libguestfs-tools and added new command <code class="language-plaintext highlighter-rouge">guestfs</code> to virtctl</li>
-  <li>[PR #5953][ashleyschuett] Allow Failed VMs to be stopped when using <code class="language-plaintext highlighter-rouge">--force --gracePeriod 0</code></li>
-  <li>[PR #5876][mlsorensen] KubeVirt CR supports specifying a runtime class for virt-launcher pods via ‘launcherRuntimeClass’.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.44.0 changes]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.45.0 changes]]></summary></entry></feed>
