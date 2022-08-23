@@ -67,14 +67,9 @@ endif
 endif
 
 ifndef DEBUG
-	@$(eval export DEBUG=@)
+	@$(eval export VERBOSE=@)
 else
-ifeq ($(shell test "$(DEBUG)" = True  -o  \
-	                 "$(DEBUG)" = true && printf "true"), true)
-	@$(eval export DEBUG=)
-else
-	@$(eval export DEBUG=@)
-endif
+	@$(eval unset VERBOSE)
 endif
 
 ifdef SELINUX_ENABLED
@@ -115,7 +110,7 @@ build: envvar
 ## Build image localhost/kubevirt-kubevirt.github.io
 build_img: | envvar
 	@echo "${GREEN}Makefile: Building Image ${RESET}"
-	${DEBUG}if [ ! -e "./Dockerfile" ]; then \
+	${VERBOSE}if [ ! -e "./Dockerfile" ]; then \
 	  IMAGE="`echo $${IMGTAG} | sed -e s#\'##g -e s#localhost\/## -e s#:latest##`";  \
 	  if [ "`curl https://raw.githubusercontent.com/kubevirt/project-infra/main/images/kubevirt-kubevirt.github.io/Dockerfile -o ./Dockerfile -w '%{http_code}\n' -s`" != "200" ]; then \
 	    echo "curl Dockerfile failed... exitting!"; \
@@ -137,14 +132,14 @@ build_img: | envvar
 ## Check external, internal links and links/selectors to userguide on website content
 check_links: | envvar stop
 	@echo -n "${GREEN}Makefile: Check external and internal links${RESET}"
-	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake links:test_external; rake links:test_internal;'
+	${VERBOSE}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake links:test_external; rake links:test_internal;'
 
 
 ## Check links/selectors to userguide on website content
 check_links_selectors: | envvar stop
 	@echo "${GREEN}Makefile: Check url selectors to user-guide${RESET}"
 #BEGIN BIG SHELL SCRIPT
-	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors' | sed -n -e '/HTML-Proofer finished successfully./,$$p' | grep -v 'HTML-Proofer finished successfully.' > links 2> /dev/null; \
+	${VERBOSE}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache ${IMGTAG} /bin/bash -c 'cd /srv; rake --trace links:userguide_selectors' | sed -n -e '/HTML-Proofer finished successfully./,$$p' | grep -v 'HTML-Proofer finished successfully.' > links 2> /dev/null; \
 	${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv:ro${SELINUX_ENABLED} --mount type=tmpfs,destination=/srv/_site --workdir=/srv ${IMGTAG} /bin/bash -c \
 	  "for i in \`cat ./links\`; do \
 			echo -n 'File: ' && echo \"\$${i}\" | cut -d',' -f 2; \
@@ -165,14 +160,14 @@ check_links_selectors: | envvar stop
 ## Check markdown linting
 check_lint: | envvar stop
 	@echo "${GREEN}Makefile: Linting Markdown files using ${LINT_IMAGE}${RESET}"
-	${DEBUG}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache --workdir=/srv ${IMGTAG} /bin/bash -c 'markdownlint -c .markdownlint.yaml -i .markdownlintignore **/*.md'
+	${VERBOSE}${CONTAINER_ENGINE} run -it --rm --name website --net=host -v ${PWD}:/srv/:ro${SELINUX_ENABLED} -v /dev/null:/srv/Gemfile.lock --mount type=tmpfs,destination=/srv/_site --mount type=tmpfs,destination=/srv/.jekyll-cache --workdir=/srv ${IMGTAG} /bin/bash -c 'markdownlint -c .markdownlint.yaml -i .markdownlintignore **/*.md'
 	@echo
 
 
 ## Check spelling on content
 check_spelling: | envvar stop
 	@echo "${GREEN}Makefile: Check spelling on site content${RESET}"
-	${DEBUG}if [ ! -e "./yaspeller.json" ]; then \
+	${VERBOSE}if [ ! -e "./yaspeller.json" ]; then \
 		echo "${WHITE}Downloading Dictionary file: https://raw.githubusercontent.com/kubevirt/project-infra/main/images/yaspeller/.yaspeller.json${RESET}"; \
 		if ! `curl -fs https://raw.githubusercontent.com/kubevirt/project-infra/main/images/yaspeller/.yaspeller.json -o yaspeller.json`; then \
 			echo "${RED}ERROR: Unable to curl yaspeller dictionary file${RESET}"; \

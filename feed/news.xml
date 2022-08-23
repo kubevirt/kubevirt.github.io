@@ -1,4 +1,467 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-07-08T16:45:58+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-08-23T17:44:11+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Simplifying KubeVirt’s `VirtualMachine` UX with Instancetypes and Preferences</title><link href="https://kubevirt.io//2022/KubeVirt-Introduction-of-instancetypes.html" rel="alternate" type="text/html" title="Simplifying KubeVirt’s `VirtualMachine` UX with Instancetypes and Preferences" /><published>2022-08-12T00:00:00+00:00</published><updated>2022-08-12T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-Introduction-of-instancetypes</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-Introduction-of-instancetypes.html"><![CDATA[<p>KubeVirt’s <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> API contains many advanced options for tuning a virtual machine’s resources and performance that go beyond what typical users need to be aware of. Users have until now been unable to simply define the storage/network they want assigned to their VM and then declare in broad terms what quality of resources and kind of performance they need for their VM. Instead, the user has to be keenly aware how to request specific compute resources alongside all of the performance tunings available on the <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> API and how those tunings impact their guest’s operating system in order to get a desired result.</p>
+
+<p>A common pattern for IaaS is to have abstractions separating the resource sizing and performance of a workload from the user-defined values related to launching their custom application. This pattern is evident across all the major cloud providers (also known as hyperscalers) as well as open source IaaS projects like OpenStack. AWS has <a href="https://aws.amazon.com/ec2/instance-types/">instance types</a>, GCP has <a href="https://cloud.google.com/compute/docs/machine-types#custom_machine_types">machine types</a>, Azure has <a href="https://docs.microsoft.com/en-us/azure/virtual-machines/sizes">instance VM sizes</a>, and OpenStack has <a href="https://docs.openstack.org/nova/latest/user/flavors.html">flavors</a>.</p>
+
+<p>Let’s take AWS for example to help visualize what this abstraction enables. Launching an EC2 instance only requires a few top level arguments; the disk image, instance type, keypair, security group, and subnet:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>aws ec2 run-instances <span class="nt">--image-id</span> ami-xxxxxxxx <span class="se">\</span>
+                        <span class="nt">--count</span> 1 <span class="se">\</span>
+                        <span class="nt">--instance-type</span> c4.xlarge <span class="se">\</span>
+                        <span class="nt">--key-name</span> MyKeyPair <span class="se">\</span>
+                        <span class="nt">--security-group-ids</span> sg-903004f8 <span class="se">\</span>
+                        <span class="nt">--subnet-id</span> subnet-6e7f829e
+</code></pre></div></div>
+
+<p>When creating the EC2 instance the user doesn’t define the amount of resources, what processor to use, how to optimize the performance of the instance, or what hardware to schedule the instance on. Instead, all of that information is wrapped up in that single <code class="language-plaintext highlighter-rouge">--instance-type c4.xlarge</code> CLI argument. <code class="language-plaintext highlighter-rouge">c4</code> denotes a specific performance profile version, in this case from the <code class="language-plaintext highlighter-rouge">Compute Optimized</code> family and <code class="language-plaintext highlighter-rouge">xlarge</code> denotes a specific amount of compute resources provided by the instance type, in this case 4 vCPUs, 7.5 GiB of RAM, 750 Mbps EBS bandwidth, etc.</p>
+
+<p>While hyperscalers can provide predefined types with performance profiles and compute resources already assigned IaaS and virtualization projects such as OpenStack and KubeVirt can only provide the raw abstractions for operators, admins, and even vendors to then create instances of these abstractions specific to each deployment.</p>
+
+<h2 id="instancetype-api">Instancetype API</h2>
+
+<p>The recently renamed instancetype API and associated <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a> aim to address this by providing KubeVirt users with a set of APIs and abstractions that allow them to make fewer choices when creating a <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> while still ending up with a working, performant guest at runtime.</p>
+
+<h2 id="virtualmachineinstancetype">VirtualMachineInstancetype</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstancetype</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-instancetype</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">cpu</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">memory</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="s">128Mi</span>
+</code></pre></div></div>
+
+<p>KubeVirt now provides two instancetype based <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a>, a cluster wide <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineclusterinstancetype"><code class="language-plaintext highlighter-rouge">VirtualMachineClusterInstancetype</code></a> and a namespaced <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineinstancetype"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancetype</code></a>. These <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a> encapsulate the following resource related characteristics of a <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> through a shared <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineinstancetypespec"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancetypeSpec</code></a>:</p>
+
+<ul>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_cpuinstancetype">CPU</a> : Required number of vCPUs presented to the guest</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_memoryinstancetype">Memory</a> : Required amount of memory presented to the guest</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1_gpu">GPUs</a> : Optional list of vGPUs to passthrough</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1_hostdevice">HostDevices</a>: Optional list of HostDevices to passthrough</li>
+  <li><a href="`string`">IOThreadsPolicy</a> : Optional IOThreadsPolicy to be used</li>
+  <li><a href="http://kubevirt.io/api-reference/main/definitions.html#_v1_launchsecurity">LaunchSecurity</a>: Optional LaunchSecurity to be used</li>
+</ul>
+
+<p>Anything provided within an instancetype cannot be overridden within a <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a>. For example, <code class="language-plaintext highlighter-rouge">CPU</code> and <code class="language-plaintext highlighter-rouge">Memory</code> are both required attributes of an instancetype. If a user makes any requests for <code class="language-plaintext highlighter-rouge">CPU</code> or <code class="language-plaintext highlighter-rouge">Memory</code> resources within their <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a>, the instancetype will conflict and the request will be rejected.</p>
+
+<h2 id="virtualmachinepreference">VirtualMachinePreference</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachinePreference</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-preference</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">devices</span><span class="pi">:</span>
+    <span class="na">preferredDiskBus</span><span class="pi">:</span> <span class="s">virtio</span>
+    <span class="na">preferredInterfaceModel</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+
+<p>KubeVirt also provides two further preference based <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a>, again a cluster-wide <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineclusterpreference"><code class="language-plaintext highlighter-rouge">VirtualMachineClusterPreference</code></a> and namespaced <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachinepreference"><code class="language-plaintext highlighter-rouge">VirtualMachinePreference</code></a>. These <a href="https://kubernetes.io/docs/concepts/extend-kubernetes/api-extension/custom-resources/"><code class="language-plaintext highlighter-rouge">CRDs</code></a> encapsulate the preferred value of any remaining attributes of a <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> required to run a given workload, again this is through a shared <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachinepreferencespec"><code class="language-plaintext highlighter-rouge">VirtualMachinePreferenceSpec</code></a>.</p>
+
+<p>Unlike instancetypes, preferences only represent the preferred values and as such can be overridden by values in the <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> provided by the user.</p>
+
+<h2 id="virtualmachineinstancetypepreferencematcher">VirtualMachine{Instancetype,Preference}Matcher</h2>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">example-vm</span>
+<span class="na">spec</span><span class="pi">:</span>
+<span class="pi">[</span><span class="nv">..</span><span class="pi">]</span>
+  <span class="na">instancetype</span><span class="pi">:</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstancetype</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">example-instancetype</span>
+  <span class="na">preference</span><span class="pi">:</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachinePreference</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">example-preference</span>
+<span class="pi">[</span><span class="nv">..</span><span class="pi">]</span>
+</code></pre></div></div>
+
+<p>The previous instancetype and preference CRDs are matched to a given <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> through the use of a matcher. Each matcher consists of the following:</p>
+
+<ul>
+  <li>Name (string): Name of the resource being referenced</li>
+  <li>Kind (string):  Optional, defaults to the cluster wide CRD kinds of <code class="language-plaintext highlighter-rouge">VirtualMachineClusterInstancetype</code> or <code class="language-plaintext highlighter-rouge">VirtualMachineClusterPreference</code></li>
+  <li>RevisionName (string) : Optional, name of a <a href="https://kubernetes.io/docs/reference/kubernetes-api/workload-resources/controller-revision-v1/">ControllerRevision</a> containing a copy of the <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachineinstancetypespec"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancetypeSpec</code></a> or <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachinepreferencespec"><code class="language-plaintext highlighter-rouge">VirtualMachinePreferenceSpec</code></a> taken when the <a href="http://kubevirt.io/api-reference/main/definitions.html#_v1alpha1_virtualmachine"><code class="language-plaintext highlighter-rouge">VirtualMachine</code></a> is first started.</li>
+</ul>
+
+<h2 id="virtualmachineinstancepreset-deprecation">VirtualMachineInstancePreset Deprecation</h2>
+
+<p>The new instancetype API and CRDs conflict somewhat with the existing <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachineinstancepreset"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancePreset</code></a> CRD. The approach taken by the CRD has also been removed in core k8s so, as advertised on the <a href="https://groups.google.com/g/kubevirt-dev/c/eM7JaDV_EU8">mailing list</a>, I have started the <a href="https://github.com/kubevirt/kubevirt/pull/8069">process of deprecating</a> <a href="https://kubevirt.io/api-reference/main/definitions.html#_v1_virtualmachineinstancepreset"><code class="language-plaintext highlighter-rouge">VirtualMachineInstancePreset</code></a> in favor of the Instancetype CRDs listed above.</p>
+
+<h2 id="examples">Examples</h2>
+
+<p>The following example is taken from the <a href="https://kubevirt.io/user-guide/virtual_machines/instancetypes/">KubeVirt User Guide</a>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">$ cat &lt;&lt; EOF | kubectl apply -f -</span> 
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstancetype</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">cmedium</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">cpu</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">memory</span><span class="pi">:</span>
+    <span class="na">guest</span><span class="pi">:</span> <span class="s">1Gi</span>
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">instancetype.kubevirt.io/v1alpha1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachinePreference</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">devices</span><span class="pi">:</span>
+    <span class="na">preferredDiskBus</span><span class="pi">:</span> <span class="s">virtio</span>
+    <span class="na">preferredInterfaceModel</span><span class="pi">:</span> <span class="s">virtio</span>
+    <span class="na">preferredRng</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">features</span><span class="pi">:</span>
+    <span class="na">preferredAcpi</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">preferredSmm</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">firmware</span><span class="pi">:</span>
+    <span class="na">preferredUseEfi</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">preferredUseSecureBoot</span><span class="pi">:</span> <span class="no">true</span>    
+<span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">instancetype</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">cmedium</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">virtualMachineInstancetype</span>
+  <span class="na">preference</span><span class="pi">:</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">fedora</span>
+    <span class="na">kind</span><span class="pi">:</span> <span class="s">virtualMachinePreference</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">metadata</span><span class="pi">:</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/containerdisks/fedora:latest</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+            <span class="s">#cloud-config</span>
+            <span class="s">users:</span>
+              <span class="s">- name: admin</span>
+                <span class="s">sudo: ALL=(ALL) NOPASSWD:ALL</span>
+                <span class="s">ssh_authorized_keys:</span>
+                  <span class="s">- ssh-rsa AAAA...</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinit</span>
+<span class="s">EOF</span>
+</code></pre></div></div>
+
+<p>We can compare the original <code class="language-plaintext highlighter-rouge">VirtualMachine</code> spec with that of the running <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> to confirm our instancetype and preferences have been applied using the following <code class="language-plaintext highlighter-rouge">diff</code> command:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>diff <span class="nt">--color</span> <span class="nt">-u</span> &lt;<span class="o">(</span> kubectl get vms/fedora <span class="nt">-o</span> json | jq .spec.template.spec<span class="o">)</span> &lt;<span class="o">(</span> kubectl get vmis/fedora <span class="nt">-o</span> json | jq .spec<span class="o">)</span>
+<span class="o">[</span>..]
+ <span class="o">{</span>
+   <span class="s2">"domain"</span>: <span class="o">{</span>
+-    <span class="s2">"devices"</span>: <span class="o">{}</span>,
++    <span class="s2">"cpu"</span>: <span class="o">{</span>
++      <span class="s2">"cores"</span>: 1,
++      <span class="s2">"model"</span>: <span class="s2">"host-model"</span>,
++      <span class="s2">"sockets"</span>: 1,
++      <span class="s2">"threads"</span>: 1
++    <span class="o">}</span>,
++    <span class="s2">"devices"</span>: <span class="o">{</span>
++      <span class="s2">"disks"</span>: <span class="o">[</span>
++        <span class="o">{</span>
++          <span class="s2">"disk"</span>: <span class="o">{</span>
++            <span class="s2">"bus"</span>: <span class="s2">"virtio"</span>
++          <span class="o">}</span>,
++          <span class="s2">"name"</span>: <span class="s2">"containerdisk"</span>
++        <span class="o">}</span>,
++        <span class="o">{</span>
++          <span class="s2">"disk"</span>: <span class="o">{</span>
++            <span class="s2">"bus"</span>: <span class="s2">"virtio"</span>
++          <span class="o">}</span>,
++          <span class="s2">"name"</span>: <span class="s2">"cloudinit"</span>
++        <span class="o">}</span>
++      <span class="o">]</span>,
++      <span class="s2">"interfaces"</span>: <span class="o">[</span>
++        <span class="o">{</span>
++          <span class="s2">"bridge"</span>: <span class="o">{}</span>,
++          <span class="s2">"model"</span>: <span class="s2">"virtio"</span>,
++          <span class="s2">"name"</span>: <span class="s2">"default"</span>
++        <span class="o">}</span>
++      <span class="o">]</span>,
++      <span class="s2">"rng"</span>: <span class="o">{}</span>
++    <span class="o">}</span>,
++    <span class="s2">"features"</span>: <span class="o">{</span>
++      <span class="s2">"acpi"</span>: <span class="o">{</span>
++        <span class="s2">"enabled"</span>: <span class="nb">true</span>
++      <span class="o">}</span>,
++      <span class="s2">"smm"</span>: <span class="o">{</span>
++        <span class="s2">"enabled"</span>: <span class="nb">true</span>
++      <span class="o">}</span>
++    <span class="o">}</span>,
++    <span class="s2">"firmware"</span>: <span class="o">{</span>
++      <span class="s2">"bootloader"</span>: <span class="o">{</span>
++        <span class="s2">"efi"</span>: <span class="o">{</span>
++          <span class="s2">"secureBoot"</span>: <span class="nb">true</span>
++        <span class="o">}</span>
++      <span class="o">}</span>,
++      <span class="s2">"uuid"</span>: <span class="s2">"98f07cdd-96da-5880-b6c7-1a5700b73dc4"</span>
++    <span class="o">}</span>,
+     <span class="s2">"machine"</span>: <span class="o">{</span>
+       <span class="s2">"type"</span>: <span class="s2">"q35"</span>
+     <span class="o">}</span>,
+-    <span class="s2">"resources"</span>: <span class="o">{}</span>
++    <span class="s2">"memory"</span>: <span class="o">{</span>
++      <span class="s2">"guest"</span>: <span class="s2">"1Gi"</span>
++    <span class="o">}</span>,
++    <span class="s2">"resources"</span>: <span class="o">{</span>
++      <span class="s2">"requests"</span>: <span class="o">{</span>
++        <span class="s2">"memory"</span>: <span class="s2">"1Gi"</span>
++      <span class="o">}</span>
++    <span class="o">}</span>
+   <span class="o">}</span>,
++  <span class="s2">"networks"</span>: <span class="o">[</span>
++    <span class="o">{</span>
++      <span class="s2">"name"</span>: <span class="s2">"default"</span>,
++      <span class="s2">"pod"</span>: <span class="o">{}</span>
++    <span class="o">}</span>
++  <span class="o">]</span>,
+   <span class="s2">"volumes"</span>: <span class="o">[</span>
+     <span class="o">{</span>
+       <span class="s2">"containerDisk"</span>: <span class="o">{</span>
+-        <span class="s2">"image"</span>: <span class="s2">"quay.io/containerdisks/fedora:latest"</span>
++        <span class="s2">"image"</span>: <span class="s2">"quay.io/containerdisks/fedora:latest"</span>,
++        <span class="s2">"imagePullPolicy"</span>: <span class="s2">"Always"</span>
+       <span class="o">}</span>,
+       <span class="s2">"name"</span>: <span class="s2">"containerdisk"</span>
+     <span class="o">}</span>,
+</code></pre></div></div>
+
+<h2 id="future-work">Future work</h2>
+
+<p>There’s still plenty of work required before the API and CRDs can move from their current <code class="language-plaintext highlighter-rouge">alpha</code> version to <code class="language-plaintext highlighter-rouge">beta</code>. We have a specific <a href="https://github.com/kubevirt/kubevirt/issues/8235"><code class="language-plaintext highlighter-rouge">kubevirt/kubevirt</code> issue tracking our progress to <code class="language-plaintext highlighter-rouge">beta</code></a>. As set out there and in the <a href="https://github.com/kubevirt/community/blob/main/docs/api-graduation-guidelines.md">KubeVirt community API Graduation Phase Expecations</a>, part of this work is to seek feedback from the wider community so please do feel free to chime in there with any and all feedback on the API and CRDs.</p>
+
+<p>You can also track our work on this API through the <a href="https://github.com/kubevirt/kubevirt/labels/area%2Finstancetype"><code class="language-plaintext highlighter-rouge">area/instancetype</code> tag</a> or my <a href="https://blog.yarwood.me.uk/tags/instancetypes/">personal blog</a> where I will be posting <a href="https://blog.yarwood.me.uk/2022/07/21/kubevirt_instancetype_update_2/">regular updates</a> and <a href="https://blog.yarwood.me.uk/2022/08/03/kubevirt_instancetype_demo_2/">demos</a> for instancetypes.</p>]]></content><author><name>Lee Yarwood</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="instancetypes" /><category term="preferences" /><category term="VirtualMachine" /><category term="VirtualMachineInstancetype" /><category term="VirtualMachinePreference" /><summary type="html"><![CDATA[An introduction to Instancetypes and preferences in KubeVirt]]></summary></entry><entry><title type="html">KubeVirt: installing Microsoft Windows 11 from an ISO</title><link href="https://kubevirt.io//2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html" rel="alternate" type="text/html" title="KubeVirt: installing Microsoft Windows 11 from an ISO" /><published>2022-08-02T00:00:00+00:00</published><updated>2022-08-02T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-installing_Microsoft_Windows_11_from_an_iso.html"><![CDATA[<p>This blog post describes a simple way to deploy a Windows 11 VM with KubeVirt, using an installation ISO as a starting point.<br />
+Although only tested with Windows 11, the steps described here should also work to deploy other recent versions of Windows.</p>
+
+<h2 id="pre-requisites">Pre-requisites</h2>
+
+<ul>
+  <li>You’ll need a Kubernetes cluster with worker node(s) that have at least 6GB of available memory</li>
+  <li><a href="https://kubevirt.io/user-guide">KubeVirt</a> and <a href="https://github.com/kubevirt/containerized-data-importer/blob/main/README.md">CDI</a> both deployed on the cluster</li>
+  <li>A storage backend, such as <a href="https://ceph.com/">Rook Ceph</a></li>
+  <li>A Windows iso. One can be found at <a href="https://www.microsoft.com/software-download/windows11">https://www.microsoft.com/software-download/windows11</a></li>
+</ul>
+
+<p>A suitable test cluster can easily be deployed thanks to KubeVirtCI by running the following commands from the <a href="https://github.com/kubevirt/kubevirt">KubeVirt source repository</a>:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_MEMORY_SIZE</span><span class="o">=</span>8192M
+<span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_STORAGE</span><span class="o">=</span>rook-ceph-default
+<span class="nv">$ </span>make cluster-up <span class="o">&amp;&amp;</span> make cluster-sync
+</code></pre></div></div>
+
+<h2 id="preparation">Preparation</h2>
+
+<p>Before the virtual machine can be created, we need to setup storage volumes for the ISO and the drive, and write the appropriate VM(I) yaml.</p>
+
+<ol>
+  <li>
+    <p>Uploading the ISO to a PVC</p>
+
+    <p>KubeVirt provides a simple tool that is able to do that for us: <code class="language-plaintext highlighter-rouge">virtctl</code>.<br />
+Here’s the command to upload the ISO, just replace <code class="language-plaintext highlighter-rouge">/storage/win11.iso</code> with the path to your Windows 11 ISO:
+<code class="language-plaintext highlighter-rouge">virtctl image-upload pvc win11cd-pvc --size 6Gi --image-path=/storage/win11.iso --insecure</code></p>
+  </li>
+  <li>
+    <p>Creating a persistent volume to use as the Windows drive</p>
+
+    <p>This will depend on the storage configuration of your cluster.
+The following yaml, to apply to the cluster using <code class="language-plaintext highlighter-rouge">kubectl create</code>, should work just fine on a KubeVirtCI cluster:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolume</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">task-pv-volume</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">type</span><span class="pi">:</span> <span class="s">local</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+  <span class="na">capacity</span><span class="pi">:</span>
+    <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">hostPath</span><span class="pi">:</span>
+    <span class="na">path</span><span class="pi">:</span> <span class="s2">"</span><span class="s">/tmp/hostImages/win11"</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>Microsoft actually <a href="https://docs.microsoft.com/en-us/windows/whats-new/windows-11-requirements">recommends</a> at least 64GB of storage.
+But, unlike some other requirements, the installer will accept smaller disks.
+This is convenient when testing with KubeVirtCI, as nodes only have about 20GB of free space.
+However, please bear in mind that such a small drive should only be used for testing purposes, and might lead to instabilities.</p>
+
+
+</div></div>
+<ol>
+  <li>
+    <p>Creating a persistent volume claim (PVC) for the drive</p>
+
+    <p>Once again, your milage may vary, but the following PVC yaml works fine on KubeVirtCI:</p>
+
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">PersistentVolumeClaim</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">disk-windows</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">accessModes</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="s">ReadWriteOnce</span>
+  <span class="na">resources</span><span class="pi">:</span>
+    <span class="na">requests</span><span class="pi">:</span>
+      <span class="na">storage</span><span class="pi">:</span> <span class="s">15Gi</span>
+  <span class="na">storageClassName</span><span class="pi">:</span> <span class="s">hostpath</span>
+</code></pre></div>    </div>
+
+    <p>The name of PVC, <code class="language-plaintext highlighter-rouge">disk-windows</code> here, will be used in the yaml of the VM(I) as the main volume.</p>
+  </li>
+  <li>
+    <p>Creating the VM(I) yaml file</p>
+
+    <p>KubeVirt already includes an example <a href="https://github.com/kubevirt/kubevirt/blob/main/examples/vmi-windows.yaml">Windows VMI yaml file</a>, which we’ll use as a starting point here for convenience.<br />
+Using a VMI yaml is more than enough for testing purposes, however for more serious applications you might want to consider changing it into a VM.</p>
+
+    <p>First, in the yaml above, bump the memory up to 4Gi, which is a hard requirement of Windows 11. (Windows 10 is happy with 2Gi).</p>
+
+    <p>Then, let’s add the ISO created above.
+Add is as a cdrom in the disks section:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+</code></pre></div>    </div>
+    <p>And the corresponding volume at the bottom:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">win11cd-pvc</span>
+</code></pre></div>    </div>
+    <p>Note that the names should match, and that the <code class="language-plaintext highlighter-rouge">claimName</code> is what we used in the <code class="language-plaintext highlighter-rouge">virtctl</code> command above.</p>
+
+    <p>Here is what the VMI looks like after those changes:</p>
+    <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachineInstance</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="na">special</span><span class="pi">:</span> <span class="s">vmi-windows</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vmi-windows</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">domain</span><span class="pi">:</span>
+    <span class="na">clock</span><span class="pi">:</span>
+      <span class="na">timer</span><span class="pi">:</span>
+        <span class="na">hpet</span><span class="pi">:</span>
+          <span class="na">present</span><span class="pi">:</span> <span class="no">false</span>
+        <span class="na">hyperv</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">pit</span><span class="pi">:</span>
+          <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">delay</span>
+        <span class="na">rtc</span><span class="pi">:</span>
+          <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">catchup</span>
+      <span class="na">utc</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">cpu</span><span class="pi">:</span>
+      <span class="na">cores</span><span class="pi">:</span> <span class="m">2</span>
+    <span class="na">devices</span><span class="pi">:</span>
+      <span class="na">disks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">pvcdisk</span>
+      <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+          <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+      <span class="na">interfaces</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">masquerade</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">model</span><span class="pi">:</span> <span class="s">e1000</span>
+        <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+      <span class="na">tpm</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">features</span><span class="pi">:</span>
+      <span class="na">acpi</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">apic</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">hyperv</span><span class="pi">:</span>
+        <span class="na">relaxed</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">spinlocks</span><span class="pi">:</span>
+          <span class="na">spinlocks</span><span class="pi">:</span> <span class="m">8191</span>
+        <span class="na">vapic</span><span class="pi">:</span> <span class="pi">{}</span>
+      <span class="na">smm</span><span class="pi">:</span> <span class="pi">{}</span>
+    <span class="na">firmware</span><span class="pi">:</span>
+      <span class="na">bootloader</span><span class="pi">:</span>
+        <span class="na">efi</span><span class="pi">:</span>
+          <span class="na">secureBoot</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">uuid</span><span class="pi">:</span> <span class="s">5d307ca9-b3ef-428c-8861-06e72d69f223</span>
+    <span class="na">resources</span><span class="pi">:</span>
+      <span class="na">requests</span><span class="pi">:</span>
+        <span class="na">memory</span><span class="pi">:</span> <span class="s">4Gi</span>
+  <span class="na">networks</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
+    <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
+  <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+  <span class="na">volumes</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">pvcdisk</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">disk-windows</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winiso</span>
+    <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
+      <span class="na">claimName</span><span class="pi">:</span> <span class="s">win11cd-pvc</span>
+</code></pre></div>    </div>
+  </li>
+</ol>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>When customizing this VMI definition or creating your own, please keep in mind that the TPM device and the UEFI firmware with SecureBoot are both hard requirements of Windows 11.
+Not having them will cause the Windows 11 installation to fail early. Please also note that the SMM CPU feature is required for UEFI + SecureBoot.
+However, they can all be omitted in the case of a Windows 10 VM(I).
+Finally, we do not currently support TPM persistence, so any secret stored in the emulated TPM will be lost next time you boot the VMI.
+For example, do not enable BitLocker, as it will fail to find the encryption key next boot and you will have to manually enter the (55 characters!) recovery key each boot.</p>
+
+
+</div></div>
+<h2 id="windows-installation">Windows installation</h2>
+
+<p>You should now be able to create the VMI and start the Windows installation process.<br />
+Just use kubectl to start the VMI created above: <code class="language-plaintext highlighter-rouge">kubectl create -f vmi-windows.yaml</code>.<br />
+Shortly after, open a VNC session to it using <code class="language-plaintext highlighter-rouge">virtctl vnc vmi-windows</code> (keep trying until the VMI is running and the VNC session pops up).<br />
+You should now see the boot screen, and shortly after a prompt to “Press any key to boot from CD or DVD…”. You have a few seconds to do so or the VM will fail to boot.
+Then just follow the steps to install Windows.</p>
+
+<h2 id="virtio-drivers-installation-optional">VirtIO drivers installation (optional)</h2>
+
+<p>Once Windows is installed, it’s a good ideas to install the <a href="http://www.linux-kvm.org/page/Virtio">VirtIO</a> drivers inside the VM, as they can drastically improve performance.
+The latest version can be downloaded <a href="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/">here</a>.
+<code class="language-plaintext highlighter-rouge">virtio-win-gt-x64.msi</code> is the simplest package to install, as you just have to run it as Administrator.</p>
+
+<p>Alternatively, KubeVirt has a containerdisk image that can be mounted inside the VM.<br />
+To use it, just add a simple cdrom disk to the VMI, like:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
+    <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+<p>and the volume:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
+      <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
+    <span class="na">name</span><span class="pi">:</span> <span class="s">virtio</span>
+</code></pre></div></div>
+<p>When using KubeVirtCI, a local copy of the image is also available at <code class="language-plaintext highlighter-rouge">registry:5000/kubevirt/virtio-container-disk:devel</code>.</p>
+
+<h2 id="further-performance-improvements">Further performance improvements</h2>
+
+<p>Windows is quite resource-hungry, and you might find that the VM created above is too slow, even with the VirtIO drivers installed.<br />
+Here are a few steps you can take to improve things:</p>
+<ul>
+  <li>Increasing the RAM is always a good idea, if you have enough available of course.</li>
+  <li>Increasing the number of CPUs, and/or using CPUManager to assign dedicated CPU to the VM should also help a lot.</li>
+  <li>Once the VirtIO drivers are installed, the main drive can also be switched from <code class="language-plaintext highlighter-rouge">sata</code> to <code class="language-plaintext highlighter-rouge">virtio</code>, and the attached CDROMs can be removed.</li>
+</ul>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html"><![CDATA[This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt]]></summary></entry><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
 
 <p>The KubeVirt community presented two sessions, both on Wednesday May 18th:</p>
 <ol>
@@ -1162,1083 +1625,4 @@ VirtualMachine             testvm     myvms         <span class="nb">false</span
 
 <p><a href="https://kubevirt.io/2018/KubeVirt-API-Access-Control.html">KubeVirt API Access Control</a></p>
 
-<p><a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="go" /><category term="api" /><category term="authentication" /><summary type="html"><![CDATA[This blog post discusses authentication methods that can be used with the KubeVirt client-go library.]]></summary></entry><entry><title type="html">Using Intel vGPUs with Kubevirt</title><link href="https://kubevirt.io//2021/intel-vgpu-kubevirt.html" rel="alternate" type="text/html" title="Using Intel vGPUs with Kubevirt" /><published>2021-04-30T00:00:00+00:00</published><updated>2021-04-30T00:00:00+00:00</updated><id>https://kubevirt.io//2021/intel-vgpu-kubevirt</id><content type="html" xml:base="https://kubevirt.io//2021/intel-vgpu-kubevirt.html"><![CDATA[<!-- TOC depthFrom:2 insertAnchor:false orderedList:false updateOnSave:true withLinks:true -->
-<ul>
-  <li><a href="#introduction">Introduction</a></li>
-  <li><a href="#prerequisites">Prerequisites</a>
-    <ul>
-      <li><a href="#fedora-workstation-prep">Fedora Workstation Prep</a></li>
-      <li><a href="#preparing-the-intel-vgpu-driver">Preparing the Intel vGPU driver</a></li>
-    </ul>
-  </li>
-  <li><a href="#install-kubernetes-with-minikube">Install Kubernetes with minikube</a></li>
-  <li><a href="#install-kubevirt">Install kubevirt</a>
-    <ul>
-      <li><a href="#validate-vgpu-detection">Validate vGPU detection</a></li>
-      <li><a href="#install-containerize-data-importer">Install Containerize Data Importer</a></li>
-    </ul>
-  </li>
-  <li><a href="#install-windows">Install Windows</a></li>
-  <li><a href="#accessing-the-windows-vm">Accessing the Windows VM</a></li>
-  <li><a href="#using-the-gpu">Using the GPU</a>
-<!-- /TOC --></li>
-</ul>
-
-<h2 id="introduction">Introduction</h2>
-
-<p>Graphical User Interfaces (GUIs) have come along way over the past few years and most modern desktop environments expect some form of GPU acceleration in order to give you a seamless user experience. If you have tried running things like Windows 10 within Kubevirt you may have noticed that the desktop experience felt a little slow. This is due to Windows 10 reliance on GPU acceleration. In addition many applications are also now taking advantage of GPU acceleration and it can even be used in web based applications such as “FishGL”:
-<br /></p>
-
-<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
-  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
-    <a href="/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-nogpu.png" itemprop="contentUrl" data-size="800x530">
-      <img src="/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-nogpu.png" itemprop="thumbnail" width="100%" alt="FishGL" />
-    </a>
-    <figcaption itemprop="caption description"></figcaption>
-  </figure>
-</div>
-
-<p>Without GPU hardware acceleration the user experience of a Virtual machine can be greatly impacted.</p>
-
-<p>Starting with 5th generation Intel Core processors that have embedded Intel graphics processing units it is possible to share the graphics processor between multiple virtual machines. In Linux, this sharing of a GPU is typically enabled through the use of mediated GPU devices, also known as vGPUs. Kubevirt has supported the use of GPUs including GPU passthrough and vGPU since v0.22.0 back in 2019. This support was centered around one specific vendor, and only worked with expensive enterprise class cards and required additional licensing. Starting with <a href="https://github.com/kubevirt/kubevirt/releases/tag/v0.40.0">Kubevirt 0.40</a> support for detecting and allocating the Intel based vGPUs has been added to Kubevirt. Support for the creation of these virtualized Intel GPUs is available in the Linux Kernel since the 4.19 release. What does this meaning for you? You no longer need additional drivers or licenses to test out GPU accelerated virtual machines.</p>
-
-<p>The total number of Intel vGPUs you can create is dependent on your specific hardware as well as support for changing the Graphics aperture size and shared graphics memory within your BIOS. For more details on this see <a href="https://github.com/intel/gvt-linux/wiki/GVTg_Setup_Guide#53-create-vgpu-kvmgt-only">Create vGPU (KVMGT only)</a> in the Intel GVTg wiki. Minimally configured devices can typically make at least two vGPU devices.</p>
-
-<p>You can reproduce this work on any Kubernetes cluster running kubevirt v0.40.0 or later, but the steps you need to take to load the kernel modules and enable the virtual devices will vary based on the underlying OS your Kubernetes cluster is running on. In order to demonstrate how you can enable this feature, we will use an all-in-one Kubernetes cluster built using Fedora 32 and minikube.</p>
-
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>This blog post is a more advanced topic and assumes some Linux and Kubernetes understanding.</p>
-
-
-</div></div>
-<h2 id="prerequisites">Prerequisites</h2>
-
-<p>Before we begin you will need a few things to make use of the Intel GPU:</p>
-
-<ul>
-  <li>A workstation or server with a 5th Generation or higher Intel Core Processor, or E3_v4 or higher Xeon Processor and enough memory to virtualize one or more VMs</li>
-  <li>A preinstalled Fedora 32 Workstation with at least 50Gb of free space in the “/” filesystem</li>
-  <li>The following software:
-    <ul>
-      <li>minikube - See <a href="https://minikube.sigs.k8s.io/docs/start/">minikube start</a></li>
-      <li>virtctl - See <a href="https://github.com/kubevirt/kubevirt/releases">kubevirt releases</a></li>
-      <li>kubectl - See <a href="https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/">Install and Set Up kubectl on Linux</a></li>
-    </ul>
-  </li>
-  <li>A Windows 10 Install ISO Image - See <a href="https://www.microsoft.com/en-us/software-download/windows10">Download Windows 10 Disk Image</a></li>
-</ul>
-
-<h3 id="fedora-workstation-prep">Fedora Workstation Prep</h3>
-
-<p>In order to use minikube on Fedora 32 we will be installing multiple applications that will be used throughout this demo. In addition we will be configuring the workstation to use cgroups v1 and we will be updating the firewall to allow proper communication to our Kubernetes cluster as well as any hosted applications. Finally we will be disabling SELinux per the minikube bare-metal install instructions:</p>
-
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>This post assumes that we are starting with a fresh install of Fedora 32. If you are using an existing configured Fedora 32 Workstation, you may have some software conflicts.</p>
-
-
-</div></div>
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf update <span class="nt">-y</span>
-<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> pciutils podman podman-docker conntrack tigervnc rdesktop
-<span class="nb">sudo </span>grubby <span class="nt">--update-kernel</span><span class="o">=</span>ALL <span class="nt">--args</span><span class="o">=</span><span class="s2">"systemd.unified_cgroup_hierarchy=0"</span>
-<span class="c"># Setup firewall rules to allow inbound and outbound connections from your minikube cluster</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>30000-65535/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>30000-65535/udp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>10250-10252/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>10248/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>2379-2380/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>6443/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>8443/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-port</span><span class="o">=</span>9153/tcp <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-service</span><span class="o">=</span>dns <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-interface</span><span class="o">=</span>cni-podman0 <span class="nt">--permanent</span>
-<span class="nb">sudo </span>firewall-cmd <span class="nt">--add-masquerade</span> <span class="nt">--permanent</span>
-<span class="nb">sudo </span>vi /etc/selinux/config
-<span class="c"># change the "SELINUX=enforcing" to "SELINUX=permissive"</span>
-<span class="nb">sudo </span>setenforce 0
-<span class="nb">sudo </span>systemctl <span class="nb">enable </span>sshd <span class="nt">--now</span>
-</code></pre></div></div>
-
-<p>We will now install the CRIO runtime:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>dnf module <span class="nb">enable</span> <span class="nt">-y</span> cri-o:1.18
-<span class="nb">sudo </span>dnf <span class="nb">install</span> <span class="nt">-y</span> cri-o cri-tools
-<span class="nb">sudo </span>systemctl <span class="nb">enable</span> <span class="nt">--now</span> crio
-</code></pre></div></div>
-
-<h3 id="preparing-the-intel-vgpu-driver">Preparing the Intel vGPU driver</h3>
-
-<p>In order to make use of the Intel vGPU driver, we need to make a few changes to our all-in-one host. The commands below assume you are using a Fedora based host. If you are using a different base OS, be sure to update your commands for that specific distribution.</p>
-
-<p>The following commands will do the following:</p>
-
-<ul>
-  <li>load the kvmgt module to enable support within kvm</li>
-  <li>enable gvt in the i915 module</li>
-  <li>update the Linux kernel to enable Intel IOMMU</li>
-</ul>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>sh <span class="nt">-c</span> <span class="s2">"echo kvmgt &gt; /etc/modules-load.d/gpu-kvmgt.conf"</span>
-<span class="nb">sudo </span>grubby <span class="nt">--update-kernel</span><span class="o">=</span>ALL <span class="nt">--args</span><span class="o">=</span><span class="s2">"intel_iommu=on i915.enable_gvt=1"</span>
-<span class="nb">sudo </span>shutdown <span class="nt">-r</span> now
-</code></pre></div></div>
-
-<p>After the reboot check to ensure that the proper kernel modules have been loaded:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>lsmod | <span class="nb">grep </span>kvmgt
-kvmgt                  32768  0
-mdev                   20480  2 kvmgt,vfio_mdev
-vfio                   32768  3 kvmgt,vfio_mdev,vfio_iommu_type1
-kvm                   798720  2 kvmgt,kvm_intel
-i915                 2494464  4 kvmgt
-drm                   557056  4 drm_kms_helper,kvmgt,i915
-</code></pre></div></div>
-
-<p>We will now create our vGPU devices. These virtual devices are created by echoing a GUID into a sys device created by the Intel driver. This needs to be done every time the system boots. The easiest way to do this is using a systemd service that runs on every boot. Before we create this systemd service, we need to validate the PCI ID of your Intel Graphics card. To do this we will use the <code class="language-plaintext highlighter-rouge">lspci</code> command</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo </span>lspci
-00:00.0 Host bridge: Intel Corporation Device 9b53 <span class="o">(</span>rev 03<span class="o">)</span>
-00:02.0 VGA compatible controller: Intel Corporation Device 9bc8 <span class="o">(</span>rev 03<span class="o">)</span>
-00:08.0 System peripheral: Intel Corporation Xeon E3-1200 v5/v6 / E3-1500 v5 / 6th/7th/8th Gen Core Processor Gaussian Mixture Model
-</code></pre></div></div>
-
-<p>Take note that in the above output the Intel GPU is on “00:02.0”. Now create the <code class="language-plaintext highlighter-rouge">/etc/systemd/system/gvtg-enable.service</code> but be sure to update the PCI ID as appropriate for your machine:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> ~/gvtg-enable.service <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
-[Unit]
-Description=Create Intel GVT-g vGPU
-
-[Service]
-Type=oneshot
-ExecStart=/bin/sh -c "echo '56a4c4e2-c81f-4cba-82bf-af46c30ea32d' &gt; /sys/devices/pci0000:00/0000:00:02.0/mdev_supported_types/i915-GVTg_V5_8/create"
-ExecStart=/bin/sh -c "echo '973069b7-2025-406b-b3c9-301016af3150' &gt; /sys/devices/pci0000:00/0000:00:02.0/mdev_supported_types/i915-GVTg_V5_8/create"
-ExecStop=/bin/sh -c "echo '1' &gt; /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d/remove"
-ExecStop=/bin/sh -c "echo '1' &gt; /sys/devices/pci0000:00/0000:00:02.0/973069b7-2025-406b-b3c9-301016af3150/remove"
-RemainAfterExit=yes
-
-[Install]
-WantedBy=multi-user.target
-</span><span class="no">EOF
-</span><span class="nb">sudo mv</span> ~/gvtg-enable.service /etc/systemd/system/gvtg-enable.service
-<span class="nb">sudo </span>systemctl <span class="nb">enable </span>gvtg-enable <span class="nt">--now</span>
-</code></pre></div></div>
-
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>The above systemd service will create two vGPU devices, you can repeat the commands with additional unique GUIDs up to a maximum of 8 vGPU if your particular hardware supports it.</p>
-
-
-</div></div>
-<p>We can validate that the vGPU devices were created by looking in the <code class="language-plaintext highlighter-rouge">/sys/devices/pci0000:00/0000:00:02.0/</code> directory.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">ls</span> <span class="nt">-lsa</span> /sys/devices/pci0000:00/0000:00:02.0/56a4c4e2-c81f-4cba-82bf-af46c30ea32d
-total 0
-lrwxrwxrwx. 1 root root    0 Apr 20 13:56 driver -&gt; ../../../../bus/mdev/drivers/vfio_mdev
-drwxr-xr-x. 2 root root    0 Apr 20 14:41 intel_vgpu
-lrwxrwxrwx. 1 root root    0 Apr 20 14:41 iommu_group -&gt; ../../../../kernel/iommu_groups/8
-lrwxrwxrwx. 1 root root    0 Apr 20 14:41 mdev_type -&gt; ../mdev_supported_types/i915-GVTg_V5_8
-drwxr-xr-x. 2 root root    0 Apr 20 14:41 power
-<span class="nt">--w-------</span><span class="nb">.</span> 1 root root 4096 Apr 20 14:41 remove
-lrwxrwxrwx. 1 root root    0 Apr 20 13:56 subsystem -&gt; ../../../../bus/mdev
-<span class="nt">-rw-r--r--</span><span class="nb">.</span> 1 root root 4096 Apr 20 13:56 uevent
-</code></pre></div></div>
-
-<p>Note that “mdev_type” points to “i915-GVTg_V5_8”, this will come into play later when we configure kubevirt to detect the vGPU.</p>
-
-<h2 id="install-kubernetes-with-minikube">Install Kubernetes with minikube</h2>
-
-<p>We will now install Kubernetes onto our Fedora Workstation. <a href="https://minikube.sigs.k8s.io/docs/">Minikube</a> will help quickly set up our Kubernetes cluster environment. We will start by getting the latest release of minikube and kubectl.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-LO</span> https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-<span class="nb">sudo install </span>minikube-linux-amd64 /usr/local/bin/minikube
-<span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>minikube kubectl version | <span class="nb">head</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">', '</span> <span class="o">{</span><span class="s1">'print $3'</span><span class="o">}</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="o">{</span><span class="s1">'print $2'</span><span class="o">}</span> | <span class="nb">sed </span>s/<span class="se">\"</span>//g<span class="si">)</span>
-<span class="nb">sudo install</span> <span class="k">${</span><span class="nv">HOME</span><span class="k">}</span>/.minikube/cache/linux/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/kubectl /usr/local/bin
-</code></pre></div></div>
-
-<p>We will be using the minikube driver “none” which will install Kubernetes directly onto this machine. This will allow you to maintain a copy of the virtual machines that you build through a reboot. Later in this post we will create persistent volumes for virtual machine storage in “/data”. As previously noted, ensure that you have at least 50Gb of free space in “/data” to complete this setup. The minikube install will take a few minutes to complete.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">sudo mkdir</span> <span class="nt">-p</span> /data/winhd1-pv
-<span class="nv">$ </span><span class="nb">sudo </span>minikube start <span class="nt">--driver</span><span class="o">=</span>none <span class="nt">--container-runtime</span><span class="o">=</span>crio
-😄  minikube v1.19.0 on Fedora 32
-✨  Using the none driver based on user configuration
-👍  Starting control plane node minikube <span class="k">in </span>cluster minikube
-🤹  Running on localhost <span class="o">(</span><span class="nv">CPUs</span><span class="o">=</span>12, <span class="nv">Memory</span><span class="o">=</span>31703MB, <span class="nv">Disk</span><span class="o">=</span>71645MB<span class="o">)</span> ...
-ℹ️  OS release is Fedora 32 <span class="o">(</span>Workstation Edition<span class="o">)</span>
-🐳  Preparing Kubernetes v1.20.2 on Docker 20.10.6 ...
-    ▪ Generating certificates and keys ...
-    ▪ Booting up control plane ...
-    ▪ Configuring RBAC rules ...
-🤹  Configuring <span class="nb">local </span>host environment ...
-🔎  Verifying Kubernetes components...
-    ▪ Using image gcr.io/k8s-minikube/storage-provisioner:v5
-🌟  Enabled addons: storage-provisioner, default-storageclass
-🏄  Done! kubectl is now configured to use <span class="s2">"minikube"</span> cluster and <span class="s2">"default"</span> namespace by default
-</code></pre></div></div>
-
-<p>In order to make our interaction with Kubernetes a little easier, we will need to copy some files and update our <code class="language-plaintext highlighter-rouge">.kube/config</code></p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">mkdir</span> <span class="nt">-p</span> ~/.minikube/profiles/minikube
-<span class="nb">sudo cp</span> <span class="nt">-r</span> /root/.kube /home/<span class="nv">$USER</span>
-<span class="nb">sudo cp</span> /root/.minikube/ca.crt /home/<span class="nv">$USER</span>/.minikube/ca.crt
-<span class="nb">sudo cp</span> /root/.minikube/profiles/minikube/client.crt /home/<span class="nv">$USER</span>/.minikube/profiles/minikube
-<span class="nb">sudo cp</span> /root/.minikube/profiles/minikube/client.key /home/<span class="nv">$USER</span>/.minikube/profiles/minikube
-<span class="nb">sudo chown</span> <span class="nt">-R</span> <span class="nv">$USER</span>:<span class="nv">$USER</span> /home/<span class="nv">$USER</span>/.kube
-<span class="nb">sudo chown</span> <span class="nt">-R</span> <span class="nv">$USER</span>:<span class="nv">$USER</span> /home/<span class="nv">$USER</span>/.minikube
-<span class="nb">sed</span> <span class="nt">-i</span>  <span class="s2">"s/root/home</span><span class="se">\/</span><span class="nv">$USER</span><span class="s2">/"</span> ~/.kube/config
-</code></pre></div></div>
-
-<p>Once the minikube install is complete, validate that everything is working properly.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get nodes
-NAME       STATUS   ROLES                  AGE    VERSION
-kubevirt   Ready    control-plane,master   4m5s   v1.20.2
-</code></pre></div></div>
-
-<p>As long as you don’t get any errors, your base Kubernetes cluster is ready to go.</p>
-
-<h2 id="install-kubevirt">Install kubevirt</h2>
-
-<p>Our all-in-one Kubernetes cluster is now ready for installing Installing Kubevirt. Using the minikube addons manager, we will install kubevirt into our cluster:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">sudo </span>minikube addons <span class="nb">enable </span>kubevirt
-kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kubevirt kubevirt <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available <span class="nt">--timeout</span><span class="o">=</span>300s
-</code></pre></div></div>
-
-<p>At this point, we need to update our instance of kubevirt in the cluster. We need to configure kubevirt to detect the Intel vGPU by giving it an <em>mdevNameSelector</em> to look for, and a <em>resourceName</em> to assign to it. The <em>mdevNameSelector</em> comes from the “mdev_type” that we identified earlier when we created the two virtual GPUs. When the kubevirt device manager finds instances of this mdev type, it will record this information and tag the node with the identified resourceName. We will use this resourceName later when we start up our virtual machine.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> kubevirt-patch.yaml <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
-spec:
-  configuration:
-    developerConfiguration:
-      featureGates:
-      - GPU
-    permittedHostDevices:
-      mediatedDevices:
-      - mdevNameSelector: "i915-GVTg_V5_8"
-        resourceName: "intel.com/U630"
-</span><span class="no">EOF
-</span>kubectl patch kubevirt kubevirt <span class="nt">-n</span> kubevirt <span class="nt">--patch</span> <span class="s2">"</span><span class="si">$(</span><span class="nb">cat </span>kubevirt-patch.yaml<span class="si">)</span><span class="s2">"</span> <span class="nt">--type</span><span class="o">=</span>merge
-</code></pre></div></div>
-
-<p>We now need to wait for kubevirt to reload its configuration.</p>
-
-<h3 id="validate-vgpu-detection">Validate vGPU detection</h3>
-
-<p>Now that kubevirt is installed and running, lets ensure that the vGPU was identified correctly. Describe the minikube node, using the command <code class="language-plaintext highlighter-rouge">kubectl describe node</code> and look for the “Capacity” section. If kubevirt properly detected the vGPU you will see an entry for “intel.com/U630” with a capacity value of greater than 0.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl describe node
-Name:               kubevirt
-Roles:              control-plane,master
-Labels:             beta.kubernetes.io/arch<span class="o">=</span>amd64
-                    beta.kubernetes.io/os<span class="o">=</span>linux
-...
-Capacity:
-  cpu:                            12
-  devices.kubevirt.io/kvm:        110
-  devices.kubevirt.io/tun:        110
-  devices.kubevirt.io/vhost-net:  110
-  ephemeral-storage:              71645Mi
-  hugepages-1Gi:                  0
-  hugepages-2Mi:                  0
-  intel.com/U630:                 2
-  memory:                         11822640Ki
-  pods:                           110
-</code></pre></div></div>
-
-<p>There it is, intel.com/U630 - two of them are available.  Now all we need is a virtual machine to consume them.</p>
-
-<h3 id="install-containerize-data-importer">Install Containerize Data Importer</h3>
-
-<p>In order to install Windows 10, we are going to need to upload a Windows 10 install ISO to the cluster. This can be facilitated through the use of the Containerized Data Importer. The following steps are taken from the <a href="https://kubevirt.io/labs/kubernetes/lab2.html">Experiment with the Containerized Data Importer (CDI)</a> web page:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://github.com/kubevirt/containerized-data-importer/releases/latest | <span class="nb">grep</span> <span class="nt">-o</span> <span class="s2">"v[0-9]</span><span class="se">\.</span><span class="s2">[0-9]*</span><span class="se">\.</span><span class="s2">[0-9]*"</span><span class="si">)</span>
-kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-operator.yaml
-kubectl create <span class="nt">-f</span> https://github.com/kubevirt/containerized-data-importer/releases/download/<span class="nv">$VERSION</span>/cdi-cr.yaml
-kubectl <span class="nt">-n</span> cdi <span class="nb">wait </span>cdi cdi <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available <span class="nt">--timeout</span><span class="o">=</span>300s
-</code></pre></div></div>
-
-<p>Now that our CDI is available, we will expose it for consumption using a nodePort. This will allow us to connect to the cdi-proxy in the next steps.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> cdi-nodeport.yaml <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
-apiVersion: v1
-kind: Service
-metadata:
-  name: cdi-proxy-nodeport
-  namespace: cdi
-spec:
-  type: NodePort
-  selector:
-    cdi.kubevirt.io: cdi-uploadproxy
-  ports:
-    - port: 8443
-      nodePort: 30443
-</span><span class="no">EOF
-</span>kubectl create <span class="nt">-f</span> cdi-nodeport.yaml
-</code></pre></div></div>
-
-<p>One final step, lets get the latest release of virtctl which we will be using as we install Windows.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>kubectl get kubevirt.kubevirt.io/kubevirt <span class="nt">-n</span> kubevirt <span class="nt">-o</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.status.observedKubeVirtVersion}"</span><span class="si">)</span>
-curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span><span class="nt">-linux-amd64</span>
-<span class="nb">sudo install </span>virtctl /usr/local/bin
-</code></pre></div></div>
-
-<h2 id="install-windows">Install Windows</h2>
-
-<p>At this point we can now install a Windows VM in order to test this feature. The steps below are based on <a href="https://kubevirt.io/2020/KubeVirt-installing_Microsoft_Windows_from_an_iso.html">KubeVirt: installing Microsoft Windows from an ISO</a> however we will be using Windows 10 instead of Windows Server 2012. The commands below assume that you have a Windows 10 ISO file called <code class="language-plaintext highlighter-rouge">win10-virtio.iso</code>. If you need a Windows 10 CD, please see <a href="https://www.microsoft.com/en-us/software-download/windows10">Download Windows 10 Disk Image</a> and come back here after you have obtained your install CD.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl image-upload <span class="se">\</span>
-   <span class="nt">--image-path</span><span class="o">=</span>win10-virtio.iso <span class="se">\</span>
-   <span class="nt">--pvc-name</span><span class="o">=</span>iso-win10 <span class="se">\</span>
-   <span class="nt">--access-mode</span><span class="o">=</span>ReadWriteOnce <span class="se">\</span>
-   <span class="nt">--pvc-size</span><span class="o">=</span>6G <span class="se">\</span>
-   <span class="nt">--uploadproxy-url</span><span class="o">=</span>https://127.0.0.1:30443 <span class="se">\</span>
-   <span class="nt">--insecure</span> <span class="se">\</span>
-   <span class="nt">--wait-secs</span><span class="o">=</span>240
-</code></pre></div></div>
-
-<p>We need a place to store our Windows 10 virtual disk, use the following to create a 40Gb space to store our file. In order to do this within minikube we will manually create a PersistentVolume (PV) as well as a PersistentVolumeClaim (PVC). These steps assume that you have 45+ GiB of free space in “/”.  We will create a “/data” directory as well as a subdirectory for storing our PV. If you do not have at least 45 GiB of free space in “/”, you will need to free up space, or mount storage on “/data” to continue.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> win10-pvc.yaml <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
----
-apiVersion: v1
-kind: PersistentVolume
-metadata:
-  name: pvwinhd1
-spec:
-  accessModes:
-    - ReadWriteOnce
-  capacity:
-    storage: 43Gi
-  claimRef:
-    namespace: default
-    name: winhd1
-  hostPath:
-    path: /data/winhd1-pv
----
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: winhd1
-spec:
-  accessModes:
-    - ReadWriteOnce
-  resources:
-    requests:
-      storage: 40Gi
-</span><span class="no">EOF
-</span>kubectl create <span class="nt">-f</span> win10-pvc.yaml
-</code></pre></div></div>
-
-<p>We can now create our Windows 10 virtual machine. Use the following to create a virtual machine definition file that includes a vGPU:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> win10vm1.yaml <span class="o">&lt;&lt;</span> <span class="no">EOF</span><span class="sh">
-apiVersion: kubevirt.io/v1alpha3
-kind: VirtualMachine
-metadata:
-  name: win10vm1
-spec:
-  running: false
-  template:
-    metadata:
-      creationTimestamp: null
-      labels:
-        kubevirt.io/domain: win10vm1
-    spec:
-      domain:
-        clock:
-          timer:
-            hpet:
-              present: false
-            hyperv: {}
-            pit:
-              tickPolicy: delay
-            rtc:
-              tickPolicy: catchup
-          utc: {}
-        cpu:
-          cores: 1
-          sockets: 2
-          threads: 1
-        devices:
-          gpus:
-          - deviceName: intel.com/U630
-            name: gpu1
-          disks:
-          - cdrom:
-              bus: sata
-            name: windows-guest-tools
-          - bootOrder: 1
-            cdrom:
-              bus: sata
-            name: cdrom
-          - bootOrder: 2
-            disk:
-              bus: sata
-            name: disk-1
-          inputs:
-          - bus: usb
-            name: tablet
-            type: tablet
-          interfaces:
-          - masquerade: {}
-            model: e1000e
-            name: nic-0
-        features:
-          acpi: {}
-          apic: {}
-          hyperv:
-            relaxed: {}
-            spinlocks:
-              spinlocks: 8191
-            vapic: {}
-        machine:
-          type: pc-q35-rhel8.2.0
-        resources:
-          requests:
-            memory: 8Gi
-      hostname: win10vm1
-      networks:
-      - name: nic-0
-        pod: {}
-      terminationGracePeriodSeconds: 3600
-      volumes:
-        - name: cdrom
-          persistentVolumeClaim:
-            claimName: iso-win10
-        - name: disk-1
-          persistentVolumeClaim:
-            claimName: winhd1
-        - containerDisk:
-            image: quay.io/kubevirt/virtio-container-disk
-          name: windows-guest-tools
-</span><span class="no">EOF
-</span>kubectl create <span class="nt">-f</span> win10vm1.yaml
-</code></pre></div></div>
-
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">NOTE</p><p>This VM is not optimized to use virtio devices to simplify the OS install. By using SATA devices as well as an emulated e1000 network card, we do not need to worry about loading additional drivers.</p>
-
-
-</div></div>
-<p>The key piece of information that we have added to this virtual machine definition is this snippet of yaml:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code>        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">gpus</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">deviceName</span><span class="pi">:</span> <span class="s">intel.com/U630</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">gpu1</span>
-</code></pre></div></div>
-
-<p>Here we are identifying the gpu device that we want to attach to this VM. The deviceName relates back to the name that we gave to kubevirt to identify the Intel GPU resources. It also is the same identifier that shows up in the “Capacity” section of a node when you run <code class="language-plaintext highlighter-rouge">kubectl describe node</code>.</p>
-
-<p>We can now start the virtual machine:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl start win10vm1
-kubectl get vmi <span class="nt">--watch</span>
-</code></pre></div></div>
-
-<p>When the output of shows that the vm is in a “Running” phase you can “CTRL+C” to end the watch command.</p>
-
-<h2 id="accessing-the-windows-vm">Accessing the Windows VM</h2>
-
-<p>Since we are running this VM on this local machine, we can now take advantage of the virtctl command to connect to the VNC console of the virtual machine.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl vnc win10vm1
-</code></pre></div></div>
-
-<p>A new VNC Viewer window will open and you should now see the Windows 10 install screen. Follow standard Windows 10 install steps at this point.</p>
-
-<p>Once the install is complete you have a Windows 10 VM running with a GPU available. You can test that GPU acceleration is available by opening the Windows 10 task manager, selecting Advanced and then select the “Performance” tab. Note that the first time you start up, Windows is still detecting and installing the appropriate drivers. It may take a minute or two for the GPU information to show up in the Performance tab.</p>
-
-<p>Try testing out the GPU acceleration. Open a web browser in your VM and navigate to “https://webglsamples.org/fishtank/fishtank.html” HOWEVER don’t be surprised by the poor performance. The default kubevirt console does not take advantage of the GPU. For that we need to take one final step to use the Windows Remote Desktop Protocol (RDP) which can use the GPU.</p>
-
-<h2 id="using-the-gpu">Using the GPU</h2>
-
-<p>In order to take advantage of the virtual GPU we have added, we will need to connect to the virtual machine over Remote Desktop Protocol (RDP). Follow these steps to enable RDP:</p>
-
-<ol>
-  <li>In the Windows 10 search bar, type “<strong>Remote Desktop Settings</strong>” and then open the result.</li>
-  <li>Select “<strong>Enable Remote Desktop</strong>” and confirm the change.</li>
-  <li>Select “<strong>Advanced settings</strong>” and un-check “<strong>Require computers to use Network level Authentication</strong>”, and confirm this change.</li>
-  <li>Finally reboot the Windows 10 Virtual machine.</li>
-</ol>
-
-<p>Now, run the following commands in order to expose the RDP server to outside your Kubernetes cluster:</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>virtctl expose vm win10vm1 <span class="nt">--port</span><span class="o">=</span>3389 <span class="nt">--type</span><span class="o">=</span>NodePort <span class="nt">--name</span><span class="o">=</span>win10vm1-rdp
-<span class="nv">$ </span>kubectl get svc
-NAME           TYPE        CLUSTER-IP       EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>          AGE
-kubernetes     ClusterIP   10.96.0.1        &lt;none&gt;        443/TCP          18h
-win10vm1-rdp   NodePort    10.105.159.184   &lt;none&gt;        3389:30627/TCP   39s
-</code></pre></div></div>
-
-<p>Note the port that was assigned to this service we will use it in the next step. In the above output the port is 30627.</p>
-
-<p>We can now use the rdesktop tool to connect to our VM and get the full advantages of the vGPU. From a command line run <code class="language-plaintext highlighter-rouge">rdesktop localhost:&lt;port&gt;</code> being sure to update the port based on the output from above. When prompted by rdesktop accept the certificate. Log into your Windows 10 client. You can now test out the vGPU.</p>
-
-<p>Let’s try FishGL again. Open a browser and go to <a href="https://webglsamples.org/fishtank/fishtank.html">https://webglsamples.org/fishtank/fishtank.html</a>. You should notice a large improvement in the applications performance. You can also open the Task Manager and look at the performance tab to see the GPU under load.
-<br /></p>
-
-<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
-  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
-    <a href="/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-gpu.png" itemprop="contentUrl" data-size="800x530">
-      <img src="/assets/2021-04-30-intel-vgpu-kubevirt/fishgl-gpu.png" itemprop="thumbnail" width="100%" alt="FishGL" />
-    </a>
-    <figcaption itemprop="caption description"></figcaption>
-  </figure>
-</div>
-
-<p>Note that since you are running your Fedora 32 workstation on this same GPU you are already sharing the graphics workload between your primary desktop, and the virtualized Windows Desktop also running on this machine.</p>
-
-<p>Congratulations! You now have a VM running in Kubernetes using an Intel vGPU. If your test machine has enough resources you can repeat the steps and create multiple virtual machines all sharing the one Intel GPU.</p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="vGPU" /><category term="Windows" /><category term="GPU" /><category term="Intel" /><category term="minikube" /><category term="Fedora" /><summary type="html"><![CDATA[This blog post guides users on how to improve VM graphics performance using Intel Core processors, GPU Virtualization and Kubevirt.]]></summary></entry><entry><title type="html">Automated Windows Installation With Tekton Pipelines</title><link href="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html" rel="alternate" type="text/html" title="Automated Windows Installation With Tekton Pipelines" /><published>2021-04-21T00:00:00+00:00</published><updated>2021-04-21T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines</id><content type="html" xml:base="https://kubevirt.io//2021/Automated-Windows-Installation-With-Tekton-Pipelines.html"><![CDATA[<h2 id="introduction">Introduction</h2>
-
-<p>This blog shows how we can easily automate a process of installing Windows VMs on KubeVirt with <a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a>.</p>
-
-<p>Tekton Pipelines can be used to create a single <code class="language-plaintext highlighter-rouge">Pipeline</code> that encapsulates the installation process which can be run and replicated with <code class="language-plaintext highlighter-rouge">PipelineRuns</code>.
-The pipeline will be built with <a href="https://github.com/kubevirt/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a>, which includes all the necessary tasks for this example.</p>
-
-<h2 id="pipeline-description">Pipeline Description</h2>
-
-<p>The pipeline will prepare an empty Persistent Volume Claim (PVC) and download a Windows source ISO into another PVC. Both of them will be initialized with Containerized Data Importer (CDI).
-It will then spin up an installation VM and use Windows Answer Files to automatically install the VM.
-Then the pipeline will wait for the installation to complete and will delete the installation VM while keeping the artifact PVC with the installed operating system.
-You can later use the artifact PVC as a base image and copy it for new VMs.</p>
-
-<h2 id="prerequisites">Prerequisites</h2>
-
-<ul>
-  <li>KubeVirt <code class="language-plaintext highlighter-rouge">v0.39.0</code></li>
-  <li>Tekton Pipelines <code class="language-plaintext highlighter-rouge">v0.19.0</code></li>
-  <li>KubeVirt Tekton Tasks <code class="language-plaintext highlighter-rouge">v0.3.0</code></li>
-</ul>
-
-<h2 id="running-windows-installer-pipeline">Running Windows Installer Pipeline</h2>
-
-<h2 id="obtaining-a-url-of-windows-source-iso">Obtaining a URL of Windows Source ISO</h2>
-
-<p>First we have to obtain a Download URL of Windows Source ISO.</p>
-
-<ol>
-  <li>Go to <a href="https://www.microsoft.com/en-us/software-download/windows10ISO">https://www.microsoft.com/en-us/software-download/windows10ISO</a>. You can also obtain a server edition for evaluation at <a href="https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019">https://www.microsoft.com/en-us/evalcenter/evaluate-windows-server-2019</a>.</li>
-  <li>Fill in the edition and <code class="language-plaintext highlighter-rouge">English</code> language (other languages need to be updated in windows-10-autounattend ConfigMap below) and go to the download page.</li>
-  <li>Right-click on the 64-bit download button and copy the download link. The link should be valid for 24 hours.  We will need this URL a bit later when running the pipeline.</li>
-</ol>
-
-<h2 id="preparing-autounattendxml-configmap">Preparing autounattend.xml ConfigMap</h2>
-
-<p>Now we have to prepare our autounattend.xml Answer File with the installation instructions. We will store it in a <code class="language-plaintext highlighter-rouge">ConfigMap</code>, but optionally it can be stored in a <code class="language-plaintext highlighter-rouge">Secret</code> as well.</p>
-
-<p>The configuration file can be generated with <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/windows-system-image-manager-overview-topics">Windows SIM</a>
-or it can be specified manually according to <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/wsim/answer-files-overview">Answer File Reference</a>
-and <a href="https://docs.microsoft.com/en-us/windows-hardware/customize/desktop/unattend/components-b-unattend">Answer File Components Reference</a>.</p>
-
-<p>The following config map includes the required drivers and guest disk configuration.
-It also specifies how the installation should proceed and what users should be created.
-In our case it is an <code class="language-plaintext highlighter-rouge">Administrator</code> user with <code class="language-plaintext highlighter-rouge">changepassword</code> password.
-You can also change the Answer File according to your needs by consulting the already mentioned documentation.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-autounattend</span>
-<span class="na">data</span><span class="pi">:</span>
-  <span class="na">Autounattend.xml</span><span class="pi">:</span> <span class="pi">|</span>
-    <span class="s">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
-    <span class="s">&lt;unattend xmlns="urn:schemas-microsoft-com:unattend"&gt;</span>
-        <span class="s">&lt;settings pass="windowsPE"&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-PnpCustomizationsWinPE" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" processorArchitecture="amd64" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State"&gt;</span>
-                <span class="s">&lt;DriverPaths&gt;</span>
-                    <span class="s">&lt;PathAndCredentials wcm:action="add" wcm:keyValue="1"&gt;</span>
-                        <span class="s">&lt;Path&gt;E:\viostor\w10\amd64&lt;/Path&gt;</span>
-                    <span class="s">&lt;/PathAndCredentials&gt;</span>
-                    <span class="s">&lt;PathAndCredentials wcm:action="add" wcm:keyValue="2"&gt;</span>
-                        <span class="s">&lt;Path&gt;E:\NetKVM\w10\amd64&lt;/Path&gt;</span>
-                    <span class="s">&lt;/PathAndCredentials&gt;</span>
-                    <span class="s">&lt;PathAndCredentials wcm:action="add" wcm:keyValue="3"&gt;</span>
-                        <span class="s">&lt;Path&gt;E:\viorng\w10\amd64&lt;/Path&gt;</span>
-                    <span class="s">&lt;/PathAndCredentials&gt;</span>
-                <span class="s">&lt;/DriverPaths&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;SetupUILanguage&gt;</span>
-                    <span class="s">&lt;UILanguage&gt;en-US&lt;/UILanguage&gt;</span>
-                <span class="s">&lt;/SetupUILanguage&gt;</span>
-                <span class="s">&lt;InputLocale&gt;0409:00000409&lt;/InputLocale&gt;</span>
-                <span class="s">&lt;SystemLocale&gt;en-US&lt;/SystemLocale&gt;</span>
-                <span class="s">&lt;UILanguage&gt;en-US&lt;/UILanguage&gt;</span>
-                <span class="s">&lt;UILanguageFallback&gt;en-US&lt;/UILanguageFallback&gt;</span>
-                <span class="s">&lt;UserLocale&gt;en-US&lt;/UserLocale&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;DiskConfiguration&gt;</span>
-                    <span class="s">&lt;Disk wcm:action="add"&gt;</span>
-                        <span class="s">&lt;CreatePartitions&gt;</span>
-                            <span class="s">&lt;CreatePartition wcm:action="add"&gt;</span>
-                                <span class="s">&lt;Order&gt;1&lt;/Order&gt;</span>
-                                <span class="s">&lt;Type&gt;Primary&lt;/Type&gt;</span>
-                                <span class="s">&lt;Size&gt;100&lt;/Size&gt;</span>
-                            <span class="s">&lt;/CreatePartition&gt;</span>
-                            <span class="s">&lt;CreatePartition wcm:action="add"&gt;</span>
-                                <span class="s">&lt;Extend&gt;true&lt;/Extend&gt;</span>
-                                <span class="s">&lt;Order&gt;2&lt;/Order&gt;</span>
-                                <span class="s">&lt;Type&gt;Primary&lt;/Type&gt;</span>
-                            <span class="s">&lt;/CreatePartition&gt;</span>
-                        <span class="s">&lt;/CreatePartitions&gt;</span>
-                        <span class="s">&lt;ModifyPartitions&gt;</span>
-                            <span class="s">&lt;ModifyPartition wcm:action="add"&gt;</span>
-                                <span class="s">&lt;Active&gt;true&lt;/Active&gt;</span>
-                                <span class="s">&lt;Format&gt;NTFS&lt;/Format&gt;</span>
-                                <span class="s">&lt;Label&gt;System Reserved&lt;/Label&gt;</span>
-                                <span class="s">&lt;Order&gt;1&lt;/Order&gt;</span>
-                                <span class="s">&lt;PartitionID&gt;1&lt;/PartitionID&gt;</span>
-                                <span class="s">&lt;TypeID&gt;0x27&lt;/TypeID&gt;</span>
-                            <span class="s">&lt;/ModifyPartition&gt;</span>
-                            <span class="s">&lt;ModifyPartition wcm:action="add"&gt;</span>
-                                <span class="s">&lt;Active&gt;true&lt;/Active&gt;</span>
-                                <span class="s">&lt;Format&gt;NTFS&lt;/Format&gt;</span>
-                                <span class="s">&lt;Label&gt;OS&lt;/Label&gt;</span>
-                                <span class="s">&lt;Letter&gt;C&lt;/Letter&gt;</span>
-                                <span class="s">&lt;Order&gt;2&lt;/Order&gt;</span>
-                                <span class="s">&lt;PartitionID&gt;2&lt;/PartitionID&gt;</span>
-                            <span class="s">&lt;/ModifyPartition&gt;</span>
-                        <span class="s">&lt;/ModifyPartitions&gt;</span>
-                        <span class="s">&lt;DiskID&gt;0&lt;/DiskID&gt;</span>
-                        <span class="s">&lt;WillWipeDisk&gt;true&lt;/WillWipeDisk&gt;</span>
-                    <span class="s">&lt;/Disk&gt;</span>
-                <span class="s">&lt;/DiskConfiguration&gt;</span>
-                <span class="s">&lt;ImageInstall&gt;</span>
-                    <span class="s">&lt;OSImage&gt;</span>
-                        <span class="s">&lt;InstallTo&gt;</span>
-                            <span class="s">&lt;DiskID&gt;0&lt;/DiskID&gt;</span>
-                            <span class="s">&lt;PartitionID&gt;2&lt;/PartitionID&gt;</span>
-                        <span class="s">&lt;/InstallTo&gt;</span>
-                        <span class="s">&lt;InstallToAvailablePartition&gt;false&lt;/InstallToAvailablePartition&gt;</span>
-                    <span class="s">&lt;/OSImage&gt;</span>
-                <span class="s">&lt;/ImageInstall&gt;</span>
-                <span class="s">&lt;UserData&gt;</span>
-                    <span class="s">&lt;AcceptEula&gt;true&lt;/AcceptEula&gt;</span>
-                    <span class="s">&lt;FullName&gt;Administrator&lt;/FullName&gt;</span>
-                    <span class="s">&lt;Organization&gt;&lt;/Organization&gt;</span>
-                    <span class="s">&lt;ProductKey&gt;</span>
-                        <span class="s">&lt;Key&gt;W269N-WFGWX-YVC9B-4J6C9-T83GX&lt;/Key&gt;</span>
-                    <span class="s">&lt;/ProductKey&gt;</span>
-                <span class="s">&lt;/UserData&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-        <span class="s">&lt;/settings&gt;</span>
-        <span class="s">&lt;settings pass="offlineServicing"&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-LUA-Settings" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;EnableLUA&gt;false&lt;/EnableLUA&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-        <span class="s">&lt;/settings&gt;</span>
-        <span class="s">&lt;settings pass="generalize"&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-Security-SPP" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;SkipRearm&gt;1&lt;/SkipRearm&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-        <span class="s">&lt;/settings&gt;</span>
-        <span class="s">&lt;settings pass="specialize"&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-International-Core" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;InputLocale&gt;0409:00000409&lt;/InputLocale&gt;</span>
-                <span class="s">&lt;SystemLocale&gt;en-US&lt;/SystemLocale&gt;</span>
-                <span class="s">&lt;UILanguage&gt;en-US&lt;/UILanguage&gt;</span>
-                <span class="s">&lt;UILanguageFallback&gt;en-US&lt;/UILanguageFallback&gt;</span>
-                <span class="s">&lt;UserLocale&gt;en-US&lt;/UserLocale&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;SkipAutoActivation&gt;true&lt;/SkipAutoActivation&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-SQMApi" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;CEIPEnabled&gt;0&lt;/CEIPEnabled&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;ComputerName&gt;WindowsVM&lt;/ComputerName&gt;</span>
-                <span class="s">&lt;ProductKey&gt;W269N-WFGWX-YVC9B-4J6C9-T83GX&lt;/ProductKey&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-        <span class="s">&lt;/settings&gt;</span>
-        <span class="s">&lt;settings pass="oobeSystem"&gt;</span>
-            <span class="s">&lt;component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"&gt;</span>
-                <span class="s">&lt;AutoLogon&gt;</span>
-                    <span class="s">&lt;Password&gt;</span>
-                        <span class="s">&lt;Value&gt;changepassword&lt;/Value&gt;</span>
-                        <span class="s">&lt;PlainText&gt;true&lt;/PlainText&gt;</span>
-                    <span class="s">&lt;/Password&gt;</span>
-                    <span class="s">&lt;Enabled&gt;true&lt;/Enabled&gt;</span>
-                    <span class="s">&lt;Username&gt;Administrator&lt;/Username&gt;</span>
-                <span class="s">&lt;/AutoLogon&gt;</span>
-                <span class="s">&lt;OOBE&gt;</span>
-                    <span class="s">&lt;HideEULAPage&gt;true&lt;/HideEULAPage&gt;</span>
-                    <span class="s">&lt;HideOEMRegistrationScreen&gt;true&lt;/HideOEMRegistrationScreen&gt;</span>
-                    <span class="s">&lt;HideOnlineAccountScreens&gt;true&lt;/HideOnlineAccountScreens&gt;</span>
-                    <span class="s">&lt;HideWirelessSetupInOOBE&gt;true&lt;/HideWirelessSetupInOOBE&gt;</span>
-                    <span class="s">&lt;NetworkLocation&gt;Home&lt;/NetworkLocation&gt;</span>
-                    <span class="s">&lt;SkipUserOOBE&gt;true&lt;/SkipUserOOBE&gt;</span>
-                    <span class="s">&lt;SkipMachineOOBE&gt;true&lt;/SkipMachineOOBE&gt;</span>
-                    <span class="s">&lt;ProtectYourPC&gt;3&lt;/ProtectYourPC&gt;</span>
-                <span class="s">&lt;/OOBE&gt;</span>
-                <span class="s">&lt;UserAccounts&gt;</span>
-                    <span class="s">&lt;LocalAccounts&gt;</span>
-                        <span class="s">&lt;LocalAccount wcm:action="add"&gt;</span>
-                            <span class="s">&lt;Password&gt;</span>
-                                <span class="s">&lt;Value&gt;changepassword&lt;/Value&gt;</span>
-                                <span class="s">&lt;PlainText&gt;true&lt;/PlainText&gt;</span>
-                            <span class="s">&lt;/Password&gt;</span>
-                            <span class="s">&lt;Description&gt;&lt;/Description&gt;</span>
-                            <span class="s">&lt;DisplayName&gt;Administrator&lt;/DisplayName&gt;</span>
-                            <span class="s">&lt;Group&gt;Administrators&lt;/Group&gt;</span>
-                            <span class="s">&lt;Name&gt;Administrator&lt;/Name&gt;</span>
-                        <span class="s">&lt;/LocalAccount&gt;</span>
-                    <span class="s">&lt;/LocalAccounts&gt;</span>
-                <span class="s">&lt;/UserAccounts&gt;</span>
-                <span class="s">&lt;RegisteredOrganization&gt;&lt;/RegisteredOrganization&gt;</span>
-                <span class="s">&lt;RegisteredOwner&gt;Administrator&lt;/RegisteredOwner&gt;</span>
-                <span class="s">&lt;DisableAutoDaylightTimeSet&gt;false&lt;/DisableAutoDaylightTimeSet&gt;</span>
-                <span class="s">&lt;FirstLogonCommands&gt;</span>
-                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
-                        <span class="s">&lt;Description&gt;Control Panel View&lt;/Description&gt;</span>
-                        <span class="s">&lt;Order&gt;1&lt;/Order&gt;</span>
-                        <span class="s">&lt;CommandLine&gt;reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel" /v StartupPage /t REG_DWORD /d 1 /f&lt;/CommandLine&gt;</span>
-                        <span class="s">&lt;RequiresUserInput&gt;true&lt;/RequiresUserInput&gt;</span>
-                    <span class="s">&lt;/SynchronousCommand&gt;</span>
-                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
-                        <span class="s">&lt;Order&gt;2&lt;/Order&gt;</span>
-                        <span class="s">&lt;Description&gt;Control Panel Icon Size&lt;/Description&gt;</span>
-                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
-                        <span class="s">&lt;CommandLine&gt;reg add "HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\ControlPanel" /v AllItemsIconView /t REG_DWORD /d 0 /f&lt;/CommandLine&gt;</span>
-                    <span class="s">&lt;/SynchronousCommand&gt;</span>
-                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
-                        <span class="s">&lt;Order&gt;3&lt;/Order&gt;</span>
-                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
-                        <span class="s">&lt;CommandLine&gt;cmd /C wmic useraccount where name="Administrator" set PasswordExpires=false&lt;/CommandLine&gt;</span>
-                        <span class="s">&lt;Description&gt;Password Never Expires&lt;/Description&gt;</span>
-                    <span class="s">&lt;/SynchronousCommand&gt;</span>
-                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
-                        <span class="s">&lt;Order&gt;4&lt;/Order&gt;</span>
-                        <span class="s">&lt;Description&gt;Remove AutoAdminLogon&lt;/Description&gt;</span>
-                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
-                        <span class="s">&lt;CommandLine&gt;reg add "HKEY_LOCAL_MACHINE\Software\Microsoft\Windows NT\CurrentVersion\Winlogon" /v AutoAdminLogon /t REG_SZ /d 0 /f&lt;/CommandLine&gt;</span>
-                    <span class="s">&lt;/SynchronousCommand&gt;</span>
-                    <span class="s">&lt;SynchronousCommand wcm:action="add"&gt;</span>
-                        <span class="s">&lt;Order&gt;5&lt;/Order&gt;</span>
-                        <span class="s">&lt;RequiresUserInput&gt;false&lt;/RequiresUserInput&gt;</span>
-                        <span class="s">&lt;CommandLine&gt;cmd /c shutdown /s /f /t 10&lt;/CommandLine&gt;</span>
-                        <span class="s">&lt;Description&gt;Shuts down the system&lt;/Description&gt;</span>
-                    <span class="s">&lt;/SynchronousCommand&gt;</span>
-                <span class="s">&lt;/FirstLogonCommands&gt;</span>
-                <span class="s">&lt;TimeZone&gt;Alaskan Standard Time&lt;/TimeZone&gt;</span>
-            <span class="s">&lt;/component&gt;</span>
-        <span class="s">&lt;/settings&gt;</span>
-    <span class="s">&lt;/unattend&gt;</span>
-<span class="s">---</span>
-</code></pre></div></div>
-
-<h2 id="creating-the-pipeline">Creating the Pipeline</h2>
-
-<p>Let’s create a pipeline which consists of the following tasks.</p>
-
-<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  create-source-dv <span class="nt">---</span> create-vm-from-manifest <span class="nt">---</span> wait-for-vmi-status <span class="nt">---</span> cleanup-vm
-                    |
-    create-base-dv <span class="nt">--</span>
-</code></pre></div></div>
-
-<ol>
-  <li><code class="language-plaintext highlighter-rouge">create-source-dv</code> task downloads a Windows source ISO into a PVC called <code class="language-plaintext highlighter-rouge">windows-10-source-*</code>.</li>
-  <li><code class="language-plaintext highlighter-rouge">create-base-dv</code> task creates an empty PVC for new windows installation called <code class="language-plaintext highlighter-rouge">windows-10-base-*</code>.</li>
-  <li><code class="language-plaintext highlighter-rouge">create-vm-from-manifest</code> task creates a VM called <code class="language-plaintext highlighter-rouge">windows-installer-*</code>
-from the empty PVC and with the <code class="language-plaintext highlighter-rouge">windows-10-source-*</code> PVC attached as a CD-ROM.</li>
-  <li><code class="language-plaintext highlighter-rouge">wait-for-vmi-status</code> task waits until the VM shuts down.</li>
-  <li><code class="language-plaintext highlighter-rouge">cleanup-vm</code> deletes the installer VM and ISO PVC.</li>
-  <li>The output artifact will be the <code class="language-plaintext highlighter-rouge">windows-10-base-*</code> PVC with the Windows installation.</li>
-</ol>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">tekton.dev/v1beta1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">Pipeline</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">windows-installer</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">params</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winImageDownloadURL</span>
-      <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">autounattendConfigMapName</span>
-      <span class="na">default</span><span class="pi">:</span> <span class="s">windows-10-autounattend</span>
-      <span class="na">type</span><span class="pi">:</span> <span class="s">string</span>
-  <span class="na">tasks</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">create-source-dv</span>
-      <span class="na">params</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">manifest</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">apiVersion: cdi.kubevirt.io/v1beta1</span>
-            <span class="s">kind: DataVolume</span>
-            <span class="s">metadata:</span>
-              <span class="s">generateName: windows-10-source-</span>
-            <span class="s">spec:</span>
-              <span class="s">pvc:</span>
-                <span class="s">accessModes:</span>
-                  <span class="s">- ReadWriteOnce</span>
-                <span class="s">resources:</span>
-                  <span class="s">requests:</span>
-                    <span class="s">storage: 7Gi</span>
-                <span class="s">volumeMode: Filesystem</span>
-              <span class="s">source:</span>
-                <span class="s">http:</span>
-                  <span class="s">url: $(params.winImageDownloadURL)</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">waitForSuccess</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
-      <span class="na">timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2h'</span>
-      <span class="na">taskRef</span><span class="pi">:</span>
-        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">create-base-dv</span>
-      <span class="na">params</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">manifest</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">apiVersion: cdi.kubevirt.io/v1beta1</span>
-            <span class="s">kind: DataVolume</span>
-            <span class="s">metadata:</span>
-              <span class="s">generateName: windows-10-base-</span>
-            <span class="s">spec:</span>
-              <span class="s">pvc:</span>
-                <span class="s">accessModes:</span>
-                  <span class="s">- ReadWriteOnce</span>
-                <span class="s">resources:</span>
-                  <span class="s">requests:</span>
-                    <span class="s">storage: 20Gi</span>
-                <span class="s">volumeMode: Filesystem</span>
-              <span class="s">source:</span>
-                <span class="s">blank: {}</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">waitForSuccess</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s1">'</span><span class="s">true'</span>
-      <span class="na">taskRef</span><span class="pi">:</span>
-        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">create-vm-from-manifest</span>
-      <span class="na">params</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">manifest</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">apiVersion: kubevirt.io/v1alpha3</span>
-            <span class="s">kind: VirtualMachine</span>
-            <span class="s">metadata:</span>
-              <span class="s">generateName: windows-installer-</span>
-              <span class="s">annotation:</span>
-                <span class="s">description: Windows VM generated by windows-installer pipeline</span>
-              <span class="s">labels:</span>
-                <span class="s">app: windows-installer</span>
-            <span class="s">spec:</span>
-              <span class="s">runStrategy: RerunOnFailure</span>
-              <span class="s">template:</span>
-                <span class="s">metadata:</span>
-                  <span class="s">labels:</span>
-                    <span class="s">kubevirt.io/domain: windows-installer</span>
-                <span class="s">spec:</span>
-                  <span class="s">domain:</span>
-                    <span class="s">cpu:</span>
-                      <span class="s">sockets: 2</span>
-                      <span class="s">cores: 1</span>
-                      <span class="s">threads: 1</span>
-                    <span class="s">resources:</span>
-                      <span class="s">requests:</span>
-                        <span class="s">memory: 2Gi</span>
-                    <span class="s">devices:</span>
-                      <span class="s">disks:</span>
-                        <span class="s">- name: installcdrom</span>
-                          <span class="s">cdrom:</span>
-                            <span class="s">bus: sata</span>
-                          <span class="s">bootOrder: 1</span>
-                        <span class="s">- name: rootdisk</span>
-                          <span class="s">bootOrder: 2</span>
-                          <span class="s">disk:</span>
-                            <span class="s">bus: virtio</span>
-                        <span class="s">- name: virtiocontainerdisk</span>
-                          <span class="s">cdrom:</span>
-                            <span class="s">bus: sata</span>
-                        <span class="s">- name: sysprepconfig</span>
-                          <span class="s">cdrom:</span>
-                            <span class="s">bus: sata</span>
-                      <span class="s">interfaces:</span>
-                        <span class="s">- bridge: {}</span>
-                          <span class="s">name: default</span>
-                      <span class="s">inputs:</span>
-                        <span class="s">- type: tablet</span>
-                          <span class="s">bus: usb</span>
-                          <span class="s">name: tablet</span>
-                  <span class="s">networks:</span>
-                    <span class="s">- name: default</span>
-                      <span class="s">pod: {}</span>
-                  <span class="s">volumes:</span>
-                    <span class="s">- name: installcdrom</span>
-                    <span class="s">- name: rootdisk</span>
-                    <span class="s">- name: virtiocontainerdisk</span>
-                      <span class="s">containerDisk:</span>
-                        <span class="s">image: kubevirt/virtio-container-disk</span>
-                    <span class="s">- name: sysprepconfig</span>
-                      <span class="s">sysprep:</span>
-                        <span class="s">configMap:</span>
-                          <span class="s">name: $(params.autounattendConfigMapName)</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">ownDataVolumes</span>
-          <span class="na">value</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="s2">"</span><span class="s">installcdrom:$(tasks.create-source-dv.results.name)"</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">dataVolumes</span>
-          <span class="na">value</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="s2">"</span><span class="s">rootdisk:$(tasks.create-base-dv.results.name)"</span>
-      <span class="na">runAfter</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">create-source-dv</span>
-        <span class="pi">-</span> <span class="s">create-base-dv</span>
-      <span class="na">taskRef</span><span class="pi">:</span>
-        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">create-vm-from-manifest</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">wait-for-vmi-status</span>
-      <span class="na">params</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">vmiName</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">$(tasks.create-vm-from-manifest.results.name)"</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">successCondition</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">status.phase</span><span class="nv"> </span><span class="s">==</span><span class="nv"> </span><span class="s">Succeeded"</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">failureCondition</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">status.phase</span><span class="nv"> </span><span class="s">in</span><span class="nv"> </span><span class="s">(Failed,</span><span class="nv"> </span><span class="s">Unknown)"</span>
-      <span class="na">runAfter</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">create-vm-from-manifest</span>
-      <span class="na">timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">2h'</span>
-      <span class="na">taskRef</span><span class="pi">:</span>
-        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">wait-for-vmi-status</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cleanup-vm</span>
-      <span class="na">params</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">vmName</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">$(tasks.create-vm-from-manifest.results.name)"</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">delete</span>
-          <span class="na">value</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
-      <span class="na">runAfter</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="s">wait-for-vmi-status</span>
-      <span class="na">taskRef</span><span class="pi">:</span>
-        <span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterTask</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cleanup-vm</span>
-</code></pre></div></div>
-
-<h2 id="running-the-pipeline">Running the Pipeline</h2>
-
-<p>To run the pipeline we need to create the following <code class="language-plaintext highlighter-rouge">PipelineRun</code> which references our <code class="language-plaintext highlighter-rouge">Pipeline</code>.
-Before we do that, we should replace DOWNLOAD_URL with the Windows source URL we obtained earlier.</p>
-
-<p>The <code class="language-plaintext highlighter-rouge">PipelineRun</code> also specifies the serviceAccount names for all the steps/tasks and the timeout for the whole <code class="language-plaintext highlighter-rouge">Pipeline</code>.
-The timeout should be changed appropriately; for example if you have a slow download connection.
-You can also set a timeout for each task in the <code class="language-plaintext highlighter-rouge">Pipeline</code> definition.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">tekton.dev/v1beta1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">PipelineRun</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">generateName</span><span class="pi">:</span> <span class="s">windows-installer-run-</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">params</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">winImageDownloadURL</span>
-      <span class="na">value</span><span class="pi">:</span> <span class="s">DOWNLOAD_URL</span>
-  <span class="na">pipelineRef</span><span class="pi">:</span>
-    <span class="na">name</span><span class="pi">:</span> <span class="s">windows-installer</span>
-  <span class="na">timeout</span><span class="pi">:</span> <span class="s1">'</span><span class="s">5h'</span>
-  <span class="na">serviceAccountNames</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">create-source-dv</span>
-      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest-task</span>
-    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">create-base-dv</span>
-      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">create-datavolume-from-manifest-task</span>
-    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">create-vm-from-manifest</span>
-      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">create-vm-from-manifest-task</span>
-    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">wait-for-vmi-status</span>
-      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">wait-for-vmi-status-task</span>
-    <span class="pi">-</span> <span class="na">taskName</span><span class="pi">:</span> <span class="s">cleanup-vm</span>
-      <span class="na">serviceAccountName</span><span class="pi">:</span> <span class="s">cleanup-vm-task</span>
-</code></pre></div></div>
-
-<h2 id="inspecting-the-output">Inspecting the output</h2>
-
-<p>Firstly, you can inspect the progress of the windows-10-source and windows-10-base import:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get dvs | <span class="nb">grep </span>windows-10-
-
-<span class="o">&gt;</span> windows-10-base-8zxwr     Succeeded          100.0%                21s
-<span class="o">&gt;</span> windows-10-source-jdv64   ImportInProgress   1.01%                 20s
-</code></pre></div></div>
-
-<p>To inspect the status of the pipeline run:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pipelinerun <span class="nt">-l</span> <span class="s2">"tekton.dev/pipeline=windows-installer"</span>
-
-<span class="o">&gt;</span> NAME                          SUCCEEDED   REASON                          STARTTIME   COMPLETIONTIME
-<span class="o">&gt;</span> windows-installer-run-n2mjf   Unknown     Running                         118s
-</code></pre></div></div>
-
-<p>To check the status of each task and its pods:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pipelinerun <span class="nt">-o</span> yaml <span class="nt">-l</span> <span class="s2">"tekton.dev/pipeline=windows-installer"</span>
-kubectl get pods <span class="nt">-l</span> <span class="s2">"tekton.dev/pipeline=windows-installer"</span>
-</code></pre></div></div>
-
-<p>Once the pipeline run completes, you should be left with a <code class="language-plaintext highlighter-rouge">windows-10-base-xxxxx</code> PVC (backed by a DataVolume).
-You can then create a new VM with a copy of this PVC to test it.
-You need to replace PVC_NAME with <code class="language-plaintext highlighter-rouge">windows-10-base-xxxxx</code> (you can use <code class="language-plaintext highlighter-rouge">kubectl get dvs -o name | grep -o "windows-10-base-.*"</code>) and PVC_NAMESPACE with the correct namespace in the following YAML.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-vm</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">dataVolumeTemplates</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">cdi.kubevirt.io/v1beta1</span>
-      <span class="na">kind</span><span class="pi">:</span> <span class="s">DataVolume</span>
-      <span class="na">metadata</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-vm-root</span>
-      <span class="na">spec</span><span class="pi">:</span>
-        <span class="na">pvc</span><span class="pi">:</span>
-          <span class="na">accessModes</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="s">ReadWriteMany</span>
-          <span class="na">resources</span><span class="pi">:</span>
-            <span class="na">requests</span><span class="pi">:</span>
-              <span class="na">storage</span><span class="pi">:</span> <span class="s">20Gi</span>
-        <span class="na">source</span><span class="pi">:</span>
-          <span class="na">pvc</span><span class="pi">:</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">PVC_NAME</span>
-            <span class="na">namespace</span><span class="pi">:</span> <span class="s">PVC_NAMESPACE</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">windows-10-vm</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">cpu</span><span class="pi">:</span>
-          <span class="na">sockets</span><span class="pi">:</span> <span class="m">2</span>
-          <span class="na">cores</span><span class="pi">:</span> <span class="m">1</span>
-          <span class="na">threads</span><span class="pi">:</span> <span class="m">1</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">2Gi</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">rootdisk</span>
-              <span class="na">bootOrder</span><span class="pi">:</span> <span class="m">1</span>
-              <span class="na">disk</span><span class="pi">:</span>
-                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
-              <span class="na">cdrom</span><span class="pi">:</span>
-                <span class="na">bus</span><span class="pi">:</span> <span class="s">sata</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-          <span class="na">inputs</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">type</span><span class="pi">:</span> <span class="s">tablet</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">usb</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">tablet</span>
-      <span class="na">networks</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">rootdisk</span>
-          <span class="na">dataVolume</span><span class="pi">:</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">windows-10-vm-root</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">virtiocontainerdisk</span>
-          <span class="na">containerDisk</span><span class="pi">:</span>
-            <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/virtio-container-disk</span>
-</code></pre></div></div>
-
-<p>You can start the VM and login with <code class="language-plaintext highlighter-rouge">Administrator</code> : <code class="language-plaintext highlighter-rouge">changepassword</code> credentials. Then you should be welcomed by your fresh VM.</p>
-
-<div class="zoom">
-  <img src="/assets/2021-04-21-Automated-Windows-Installation-With-Tekton-Pipelines/win-started.png" width="100" height="75" itemprop="thumbnail" alt="Started Windows VM" />
-</div>
-
-<h2 id="resources">Resources</h2>
-
-<ul>
-  <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks/tree/main/examples/pipelines/windows-installer">YAML files used in this example</a></li>
-  <li><a href="https://github.com/kubevirt/kubevirt-tekton-tasks">KubeVirt Tekton Tasks</a></li>
-  <li><a href="https://github.com/tektoncd/pipeline">Tekton Pipelines</a></li>
-</ul>]]></content><author><name>Filip Křepinský</name></author><category term="news" /><category term="kubevirt" /><category term="Kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Tekton Pipelines" /><category term="KubeVirt Tekton Tasks" /><category term="Windows" /><summary type="html"><![CDATA[This blog shows how KubeVirt Tekton Tasks can be utilized to automatically install and setup Windows VMs from scratch]]></summary></entry></feed>
+<p><a href="https://kubevirt.io/user-guide/operations/authorization/">KubeVirt Default RBAC Cluster Roles</a></p>]]></content><author><name>Mark DeNeve</name></author><category term="news" /><category term="kubevirt" /><category term="go" /><category term="api" /><category term="authentication" /><summary type="html"><![CDATA[This blog post discusses authentication methods that can be used with the KubeVirt client-go library.]]></summary></entry></feed>
