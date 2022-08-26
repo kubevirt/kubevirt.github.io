@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-08-23T17:44:11+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.56.0</title><link href="https://kubevirt.io//2022/changelog-v0.56.0.html" rel="alternate" type="text/html" title="KubeVirt v0.56.0" /><published>2022-08-18T00:00:00+00:00</published><updated>2022-08-18T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.56.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.56.0.html"><![CDATA[<h2 id="v0560">v0.56.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-08-26T21:43:01+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.56.0</title><link href="https://kubevirt.io//2022/changelog-v0.56.0.html" rel="alternate" type="text/html" title="KubeVirt v0.56.0" /><published>2022-08-18T00:00:00+00:00</published><updated>2022-08-18T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.56.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.56.0.html"><![CDATA[<h2 id="v0560">v0.56.0</h2>
 
 <p>Released on: Thu Aug 18 20:10:29 2022 +0000</p>
 
@@ -512,6 +512,7 @@ Here are a few steps you can take to improve things:</p>
 </ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.55.0 changes]]></summary></entry><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
 
 <p>The KubeVirt community presented two sessions, both on Wednesday May 18th:</p>
+
 <ol>
   <li>A Virtual Open Office Hours session, and</li>
   <li>A Maintainer Track session: ‘It’s All for the Users. More Durable, Secure, and Pluggable. KubeVirt v0.53’</li>
@@ -536,12 +537,14 @@ You can watch <a href="https://youtu.be/L9H0pz5PpKo">the CNCF recording here</a>
 <p>There was a healthy amount of questions, both during Q&amp;A and after the talk. The participants were particularly interested to know how to prepare and customize VM disks with KubeVirt, how to run Windows VM, especially combined with GPUs, and how to expose the Kubernetes API service of a deployed cluster to the KubeVirt cluster API provider outside of the KubeVirt VM. There were additional questions on the status of TPM support and VM migration when the hosting node goes down.</p>
 
 <h2 id="thank-you">Thank you!</h2>
+
 <p>Big thanks again to our presenters: Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki.
 And everyone who attended the sessions, listened, and asked great questions.</p>
 
 <h2 id="want-to-see-more-from-kubecon-eu-2022">Want to see more from KubeCon EU 2022?</h2>
 
 <p>If you’re interested in seeing more photos and recordings from the event:</p>
+
 <ul>
   <li><a href="https://www.flickr.com/photos/143247548@N03/albums/72177720298987342">CNCF’s Photo album (Flickr) of the event</a>.</li>
   <li><a href="https://www.youtube.com/c/cloudnativefdn">The CNCF video recordings of the sessions on Youtube</a>.</li>

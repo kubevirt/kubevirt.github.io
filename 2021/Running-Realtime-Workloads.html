@@ -260,15 +260,18 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <h2 id="motivation">Motivation</h2>
 
 <p>It has been possible in KubeVirt for some time already to run a VM running with a RT kernel, however the performance of such workloads never achieved parity against running on top of a bare metal host virtualized. With the availability of NUMA and CPUManager as features in KubeVirt, we were close to a point where we had almost all the ingredients to deliver the <a href="https://www.libvirt.org/kbase/kvm-realtime.html">recommended</a> tunings in libvirt for achieving the low CPU latency needed for such workloads. We were missing two important settings:</p>
+
 <ul>
   <li>The ability to configure the VCPUs to run with real-time scheduling policy.</li>
   <li>Lock the VMs huge pages in RAM to prevent swapping.</li>
 </ul>
 
 <h2 id="setting-up-the-environment">Setting up the Environment</h2>
+
 <p>To achieve the lowest latency possible in a given environment, first it needs to be configured to allow its resources to be consumed efficiently.</p>
 
 <h3 id="the-cluster">The Cluster</h3>
+
 <p>The target node has to be configured to reserve memory for hugepages and the kernel to allow threads to run with real-time scheduling policy. The memory can be reserved as a <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html">kernel boot parameter</a> or by changing the kernel’s page count at <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html">runtime</a>.</p>
 
 <p>The kernel’s runtime scheduling limit can be adjusted either by installing a real-time kernel in the node (the recommended option), or changing the kernel’s setting <code class="language-plaintext highlighter-rouge">kernel.sched_rt_runtime_us</code> to equal -1, to allow for unlimited runtime of real-time scheduled threads. This kernel setting defines the time period to be devoted to running real-time threads. KubeVirt will detect if the node has been configured with unlimited runtime and will label the node with <code class="language-plaintext highlighter-rouge">kubevirt.io/realtime</code> to highlight the capacity of running real-time workloads. Later on we’ll come back to this label when we talk about how the workload is scheduled.</p>
@@ -276,9 +279,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>It is also recommended tuning the node’s BIOS settings for optimal real-time performance is also recommended to achieve even lower CPU latencies. Consult with your hardware provider to obtain the information on how to best tune your equipment.</p>
 
 <h3 id="kubevirt">KubeVirt</h3>
+
 <p>The VM will require to be granted fully dedicated CPUs and be able to use huge pages. These requirements can be achieved in KubeVirt by enabling the feature gates of CPUManager and NUMA in the KubeVirt CR. There is no dedicated feature gate to enable the new real-time optimizations.</p>
 
 <h2 id="the-manifest">The Manifest</h2>
+
 <p>With the cluster configured to provide the dedicated resources for the workload, it’s time to review an example of a VM manifest using the optimizations for low CPU latency. The first focus is to reduce the VM’s I/O by limiting it’s devices to only serial console:</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.devices.autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
@@ -287,6 +292,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </code></pre></div></div>
 
 <p>The pod needs to have a guaranteed QoS for its memory and CPU resources, to make sure that the CPU manager will dedicate the requested CPUs to the pod.</p>
+
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.resources.request.cpu</span><span class="pi">:</span> <span class="m">2</span>
 <span class="na">spec.domain.resources.request.memory</span><span class="pi">:</span> <span class="s">1Gi</span>
 <span class="na">spec.domain.resources.limits.cpu</span><span class="pi">:</span> <span class="m">2</span>
@@ -342,7 +348,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <span class="na">disks</span><span class="pi">:</span>
           <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
               <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>      
+            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
           <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
               <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
             <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
@@ -386,6 +392,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 </code></pre></div></div>
 
 <h2 id="the-deployment">The Deployment</h2>
+
 <p>Because the manifest has enabled the real-time setting, when deployed KubeVirt applies the node label selector so that the Kubernetes scheduler will place the deployment in a node that is able to run threads with real-time scheduling policy (node label <code class="language-plaintext highlighter-rouge">kubevirt.io/realtime</code>). But there’s more, because the manifest also specifies the pod’s resource need of dedicated CPUs, KubeVirt will also add the node selector of <code class="language-plaintext highlighter-rouge">cpumanager=true</code> to guarantee that the pod is able to use the assigned CPUs alone. And finally, the scheduler also takes care of guaranteeing that the target node has sufficient free huge pages of the specified size (1Gi in our example) to satisfy the memory requested. With all these validations checked, the pod is successfully scheduled.</p>
 
 <h2 id="key-takeaways">Key Takeaways</h2>
