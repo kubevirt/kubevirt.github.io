@@ -116,7 +116,7 @@ $ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUB
 </div>
 
 > warning "Warning"
-> **oc** is the specific command-line tool for OKD, however, it is based in *kubectl* plus some additional features detailed here. It is probably that along the blog post, you can find executions with *oc* or *kubectl* interchangeably.
+> **oc** is the specific command-line tool for OKD, however, it is based in _kubectl_ plus some additional features detailed here. It is probably that along the blog post, you can find executions with _oc_ or _kubectl_ interchangeably.
 
 `containerDisks` are created from RAW or [QCOW2](https://www.linux-kvm.org/page/Qcow2) virtual machine images. Nevertheless, virtual machine images with all the agreed software and proper configuration must be created previously. The company currently uses CentOS 7 as their approved base operating system to run their applications. However, during the last months, it has been encouraging to move to the recently released version 8 of CentOS.
 
@@ -351,7 +351,7 @@ Now, let’s edit the `devstation-centos8.toml` file which is in charge of build
 - A Git repository has been configured to be cloned. Actually, it is a Git repository that contains a manual detailing how the custom image is configured and how it must be used.
 
 > warning "Warning"
-> It is important to add console as a kernel option since the Builder Image tool disables access to serial console by default. It will allow the *virtctl* command to connect to the VM while it is booting in our OKD Kubernetes cluster.
+> It is important to add console as a kernel option since the Builder Image tool disables access to serial console by default. It will allow the _virtctl_ command to connect to the VM while it is booting in our OKD Kubernetes cluster.
 
 This is the final building configuration file, it can be downloaded from [here](/assets/2020-12-01-Customizing-images-for-containerized-vms/devstation-centos8.toml)
 
@@ -552,7 +552,7 @@ Format specific information:
 
 ### Verify the custom-built image
 
-Before continuing, it is suggested to verify the golden expanded image. Since the qcow2 image is not yet containerized, it can easily run on KVM/libvirt. In our case, the builder server has already in place the *Virtualization Host* group packages.
+Before continuing, it is suggested to verify the golden expanded image. Since the qcow2 image is not yet containerized, it can easily run on KVM/libvirt. In our case, the builder server has already in place the _Virtualization Host_ group packages.
 
 > info "Information"
 > There are a lot of tools that allow us to run a qcow2 image in libvirt. In this example, `virt-install` is used, however, other tool that makes easy to deploy VM images and worth exploring is [kcli](https://github.com/karmab/kcli)
@@ -744,7 +744,7 @@ At this point we built:
 
 ## Image containerization procedure
 
-The procedure to inject a *VirtualMachineInstance* disk into a container images is pretty well explained in [containerDisk Workflow example](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes) from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the *VirtualMachine*
+The procedure to inject a _VirtualMachineInstance_ disk into a container images is pretty well explained in [containerDisk Workflow example](https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes) from the official documentation. Only RAW and QCOW2 formats are supported and the disk it is recommended to be placed into the /disk directory inside the container. Actually, it can be placed in other directories, but then, it must be explicitly configured when creating the _VirtualMachine_
 
 Currently, there are 4 standardized images ready to be containerized. The process is the same for all of them, so in order to keep it short, we are just going to show the process of creating a container image from the CentOS 8 QCOW2 images.
 
