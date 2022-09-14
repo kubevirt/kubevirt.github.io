@@ -52,7 +52,7 @@ KubeVirt can be installed using the KubeVirt operator, which manages the lifecyc
   > If for any reason nested virtualization cannot be enabled do enable KubeVirt emulation as follows:
   >
   >```bash
-  >kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
+  >kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
   >```
 
 * Again use `kubectl` to deploy the KubeVirt custom resource definitions:

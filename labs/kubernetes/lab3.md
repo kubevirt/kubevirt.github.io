@@ -41,7 +41,7 @@ pod/virt-operator-5ddb4674b9-6fbrv condition met
 If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
 
 ```sh
-$ kubectl create configmap kubevirt-config -n kubevirt --from-literal debug.useEmulation=true
+$ kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
 configmap/kubevirt-config created
 ```
 
