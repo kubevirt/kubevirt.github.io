@@ -1,4 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-08-26T21:43:01+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.56.0</title><link href="https://kubevirt.io//2022/changelog-v0.56.0.html" rel="alternate" type="text/html" title="KubeVirt v0.56.0" /><published>2022-08-18T00:00:00+00:00</published><updated>2022-08-18T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.56.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.56.0.html"><![CDATA[<h2 id="v0560">v0.56.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-09-14T15:56:56+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.57.0</title><link href="https://kubevirt.io//2022/changelog-v0.57.0.html" rel="alternate" type="text/html" title="KubeVirt v0.57.0" /><published>2022-09-12T00:00:00+00:00</published><updated>2022-09-12T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.57.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.57.0.html"><![CDATA[<h2 id="v0570">v0.57.0</h2>
+
+<p>Released on: Mon Sep 12 14:00:44 2022 +0000</p>
+
+<ul>
+  <li>[PR #8129][mlhnono68] Fixes virtctl to support connection to clusters proxied by RANCHER or having special paths</li>
+  <li>[PR #8337][0xFelix] virtctl’s native SSH client is now useable in the Windows console without workarounds</li>
+  <li>[PR #8257][awels] VirtualMachineExport now supports VM export source type.</li>
+  <li>[PR #8367][vladikr] fix the guest memory conversion by setting it to resources.requests.memory when guest memory is not explicitly provided</li>
+  <li>[PR #7990][ormergi] Deprecate SR-IOV live migration feature gate.</li>
+  <li>[PR #8069][lyarwood] The VirtualMachineInstancePreset resource has been deprecated ahead of removal in a future release. Users should instead use the VirtualMachineInstancetype and VirtualMachinePreference resources to encapsulate any shared resource or preferences characteristics shared by their VirtualMachines.</li>
+  <li>[PR #8326][0xFelix] virtctl: Do not log wrapped ssh command by default</li>
+  <li>[PR #8325][rhrazdil] Enable route_localnet sysctl option for masquerade binding at virt-handler</li>
+  <li>[PR #8159][acardace] Add support for USB disks</li>
+  <li>[PR #8006][lyarwood] <code class="language-plaintext highlighter-rouge">AutoattachInputDevice</code> has been added to <code class="language-plaintext highlighter-rouge">Devices</code> allowing an <code class="language-plaintext highlighter-rouge">Input</code> device to be automatically attached to a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> on start up.  <code class="language-plaintext highlighter-rouge">PreferredAutoattachInputDevice</code> has also been added to <code class="language-plaintext highlighter-rouge">DevicePreferences</code> allowing users to control this behaviour with a set of preferences.</li>
+  <li>[PR #8134][arnongilboa] Support DataVolume garbage collection</li>
+  <li>[PR #8157][StefanKro] TrilioVault for Kubernetes now supports KubeVirt for backup and recovery.</li>
+  <li>[PR #8273][alaypatel07] add server-side validations for spec.topologySpreadConstraints during object creation</li>
+  <li>[PR #8049][alicefr] Set RunAsNonRoot as default for the guestfs pod</li>
+  <li>[PR #8107][awels] Allow VirtualMachineSnapshot as a VirtualMachineExport source</li>
+  <li>[PR #7846][janeczku] Added support for configuring topology spread constraints for virtual machines.</li>
+  <li>[PR #8215][alaypatel07] support validation for spec.affinity fields during vmi creation</li>
+  <li>[PR #8071][oshoval] Relax networkInterfaceMultiqueue semantics: multi queue will configure only what it can (virtio interfaces).</li>
+  <li>[PR #7549][akrejcir] Added new API subresources to expand instancetype and preference.</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.57.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.56.0</title><link href="https://kubevirt.io//2022/changelog-v0.56.0.html" rel="alternate" type="text/html" title="KubeVirt v0.56.0" /><published>2022-08-18T00:00:00+00:00</published><updated>2022-08-18T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.56.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.56.0.html"><![CDATA[<h2 id="v0560">v0.56.0</h2>
 
 <p>Released on: Thu Aug 18 20:10:29 2022 +0000</p>
 
@@ -216,29 +240,4 @@
   <li>[PR #6681][fossedihelm] Users can use –dry-run flag</li>
   <li>[PR #6663][jean-edouard] The number of virt-api and virt-controller replicas is now configurable in the CSV</li>
   <li>[PR #5981][maya-r] Always resize disk.img files to the largest size at boot.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.48.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.46.0</title><link href="https://kubevirt.io//2021/changelog-v0.46.0.html" rel="alternate" type="text/html" title="KubeVirt v0.46.0" /><published>2021-10-08T00:00:00+00:00</published><updated>2021-10-08T00:00:00+00:00</updated><id>https://kubevirt.io//2021/changelog-v0.46.0</id><content type="html" xml:base="https://kubevirt.io//2021/changelog-v0.46.0.html"><![CDATA[<h2 id="v0460">v0.46.0</h2>
-
-<p>Released on: Fri Oct 8 21:12:33 2021 +0000</p>
-
-<ul>
-  <li>[PR #6425][awels] Hotplug disks are possible when iothreads are enabled.</li>
-  <li>[PR #6297][acardace] mutate migration PDBs instead of creating an additional one for the duration of the migration.</li>
-  <li>[PR #6464][awels] BugFix: Fixed hotplug race between kubelet and virt-handler when virt-launcher dies unexpectedly.</li>
-  <li>[PR #6465][salanki] Fix corrupted DHCP Gateway Option from local DHCP server, leading to rejected IP configuration on Windows VMs.</li>
-  <li>[PR #6458][vladikr] Tagged SR-IOV interfaces will now appear in the config drive metadata</li>
-  <li>[PR #6446][brybacki] Access mode for virtctl image upload is now optional. This version of virtctl now requires CDI v1.34 or greater</li>
-  <li>[PR #6391][zcahana] Cleanup obsolete permissions from virt-operator’s ClusterRole</li>
-  <li>[PR #6419][rthallisey] Fix virt-controller panic caused by lots of deleted VMI events</li>
-  <li>[PR #5972][kwiesmueller] Add a <code class="language-plaintext highlighter-rouge">ssh</code> command to <code class="language-plaintext highlighter-rouge">virtctl</code> that can be used to open SSH sessions to VMs/VMIs.</li>
-  <li>[PR #6403][jrife] Removed go module pinning to an old version (v0.3.0) of github.com/go-kit/kit</li>
-  <li>[PR #6367][brybacki] virtctl imageupload now uses DataVolume.spec.storage</li>
-  <li>[PR #6198][iholder-redhat] Fire a Prometheus alert when a lot of REST failures are detected in virt-api</li>
-  <li>[PR #6211][davidvossel] cluster-profiler pprof gathering tool and corresponding “ClusterProfiler” feature gate</li>
-  <li>[PR #6323][vladikr] switch live migration to use unix sockets</li>
-  <li>[PR #6374][vladikr] Fix the default setting of CPU requests on vmipods</li>
-  <li>[PR #6283][rthallisey] Record the time it takes to delete a VMI and expose it as a metric</li>
-  <li>[PR #6251][rmohr] Better place vcpu threads on host cpus to form more efficient passthrough architectures</li>
-  <li>[PR #6377][rmohr] Don’t fail on failed selinux relabel attempts if selinux is permissive</li>
-  <li>[PR #6308][awels] BugFix: hotplug was broken when using it with a hostpath volume that was on a separate device.</li>
-  <li>[PR #6186][davidvossel] Add resource and verb labels to rest_client_requests_total metric</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.46.0 changes]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.48.0 changes]]></summary></entry></feed>

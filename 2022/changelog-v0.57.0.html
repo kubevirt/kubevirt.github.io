@@ -30,26 +30,26 @@
     <meta name="google-site-verification" content="eaETLLM6xObn1li9l9eU8lNIBgBpU0OQLXV1faU1svE" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//blogs/page19/">
+    <link rel="canonical" href="https://kubevirt.io//2022/changelog-v0.57.0.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Blogs | KubeVirt.io</title>
+    <title>KubeVirt v0.57.0 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
-    <meta property="og:title" content="Blogs | KubeVirt.io">
+    <meta name="description" content="This article provides information about KubeVirt release v0.57.0 changes">
+    <meta name="keywords" content="release notes, changelog" >
+    <meta property="og:title" content="KubeVirt v0.57.0 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//blogs/page19/" >
+    <meta property="og:url" content="https://kubevirt.io//2022/changelog-v0.57.0.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This article provides information about KubeVirt release v0.57.0 changes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2022-09-14 15:56:56 +0000" >
-    <meta name="twitter:title" content="Blogs | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2022-09-12 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v0.57.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v0.57.0 changes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -231,216 +231,121 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container-fluid">
+      <div class="container">
   <div class="row">
-    <h1 class="page-title pl-3">Blogs</h1>
-  </div>
-  <div class="row">
-    <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2">
-      
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v0.57.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/changelog">changelog</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: September 12, 2022  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="v0570">v0.57.0</h2>
+
+<p>Released on: Mon Sep 12 14:00:44 2022 +0000</p>
+
+<ul>
+  <li>[PR #8129][mlhnono68] Fixes virtctl to support connection to clusters proxied by RANCHER or having special paths</li>
+  <li>[PR #8337][0xFelix] virtctl’s native SSH client is now useable in the Windows console without workarounds</li>
+  <li>[PR #8257][awels] VirtualMachineExport now supports VM export source type.</li>
+  <li>[PR #8367][vladikr] fix the guest memory conversion by setting it to resources.requests.memory when guest memory is not explicitly provided</li>
+  <li>[PR #7990][ormergi] Deprecate SR-IOV live migration feature gate.</li>
+  <li>[PR #8069][lyarwood] The VirtualMachineInstancePreset resource has been deprecated ahead of removal in a future release. Users should instead use the VirtualMachineInstancetype and VirtualMachinePreference resources to encapsulate any shared resource or preferences characteristics shared by their VirtualMachines.</li>
+  <li>[PR #8326][0xFelix] virtctl: Do not log wrapped ssh command by default</li>
+  <li>[PR #8325][rhrazdil] Enable route_localnet sysctl option for masquerade binding at virt-handler</li>
+  <li>[PR #8159][acardace] Add support for USB disks</li>
+  <li>[PR #8006][lyarwood] <code class="language-plaintext highlighter-rouge">AutoattachInputDevice</code> has been added to <code class="language-plaintext highlighter-rouge">Devices</code> allowing an <code class="language-plaintext highlighter-rouge">Input</code> device to be automatically attached to a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> on start up.  <code class="language-plaintext highlighter-rouge">PreferredAutoattachInputDevice</code> has also been added to <code class="language-plaintext highlighter-rouge">DevicePreferences</code> allowing users to control this behaviour with a set of preferences.</li>
+  <li>[PR #8134][arnongilboa] Support DataVolume garbage collection</li>
+  <li>[PR #8157][StefanKro] TrilioVault for Kubernetes now supports KubeVirt for backup and recovery.</li>
+  <li>[PR #8273][alaypatel07] add server-side validations for spec.topologySpreadConstraints during object creation</li>
+  <li>[PR #8049][alicefr] Set RunAsNonRoot as default for the guestfs pod</li>
+  <li>[PR #8107][awels] Allow VirtualMachineSnapshot as a VirtualMachineExport source</li>
+  <li>[PR #7846][janeczku] Added support for configuring topology spread constraints for virtual machines.</li>
+  <li>[PR #8215][alaypatel07] support validation for spec.affinity fields during vmi creation</li>
+  <li>[PR #8071][oshoval] Relax networkInterfaceMultiqueue semantics: multi queue will configure only what it can (virtio interfaces).</li>
+  <li>[PR #7549][akrejcir] Added new API subresources to expand instancetype and preference.</li>
+</ul>
+
+        </article>
         
-          
-          <ul class="blogs-navigation">
-            <h3>Categories</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/news.html"  class="blogs-navigation--item_link" >
-                  News
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/updates.html"  class="blogs-navigation--item_link" >
-                  Weekly Updates
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/releases.html"  class="blogs-navigation--item_link" >
-                  Releases
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/uncategorized.html"  class="blogs-navigation--item_link" >
-                  Uncategorized
-                </a>
-                
-              </li>
-            
-          </ul>
-          
         
-          
-          <ul class="blogs-navigation">
-            <h3>Additional filters</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/date.html"  class="blogs-navigation--item_link" >
-                  Grouped by Date
-                </a>
-                
-              </li>
-            
-          </ul>
-          
-        
-      
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v0.57.0&url=https://www.kubevirt.io/2022/changelog-v0.57.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
     </div>
-    <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10">
-      <ul class="posts">
-        
-          <li>
-            <h2 class="posts-title"><a href="/2019/kubevirt-with-ansible-part-2.html">KubeVirt with Ansible, part 2</a></h2>
-            <div class="posts-date">8 Jul, 2019</div>
-            A deeper dive into Ansible 2.8's KubeVirt features
-            
-            <div class="readmore">
-    <a href="/2019/kubevirt-with-ansible-part-2.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2019/changelog-v0.19.0.html">KubeVirt v0.19.0</a></h2>
-            <div class="posts-date">July 05, 2019</div>
-            This article provides information about KubeVirt release v0.19.0 changes
-            
-            <div class="readmore">
-    <a href="/2019/changelog-v0.19.0.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2019/changelog-v0.18.0.html">KubeVirt v0.18.0</a></h2>
-            <div class="posts-date">June 05, 2019</div>
-            This article provides information about KubeVirt release v0.18.0 changes
-            
-            <div class="readmore">
-    <a href="/2019/changelog-v0.18.0.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2019/Kubevirt-vagrant-provider.html">KubeVirt vagrant provider</a></h2>
-            <div class="posts-date">June 4, 2019</div>
-            The post describes how to use kubevirt vagrant provider
-            
-            <div class="readmore">
-    <a href="/2019/Kubevirt-vagrant-provider.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2019/kubevirt-with-ansible-part-1.html">KubeVirt with Ansible, part 1 – Introduction</a></h2>
-            <div class="posts-date">May 21, 2019</div>
-            With the release of Ansible 2.8 comes a new set of KubeVirt modules
-            
-            <div class="readmore">
-    <a href="/2019/kubevirt-with-ansible-part-1.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-      </ul>
-    </div>
-    
-<div class="pagination align-items-center">
-  
-    <a href="/blogs/page18" class="btn btn-outline-secondary btn-light mr-2">
-      <i class="fas fa-angle-left"></i> New
-    </a>
-  
-
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-        <strong class="font-weight-bold">19</strong>
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-  <strong>of 34</strong>
-
-  
-    <a href="/blogs/page20" class="btn btn-outline-secondary btn-light ml-2">
-      Old <i class="fas fa-angle-right"></i>
-    </a>
-  
-
-</div>
-
   </div>
 </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 

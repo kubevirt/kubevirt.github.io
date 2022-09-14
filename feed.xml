@@ -1,4 +1,28 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-08-26T21:43:01+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.56.0</title><link href="https://kubevirt.io//2022/changelog-v0.56.0.html" rel="alternate" type="text/html" title="KubeVirt v0.56.0" /><published>2022-08-18T00:00:00+00:00</published><updated>2022-08-18T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.56.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.56.0.html"><![CDATA[<h2 id="v0560">v0.56.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2022-09-14T15:56:56+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v0.57.0</title><link href="https://kubevirt.io//2022/changelog-v0.57.0.html" rel="alternate" type="text/html" title="KubeVirt v0.57.0" /><published>2022-09-12T00:00:00+00:00</published><updated>2022-09-12T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.57.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.57.0.html"><![CDATA[<h2 id="v0570">v0.57.0</h2>
+
+<p>Released on: Mon Sep 12 14:00:44 2022 +0000</p>
+
+<ul>
+  <li>[PR #8129][mlhnono68] Fixes virtctl to support connection to clusters proxied by RANCHER or having special paths</li>
+  <li>[PR #8337][0xFelix] virtctl’s native SSH client is now useable in the Windows console without workarounds</li>
+  <li>[PR #8257][awels] VirtualMachineExport now supports VM export source type.</li>
+  <li>[PR #8367][vladikr] fix the guest memory conversion by setting it to resources.requests.memory when guest memory is not explicitly provided</li>
+  <li>[PR #7990][ormergi] Deprecate SR-IOV live migration feature gate.</li>
+  <li>[PR #8069][lyarwood] The VirtualMachineInstancePreset resource has been deprecated ahead of removal in a future release. Users should instead use the VirtualMachineInstancetype and VirtualMachinePreference resources to encapsulate any shared resource or preferences characteristics shared by their VirtualMachines.</li>
+  <li>[PR #8326][0xFelix] virtctl: Do not log wrapped ssh command by default</li>
+  <li>[PR #8325][rhrazdil] Enable route_localnet sysctl option for masquerade binding at virt-handler</li>
+  <li>[PR #8159][acardace] Add support for USB disks</li>
+  <li>[PR #8006][lyarwood] <code class="language-plaintext highlighter-rouge">AutoattachInputDevice</code> has been added to <code class="language-plaintext highlighter-rouge">Devices</code> allowing an <code class="language-plaintext highlighter-rouge">Input</code> device to be automatically attached to a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> on start up.  <code class="language-plaintext highlighter-rouge">PreferredAutoattachInputDevice</code> has also been added to <code class="language-plaintext highlighter-rouge">DevicePreferences</code> allowing users to control this behaviour with a set of preferences.</li>
+  <li>[PR #8134][arnongilboa] Support DataVolume garbage collection</li>
+  <li>[PR #8157][StefanKro] TrilioVault for Kubernetes now supports KubeVirt for backup and recovery.</li>
+  <li>[PR #8273][alaypatel07] add server-side validations for spec.topologySpreadConstraints during object creation</li>
+  <li>[PR #8049][alicefr] Set RunAsNonRoot as default for the guestfs pod</li>
+  <li>[PR #8107][awels] Allow VirtualMachineSnapshot as a VirtualMachineExport source</li>
+  <li>[PR #7846][janeczku] Added support for configuring topology spread constraints for virtual machines.</li>
+  <li>[PR #8215][alaypatel07] support validation for spec.affinity fields during vmi creation</li>
+  <li>[PR #8071][oshoval] Relax networkInterfaceMultiqueue semantics: multi queue will configure only what it can (virtio interfaces).</li>
+  <li>[PR #7549][akrejcir] Added new API subresources to expand instancetype and preference.</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.57.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.56.0</title><link href="https://kubevirt.io//2022/changelog-v0.56.0.html" rel="alternate" type="text/html" title="KubeVirt v0.56.0" /><published>2022-08-18T00:00:00+00:00</published><updated>2022-08-18T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.56.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.56.0.html"><![CDATA[<h2 id="v0560">v0.56.0</h2>
 
 <p>Released on: Thu Aug 18 20:10:29 2022 +0000</p>
 
@@ -840,21 +864,4 @@ metallb-nginx-svc   LoadBalancer   10.96.254.136   172.18.1.1    5678:32438/TCP 
 <h2 id="conclusion">Conclusion</h2>
 
 <p>In this blog post we used MetalLB to expose a service using an external IP assigned to a virtual machine. 
-This illustrates how virtual machine traffic can be load-balanced via a service.</p>]]></content><author><name>Ram Lavi</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="load-balancer" /><category term="MetalLB" /><summary type="html"><![CDATA[This post illustrates setting up a virtual machine with MetalLB LoadBalancer service.]]></summary></entry><entry><title type="html">KubeVirt v0.51.0</title><link href="https://kubevirt.io//2022/changelog-v0.51.0.html" rel="alternate" type="text/html" title="KubeVirt v0.51.0" /><published>2022-03-08T00:00:00+00:00</published><updated>2022-03-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.51.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.51.0.html"><![CDATA[<h2 id="v0510">v0.51.0</h2>
-
-<p>Released on: Tue Mar 8 21:06:59 2022 +0000</p>
-
-<ul>
-  <li>[PR #7102][machadovilaca] Add Virtual Machine name label to virt-launcher pod</li>
-  <li>[PR #7139][davidvossel] Fixes inconsistent VirtualMachinePool VM/VMI updates by using controller revisions</li>
-  <li>[PR #6754][jean-edouard] New and resized disks are now always 1MiB-aligned</li>
-  <li>[PR #7086][acardace] Add ‘EvictionStrategy’ as a cluster-wide setting in the KubeVirt CR</li>
-  <li>[PR #7232][rmohr] Properly format the PDB scale event during migrations</li>
-  <li>[PR #7223][Barakmor1] Add a name label to virt-operator pods</li>
-  <li>[PR #7221][davidvossel] RunStrategy: Once - allows declaring a VM should run once to a finalized state</li>
-  <li>[PR #7091][EdDev] SR-IOV interfaces are now reported in the VMI status even without an active guest-agent.</li>
-  <li>[PR #7169][rmohr] Improve device plugin de-registration in virt-handler and some test stabilizations</li>
-  <li>[PR #6604][alicefr] Add shareable option to identify if the disk is shared with other VMs</li>
-  <li>[PR #7144][davidvossel] Garbage collect finalized migration objects only leaving the most recent 5 objects</li>
-  <li>[PR #6110][xpivarc] [Nonroot] SRIOV is now available.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.51.0 changes]]></summary></entry></feed>
+This illustrates how virtual machine traffic can be load-balanced via a service.</p>]]></content><author><name>Ram Lavi</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="load-balancer" /><category term="MetalLB" /><summary type="html"><![CDATA[This post illustrates setting up a virtual machine with MetalLB LoadBalancer service.]]></summary></entry></feed>

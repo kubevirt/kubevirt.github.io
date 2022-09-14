@@ -47,7 +47,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2022-08-26 21:43:01 +0000" >
+    <meta property="og:article:published_time" content="2022-09-14 15:56:56 +0000" >
     <meta name="twitter:title" content="KubeVirt Upgrades | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -469,8 +469,8 @@ pod/virt-operator-5ddb4674b9-6fbrv condition met
 
 <p>If you’re running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create configmap kubevirt-config <span class="nt">-n</span> kubevirt <span class="nt">--from-literal</span> debug.useEmulation<span class="o">=</span><span class="nb">true
-</span>configmap/kubevirt-config created
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> kubevirt patch kubevirt kubevirt <span class="nt">--type</span><span class="o">=</span>merge <span class="nt">--patch</span> <span class="s1">'{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'</span>
+configmap/kubevirt-config created
 </code></pre></div></div>
 
 <p>Now let’s deploy KubeVirt by creating a Custom Resource that will trigger the ‘operator’ and perform the deployment:</p>
