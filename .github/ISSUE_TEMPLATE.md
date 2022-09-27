@@ -1,4 +1,6 @@
-<!-- This form is for bug reports and feature requests ONLY! -->
+<!-- This form is for bug reports and feature requests ONLY!
+This repository is for the KubeVirt website.
+Technical issues related to KubeVirt should be filed in the kubevirt/kubevirt repository. -->
 
 **Is this a BUG REPORT or FEATURE REQUEST?**:
 
