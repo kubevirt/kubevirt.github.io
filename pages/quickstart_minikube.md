@@ -21,6 +21,11 @@ tags:
 
 Minikube quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
 
+> warning "Note:"
+> Recent versions of Minikube have been found to not work with KubeVirt.
+> The issue is [under investigation](https://github.com/kubevirt/kubevirt.github.io/issues/859) and appears to be related to the MiniKube virtual machine image.
+> In the meantime, a work-around is to select a driver for MiniKube that does not involve its VM image, such as `podman`.
+
 ## Prepare minikube Kubernetes environment
 
 {% include quickstarts/kubectl.md %}
