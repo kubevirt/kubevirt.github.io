@@ -243,7 +243,7 @@ Targets:
 ## Developer
 
 * Github project: https://github.com/kubevirt
-* Community meetings: [Google Calendar](https://calendar.google.com/calendar/embed?src=18pc0jur01k8f2cccvn5j04j1g%40group.calendar.google.com&ctz=Etc%2FGMT)
+* Community meetings: [Google Calendar](https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io)
 
 ## Privacy
 
