@@ -26,6 +26,6 @@
     "yaspeller-ci": "^1.0.2"
   },
   "dependencies": {
-    "yaspeller": "^7.0.0"
+    "yaspeller": "^7.2.1"
   }
 }
