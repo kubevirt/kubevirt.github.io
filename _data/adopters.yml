@@ -9,7 +9,7 @@ adopters:
   - {link: 'https://minikube.sigs.k8s.io', logo: minikube.png, name: minikube}
   - {link: 'https://www.ovirt.org/documentation/administration_guide/index.html#proc-adding-kubevirt-openshift-as-an-external-provider_external_providers',
     logo: oVirt.png, name: oVirt}
-  - {link: 'https://minikube.sigs.k8s.io', logo: okd.png, name: okd}
+  - {link: 'https://www.okd.io/', logo: okd.png, name: okd}
   vendors:
   - {link: 'https://metal.equinix.com/', logo: EQUINIX.png, name: EQUINIX}
   - {link: 'https://www.h3c.com/en/Products_Technology/Enterprise_Products/Cloud_Computing/Cloud_Computing_Products/H3C_CloudOS/H3C_CloudOS_full-stack/',
