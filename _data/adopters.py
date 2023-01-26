@@ -25,12 +25,16 @@ def logo(name):
     path = '../assets/images/adopters/'
     name = re.sub('[^a-zA-Z0-9 \n]', '', name)
     for root, dirs, files in os.walk(path):
-        result = [s for s in files if '.' + name + '.' in '.' + s]
+        result = [s for s in files if '.' + name.lower() + '.' in '.' + s.lower()]
 
     if len(result) > 1:
         print("Image search yielded more than 1 result")
         print(result)
         print("Please resolve this and settle on one img file")
+        raise SystemExit
+    if len(result) == 0:
+        print("Image search could not find anything for " + name)
+        print("Please add an image file for " + name)
         raise SystemExit
     return result[0]
 
