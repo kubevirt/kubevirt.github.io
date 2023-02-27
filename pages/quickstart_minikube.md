@@ -19,12 +19,8 @@ tags:
 
 ## Easy install using minikube
 
-Minikube quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
+[Minikube](https://minikube.sigs.k8s.io/docs/start/) quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
 
-> warning "Note:"
-> Recent versions of Minikube have been found to not work with KubeVirt.
-> The issue is [under investigation](https://github.com/kubevirt/kubevirt.github.io/issues/859) and appears to be related to the MiniKube virtual machine image.
-> In the meantime, a work-around is to select a driver for MiniKube that does not involve its VM image, such as `podman`.
 
 ## Prepare minikube Kubernetes environment
 
@@ -51,8 +47,11 @@ Minikube ships a kubectl client version that matches the kubernetes version to a
 * Starting minikube can be as simple as running the following command:
 
   ```bash
-  minikube start
+  minikube start --cni=flannel
   ```
+
+  > info "CNI:"
+  > We add the container network interface (CNI) called [flannel](https://github.com/flannel-io/flannel/blob/master/README.md) to make minikube work with VMs that use a masquerade type network interface. If a CNI does not work for you, switch instances of "masquerade" to "bridge" in example VM definitions.
 
   > info ""
   > See the minikube handbook [_here_](https://minikube.sigs.k8s.io/docs/) for advanced start options and instructions on how to operate minikube.
@@ -74,6 +73,9 @@ KubeVirt can be installed using the KubeVirt operator, which manages the lifecyc
 Below are two examples of how to install KubeVirt using the latest release.
 
 ### The easy way
+
+> warning "Addon currently broken"
+> An issue has been [reported](https://github.com/kubernetes/minikube/issues/15918) where more recent versions of minikube break the kubevirt addon. Fall back to the "in-depth" section below until this is resolved.
 
 * Installing KubeVirt can be as simple as the following command:
 
