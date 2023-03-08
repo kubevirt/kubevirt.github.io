@@ -6,7 +6,7 @@ KubeVirt provides an additional binary called _virtctl_ for quick access to the 
 `virtctl` can be retrieved from the release page of the KubeVirt github page.
 
 * Run the following:
-   ```bash
+```bash
 VERSION=$(kubectl get kubevirt.kubevirt.io/kubevirt -n kubevirt -o=jsonpath="{.status.observedKubeVirtVersion}")
 ARCH=$(uname -s | tr A-Z a-z)-$(uname -m | sed 's/x86_64/amd64/') || windows-amd64.exe
 echo ${ARCH}
