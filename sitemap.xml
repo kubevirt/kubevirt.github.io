@@ -697,6 +697,10 @@
 <lastmod>2023-03-03T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html</loc>
+<lastmod>2023-03-06T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1481,6 +1485,12 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/virtualmachinepreference.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/sdn.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/ovn.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>

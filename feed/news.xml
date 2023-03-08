@@ -1,4 +1,279 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-03-08T12:26:33+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2023!</title><link href="https://kubevirt.io//2023/KubeVirt-Summit-2023.html" rel="alternate" type="text/html" title="KubeVirt Summit 2023!" /><published>2023-03-03T00:00:00+00:00</published><updated>2023-03-03T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-Summit-2023</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-Summit-2023.html"><![CDATA[<p>The third online <a href="/summit/">KubeVirt Summit</a> starts March 29, 2023!</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-03-08T17:33:43+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Secondary networks for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html" rel="alternate" type="text/html" title="Secondary networks for KubeVirt VMs using OVN-Kubernetes" /><published>2023-03-06T00:00:00+00:00</published><updated>2023-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<p>OVN (Open Virtual Network) is a series of daemons for the Open vSwitch that
+translate virtual network configurations into OpenFlow. It provides virtual
+networking capabilities for any type of workload on a virtualized platform
+(virtual machines and containers) using the same API.</p>
+
+<p>OVN provides a higher-layer of abstraction than Open vSwitch, working with
+logical routers and logical switches, rather than flows.
+More details can be found in the OVN architecture
+<a href="https://man7.org/linux/man-pages/man7/ovn-architecture.7.html#DESCRIPTION">man page</a>.</p>
+
+<p>In this post we will repeat the scenario of
+<a href="https://kubevirt.io/2020/Multiple-Network-Attachments-with-bridge-CNI.html">its bridge CNI equivalent</a>,
+using this SDN approach, which uses virtual networking infrastructure: thus, it
+is <strong>not</strong> required to provision VLANs or other physical network resources.</p>
+
+<h2 id="demo">Demo</h2>
+<p>To run this demo, you will need a Kubernetes cluster with the following
+components installed:</p>
+<ul>
+  <li>OVN-Kubernetes</li>
+  <li>multus-cni</li>
+  <li>KubeVirt</li>
+</ul>
+
+<p>The <a href="#environment-setup">following section</a> will show you how to create a
+<a href="https://kind.sigs.k8s.io/">KinD</a> cluster, with upstream latest OVN-Kubernetes,
+and upstream latest multus-cni deployed. Please <strong>skip</strong> this section if your
+cluster already features these components (e.g. Openshift).</p>
+
+<h3 id="setup-demo-environment">Setup demo environment</h3>
+<p>Refer to the OVN-Kubernetes repo
+<a href="https://github.com/ovn-org/ovn-kubernetes/blob/master/docs/kind.md#ovn-kubernetes-kind-setup">KIND documentation</a>
+for more details; the gist of it is you should clone the OVN-Kubernetes
+repository, and run their kind helper script:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:ovn-org/ovn-kubernetes.git
+
+<span class="nb">cd </span>ovn-kubernetes
+<span class="nb">pushd </span>contrib <span class="p">;</span> ./kind.sh <span class="nt">--multi-network-enable</span> <span class="p">;</span> <span class="nb">popd</span>
+</code></pre></div></div>
+
+<p>This will get you a running kind cluster, configured to use OVN-Kubernetes as
+the default cluster network, configuring the multi-homing OVN-Kubernetes feature
+gate, and deploying
+<a href="https://github.com/k8snetworkplumbingwg/multus-cni">multus-cni</a> in the cluster.</p>
+
+<h4 id="install-kubevirt-in-the-cluster">Install KubeVirt in the cluster</h4>
+<p>Follow Kubevirt’s
+<a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a>
+to install the latest released version (currently, v0.59.0). Please skip this
+section if you already have a running cluster with KubeVirt installed in it.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span><span class="si">$(</span>curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt<span class="si">)</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
+kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>360s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
+</code></pre></div></div>
+
+<p>Now we have a Kubernetes cluster with all the pieces to start the Demo.</p>
+
+<h3 id="define-the-overlay-network">Define the overlay network</h3>
+<p>Provision the following yaml to define the overlay which will configure the
+secondary attachment for the KubeVirt VMs. Please refer to the OVN-Kubernetes
+user
+<a href="https://github.com/ovn-org/ovn-kubernetes/blob/master/docs/multi-homing.md#switched---layer-2---topology">documentation</a>
+for details into each of the knobs.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: k8s.cni.cncf.io/v1
+kind: NetworkAttachmentDefinition
+metadata:
+  name: l2-network
+  namespace: default
+spec:
+  config: |2
+    {
+            "cniVersion": "0.3.1",
+            "name": "l2-network",
+            "type": "ovn-k8s-cni-overlay",
+            "topology":"layer2",
+            "netAttachDefName": "default/l2-network"
+    }
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>The above example will configure a cluster-wide overlay <strong>without</strong> a subnet
+defined. This means the users will have to define static IPs for their VMs.</p>
+
+<p>It is also worth to point out the value of the <code class="language-plaintext highlighter-rouge">netAttachDefName</code> attribute
+must match the <code class="language-plaintext highlighter-rouge">&lt;namespace&gt;/&lt;name&gt;</code> of the surrounding
+<code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> object.</p>
+
+<h3 id="spin-up-the-vms">Spin up the VMs</h3>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+---
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: vm-server
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+          - name: flatl2-overlay
+            bridge: {}
+        machine:
+          type: ""
+        resources:
+          requests:
+            memory: 1024M
+      networks:
+      - name: default
+        pod: {}
+      - name: flatl2-overlay
+        multus:
+          networkName: l2-network
+      terminationGracePeriodSeconds: 0
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkData: |
+              version: 2
+              ethernets:
+                eth1:
+                  addresses: [ 192.0.2.20/24 ]
+            userData: |-
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+---
+apiVersion: kubevirt.io/v1alpha3
+kind: VirtualMachine
+metadata:
+  name: vm-client
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        devices:
+          disks:
+            - name: containerdisk
+              disk:
+                bus: virtio
+            - name: cloudinitdisk
+              disk:
+                bus: virtio
+          interfaces:
+          - name: default
+            masquerade: {}
+          - name: flatl2-overlay
+            bridge: {}
+        machine:
+          type: ""
+        resources:
+          requests:
+            memory: 1024M
+      networks:
+      - name: default
+        pod: {}
+      - name: flatl2-overlay
+        multus:
+          networkName: l2-network
+      terminationGracePeriodSeconds: 0
+      volumes:
+        - name: containerdisk
+          containerDisk:
+            image: quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel
+        - name: cloudinitdisk
+          cloudInitNoCloud:
+            networkData: |
+              version: 2
+              ethernets:
+                eth1:
+                  addresses: [ 192.0.2.10/24 ]
+            userData: |-
+              #cloud-config
+              password: fedora
+              chpasswd: { expire: False }
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Provision these two Virtual Machines, and wait for them to boot up.</p>
+
+<h3 id="test-connectivity">Test connectivity</h3>
+<p>To verify connectivity over our layer 2 overlay, we need first to ensure the IP
+address of the server VM; let’s query the VMI status for that:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmi vm-server <span class="nt">-ojsonpath</span><span class="o">=</span><span class="s2">"{ @.status.interfaces }"</span> | jq
+<span class="o">[</span>
+  <span class="o">{</span>
+    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
+    <span class="s2">"interfaceName"</span>: <span class="s2">"eth0"</span>,
+    <span class="s2">"ipAddress"</span>: <span class="s2">"10.244.2.8"</span>,
+    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
+      <span class="s2">"10.244.2.8"</span>
+    <span class="o">]</span>,
+    <span class="s2">"mac"</span>: <span class="s2">"52:54:00:23:1c:c2"</span>,
+    <span class="s2">"name"</span>: <span class="s2">"default"</span>,
+    <span class="s2">"queueCount"</span>: 1
+  <span class="o">}</span>,
+  <span class="o">{</span>
+    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
+    <span class="s2">"interfaceName"</span>: <span class="s2">"eth1"</span>,
+    <span class="s2">"ipAddress"</span>: <span class="s2">"192.0.2.20"</span>,
+    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
+      <span class="s2">"192.0.2.20"</span>,
+      <span class="s2">"fe80::7cab:88ff:fe5b:39f"</span>
+    <span class="o">]</span>,
+    <span class="s2">"mac"</span>: <span class="s2">"7e:ab:88:5b:03:9f"</span>,
+    <span class="s2">"name"</span>: <span class="s2">"flatl2-overlay"</span>,
+    <span class="s2">"queueCount"</span>: 1
+  <span class="o">}</span>
+<span class="o">]</span>
+</code></pre></div></div>
+
+<p>You can afterwards connect to them via console and ping <code class="language-plaintext highlighter-rouge">vm-server</code>:</p>
+
+<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>The user and password for this VMs is fedora; check the VM template spec cloudinit userData</p>
+
+
+</div></div>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl console vm-client
+ip a <span class="c"># confirm the IP address is the one set via cloud-init</span>
+<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ip a
+1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
+    <span class="nb">link</span>/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+    inet 127.0.0.1/8 scope host lo
+       valid_lft forever preferred_lft forever
+    inet6 ::1/128 scope host
+       valid_lft forever preferred_lft forever
+2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1400 qdisc fq_codel state UP group default qlen 1000
+    <span class="nb">link</span>/ether 52:54:00:29:de:53 brd ff:ff:ff:ff:ff:ff
+    altname enp1s0
+    inet 10.0.2.2/24 brd 10.0.2.255 scope global dynamic noprefixroute eth0
+       valid_lft 86313584sec preferred_lft 86313584sec
+    inet6 fe80::5054:ff:fe29:de53/64 scope <span class="nb">link
+       </span>valid_lft forever preferred_lft forever
+3: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1400 qdisc fq_codel state UP group default qlen 1000
+    <span class="nb">link</span>/ether 36:f9:29:65:66:55 brd ff:ff:ff:ff:ff:ff
+    altname enp2s0
+    inet 192.0.2.10/24 brd 192.0.2.255 scope global noprefixroute eth1
+       valid_lft forever preferred_lft forever
+    inet6 fe80::34f9:29ff:fe65:6655/64 scope <span class="nb">link
+       </span>valid_lft forever preferred_lft forever
+
+<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ping <span class="nt">-c4</span> 192.0.2.20 <span class="c"># ping the vm-server static IP</span>
+PING 192.0.2.20 <span class="o">(</span>192.0.2.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.05 ms
+64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.05 ms
+64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.995 ms
+64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.902 ms
+
+<span class="nt">---</span> 192.0.2.20 ping statistics <span class="nt">---</span>
+4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3006ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.902/0.997/1.046/0.058 ms
+</code></pre></div></div>
+<h2 id="conclusion">Conclusion</h2>
+<p>In this post we have seen how to use OVN-Kubernetes to create an overlay to
+connect VMs in different nodes using secondary networks, without having to
+configure any physical networking infrastructure.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure cluster-wide overlays as secondary networks for KubeVirt virtual machines.]]></summary></entry><entry><title type="html">KubeVirt Summit 2023!</title><link href="https://kubevirt.io//2023/KubeVirt-Summit-2023.html" rel="alternate" type="text/html" title="KubeVirt Summit 2023!" /><published>2023-03-03T00:00:00+00:00</published><updated>2023-03-03T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-Summit-2023</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-Summit-2023.html"><![CDATA[<p>The third online <a href="/summit/">KubeVirt Summit</a> starts March 29, 2023!</p>
 
 <h2 id="when">When</h2>
 
@@ -1101,333 +1376,4 @@ vm-fedora34   11m   Running   10.244.196.175   node01     True
 
 <h2 id="key-takeaways">Key Takeaways</h2>
 
-<p>The portability of workloads across different environments is becoming increasingly important and operations teams need to be vigilant about avoiding vendor lock in. For containers, Kubernetes is an attractive option because it provides a consistent API layer that can run across multiple cloud platforms. KubeVirt can provide that same level of consistency for VMs. As a community we need to invest further into automation tools that allow people to make the transition to KubeVirt.</p>]]></content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="AWS" /><category term="EC2" /><category term="AMI" /><summary type="html"><![CDATA[This blog post outlines the fundamentals for how to import VMs from AWS into KubeVirt]]></summary></entry><entry><title type="html">Running virtual machines in Istio service mesh</title><link href="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html" rel="alternate" type="text/html" title="Running virtual machines in Istio service mesh" /><published>2021-08-13T00:00:00+00:00</published><updated>2021-08-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh</id><content type="html" xml:base="https://kubevirt.io//2021/Virtual-machines-in-Istio-service-mesh.html"><![CDATA[<h2 id="introduction">Introduction</h2>
-
-<p>This blog post demonstrates running virtual machines in <a href="https://istio.io/">Istio</a> service mesh.</p>
-
-<p>Istio service mesh allows to monitor, visualize, and manage traffic between pods and external services by
-injecting a proxy container - a sidecar - which forwards inbound and outbound traffic of a pod/virtual machine.
-This allows the sidecar to collect metadata about the proxied traffic and also actively interfere with it. For more in-depth information about the Istio proxy mechanism, see <a href="https://medium.com/open-5g-hypercore/episode-iii-meshville-7f0bb7ca0e3b">this blog post</a> published by Dough Smith et al.</p>
-
-<p>The main features of Istio are traffic shifting (migrating traffic from an old to new version of a service), dynamic request routing, fault injection or traffic mirroring for testing/debugging purposes, and more.
-Visit <a href="https://istio.io/latest/docs/tasks/">Istio documentation</a> to learn about all its features.
-Istio featureset may be further extended by installing addons. Kiali, for example, is a UI dashboard that provides traffic information
-of all microservices in a mesh, capable of composing communication graph between all microservices.</p>
-
-<h2 id="prerequisites">Prerequisites</h2>
-
-<ul>
-  <li>KubeVirt <code class="language-plaintext highlighter-rouge">v0.43.0</code></li>
-  <li>CRI-O <code class="language-plaintext highlighter-rouge">v1.19.0</code></li>
-</ul>
-
-<h2 id="limitations">Limitations</h2>
-
-<p>Istio is only supported with masquerade network binding and pod network over IPv4.</p>
-
-<h2 id="demo">Demo</h2>
-
-<p>This section covers deployment of a local cluster with Istio service mesh, KubeVirt installation and creation of an Istio-enabled virtual machine.
-Finally, Kiali dashboard is used to examine both inbound and outbound traffic of the created virtual machine.</p>
-
-<h3 id="run-kubernetes-cluster">Run Kubernetes cluster</h3>
-
-<p>In this blog post, we are going to use <a href="https://github.com/kubevirt/kubevirtci">kubevirtci</a> as our Kubernetes ephemeral cluster provider.</p>
-
-<p>Follow these steps to deploy a local cluster with pre-installed Istio service mesh:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone https://github.com/kubevirt/kubevirtci
-<span class="nb">cd </span>kubevirtci
-<span class="nb">export </span><span class="nv">KUBEVIRTCI_TAG</span><span class="o">=</span>2108222252-0007793
-<span class="c"># Pin to version used in this blog post in case</span>
-<span class="c"># k8s-1.21 provider version disappears in the future</span>
-git checkout <span class="nv">$KUBEVIRTCI_TAG</span>
-<span class="nb">export </span><span class="nv">KUBEVIRT_NUM_NODES</span><span class="o">=</span>2
-<span class="nb">export </span><span class="nv">KUBEVIRT_PROVIDER</span><span class="o">=</span>k8s-1.21
-<span class="nb">export </span><span class="nv">KUBEVIRT_DEPLOY_ISTIO</span><span class="o">=</span><span class="nb">true
-export </span><span class="nv">KUBEVIRT_WITH_CNAO</span><span class="o">=</span><span class="nb">true
-</span>make cluster-up
-<span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span>./cluster-up/kubeconfig.sh<span class="si">)</span>
-</code></pre></div></div>
-
-<p>For details about Istio configuration, see Istio kubevirtci <a href="https://github.com/kubevirt/kubevirtci/blob/2108081530-91f55e3/cluster-provision/k8s/1.21/istio.sh">install script</a>.</p>
-
-<h3 id="install-kubevirt">Install Kubevirt</h3>
-
-<p>Following KubeVirt <a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a> to install released version <code class="language-plaintext highlighter-rouge">v0.43.0</code>:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span>v0.43.0
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
-kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>180s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
-</code></pre></div></div>
-
-<h3 id="install-istio-addons">Install Istio addons</h3>
-
-<p>While the ephemeral kubevirtci installs core Istio components, addons like Kiali dashboard are not installed by default.
-Download Istio manifests and client binary by running the following command:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">ISTIO_VERSION</span><span class="o">=</span>1.10.0
-curl <span class="nt">-L</span> https://istio.io/downloadIstio | sh -
-</code></pre></div></div>
-
-<p>and export path to the istioctl binary by following the output of the above command.</p>
-
-<p>Finally, deploy Kiali, Jaeger and Prometheus addons:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/kiali.yaml
-kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/jaeger.yaml
-kubectl create <span class="nt">-f</span> istio-<span class="k">${</span><span class="nv">ISTIO_VERSION</span><span class="k">}</span>/samples/addons/prometheus.yaml
-</code></pre></div></div>
-
-<p><strong>Note:</strong> If there are errors when installing the addons, try running the command again. There may be timing issues which will be resolved when the command is run again.</p>
-
-<h3 id="prepare-target-namespace">Prepare target namespace</h3>
-
-<p>Before creating virtual machines, the target namespace needs to be configured for the Istio sidecar to be injected and working properly.
-This involves adding a label and creating a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> in the target namespace.</p>
-
-<h4 id="istio-sidecar-injection">Istio sidecar injection</h4>
-
-<p>Istio supports <a href="https://istio.io/latest/docs/setup/additional-setup/sidecar-injection/">two ways of injecting</a> a sidecar to a pod - automatic and manual. For simplicity, we will only consider automatic sidecar injection in this demo, which is enabled by adding <code class="language-plaintext highlighter-rouge">istio-injection=enabled</code> label to target namespace:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl label namespace default istio-injection<span class="o">=</span>enabled
-</code></pre></div></div>
-
-<h4 id="network-attachment-definiton">Network attachment definiton</h4>
-
-<p>When Multus is installed in k8s cluster, a <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> called <code class="language-plaintext highlighter-rouge">istio-cni</code> <strong>must</strong> be created in <strong>each</strong> namespace where Istio sidecar containers are to be used:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
-apiVersion: "k8s.cni.cncf.io/v1"
-kind: NetworkAttachmentDefinition
-metadata:
-  name: istio-cni
-</span><span class="no">EOF
-</span></code></pre></div></div>
-
-<p>The <code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> spec is empty, as its only purpose is to trigger the <code class="language-plaintext highlighter-rouge">istio-cni</code> binary, which configures the in-pod traffic routing.</p>
-
-<h3 id="topology">Topology</h3>
-
-<p>To demonstrate monitoring and tracing capabilities, we will create two VMIs within Istio service mesh:</p>
-
-<ul>
-  <li><code class="language-plaintext highlighter-rouge">istio-vmi</code> repeatedly requests external HTTP service kubevirt.io, and serves a simple HTTP server on port 8080,</li>
-  <li><code class="language-plaintext highlighter-rouge">cirros-vmi</code> repeatedly request the HTTP service running on the <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI.</li>
-</ul>
-
-<p>With this setup, both inbound and outbound
-traffic metrics can be observed in Kiali dashboard for <code class="language-plaintext highlighter-rouge">istio-vmi</code>.</p>
-
-<h3 id="create-vmi-resources">Create VMI resources</h3>
-
-<p>An Istio aware virtual machine <strong>must</strong> be annotated with <code class="language-plaintext highlighter-rouge">sidecar.istio.io/inject: "true"</code>, regardless of used Istio injection mechanism.
-Without this annotation, traffic would not be properly routed through the istio proxy sidecar.
-Additonally, Istio uses <code class="language-plaintext highlighter-rouge">app</code> label for adding contextual information to the collected telemetry.
-Both, the annotation and label can be seen in the following virtual machine example:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
-apiVersion: kubevirt.io/v1
-kind: VirtualMachineInstance
-metadata:
-  annotations:
-    sidecar.istio.io/inject: "true"
-  labels:
-    app: istio-vmi
-  name: istio-vmi
-spec:
-  domain:
-    devices:
-      interfaces:
-        - name: default
-          masquerade: {}
-          ports:
-            - port: 8080
-      disks:
-        - disk:
-            bus: virtio
-          name: containerdisk
-        - disk:
-            bus: virtio
-          name: cloudinitdisk
-    resources:
-      requests:
-        memory: 1024M
-  networks:
-    - name: default
-      pod: {}
-  readinessProbe:
-    httpGet:
-      port: 8080
-    initialDelaySeconds: 120
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
-    successThreshold: 3
-  terminationGracePeriodSeconds: 0
-  volumes:
-    - name: containerdisk
-      containerDisk:
-        image: kubevirt/fedora-cloud-container-disk-demo:devel
-    - cloudInitNoCloud:
-        userData: |
-          #cloud-config
-          password: fedora
-          chpasswd: { expire: False }
-          runcmd:
-          - dnf install -y screen nc
-          - while true ; do sh -c "nc -lp 8080 -c  </span><span class="se">\"</span><span class="sh">echo -e 'HTTP/1.1 200 OK</span><span class="se">\n\n</span><span class="sh">Hello'</span><span class="se">\"</span><span class="sh"> " ; done &amp;
-          - while true ; do curl kubevirt.io &gt;out 2&gt;/dev/null ; sleep 1 ; done &amp;
-      name: cloudinitdisk
-</span><span class="no">EOF
-</span></code></pre></div></div>
-
-<p>The cloud init section of the VMI runs two loops requesting <code class="language-plaintext highlighter-rouge">kubevirt.io</code> website every second to generate outbound traffic (from the VMI) and serving simple HTTP server on port <code class="language-plaintext highlighter-rouge">8080</code>, which will be used for monitoring of inbound traffic (to the VMI).</p>
-
-<p>Let’s also create a service for the VMI that will be used to access the http server in <code class="language-plaintext highlighter-rouge">istio-vmi</code>:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f-
-apiVersion: v1
-kind: Service
-metadata:
-  name: istio-vmi-svc
-spec:
-  selector:
-    app: istio-vmi
-  ports:
-  - port: 8080
-    protocol: TCP
-</span><span class="no">EOF
-</span></code></pre></div></div>
-
-<p>Finally, create the <code class="language-plaintext highlighter-rouge">cirros-vmi</code> VMI, for the purpose of generating inbound traffic to <code class="language-plaintext highlighter-rouge">istio-vmi</code> VMI:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
-apiVersion: kubevirt.io/v1
-kind: VirtualMachineInstance
-metadata:
-  annotations:
-    sidecar.istio.io/inject: "true"
-  name: cirros-vmi
-  labels:
-    app: cirros-vmi
-spec:
-  domain:
-    devices:
-      interfaces:
-        - name: default
-          masquerade: {}
-      disks:
-        - disk:
-            bus: virtio
-          name: containerdisk
-        - disk:
-            bus: virtio
-          name: cloudinitdisk
-    resources:
-      requests:
-        memory: 128M
-  networks:
-    - name: default
-      pod: {}
-  terminationGracePeriodSeconds: 0
-  volumes:
-    - name: containerdisk
-      containerDisk:
-        image: kubevirt/cirros-container-disk-demo:devel
-    - name: cloudinitdisk
-      cloudInitNoCloud:
-        userData: |
-          #!/bin/sh
-          while true ; do curl istio-vmi-svc.default.svc.cluster.local:8080 ; sleep 1 ; done
-</span><span class="no">EOF
-</span></code></pre></div></div>
-
-<p>Wait for the <code class="language-plaintext highlighter-rouge">istio-vmi</code> to be ready:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nb">wait</span> <span class="nt">--for</span><span class="o">=</span><span class="nv">condition</span><span class="o">=</span>ready <span class="nt">--timeout</span><span class="o">=</span>180s pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>istio-vmi
-</code></pre></div></div>
-
-<p>After creating the VMIs, the corresponding virt-launcher pods should have 3 ready containers, as shown in the snippet below:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods
-NAME                             READY   STATUS    RESTARTS   AGE
-virt-launcher-istio-vmi-XYZ      3/3     Running   0          4m13s
-virt-launcher-cirros-vmi-XYZ     3/3     Running   0          2m21s
-</code></pre></div></div>
-
-<p><code class="language-plaintext highlighter-rouge">Istioctl proxy-status</code> should report that the sidecar proxies running inside the virt-launcher pods have synced with Istio control plane:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl proxy-status
-NAME                                          CDS        LDS        EDS        RDS          ISTIOD                      VERSION
-virt-launcher-cirros-vmi-9f765.default        SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-5d79g     1.10.0
-virt-launcher-istio-vmi-99t8t.default         SYNCED     SYNCED     SYNCED     SYNCED       istiod-7d96484d6b-nk4cd     1.10.0
-</code></pre></div></div>
-
-<p><strong>Note:</strong> Displaying only relevant VMI entities.</p>
-
-<h3 id="monitor-traffic-in-kiali-dashboard">Monitor traffic in Kiali dashboard</h3>
-
-<p>With both VMIs up and running, we can open the Kiali dashboard and observe the traffic metrics.
-Run the following command, to access Kiali dashboard:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>istioctl dashboard kiali
-</code></pre></div></div>
-
-<h4 id="topology-graph">Topology graph</h4>
-
-<p>Let’s start by navigating to the topology graph by clicking the Graph menu item.</p>
-
-<p><br /></p>
-<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
-  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
-    <a href="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/topology-graph.png" itemprop="contentUrl" data-size="800x530">
-      <img src="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/topology-graph.png" itemprop="thumbnail" width="100%" alt="Topology graph" />
-    </a>
-    <figcaption itemprop="Topology graph of deployed VMIs showing the traffic flows"></figcaption>
-  </figure>
-</div>
-
-<p>In the topology graph, we can observe the following traffic flows:</p>
-
-<ul>
-  <li>requests from <code class="language-plaintext highlighter-rouge">cirros-vmi</code> to <code class="language-plaintext highlighter-rouge">istio-vmi</code> via <code class="language-plaintext highlighter-rouge">istio-vmi-svc</code> service,</li>
-  <li>requests from <code class="language-plaintext highlighter-rouge">istio-vmi</code> to <code class="language-plaintext highlighter-rouge">PasstroughCluster</code>. The <code class="language-plaintext highlighter-rouge">PastroughCluster</code> marks  destinations external to our service mesh.</li>
-</ul>
-
-<h4 id="workloads">Workloads</h4>
-
-<p>Navigate to <code class="language-plaintext highlighter-rouge">istio-vmi</code> workload overview by clicking the <code class="language-plaintext highlighter-rouge">Workloads</code> menu item and selecting <code class="language-plaintext highlighter-rouge">istio-vmi</code> from the list.</p>
-
-<p>The overview page presents partial topology graph with traffic related to <code class="language-plaintext highlighter-rouge">istio-vmi</code>. In our case, this graph is the same as the graph of our entire mesh.</p>
-
-<p>Navigate to Inbound Metrics tab to see metrics charts of inbound traffic.</p>
-
-<p><br /></p>
-<div class="my-gallery" itemscope="" itemtype="http://schema.org/ImageGallery">
-  <figure itemprop="associatedMedia" itemscope="" itemtype="http://schema.org/ImageObject">
-    <a href="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/istio-blog-vmi-istio-inbound-traffic.png" itemprop="contentUrl" data-size="800x530">
-      <img src="/assets/2021-08-13-Virtual-machines-in-Istio-service-mesh/istio-blog-vmi-istio-inbound-traffic.png" itemprop="thumbnail" width="100%" alt="Inbound traffic metrics" />
-    </a>
-    <figcaption itemprop="Inbound traffic metrics for `istio-vmi`"></figcaption>
-  </figure>
-</div>
-
-<p>In Request volume chart we can see that number of requests stabilizes at around <code class="language-plaintext highlighter-rouge">1 ops</code>, which matches our loop sending one reqest per second. Request throughput chart reveals that the requests consume around <code class="language-plaintext highlighter-rouge">4 kbit/s</code> of bandwidth.
-Remaining two charts provide information about Request duration and size.</p>
-
-<p>The same metrics are collected for outbound traffic as well, which can be seen in Outbound Metrics tab.</p>
-
-<h2 id="cluster-teardown">Cluster teardown</h2>
-
-<p>Run the following command to deprovision the ephemeral cluster:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make cluster-down
-</code></pre></div></div>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>KubeVirt introduced <a href="https://kubevirt.io/user-guide/virtual_machines/istio_service_mesh/">support for Istio</a>, allowing virtual machines to be part of a service mesh.</p>
-
-<p>This blog post covered running KubeVirt virtual machine in Istio service mesh using an ephemeral kubevirtci cluster. Kiali dashboard was used to observe inbound and outbound traffic of a virtual machine.</p>]]></content><author><name>Radim Hrazdil</name></author><category term="news" /><category term="kubevirt" /><category term="istio" /><category term="virtual machine" /><category term="VM" /><category term="service mesh" /><category term="mesh" /><summary type="html"><![CDATA[This blog post demonstrates running virtual machines in Istio service mesh.]]></summary></entry></feed>
+<p>The portability of workloads across different environments is becoming increasingly important and operations teams need to be vigilant about avoiding vendor lock in. For containers, Kubernetes is an attractive option because it provides a consistent API layer that can run across multiple cloud platforms. KubeVirt can provide that same level of consistency for VMs. As a community we need to invest further into automation tools that allow people to make the transition to KubeVirt.</p>]]></content><author><name>David Vossel</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="AWS" /><category term="EC2" /><category term="AMI" /><summary type="html"><![CDATA[This blog post outlines the fundamentals for how to import VMs from AWS into KubeVirt]]></summary></entry></feed>
