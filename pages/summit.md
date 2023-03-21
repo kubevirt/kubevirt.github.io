@@ -65,10 +65,10 @@ Presented by Marcelo Feitoza Parisi
 KubeVirt-Manager is an Open Source initiative that plans to democratize KubeVirt usage and scale KubeVirt's reach to legacy virtualization administrators and users, by delivering a simple, effective and friendly Web User Interface for KubeVirt, using technologies like AngularJS, Bootstrap and NoVNC embedded. By implementing a simple Web User Interface, KubeVirt-Manager can effectively eliminate the needs of writing and managing complex Kubernetes YAML files. Containerized Data Importer is also used by KubeVirt-Manager as a backend for Data Volume general management tasks, like provisioning, creating and scaling.
 
 
-16:30-16:55: **The latest in KubeVirt VM exports**<br>
-Presented by Maya Rashish
+16:30-16:55: **How Killercoda works with KubeVirt**<br>
+Presented by Meha Bhalodiya & Adam Gardner
 
-We'll talk about the recently introduced feature for easily exporting VMs and use some recent quality of life improvements that have made it in since the feature was introduced
+By using KubeVirt in conjunction with Killercoda, users can take advantage of the benefits of virtualization while still utilizing the benefits of Kubernetes. This can provide a powerful and flexible platform for running VMs, and can help to simplify the management of VMs and to improve the performance and security of the platform.  The integration of virtualization technology with Kubernetes allows customers to easily manage and monitor their VMs while taking advantage of the scalability and self-healing capabilities of Kubernetes. With Killercoda, users can create custom virtual networks, use firewalls and load balancers, and even establish VPN connections between VMs and other resources.
 
 
 17:00-17:50: **DPU Accelerated Networking for KubeVirt Pods**<br>
@@ -95,11 +95,10 @@ Want to develop in the cloud with your friends? We'll invite you to walk through
 
 
 ### March 30
+14:00-14:25: **The latest in KubeVirt VM exports**<br>
+Presented by Maya Rashish
 
-14:00-14:25: **How Killercoda works with KubeVirt**<br>
-Presented by Meha Bhalodiya & Adam Gardner
-
-By using KubeVirt in conjunction with Killercoda, users can take advantage of the benefits of virtualization while still utilizing the benefits of Kubernetes. This can provide a powerful and flexible platform for running VMs, and can help to simplify the management of VMs and to improve the performance and security of the platform.  The integration of virtualization technology with Kubernetes allows customers to easily manage and monitor their VMs while taking advantage of the scalability and self-healing capabilities of Kubernetes. With Killercoda, users can create custom virtual networks, use firewalls and load balancers, and even establish VPN connections between VMs and other resources.
+We'll talk about the recently introduced feature for easily exporting VMs and use some recent quality of life improvements that have made it in since the feature was introduced 
 
 
 14:30-14:55: **High Performance Network Stack for KubeVirt-based Managed Kubernetes**<br>
