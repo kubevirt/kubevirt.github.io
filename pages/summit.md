@@ -21,7 +21,7 @@ and discussion within the community in real-time.
 
 ## Schedule
 
-Both days are 14:00 - 19:00 UTC (9:00–14:00 EST, 15:00–20:00 CET)
+Both days are 14:00 - 19:00 UTC (10:00–15:00 EDT, 16:00–21:00 CEST)
 
 ### March 29
 
