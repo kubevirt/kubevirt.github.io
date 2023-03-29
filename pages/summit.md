@@ -19,9 +19,13 @@ and discussion within the community in real-time.
 
 [Register for KubeVirt Summit 2023](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2023/) on the CNCF Community events page. Attendance is free.
 
+**Update due to technical issues**
+Day 1 experienced some technical issues with the event page listed above. We are waiting to hear whether this will be resolved before Day 2 begins. If it is not, we will update the above event page with the new link.
+
 ## Schedule
 
-Both days are 14:00 - 19:00 UTC (10:00–15:00 EDT, 16:00–21:00 CEST)
+Both days were orginally scheduled for 14:00 - 19:00 UTC (10:00–15:00 EDT, 16:00–21:00 CEST).
+Due to technical issues Thursday will start will be 13:00 - 19:00 UTC.
 
 ### March 29
 
@@ -95,6 +99,23 @@ Want to develop in the cloud with your friends? We'll invite you to walk through
 
 
 ### March 30
+
+1300-1325: **Update on KubeVirt’s Road to V1**<br>
+Presented by Ryan Hallisey & Fabian Deutsch
+
+The KubeVirt community will soon create the 59th release for KubeVirt, so let’s talk about what it will take for the next release to be v1.0.0.  In this talk we’ll discuss the upcoming changes in the community to get ready for 1.0 and the timeline.
+
+
+13:30-13:55: **Moving the instance type API towards v1 and streamlining the VM creation process**<br>
+Presented by Lee Yarwood & Felix Matouschek
+
+This presentation introduces the current state of the Instance type API (currently v1alpha2) and discusses the future planned improvements as we move towards v1. It will also provide an insight into the latest development advances in KubeVirt aiming to streamline the virtual machine creation process.
+
+By introducing virtual machine instance types and preferences, KubeVirt gains abstractions for resource sizing, performance and OS support, which allow users to focus on the parameters relevant to their applications. To make instance types and preferences approachable, the command line tools of KubeVirt were extended to enable a user experience on a par with all major hyperscalers.
+
+Attendees of this talk will learn about KubeVirt's new instance types and preferences, how they considerably improve the user experience and how they reduce the maintenance effort of KubeVirt virtual machines.
+
+
 14:00-14:25: **The latest in KubeVirt VM exports**<br>
 Presented by Maya Rashish
 
