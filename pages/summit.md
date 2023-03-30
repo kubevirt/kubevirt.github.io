@@ -19,9 +19,6 @@ and discussion within the community in real-time.
 
 [Register for KubeVirt Summit 2023](https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2023/) on the CNCF Community events page. Attendance is free.
 
-**Update due to technical issues**
-Day 1 experienced some technical issues with the event page listed above. We are waiting to hear whether this will be resolved before Day 2 begins. If it is not, we will update the above event page with the new link.
-
 ## Schedule
 
 Both days were orginally scheduled for 14:00 - 19:00 UTC (10:00–15:00 EDT, 16:00–21:00 CEST).
