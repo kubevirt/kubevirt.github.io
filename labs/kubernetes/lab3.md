@@ -16,10 +16,10 @@ tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]
 
 If you've already covered this, jump over this section.
 
-Let's stick to use the release `v0.20.1`:
+Let's stick to use the release `v0.59.0`:
 
 ```sh
-export KUBEVIRT_VERSION=v0.20.1
+export KUBEVIRT_VERSION=v0.59.0
 ```
 
 Let's deploy the KubeVirt Operator by running the following command:
