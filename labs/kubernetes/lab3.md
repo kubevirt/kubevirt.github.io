@@ -144,17 +144,6 @@ $ kubectl get vmis
 
 Once the PHASE will change to `Running`, we're ready for upgrading KubeVirt.
 
-#### Define the next version to upgrade to
-
-KubeVirt starting from `v0.17.0` onwards, allows to upgrade one version at a time, by using two approaches as defined in the [user-guide](https://kubevirt.io/user-guide/operations/updating_and_deletion):
-
-- Patching the imageTag value in the KubeVirt CR spec
-- Updating the operator if no imageTag is defined (defaulting to upgrade to match the operator version)
-
-**WARNING:** In both cases, the supported scenario is updating from N-1 to N
-
-**NOTE:** Zero downtime rolling updates are supported starting with release `v0.17.0` onwards. Updating from any release prior to the KubeVirt `v0.17.0` release is not supported.
-
 #### Performing the upgrade
 
 ##### Updating the KubeVirt operator if no imageTag value is set
@@ -207,7 +196,7 @@ Warning: kubectl apply should be used on resource created by either kubectl crea
 deployment.apps/virt-operator configured
 ```
 
-**NOTE:** Since version `0.20.1`, the operator version should be checked with the following command:
+**NOTE:** Since version `0.56.1`, the operator version should be checked with the following command:
 
 ```sh
 $ echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}')
