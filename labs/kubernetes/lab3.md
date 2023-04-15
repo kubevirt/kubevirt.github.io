@@ -16,10 +16,10 @@ tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]
 
 If you've already covered this, jump over this section.
 
-Let's stick to use the release `v0.59.0`:
+Let's stick to use the release `v0.56.1`:
 
 ```sh
-export KUBEVIRT_VERSION=v0.59.0
+export KUBEVIRT_VERSION=v0.56.1
 ```
 
 Let's deploy the KubeVirt Operator by running the following command:
@@ -161,10 +161,10 @@ KubeVirt starting from `v0.17.0` onwards, allows to upgrade one version at a tim
 
 When no `imageTag` value is set in the KubeVirt CR, the system assumes that the version of KubeVirt is locked to the version of the operator. This means that updating the operator will result in the underlying KubeVirt installation being updated as well.
 
-Let's upgrade to the newer version after the one installed (`0.20.1` -> `0.21.0`):
+Let's upgrade to the newer version after the one installed (`v0.56.1` -> `v0.57.0`):
 
 ```sh
-$ export KUBEVIRT_VERSION=v0.21.0
+$ export KUBEVIRT_VERSION=v0.56.1
 $ kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
 ...
