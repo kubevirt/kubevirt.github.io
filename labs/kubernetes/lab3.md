@@ -164,7 +164,7 @@ When no `imageTag` value is set in the KubeVirt CR, the system assumes that the 
 Let's upgrade to the newer version after the one installed (`v0.56.1` -> `v0.57.0`):
 
 ```sh
-$ export KUBEVIRT_VERSION=v0.56.1
+$ export KUBEVIRT_VERSION=v0.57.0
 $ kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
 ...
