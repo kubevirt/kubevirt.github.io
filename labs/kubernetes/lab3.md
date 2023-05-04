@@ -38,18 +38,18 @@ $ kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevir
 pod/virt-operator-5ddb4674b9-6fbrv condition met
 ```
 
-If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
-
-```sh
-$ kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
-configmap/kubevirt-config created
-```
-
 Now let's deploy KubeVirt by creating a Custom Resource that will trigger the 'operator' and perform the deployment:
 
 ```sh
 $ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
 kubevirt.kubevirt.io/kubevirt created
+```
+
+If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
+
+```sh
+$ kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
+configmap/kubevirt-config created
 ```
 
 Let's check the deployment:
