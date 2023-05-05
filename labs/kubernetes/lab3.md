@@ -12,7 +12,7 @@ tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]
 
 #### Deploy KubeVirt
 
-**_NOTE_**: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you're already using latest, please start with an older KubeVirt version and follow [Lab1]({{ site.baseurl }}/labs/kubernetes/lab1) to deploy KubeVirt on it, but using version `v0.20.1` instead.
+**_NOTE_**: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you're already using latest, please start with an older KubeVirt version and follow [Lab1]({{ site.baseurl }}/labs/kubernetes/lab1) to deploy KubeVirt on it, but using version `v0.56.1` instead.
 
 If you've already covered this, jump over this section.
 
@@ -207,7 +207,7 @@ Warning: kubectl apply should be used on resource created by either kubectl crea
 deployment.apps/virt-operator configured
 ```
 
-**NOTE:** Since version `0.56.1`, the operator version should be checked with the following command:
+The following command shows how to check the operator version
 
 ```sh
 $ echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}')
