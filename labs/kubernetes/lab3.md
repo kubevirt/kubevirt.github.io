@@ -12,14 +12,14 @@ tags: [laboratory, kubevirt upgrades, upgrade, lifecycle, lab]
 
 #### Deploy KubeVirt
 
-**_NOTE_**: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you're already using latest, please start with an older KubeVirt version and follow [Lab1]({{ site.baseurl }}/labs/kubernetes/lab1) to deploy KubeVirt on it, but using version `v0.20.1` instead.
+**_NOTE_**: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you're already using latest, please start with an older KubeVirt version and follow [Lab1]({{ site.baseurl }}/labs/kubernetes/lab1) to deploy KubeVirt on it, but using version `v0.56.1` instead.
 
 If you've already covered this, jump over this section.
 
-Let's stick to use the release `v0.20.1`:
+Let's stick to use the release `v0.56.1`:
 
 ```sh
-export KUBEVIRT_VERSION=v0.20.1
+export KUBEVIRT_VERSION=v0.56.1
 ```
 
 Let's deploy the KubeVirt Operator by running the following command:
@@ -38,18 +38,18 @@ $ kubectl wait --for condition=ready pod -l kubevirt.io=virt-operator -n kubevir
 pod/virt-operator-5ddb4674b9-6fbrv condition met
 ```
 
-If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
-
-```sh
-$ kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
-configmap/kubevirt-config created
-```
-
 Now let's deploy KubeVirt by creating a Custom Resource that will trigger the 'operator' and perform the deployment:
 
 ```sh
 $ kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-cr.yaml
 kubevirt.kubevirt.io/kubevirt created
+```
+
+If you're running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.
+
+```sh
+$ kubectl -n kubevirt patch kubevirt kubevirt --type=merge --patch '{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'
+configmap/kubevirt-config created
 ```
 
 Let's check the deployment:
@@ -161,10 +161,10 @@ KubeVirt starting from `v0.17.0` onwards, allows to upgrade one version at a tim
 
 When no `imageTag` value is set in the KubeVirt CR, the system assumes that the version of KubeVirt is locked to the version of the operator. This means that updating the operator will result in the underlying KubeVirt installation being updated as well.
 
-Let's upgrade to the newer version after the one installed (`0.20.1` -> `0.21.0`):
+Let's upgrade to the newer version after the one installed (`v0.56.1` -> `v0.57.0`):
 
 ```sh
-$ export KUBEVIRT_VERSION=v0.21.0
+$ export KUBEVIRT_VERSION=v0.57.0
 $ kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/${KUBEVIRT_VERSION}/kubevirt-operator.yaml
 Warning: kubectl apply should be used on resource created by either kubectl create --save-config or kubectl apply
 ...
@@ -207,7 +207,7 @@ Warning: kubectl apply should be used on resource created by either kubectl crea
 deployment.apps/virt-operator configured
 ```
 
-**NOTE:** Since version `0.20.1`, the operator version should be checked with the following command:
+The following command shows how to check the operator version
 
 ```sh
 $ echo $(kubectl get deployment.apps virt-operator -n kubevirt -o jsonpath='{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}')
