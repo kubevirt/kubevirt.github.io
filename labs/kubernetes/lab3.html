@@ -47,7 +47,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2023-03-30 15:12:28 +0000" >
+    <meta property="og:article:published_time" content="2023-05-08 12:11:43 +0000" >
     <meta name="twitter:title" content="KubeVirt Upgrades | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -444,13 +444,13 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <h4 id="deploy-kubevirt">Deploy KubeVirt</h4>
 
-<p><strong><em>NOTE</em></strong>: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you’re already using latest, please start with an older KubeVirt version and follow <a href="/labs/kubernetes/lab1">Lab1</a> to deploy KubeVirt on it, but using version <code class="language-plaintext highlighter-rouge">v0.20.1</code> instead.</p>
+<p><strong><em>NOTE</em></strong>: For upgrading to the latest KubeVirt version, first we will install a specific older version of the operator, if you’re already using latest, please start with an older KubeVirt version and follow <a href="/labs/kubernetes/lab1">Lab1</a> to deploy KubeVirt on it, but using version <code class="language-plaintext highlighter-rouge">v0.56.1</code> instead.</p>
 
 <p>If you’ve already covered this, jump over this section.</p>
 
-<p>Let’s stick to use the release <code class="language-plaintext highlighter-rouge">v0.20.1</code>:</p>
+<p>Let’s stick to use the release <code class="language-plaintext highlighter-rouge">v0.56.1</code>:</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span>v0.20.1
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span>v0.56.1
 </code></pre></div></div>
 
 <p>Let’s deploy the KubeVirt Operator by running the following command:</p>
@@ -467,16 +467,16 @@ deployment.apps/virt-operator created
 pod/virt-operator-5ddb4674b9-6fbrv condition met
 </code></pre></div></div>
 
-<p>If you’re running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.</p>
-
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> kubevirt patch kubevirt kubevirt <span class="nt">--type</span><span class="o">=</span>merge <span class="nt">--patch</span> <span class="s1">'{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'</span>
-configmap/kubevirt-config created
-</code></pre></div></div>
-
 <p>Now let’s deploy KubeVirt by creating a Custom Resource that will trigger the ‘operator’ and perform the deployment:</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-cr.yaml
 kubevirt.kubevirt.io/kubevirt created
+</code></pre></div></div>
+
+<p>If you’re running in a virtualized environment, in order to be able to run VMs here we need to pre-configure KubeVirt so it uses software-emulated virtualization instead of trying to use real hardware virtualization.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl <span class="nt">-n</span> kubevirt patch kubevirt kubevirt <span class="nt">--type</span><span class="o">=</span>merge <span class="nt">--patch</span> <span class="s1">'{"spec":{"configuration":{"developerConfiguration":{"useEmulation":true}}}}'</span>
+configmap/kubevirt-config created
 </code></pre></div></div>
 
 <p>Let’s check the deployment:</p>
@@ -580,9 +580,9 @@ testvm    1m        Running   10.32.0.11   master
 
 <p>When no <code class="language-plaintext highlighter-rouge">imageTag</code> value is set in the KubeVirt CR, the system assumes that the version of KubeVirt is locked to the version of the operator. This means that updating the operator will result in the underlying KubeVirt installation being updated as well.</p>
 
-<p>Let’s upgrade to the newer version after the one installed (<code class="language-plaintext highlighter-rouge">0.20.1</code> -&gt; <code class="language-plaintext highlighter-rouge">0.21.0</code>):</p>
+<p>Let’s upgrade to the newer version after the one installed (<code class="language-plaintext highlighter-rouge">v0.56.1</code> -&gt; <code class="language-plaintext highlighter-rouge">v0.57.0</code>):</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span>v0.21.0
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">export </span><span class="nv">KUBEVIRT_VERSION</span><span class="o">=</span>v0.57.0
 <span class="nv">$ </span>kubectl apply <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">KUBEVIRT_VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 Warning: kubectl apply should be used on resource created by either kubectl create <span class="nt">--save-config</span> or kubectl apply
 ...
@@ -621,7 +621,7 @@ Warning: kubectl apply should be used on resource created by either kubectl crea
 deployment.apps/virt-operator configured
 </code></pre></div></div>
 
-<p><strong>NOTE:</strong> Since version <code class="language-plaintext highlighter-rouge">0.20.1</code>, the operator version should be checked with the following command:</p>
+<p>The following command shows how to check the operator version</p>
 
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="si">$(</span>kubectl get deployment.apps virt-operator <span class="nt">-n</span> kubevirt <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.spec.template.spec.containers[0].env[?(@.name=="KUBEVIRT_VERSION")].value}'</span><span class="si">)</span>
 </code></pre></div></div>
