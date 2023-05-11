@@ -39,6 +39,7 @@ and as a result already has `MetalLB` installed in the cluster.
 ### Architecture
 Please refer to the architecture diagram below to understand the solution.
 ![MetalLB Service resolved by name](/assets/2023-05-08-metallb-external-dns/arch.jpg)
+<img src="/assets/2023-05-08-metallb-external-dns/arch.jpg" alt= “” width="150" height="150">
 
 1. Client outside the Cluster initiates the ssh connection
 2. Cluster interface used by MetalLB to propagate the IPs of MetalLB
