@@ -28,7 +28,18 @@ This blog post wants to take this a step further, and allow the user to
 interact with exposed services via FQDN, rather than IPs.
 
 ## Motivation
-TODO
+Using DNS names is more confortable than relying on IP addresses since they are
+easier to remember, provide hierarchies, and dissociate the workload from the
+IP address (which may change over time).
+
+As such, a typical workload user would benefit from referring to Kubernetes
+`LoadBalancer` services by name.
+
+## Goal
+Reach a service exposed via a `LoadBalancer` service type using its name,
+rather than an IP.
+
+As reference, we will use an SSH service running on a VM.
 
 ## Demo
 This post assumes the user has followed throught the installation instructions
@@ -39,7 +50,7 @@ and as a result already has `MetalLB` installed in the cluster.
 ### Architecture
 Please refer to the architecture diagram below to understand the solution.
 ![MetalLB Service resolved by name](/assets/2023-05-08-metallb-external-dns/arch.jpg)
-<img src="/assets/2023-05-08-metallb-external-dns/arch.jpg" alt= “” width="150" height="150">
+<img src="/assets/2023-05-08-metallb-external-dns/arch.jpg" alt= “” width="25" height="25">
 
 1. Client outside the Cluster initiates the ssh connection
 2. Cluster interface used by MetalLB to propagate the IPs of MetalLB
@@ -114,5 +125,14 @@ TODO
 TODO
 
 ## Conclusion
-TODO
+Combining the functionality of MetalLB Operator and externalDNS allows us to
+expose VirtualMachines via SSH by adding simple annotations on the related
+kubernetes service object.
+
+Propagating the Virtual Machines IP Address with dynamic A records on
+`externalDNS`, allowed us to expose workloads easily on arbitrary FQDNs,
+different from the cluster domain.
+
+This approach can be used to expose **any** TCP service running on a container
+or Virtual Machine.
 
