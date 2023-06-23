@@ -42,7 +42,7 @@ Review the "cdi" pods that were added.
 
 #### Use CDI to Import a Disk Image
 
-As an example, we will import a Fedora33 Cloud Image as a PVC and launch a Virtual Machine making use of it.
+As an example, we will import a Fedora36 Cloud Image as a PVC and launch a Virtual Machine making use of it.
 
 ```bash
 {% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
