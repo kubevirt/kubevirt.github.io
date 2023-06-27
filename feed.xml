@@ -1,4 +1,686 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-06-23T14:02:31+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Secondary networks for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html" rel="alternate" type="text/html" title="Secondary networks for KubeVirt VMs using OVN-Kubernetes" /><published>2023-03-06T00:00:00+00:00</published><updated>2023-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-06-27T14:36:52+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Secondary networks connected to the physical underlay for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet.html" rel="alternate" type="text/html" title="Secondary networks connected to the physical underlay for KubeVirt VMs using OVN-Kubernetes" /><published>2023-05-31T00:00:00+00:00</published><updated>2023-05-31T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<p>OVN (Open Virtual Network) is a series of daemons for the Open vSwitch that
+translate virtual network configurations into OpenFlow. It provides virtual
+networking capabilities for any type of workload on a virtualized platform
+(virtual machines and containers) using the same API.</p>
+
+<p>OVN provides a higher-layer of abstraction than Open vSwitch, working with
+logical routers and logical switches, rather than flows.
+More details can be found in the OVN architecture
+<a href="https://man7.org/linux/man-pages/man7/ovn-architecture.7.html#DESCRIPTION">man page</a>.</p>
+
+<p>In this post we will repeat the scenario of
+<a href="https://kubevirt.io/2020/Multiple-Network-Attachments-with-bridge-CNI.html">its bridge CNI equivalent</a>,
+using this SDN approach. This secondary network topology is akin to the one
+described in the <a href="http://kubevirt.io/2023/OVN-kubernetes-secondary-networks.html">flatL2 topology</a>,
+but allows connectivity to the physical underlay.</p>
+
+<h2 id="demo">Demo</h2>
+<p>To run this demo, we will prepare a Kubernetes cluster with the following
+components installed:</p>
+<ul>
+  <li><a href="https://github.com/ovn-org/ovn-kubernetes">OVN-Kubernetes</a></li>
+  <li><a href="https://github.com/k8snetworkplumbingwg/multus-cni">multus-cni</a></li>
+  <li><a href="https://github.com/kubevirt/kubevirt">KubeVirt</a></li>
+</ul>
+
+<p>The <a href="#environment-setup">following section</a> will show you how to create a
+<a href="https://kind.sigs.k8s.io/">KinD</a> cluster, with upstream latest OVN-Kubernetes,
+and upstream latest multus-cni deployed.</p>
+
+<h3 id="setup-demo-environment">Setup demo environment</h3>
+<p>Refer to the OVN-Kubernetes repo
+<a href="https://github.com/ovn-org/ovn-kubernetes/blob/master/docs/kind.md#ovn-kubernetes-kind-setup">KIND documentation</a>
+for more details; the gist of it is you should clone the OVN-Kubernetes
+repository, and run their kind helper script:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:ovn-org/ovn-kubernetes.git
+
+<span class="nb">cd </span>ovn-kubernetes
+<span class="nb">pushd </span>contrib <span class="p">;</span> ./kind.sh <span class="nt">--multi-network-enable</span> <span class="p">;</span> <span class="nb">popd</span>
+</code></pre></div></div>
+
+<p>This will get you a running kind cluster, configured to use OVN-Kubernetes as
+the default cluster network, configuring the multi-homing OVN-Kubernetes feature
+gate, and deploying
+<a href="https://github.com/k8snetworkplumbingwg/multus-cni">multus-cni</a> in the cluster.</p>
+
+<h3 id="install-kubevirt-in-the-cluster">Install KubeVirt in the cluster</h3>
+<p>Follow Kubevirt’s
+<a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a>
+to install the latest released version (currently, v0.59.0).</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span><span class="si">$(</span>curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt<span class="si">)</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
+kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
+kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>360s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
+</code></pre></div></div>
+
+<p>Now we have a Kubernetes cluster with all the pieces to start the Demo.</p>
+
+<h3 id="single-broadcast-domain">Single broadcast domain</h3>
+<p>In this scenario we will see how traffic from a single localnet network can be
+connected to a physical network in the host using a dedicated bridge.</p>
+
+<p>This scenario does not use any VLAN encapsulation, thus is simpler, since the
+network admin does not need to provision any VLANs in advance.</p>
+
+<h4 id="configuring-the-underlay">Configuring the underlay</h4>
+<p>When you’ve started the KinD cluster with the <code class="language-plaintext highlighter-rouge">--multi-network-enable</code> flag an
+additional OCI network was created, and attached to each of the KinD nodes.</p>
+
+<p>But still, further steps may be required, depending on the desired L2
+configuration.</p>
+
+<p>Let’s first create a dedicated OVS bridge, and attach the aforementioned
+virtualized network to it:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for </span>node <span class="k">in</span> <span class="si">$(</span>kubectl <span class="nt">-n</span> ovn-kubernetes get pods <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>ovs-node <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.items[*].metadata.name}"</span><span class="si">)</span>
+<span class="k">do
+	</span>kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-br ovsbr1
+	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-port ovsbr1 eth1
+	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nb">set </span>open <span class="nb">.</span> external_ids:ovn-bridge-mappings<span class="o">=</span>physnet:breth0,localnet.network_br-localnet:ovsbr1
+<span class="k">done</span>
+</code></pre></div></div>
+
+<p>The first two commands are self-evident: you create an OVS bridge, and attach
+a port to it; the last one is not. In it, we’re using the
+<a href="https://access.redhat.com/documentation/en-us/red_hat_openstack_platform/16.0/html/networking_guide/bridge-mappings">OVN bridge mapping</a>
+API to configure which OVS bridge must be used for each physical network.
+It creates a patch port between the OVN integration bridge - <code class="language-plaintext highlighter-rouge">br-int</code> - and the
+OVS bridge you tell it to, and traffic will be forwarded to/from it with the
+help of a
+<a href="https://man7.org/linux/man-pages/man5/ovn-nb.5.html#Logical_Switch_Port_TABLE">localnet port</a>.</p>
+
+<p>You will also have to configure an IP address on the bridge for the
+extra-network the kind script created. For that, you first need to identify the
+bridge’s name:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">OCI_BIN</span><span class="o">=</span>podman | docker <span class="c"># choose your cup of tea.</span>
+<span class="nv">$OCI_BIN</span> network inspect underlay <span class="nt">--format</span> <span class="s1">'{ .NetworkInterface }}'</span>
+podman3
+
+ip addr add 10.128.0.1/24 dev podman3
+</code></pre></div></div>
+
+<p>Let’s also use an IP in the same subnet as the network subnet (defined in the
+NAD). This IP address must be excluded from the IPAM pool (also on the NAD),
+otherwise the OVN-Kubernetes IPAM may assign it to a workload.</p>
+
+<h4 id="defining-the-ovn-kubernetes-networks">Defining the OVN-Kubernetes networks</h4>
+<p>Once the underlay is configured, we can now provision the attachment configuration:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">k8s.cni.cncf.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">localnet-network</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">config</span><span class="pi">:</span> <span class="pi">|2</span>
+    <span class="s">{</span>
+            <span class="s">"cniVersion": "0.3.1",</span>
+            <span class="s">"name": "localnet-network",</span>
+            <span class="s">"type": "ovn-k8s-cni-overlay",</span>
+            <span class="s">"topology": "localnet",</span>
+            <span class="s">"subnets": "10.128.0.0/24",</span>
+            <span class="s">"excludeSubnets": "10.128.0.1/32",</span>
+            <span class="s">"netAttachDefName": "default/localnet-network"</span>
+    <span class="s">}</span>
+</code></pre></div></div>
+
+<p>It is required to list the gateway IP in the <code class="language-plaintext highlighter-rouge">excludedSubnets</code> attribute, thus
+preventing OVN-Kubernetes from assigning that IP address to the workloads.</p>
+
+<h4 id="spin-up-the-vms">Spin up the VMs</h4>
+<p>These four VMs (two VMs connected to each tenant network) can be used for the
+single broadcast domain scenario (no VLANs).</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-server</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span>
+        <span class="na">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">ovn-worker</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">localnet</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">localnet</span>
+        <span class="na">multus</span><span class="pi">:</span>
+          <span class="na">networkName</span><span class="pi">:</span> <span class="s">localnet-network</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">version: 2</span>
+              <span class="s">ethernets:</span>
+                <span class="s">eth0:</span>
+                  <span class="s">dhcp4: true</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-client</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span>
+        <span class="na">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">ovn-worker2</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">localnet</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">localnet</span>
+        <span class="na">multus</span><span class="pi">:</span>
+          <span class="na">networkName</span><span class="pi">:</span> <span class="s">localnet-network</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">version: 2</span>
+              <span class="s">ethernets:</span>
+                <span class="s">eth0:</span>
+                  <span class="s">dhcp4: true</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+</code></pre></div></div>
+
+<h4 id="test-east--west-communication">Test East / West communication</h4>
+<p>You can check east/west connectivity between both <strong>red</strong> VMs via ICMP:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmi vm-server <span class="nt">-ojsonpath</span><span class="o">=</span><span class="s2">"{ @.status.interfaces }"</span> | jq
+<span class="o">[</span>
+  <span class="o">{</span>
+    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
+    <span class="s2">"interfaceName"</span>: <span class="s2">"eth0"</span>,
+    <span class="s2">"ipAddress"</span>: <span class="s2">"10.128.0.2"</span>,
+    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
+      <span class="s2">"10.128.0.2"</span>,
+      <span class="s2">"fe80::e83d:16ff:fe76:c1bd"</span>
+    <span class="o">]</span>,
+    <span class="s2">"mac"</span>: <span class="s2">"ea:3d:16:76:c1:bd"</span>,
+    <span class="s2">"name"</span>: <span class="s2">"localnet"</span>,
+    <span class="s2">"queueCount"</span>: 1
+  <span class="o">}</span>
+<span class="o">]</span>
+
+<span class="nv">$ </span>virtctl console vm-client
+Successfully connected to vm-client console. The escape sequence is ^]
+
+<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ping 192.168.123.20
+PING 192.168.123.20 <span class="o">(</span>192.168.123.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.534 ms
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.246 ms
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.178 ms
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.236 ms
+
+<span class="nt">---</span> 192.168.123.20 ping statistics <span class="nt">---</span>
+4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3028ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.178/0.298/0.534/0.138 ms
+</code></pre></div></div>
+
+<h4 id="check-underlay-services">Check underlay services</h4>
+<p>We can now start HTTP servers listening to the IPs attached on
+the gateway:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 <span class="nt">-m</span> http.server <span class="nt">--bind</span> 10.128.0.1 9000
+</code></pre></div></div>
+
+<p>And finally curl this from your client:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>curl <span class="nt">-v</span> 10.128.0.1:9000
+<span class="k">*</span>   Trying 10.128.0.1:9000...
+<span class="k">*</span> Connected to 10.128.0.1 <span class="o">(</span>10.128.0.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET / HTTP/1.1
+<span class="o">&gt;</span> Host: 10.128.0.1:9000
+<span class="o">&gt;</span> User-Agent: curl/7.69.1
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> 
+<span class="k">*</span> Mark bundle as not supporting multiuse
+<span class="k">*</span> HTTP 1.0, assume close after body
+&lt; HTTP/1.0 200 OK
+&lt; Server: SimpleHTTP/0.6 Python/3.11.3
+&lt; Date: Thu, 01 Jun 2023 16:05:09 GMT
+&lt; Content-type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>utf-8
+&lt; Content-Length: 2923
+...
+</code></pre></div></div>
+
+<h3 id="multiple-physical-networks-pointing-to-the-same-ovs-bridge">Multiple physical networks pointing to the same OVS bridge</h3>
+<p>This example will feature 2 physical networks, each with a different VLAN,
+both pointing at the same OVS bridge.</p>
+
+<h4 id="configuring-the-underlay-1">Configuring the underlay</h4>
+<p>Again, the first thing to do is create a dedicated OVS bridge, and attach the
+aforementioned virtualized network to it, while defining it as a trunk port
+for two broadcast domains, with tags 10 and 20.</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">for </span>node <span class="k">in</span> <span class="si">$(</span>kubectl <span class="nt">-n</span> ovn-kubernetes get pods <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>ovs-node <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.items[*].metadata.name}"</span><span class="si">)</span>
+<span class="k">do
+	</span>kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-br ovsbr1
+	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-port ovsbr1 eth1 <span class="nv">trunks</span><span class="o">=</span>10,20 <span class="nv">vlan_mode</span><span class="o">=</span>trunk
+	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nb">set </span>open <span class="nb">.</span> external_ids:ovn-bridge-mappings<span class="o">=</span>physnet:breth0,tenantblue_br-localnet:ovsbr1,tenantred_br-localnet:ovsbr1
+<span class="k">done</span>
+</code></pre></div></div>
+
+<p>We must now configure the physical network; since the packets are leaving the
+OVS bridge tagged with either the 10 or 20 VLAN, we must configure the physical
+network where the virtualized nodes run to handle the tagged traffic.</p>
+
+<p>For that we will create two VLANed interfaces, each with a different subnet; we
+will need to know the name of the bridge the kind script created to implement
+the extra network it required. Those VLAN interfaces also need to be configured
+with an IP address:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">OCI_BIN</span><span class="o">=</span>podman | docker <span class="c"># choose your cup of tea.</span>
+<span class="nv">$OCI_BIN</span> network inspect underlay <span class="nt">--format</span> <span class="s1">'{ .NetworkInterface }}'</span>
+podman3
+
+<span class="c"># create the VLANs</span>
+ip <span class="nb">link </span>add <span class="nb">link </span>podman3 name podman3.10 <span class="nb">type </span>vlan <span class="nb">id </span>10
+ip addr add 192.168.123.1/24 dev podman3.10
+ip <span class="nb">link set </span>dev podman3.10 up
+
+ip <span class="nb">link </span>add <span class="nb">link </span>podman3 name podman3.20 <span class="nb">type </span>vlan <span class="nb">id </span>20
+ip addr add 192.168.124.1/24 dev podman3.20
+ip <span class="nb">link set </span>dev podman3.20 up
+</code></pre></div></div>
+
+<p><strong>NOTE:</strong> both the <code class="language-plaintext highlighter-rouge">tenantblue</code> and <code class="language-plaintext highlighter-rouge">tenantred</code> networks forward their traffic
+to the <code class="language-plaintext highlighter-rouge">ovsbr1</code> OVS bridge.</p>
+
+<h4 id="defining-the-ovn-kubernetes-networks-1">Defining the OVN-Kubernetes networks</h4>
+<p>Let us now provision the attachment configuration for the two physical networks.
+Notice they do not have a subnet defined, which means our workloads must
+configure static IPs via cloud-init.</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">k8s.cni.cncf.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">tenantred</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">config</span><span class="pi">:</span> <span class="pi">|2</span>
+    <span class="s">{</span>
+            <span class="s">"cniVersion": "0.3.1",</span>
+            <span class="s">"name": "tenantred",</span>
+            <span class="s">"type": "ovn-k8s-cni-overlay",</span>
+            <span class="s">"topology": "localnet",</span>
+            <span class="s">"vlanID": 10,</span>
+            <span class="s">"netAttachDefName": "default/tenantred"</span>
+    <span class="s">}</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">k8s.cni.cncf.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">tenantblue</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">config</span><span class="pi">:</span> <span class="pi">|2</span>
+    <span class="s">{</span>
+            <span class="s">"cniVersion": "0.3.1",</span>
+            <span class="s">"name": "tenantblue",</span>
+            <span class="s">"type": "ovn-k8s-cni-overlay",</span>
+            <span class="s">"topology": "localnet",</span>
+            <span class="s">"vlanID": 20,</span>
+            <span class="s">"netAttachDefName": "default/tenantblue"</span>
+    <span class="s">}</span>
+</code></pre></div></div>
+
+<p><strong>NOTE:</strong> each of the <code class="language-plaintext highlighter-rouge">tenantblue</code> and <code class="language-plaintext highlighter-rouge">tenantred</code> networks tags their traffic
+with a different VLAN, which must be listed on the port <code class="language-plaintext highlighter-rouge">trunks</code> configuration.</p>
+
+<h4 id="spin-up-the-vms-1">Spin up the VMs</h4>
+<p>These two VMs can be used for the OVS bridge sharing scenario (two physical
+networks share the same OVS bridge, each on a different VLAN).</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-red-1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span>
+        <span class="na">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">ovn-worker</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">physnet-red</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">physnet-red</span>
+        <span class="na">multus</span><span class="pi">:</span>
+          <span class="na">networkName</span><span class="pi">:</span> <span class="s">tenantred</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">version: 2</span>
+              <span class="s">ethernets:</span>
+                <span class="s">eth0:</span>
+                  <span class="s">addresses: [ 192.168.123.10/24 ]</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-red-2</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span>
+        <span class="na">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">ovn-worker</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
+        <span class="na">multus</span><span class="pi">:</span>
+          <span class="na">networkName</span><span class="pi">:</span> <span class="s">tenantred</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">version: 2</span>
+              <span class="s">ethernets:</span>
+                <span class="s">eth0:</span>
+                  <span class="s">addresses: [ 192.168.123.20/24 ]</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-blue-1</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span>
+        <span class="na">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">ovn-worker</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">physnet-blue</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">physnet-blue</span>
+        <span class="na">multus</span><span class="pi">:</span>
+          <span class="na">networkName</span><span class="pi">:</span> <span class="s">tenantblue</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">version: 2</span>
+              <span class="s">ethernets:</span>
+                <span class="s">eth0:</span>
+                  <span class="s">addresses: [ 192.168.124.10/24 ]</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+<span class="s">---</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">vm-blue-2</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">template</span><span class="pi">:</span>
+    <span class="na">spec</span><span class="pi">:</span>
+      <span class="na">nodeSelector</span><span class="pi">:</span>
+        <span class="na">kubernetes.io/hostname</span><span class="pi">:</span> <span class="s">ovn-worker</span>
+      <span class="na">domain</span><span class="pi">:</span>
+        <span class="na">devices</span><span class="pi">:</span>
+          <span class="na">disks</span><span class="pi">:</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+              <span class="na">disk</span><span class="pi">:</span>
+                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
+          <span class="na">interfaces</span><span class="pi">:</span>
+          <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">physnet-blue</span>
+            <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
+        <span class="na">machine</span><span class="pi">:</span>
+          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
+        <span class="na">resources</span><span class="pi">:</span>
+          <span class="na">requests</span><span class="pi">:</span>
+            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
+      <span class="na">networks</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">physnet-blue</span>
+        <span class="na">multus</span><span class="pi">:</span>
+          <span class="na">networkName</span><span class="pi">:</span> <span class="s">tenantblue</span>
+      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
+      <span class="na">volumes</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
+          <span class="na">containerDisk</span><span class="pi">:</span>
+            <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel</span>
+        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
+          <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
+            <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
+              <span class="s">version: 2</span>
+              <span class="s">ethernets:</span>
+                <span class="s">eth0:</span>
+                  <span class="s">addresses: [ 192.168.124.20/24 ]</span>
+            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
+              <span class="s">#cloud-config</span>
+              <span class="s">password: fedora</span>
+              <span class="s">chpasswd: { expire: False }</span>
+</code></pre></div></div>
+
+<h4 id="test-east--west-communication-1">Test East / West communication</h4>
+<p>You can check east/west connectivity between both <strong>red</strong> VMs via ICMP:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmi vm-red-2 <span class="nt">-ojsonpath</span><span class="o">=</span><span class="s2">"{ @.status.interfaces }"</span> | jq
+<span class="o">[</span>
+  <span class="o">{</span>
+    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
+    <span class="s2">"interfaceName"</span>: <span class="s2">"eth0"</span>,
+    <span class="s2">"ipAddress"</span>: <span class="s2">"192.168.123.20"</span>,
+    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
+      <span class="s2">"192.168.123.20"</span>,
+      <span class="s2">"fe80::e83d:16ff:fe76:c1bd"</span>
+    <span class="o">]</span>,
+    <span class="s2">"mac"</span>: <span class="s2">"ea:3d:16:76:c1:bd"</span>,
+    <span class="s2">"name"</span>: <span class="s2">"flatl2-overlay"</span>,
+    <span class="s2">"queueCount"</span>: 1
+  <span class="o">}</span>
+<span class="o">]</span>
+
+<span class="nv">$ </span>virtctl console vm-red-1
+Successfully connected to vm-red-1 console. The escape sequence is ^]
+
+<span class="o">[</span>fedora@vm-red-1 ~]<span class="nv">$ </span>ping 192.168.123.20
+PING 192.168.123.20 <span class="o">(</span>192.168.123.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.534 ms
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.246 ms
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.178 ms
+64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.236 ms
+
+<span class="nt">---</span> 192.168.123.20 ping statistics <span class="nt">---</span>
+4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3028ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.178/0.298/0.534/0.138 ms
+</code></pre></div></div>
+
+<p>The same behavior can be seen on the VMs attached to the <strong>blue</strong> network:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmi vm-blue-2 <span class="nt">-ojsonpath</span><span class="o">=</span><span class="s2">"{ @.status.interfaces }"</span> | jq
+<span class="o">[</span>
+  <span class="o">{</span>
+    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
+    <span class="s2">"interfaceName"</span>: <span class="s2">"eth0"</span>,
+    <span class="s2">"ipAddress"</span>: <span class="s2">"192.168.124.20"</span>,
+    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
+      <span class="s2">"192.168.124.20"</span>,
+      <span class="s2">"fe80::6cae:e4ff:fefc:bd02"</span>
+    <span class="o">]</span>,
+    <span class="s2">"mac"</span>: <span class="s2">"6e:ae:e4:fc:bd:02"</span>,
+    <span class="s2">"name"</span>: <span class="s2">"physnet-blue"</span>,
+    <span class="s2">"queueCount"</span>: 1
+  <span class="o">}</span>
+<span class="o">]</span>
+
+<span class="nv">$ </span>virtctl console vm-blue-1
+Successfully connected to vm-blue-1 console. The escape sequence is ^]
+
+<span class="o">[</span>fedora@vm-blue-1 ~]<span class="nv">$ </span>ping 
+<span class="o">[</span>fedora@vm-blue-1 ~]<span class="nv">$ </span>ping 192.168.124.20
+PING 192.168.124.20 <span class="o">(</span>192.168.124.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 192.168.124.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.531 ms
+64 bytes from 192.168.124.20: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.255 ms
+64 bytes from 192.168.124.20: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.688 ms
+64 bytes from 192.168.124.20: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.648 ms
+
+<span class="nt">---</span> 192.168.124.20 ping statistics <span class="nt">---</span>
+4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3047ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.255/0.530/0.688/0.169 ms
+</code></pre></div></div>
+
+<h3 id="accessing-the-underlay-services">Accessing the underlay services</h3>
+<p>We can now start HTTP servers listening to the IPs attached on the VLAN
+interfaces:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>python3 <span class="nt">-m</span> http.server <span class="nt">--bind</span> 192.168.123.1 9000 &amp;
+python3 <span class="nt">-m</span> http.server <span class="nt">--bind</span> 192.168.124.1 9000 &amp;
+</code></pre></div></div>
+
+<p>And finally curl this from your client (blue network):</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>fedora@vm-blue-1 ~]<span class="nv">$ </span>curl <span class="nt">-v</span> 192.168.124.1:9000
+<span class="k">*</span>   Trying 192.168.124.1:9000...
+<span class="k">*</span> Connected to 192.168.124.1 <span class="o">(</span>192.168.124.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET / HTTP/1.1
+<span class="o">&gt;</span> Host: 192.168.124.1:9000
+<span class="o">&gt;</span> User-Agent: curl/7.69.1
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> 
+<span class="k">*</span> Mark bundle as not supporting multiuse
+<span class="k">*</span> HTTP 1.0, assume close after body
+&lt; HTTP/1.0 200 OK
+&lt; Server: SimpleHTTP/0.6 Python/3.11.3
+&lt; Date: Thu, 01 Jun 2023 16:05:09 GMT
+&lt; Content-type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>utf-8
+&lt; Content-Length: 2923
+...
+</code></pre></div></div>
+
+<p>And from the client connected to the red network:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>fedora@vm-red-1 ~]<span class="nv">$ </span>curl <span class="nt">-v</span> 192.168.123.1:9000
+<span class="k">*</span>   Trying 192.168.123.1:9000...
+<span class="k">*</span> Connected to 192.168.123.1 <span class="o">(</span>192.168.123.1<span class="o">)</span> port 9000 <span class="o">(</span><span class="c">#0)</span>
+<span class="o">&gt;</span> GET / HTTP/1.1
+<span class="o">&gt;</span> Host: 192.168.123.1:9000
+<span class="o">&gt;</span> User-Agent: curl/7.69.1
+<span class="o">&gt;</span> Accept: <span class="k">*</span>/<span class="k">*</span>
+<span class="o">&gt;</span> 
+<span class="k">*</span> Mark bundle as not supporting multiuse
+<span class="k">*</span> HTTP 1.0, assume close after body
+&lt; HTTP/1.0 200 OK
+&lt; Server: SimpleHTTP/0.6 Python/3.11.3
+&lt; Date: Thu, 01 Jun 2023 16:06:02 GMT
+&lt; Content-type: text/html<span class="p">;</span> <span class="nv">charset</span><span class="o">=</span>utf-8
+&lt; Content-Length: 2923
+&lt; 
+...
+</code></pre></div></div>
+
+<h2 id="conclusions">Conclusions</h2>
+<p>In this post we have seen how to use OVN-Kubernetes to create secondary
+networks connected to the physical underlay, allowing both east/west
+communication between VMs, and access to services running outside the
+Kubernetes cluster.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure secondary networks connected to the physical underlay for KubeVirt virtual machines.]]></summary></entry><entry><title type="html">Secondary networks for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html" rel="alternate" type="text/html" title="Secondary networks for KubeVirt VMs using OVN-Kubernetes" /><published>2023-03-06T00:00:00+00:00</published><updated>2023-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>OVN (Open Virtual Network) is a series of daemons for the Open vSwitch that
 translate virtual network configurations into OpenFlow. It provides virtual
 networking capabilities for any type of workload on a virtualized platform
@@ -947,44 +1629,4 @@ Here are a few steps you can take to improve things:</p>
   <li>[PR #7811][raspbeep] User now gets information about the type of commands which the guest agent does not support.</li>
   <li>[PR #7590][awels] VMExport allows filesystem PVCs to be exported as either disks or directories.</li>
   <li>[PR #7683][alicefr] Add –command and –local-ssh-opts” options to virtctl ssh to execute remote command using local ssh method</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.55.0 changes]]></summary></entry><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
-
-<p>The KubeVirt community presented two sessions, both on Wednesday May 18th:</p>
-
-<ol>
-  <li>A Virtual Open Office Hours session, and</li>
-  <li>A Maintainer Track session: ‘It’s All for the Users. More Durable, Secure, and Pluggable. KubeVirt v0.53’</li>
-</ol>
-
-<h2 id="virtual-open-office-hours">Virtual Open Office Hours</h2>
-
-<p>This was a 45-minute project virtual session, hosted by the CNCF. This was on the Bevy platform (which will be familiar to KubeVirt Summit attendees from the past two years) and we had five lovely people from the KubeVirt community ready with a variety of demos and presentations and to answer questions from attendees:+
-Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki</p>
-
-<p>This was an opportunity for KubeCon attendees (virtual and physical) to ask questions and discuss any topics, and our presenters covered the following: Introduction to KubeVirt, live migration, Istio integration, and CDI hotplug/resize.
-Despite some initial technical issues and improvised changes, this session went really well. We had about ~25 consistent attendees, and we received a good range of Q&amp;A and interaction with the attendees on all topics presented. It was a very solid 45 minutes.
-Unfortunately, due to a miscommunication, there is no recording of this session.</p>
-
-<p>A huge thanks to the presenters for their time and collaboration in preparing for this.</p>
-
-<h2 id="maintainer-track">Maintainer Track</h2>
-
-<p>Later that day, on the Maintainer Track, Alice also gave an in-depth breakdown of a whole slew of new KubeVirt features and showed a demo with the KubeVirt Cluster API: deploying Kubernetes on top of Kubernetes.
-You can watch <a href="https://youtu.be/L9H0pz5PpKo">the CNCF recording here</a>, and download the <a href="https://kccnceu2022.sched.com/event/ytu1">demo video and slides</a> that are available from the schedule.</p>
-
-<p>There was a healthy amount of questions, both during Q&amp;A and after the talk. The participants were particularly interested to know how to prepare and customize VM disks with KubeVirt, how to run Windows VM, especially combined with GPUs, and how to expose the Kubernetes API service of a deployed cluster to the KubeVirt cluster API provider outside of the KubeVirt VM. There were additional questions on the status of TPM support and VM migration when the hosting node goes down.</p>
-
-<h2 id="thank-you">Thank you!</h2>
-
-<p>Big thanks again to our presenters: Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki.
-And everyone who attended the sessions, listened, and asked great questions.</p>
-
-<h2 id="want-to-see-more-from-kubecon-eu-2022">Want to see more from KubeCon EU 2022?</h2>
-
-<p>If you’re interested in seeing more photos and recordings from the event:</p>
-
-<ul>
-  <li><a href="https://www.flickr.com/photos/143247548@N03/albums/72177720298987342">CNCF’s Photo album (Flickr) of the event</a>.</li>
-  <li><a href="https://www.youtube.com/c/cloudnativefdn">The CNCF video recordings of the sessions on Youtube</a>.</li>
-  <li>And <a href="https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/program/schedule/">the event schedule</a> to help you find sessions.</li>
-</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.55.0 changes]]></summary></entry></feed>
