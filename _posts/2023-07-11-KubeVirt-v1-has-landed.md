@@ -20,13 +20,13 @@ tags:
 
 ---
 
-The KubeVirt community is proud to announce the release of KubeVirt v1.0! This release demonstrates the accomplishments of the community and user adoption over the years and represents an important milestone for everyone involved.
+The KubeVirt community is proud to announce the release of [KubeVirt v1.0](https://github.com/kubevirt/kubevirt/releases/tag/v1.0.0)! This release demonstrates the accomplishments of the community and user adoption over the years and represents an important milestone for everyone involved.
 
 ## A brief history
 The KubeVirt project started in Red Hat at the end of 2016, with the question: Can virtual machines (VMs) run in containers and be deployed by Kubernetes?
 It proved to be not only possible, but quickly emerged as a promising solution to the future of virtual machines in the container age.
 KubeVirt joined the [CNCF](https://www.cncf.io/) as a Sandbox project in September 2019, and an Incubating project in April 2022.
-From a handful of people hacking away on a proof of concept, KubeVirt has grown into 45 active repositories, with the primary [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt) repo having 17k commits and almost 1k forks.
+From a handful of people hacking away on a proof of concept, KubeVirt has grown into 45 active repositories, with the primary [kubevirt/kubevirt](https://github.com/kubevirt/kubevirt) repo having 17k commits and 1k forks.
 
 ## What does v1.0 mean to the community?
 The v1.0 release signifies the incredible growth that the community has gone through in the past six years from an idea to a production-ready Virtual Machine Management solution. The next stage with v1.0 is the additional focus on maintaining APIs while continuing to grow the project. This has led KubeVirt to adopt community practices from Kubernetes in key parts of the project.
@@ -40,17 +40,15 @@ The theme 'aligning with Kubernetes' is also felt through the other parts of the
 This release demonstrates the accomplishments of the community and user adoption over the past many months. The full list of feature and bug fixes can be found in our [release notes](https://github.com/kubevirt/kubevirt/releases/tag/v1.0.0), but we’ve also asked representatives from some of our SIGs for a summary.
 
 ### SIG-scale
-[Performance and scalability graphs from 0.58 to v1.0](https://github.com/kubevirt/kubevirt/blob/main/docs/release-v1-perf-scale-benchmarks.md)
+KubeVirt’s SIG-scale drives the performance and scalability initiatives in the community. Our focus for the v1.0 release was on sharing the performance results over the past 6 months. The benchmarks since December 2022 which cover the past two release - v0.59 (Mar 2023) and v1.0 (July 2023) are as follows:
 
-KubeVirt’s SIG-scale drives the performance and scalability initiatives in the community. Our focus for the v1.0 release was on sharing the performance results over the past 3 releases - v0.58 to v0.59 to v1.0.
+[Performance benchmarks for v1.0 release](https://github.com/kubevirt/kubevirt/blob/release-1.0/docs/release-v1-perf-scale-benchmarks.md#performance-benchmarks-for-v1-release)
 
-Viewing these measurements over multiple releases highlights the change in performance and scalability over time so that the community and end-users know what to expect. The results also help to identify the effects each code change has so community members can diagnose.
+[Scalability benchmarks for v1.0 release](https://github.com/kubevirt/kubevirt/blob/release-1.0/docs/release-v1-perf-scale-benchmarks.md#scalability-benchmarks-for-v1-release)
 
-End-users can use the same tools and techniques SIG-scale uses to analyze their own performance and scalability. Since performance and scalability are mostly relative, analyzing production KubeVirt deployments will be important to further contextualize the community's measurements.
+Publishing these measurements provides the community and end-users visibility into the performance and scalability over multiple releases. In addition, these results help identify the effects of code changes so that community members can diagnose performance problems and regressions.
 
-[Performance benchmarks for v1.0 release](https://github.com/kubevirt/kubevirt/blob/main/docs/release-v1-perf-scale-benchmarks.md#performance-benchmarks-for-v1-release)
-
-[Scalability benchmarks for v1.0 release](https://github.com/kubevirt/kubevirt/blob/main/docs/release-v1-perf-scale-benchmarks.md#scalability-benchmarks-for-v1-release)
+End-users can use the same tools and techniques SIG-scale uses to analyze performance and scalability in their own deployments. Since performance and scalability are mostly relative to the deployment stack, the same strategies should be used to further contextualize the community’s measurements.
 
 ### SIG-storage
 SIG-storage is focused on providing persistent storage to KubeVirt VMs and managing that storage throughout the lifecycle of the VM. This begins with provisioning and populating PVCs with bootable images but also includes features such as disk hotplug, snapshots, backup and restore, disaster recovery, and virtual machine export.
