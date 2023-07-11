@@ -63,7 +63,7 @@ For v1.0, SIG-compute developed features for memory over-commit. This includes i
 ### SIG-network
 SIG-network is committed to enhancing and maintaining all aspects of Virtual Machine network connectivity and management in KubeVirt.
 
-For the v1.0 release, we have introduced HotPlug and HotUnplug (as Alpha), which enables users to add and remove VM secondary network interfaces that use bridge binding on a running VM. HotPlug API stabilization and support for SR-IOV interfaces is under development for the next minor release.
+For the v1.0 release, we have introduced hot plug and hot unplug (as alpha), which enables users to add and remove VM secondary network interfaces that use bridge binding on a running VM. Hot plug API stabilization and support for SR-IOV interfaces is under development for the next minor release.
 
 ### SIG-infra
 The effort to simplify the VirtualMachine UX is still ongoing and with the v1.0 release we were able to introduce the v1beta1 version of the instancetype.kubevirt.io API. In the future KubeVirt v1.1.0 release we are aiming to finally graduate the instancetype.kubevirt.io API to v1.
