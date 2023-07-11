@@ -1,4 +1,57 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-06-27T14:36:52+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Secondary networks connected to the physical underlay for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet.html" rel="alternate" type="text/html" title="Secondary networks connected to the physical underlay for KubeVirt VMs using OVN-Kubernetes" /><published>2023-05-31T00:00:00+00:00</published><updated>2023-05-31T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-07-11T17:22:43+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.0 has landed!</title><link href="https://kubevirt.io//2023/KubeVirt-v1-has-landed.html" rel="alternate" type="text/html" title="KubeVirt v1.0 has landed!" /><published>2023-07-11T00:00:00+00:00</published><updated>2023-07-11T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-v1-has-landed</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-v1-has-landed.html"><![CDATA[<p>The KubeVirt community is proud to announce the release of <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.0.0">KubeVirt v1.0</a>! This release demonstrates the accomplishments of the community and user adoption over the years and represents an important milestone for everyone involved.</p>
+
+<h2 id="a-brief-history">A brief history</h2>
+<p>The KubeVirt project started in Red Hat at the end of 2016, with the question: Can virtual machines (VMs) run in containers and be deployed by Kubernetes?
+It proved to be not only possible, but quickly emerged as a promising solution to the future of virtual machines in the container age.
+KubeVirt joined the <a href="https://www.cncf.io/">CNCF</a> as a Sandbox project in September 2019, and an Incubating project in April 2022.
+From a handful of people hacking away on a proof of concept, KubeVirt has grown into 45 active repositories, with the primary <a href="https://github.com/kubevirt/kubevirt">kubevirt/kubevirt</a> repo having 17k commits and 1k forks.</p>
+
+<h2 id="what-does-v10-mean-to-the-community">What does v1.0 mean to the community?</h2>
+<p>The v1.0 release signifies the incredible growth that the community has gone through in the past six years from an idea to a production-ready Virtual Machine Management solution. The next stage with v1.0 is the additional focus on maintaining APIs while continuing to grow the project. This has led KubeVirt to adopt community practices from Kubernetes in key parts of the project.</p>
+
+<p>Leading up to this release we had a shift in release cadence: from monthly to 3 times a year, following the Kubernetes release model. This allows our developer community additional time to ensure stability and compatibility, our users more time to plan and comfortably upgrade, and also aligns our releases with Kubernetes to simplify maintenance and supportability.</p>
+
+<p>The theme ‘aligning with Kubernetes’ is also felt through the other parts of the community, by following their governance processes; introducing SIGs to split test and review responsibilities, as well as a SIG release repo to handle everything related to a release; and regular <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io">SIG meetings</a> that now include SIG scale and performance and SIG storage alongside our weekly Community meetings.</p>
+
+<h2 id="whats-included-in-this-release">What’s included in this release?</h2>
+
+<p>This release demonstrates the accomplishments of the community and user adoption over the past many months. The full list of feature and bug fixes can be found in our <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.0.0">release notes</a>, but we’ve also asked representatives from some of our SIGs for a summary.</p>
+
+<h3 id="sig-scale">SIG-scale</h3>
+<p>KubeVirt’s SIG-scale drives the performance and scalability initiatives in the community. Our focus for the v1.0 release was on sharing the performance results over the past 6 months. The benchmarks since December 2022 which cover the past two release - v0.59 (Mar 2023) and v1.0 (July 2023) are as follows:</p>
+
+<p><a href="https://github.com/kubevirt/kubevirt/blob/release-1.0/docs/release-v1-perf-scale-benchmarks.md#performance-benchmarks-for-v1-release">Performance benchmarks for v1.0 release</a></p>
+
+<p><a href="https://github.com/kubevirt/kubevirt/blob/release-1.0/docs/release-v1-perf-scale-benchmarks.md#scalability-benchmarks-for-v1-release">Scalability benchmarks for v1.0 release</a></p>
+
+<p>Publishing these measurements provides the community and end-users visibility into the performance and scalability over multiple releases. In addition, these results help identify the effects of code changes so that community members can diagnose performance problems and regressions.</p>
+
+<p>End-users can use the same tools and techniques SIG-scale uses to analyze performance and scalability in their own deployments. Since performance and scalability are mostly relative to the deployment stack, the same strategies should be used to further contextualize the community’s measurements.</p>
+
+<h3 id="sig-storage">SIG-storage</h3>
+<p>SIG-storage is focused on providing persistent storage to KubeVirt VMs and managing that storage throughout the lifecycle of the VM. This begins with provisioning and populating PVCs with bootable images but also includes features such as disk hotplug, snapshots, backup and restore, disaster recovery, and virtual machine export.</p>
+
+<p>For v1.0, SIG-storage delivered the following features: providing a flexible VM export API, enabling persistent SCSI reservation, provisioning VMs from a retained snapshot, and setting out-of-the-box defaults for additional storage provisioners. Another major effort was to implement Volume Populator alternatives to the KubeVirt DataVolume API in order to better leverage platform capabilities. The SIG meets every 2 weeks and welcomes anyone to join us for interesting storage discussions.</p>
+
+<h3 id="sig-compute">SIG-compute</h3>
+<p>SIG-compute is focused on the core virtualization functionality of KubeVirt, but also encompasses features that don’t fit well into another SIG. Some examples of SIG-compute’s scope include the lifecycle of VMs, migration, as well as maintenance of the core API.</p>
+
+<p>For v1.0, SIG-compute developed features for memory over-commit. This includes initial support for KSM and FreePageReporting. We added support for persistent vTPM, which makes it much easier to use BitLocker on Windows installs. Additionally, there’s now an initial implementation for CPU Hotplug (currently hidden behind a feature gate).</p>
+
+<h3 id="sig-network">SIG-network</h3>
+<p>SIG-network is committed to enhancing and maintaining all aspects of Virtual Machine network connectivity and management in KubeVirt.</p>
+
+<p>For the v1.0 release, we have introduced hot plug and hot unplug (as alpha), which enables users to add and remove VM secondary network interfaces that use bridge binding on a running VM. Hot plug API stabilization and support for SR-IOV interfaces is under development for the next minor release.</p>
+
+<h3 id="sig-infra">SIG-infra</h3>
+<p>The effort to simplify the VirtualMachine UX is still ongoing and with the v1.0 release we were able to introduce the v1beta1 version of the instancetype.kubevirt.io API. In the future KubeVirt v1.1.0 release we are aiming to finally graduate the instancetype.kubevirt.io API to v1.</p>
+
+<p>With the new version it is now possible to control the memory overcommit of virtual machines as a percentage within instance types. Resource requirements were added to preferences, which allows users to ensure that requirements of a workload are met. Also several new preference attributes have been added to cover more use cases.</p>
+
+<p>Moreover, virtctl was extended to make use of the new instance type and preference features.</p>
+
+<h2 id="what-next-for-kubevirt">What next for KubeVirt?</h2>
+<p>From a development perspective, we will continue to introduce and improve features that make life easier for virtualization users in a manner that is as native to Kubernetes as possible. From a community perspective, we are improving our new contributor experience so that we can continue to grow and help new members learn and be a part of the cloud native ecosystem. In addition, with this milestone we can now shift our attention on becoming a CNCF Graduated project.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.0" /><category term="release" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[We are very pleased to announce the release of KubeVirt v1.0!]]></summary></entry><entry><title type="html">Secondary networks connected to the physical underlay for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet.html" rel="alternate" type="text/html" title="Secondary networks connected to the physical underlay for KubeVirt VMs using OVN-Kubernetes" /><published>2023-05-31T00:00:00+00:00</published><updated>2023-05-31T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-localnet.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>OVN (Open Virtual Network) is a series of daemons for the Open vSwitch that
 translate virtual network configurations into OpenFlow. It provides virtual
 networking capabilities for any type of workload on a virtualized platform
@@ -1773,144 +1826,4 @@ All you need is to define the right environment variables before starting the cl
 
 <p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
 
-<p>We are looking forward to meeting you there!</p>]]></content><author><name>Chandler Wilkerson</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's second annual dedicated online event]]></summary></entry><entry><title type="html">Running real-time workloads with improved performance</title><link href="https://kubevirt.io//2021/Running-Realtime-Workloads.html" rel="alternate" type="text/html" title="Running real-time workloads with improved performance" /><published>2021-10-13T00:00:00+00:00</published><updated>2021-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2021/Running-Realtime-Workloads</id><content type="html" xml:base="https://kubevirt.io//2021/Running-Realtime-Workloads.html"><![CDATA[<h2 id="motivation">Motivation</h2>
-
-<p>It has been possible in KubeVirt for some time already to run a VM running with a RT kernel, however the performance of such workloads never achieved parity against running on top of a bare metal host virtualized. With the availability of NUMA and CPUManager as features in KubeVirt, we were close to a point where we had almost all the ingredients to deliver the <a href="https://www.libvirt.org/kbase/kvm-realtime.html">recommended</a> tunings in libvirt for achieving the low CPU latency needed for such workloads. We were missing two important settings:</p>
-
-<ul>
-  <li>The ability to configure the VCPUs to run with real-time scheduling policy.</li>
-  <li>Lock the VMs huge pages in RAM to prevent swapping.</li>
-</ul>
-
-<h2 id="setting-up-the-environment">Setting up the Environment</h2>
-
-<p>To achieve the lowest latency possible in a given environment, first it needs to be configured to allow its resources to be consumed efficiently.</p>
-
-<h3 id="the-cluster">The Cluster</h3>
-
-<p>The target node has to be configured to reserve memory for hugepages and the kernel to allow threads to run with real-time scheduling policy. The memory can be reserved as a <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html">kernel boot parameter</a> or by changing the kernel’s page count at <a href="https://www.kernel.org/doc/html/latest/admin-guide/mm/hugetlbpage.html">runtime</a>.</p>
-
-<p>The kernel’s runtime scheduling limit can be adjusted either by installing a real-time kernel in the node (the recommended option), or changing the kernel’s setting <code class="language-plaintext highlighter-rouge">kernel.sched_rt_runtime_us</code> to equal -1, to allow for unlimited runtime of real-time scheduled threads. This kernel setting defines the time period to be devoted to running real-time threads. KubeVirt will detect if the node has been configured with unlimited runtime and will label the node with <code class="language-plaintext highlighter-rouge">kubevirt.io/realtime</code> to highlight the capacity of running real-time workloads. Later on we’ll come back to this label when we talk about how the workload is scheduled.</p>
-
-<p>It is also recommended tuning the node’s BIOS settings for optimal real-time performance is also recommended to achieve even lower CPU latencies. Consult with your hardware provider to obtain the information on how to best tune your equipment.</p>
-
-<h3 id="kubevirt">KubeVirt</h3>
-
-<p>The VM will require to be granted fully dedicated CPUs and be able to use huge pages. These requirements can be achieved in KubeVirt by enabling the feature gates of CPUManager and NUMA in the KubeVirt CR. There is no dedicated feature gate to enable the new real-time optimizations.</p>
-
-<h2 id="the-manifest">The Manifest</h2>
-
-<p>With the cluster configured to provide the dedicated resources for the workload, it’s time to review an example of a VM manifest using the optimizations for low CPU latency. The first focus is to reduce the VM’s I/O by limiting it’s devices to only serial console:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.devices.autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
-<span class="na">spec.domain.devices.autoattachMemBalloon</span><span class="pi">:</span> <span class="no">false</span>
-<span class="na">spec.domain.devices.autoattachGraphicsDevice</span><span class="pi">:</span> <span class="no">false</span>
-</code></pre></div></div>
-
-<p>The pod needs to have a guaranteed QoS for its memory and CPU resources, to make sure that the CPU manager will dedicate the requested CPUs to the pod.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.resources.request.cpu</span><span class="pi">:</span> <span class="m">2</span>
-<span class="na">spec.domain.resources.request.memory</span><span class="pi">:</span> <span class="s">1Gi</span>
-<span class="na">spec.domain.resources.limits.cpu</span><span class="pi">:</span> <span class="m">2</span>
-<span class="na">spec.domain.resources.limits.memory</span><span class="pi">:</span> <span class="s">1Gi</span>
-</code></pre></div></div>
-
-<p>Still on the CPU front, we add the settings to instruct the KVM to give a clear visibility of the host’s features to the guest, request the CPU manager in the node to isolate the assigned CPUs and to make sure that the emulator and IO threads in the VM run in their own dedicated VCPU rather than sharing the computational time with the workload.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.model</span><span class="pi">:</span> <span class="s">host-passthrough</span>
-<span class="na">spec.domain.cpu.dedicateCpuPlacement</span><span class="pi">:</span> <span class="no">true</span>
-<span class="na">spec.domain.cpu.isolateEmulatorThread</span><span class="pi">:</span> <span class="no">true</span>
-<span class="na">spec.domain.cpu.ioThreadsPolicy</span><span class="pi">:</span> <span class="s">auto</span>
-</code></pre></div></div>
-
-<p>We also request the huge pages size and guaranteed NUMA topology that will pin the CPU and memory resources to a single NUMA node in the host. The Kubernetes scheduler will perform due diligence to schedule the pod in a node with enough free huge pages of the given size.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.numa.guestMappingPassthrough</span><span class="pi">:</span> <span class="pi">{}</span>
-<span class="na">spec.domain.memory.hugepages.pageSize</span><span class="pi">:</span> <span class="s">1Gi</span>
-</code></pre></div></div>
-
-<p>Lastly, we define the new real-time settings to instruct KubeVirt to apply the real-time scheduling policy for the pinned VCPUs and lock the process memory to avoid from being swapped by the host. In this example, we’ll configure the workload to only apply the real-time scheduling policy to VCPU 0.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.realtime.mask</span><span class="pi">:</span> <span class="m">0</span>
-</code></pre></div></div>
-
-<p>Alternatively, if no <code class="language-plaintext highlighter-rouge">mask</code> value is specified, all requested CPUs will be configured for real-time scheduling.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.realtime</span><span class="pi">:</span> <span class="pi">{}</span>
-</code></pre></div></div>
-
-<p>The following yaml is a complete manifest including all the settings we just reviewed.</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">fedora-realtime</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-realtime</span>
-  <span class="na">namespace</span><span class="pi">:</span> <span class="s">poc</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">fedora-realtime</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
-          <span class="na">autoattachMemBalloon</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">autoattachGraphicsDevice</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-        <span class="na">machine</span><span class="pi">:</span>
-          <span class="na">type</span><span class="pi">:</span> <span class="s2">"</span><span class="s">"</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
-            <span class="na">cpu</span><span class="pi">:</span> <span class="m">2</span>
-          <span class="na">limits</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1Gi</span>
-            <span class="na">cpu</span><span class="pi">:</span> <span class="m">2</span>
-        <span class="na">cpu</span><span class="pi">:</span>
-          <span class="na">model</span><span class="pi">:</span> <span class="s">host-passthrough</span>
-          <span class="na">dedicatedCpuPlacement</span><span class="pi">:</span> <span class="no">true</span>
-          <span class="na">isolateEmulatorThread</span><span class="pi">:</span> <span class="no">true</span>
-          <span class="na">ioThreadsPolicy</span><span class="pi">:</span> <span class="s">auto</span>
-          <span class="na">features</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">tsc-deadline</span>
-              <span class="na">policy</span><span class="pi">:</span> <span class="s">require</span>
-          <span class="na">numa</span><span class="pi">:</span>
-            <span class="na">guestMappingPassthrough</span><span class="pi">:</span> <span class="pi">{}</span>
-          <span class="na">realtime</span><span class="pi">:</span>
-            <span class="na">mask</span><span class="pi">:</span> <span class="s2">"</span><span class="s">0"</span>
-        <span class="na">memory</span><span class="pi">:</span>
-          <span class="na">hugepages</span><span class="pi">:</span>
-            <span class="na">pageSize</span><span class="pi">:</span> <span class="s">1Gi</span>
-      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-realtime-container-disk:20211008_5a22acb18</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">password: fedora</span>
-            <span class="s">chpasswd: { expire: False }</span>
-            <span class="s">bootcmd:</span>
-              <span class="s">- tuned-adm profile realtime</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-</code></pre></div></div>
-
-<h2 id="the-deployment">The Deployment</h2>
-
-<p>Because the manifest has enabled the real-time setting, when deployed KubeVirt applies the node label selector so that the Kubernetes scheduler will place the deployment in a node that is able to run threads with real-time scheduling policy (node label <code class="language-plaintext highlighter-rouge">kubevirt.io/realtime</code>). But there’s more, because the manifest also specifies the pod’s resource need of dedicated CPUs, KubeVirt will also add the node selector of <code class="language-plaintext highlighter-rouge">cpumanager=true</code> to guarantee that the pod is able to use the assigned CPUs alone. And finally, the scheduler also takes care of guaranteeing that the target node has sufficient free huge pages of the specified size (1Gi in our example) to satisfy the memory requested. With all these validations checked, the pod is successfully scheduled.</p>
-
-<h2 id="key-takeaways">Key Takeaways</h2>
-
-<p>Being able to run real-time workloads in KubeVirt with lower CPU latency opens new possibilities and expands the use cases where KubeVirt can assist in migrating legacy VMs into the cloud. Real-time workloads are extremely sensitive to the amount of layers between the bare metal and its runtime: the more layers in between, the higher the latency will be. The changes introduced in KubeVirt help reduce such waste and provide lower CPU latencies as the hardware is more efficiently tuned.</p>]]></content><author><name>Jordi Gil</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="real-time" /><category term="NUMA" /><category term="CPUManager" /><summary type="html"><![CDATA[This blog post details the various enhancements made to improve the performance of real-time workloads in KubeVirt]]></summary></entry></feed>
+<p>We are looking forward to meeting you there!</p>]]></content><author><name>Chandler Wilkerson</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's second annual dedicated online event]]></summary></entry></feed>
