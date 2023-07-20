@@ -337,7 +337,7 @@ virtualized network to it:</p>
 <span class="k">do
 	</span>kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-br ovsbr1
 	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-port ovsbr1 eth1
-	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nb">set </span>open <span class="nb">.</span> external_ids:ovn-bridge-mappings<span class="o">=</span>physnet:breth0,localnet.network_br-localnet:ovsbr1
+	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nb">set </span>open <span class="nb">.</span> external_ids:ovn-bridge-mappings<span class="o">=</span>physnet:breth0,localnet-network:ovsbr1
 <span class="k">done</span>
 </code></pre></div></div>
 
@@ -350,11 +350,15 @@ OVS bridge you tell it to, and traffic will be forwarded to/from it with the
 help of a
 <a href="https://man7.org/linux/man-pages/man5/ovn-nb.5.html#Logical_Switch_Port_TABLE">localnet port</a>.</p>
 
+<p><strong>NOTE:</strong> The provided mapping <strong>must</strong> match the <code class="language-plaintext highlighter-rouge">name</code> within the
+<code class="language-plaintext highlighter-rouge">net-attach-def</code>.Spec.Config JSON, otherwise, the patch ports will not be
+created.</p>
+
 <p>You will also have to configure an IP address on the bridge for the
 extra-network the kind script created. For that, you first need to identify the
-bridge’s name:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">OCI_BIN</span><span class="o">=</span>podman | docker <span class="c"># choose your cup of tea.</span>
-<span class="nv">$OCI_BIN</span> network inspect underlay <span class="nt">--format</span> <span class="s1">'{ .NetworkInterface }}'</span>
+bridge’s name. In the example below we’re providing a command for the podman
+runtime:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>podman network inspect underlay <span class="nt">--format</span> <span class="s1">''</span>
 podman3
 
 ip addr add 10.128.0.1/24 dev podman3
@@ -558,7 +562,7 @@ for two broadcast domains, with tags 10 and 20.</p>
 <span class="k">do
 	</span>kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-br ovsbr1
 	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nt">--may-exist</span> add-port ovsbr1 eth1 <span class="nv">trunks</span><span class="o">=</span>10,20 <span class="nv">vlan_mode</span><span class="o">=</span>trunk
-	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nb">set </span>open <span class="nb">.</span> external_ids:ovn-bridge-mappings<span class="o">=</span>physnet:breth0,tenantblue_br-localnet:ovsbr1,tenantred_br-localnet:ovsbr1
+	kubectl <span class="nt">-n</span> ovn-kubernetes <span class="nb">exec</span> <span class="nt">-ti</span> <span class="nv">$node</span> <span class="nt">--</span> ovs-vsctl <span class="nb">set </span>open <span class="nb">.</span> external_ids:ovn-bridge-mappings<span class="o">=</span>physnet:breth0,tenantblue:ovsbr1,tenantred:ovsbr1
 <span class="k">done</span>
 </code></pre></div></div>
 
