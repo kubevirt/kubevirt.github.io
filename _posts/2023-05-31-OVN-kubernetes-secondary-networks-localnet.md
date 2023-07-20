@@ -100,7 +100,7 @@ for node in $(kubectl -n ovn-kubernetes get pods -l app=ovs-node -o jsonpath="{.
 do
 	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl --may-exist add-br ovsbr1
 	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl --may-exist add-port ovsbr1 eth1
-	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl set open . external_ids:ovn-bridge-mappings=physnet:breth0,localnet.network_br-localnet:ovsbr1
+	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl set open . external_ids:ovn-bridge-mappings=physnet:breth0,localnet-network:ovsbr1
 done
 ```
 
@@ -112,6 +112,10 @@ It creates a patch port between the OVN integration bridge - `br-int` - and the
 OVS bridge you tell it to, and traffic will be forwarded to/from it with the
 help of a
 [localnet port](https://man7.org/linux/man-pages/man5/ovn-nb.5.html#Logical_Switch_Port_TABLE).
+
+**NOTE:** The provided mapping **must** match the `name` within the
+`net-attach-def`.Spec.Config JSON, otherwise, the patch ports will not be
+created.
 
 You will also have to configure an IP address on the bridge for the
 extra-network the kind script created. For that, you first need to identify the
@@ -328,7 +332,7 @@ for node in $(kubectl -n ovn-kubernetes get pods -l app=ovs-node -o jsonpath="{.
 do
 	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl --may-exist add-br ovsbr1
 	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl --may-exist add-port ovsbr1 eth1 trunks=10,20 vlan_mode=trunk
-	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl set open . external_ids:ovn-bridge-mappings=physnet:breth0,tenantblue_br-localnet:ovsbr1,tenantred_br-localnet:ovsbr1
+	kubectl -n ovn-kubernetes exec -ti $node -- ovs-vsctl set open . external_ids:ovn-bridge-mappings=physnet:breth0,tenantblue:ovsbr1,tenantred:ovsbr1
 done
 ```
 
