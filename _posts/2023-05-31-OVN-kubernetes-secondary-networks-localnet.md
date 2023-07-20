@@ -119,10 +119,10 @@ created.
 
 You will also have to configure an IP address on the bridge for the
 extra-network the kind script created. For that, you first need to identify the
-bridge's name:
+bridge's name. In the example below we're providing a command for the podman
+runtime:
 ```bash
-OCI_BIN=podman | docker # choose your cup of tea.
-$OCI_BIN network inspect underlay --format '{ .NetworkInterface }}'
+podman network inspect underlay --format '{{ .NetworkInterface }}'
 podman3
 
 ip addr add 10.128.0.1/24 dev podman3
