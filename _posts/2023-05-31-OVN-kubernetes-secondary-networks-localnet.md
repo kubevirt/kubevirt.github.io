@@ -122,20 +122,17 @@ extra-network the kind script created. For that, you first need to identify the
 bridge's name. In the example below we're providing a command for the podman
 runtime:
 ```bash
-podman network inspect underlay --format '{{ .NetworkInterface }}'
+podman network inspect underlay --format '{{ "{{" }} .NetworkInterface }}'
 podman3
 
 ip addr add 10.128.0.1/24 dev podman3
 ```
 
-**NOTE:** Docker has a little different format, so we will need to use the following command for it:
-<code>
-ip a | grep `docker network inspect underlay --format '&#123;&#123; index .IPAM.Config 0 "Gateway" &#125;&#125;'` | awk '{print $NF}'
-</code>
-
-The command output will be the bridge name, for example `br-0aeb0318f71f`.
-We can use it in the following command
+**NOTE:** for docker, please use the following command:
 ```bash
+ip a | grep `docker network inspect underlay --format '{{ "{{" }} index .IPAM.Config 0 "Gateway" }}'` | awk '{print $NF}'
+br-0aeb0318f71f
+
 ip addr add 10.128.0.1/24 dev br-0aeb0318f71f
 ```
 
@@ -168,8 +165,7 @@ It is required to list the gateway IP in the `excludedSubnets` attribute, thus
 preventing OVN-Kubernetes from assigning that IP address to the workloads.
 
 #### Spin up the VMs
-These four VMs (two VMs connected to each tenant network) can be used for the
-single broadcast domain scenario (no VLANs).
+These two VMs can be used for the single broadcast domain scenario (no VLANs).
 ```yaml
 ---
 apiVersion: kubevirt.io/v1alpha3
@@ -270,12 +266,12 @@ spec:
 ```
 
 #### Test East / West communication
-You can check east/west connectivity between both **red** VMs via ICMP:
+You can check east/west connectivity between both VMs via ICMP:
 ```bash
 $ kubectl get vmi vm-server -ojsonpath="{ @.status.interfaces }" | jq
 [
   {
-    "infoSource": "domain, guest-agent",
+    "infoSource": "domain, guest-agent, multus-status",
     "interfaceName": "eth0",
     "ipAddress": "10.128.0.2",
     "ipAddresses": [
@@ -291,16 +287,16 @@ $ kubectl get vmi vm-server -ojsonpath="{ @.status.interfaces }" | jq
 $ virtctl console vm-client
 Successfully connected to vm-client console. The escape sequence is ^]
 
-[fedora@vm-client ~]$ ping 192.168.123.20
-PING 192.168.123.20 (192.168.123.20) 56(84) bytes of data.
-64 bytes from 192.168.123.20: icmp_seq=1 ttl=64 time=0.534 ms
-64 bytes from 192.168.123.20: icmp_seq=2 ttl=64 time=0.246 ms
-64 bytes from 192.168.123.20: icmp_seq=3 ttl=64 time=0.178 ms
-64 bytes from 192.168.123.20: icmp_seq=4 ttl=64 time=0.236 ms
+[fedora@vm-client ~]$ ping 10.128.0.2
+PING 10.128.0.2 (10.128.0.2) 56(84) bytes of data.
+64 bytes from 10.128.0.2: icmp_seq=1 ttl=64 time=0.808 ms
+64 bytes from 10.128.0.2: icmp_seq=2 ttl=64 time=0.478 ms
+64 bytes from 10.128.0.2: icmp_seq=3 ttl=64 time=0.536 ms
+64 bytes from 10.128.0.2: icmp_seq=4 ttl=64 time=0.507 ms
 
---- 192.168.123.20 ping statistics ---
-4 packets transmitted, 4 received, 0% packet loss, time 3028ms
-rtt min/avg/max/mdev = 0.178/0.298/0.534/0.138 ms
+--- 10.128.0.2 ping statistics ---
+4 packets transmitted, 4 received, 0% packet loss, time 3005ms
+rtt min/avg/max/mdev = 0.478/0.582/0.808/0.131 ms
 ```
 
 #### Check underlay services
@@ -356,7 +352,7 @@ will need to know the name of the bridge the kind script created to implement
 the extra network it required. Those VLAN interfaces also need to be configured
 with an IP address: (for docker see previous example)
 ```bash
-podman network inspect underlay --format '{ .NetworkInterface }}'
+podman network inspect underlay --format '{{ "{{" }} .NetworkInterface }}'
 podman3
 
 # create the VLANs
@@ -665,7 +661,6 @@ $ kubectl get vmi vm-blue-2 -ojsonpath="{ @.status.interfaces }" | jq
 $ virtctl console vm-blue-1
 Successfully connected to vm-blue-1 console. The escape sequence is ^]
 
-[fedora@vm-blue-1 ~]$ ping 
 [fedora@vm-blue-1 ~]$ ping 192.168.124.20
 PING 192.168.124.20 (192.168.124.20) 56(84) bytes of data.
 64 bytes from 192.168.124.20: icmp_seq=1 ttl=64 time=0.531 ms
