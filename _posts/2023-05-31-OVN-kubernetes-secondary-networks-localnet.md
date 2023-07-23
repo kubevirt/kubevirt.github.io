@@ -128,6 +128,17 @@ podman3
 ip addr add 10.128.0.1/24 dev podman3
 ```
 
+**NOTE:** Docker has a little different format, so we will need to use the following command for it:
+<code>
+ip a | grep `docker network inspect underlay --format '&#123;&#123; index .IPAM.Config 0 "Gateway" &#125;&#125;'` | awk '{print $NF}'
+</code>
+
+The command output will be the bridge name, for example `br-0aeb0318f71f`.
+We can use it in the following command
+```bash
+ip addr add 10.128.0.1/24 dev br-0aeb0318f71f
+```
+
 Let's also use an IP in the same subnet as the network subnet (defined in the
 NAD). This IP address must be excluded from the IPAM pool (also on the NAD),
 otherwise the OVN-Kubernetes IPAM may assign it to a workload.
@@ -343,10 +354,9 @@ network where the virtualized nodes run to handle the tagged traffic.
 For that we will create two VLANed interfaces, each with a different subnet; we
 will need to know the name of the bridge the kind script created to implement
 the extra network it required. Those VLAN interfaces also need to be configured
-with an IP address:
+with an IP address: (for docker see previous example)
 ```bash
-OCI_BIN=podman | docker # choose your cup of tea.
-$OCI_BIN network inspect underlay --format '{ .NetworkInterface }}'
+podman network inspect underlay --format '{ .NetworkInterface }}'
 podman3
 
 # create the VLANs
