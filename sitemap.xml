@@ -713,6 +713,10 @@
 <lastmod>2023-07-11T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-policies.html</loc>
+<lastmod>2023-07-24T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1518,6 +1522,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/party-time.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/networkpolicy.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
