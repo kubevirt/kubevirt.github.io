@@ -12,9 +12,9 @@ tags: [laboratory, importer, vm import, containerized data importer, CDI, lab]
 
 - You can experiment with this lab online at [Killercoda](https://killercoda.com/kubevirt/scenario/kubevirt-cdi)
 
-[CDI](https://github.com/kubevirt/containerized-data-importer) is a utility designed to import Virtual Machine images for use with Kubevirt.
+In this lab, you will learn how to use Containerized Data Importer ([CDI](https://github.com/kubevirt/containerized-data-importer)) to import Virtual Machine images for use with Kubevirt. CDI simplifies the process of importing data from various sources into Kubernetes Persistent Volumes, making it easier to use that data within your virtual machines.
 
-At a high level, a PersistentVolumeClaim (PVC) is created. A custom controller watches for importer specific claims, and when discovered, starts an import process to create a raw image named _disk.img_ with the desired content into the associated PVC.
+CDI introduces [DataVolumes](https://github.com/kubevirt/containerized-data-importer/blob/main/doc/datavolumes.md), custom resources meant to be used as abstractions of PVCs. A custom controller watches for DataVolumes and handles the creation of a target PVC with all the spec and annotations required for importing the data. Depending on the type of source, other specific CDI controller will start the import process and create a raw image named _disk.img_ with the desired content into the target PVC.
 
 > notes "Note"
 > This 'lab' targets deployment on _one node_ as it uses Minikube and its `hostpath` storage class which can create PersistentVolumes (PVs) on only one node at a time. In production use, a StorageClass capable of ReadWriteOnce or better operation should be deployed to ensure PVs are accessible from any node.
@@ -42,13 +42,13 @@ Review the "cdi" pods that were added.
 
 #### Use CDI to Import a Disk Image
 
-As an example, we will import a Fedora36 Cloud Image as a PVC and launch a Virtual Machine making use of it.
+First, you need to create a DataVolume that points to the source data you want to import. In this example, we'll use a DataVolume to import a Fedora37 Cloud Image into a PVC and launch a Virtual Machine making use of it.
 
 ```bash
 {% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
 ```
 
-This will create the PVC with a proper annotation so that CDI controller detects it and launches an importer pod to gather the image specified in the _cdi.kubevirt.io/storage.import.endpoint_ annotation.
+A custom CDI controller will use this DataVolume to create a PVC with the same name and proper spec/annotations so that an import-specific controller detects it and launches an importer pod. This pod will gather the image specified in the _source_ field.
 
 ```
 {% include scriptlets/lab2/07_view_pod_logs.sh -%}
@@ -57,11 +57,11 @@ This will create the PVC with a proper annotation so that CDI controller detects
 Notice that the importer downloaded the publicly available Fedora Cloud qcow image. Once the importer pod completes, this PVC is ready for use in kubevirt.
 
 > notes ""
-> If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the PVC, and then recreate the PVC.
+> If the importer pod completes in error, you may need to retry it or specify a different URL to the fedora cloud image. To retry, first delete the importer pod and the DataVolume, and then recreate the DataVolume.
 >
 >```bash
-> kubectl delete -f pvc_fedora.yml --wait
-> kubectl create -f pvc_fedora.yml
+> kubectl delete -f dv_fedora.yml --wait
+> kubectl create -f dv_fedora.yml
 >```
 
 Let's create a Virtual Machine making use of it. Review the file _vm1_pvc.yml_.

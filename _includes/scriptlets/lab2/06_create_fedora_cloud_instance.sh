@@ -1,18 +1,16 @@
-cat <<EOF > pvc_fedora.yml
-apiVersion: v1
-kind: PersistentVolumeClaim
+cat <<EOF > dv_fedora.yml
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
 metadata:
   name: "fedora"
-  labels:
-    app: containerized-data-importer
-  annotations:
-    cdi.kubevirt.io/storage.import.endpoint: "https://download.fedoraproject.org/pub/fedora/linux/releases/36/Cloud/x86_64/images/Fedora-Cloud-Base-36-1.5.x86_64.raw.xz"
 spec:
-  accessModes:
-  - ReadWriteOnce
-  resources:
-    requests:
-      storage: 5Gi
+  storage:
+    resources:
+      requests:
+        storage: 5Gi
+  source:
+    http:
+      url: "https://download.fedoraproject.org/pub/fedora/linux/releases/37/Cloud/x86_64/images/Fedora-Cloud-Base-37-1.7.x86_64.raw.xz"
 EOF
 
-kubectl create -f pvc_fedora.yml
+kubectl create -f dv_fedora.yml
