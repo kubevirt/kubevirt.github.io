@@ -96,6 +96,7 @@ All Blog posts are located in the [\_posts](/_posts/) directory, each entry is a
   - Title is a very important piece of your blog post, a catchy title will likely have more readers, write a bad title and no matter how good the content is, you'll likely get less readers
   - After the title, write a brief introduction of what you're going to be writing about, which will help the reader to get a grasp on the topic
   - Closing section, the same way we can add a brief introduction of what the blog post is about, it's very important to add a closing section with thoughts, upcoming work on the topic discussed, encourage readers to test something and share their findings, joining the community, ...
+  - After the blog has been merged, let the community know about it by sending a short email to the [kubevirt-dev](https://groups.google.com/forum/#!forum/kubevirt-dev) mailing list.
   - For big images, you can use photoswipe to show a miniature that is zoomable, to do so, insert code like this:
 
     ```html
