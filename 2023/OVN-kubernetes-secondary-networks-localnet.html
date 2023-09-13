@@ -359,10 +359,17 @@ created.</p>
 extra-network the kind script created. For that, you first need to identify the
 bridge’s name. In the example below we’re providing a command for the podman
 runtime:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>podman network inspect underlay <span class="nt">--format</span> <span class="s1">''</span>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>podman network inspect underlay <span class="nt">--format</span> <span class="s1">'{{ .NetworkInterface }}'</span>
 podman3
 
 ip addr add 10.128.0.1/24 dev podman3
+</code></pre></div></div>
+
+<p><strong>NOTE:</strong> for docker, please use the following command:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>ip a | <span class="nb">grep</span> <span class="sb">`</span>docker network inspect underlay <span class="nt">--format</span> <span class="s1">'{{ index .IPAM.Config 0 "Gateway" }}'</span><span class="sb">`</span> | <span class="nb">awk</span> <span class="s1">'{print $NF}'</span>
+br-0aeb0318f71f
+
+ip addr add 10.128.0.1/24 dev br-0aeb0318f71f
 </code></pre></div></div>
 
 <p>Let’s also use an IP in the same subnet as the network subnet (defined in the
@@ -393,8 +400,7 @@ otherwise the OVN-Kubernetes IPAM may assign it to a workload.</p>
 preventing OVN-Kubernetes from assigning that IP address to the workloads.</p>
 
 <h4 id="spin-up-the-vms">Spin up the VMs</h4>
-<p>These four VMs (two VMs connected to each tenant network) can be used for the
-single broadcast domain scenario (no VLANs).</p>
+<p>These two VMs can be used for the single broadcast domain scenario (no VLANs).</p>
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha3</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
@@ -494,11 +500,11 @@ single broadcast domain scenario (no VLANs).</p>
 </code></pre></div></div>
 
 <h4 id="test-east--west-communication">Test East / West communication</h4>
-<p>You can check east/west connectivity between both <strong>red</strong> VMs via ICMP:</p>
+<p>You can check east/west connectivity between both VMs via ICMP:</p>
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>kubectl get vmi vm-server <span class="nt">-ojsonpath</span><span class="o">=</span><span class="s2">"{ @.status.interfaces }"</span> | jq
 <span class="o">[</span>
   <span class="o">{</span>
-    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
+    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent, multus-status"</span>,
     <span class="s2">"interfaceName"</span>: <span class="s2">"eth0"</span>,
     <span class="s2">"ipAddress"</span>: <span class="s2">"10.128.0.2"</span>,
     <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
@@ -514,16 +520,16 @@ single broadcast domain scenario (no VLANs).</p>
 <span class="nv">$ </span>virtctl console vm-client
 Successfully connected to vm-client console. The escape sequence is ^]
 
-<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ping 192.168.123.20
-PING 192.168.123.20 <span class="o">(</span>192.168.123.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.534 ms
-64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.246 ms
-64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.178 ms
-64 bytes from 192.168.123.20: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.236 ms
+<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ping 10.128.0.2
+PING 10.128.0.2 <span class="o">(</span>10.128.0.2<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
+64 bytes from 10.128.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.808 ms
+64 bytes from 10.128.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.478 ms
+64 bytes from 10.128.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.536 ms
+64 bytes from 10.128.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.507 ms
 
-<span class="nt">---</span> 192.168.123.20 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3028ms
-rtt min/avg/max/mdev <span class="o">=</span> 0.178/0.298/0.534/0.138 ms
+<span class="nt">---</span> 10.128.0.2 ping statistics <span class="nt">---</span>
+4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3005ms
+rtt min/avg/max/mdev <span class="o">=</span> 0.478/0.582/0.808/0.131 ms
 </code></pre></div></div>
 
 <h4 id="check-underlay-services">Check underlay services</h4>
@@ -574,9 +580,8 @@ network where the virtualized nodes run to handle the tagged traffic.</p>
 <p>For that we will create two VLANed interfaces, each with a different subnet; we
 will need to know the name of the bridge the kind script created to implement
 the extra network it required. Those VLAN interfaces also need to be configured
-with an IP address:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">OCI_BIN</span><span class="o">=</span>podman | docker <span class="c"># choose your cup of tea.</span>
-<span class="nv">$OCI_BIN</span> network inspect underlay <span class="nt">--format</span> <span class="s1">'{ .NetworkInterface }}'</span>
+with an IP address: (for docker see previous example)</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>podman network inspect underlay <span class="nt">--format</span> <span class="s1">'{{ .NetworkInterface }}'</span>
 podman3
 
 <span class="c"># create the VLANs</span>
@@ -881,7 +886,6 @@ rtt min/avg/max/mdev <span class="o">=</span> 0.178/0.298/0.534/0.138 ms
 <span class="nv">$ </span>virtctl console vm-blue-1
 Successfully connected to vm-blue-1 console. The escape sequence is ^]
 
-<span class="o">[</span>fedora@vm-blue-1 ~]<span class="nv">$ </span>ping 
 <span class="o">[</span>fedora@vm-blue-1 ~]<span class="nv">$ </span>ping 192.168.124.20
 PING 192.168.124.20 <span class="o">(</span>192.168.124.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
 64 bytes from 192.168.124.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.531 ms
