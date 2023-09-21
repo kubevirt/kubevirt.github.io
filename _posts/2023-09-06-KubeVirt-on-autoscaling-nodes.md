@@ -47,7 +47,7 @@ All the code used in this article may also be found at
 
 First let's set some environment variables:
 
-{% highlight bash linenos %}
+```bash
 # The name of the EKS cluster we're going to create
 export RD_CLUSTER_NAME=my-cluster
 
@@ -60,13 +60,13 @@ export RD_K8S_VERSION=1.27
 # The name of the keypair that we're going to inject into the nodes. You
 # must create this ahead of time in the correct region.
 export RD_EC2_KEYPAIR_NAME=eks-my-cluster
-{% endhighlight %}
+```
 
 ### Prepare the cluster.yaml file
 
 Using [eksctl](https://eksctl.io/), prepare an EKS cluster config:
 
-{% highlight bash linenos %}
+```bash
 eksctl create cluster \
     --dry-run \
     --name=${RD_CLUSTER_NAME} \
@@ -83,7 +83,7 @@ eksctl create cluster \
     --vpc-nat-mode HighlyAvailable \
     --with-oidc \
 > cluster.yaml
-{% endhighlight %}
+```
 
 `--dry-run` means the command will not actually create the cluster but will
 instead output a config to stdout which we then write to `cluster.yaml`.
@@ -100,22 +100,22 @@ will ever be scheduled in these nodes. Thus we need to taint them. In the
 generated `cluster.yaml` file, append the following taint to the only node
 group in the `managedNodeGroups` list:
 
-{% highlight yaml linenos %}
+```yaml
 managedNodeGroups:
 - amiFamily: AmazonLinux2
   ...
   taints:
     - key: CriticalAddonsOnly
       effect: NoSchedule
-{% endhighlight %}
+```
 
 ### Create the cluster
 
 We can now create the cluster:
 
-{% highlight bash %}
+```bash
 eksctl create cluster --config-file cluster.yaml
-{% endhighlight %}
+```
 
 Example output:
 
@@ -133,9 +133,9 @@ Example output:
 Once the command is done, you should be able to query the the kube API. For
 example:
 
-{% highlight bash %}
+```bash
 kubectl get nodes
-{% endhighlight %}
+```
 
 Example output:
 
@@ -157,13 +157,13 @@ docs](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cl
 > enabling `--balance-similar-node-groups`.
 
 Based on the above, we will create a node group for each of the availability
-zones that was declared in `cluster.yaml` so that the Cluster Autoscaler will
+zones (AZs) that was declared in `cluster.yaml` so that the Cluster Autoscaler will
 always bring up a node in the AZ where a VM's EBS-backed PV is located.
 
 To do that, we will first prepare a template that we can then feed to
 `envsubst`. Save the following in `node-group.yaml.template`:
 
-{% highlight yaml linenos %}
+```yaml
 ---
 # See: Config File Schema <https://eksctl.io/usage/schema/>
 apiVersion: eksctl.io/v1alpha5
@@ -207,13 +207,13 @@ managedNodeGroups:
       k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/vhost-net: "1"
       k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage: 50M
       k8s.io/cluster-autoscaler/node-template/label/kubevirt.io/schedulable: "true"
-{% endhighlight %}
+```
 
 The last few tags bears additional emphasis. They are required because when a
 virtual machine is created, it will have the following requirements:
 
 
-{% highlight yaml linenos %}
+```yaml
 requests:
   devices.kubevirt.io/kvm: 1
   devices.kubevirt.io/tun: 1
@@ -221,7 +221,7 @@ requests:
   ephemeral-storage: 50M
 
 nodeSelectors: kubevirt.io/schedulable=true
-{% endhighlight %}
+```
 
 However, at least when scaling from zero for the first time, CAS will have no
 knowledge of this information unless the correct AWS tags are added to the node
@@ -229,13 +229,13 @@ group. This is why we have the following added to the managed node group's
 tags:
 
 
-{% highlight yaml linenos %}
+```yaml
 k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/kvm: "1"
 k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/tun: "1"
 k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/vhost-net: "1"
 k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage: 50M
 k8s.io/cluster-autoscaler/node-template/label/kubevirt.io/schedulable: "true"
-{% endhighlight %}
+```
 
 > For more information on these tags, see [Auto-Discovery
 > Setup](https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup).
@@ -244,14 +244,14 @@ k8s.io/cluster-autoscaler/node-template/label/kubevirt.io/schedulable: "true"
 
 We can now create the node group:
 
-{% highlight bash %}
+```bash
 yq .availabilityZones[] cluster.yaml -r | \
     xargs -I{} bash -c "
         export EKS_AZ={};
         envsubst < node-group.yaml.template | \
         eksctl create nodegroup --config-file -
     "
-{% endhighlight %}
+```
 
 ## Deploy KubeVirt
 
@@ -260,14 +260,14 @@ yq .availabilityZones[] cluster.yaml -r | \
 
 Deploy the KubeVirt operator:
 
-{% highlight bash %}
+```bash
 kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/v1.0.0/kubevirt-operator.yaml
-{% endhighlight %}
+```
 
 So that the operator will know how to deploy KubeVirt, let's add the `KubeVirt`
 resource:
 
-{% highlight bash %}
+```bash
 cat <<EOF | kubectl apply -f -
 apiVersion: kubevirt.io/v1
 kind: KubeVirt
@@ -290,19 +290,19 @@ spec:
         - key: CriticalAddonsOnly
           operator: Exists
 EOF
-{% endhighlight %}
+```
 
 > Notice how we are specifically configuring KubeVirt itself to tolerate the
 > `CriticalAddonsOnly` taint. This is so that the KubeVirt services themselves
-> can be scheduled in the infra nodes instead of the bare metals nodes which we
+> can be scheduled in the infra nodes instead of the bare metal nodes which we
 > want to scale down to zero when there are no VMs.
 
 Wait until KubeVirt is in a `Deployed` state:
 
-{% highlight bash %}
+```bash
 kubectl get -n kubevirt -o=jsonpath="{.status.phase}" \
 	kubevirt.kubevirt.io/kubevirt
-{% endhighlight %}
+```
 
 Example output:
 
@@ -312,9 +312,9 @@ Deployed
 
 Double check that all KubeVirt components are healthy:
 
-{% highlight bash %}
+```bash
 kubectl get pods -n kubevirt
-{% endhighlight %}
+```
 
 Example output:
 
@@ -337,13 +337,13 @@ pod/virt-operator-85f65df79b-rp8p5   1/1     Running   0              98d
 
 First create a secret from your public key:
 
-{% highlight bash %}
+```bash
 kubectl create secret generic my-pub-key --from-file=key1=~/.ssh/id_rsa.pub
-{% endhighlight %}
+```
 
 Next, create the VM:
 
-{% highlight bash %}
+```bash
 # Create a VM referencing the Secret using propagation method configDrive
 cat <<EOF | kubectl create -f -
 apiVersion: kubevirt.io/v1
@@ -386,13 +386,13 @@ spec:
             chpasswd: { expire: False }
         name: cloudinitdisk
 EOF
-{% endhighlight %}
+```
 
 Check that the test VM is running:
 
-{% highlight bash %}
+```bash
 kubectl get vm
-{% endhighlight %}
+```
 
 Example output:
 
@@ -403,9 +403,9 @@ testvm      30s     Running              True
 
 Delete the VM:
 
-{% highlight bash %}
+```bash
 kubectl delete testvm
-{% endhighlight %}
+```
 
 ## Set Up Cluster Autoscaler
 
@@ -425,7 +425,7 @@ is to define the IAM policy.
 Prepare the policy document by rendering the following file.
 
 
-{% highlight bash %}
+```bash
 cat > policy.json <<EOF
 {
     "Version": "2012-10-17",
@@ -455,15 +455,15 @@ cat > policy.json <<EOF
     ]
 }
 EOF
-{% endhighlight %}
+```
 
 The above should be enough for CAS to do its job. Next, create the policy:
 
-{% highlight bash %}
+```bash
 aws iam create-policy \
     --policy-name eks-${RD_REGION}-${RD_CLUSTER_NAME}-ClusterAutoscalerPolicy \
     --policy-document file://policy.json
-{% endhighlight %}
+```
 
 > IMPORTANT: Take note of the returned policy ARN. You will need that below.
 
@@ -478,7 +478,7 @@ single command using `eksctl`:
 > Works](https://eksctl.io/usage/iamserviceaccounts/#how-it-works) from the
 > `eksctl` documentation for IAM Roles for Service Accounts.
 
-{% highlight bash %}
+```bash
 export RD_POLICY_ARN="<Get this value from the last command's output>"
 
 eksctl create iamserviceaccount \
@@ -489,15 +489,15 @@ eksctl create iamserviceaccount \
 	--attach-policy-arn=${RD_POLICY_ARN} \
 	--override-existing-serviceaccounts \
 	--approve
-{% endhighlight %}
+```
 
 Double check that the `cluster-autoscaler` service account has been correctly
 annotated with the IAM role that was created by `eksctl` in the same step:
 
-{% highlight bash %}
+```bash
 kubectl get sa cluster-autoscaler -n kube-system -ojson | \
 	jq -r '.metadata.annotations | ."eks.amazonaws.com/role-arn"'
-{% endhighlight %}
+```
 
 Example output:
 
@@ -515,9 +515,9 @@ and MINOR version as the kubernetes cluster you're deploying to.
 
 Get the kube cluster's version:
 
-{% highlight bash %}
+```bash
 kubectl version -ojson | jq -r .serverVersion.gitVersion
-{% endhighlight %}
+```
 
 Example output:
 
@@ -531,24 +531,24 @@ Page](https://github.com/kubernetes/autoscaler/releases?q=cluster-autoscaler+1&e
 
 Example:
 
-{% highlight bash %}
+```bash
 export CLUSTER_AUTOSCALER_VERSION=1.27.3
-{% endhighlight %}
+```
 
 Next, deploy the cluster autoscaler using the deployment template that I
 prepared in the [companion
 repo](https://github.com/relaxdiego/kubevirt-cas-baremetal)
 
-{% highlight bash %}
+```bash
 envsubst < <(curl https://raw.githubusercontent.com/relaxdiego/kubevirt-cas-baremetal/main/cas-deployment.yaml.template) | \
   kubectl apply -f -
-{% endhighlight %}
+```
 
 Check the cluster autoscaler status:
 
-{% highlight bash %}
+```bash
 kubectl get deploy,pod -l app=cluster-autoscaler -n kube-system
-{% endhighlight %}
+```
 
 Example output:
 
@@ -562,9 +562,9 @@ pod/cluster-autoscaler-6c58bd6d89-v8wbn   1/1     Running   0          60s
 
 Tail the `cluster-autoscaler` pod's logs to see what's happening:
 
-{% highlight bash %}
+```bash
 kubectl -n kube-system logs -f deployment.apps/cluster-autoscaler
-{% endhighlight %}
+```
 
 Below are example log entries from Cluster Autoscaler terminating an unneeded
 node:
