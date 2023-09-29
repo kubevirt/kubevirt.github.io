@@ -721,6 +721,10 @@
 <lastmod>2023-09-05T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html</loc>
+<lastmod>2023-09-06T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -730,10 +734,10 @@
 <loc>https://kubevirt.io//cluster-api-provider-external/</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//community/</loc>
+<loc>https://kubevirt.io//category/community.html</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//category/community.html</loc>
+<loc>https://kubevirt.io//community/</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/community</loc>
@@ -1544,6 +1548,12 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/iac.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/cluster-autoscaler.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/eks.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page2/</loc>

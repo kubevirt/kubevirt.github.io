@@ -1,4 +1,595 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-09-13T08:18:22+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Managing KubeVirt VMs with Ansible</title><link href="https://kubevirt.io//2023/Managing-KubeVirt-VMs-with-Ansible.html" rel="alternate" type="text/html" title="Managing KubeVirt VMs with Ansible" /><published>2023-09-05T00:00:00+00:00</published><updated>2023-09-05T00:00:00+00:00</updated><id>https://kubevirt.io//2023/Managing-KubeVirt-VMs-with-Ansible</id><content type="html" xml:base="https://kubevirt.io//2023/Managing-KubeVirt-VMs-with-Ansible.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-09-29T12:50:23+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Running KubeVirt with Cluster Autoscaler</title><link href="https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html" rel="alternate" type="text/html" title="Running KubeVirt with Cluster Autoscaler" /><published>2023-09-06T00:00:00+00:00</published><updated>2023-09-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+
+<p>For this article, we’ll learn about the process of setting up
+<a href="https://kubevirt.io/">KubeVirt</a> with <a href="https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md">Cluster
+Autoscaler</a>
+on EKS. In addition, we’ll be using bare metal nodes to host KubeVirt VMs.</p>
+
+<h2 id="required-base-knowledge">Required Base Knowledge</h2>
+
+<p>This article will talk about how to make various software systems work together
+but introducing each one in detail is outside of its scope. Thus, you must already:</p>
+
+<ol>
+  <li>Know how to administer a Kubernetes cluster;</li>
+  <li>Be familiar with AWS, specifically IAM and EKS; and</li>
+  <li>Have some experience with KubeVirt.</li>
+</ol>
+
+<h2 id="companion-code">Companion Code</h2>
+
+<p>All the code used in this article may also be found at
+<a href="https://github.com/relaxdiego/kubevirt-cas-baremetal">github.com/relaxdiego/kubevirt-cas-baremetal</a>.</p>
+
+<h2 id="set-up-the-cluster">Set Up the Cluster</h2>
+
+<h3 id="shared-environment-variables">Shared environment variables</h3>
+
+<p>First let’s set some environment variables:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># The name of the EKS cluster we're going to create</span>
+<span class="nb">export </span><span class="nv">RD_CLUSTER_NAME</span><span class="o">=</span>my-cluster
+
+<span class="c"># The region where we will create the cluster</span>
+<span class="nb">export </span><span class="nv">RD_REGION</span><span class="o">=</span>us-west-2
+
+<span class="c"># Kubernetes version to use</span>
+<span class="nb">export </span><span class="nv">RD_K8S_VERSION</span><span class="o">=</span>1.27
+
+<span class="c"># The name of the keypair that we're going to inject into the nodes. You</span>
+<span class="c"># must create this ahead of time in the correct region.</span>
+<span class="nb">export </span><span class="nv">RD_EC2_KEYPAIR_NAME</span><span class="o">=</span>eks-my-cluster
+</code></pre></div></div>
+
+<h3 id="prepare-the-clusteryaml-file">Prepare the cluster.yaml file</h3>
+
+<p>Using <a href="https://eksctl.io/">eksctl</a>, prepare an EKS cluster config:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>eksctl create cluster <span class="se">\</span>
+    <span class="nt">--dry-run</span> <span class="se">\</span>
+    <span class="nt">--name</span><span class="o">=</span><span class="k">${</span><span class="nv">RD_CLUSTER_NAME</span><span class="k">}</span> <span class="se">\</span>
+    <span class="nt">--nodegroup-name</span> ng-infra <span class="se">\</span>
+    <span class="nt">--node-type</span> m5.xlarge <span class="se">\</span>
+    <span class="nt">--nodes</span> 2 <span class="se">\</span>
+    <span class="nt">--nodes-min</span> 2 <span class="se">\</span>
+    <span class="nt">--nodes-max</span> 2 <span class="se">\</span>
+    <span class="nt">--node-labels</span> <span class="nv">workload</span><span class="o">=</span>infra <span class="se">\</span>
+    <span class="nt">--region</span><span class="o">=</span><span class="k">${</span><span class="nv">RD_REGION</span><span class="k">}</span> <span class="se">\</span>
+    <span class="nt">--ssh-access</span> <span class="se">\</span>
+    <span class="nt">--ssh-public-key</span> <span class="k">${</span><span class="nv">RD_EC2_KEYPAIR_NAME</span><span class="k">}</span> <span class="se">\</span>
+    <span class="nt">--version</span> <span class="k">${</span><span class="nv">RD_K8S_VERSION</span><span class="k">}</span> <span class="se">\</span>
+    <span class="nt">--vpc-nat-mode</span> HighlyAvailable <span class="se">\</span>
+    <span class="nt">--with-oidc</span> <span class="se">\</span>
+<span class="o">&gt;</span> cluster.yaml
+</code></pre></div></div>
+
+<p><code class="language-plaintext highlighter-rouge">--dry-run</code> means the command will not actually create the cluster but will
+instead output a config to stdout which we then write to <code class="language-plaintext highlighter-rouge">cluster.yaml</code>.</p>
+
+<p>Open the file and look at what it has produced.</p>
+
+<blockquote>
+  <p>For more info on the schema used by <code class="language-plaintext highlighter-rouge">cluster.yaml</code>, see the <a href="https://eksctl.io/usage/schema/">Config file
+schema</a> page from eksctl.io</p>
+</blockquote>
+
+<p>This cluster will start out with a node group that we will use to host our
+“infra” services. This is why we are using the cheaper <code class="language-plaintext highlighter-rouge">m5.xlarge</code> rather than
+a baremetal instance type. However, we also need to ensure that none of our VMs
+will ever be scheduled in these nodes. Thus we need to taint them. In the
+generated <code class="language-plaintext highlighter-rouge">cluster.yaml</code> file, append the following taint to the only node
+group in the <code class="language-plaintext highlighter-rouge">managedNodeGroups</code> list:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">managedNodeGroups</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">amiFamily</span><span class="pi">:</span> <span class="s">AmazonLinux2</span>
+  <span class="s">...</span>
+  <span class="na">taints</span><span class="pi">:</span>
+    <span class="pi">-</span> <span class="na">key</span><span class="pi">:</span> <span class="s">CriticalAddonsOnly</span>
+      <span class="na">effect</span><span class="pi">:</span> <span class="s">NoSchedule</span>
+</code></pre></div></div>
+
+<h3 id="create-the-cluster">Create the cluster</h3>
+
+<p>We can now create the cluster:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>eksctl create cluster <span class="nt">--config-file</span> cluster.yaml
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>2023-08-20 07:59:14 [ℹ]  eksctl version ...
+2023-08-20 07:59:14 [ℹ]  using region us-west-2 ...
+2023-08-20 07:59:14 [ℹ]  subnets for us-west-2a ...
+2023-08-20 07:59:14 [ℹ]  subnets for us-west-2b ...
+2023-08-20 07:59:14 [ℹ]  subnets for us-west-2c ...
+...
+2023-08-20 08:14:06 [ℹ]  kubectl command should work with ...
+2023-08-20 08:14:06 [✔]  EKS cluster "my-cluster" in "us-west-2" is ready
+</code></pre></div></div>
+
+<p>Once the command is done, you should be able to query the the kube API. For
+example:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get nodes
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                      STATUS   ROLES    AGE     VERSION
+ip-XXX.compute.internal   Ready    &lt;none&gt;   32m     v1.27.4-eks-2d98532
+ip-YYY.compute.internal   Ready    &lt;none&gt;   32m     v1.27.4-eks-2d98532
+</code></pre></div></div>
+
+<h3 id="create-the-node-groups">Create the Node Groups</h3>
+
+<p>As per <a href="https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md">this section of the Cluster Autoscaler
+docs</a>:</p>
+
+<blockquote>
+  <p>If you’re using Persistent Volumes, your deployment needs to run in the same
+AZ as where the EBS volume is, otherwise the pod scheduling could fail if it
+is scheduled in a different AZ and cannot find the EBS volume. To overcome
+this, either use a single AZ ASG for this use case, or an ASG-per-AZ while
+enabling <code class="language-plaintext highlighter-rouge">--balance-similar-node-groups</code>.</p>
+</blockquote>
+
+<p>Based on the above, we will create a node group for each of the availability
+zones (AZs) that was declared in <code class="language-plaintext highlighter-rouge">cluster.yaml</code> so that the Cluster Autoscaler will
+always bring up a node in the AZ where a VM’s EBS-backed PV is located.</p>
+
+<p>To do that, we will first prepare a template that we can then feed to
+<code class="language-plaintext highlighter-rouge">envsubst</code>. Save the following in <code class="language-plaintext highlighter-rouge">node-group.yaml.template</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
+<span class="c1"># See: Config File Schema &lt;https://eksctl.io/usage/schema/&gt;</span>
+<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">eksctl.io/v1alpha5</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterConfig</span>
+
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">${RD_CLUSTER_NAME}</span>
+  <span class="na">region</span><span class="pi">:</span> <span class="s">${RD_REGION}</span>
+
+<span class="na">managedNodeGroups</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">ng-${EKS_AZ}-c5-metal</span>
+    <span class="na">amiFamily</span><span class="pi">:</span> <span class="s">AmazonLinux2</span>
+    <span class="na">instanceType</span><span class="pi">:</span> <span class="s">c5.metal</span>
+    <span class="na">availabilityZones</span><span class="pi">:</span>
+      <span class="pi">-</span> <span class="s">${EKS_AZ}</span>
+    <span class="na">desiredCapacity</span><span class="pi">:</span> <span class="m">1</span>
+    <span class="na">maxSize</span><span class="pi">:</span> <span class="m">3</span>
+    <span class="na">minSize</span><span class="pi">:</span> <span class="m">0</span>
+    <span class="na">labels</span><span class="pi">:</span>
+      <span class="na">alpha.eksctl.io/cluster-name</span><span class="pi">:</span> <span class="s">my-cluster</span>
+      <span class="na">alpha.eksctl.io/nodegroup-name</span><span class="pi">:</span> <span class="s">ng-${EKS_AZ}-c5-metal</span>
+      <span class="na">workload</span><span class="pi">:</span> <span class="s">vm</span>
+    <span class="na">privateNetworking</span><span class="pi">:</span> <span class="no">false</span>
+    <span class="na">ssh</span><span class="pi">:</span>
+      <span class="na">allow</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">publicKeyPath</span><span class="pi">:</span> <span class="s">${RD_EC2_KEYPAIR_NAME}</span>
+    <span class="na">volumeSize</span><span class="pi">:</span> <span class="m">500</span>
+    <span class="na">volumeIOPS</span><span class="pi">:</span> <span class="m">10000</span>
+    <span class="na">volumeThroughput</span><span class="pi">:</span> <span class="m">750</span>
+    <span class="na">volumeType</span><span class="pi">:</span> <span class="s">gp3</span>
+    <span class="na">tags</span><span class="pi">:</span>
+      <span class="na">alpha.eksctl.io/nodegroup-name</span><span class="pi">:</span> <span class="s">ng-${EKS_AZ}-c5-metal</span>
+      <span class="na">alpha.eksctl.io/nodegroup-type</span><span class="pi">:</span> <span class="s">managed</span>
+      <span class="na">k8s.io/cluster-autoscaler/my-cluster</span><span class="pi">:</span> <span class="s">owned</span>
+      <span class="na">k8s.io/cluster-autoscaler/enabled</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+      <span class="c1"># The following tags help CAS determine that this node group is able</span>
+      <span class="c1"># to satisfy the label and resource requirements of the KubeVirt VMs.</span>
+      <span class="c1"># See: https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup</span>
+      <span class="na">k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/kvm</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1"</span>
+      <span class="na">k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/tun</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1"</span>
+      <span class="na">k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/vhost-net</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1"</span>
+      <span class="na">k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage</span><span class="pi">:</span> <span class="s">50M</span>
+      <span class="na">k8s.io/cluster-autoscaler/node-template/label/kubevirt.io/schedulable</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+</code></pre></div></div>
+
+<p>The last few tags bears additional emphasis. They are required because when a
+virtual machine is created, it will have the following requirements:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">requests</span><span class="pi">:</span>
+  <span class="na">devices.kubevirt.io/kvm</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">devices.kubevirt.io/tun</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">devices.kubevirt.io/vhost-net</span><span class="pi">:</span> <span class="m">1</span>
+  <span class="na">ephemeral-storage</span><span class="pi">:</span> <span class="s">50M</span>
+
+<span class="na">nodeSelectors</span><span class="pi">:</span> <span class="s">kubevirt.io/schedulable=true</span>
+</code></pre></div></div>
+
+<p>However, at least when scaling from zero for the first time, CAS will have no
+knowledge of this information unless the correct AWS tags are added to the node
+group. This is why we have the following added to the managed node group’s
+tags:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/kvm</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1"</span>
+<span class="na">k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/tun</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1"</span>
+<span class="na">k8s.io/cluster-autoscaler/node-template/resources/devices.kubevirt.io/vhost-net</span><span class="pi">:</span> <span class="s2">"</span><span class="s">1"</span>
+<span class="na">k8s.io/cluster-autoscaler/node-template/resources/ephemeral-storage</span><span class="pi">:</span> <span class="s">50M</span>
+<span class="na">k8s.io/cluster-autoscaler/node-template/label/kubevirt.io/schedulable</span><span class="pi">:</span> <span class="s2">"</span><span class="s">true"</span>
+</code></pre></div></div>
+
+<blockquote>
+  <p>For more information on these tags, see <a href="https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md#auto-discovery-setup">Auto-Discovery
+Setup</a>.</p>
+</blockquote>
+
+<h3 id="create-the-vm-node-groups">Create the VM Node Groups</h3>
+
+<p>We can now create the node group:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>yq .availabilityZones[] cluster.yaml <span class="nt">-r</span> | <span class="se">\</span>
+    xargs <span class="nt">-I</span><span class="o">{}</span> bash <span class="nt">-c</span> <span class="s2">"
+        export EKS_AZ={};
+        envsubst &lt; node-group.yaml.template | </span><span class="se">\</span><span class="s2">
+        eksctl create nodegroup --config-file -
+    "</span>
+</code></pre></div></div>
+
+<h2 id="deploy-kubevirt">Deploy KubeVirt</h2>
+
+<blockquote>
+  <p>The following was adapted from <a href="https://kubevirt.io/quickstart_cloud/">KubeVirt quickstart with cloud
+providers</a>.</p>
+</blockquote>
+
+<p>Deploy the KubeVirt operator:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/v1.0.0/kubevirt-operator.yaml
+</code></pre></div></div>
+
+<p>So that the operator will know how to deploy KubeVirt, let’s add the <code class="language-plaintext highlighter-rouge">KubeVirt</code>
+resource:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
+apiVersion: kubevirt.io/v1
+kind: KubeVirt
+metadata:
+  name: kubevirt
+  namespace: kubevirt
+spec:
+  certificateRotateStrategy: {}
+  configuration:
+    developerConfiguration:
+      featureGates: []
+  customizeComponents: {}
+  imagePullPolicy: IfNotPresent
+  workloadUpdateStrategy: {}
+  infra:
+    nodePlacement:
+      nodeSelector:
+        workload: infra
+      tolerations:
+        - key: CriticalAddonsOnly
+          operator: Exists
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<blockquote>
+  <p>Notice how we are specifically configuring KubeVirt itself to tolerate the
+<code class="language-plaintext highlighter-rouge">CriticalAddonsOnly</code> taint. This is so that the KubeVirt services themselves
+can be scheduled in the infra nodes instead of the bare metal nodes which we
+want to scale down to zero when there are no VMs.</p>
+</blockquote>
+
+<p>Wait until KubeVirt is in a <code class="language-plaintext highlighter-rouge">Deployed</code> state:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get <span class="nt">-n</span> kubevirt <span class="nt">-o</span><span class="o">=</span><span class="nv">jsonpath</span><span class="o">=</span><span class="s2">"{.status.phase}"</span> <span class="se">\</span>
+	kubevirt.kubevirt.io/kubevirt
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Deployed
+</code></pre></div></div>
+
+<p>Double check that all KubeVirt components are healthy:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> kubevirt
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                                 READY   STATUS    RESTARTS       AGE
+pod/virt-api-674467958c-5chhj        1/1     Running   0              98d
+pod/virt-api-674467958c-wzcmk        1/1     Running   0              5d
+pod/virt-controller-6768977b-49wwb   1/1     Running   0              98d
+pod/virt-controller-6768977b-6pfcm   1/1     Running   0              5d
+pod/virt-handler-4hztq               1/1     Running   0              5d
+pod/virt-handler-x98x5               1/1     Running   0              98d
+pod/virt-operator-85f65df79b-lg8xb   1/1     Running   0              5d
+pod/virt-operator-85f65df79b-rp8p5   1/1     Running   0              98d
+</code></pre></div></div>
+
+<h2 id="deploy-a-vm-to-test">Deploy a VM to test</h2>
+
+<blockquote>
+  <p>The following is copied from
+<a href="https://kubevirt.io/user-guide/virtual_machines/accessing_virtual_machines/#static-ssh-public-key-injection-via-cloud-init">kubevirt.io</a>.</p>
+</blockquote>
+
+<p>First create a secret from your public key:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create secret generic my-pub-key <span class="nt">--from-file</span><span class="o">=</span><span class="nv">key1</span><span class="o">=</span>~/.ssh/id_rsa.pub
+</code></pre></div></div>
+
+<p>Next, create the VM:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Create a VM referencing the Secret using propagation method configDrive</span>
+<span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl create -f -
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: testvm
+spec:
+  running: true
+  template:
+    spec:
+      domain:
+        devices:
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+          rng: {}
+        resources:
+          requests:
+            memory: 1024M
+      terminationGracePeriodSeconds: 0
+      accessCredentials:
+      - sshPublicKey:
+          source:
+            secret:
+              secretName: my-pub-key
+          propagationMethod:
+            configDrive: {}
+      volumes:
+      - containerDisk:
+          image: quay.io/containerdisks/fedora:latest
+        name: containerdisk
+      - cloudInitConfigDrive:
+          userData: |-
+            #cloud-config
+            password: fedora
+            chpasswd: { expire: False }
+        name: cloudinitdisk
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Check that the test VM is running:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vm
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME        AGE     STATUS               READY
+testvm      30s     Running              True
+</code></pre></div></div>
+
+<p>Delete the VM:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete testvm
+</code></pre></div></div>
+
+<h2 id="set-up-cluster-autoscaler">Set Up Cluster Autoscaler</h2>
+
+<h3 id="prepare-the-permissions-for-cluster-autoscaler">Prepare the permissions for Cluster Autoscaler</h3>
+
+<p>So that CAS can set the desired capacity of each node group dynamically, we
+must grant it limited access to certain AWS resources. The first step to this
+is to define the IAM policy.</p>
+
+<blockquote>
+  <p>This section is based off of the “Create an IAM policy and role” section of
+the <a href="https://docs.aws.amazon.com/eks/latest/userguide/autoscaling.html">AWS
+Autoscaling</a>
+documentation.</p>
+</blockquote>
+
+<h3 id="create-the-cluster-specific-policy-document">Create the cluster-specific policy document</h3>
+
+<p>Prepare the policy document by rendering the following file.</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> policy.json <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "VisualEditor0",
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:SetDesiredCapacity",
+                "autoscaling:TerminateInstanceInAutoScalingGroup"
+            ],
+            "Resource": "*"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "autoscaling:DescribeAutoScalingInstances",
+                "autoscaling:DescribeAutoScalingGroups",
+                "ec2:DescribeLaunchTemplateVersions",
+                "autoscaling:DescribeTags",
+                "autoscaling:DescribeLaunchConfigurations",
+                "ec2:DescribeInstanceTypes"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>The above should be enough for CAS to do its job. Next, create the policy:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>aws iam create-policy <span class="se">\</span>
+    <span class="nt">--policy-name</span> eks-<span class="k">${</span><span class="nv">RD_REGION</span><span class="k">}</span>-<span class="k">${</span><span class="nv">RD_CLUSTER_NAME</span><span class="k">}</span><span class="nt">-ClusterAutoscalerPolicy</span> <span class="se">\</span>
+    <span class="nt">--policy-document</span> file://policy.json
+</code></pre></div></div>
+
+<blockquote>
+  <p>IMPORTANT: Take note of the returned policy ARN. You will need that below.</p>
+</blockquote>
+
+<h3 id="create-the-iam-role-and-k8s-service-account-pair">Create the IAM role and k8s service account pair</h3>
+
+<p>The Cluster Autoscaler needs a service account in the k8s cluster that’s
+associated with an IAM role that consumes the policy document we created in the
+previous section. This is normally a two-step process but can be created in a
+single command using <code class="language-plaintext highlighter-rouge">eksctl</code>:</p>
+
+<blockquote>
+  <p>For more information on what <code class="language-plaintext highlighter-rouge">eksctl</code> is doing under the covers, see <a href="https://eksctl.io/usage/iamserviceaccounts/#how-it-works">How It
+Works</a> from the
+<code class="language-plaintext highlighter-rouge">eksctl</code> documentation for IAM Roles for Service Accounts.</p>
+</blockquote>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RD_POLICY_ARN</span><span class="o">=</span><span class="s2">"&lt;Get this value from the last command's output&gt;"</span>
+
+eksctl create iamserviceaccount <span class="se">\</span>
+	<span class="nt">--cluster</span><span class="o">=</span><span class="k">${</span><span class="nv">RD_CLUSTER_NAME</span><span class="k">}</span> <span class="se">\</span>
+	<span class="nt">--region</span><span class="o">=</span><span class="k">${</span><span class="nv">RD_REGION</span><span class="k">}</span> <span class="se">\</span>
+	<span class="nt">--namespace</span><span class="o">=</span>kube-system <span class="se">\</span>
+	<span class="nt">--name</span><span class="o">=</span>cluster-autoscaler <span class="se">\</span>
+	<span class="nt">--attach-policy-arn</span><span class="o">=</span><span class="k">${</span><span class="nv">RD_POLICY_ARN</span><span class="k">}</span> <span class="se">\</span>
+	<span class="nt">--override-existing-serviceaccounts</span> <span class="se">\</span>
+	<span class="nt">--approve</span>
+</code></pre></div></div>
+
+<p>Double check that the <code class="language-plaintext highlighter-rouge">cluster-autoscaler</code> service account has been correctly
+annotated with the IAM role that was created by <code class="language-plaintext highlighter-rouge">eksctl</code> in the same step:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get sa cluster-autoscaler <span class="nt">-n</span> kube-system <span class="nt">-ojson</span> | <span class="se">\</span>
+	jq <span class="nt">-r</span> <span class="s1">'.metadata.annotations | ."eks.amazonaws.com/role-arn"'</span>
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>arn:aws:iam::365499461711:role/eksctl-my-cluster-addon-iamserviceaccount-...
+</code></pre></div></div>
+
+<p>Check from the AWS Console if the above role contains the policy that we created
+earlier.</p>
+
+<h3 id="deploy-cluster-autoscaler">Deploy Cluster Autoscaler</h3>
+
+<p>First, find the most recent Cluster Autoscaler version that has the same MAJOR
+and MINOR version as the kubernetes cluster you’re deploying to.</p>
+
+<p>Get the kube cluster’s version:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl version <span class="nt">-ojson</span> | jq <span class="nt">-r</span> .serverVersion.gitVersion
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>v1.27.4-eks-2d98532
+</code></pre></div></div>
+
+<p>Choose the appropriate version for CAS. You can get the latest Cluster
+Autoscaler versions from its <a href="https://github.com/kubernetes/autoscaler/releases?q=cluster-autoscaler+1&amp;expanded=true">Github Releases
+Page</a>.</p>
+
+<p>Example:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">CLUSTER_AUTOSCALER_VERSION</span><span class="o">=</span>1.27.3
+</code></pre></div></div>
+
+<p>Next, deploy the cluster autoscaler using the deployment template that I
+prepared in the <a href="https://github.com/relaxdiego/kubevirt-cas-baremetal">companion
+repo</a></p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>envsubst &lt; &lt;<span class="o">(</span>curl https://raw.githubusercontent.com/relaxdiego/kubevirt-cas-baremetal/main/cas-deployment.yaml.template<span class="o">)</span> | <span class="se">\</span>
+  kubectl apply <span class="nt">-f</span> -
+</code></pre></div></div>
+
+<p>Check the cluster autoscaler status:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get deploy,pod <span class="nt">-l</span> <span class="nv">app</span><span class="o">=</span>cluster-autoscaler <span class="nt">-n</span> kube-system
+</code></pre></div></div>
+
+<p>Example output:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                                 READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/cluster-autoscaler   1/1     1            1           4m1s
+
+NAME                                      READY   STATUS    RESTARTS   AGE
+pod/cluster-autoscaler-6c58bd6d89-v8wbn   1/1     Running   0          60s
+</code></pre></div></div>
+
+<p>Tail the <code class="language-plaintext highlighter-rouge">cluster-autoscaler</code> pod’s logs to see what’s happening:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl <span class="nt">-n</span> kube-system logs <span class="nt">-f</span> deployment.apps/cluster-autoscaler
+</code></pre></div></div>
+
+<p>Below are example log entries from Cluster Autoscaler terminating an unneeded
+node:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>node ip-XXXX.YYYY.compute.internal may be removed
+...
+ip-XXXX.YYYY.compute.internal was unneeded for 1m3.743475455s
+</code></pre></div></div>
+
+<p>Once the timeout has been reached (default: 10 minutes), CAS will scale down
+the group:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Scale-down: removing empty node ip-XXXX.YYYY.compute.internal
+Event(v1.ObjectReference{Kind:"ConfigMap", Namespace:"kube-system", ...
+Successfully added ToBeDeletedTaint on node ip-XXXX.YYYY.compute.internal
+Terminating EC2 instance: i-ZZZZ
+DeleteInstances was called: ...
+</code></pre></div></div>
+
+<blockquote>
+  <p>For more information on how Cluster Autoscaler scales down a node group, see
+<a href="https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/FAQ.md#how-does-scale-down-work">How does scale-down
+work?</a>
+from the project’s FAQ.</p>
+</blockquote>
+
+<p>When you try to get the list of nodes, you should see the bare metal nodes
+tainted such that they are no longer schedulable:</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME       STATUS                     ROLES    AGE    VERSION
+ip-XXXX    Ready,SchedulingDisabled   &lt;none&gt;   70m    v1.27.3-eks-a5565ad
+ip-XXXX    Ready,SchedulingDisabled   &lt;none&gt;   70m    v1.27.3-eks-a5565ad
+ip-XXXX    Ready,SchedulingDisabled   &lt;none&gt;   70m    v1.27.3-eks-a5565ad
+ip-XXXX    Ready                      &lt;none&gt;   112m   v1.27.3-eks-a5565ad
+ip-XXXX    Ready                      &lt;none&gt;   112m   v1.27.3-eks-a5565ad
+</code></pre></div></div>
+
+<p>In a few more minutes, the nodes will be deleted.</p>
+
+<p>To try the scale up, just deploy a VM.</p>
+
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>Expanding Node Group eks-ng-eacf8ebb ...
+Best option to resize: eks-ng-eacf8ebb
+Estimated 1 nodes needed in eks-ng-eacf8ebb
+Final scale-up plan: [{eks-ng-eacf8ebb 0-&gt;1 (max: 3)}]
+Scale-up: setting group eks-ng-eacf8ebb size to 1
+Setting asg eks-ng-eacf8ebb size to 1
+</code></pre></div></div>
+
+<h2 id="done">Done</h2>
+
+<p>At this point you should have a working, auto-scaling EKS cluster that can host
+VMs on bare metal nodes. If you have any questions, ask them
+<a href="https://github.com/relaxdiego/relaxdiego.github.com/discussions/new?category=general">here</a>.</p>
+
+<h2 id="references">References</h2>
+
+<ul>
+  <li><a href="https://docs.aws.amazon.com/eks/latest/userguide/autoscaling.html">Amazon EKS Autoscaling</a></li>
+  <li><a href="https://aws.plainenglish.io/cluster-autoscaler-amazon-eks-7ffaa24e5938">Cluster Autoscaler in Plain English</a></li>
+  <li><a href="https://aws.github.io/aws-eks-best-practices/">AWS EKS Best Practices Guide</a></li>
+  <li><a href="https://docs.aws.amazon.com/eks/latest/userguide/iam-roles-for-service-accounts.html">IAM roles for service accounts</a></li>
+  <li><a href="https://eksctl.io/usage/iamserviceaccounts/">eksctl create iamserviceaccount</a></li>
+</ul>]]></content><author><name>Mark Maglana, Jonathan Kinred, Paul Myjavec</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Cluster Autoscaler" /><category term="AWS" /><category term="EKS" /><summary type="html"><![CDATA[This post explains how to set up KubeVirt with Cluster Autoscaler on EKS]]></summary></entry><entry><title type="html">Managing KubeVirt VMs with Ansible</title><link href="https://kubevirt.io//2023/Managing-KubeVirt-VMs-with-Ansible.html" rel="alternate" type="text/html" title="Managing KubeVirt VMs with Ansible" /><published>2023-09-05T00:00:00+00:00</published><updated>2023-09-05T00:00:00+00:00</updated><id>https://kubevirt.io//2023/Managing-KubeVirt-VMs-with-Ansible</id><content type="html" xml:base="https://kubevirt.io//2023/Managing-KubeVirt-VMs-with-Ansible.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 
 <p>Infrastructure teams managing virtual machines (VMs) and the end users of these systems make use of a variety of tools as part of their day-to-day world. One such tool that is shared amongst these two groups is Ansible, an agentless automation tool for the enterprise. To simplify both the adoption and usage of KubeVirt as well as to integrate seamlessly into existing workflows, the KubeVirt community is excited to introduce the release of the first version of the KubeVirt collection for <a href="https://docs.ansible.com/ansible/latest/index.html">Ansible</a>, called <code class="language-plaintext highlighter-rouge">kubevirt.core</code>, which includes a number of tools that you do not want to miss.</p>
 
@@ -2321,230 +2912,4 @@ And everyone who attended the sessions, listened, and asked great questions.</p>
   <li><a href="https://www.flickr.com/photos/143247548@N03/albums/72177720298987342">CNCF’s Photo album (Flickr) of the event</a>.</li>
   <li><a href="https://www.youtube.com/c/cloudnativefdn">The CNCF video recordings of the sessions on Youtube</a>.</li>
   <li>And <a href="https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/program/schedule/">the event schedule</a> to help you find sessions.</li>
-</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry><entry><title type="html">Load-balancer for virtual machines on bare metal Kubernetes clusters</title><link href="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html" rel="alternate" type="text/html" title="Load-balancer for virtual machines on bare metal Kubernetes clusters" /><published>2022-04-03T00:00:00+00:00</published><updated>2022-04-03T00:00:00+00:00</updated><id>https://kubevirt.io//2022/Virtual-Machines-with-MetalLB</id><content type="html" xml:base="https://kubevirt.io//2022/Virtual-Machines-with-MetalLB.html"><![CDATA[<h2 id="introduction">Introduction</h2>
-
-<p>Over the last year, Kubevirt and MetalLB have shown to be powerful duo in order to support fault-tolerant access to an application on virtual machines through an external IP address. 
-As a Cluster administrator using an on-prem cluster without a network load-balancer, now it’s possible to use MetalLB operator to provide load-balancer capabilities (with Services of type <code class="language-plaintext highlighter-rouge">LoadBalancer</code>) to virtual machines.</p>
-
-<h2 id="metallb">MetalLB</h2>
-
-<p><a href="https://metallb.universe.tf/">MetalLB</a> allows you to create Kubernetes services of type <code class="language-plaintext highlighter-rouge">LoadBalancer</code>, and provides network load-balancer implementation in on-prem clusters that don’t run on a cloud provider.
-MetalLB is responsible for assigning/unassigning an external IP Address to your service, using IPs from pre-configured pools. In order for the external IPs to be announced externally, MetalLB works in 2 modes, Layer 2 and BGP:</p>
-
-<ul>
-  <li>
-    <p>Layer 2 mode (ARP/NDP):</p>
-
-    <p>This mode - which actually does not implement real load-balancing behavior - provides a failover mechanism where a single node owns the <code class="language-plaintext highlighter-rouge">LoadBalancer</code> service, until it fails, triggering another node to be chosen as the service owner. This configuration mode makes the IPs reachable from the local network.<br />
-In this method, the MetalLB speaker pod announces the IPs in ARP (for IPv4) and NDP (for IPv6) protocols over the host network. From a network perspective, the node owning the service appears to have multiple IP addresses assigned to a network interface. After traffic is routed to the node, the service proxy sends the traffic to the application pods.</p>
-  </li>
-  <li>
-    <p>BGP mode:</p>
-
-    <p>This mode provides real load-balancing behavior, by establishing BGP peering sessions with the network routers - which advertise the external IPs of the <code class="language-plaintext highlighter-rouge">LoadBalancer</code> service, distributing the load over the nodes.</p>
-  </li>
-</ul>
-
-<p>To read more on MetalLB concepts, implementation and limitations, please read <a href="https://metallb.universe.tf/concepts/">its documentation</a>.</p>
-
-<h2 id="demo-virtual-machine-with-external-ip-and-metallb-load-balancer">Demo: Virtual machine with external IP and MetalLB load-balancer</h2>
-
-<p>With the following recipe we will end up with a nginx server running on a virtual machine, accessible outside the cluster using MetalLB load-balancer with Layer 2 mode.</p>
-
-<h3 id="demo-environment-setup">Demo environment setup</h3>
-
-<p>We are going to use <a href="https://kind.sigs.k8s.io">kind</a> provider as an ephemeral Kubernetes cluster.</p>
-
-<p>Prerequirements:</p>
-<ul>
-  <li>First install kind on your machine following its <a href="https://kind.sigs.k8s.io/docs/user/quick-start/#installation">installation guide</a>.</li>
-  <li>To use kind, you will also need to <a href="https://docs.docker.com/install/">install docker</a>.</li>
-</ul>
-
-<h4 id="external-ips-on-macos-and-windows">External IPs on macOS and Windows</h4>
-
-<p>This demo runs Docker on Linux, which allows sending traffic directly to the load-balancer’s external IP if the IP space is within the docker IP space.
-On macOS and Windows however, docker does not expose the docker network to the host, rendering the external IP unreachable from other kind nodes. In order to workaround this, one could expose pods and services using extra port mappings as shown in the extra port mappings section of kind’s <a href="https://kind.sigs.k8s.io/docs/user/configuration#extra-port-mappings">Configuration Guide</a>.</p>
-
-<h3 id="deploying-cluster">Deploying cluster</h3>
-
-<p>To start a kind cluster:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kind create cluster
-</code></pre></div></div>
-
-<p>In order to interact with the specific cluster created:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl cluster-info <span class="nt">--context</span> kind-kind
-</code></pre></div></div>
-
-<h3 id="installing-components">Installing components</h3>
-
-<h4 id="installing-metallb-on-the-cluster">Installing MetalLB on the cluster</h4>
-
-<p>There are <a href="https://metallb.universe.tf/installation/">many ways</a> to install MetalLB. For the sake of this example, we will install MetalLB via manifests. To do this, follow this <a href="https://metallb.universe.tf/installation/#installation-by-manifest">guide</a>. 
-Confirm successful installation by waiting for MetalLB pods to have a status of Running:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get pods <span class="nt">-n</span> metallb-system <span class="nt">--watch</span>
-</code></pre></div></div>
-
-<h4 id="installing-kubevirt-on-the-cluster">Installing Kubevirt on the cluster</h4>
-
-<p>Following Kubevirt <a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a> to install released version v0.51.0</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span>v0.51.0
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
-kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>360s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
-</code></pre></div></div>
-
-<p>Now we have a Kubernetes cluster with all the pieces to start the Demo.</p>
-
-<h3 id="network-resources-configuration">Network resources configuration</h3>
-
-<h4 id="setting-address-pool-to-be-used-by-the-loadbalancer">Setting Address Pool to be used by the LoadBalancer</h4>
-
-<p>In order to complete the Layer 2 mode configuration, we need to set a range of IP addresses for the LoadBalancer to use.
-On Linux we can use the docker kind network (macOS and Windows users see <a href="#external-ips-on-macos-and-windows">External IPs Prerequirement</a>), so by using this command:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>docker network inspect <span class="nt">-f</span> <span class="s1">''</span> kind
-</code></pre></div></div>
-
-<p>You should get the subclass you can set the IP range from. The output should contain a cidr such as 172.18.0.0/16.
-Using this result we will create the following Layer 2 address pool with 172.18.1.1-172.18.1.16 range:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl apply -f -</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">ConfigMap</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">namespace</span><span class="pi">:</span> <span class="s">metallb-system</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">config</span>
-<span class="na">data</span><span class="pi">:</span>
-  <span class="na">config</span><span class="pi">:</span> <span class="pi">|</span>
-    <span class="s">address-pools:</span>
-    <span class="s">- name: addresspool-sample1</span>
-      <span class="s">protocol: layer2</span>
-      <span class="s">addresses:</span>
-      <span class="s">- 172.18.1.1-172.18.1.16</span>
-<span class="s">EOF</span>
-</code></pre></div></div>
-
-<h3 id="network-utilization">Network utilization</h3>
-
-<h4 id="spin-up-a-virtual-machine-running-nginx">Spin up a Virtual Machine running Nginx</h4>
-
-<p>Now it’s time to start-up a virtual machine running nginx using the following yaml.
-The virtual machine has a <code class="language-plaintext highlighter-rouge">metallb-service=nginx</code> we created to use when creating the service.</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl apply -f -</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">fedora-nginx</span>
-  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">metallb-service</span><span class="pi">:</span> <span class="s">nginx</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">metallb-service</span><span class="pi">:</span> <span class="s">nginx</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-            <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-                <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-            <span class="pi">-</span> <span class="na">masquerade</span><span class="pi">:</span> <span class="pi">{}</span>
-              <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024M</span>
-      <span class="na">networks</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">default</span>
-          <span class="na">pod</span><span class="pi">:</span> <span class="pi">{}</span>
-      <span class="na">terminationGracePeriodSeconds</span><span class="pi">:</span> <span class="m">0</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-        <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-            <span class="na">image</span><span class="pi">:</span> <span class="s">kubevirt/fedora-cloud-container-disk-demo</span>
-          <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-        <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-            <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-              <span class="s">#cloud-config</span>
-              <span class="s">password: fedora</span>
-              <span class="s">chpasswd: { expire: False }</span>
-              <span class="s">packages:</span>
-                <span class="s">- nginx</span>
-              <span class="s">runcmd:</span>
-                <span class="s">- [ "systemctl", "enable", "--now", "nginx" ]</span>
-          <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-<span class="s">EOF</span>
-</code></pre></div></div>
-
-<h4 id="expose-the-virtual-machine-with-a-typed-loadbalancer-service">Expose the virtual machine with a typed <code class="language-plaintext highlighter-rouge">LoadBalancer</code> service</h4>
-
-<p>When creating the <code class="language-plaintext highlighter-rouge">LoadBalancer</code> typed service, we need to remember annotating the address-pool we want to use 
-<code class="language-plaintext highlighter-rouge">addresspool-sample1</code> and also add the selector <code class="language-plaintext highlighter-rouge">metallb-service: nginx</code>:</p>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="s">cat &lt;&lt;EOF | kubectl apply -f -</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">Service</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">v1</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">metallb-nginx-svc</span>
-  <span class="na">namespace</span><span class="pi">:</span> <span class="s">default</span>
-  <span class="na">annotations</span><span class="pi">:</span>
-    <span class="na">metallb.universe.tf/address-pool</span><span class="pi">:</span> <span class="s">addresspool-sample1</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">externalTrafficPolicy</span><span class="pi">:</span> <span class="s">Local</span>
-  <span class="na">ipFamilies</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="s">IPv4</span>
-  <span class="na">ports</span><span class="pi">:</span>
-    <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">tcp-5678</span>
-      <span class="na">protocol</span><span class="pi">:</span> <span class="s">TCP</span>
-      <span class="na">port</span><span class="pi">:</span> <span class="m">5678</span>
-      <span class="na">targetPort</span><span class="pi">:</span> <span class="m">80</span>
-  <span class="na">type</span><span class="pi">:</span> <span class="s">LoadBalancer</span>
-  <span class="na">selector</span><span class="pi">:</span>
-    <span class="na">metallb-service</span><span class="pi">:</span> <span class="s">nginx</span>
-<span class="s">EOF</span>
-</code></pre></div></div>
-
-<p>Notice that the service got assigned with an external IP from the range assigned by the address pool:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get service <span class="nt">-n</span> default metallb-nginx-svc
-</code></pre></div></div>
-
-<p>Example output:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>NAME                TYPE           CLUSTER-IP      EXTERNAL-IP   PORT<span class="o">(</span>S<span class="o">)</span>          AGE
-metallb-nginx-svc   LoadBalancer   10.96.254.136   172.18.1.1    5678:32438/TCP   53s
-</code></pre></div></div>
-
-<h4 id="access-the-virtual-machine-from-outside-the-cluster">Access the virtual machine from outside the cluster</h4>
-
-<p>Finally, we can check that the nginx server is accessible from outside the cluster:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>curl <span class="nt">-s</span> <span class="nt">-o</span> /dev/null 172.18.1.1:5678 <span class="o">&amp;&amp;</span> <span class="nb">echo</span> <span class="s2">"URL exists"</span>
-</code></pre></div></div>
-
-<p>Example output:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>URL exists
-</code></pre></div></div>
-<p>Note that it may take a short while for the URL to work after setting the service.</p>
-
-<h2 id="doing-this-on-your-own-cluster">Doing this on your own cluster</h2>
-
-<p>Moving outside the demo example, one who would like use MetalLB on their real life cluster, should also take other considerations in mind:</p>
-<ul>
-  <li>User privileges: you should have <code class="language-plaintext highlighter-rouge">cluster-admin</code> privileges on the cluster - in order to install MetalLB.</li>
-  <li>IP Ranges for MetalLB: getting IP Address pools allocation for MetalLB depends on your cluster environment:
-    <ul>
-      <li>If you’re running a bare-metal cluster in a shared host environment, you need to first reserve this IP Address pool from your hosting provider.</li>
-      <li>Alternatively, if you’re running on a private cluster, you can use one of the private IP Address spaces (a.k.a RFC1918 addresses). Such addresses are free, and work fine as long as you’re only providing cluster services to your LAN.</li>
-    </ul>
-  </li>
-</ul>
-
-<h2 id="conclusion">Conclusion</h2>
-
-<p>In this blog post we used MetalLB to expose a service using an external IP assigned to a virtual machine. 
-This illustrates how virtual machine traffic can be load-balanced via a service.</p>]]></content><author><name>Ram Lavi</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="load-balancer" /><category term="MetalLB" /><summary type="html"><![CDATA[This post illustrates setting up a virtual machine with MetalLB LoadBalancer service.]]></summary></entry></feed>
+</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry></feed>
