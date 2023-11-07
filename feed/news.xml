@@ -1,4 +1,67 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-09-29T12:50:23+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Running KubeVirt with Cluster Autoscaler</title><link href="https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html" rel="alternate" type="text/html" title="Running KubeVirt with Cluster Autoscaler" /><published>2023-09-06T00:00:00+00:00</published><updated>2023-09-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2023-11-07T14:36:32+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Announcing KubeVirt v1.1</title><link href="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html" rel="alternate" type="text/html" title="Announcing KubeVirt v1.1" /><published>2023-11-07T00:00:00+00:00</published><updated>2023-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2023/Announcing-KubeVirt-v1-1</id><content type="html" xml:base="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html"><![CDATA[<p>The KubeVirt Community is very pleased to announce the release of KubeVirt v1.1. This comes 17 weeks after our celebrated v1.0 release, and follows the predictable schedule we moved to three releases ago to follow the Kubernetes release cadence.</p>
+
+<p>You can read the full <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.1.0">v1.1 release notes here</a>, but we’ve asked the KubeVirt SIGs to summarize their largest successes, as well as one of the community members from Arm to list their integration accomplishments for this release.</p>
+
+<h2 id="sig-compute">SIG-compute</h2>
+<p>SIG-compute covers the core functionality of KubeVirt. This includes scheduling VMs, the API, and all KubeVirt operators.</p>
+
+<p>For the v1.1 release, we have added quite a few features. This includes memory hotplug, as a follow up to CPU hotplug, which was part of the 1.0 release. Basic KSM support was already part of KubeVirt, but we have now extended that with more tuning parameters and KubeVirt can also dynamically configure KSM based on system pressure. We’ve added persistent NVRAM support (requires that a VM use UEFI) so that settings are preserved across reboots.</p>
+
+<p>We’ve also added host-side USB passthrough support, so that USB devices on a cluster node can be made available to workloads. KubeVirt can now automatically apply limits to a VM running in a namespace with quotas. We’ve also added refinements to VM cloning, as well as the ability to create clones using the virtctl CLI tool. And you can now stream guest’s console logs.</p>
+
+<p>Finally, on the confidential computing front, we now have an API for SEV attestation.</p>
+
+<h2 id="sig-infra">SIG-infra</h2>
+<p>SIG-infra takes care of KubeVirt’s own infrastructure, user workloads and other user-focused integrations through automation and the reduction of complexity wherever possible, providing a quality experience for end users.</p>
+
+<p>In this release, two major instance type-related features were added to KubeVirt. The first feature is the deployment of Common InstanceTypes by the virt-operator. This provides users with a useful set of InstanceTypes and Preferences right out of the box and allows them to easily create virtual machines tailored to the needs of their workloads. For now this feature remains behind a feature gate, but in future versions we aim to enable the deployment by default.</p>
+
+<p>Secondly, the inference of InstanceTypes and Preferences has been enabled by default when creating virtual machines with virtctl. This feature was already present in the previous release, but users still needed to explicitly enable it. Now it is enabled by default, being as transparent as possible so as to not let the creation of virtual machines fail if inference should not be possible. This significantly improves usability, as the command line for creating virtual machines is now even simpler.</p>
+
+<h2 id="sig-network">SIG-network</h2>
+<p>SIG-network is committed to enhancing and maintaining all aspects of Virtual Machine network connectivity and management in KubeVirt.</p>
+
+<p>For the v1.1 release, we have re-designed the interface hot plug/unplug API, while adding hotplug support for SR-IOV interfaces. On top of that, we have added a network binding option allowing the community to extend the KubeVirt network configuration in the pod by injecting custom CNI plugins to configure the networking stack, and a sidecar to configure the libvirt domain. The existing <code class="language-plaintext highlighter-rouge">slirp</code> network configuration has been extracted from the code and re-designed as one such network binding, and can be used by the community as an example on how to extend KubeVirt bindings.</p>
+
+<h2 id="sig-scale">SIG-scale</h2>
+<p>SIG-scale continues to track scale and performance across releases.  The v1.1 testing lanes ran on Kubernetes 1.27 and we observed a slight performance improvement from Kubernetes.  There’s no other notable performance or scale changes in KubeVirt v1.1 as our focus has been on improving our tracking.</p>
+
+<h4 id="vmicreationtorunningsecondsp95">vmiCreationToRunningSecondsP95</h4>
+<ul>
+  <li>The gray dotted line in the graph is Feb 1, 2023, denoting release of v0.59</li>
+  <li>The blue dotted line in the graph is March 1, 2023, denoting release of v0.60</li>
+  <li>The green dotted line in the graph is July 6, 2023, denoting release of v1.0.0</li>
+  <li>The red dotted line in the graph is September 6, 2023, denoting change in k8s provider from v1.25 to v1.27</li>
+</ul>
+
+<p><img src="/assets/2023-11-07-Announcing-KubeVirt-v1-1/vmi-p95-Creation-to-Running.png" alt="Alt text" />
+<img src="/assets/2023-11-07-Announcing-KubeVirt-v1-1/vm-p95-Creation-to-Running.png" alt="Alt text" /></p>
+
+<p>Full v1.1 data source: <a href="https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md">https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md</a></p>
+
+<h2 id="sig-storage">SIG-storage</h2>
+<p>SIG-storage is focused on providing persistent storage to KubeVirt VMs and managing that storage throughout the lifecycle of the VM. This begins with provisioning and populating PVCs with bootable images but also includes features such as disk hotplug, snapshots, backup and restore, disaster recovery, and virtual machine export.</p>
+
+<p>For this release we aimed to draw closer to Kubernetes principles when it comes to managing storage artifacts. Introducing CDI volume populators, which is CDI’s implementation of importing/uploading/cloning data to PVCs using the <code class="language-plaintext highlighter-rouge">dataSourceRef</code> field. This follows the Kubernetes way of populating PVCs and enables us to populate PVCs directly without the need for DataVolumes, an important but bespoke object that has served the KubeVirt use case for many years.</p>
+
+<p>Speaking of DataVolumes, they will no longer be garbage collected by default, something that violated a fundamental principle of Kubernetes (even though it was very useful for our use case).</p>
+
+<p>And, finally, we can now use snapshots to store operating system “golden images”, to serve as the base image for cloning.</p>
+
+<h2 id="kubevirt-and-arm">KubeVirt and Arm</h2>
+<p>We are excited to announce the successful integration of KubeVirt on Arm64 platforms. Here are some key accomplishments:</p>
+<ol>
+  <li><strong>Building and Compiling</strong>: We have released multi-architecture KubeVirt component images and binaries, while also allowing cross-compiling Arm64 architecture images and binaries on x86_64 platforms.</li>
+  <li><strong>Core Functionality</strong>: Our dedicated efforts have focused on enabling the core functionality of KubeVirt on Arm64 platforms.</li>
+  <li><strong>Testing Integration</strong>: Quality assurance is of paramount importance. We have integrated unit tests and end-to-end tests on Arm64 servers into the pull request (PR) pre-submit process. This guarantees that KubeVirt maintains its reliability and functionality on Arm64.</li>
+  <li><strong>Comprehensive Documentation</strong>: To provide valuable insights into KubeVirt’s capabilities on Arm64 platforms, we have compiled extensive documentation. Explore the status of <a href="https://kubevirt.io/user-guide/operations/feature_gate_status_on_Arm64/">feature gates</a> and dive into <a href="https://kubevirt.io/user-guide/virtual_machines/device_status_on_Arm64/">device status documentation</a>.</li>
+  <li><strong>Hybrid Cluster Compatibility Preview</strong>: Hybrid x86_64 and Arm64 clusters can work together now as a preview feature. Try it out and provide feedback.</li>
+</ol>
+
+<p>We are thrilled to declare that KubeVirt now offers tier-one support on Arm64 platforms. This milestone represents a culmination of collaborative efforts, unwavering dedication, and a commitment to innovation within the KubeVirt community. KubeVirt is no longer just an option; it has evolved to become a first-class citizen on Arm64 platforms.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+<p>Thank you to everyone in the KubeVirt Community who contributed to this release, whether you pitched in on any of the features listed above, helped out with any of the other features or maintenance improvements listed in our release notes, or made any number of non-code contributions to our website, user guide or meetings.</p>]]></content><author><name>KubeVirt Community</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.1.0" /><category term="release" /><category term="community" /><category term="cncf" /><summary type="html"><![CDATA[We are very pleased to announce the release of KubeVirt v1.1!]]></summary></entry><entry><title type="html">Running KubeVirt with Cluster Autoscaler</title><link href="https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html" rel="alternate" type="text/html" title="Running KubeVirt with Cluster Autoscaler" /><published>2023-09-06T00:00:00+00:00</published><updated>2023-09-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-on-autoscaling-nodes.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 
 <p>For this article, we’ll learn about the process of setting up
 <a href="https://kubevirt.io/">KubeVirt</a> with <a href="https://github.com/kubernetes/autoscaler/blob/master/cluster-autoscaler/cloudprovider/aws/README.md">Cluster
@@ -2872,44 +2935,4 @@ Here are a few steps you can take to improve things:</p>
   <li>Increasing the RAM is always a good idea, if you have enough available of course.</li>
   <li>Increasing the number of CPUs, and/or using CPUManager to assign dedicated CPU to the VM should also help a lot.</li>
   <li>Once the VirtIO drivers are installed, the main drive can also be switched from <code class="language-plaintext highlighter-rouge">sata</code> to <code class="language-plaintext highlighter-rouge">virtio</code>, and the attached CDROMs can be removed.</li>
-</ul>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html"><![CDATA[This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt]]></summary></entry><entry><title type="html">KubeVirt at KubeCon EU 2022</title><link href="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html" rel="alternate" type="text/html" title="KubeVirt at KubeCon EU 2022" /><published>2022-06-28T00:00:00+00:00</published><updated>2022-06-28T00:00:00+00:00</updated><id>https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022</id><content type="html" xml:base="https://kubevirt.io//2022/KubeVirt-at-KubeCon-EU-2022.html"><![CDATA[<p>KubeCon EU was in Valencia, Spain this year from May 16-20. For many of the 7000+ physical attendees, it was their first in-person conference in several years. With luck, it was the first of many more to come, as KubeCon is a rare opportunity to learn about, from, and with a rich variety of adopters, communities, and vendors that make up the open source and cloud native ecosystem.</p>
-
-<p>The KubeVirt community presented two sessions, both on Wednesday May 18th:</p>
-
-<ol>
-  <li>A Virtual Open Office Hours session, and</li>
-  <li>A Maintainer Track session: ‘It’s All for the Users. More Durable, Secure, and Pluggable. KubeVirt v0.53’</li>
-</ol>
-
-<h2 id="virtual-open-office-hours">Virtual Open Office Hours</h2>
-
-<p>This was a 45-minute project virtual session, hosted by the CNCF. This was on the Bevy platform (which will be familiar to KubeVirt Summit attendees from the past two years) and we had five lovely people from the KubeVirt community ready with a variety of demos and presentations and to answer questions from attendees:+
-Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki</p>
-
-<p>This was an opportunity for KubeCon attendees (virtual and physical) to ask questions and discuss any topics, and our presenters covered the following: Introduction to KubeVirt, live migration, Istio integration, and CDI hotplug/resize.
-Despite some initial technical issues and improvised changes, this session went really well. We had about ~25 consistent attendees, and we received a good range of Q&amp;A and interaction with the attendees on all topics presented. It was a very solid 45 minutes.
-Unfortunately, due to a miscommunication, there is no recording of this session.</p>
-
-<p>A huge thanks to the presenters for their time and collaboration in preparing for this.</p>
-
-<h2 id="maintainer-track">Maintainer Track</h2>
-
-<p>Later that day, on the Maintainer Track, Alice also gave an in-depth breakdown of a whole slew of new KubeVirt features and showed a demo with the KubeVirt Cluster API: deploying Kubernetes on top of Kubernetes.
-You can watch <a href="https://youtu.be/L9H0pz5PpKo">the CNCF recording here</a>, and download the <a href="https://kccnceu2022.sched.com/event/ytu1">demo video and slides</a> that are available from the schedule.</p>
-
-<p>There was a healthy amount of questions, both during Q&amp;A and after the talk. The participants were particularly interested to know how to prepare and customize VM disks with KubeVirt, how to run Windows VM, especially combined with GPUs, and how to expose the Kubernetes API service of a deployed cluster to the KubeVirt cluster API provider outside of the KubeVirt VM. There were additional questions on the status of TPM support and VM migration when the hosting node goes down.</p>
-
-<h2 id="thank-you">Thank you!</h2>
-
-<p>Big thanks again to our presenters: Alice Frosi, Itamar Holder, Miguel Duarte de Mora Barroso, Luboslav Pivarc, and Bartosz Rybacki.
-And everyone who attended the sessions, listened, and asked great questions.</p>
-
-<h2 id="want-to-see-more-from-kubecon-eu-2022">Want to see more from KubeCon EU 2022?</h2>
-
-<p>If you’re interested in seeing more photos and recordings from the event:</p>
-
-<ul>
-  <li><a href="https://www.flickr.com/photos/143247548@N03/albums/72177720298987342">CNCF’s Photo album (Flickr) of the event</a>.</li>
-  <li><a href="https://www.youtube.com/c/cloudnativefdn">The CNCF video recordings of the sessions on Youtube</a>.</li>
-  <li>And <a href="https://events.linuxfoundation.org/kubecon-cloudnativecon-europe/program/schedule/">the event schedule</a> to help you find sessions.</li>
-</ul>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><category term="KubeCon" /><summary type="html"><![CDATA[A short report on the two sessions KubeVirt presented at KubeCon EU 2022]]></summary></entry></feed>
+</ul>]]></content><author><name>Jed Lejosne</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="Microsoft Windows kubernetes" /><category term="Microsoft Windows container" /><category term="Windows" /><summary type="html"><![CDATA[This blog post describes how to create a Microsoft Windows 11 virtual machine with KubeVirt]]></summary></entry></feed>

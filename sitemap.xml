@@ -725,6 +725,14 @@
 <lastmod>2023-09-06T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2023/changelog-v1.1.0.html</loc>
+<lastmod>2023-11-06T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html</loc>
+<lastmod>2023-11-07T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//client-go/</loc>
 </url>
 <url>
@@ -1556,6 +1564,9 @@
 <loc>https://kubevirt.io//tag/eks.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//tag/v1.1.0.html</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
 </url>
 <url>
@@ -1659,5 +1670,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page36/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page37/</loc>
 </url>
 </urlset>
