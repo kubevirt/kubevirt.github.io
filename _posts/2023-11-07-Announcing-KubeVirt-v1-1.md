@@ -56,7 +56,7 @@ SIG-scale continues to track scale and performance across releases.  The v1.1 te
 ![Alt text](/assets/2023-11-07-Announcing-KubeVirt-v1-1/vm-p95-Creation-to-Running.png)
 
 
-Full v1.1 data source: [https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md](https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md)
+Full v1.1 data source: [https://github.com/kubevirt/kubevirt/blob/main/docs/release-v1-perf-scale-benchmarks.md](https://github.com/kubevirt/kubevirt/blob/main/docs/release-v1-perf-scale-benchmarks.md)
 
 
 ## SIG-storage
