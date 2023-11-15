@@ -48,7 +48,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2023-11-07 14:36:32 +0000" >
+    <meta property="og:article:published_time" content="2023-11-15 20:16:24 +0000" >
     <meta name="twitter:title" content="KubeVirt quickstart with cloud providers | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -475,7 +475,7 @@ To install kubectl client please follow the official documentation for your syst
   <li>
     <p>Use <code class="language-plaintext highlighter-rouge">kubectl</code> to deploy the KubeVirt operator:</p>
 
-    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://api.github.com/repos/kubevirt/kubevirt/releases | <span class="nb">grep </span>tag_name | <span class="nb">grep</span> <span class="nt">-v</span> <span class="nt">--</span> <span class="s1">'-rc'</span> | <span class="nb">sort</span> <span class="nt">-r</span> | <span class="nb">head</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">': '</span> <span class="s1">'{print $2}'</span> | <span class="nb">sed</span> <span class="s1">'s/,//'</span> | xargs<span class="si">)</span>
+    <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>curl <span class="nt">-s</span> https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt<span class="si">)</span>
 <span class="nb">echo</span> <span class="nv">$VERSION</span>
 kubectl create <span class="nt">-f</span> https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/kubevirt-operator.yaml
 </code></pre></div>    </div>
