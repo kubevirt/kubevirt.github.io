@@ -160,10 +160,6 @@ noVNC is a JavaScript VNC client using WebSockets and HTML5 Canvas.
 It just allows you to connect through VNC to the virtual Machine already deployed in KubeVirt.
 
 No VM management or even a dashboard is enabled with this option, it's a pure DIY code that can embed the VNC access to the VM into HTML in any application or webpage.
-There is a [noVNC blogpost]({% post_url 2019-11-11-Access-Virtual-Machines-graphic-console-using-noVNC %}) detailing how to install noVNC.
-
-In this animation you can see the feature of connecting to the Virtual Machine with noVNC:
-![noVNC](/assets/2019-12-19-KubeVirt_UI_options/virtvnc.gif "noVNC")
 
 ## Summary
 
