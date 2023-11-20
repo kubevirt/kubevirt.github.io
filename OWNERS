@@ -1,19 +1,20 @@
 filters:
   ".*":
     reviewers:
+      - aburdenthehand
       - cwilkers
       - jobbler
-      - mazzystr
     approvers:
+      - aburdenthehand
       - cwilkers
-      - mazzystr
       - fabiand
       - davidvossel
       - dhiller
-      - stu-gott
-      - phoracek
       - jberkus
+      - phoracek
+      - stu-gott
     emeritus_approvers:
+      - mazzystr # 20 Nov 2023
       - codificat # 09 June 2021
       - hroyrh # 09 June 2021
       - iranzo # 20 May 2020
