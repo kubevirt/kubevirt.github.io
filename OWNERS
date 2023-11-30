@@ -2,6 +2,7 @@ filters:
   ".*":
     reviewers:
       - aburdenthehand
+      - brianmcarey
       - cwilkers
       - jean-edouard
     approvers:
