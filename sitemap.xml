@@ -389,10 +389,6 @@
 <lastmod>2019-11-04T00:00:00+00:00</lastmod>
 </url>
 <url>
-<loc>https://kubevirt.io//2019/Access-Virtual-Machines-graphic-console-using-noVNC.html</loc>
-<lastmod>2019-11-11T00:00:00+00:00</lastmod>
-</url>
-<url>
 <loc>https://kubevirt.io//2019/kubecon-na-2019.html</loc>
 <lastmod>2019-11-12T00:00:00+00:00</lastmod>
 </url>
@@ -1210,12 +1206,6 @@
 <loc>https://kubevirt.io//tag/jenkins.html</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//tag/novnc.html</loc>
-</url>
-<url>
-<loc>https://kubevirt.io//tag/console.html</loc>
-</url>
-<url>
 <loc>https://kubevirt.io//tag/kubecon.html</loc>
 </url>
 <url>
@@ -1292,6 +1282,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//tag/cockpit.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/novnc.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//tag/user-interface.html</loc>
@@ -1673,8 +1666,5 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page36/</loc>
-</url>
-<url>
-<loc>https://kubevirt.io//blogs/page37/</loc>
 </url>
 </urlset>
