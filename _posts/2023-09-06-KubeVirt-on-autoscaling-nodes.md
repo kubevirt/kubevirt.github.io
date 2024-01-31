@@ -194,6 +194,7 @@ managedNodeGroups:
     volumeIOPS: 10000
     volumeThroughput: 750
     volumeType: gp3
+    propagateASGTags: true
     tags:
       alpha.eksctl.io/nodegroup-name: ng-${EKS_AZ}-c5-metal
       alpha.eksctl.io/nodegroup-type: managed
