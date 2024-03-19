@@ -1,4 +1,82 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-01-31T16:03:03+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.1.0</title><link href="https://kubevirt.io//2023/changelog-v1.1.0.html" rel="alternate" type="text/html" title="KubeVirt v1.1.0" /><published>2023-11-06T00:00:00+00:00</published><updated>2023-11-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/changelog-v1.1.0</id><content type="html" xml:base="https://kubevirt.io//2023/changelog-v1.1.0.html"><![CDATA[<h2 id="v110">v1.1.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-03-19T14:52:16+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.2.0</title><link href="https://kubevirt.io//2024/changelog-v1.2.0.html" rel="alternate" type="text/html" title="KubeVirt v1.2.0" /><published>2024-03-05T00:00:00+00:00</published><updated>2024-03-05T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.2.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.2.0.html"><![CDATA[<h2 id="v120">v1.2.0</h2>
+
+<p>Released on: Tue Mar 5 20:25:04 2024 +0000</p>
+
+<ul>
+  <li>[PR #11318][fossedihelm] fix(vmclone): delete vmclone resource when the target vm is deleted</li>
+  <li>[PR #11393][kubevirt-bot] Bug-fix: Fix nil panic if VM update fails</li>
+  <li>[PR #11354][kubevirt-bot] Fix perfscale buckets error</li>
+  <li>[PR #11378][fossedihelm] fix(ksm): set the <code class="language-plaintext highlighter-rouge">kubevirt.io/ksm-enabled</code> node label to true if the ksm is managed by KubeVirt, instead of reflect the actual ksm value.</li>
+  <li>[PR #11271][kubevirt-bot] Bug fix: VM controller doesn’t corrupt its cache anymore</li>
+  <li>[PR #11242][kubevirt-bot] Fix migration breaking in case the VM has an rng device after hotplugging a block volume on cgroupsv2</li>
+  <li>[PR #11144][0xFelix] virtctl: Specifying size when creating a VM and using –volume-import to clone a PVC or a VolumeSnapshot is optional now</li>
+  <li>[PR #11054][jean-edouard] New cluster-wide <code class="language-plaintext highlighter-rouge">vmRolloutStrategy</code> setting to define whether changes to VMs should either be always staged or live-updated when possible.</li>
+  <li>[PR #11064][AlonaKaplan] Introduce a new API to mark a binding plugin as migratable.</li>
+  <li>[PR #11122][brianmcarey] Update runc dependency to v1.1.12</li>
+  <li>[PR #10982][machadovilaca] Refactor monitoring metrics</li>
+  <li>[PR #11069][ormergi] Bug fix: Packet drops during the initial phase of VM live migration https://issues.redhat.com/browse/CNV-28040</li>
+  <li>[PR #10961][jcanocan] Reduced VM rescheduling time on node failure</li>
+  <li>[PR #11065][fossedihelm] fix(vmclone): Generate VM patches from vmsnapshotcontent, instead of current VM</li>
+  <li>[PR #10888][fossedihelm] [Bugfix] Clone VM with WaitForFirstConsumer binding mode PVC now works.</li>
+  <li>[PR #11068][brianmcarey] Update container base image to use current stable debian 12 base</li>
+  <li>[PR #11047][jschintag] Fix potential crash when trying to list USB devices on host without any</li>
+  <li>[PR #10970][alromeros] Expose fs disk information via GuestOsInfo</li>
+  <li>[PR #11050][fossedihelm] restrict default cluster role to authenticated only users</li>
+  <li>[PR #11025][0xFelix] Allow unprivileged users read-only access to VirtualMachineCluster{Instancetypes,Preferences} by default.</li>
+  <li>[PR #10853][machadovilaca] Refactor monitoring collectors</li>
+  <li>[PR #11001][fossedihelm] Allow <code class="language-plaintext highlighter-rouge">kubevirt.io:default</code> clusterRole to get,list kubevirts</li>
+  <li>[PR #10905][tiraboschi] Aggregate DVs conditions on VMI (and so VM)</li>
+  <li>[PR #10963][alromeros] Bugfix: Reject volume exports when no output is specified</li>
+  <li>[PR #10962][machadovilaca] Update monitoring file structure</li>
+  <li>[PR #10981][AlonaKaplan] Report IP of interfaces using network binding plugin.</li>
+  <li>[PR #10922][kubevirt-bot] Updated common-instancetypes bundles to v0.4.0</li>
+  <li>[PR #10914][brianmcarey] KubeVirt is now built with go 1.21.5</li>
+  <li>[PR #10846][RamLavi] Change vm.status.PrintableStatus default value to “Stopped”</li>
+  <li>[PR #10787][matthewei] # Create a manifest for a clone with template label filters:</li>
+  <li>[PR #10918][orelmisan] VMClone: Emit an event in case restore creation fails</li>
+  <li>[PR #10916][orelmisan] Fix the value of VMI <code class="language-plaintext highlighter-rouge">Status.GuestOSInfo.Version</code></li>
+  <li>[PR #10924][AlonaKaplan] Deprecate macvtap</li>
+  <li>[PR #10898][matthewei] vmi status’s guestOsInfo adds <code class="language-plaintext highlighter-rouge">Machine</code></li>
+  <li>[PR #10866][AlonaKaplan] Raise an error in case passt feature gate or API are used.</li>
+  <li>[PR #10879][brianmcarey] Built with golang 1.20.12</li>
+  <li>[PR #10872][RamLavi] IsolateEmulatorThread: Add cluster-wide parity completion setting</li>
+  <li>[PR #10700][machadovilaca] Refactor monitoring alerts</li>
+  <li>[PR #10839][RamLavi] Change second emulator thread assign strategy to best-effort.</li>
+  <li>[PR #10863][dhiller] Remove year from generated code copyright</li>
+  <li>[PR #10747][acardace] Fix KubeVirt for CRIO 1.28 by using checksums to verify containerdisks when migrating VMIs</li>
+  <li>[PR #10860][akalenyu] BugFix: Double cloning with filter fails</li>
+  <li>[PR #10567][awels] Attachment pod creation is now rate limited</li>
+  <li>[PR #10845][orelmisan] Reject VirtualMachineClone creation when target name is equal to source name</li>
+  <li>[PR #10840][acardace] Requests/Limits can now be configured when using CPU/Memory hotplug</li>
+  <li>[PR #10418][machadovilaca] Add total VMs created metric</li>
+  <li>[PR #10800][AlonaKaplan] Support macvtap as a binding plugin</li>
+  <li>[PR #10753][victortoso] Fixes device permission when using USB host passthrough</li>
+  <li>[PR #10774][victortoso] Windows offline activation with ACPI SLIC table</li>
+  <li>[PR #10783][RamLavi] Support multiple CPUs in Housekeeping cgroup</li>
+  <li>[PR #10809][orelmisan] Source virt-launcher: Log migration info by default</li>
+  <li>[PR #10046][victortoso] Add v1alpha3 for hooks</li>
+  <li>[PR #10651][machadovilaca] Refactor monitoring  recording-rules</li>
+  <li>[PR #10732][AlonaKaplan] Extend kubvirt CR by adding domain attachment option to the network binding plugin API.</li>
+  <li>[PR #10244][hshitomi] Added “adm” subcommand under “virtctl”, and “log-verbosity” subcommand under “adm”. The log-verbosity command is:</li>
+  <li>[PR #10658][matthewei] 1. Support “Clone API” to filter VirtualMachine.spec.template.annotation and VirtualMachine.spec.template.label</li>
+  <li>[PR #10593][RamLavi] Fixes SMT Alignment Error in virt-launcher pod by optimizing isolateEmulatorThread feature (BZ#2228103).</li>
+  <li>[PR #10720][awels] Restored hotplug attachment pod request/limit to original value</li>
+  <li>[PR #10657][germag] Exposing Filesystem Persistent Volumes (PVs)  to the VM using unprivilege virtiofsd.</li>
+  <li>[PR #10637][dharmit] Functional tests for sidecar hook with ConfigMap</li>
+  <li>[PR #10598][alicefr] Add PVC option to the hook sidecars for supplying additional debugging tools</li>
+  <li>[PR #10526][cfilleke]</li>
+  <li>[PR #10699][qinqon] virt-launcher: fix qemu non root log path</li>
+  <li>[PR #10689][akalenyu] BugFix: cgroupsv2 device allowlist is bound to virt-handler internal state/block disk device overwritten on hotplug</li>
+  <li>[PR #10693][machadovilaca] Remove MigrateVmiDiskTransferRateMetric</li>
+  <li>[PR #10615][orelmisan] Remove leftover NonRoot feature gate</li>
+  <li>[PR #10529][alromeros] Allow LUN disks to be hotplugged</li>
+  <li>[PR #10582][orelmisan] Remove leftover NonRootExperimental feature gate</li>
+  <li>[PR #10596][mhenriks] Disable HTTP/2 to mitigate CVE-2023-44487</li>
+  <li>[PR #10570][machadovilaca] Fix LowKVMNodesCount not firing</li>
+  <li>[PR #10571][tiraboschi] vmi memory footprint increase by 35M when guest serial console logging is turned on (default on).</li>
+  <li>[PR #10425][ormergi] Introduce network binding plugin for Passt networking, interfacing with Kubevirt new network binding plugin API.</li>
+  <li>[PR #10479][dharmit] Ability to run scripts through hook sidecar</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.2.0 changes]]></summary></entry><entry><title type="html">KubeVirt v1.1.0</title><link href="https://kubevirt.io//2023/changelog-v1.1.0.html" rel="alternate" type="text/html" title="KubeVirt v1.1.0" /><published>2023-11-06T00:00:00+00:00</published><updated>2023-11-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/changelog-v1.1.0</id><content type="html" xml:base="https://kubevirt.io//2023/changelog-v1.1.0.html"><![CDATA[<h2 id="v110">v1.1.0</h2>
 
 <p>Released on: Mon Nov 6 16:28:56 2023 +0000</p>
 
@@ -408,29 +486,4 @@
   <li>[PR #7328][apoorvajagtap] Don’t ignore –identity-file when setting –local-ssh=true on <code class="language-plaintext highlighter-rouge">virtctl ssh</code></li>
   <li>[PR #7469][xpivarc] Users can now enable the NonRoot feature gate instead of NonRootExperimental</li>
   <li>[PR #7451][fossedihelm] Reduce virt-launcher memory usage by splitting monitoring and launcher processes</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.53.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.52.0</title><link href="https://kubevirt.io//2022/changelog-v0.52.0.html" rel="alternate" type="text/html" title="KubeVirt v0.52.0" /><published>2022-04-08T00:00:00+00:00</published><updated>2022-04-08T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.52.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.52.0.html"><![CDATA[<h2 id="v0520">v0.52.0</h2>
-
-<p>Released on: Fri Apr 8 16:17:56 2022 +0000</p>
-
-<ul>
-  <li>[PR #7024][fossedihelm] Add an warning message if the client and server virtctl versions are not aligned</li>
-  <li>[PR #7486][rmohr] Move stable.txt location to a more appropriate path</li>
-  <li>[PR #7372][saschagrunert] Fixed <code class="language-plaintext highlighter-rouge">KubeVirtComponentExceedsRequestedMemory</code> alert complaining about many-to-many matching not allowed.</li>
-  <li>[PR #7426][iholder-redhat] Add warning for manually determining core-component replica count in Kubevirt CR</li>
-  <li>[PR #7424][maiqueb] Provide interface binding types descriptions, which will be featured in the KubeVirt API.</li>
-  <li>[PR #7422][orelmisan] Fixed setting custom guest pciAddress and bootOrder parameter(s) to a list of SR-IOV NICs.</li>
-  <li>[PR #7421][rmohr] Fix knowhosts file corruption for virtctl ssh</li>
-  <li>[PR #6854][rmohr] Make virtctl ssh work with ssh-rsa+ preauthentication</li>
-  <li>[PR #7267][iholder-redhat] Applied migration configurations can now be found in VMI’s status</li>
-  <li>[PR #7321][iholder-redhat] [Migration Policies]: precedence to VMI labels over Namespace labels</li>
-  <li>[PR #7326][oshoval] The Ginkgo dependency has been upgraded to v2.1.3 (major version upgrade)</li>
-  <li>[PR #7361][SeanKnight] Fixed a bug that prevents virtctl from working with clusters accessed via Rancher authentication proxy, or any other cluster where the server URL contains a path component. (#3760)</li>
-  <li>[PR #7255][tyleraharrison] Users are now able to specify <code class="language-plaintext highlighter-rouge">--address [ip_address]</code> when using <code class="language-plaintext highlighter-rouge">virtctl vnc</code> rather than only using 127.0.0.1</li>
-  <li>[PR #7275][enp0s3] Add observedGeneration to virt-operator to have a race-free way to detect KubeVirt config rollouts</li>
-  <li>[PR #7233][xpivarc] Bug fix: Successfully aborted migrations should be reported now</li>
-  <li>[PR #7158][AlonaKaplan] Add masquerade VMs support to single stack IPv6.</li>
-  <li>[PR #7227][rmohr] Remove VMI informer from virt-api to improve scaling characteristics of virt-api</li>
-  <li>[PR #7288][raspbeep] Users now don’t need to specify container for <code class="language-plaintext highlighter-rouge">kubectl logs &lt;vmi-pod&gt;</code> and <code class="language-plaintext highlighter-rouge">kubectl exec &lt;vmi-pod&gt;</code>.</li>
-  <li>[PR #6709][xpivarc] Workloads will be migrated to nonroot implementation if NonRoot feature gate is set. (Except VirtioFS)</li>
-  <li>[PR #7241][lyarwood] Fixed a bug that prevents only a unattend.xml configmap or secret being provided as contents for a sysprep disk. (#7240, @lyarwood)</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.52.0 changes]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.53.0 changes]]></summary></entry></feed>

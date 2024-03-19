@@ -1,4 +1,117 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-01-31T16:03:03+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Announcing KubeVirt v1.1</title><link href="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html" rel="alternate" type="text/html" title="Announcing KubeVirt v1.1" /><published>2023-11-07T00:00:00+00:00</published><updated>2023-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2023/Announcing-KubeVirt-v1-1</id><content type="html" xml:base="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html"><![CDATA[<p>The KubeVirt Community is very pleased to announce the release of KubeVirt v1.1. This comes 17 weeks after our celebrated v1.0 release, and follows the predictable schedule we moved to three releases ago to follow the Kubernetes release cadence.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-03-19T14:52:16+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
+
+<h2 id="what-is-kubevirt-summit">What is KubeVirt Summit?</h2>
+
+<p>KubeVirt Summit is our annual online conference, now in its fourth year, in which the entire broader community meets to showcase technical architecture, new features, proposed changes, and in-depth tutorials.
+We have two tracks to cater for developer talks, and another for end users to share their deployment journey with KubeVirt and their use case(s) at scale. And there’s no reason why a talk can’t be both :)</p>
+
+<h2 id="when-is-it">When is it?</h2>
+
+<p>The event will take place online over two half-days:</p>
+
+<ul>
+  <li>Dates: June 25 and 26, 2024</li>
+  <li>Time: TBD 
+(In the past we have aimed for 1200-1700 UTC but may modify these times slightly depending on our speaker timezones)</li>
+</ul>
+
+<h2 id="how-to-submit-a-proposal">How to submit a proposal?</h2>
+
+<ul>
+  <li>Please submit through this [Googleform]](https://docs.google.com/forms/d/e/1FAIpQLSeELmfpD_20kZnrciXkdSdDS_MLFLN9xSaZDKptNPjg3JGLaA/viewform)</li>
+  <li>CfP closes: May 20, 2024</li>
+  <li>Schedule will announced at the end of May</li>
+</ul>
+
+<p>Do consider proposing a session, and help make our fourth Summit as valuable as possible. We welcome a range of session types, any of which can be simple and intended for beginners or face-meltingly technical. Check out <a href="https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q">last year’s talks</a> for some ideas.</p>
+
+<h2 id="have-questions">Have questions?</h2>
+
+<p>Reach out on our <a href="https://kubernetes.slack.com/messages/virtualization">virtualization</a> Slack channel (in the Kubernetes workspace).</p>
+
+<h2 id="keep-up-to-date">Keep up to date</h2>
+
+<p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
+
+<p>Good luck!</p>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's fourth annual dedicated online event]]></summary></entry><entry><title type="html">KubeVirt v1.2.0</title><link href="https://kubevirt.io//2024/changelog-v1.2.0.html" rel="alternate" type="text/html" title="KubeVirt v1.2.0" /><published>2024-03-05T00:00:00+00:00</published><updated>2024-03-05T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.2.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.2.0.html"><![CDATA[<h2 id="v120">v1.2.0</h2>
+
+<p>Released on: Tue Mar 5 20:25:04 2024 +0000</p>
+
+<ul>
+  <li>[PR #11318][fossedihelm] fix(vmclone): delete vmclone resource when the target vm is deleted</li>
+  <li>[PR #11393][kubevirt-bot] Bug-fix: Fix nil panic if VM update fails</li>
+  <li>[PR #11354][kubevirt-bot] Fix perfscale buckets error</li>
+  <li>[PR #11378][fossedihelm] fix(ksm): set the <code class="language-plaintext highlighter-rouge">kubevirt.io/ksm-enabled</code> node label to true if the ksm is managed by KubeVirt, instead of reflect the actual ksm value.</li>
+  <li>[PR #11271][kubevirt-bot] Bug fix: VM controller doesn’t corrupt its cache anymore</li>
+  <li>[PR #11242][kubevirt-bot] Fix migration breaking in case the VM has an rng device after hotplugging a block volume on cgroupsv2</li>
+  <li>[PR #11144][0xFelix] virtctl: Specifying size when creating a VM and using –volume-import to clone a PVC or a VolumeSnapshot is optional now</li>
+  <li>[PR #11054][jean-edouard] New cluster-wide <code class="language-plaintext highlighter-rouge">vmRolloutStrategy</code> setting to define whether changes to VMs should either be always staged or live-updated when possible.</li>
+  <li>[PR #11064][AlonaKaplan] Introduce a new API to mark a binding plugin as migratable.</li>
+  <li>[PR #11122][brianmcarey] Update runc dependency to v1.1.12</li>
+  <li>[PR #10982][machadovilaca] Refactor monitoring metrics</li>
+  <li>[PR #11069][ormergi] Bug fix: Packet drops during the initial phase of VM live migration https://issues.redhat.com/browse/CNV-28040</li>
+  <li>[PR #10961][jcanocan] Reduced VM rescheduling time on node failure</li>
+  <li>[PR #11065][fossedihelm] fix(vmclone): Generate VM patches from vmsnapshotcontent, instead of current VM</li>
+  <li>[PR #10888][fossedihelm] [Bugfix] Clone VM with WaitForFirstConsumer binding mode PVC now works.</li>
+  <li>[PR #11068][brianmcarey] Update container base image to use current stable debian 12 base</li>
+  <li>[PR #11047][jschintag] Fix potential crash when trying to list USB devices on host without any</li>
+  <li>[PR #10970][alromeros] Expose fs disk information via GuestOsInfo</li>
+  <li>[PR #11050][fossedihelm] restrict default cluster role to authenticated only users</li>
+  <li>[PR #11025][0xFelix] Allow unprivileged users read-only access to VirtualMachineCluster{Instancetypes,Preferences} by default.</li>
+  <li>[PR #10853][machadovilaca] Refactor monitoring collectors</li>
+  <li>[PR #11001][fossedihelm] Allow <code class="language-plaintext highlighter-rouge">kubevirt.io:default</code> clusterRole to get,list kubevirts</li>
+  <li>[PR #10905][tiraboschi] Aggregate DVs conditions on VMI (and so VM)</li>
+  <li>[PR #10963][alromeros] Bugfix: Reject volume exports when no output is specified</li>
+  <li>[PR #10962][machadovilaca] Update monitoring file structure</li>
+  <li>[PR #10981][AlonaKaplan] Report IP of interfaces using network binding plugin.</li>
+  <li>[PR #10922][kubevirt-bot] Updated common-instancetypes bundles to v0.4.0</li>
+  <li>[PR #10914][brianmcarey] KubeVirt is now built with go 1.21.5</li>
+  <li>[PR #10846][RamLavi] Change vm.status.PrintableStatus default value to “Stopped”</li>
+  <li>[PR #10787][matthewei] # Create a manifest for a clone with template label filters:</li>
+  <li>[PR #10918][orelmisan] VMClone: Emit an event in case restore creation fails</li>
+  <li>[PR #10916][orelmisan] Fix the value of VMI <code class="language-plaintext highlighter-rouge">Status.GuestOSInfo.Version</code></li>
+  <li>[PR #10924][AlonaKaplan] Deprecate macvtap</li>
+  <li>[PR #10898][matthewei] vmi status’s guestOsInfo adds <code class="language-plaintext highlighter-rouge">Machine</code></li>
+  <li>[PR #10866][AlonaKaplan] Raise an error in case passt feature gate or API are used.</li>
+  <li>[PR #10879][brianmcarey] Built with golang 1.20.12</li>
+  <li>[PR #10872][RamLavi] IsolateEmulatorThread: Add cluster-wide parity completion setting</li>
+  <li>[PR #10700][machadovilaca] Refactor monitoring alerts</li>
+  <li>[PR #10839][RamLavi] Change second emulator thread assign strategy to best-effort.</li>
+  <li>[PR #10863][dhiller] Remove year from generated code copyright</li>
+  <li>[PR #10747][acardace] Fix KubeVirt for CRIO 1.28 by using checksums to verify containerdisks when migrating VMIs</li>
+  <li>[PR #10860][akalenyu] BugFix: Double cloning with filter fails</li>
+  <li>[PR #10567][awels] Attachment pod creation is now rate limited</li>
+  <li>[PR #10845][orelmisan] Reject VirtualMachineClone creation when target name is equal to source name</li>
+  <li>[PR #10840][acardace] Requests/Limits can now be configured when using CPU/Memory hotplug</li>
+  <li>[PR #10418][machadovilaca] Add total VMs created metric</li>
+  <li>[PR #10800][AlonaKaplan] Support macvtap as a binding plugin</li>
+  <li>[PR #10753][victortoso] Fixes device permission when using USB host passthrough</li>
+  <li>[PR #10774][victortoso] Windows offline activation with ACPI SLIC table</li>
+  <li>[PR #10783][RamLavi] Support multiple CPUs in Housekeeping cgroup</li>
+  <li>[PR #10809][orelmisan] Source virt-launcher: Log migration info by default</li>
+  <li>[PR #10046][victortoso] Add v1alpha3 for hooks</li>
+  <li>[PR #10651][machadovilaca] Refactor monitoring  recording-rules</li>
+  <li>[PR #10732][AlonaKaplan] Extend kubvirt CR by adding domain attachment option to the network binding plugin API.</li>
+  <li>[PR #10244][hshitomi] Added “adm” subcommand under “virtctl”, and “log-verbosity” subcommand under “adm”. The log-verbosity command is:</li>
+  <li>[PR #10658][matthewei] 1. Support “Clone API” to filter VirtualMachine.spec.template.annotation and VirtualMachine.spec.template.label</li>
+  <li>[PR #10593][RamLavi] Fixes SMT Alignment Error in virt-launcher pod by optimizing isolateEmulatorThread feature (BZ#2228103).</li>
+  <li>[PR #10720][awels] Restored hotplug attachment pod request/limit to original value</li>
+  <li>[PR #10657][germag] Exposing Filesystem Persistent Volumes (PVs)  to the VM using unprivilege virtiofsd.</li>
+  <li>[PR #10637][dharmit] Functional tests for sidecar hook with ConfigMap</li>
+  <li>[PR #10598][alicefr] Add PVC option to the hook sidecars for supplying additional debugging tools</li>
+  <li>[PR #10526][cfilleke]</li>
+  <li>[PR #10699][qinqon] virt-launcher: fix qemu non root log path</li>
+  <li>[PR #10689][akalenyu] BugFix: cgroupsv2 device allowlist is bound to virt-handler internal state/block disk device overwritten on hotplug</li>
+  <li>[PR #10693][machadovilaca] Remove MigrateVmiDiskTransferRateMetric</li>
+  <li>[PR #10615][orelmisan] Remove leftover NonRoot feature gate</li>
+  <li>[PR #10529][alromeros] Allow LUN disks to be hotplugged</li>
+  <li>[PR #10582][orelmisan] Remove leftover NonRootExperimental feature gate</li>
+  <li>[PR #10596][mhenriks] Disable HTTP/2 to mitigate CVE-2023-44487</li>
+  <li>[PR #10570][machadovilaca] Fix LowKVMNodesCount not firing</li>
+  <li>[PR #10571][tiraboschi] vmi memory footprint increase by 35M when guest serial console logging is turned on (default on).</li>
+  <li>[PR #10425][ormergi] Introduce network binding plugin for Passt networking, interfacing with Kubevirt new network binding plugin API.</li>
+  <li>[PR #10479][dharmit] Ability to run scripts through hook sidecar</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.2.0 changes]]></summary></entry><entry><title type="html">Announcing KubeVirt v1.1</title><link href="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html" rel="alternate" type="text/html" title="Announcing KubeVirt v1.1" /><published>2023-11-07T00:00:00+00:00</published><updated>2023-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2023/Announcing-KubeVirt-v1-1</id><content type="html" xml:base="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html"><![CDATA[<p>The KubeVirt Community is very pleased to announce the release of KubeVirt v1.1. This comes 17 weeks after our celebrated v1.0 release, and follows the predictable schedule we moved to three releases ago to follow the Kubernetes release cadence.</p>
 
 <p>You can read the full <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.1.0">v1.1 release notes here</a>, but we’ve asked the KubeVirt SIGs to summarize their largest successes, as well as one of the community members from Arm to list their integration accomplishments for this release.</p>
 
@@ -2357,306 +2470,4 @@ python3 <span class="nt">-m</span> http.server <span class="nt">--bind</span> 19
 <p>In this post we have seen how to use OVN-Kubernetes to create secondary
 networks connected to the physical underlay, allowing both east/west
 communication between VMs, and access to services running outside the
-Kubernetes cluster.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure secondary networks connected to the physical underlay for KubeVirt virtual machines.]]></summary></entry><entry><title type="html">Secondary networks for KubeVirt VMs using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html" rel="alternate" type="text/html" title="Secondary networks for KubeVirt VMs using OVN-Kubernetes" /><published>2023-03-06T00:00:00+00:00</published><updated>2023-03-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks.html"><![CDATA[<h2 id="introduction">Introduction</h2>
-<p>OVN (Open Virtual Network) is a series of daemons for the Open vSwitch that
-translate virtual network configurations into OpenFlow. It provides virtual
-networking capabilities for any type of workload on a virtualized platform
-(virtual machines and containers) using the same API.</p>
-
-<p>OVN provides a higher-layer of abstraction than Open vSwitch, working with
-logical routers and logical switches, rather than flows.
-More details can be found in the OVN architecture
-<a href="https://man7.org/linux/man-pages/man7/ovn-architecture.7.html#DESCRIPTION">man page</a>.</p>
-
-<p>In this post we will repeat the scenario of
-<a href="https://kubevirt.io/2020/Multiple-Network-Attachments-with-bridge-CNI.html">its bridge CNI equivalent</a>,
-using this SDN approach, which uses virtual networking infrastructure: thus, it
-is <strong>not</strong> required to provision VLANs or other physical network resources.</p>
-
-<h2 id="demo">Demo</h2>
-<p>To run this demo, you will need a Kubernetes cluster with the following
-components installed:</p>
-<ul>
-  <li>OVN-Kubernetes</li>
-  <li>multus-cni</li>
-  <li>KubeVirt</li>
-</ul>
-
-<p>The <a href="#environment-setup">following section</a> will show you how to create a
-<a href="https://kind.sigs.k8s.io/">KinD</a> cluster, with upstream latest OVN-Kubernetes,
-and upstream latest multus-cni deployed. Please <strong>skip</strong> this section if your
-cluster already features these components (e.g. Openshift).</p>
-
-<h3 id="setup-demo-environment">Setup demo environment</h3>
-<p>Refer to the OVN-Kubernetes repo
-<a href="https://github.com/ovn-org/ovn-kubernetes/blob/master/docs/kind.md#ovn-kubernetes-kind-setup">KIND documentation</a>
-for more details; the gist of it is you should clone the OVN-Kubernetes
-repository, and run their kind helper script:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:ovn-org/ovn-kubernetes.git
-
-<span class="nb">cd </span>ovn-kubernetes
-<span class="nb">pushd </span>contrib <span class="p">;</span> ./kind.sh <span class="nt">--multi-network-enable</span> <span class="p">;</span> <span class="nb">popd</span>
-</code></pre></div></div>
-
-<p>This will get you a running kind cluster, configured to use OVN-Kubernetes as
-the default cluster network, configuring the multi-homing OVN-Kubernetes feature
-gate, and deploying
-<a href="https://github.com/k8snetworkplumbingwg/multus-cni">multus-cni</a> in the cluster.</p>
-
-<h4 id="install-kubevirt-in-the-cluster">Install KubeVirt in the cluster</h4>
-<p>Follow Kubevirt’s
-<a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a>
-to install the latest released version (currently, v0.59.0). Please skip this
-section if you already have a running cluster with KubeVirt installed in it.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span><span class="si">$(</span>curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt<span class="si">)</span>
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
-kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>360s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
-</code></pre></div></div>
-
-<p>Now we have a Kubernetes cluster with all the pieces to start the Demo.</p>
-
-<h3 id="define-the-overlay-network">Define the overlay network</h3>
-<p>Provision the following yaml to define the overlay which will configure the
-secondary attachment for the KubeVirt VMs. Please refer to the OVN-Kubernetes
-user
-<a href="https://github.com/ovn-org/ovn-kubernetes/blob/master/docs/multi-homing.md#switched---layer-2---topology">documentation</a>
-for details into each of the knobs.</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
-apiVersion: k8s.cni.cncf.io/v1
-kind: NetworkAttachmentDefinition
-metadata:
-  name: l2-network
-  namespace: default
-spec:
-  config: |2
-    {
-            "cniVersion": "0.3.1",
-            "name": "l2-network",
-            "type": "ovn-k8s-cni-overlay",
-            "topology":"layer2",
-            "netAttachDefName": "default/l2-network"
-    }
-</span><span class="no">EOF
-</span></code></pre></div></div>
-
-<p>The above example will configure a cluster-wide overlay <strong>without</strong> a subnet
-defined. This means the users will have to define static IPs for their VMs.</p>
-
-<p>It is also worth to point out the value of the <code class="language-plaintext highlighter-rouge">netAttachDefName</code> attribute
-must match the <code class="language-plaintext highlighter-rouge">&lt;namespace&gt;/&lt;name&gt;</code> of the surrounding
-<code class="language-plaintext highlighter-rouge">NetworkAttachmentDefinition</code> object.</p>
-
-<h3 id="spin-up-the-vms">Spin up the VMs</h3>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh"> | kubectl apply -f -
----
-apiVersion: kubevirt.io/v1alpha3
-kind: VirtualMachine
-metadata:
-  name: vm-server
-spec:
-  running: true
-  template:
-    spec:
-      domain:
-        devices:
-          disks:
-            - name: containerdisk
-              disk:
-                bus: virtio
-            - name: cloudinitdisk
-              disk:
-                bus: virtio
-          interfaces:
-          - name: default
-            masquerade: {}
-          - name: flatl2-overlay
-            bridge: {}
-        machine:
-          type: ""
-        resources:
-          requests:
-            memory: 1024M
-      networks:
-      - name: default
-        pod: {}
-      - name: flatl2-overlay
-        multus:
-          networkName: l2-network
-      terminationGracePeriodSeconds: 0
-      volumes:
-        - name: containerdisk
-          containerDisk:
-            image: quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel
-        - name: cloudinitdisk
-          cloudInitNoCloud:
-            networkData: |
-              version: 2
-              ethernets:
-                eth1:
-                  addresses: [ 192.0.2.20/24 ]
-            userData: |-
-              #cloud-config
-              password: fedora
-              chpasswd: { expire: False }
----
-apiVersion: kubevirt.io/v1alpha3
-kind: VirtualMachine
-metadata:
-  name: vm-client
-spec:
-  running: true
-  template:
-    spec:
-      domain:
-        devices:
-          disks:
-            - name: containerdisk
-              disk:
-                bus: virtio
-            - name: cloudinitdisk
-              disk:
-                bus: virtio
-          interfaces:
-          - name: default
-            masquerade: {}
-          - name: flatl2-overlay
-            bridge: {}
-        machine:
-          type: ""
-        resources:
-          requests:
-            memory: 1024M
-      networks:
-      - name: default
-        pod: {}
-      - name: flatl2-overlay
-        multus:
-          networkName: l2-network
-      terminationGracePeriodSeconds: 0
-      volumes:
-        - name: containerdisk
-          containerDisk:
-            image: quay.io/kubevirt/fedora-with-test-tooling-container-disk:devel
-        - name: cloudinitdisk
-          cloudInitNoCloud:
-            networkData: |
-              version: 2
-              ethernets:
-                eth1:
-                  addresses: [ 192.0.2.10/24 ]
-            userData: |-
-              #cloud-config
-              password: fedora
-              chpasswd: { expire: False }
-</span><span class="no">EOF
-</span></code></pre></div></div>
-
-<p>Provision these two Virtual Machines, and wait for them to boot up.</p>
-
-<h3 id="test-connectivity">Test connectivity</h3>
-<p>To verify connectivity over our layer 2 overlay, we need first to ensure the IP
-address of the server VM; let’s query the VMI status for that:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmi vm-server <span class="nt">-ojsonpath</span><span class="o">=</span><span class="s2">"{ @.status.interfaces }"</span> | jq
-<span class="o">[</span>
-  <span class="o">{</span>
-    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
-    <span class="s2">"interfaceName"</span>: <span class="s2">"eth0"</span>,
-    <span class="s2">"ipAddress"</span>: <span class="s2">"10.244.2.8"</span>,
-    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
-      <span class="s2">"10.244.2.8"</span>
-    <span class="o">]</span>,
-    <span class="s2">"mac"</span>: <span class="s2">"52:54:00:23:1c:c2"</span>,
-    <span class="s2">"name"</span>: <span class="s2">"default"</span>,
-    <span class="s2">"queueCount"</span>: 1
-  <span class="o">}</span>,
-  <span class="o">{</span>
-    <span class="s2">"infoSource"</span>: <span class="s2">"domain, guest-agent"</span>,
-    <span class="s2">"interfaceName"</span>: <span class="s2">"eth1"</span>,
-    <span class="s2">"ipAddress"</span>: <span class="s2">"192.0.2.20"</span>,
-    <span class="s2">"ipAddresses"</span>: <span class="o">[</span>
-      <span class="s2">"192.0.2.20"</span>,
-      <span class="s2">"fe80::7cab:88ff:fe5b:39f"</span>
-    <span class="o">]</span>,
-    <span class="s2">"mac"</span>: <span class="s2">"7e:ab:88:5b:03:9f"</span>,
-    <span class="s2">"name"</span>: <span class="s2">"flatl2-overlay"</span>,
-    <span class="s2">"queueCount"</span>: 1
-  <span class="o">}</span>
-<span class="o">]</span>
-</code></pre></div></div>
-
-<p>You can afterwards connect to them via console and ping <code class="language-plaintext highlighter-rouge">vm-server</code>:</p>
-
-<div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>The user and password for this VMs is fedora; check the VM template spec cloudinit userData</p>
-
-
-</div></div>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl console vm-client
-ip a <span class="c"># confirm the IP address is the one set via cloud-init</span>
-<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ip a
-1: lo: &lt;LOOPBACK,UP,LOWER_UP&gt; mtu 65536 qdisc noqueue state UNKNOWN group default qlen 1000
-    <span class="nb">link</span>/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
-    inet 127.0.0.1/8 scope host lo
-       valid_lft forever preferred_lft forever
-    inet6 ::1/128 scope host
-       valid_lft forever preferred_lft forever
-2: eth0: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1400 qdisc fq_codel state UP group default qlen 1000
-    <span class="nb">link</span>/ether 52:54:00:29:de:53 brd ff:ff:ff:ff:ff:ff
-    altname enp1s0
-    inet 10.0.2.2/24 brd 10.0.2.255 scope global dynamic noprefixroute eth0
-       valid_lft 86313584sec preferred_lft 86313584sec
-    inet6 fe80::5054:ff:fe29:de53/64 scope <span class="nb">link
-       </span>valid_lft forever preferred_lft forever
-3: eth1: &lt;BROADCAST,MULTICAST,UP,LOWER_UP&gt; mtu 1400 qdisc fq_codel state UP group default qlen 1000
-    <span class="nb">link</span>/ether 36:f9:29:65:66:55 brd ff:ff:ff:ff:ff:ff
-    altname enp2s0
-    inet 192.0.2.10/24 brd 192.0.2.255 scope global noprefixroute eth1
-       valid_lft forever preferred_lft forever
-    inet6 fe80::34f9:29ff:fe65:6655/64 scope <span class="nb">link
-       </span>valid_lft forever preferred_lft forever
-
-<span class="o">[</span>fedora@vm-client ~]<span class="nv">$ </span>ping <span class="nt">-c4</span> 192.0.2.20 <span class="c"># ping the vm-server static IP</span>
-PING 192.0.2.20 <span class="o">(</span>192.0.2.20<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.05 ms
-64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.05 ms
-64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.995 ms
-64 bytes from 192.0.2.20: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.902 ms
-
-<span class="nt">---</span> 192.0.2.20 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3006ms
-rtt min/avg/max/mdev <span class="o">=</span> 0.902/0.997/1.046/0.058 ms
-</code></pre></div></div>
-<h2 id="conclusion">Conclusion</h2>
-<p>In this post we have seen how to use OVN-Kubernetes to create an overlay to
-connect VMs in different nodes using secondary networks, without having to
-configure any physical networking infrastructure.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure cluster-wide overlays as secondary networks for KubeVirt virtual machines.]]></summary></entry><entry><title type="html">KubeVirt Summit 2023!</title><link href="https://kubevirt.io//2023/KubeVirt-Summit-2023.html" rel="alternate" type="text/html" title="KubeVirt Summit 2023!" /><published>2023-03-03T00:00:00+00:00</published><updated>2023-03-03T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-Summit-2023</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-Summit-2023.html"><![CDATA[<p>The third online <a href="/summit/">KubeVirt Summit</a> starts March 29, 2023!</p>
-
-<h2 id="when">When</h2>
-
-<p>The event will take place online over two half-days:</p>
-
-<ul>
-  <li>Dates: March 29 and 30, 2023.</li>
-  <li>Time: 14:00 – 19:00 UTC (9:00–14:00 EST, 15:00–20:00 CET)</li>
-</ul>
-
-<h2 id="register">Register</h2>
-
-<p><a href="/summit/">KubeVirt Summit</a> is hosted on Community.CNCF.io. This is a free event but you need to register in order to attend.</p>
-
-<p><a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2023/">Register for KubeVirt Summit 2023</a></p>
-
-<p>If this is your first time attending, you will need to create an account with CNCF.io.</p>
-
-<h2 id="schedule">Schedule</h2>
-
-<p>The schedule is available on the <a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2023/">CNCF Community Events page</a> where you register, as well as on the <a href="/summit/">KubeVirt Summit page</a>.</p>
-
-<h2 id="keep-up-to-date">Keep up to date</h2>
-
-<p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
-
-<p>See you there!</p>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's third annual dedicated online event]]></summary></entry></feed>
+Kubernetes cluster.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure secondary networks connected to the physical underlay for KubeVirt virtual machines.]]></summary></entry></feed>

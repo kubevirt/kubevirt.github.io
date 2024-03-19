@@ -729,6 +729,14 @@
 <lastmod>2023-11-07T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2024/changelog-v1.2.0.html</loc>
+<lastmod>2024-03-05T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html</loc>
+<lastmod>2024-03-19T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//application-aware-quota/</loc>
 </url>
 <url>
@@ -1669,5 +1677,8 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page36/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//blogs/page37/</loc>
 </url>
 </urlset>
