@@ -1,11 +1,22 @@
 ---
-layout: page
-title: KubeVirt Summit 2024!
-permalink: /summit/
-order: 10
+layout: post
+author: Andrew Burden
+description: Join us for the KubeVirt community's fourth annual dedicated online event
+navbar_active: Blogs
+category: news
+tags:
+  [
+    "kubevirt",
+    "event",
+    "community",
+  ]
+comments: true
+title: KubeVirt Summit 2024 CfP is open!
+pub-date: Mar 19
+pub-year: 2024
 ---
 
-The fourth online KubeVirt Summit is coming on June 25-26!
+We are very pleased to announce the details for this year's KubeVirt Summit!! 
 
 ## What is KubeVirt Summit?
 
