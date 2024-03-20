@@ -16,14 +16,14 @@ We have two tracks to cater for developer talks, and another for end users to sh
 
 The event will take place online over two half-days:
 
-- Dates: June 25 and 26, 2024
+- Dates: **June 25 and 26**, 2024
 - Time: TBD 
 (In the past we have aimed for 1200-1700 UTC but may modify these times slightly depending on our speaker timezones)
 
 ## How to submit a proposal?
 
-- Please submit through this [Googleform]](https://docs.google.com/forms/d/e/1FAIpQLSeELmfpD_20kZnrciXkdSdDS_MLFLN9xSaZDKptNPjg3JGLaA/viewform)
-- CfP closes: May 20, 2024
+- Please submit through this [Googleform](https://docs.google.com/forms/d/e/1FAIpQLSeELmfpD_20kZnrciXkdSdDS_MLFLN9xSaZDKptNPjg3JGLaA/viewform)
+- CfP closes: **May 20**, 2024
 - Schedule will announced at the end of May
 
 Do consider proposing a session, and help make our fourth Summit as valuable as possible. We welcome a range of session types, any of which can be simple and intended for beginners or face-meltingly technical. Check out [last year's talks](https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q) for some ideas.
