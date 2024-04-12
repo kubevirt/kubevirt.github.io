@@ -28,6 +28,14 @@ The event will take place online over two half-days:
 
 Do consider proposing a session, and help make our fourth Summit as valuable as possible. We welcome a range of session types, any of which can be simple and intended for beginners or face-meltingly technical. Check out [last year's talks](https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q) for some ideas.
 
+## Sponsorship opportunities
+
+If you would like to help this community event, we are offering sponsorship opportunities in two tiers: Friend and Patron.
+
+All proceeds go to operating costs and speaker swag.
+
+For the complete prospectus, please see [the KubeVirt Summit 2024 Sponsor Prospectus page](/sponsor/)
+
 ## Have questions?
 
 Reach out on our [virtualization](https://kubernetes.slack.com/messages/virtualization) Slack channel (in the Kubernetes workspace).
