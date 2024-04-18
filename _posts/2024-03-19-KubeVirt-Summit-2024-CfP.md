@@ -41,7 +41,9 @@ Do consider proposing a session, and help make our fourth Summit as valuable as 
 
 ## Have questions?
 
-Reach out on our [virtualization](https://kubernetes.slack.com/messages/virtualization) Slack channel (in the Kubernetes workspace).
+Our [KubeVirt Summit 2024](/summit/) page will continue to evolve with details as we get closer.
+
+You can also reach out on our [virtualization](https://kubernetes.slack.com/messages/virtualization) Slack channel (in the Kubernetes workspace).
 
 ## Keep up to date
 
