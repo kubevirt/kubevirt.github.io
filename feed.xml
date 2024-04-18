@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-04-15T08:43:04+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-04-18T15:38:01+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
 
 <h2 id="what-is-kubevirt-summit">What is KubeVirt Summit?</h2>
 
@@ -27,7 +27,9 @@ We have two tracks to cater for developer talks, and another for end users to sh
 
 <h2 id="have-questions">Have questions?</h2>
 
-<p>Reach out on our <a href="https://kubernetes.slack.com/messages/virtualization">virtualization</a> Slack channel (in the Kubernetes workspace).</p>
+<p>Our <a href="/summit/">KubeVirt Summit 2024</a> page will continue to evolve with details as we get closer.</p>
+
+<p>You can also reach out on our <a href="https://kubernetes.slack.com/messages/virtualization">virtualization</a> Slack channel (in the Kubernetes workspace).</p>
 
 <h2 id="keep-up-to-date">Keep up to date</h2>
 

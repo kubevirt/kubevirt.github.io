@@ -857,6 +857,9 @@
 <loc>https://kubevirt.io//search.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//sponsor/</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//ssp-operator/</loc>
 </url>
 <url>
@@ -1680,5 +1683,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/page37/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
+<lastmod>2024-04-18T15:36:18+00:00</lastmod>
 </url>
 </urlset>
