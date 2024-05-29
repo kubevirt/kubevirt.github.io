@@ -52,7 +52,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2024-05-16 15:31:33 +0000" >
+    <meta property="og:article:published_time" content="2024-05-29 09:37:52 +0000" >
     <meta name="twitter:title" content="Experiment with CDI | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -521,6 +521,19 @@ kubectl logs -f importer-fedora-pnbqh   # Substitute your importer-fedora pod na
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl delete <span class="nt">-f</span> dv_fedora.yml <span class="nt">--wait</span>
 kubectl create <span class="nt">-f</span> dv_fedora.yml
 </code></pre></div></div>
+
+
+</div></div>
+<div class="premonition notes"><div class="fa fa-check-square"></div><div class="content"><p>The following error occurs when the storage provider is not recognized by KubeVirt:</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>message: no accessMode defined DV nor on StorageProfile for standard StorageClass
+</code></pre></div></div>
+
+<p>Edit the DataVolume YAML to specify accessMode manually and retry it:</p>
+<div class="language-diff highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">spec:
+</span>  storage:
+<span class="gi">+    accessModes:
++      - ReadWriteOnce
+</span></code></pre></div></div>
 
 
 </div></div>
