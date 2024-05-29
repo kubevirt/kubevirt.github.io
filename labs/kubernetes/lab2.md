@@ -64,6 +64,20 @@ Notice that the importer downloaded the publicly available Fedora Cloud qcow ima
 > kubectl create -f dv_fedora.yml
 >```
 
+> notes ""
+> The following error occurs when the storage provider is not recognized by KubeVirt:
+>```
+> message: no accessMode defined DV nor on StorageProfile for standard StorageClass
+>```
+>
+> Edit the DataVolume YAML to specify accessMode manually and retry it:
+>```diff
+> spec:
+>   storage:
+>+    accessModes:
+>+      - ReadWriteOnce
+>```
+
 Let's create a Virtual Machine making use of it. Review the file _vm1_pvc.yml_.
 
 ```bash
