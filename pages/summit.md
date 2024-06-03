@@ -51,4 +51,5 @@ Good luck!
 Our [patron sponsors](/sponsor/): <br>
 <img src="../assets/images/CIVO_sponsor.svg" width="200" height="128" style="margin: 10px; padding: 10px;">
 <img src="../assets/images/Red_Hat_sponsor.svg" width="200" height="128" style="margin: 10px; padding: 10px;">
+<img src="../assets/images/adopters/NVIDIA.png" height="175" style="margin: 10px; padding: 10px;">
 <img src="../assets/images/SUSE_sponsor.svg" style="padding: 10px; margin: 10px;">
