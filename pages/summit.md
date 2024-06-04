@@ -5,7 +5,7 @@ permalink: /summit/
 order: 10
 ---
 
-The fourth online KubeVirt Summit is coming on June 25-26!
+The fourth online KubeVirt Summit is coming on June 24-25!
 
 ## What is KubeVirt Summit?
 
@@ -16,18 +16,21 @@ We have two tracks to cater for developer talks, and another for end users to sh
 
 The event will take place online over two half-days:
 
-- Dates: **June 25 and 26**, 2024
+- Dates: **June 24 and 25**, 2024
 - Time: 1200-1700 UTC 
+
+> note "Note"
+> Previously Summit had been announced with dates of June 25-26
 
 ## How do I register?
 
-We will have a registration page open soon! This will be updated here very soon, and also shared on our [KubeVirt-dev mailing list](https://groups.google.com/forum/#!forum/KubeVirt-dev), so please join that if you have not already.
+We will have a registration page open soon! This will be updated here very soon, and also shared on our [kubevirt-dev mailing list](https://groups.google.com/forum/#!forum/kubevirt-dev), so please join that if you have not already.
 
 ## Schedule
 
 All times are in UTC.
 
-### Tuesday, June 25
+### Monday, June 24
 
 **1200-1225: _Welcome, Opening Remarks, and Community Updates_**
 
@@ -90,7 +93,7 @@ Description: As the demand for GPU-accelerated workloads continues to surge acro
 
 This talk introduces the concept of Dynamic Resource Allocation (DRA) and demonstrates how transitioning GPU device plugins to DRA can address these challenges.  In this session, attendees will learn about how Nvidia plans to solve the specific challenges in KubeVirt to leverage the advantages of DRA.
 
-### Wednesday, June 26
+### Tuesday, June 25
 
 **1200-1225: _Optimizing live-migration for minimizing packet loss with KubeVirt and kube-ovn_** <br>
 Description: We expose more detailed steps for virtual machine live-migration in KubeVirt. Which enable kube-ovn use the multi_chassis_bindings feature as will as triggering ACL policy changes based on RARP. In this way, we significantly reduces packet loss during live migrations.
