@@ -46,10 +46,11 @@ With CC FDE design by using CC Trusted API, it guarantees the integrity and conf
 **1300-1325: _Running Kubernetes clusters the Kubernetes-native way_** <br>
 Description: Have you ever thought about building your own cloud? I bet you have. But is it possible to do this using only modern technologies and approaches, without leaving the cozy Kubernetes ecosystem?
 
- - How KubeVirt helps create secure environments.
+- How KubeVirt helps create secure environments.
 - Hard multi-tenancy with KubeVirt and Kamaji.
 - Cluster autoscaler configuration for Cluster API.
-- Operating KubeVirt with its CSI and CNI drivers. - Securing API by removing controllers from the user clusters.
+- Operating KubeVirt with its CSI and CNI drivers.
+- Securing API by removing controllers from the user clusters.
 
 **1330-1355: _Using CPU & Memory hotplug for VM vertical scaling_** <br>
 Description: I am going to present the CPU & Memory hotplug features towards the live update API, how it can be actually used for VM vertical scaling, and the future plans to use in-place pod update instead of live-migration. If time will allow, I will also try to discuss what needs to be accomplished to support auto-scaling.
@@ -57,8 +58,9 @@ Description: I am going to present the CPU & Memory hotplug features towards the
 **1400-1425: _Long-Lived User-Session VM: Enhancing Zero Downtime Rolling Deployments for Virtual Machines with Kubernetes Operators_** <br>
 Description: NVIDIA's cloud-gaming service, GeForce Now, leverages Kubernetes-managed data centers to render games and stream the output in real-time to a variety of client devices, including computers, smartphones, and tablets. Implementing rolling deployments for long-lived user-session virtual machines presents unique challenges. Each client’s traffic is tied to a specific virtual machine, so any disruption can result in immediate user impact. Depending on the service, a rolling deployment could take up to eight hours as it waits for in-progress sessions to conclude. 
 
-In this presentation, we will delve into how NVIDIA GeForce Now enhances zero downtime rolling deployments by utilizing a Kubernetes operator. Attendees will gain insights into:  - The specific challenges of rolling deployments for long-lived VMs in a Kubernetes environment. 
+In this presentation, we will delve into how NVIDIA GeForce Now enhances zero downtime rolling deployments by utilizing a Kubernetes operator. Attendees will gain insights into:
 
+- The specific challenges of rolling deployments for long-lived VMs in a Kubernetes environment. 
 - The architecture, development, and deployment of the Kubernetes operator that facilitates seamless VM rollovers. 
 - Real-world case studies comparing service availability and maintenance overhead before and after implementing the Kubernetes operator. 
 - Practical recommendations for adapting and generalizing this operator-based approach for other VM-based services. 
@@ -71,16 +73,24 @@ Description: In this presentation, we will explore the KubeVirt vDPA workflow, t
 **1500-1525: _Keep your VM dancing with volume migration_** <br>
 Description: Want a refresh of your storage? Is there a better performing class available in your cluster? Is an old one being deprecated? Don’t panic, you don’t need to turn off your VM. 
 
-The new option for updateVolumeStrategy [1] allows you to update and migrate storage while the VM is running. You just need to apply a new VM definition that replaces the existing volumes with new ones. This update will initiate the volume migration, and at the end of the process, the VM will have entirely copied the data from the old volumes to the new ones without any workload disruptions. 
+The new option for [updateVolumeStrategy](https://github.com/KubeVirt/community/blob/main/design-proposals/volume-update-strategy.md) allows you to update and migrate storage while the VM is running. You just need to apply a new VM definition that replaces the existing volumes with new ones. This update will initiate the volume migration, and at the end of the process, the VM will have entirely copied the data from the old volumes to the new ones without any workload disruptions. 
 
-The talk will cover what you can do with this new feature and go over the technical decisions that lead to the final design .  [1] https://github.com/KubeVirt/community/blob/main/design-proposals/volume-update-strategy.md 
+The talk will cover what you can do with this new feature and go over the technical decisions that lead to the final design.
 
 **1530-1555: _Optimizing GPU Capacity across multiple Data Centers_** <br>
-Description: The talk will cover details about use case, design and workflow on how Nvidia GeForce Now platform leverage a GPU Capacity to orchestrate VM workload across a fleet of Data Centers.
+Description: The talk will cover details about use case, design and workflow on how the Nvidia GeForce Now platform leverage a GPU Capacity to orchestrate VM workloads across a fleet of Data Centers.
 
-Use case: Nvidia GeForce Now platform intends to maximize GPU usage in a Data Center while catering to an on-demand continuous churning VM work load.<br>
-Specific constraint: VM should get to running state and not get stuck at “not scheduled” due to capacity unavailability.<br>
-Design details: - The system leverages a GPU Capacity API to get accurate capacity information in a DC - Design details of the GPU Capacity API and Controller. Events driven mechanism to keep track of accurate GPU Capacity information during workload churn.<br>
+Use case: 
+Nvidia GeForce Now platform intends to maximize GPU usage in a Data Center while catering to an on-demand continuous churning VM work load.
+
+Specific constraint: 
+VM should get to running state and not get stuck at “not scheduled” due to capacity unavailability.
+
+Design details: 
+- The system leverages a GPU Capacity API to get accurate capacity information in a DC. 
+- Design details of the GPU Capacity API and Controller. 
+- Events driven mechanism to keep track of accurate GPU Capacity information during workload churn.
+
 Nvidia GeForce Now workflow: How Capacity API is leveraged to orchestrate workload across a fleet of Data Centers at full GPU capacity to achieve on-demand scheduling needs.
 
 **1600-1625: _Isolating container workloads in Virtual Machines using KubeVirt_** <br>
@@ -98,7 +108,7 @@ This talk introduces the concept of Dynamic Resource Allocation (DRA) and demons
 **1200-1225: _Optimizing live-migration for minimizing packet loss with KubeVirt and kube-ovn_** <br>
 Description: We expose more detailed steps for virtual machine live-migration in KubeVirt. Which enable kube-ovn use the multi_chassis_bindings feature as will as triggering ACL policy changes based on RARP. In this way, we significantly reduces packet loss during live migrations.
 
-**1230-1255: _KubeVirt Observability with Prometheus and Grafana** <br>
+**1230-1255: _KubeVirt Observability with Prometheus and Grafana_** <br>
 Description: As KubeVirt adoption grows, so does the need for effective observability. This talk delves into the essential metrics and tools required to ensure the health and performance of your KubeVirt environments. 
 
 We'll explore practical strategies for monitoring KubeVirt workloads, identifying potential issues, and gaining valuable insights into your virtualized environment.
