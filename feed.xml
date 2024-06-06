@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-06-06T09:55:02+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-06-06T09:58:43+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
 
 <h2 id="what-is-kubevirt-summit">What is KubeVirt Summit?</h2>
 
@@ -10,7 +10,7 @@ We have two tracks to cater for developer talks, and another for end users to sh
 <p>The event will take place online over two half-days:</p>
 
 <ul>
-  <li>Dates: <strong>June 25 and 26</strong>, 2024</li>
+  <li>Dates: <del>June 25 and 26</del> <strong>June 24 and 25</strong>, 2024</li>
   <li>Time: TBD 
 (In the past we have aimed for 1200-1700 UTC but may modify these times slightly depending on our speaker timezones)</li>
 </ul>
