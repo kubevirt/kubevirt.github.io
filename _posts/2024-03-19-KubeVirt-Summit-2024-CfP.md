@@ -27,7 +27,7 @@ We have two tracks to cater for developer talks, and another for end users to sh
 
 The event will take place online over two half-days:
 
-- Dates: **June 25 and 26**, 2024
+- Dates: ~~June 25 and 26~~ **June 24 and 25**, 2024
 - Time: TBD 
 (In the past we have aimed for 1200-1700 UTC but may modify these times slightly depending on our speaker timezones)
 
