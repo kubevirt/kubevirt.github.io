@@ -24,7 +24,8 @@ The event will take place online over two half-days:
 
 ## How do I register?
 
-We will have a registration page open soon! This will be updated here very soon, and also shared on our [kubevirt-dev mailing list](https://groups.google.com/forum/#!forum/kubevirt-dev), so please join that if you have not already.
+Register now at the CNCF KubeVirt Summit event page:
+https://community.cncf.io/events/details/cncf-virtual-project-events-2024-hosted-by-cncf-presents-kubevirt-summit-2024/.
 
 ## Schedule
 
