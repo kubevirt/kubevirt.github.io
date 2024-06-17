@@ -52,7 +52,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2024-06-17 07:27:35 +0000" >
+    <meta property="og:article:published_time" content="2024-06-17 08:59:20 +0000" >
     <meta name="twitter:title" content="KubeVirt Summit 2024! | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -268,8 +268,7 @@ We have two tracks to cater for developer talks, and another for end users to sh
 </div></div>
 <h2 id="how-do-i-register">How do I register?</h2>
 
-<p>Register now at the CNCF KubeVirt Summit event page:
-https://community.cncf.io/events/details/cncf-virtual-project-events-2024-hosted-by-cncf-presents-kubevirt-summit-2024/.</p>
+<p><strong>Register now at the <a href="https://community.cncf.io/events/details/cncf-virtual-project-events-2024-hosted-by-cncf-presents-kubevirt-summit-2024/">CNCF KubeVirt Summit event page</a></strong></p>
 
 <h2 id="schedule">Schedule</h2>
 
@@ -388,7 +387,7 @@ Description: There are many benefits to use VMs with local storage, like:</p>
 <p>I’m glad to introduce a good way to do this. With the help of <a href="https://github.com/hwameistor/hwameistor">HwameiStor</a>, VMs can be smoothly used with local storage(LVs or raw disk).</p>
 
 <p><strong>13:30-13:55 <em>Real-Time Network Traffic Monitoring for KubeVirt VMs Using OVN and Switchdev SR-IOV VFIO Interfaces</em></strong> <br />
-Zhuanlan &amp; Zhangbingbing, China Mobile(SuZhou)Software Technology Co.,Ltd. <br />
+Girish Moodalbail &amp; Vengupal Iyer, Nvidia <br />
 Description: When the data plane is offloaded from the Linux kernel to Smart NICs that support the Linux SwitchDev driver model, the ability to perform real-time monitoring of network traffic for debugging or anomaly detection is lost. This issue is exacerbated when using legacy non-switchdev SR-IOV Virtual Functions (VFs), where packets sent through these VFs are only visible on the next hop switch. Consequently, any debugging efforts would require collaboration with network administrators managing the switches. Additionally, performing real-time monitoring of network traffic for anomaly detection on switches becomes significantly more challenging.</p>
 
 <p>In this presentation, we will explore how to achieve real-time monitoring of KubeVirt VMs/VMIs that are multi-homed with Switchdev SR-IOV VFIO interfaces using the open-source Open Virtual Network (OVN) SDN based on Open vSwitch (OVS). The API is defined by OVN-Kubernetes CNI as a Kubernetes Custom Resource. We will introduce the OVN packet mirroring feature, which enables the capture of packets from these interfaces and their forwarding to Scalable Functions (SFs) on the host. This process can be performed at wire speed thanks to NIC accelerators, allowing for the execution of tools like tcpdump, sFlow, and deep learning inference on the captured packets.</p>
