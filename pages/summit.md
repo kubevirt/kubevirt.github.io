@@ -24,8 +24,7 @@ The event will take place online over two half-days:
 
 ## How do I register?
 
-Register now at the CNCF KubeVirt Summit event page:
-https://community.cncf.io/events/details/cncf-virtual-project-events-2024-hosted-by-cncf-presents-kubevirt-summit-2024/.
+**Register now at the [CNCF KubeVirt Summit event page](https://community.cncf.io/events/details/cncf-virtual-project-events-2024-hosted-by-cncf-presents-kubevirt-summit-2024/)**
 
 ## Schedule
 
@@ -136,7 +135,7 @@ Description: There are many benefits to use VMs with local storage, like:
 I'm glad to introduce a good way to do this. With the help of [HwameiStor](https://github.com/hwameistor/hwameistor), VMs can be smoothly used with local storage(LVs or raw disk).
 
 **13:30-13:55 _Real-Time Network Traffic Monitoring for KubeVirt VMs Using OVN and Switchdev SR-IOV VFIO Interfaces_** <br>
-Zhuanlan & Zhangbingbing, China Mobile(SuZhou)Software Technology Co.,Ltd. <br>
+Girish Moodalbail & Vengupal Iyer, Nvidia <br>
 Description: When the data plane is offloaded from the Linux kernel to Smart NICs that support the Linux SwitchDev driver model, the ability to perform real-time monitoring of network traffic for debugging or anomaly detection is lost. This issue is exacerbated when using legacy non-switchdev SR-IOV Virtual Functions (VFs), where packets sent through these VFs are only visible on the next hop switch. Consequently, any debugging efforts would require collaboration with network administrators managing the switches. Additionally, performing real-time monitoring of network traffic for anomaly detection on switches becomes significantly more challenging.
 
 In this presentation, we will explore how to achieve real-time monitoring of KubeVirt VMs/VMIs that are multi-homed with Switchdev SR-IOV VFIO interfaces using the open-source Open Virtual Network (OVN) SDN based on Open vSwitch (OVS). The API is defined by OVN-Kubernetes CNI as a Kubernetes Custom Resource. We will introduce the OVN packet mirroring feature, which enables the capture of packets from these interfaces and their forwarding to Scalable Functions (SFs) on the host. This process can be performed at wire speed thanks to NIC accelerators, allowing for the execution of tools like tcpdump, sFlow, and deep learning inference on the captured packets.
