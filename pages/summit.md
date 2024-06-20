@@ -156,9 +156,17 @@ The [network binding plugin](https://github.com/kubevirt/kubevirt/blob/main/docs
 
 We will present the pluggable infrastructure and demonstrate a success story that used it to extend the supported interfaces (vDPA).
 
-**15:00-15:50 _Shift Happens - From Virtualisation to Cloud and Kubernetes_** <br>
-Michael Cade, Veeam Software <br>
-Description: I have worked in the virtualisation space for around 20 years and I have experience when we first saw the Virtualisation movement happen and the progression towards VMware and other hypervisors offering virtualisation platforms. I would like to take this session to educate that journey, highlighting use cases, migration strategies, data management and considerations as you consider moving into the world of VMs on Kubernetes. I will also highlight how the CSI will play a huge part on this movement. 
+**15:00-15:25 _Introducing Application Aware Resource Quota_** <br>
+Barak Mordehai, Red Hat <br>
+Description: If you want to hear about how Application Aware Resource Quota solves KubeVirt's Quota related issues during migrations and obscures Virtual Machines overhead from Quota - this session is for you.
+
+You will also hear how this project opens the door for plug-able policies to empower other operators to customize resource counting. 
+
+**15:30-15:55 _KubeVirt enablement on IBM Z and LinuxONE_** <br>
+Nourhane Bziouech, IBM <br>
+Description: Kubevirt keeps evolving and growing in features and capabilities , and one of the growth aspects is the platforms where it runs.
+
+ This session will cover the usage of Kubevirt for s390x architecture when running it on IBM Z and LinuxONE. Join me in this session and let me take you through the journey of adding Kubevirt to the IBM Z and LinuxONE platform.
 
 **16:00-16:25 _Ensuring High Availability for KubeVirt Virtual Machines_** <br>
 Javier Cano Cano, Red Hat <br>
