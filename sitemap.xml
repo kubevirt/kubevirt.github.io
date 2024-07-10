@@ -773,9 +773,6 @@
 <loc>https://kubevirt.io//blogs/date</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//videos/demos</loc>
-</url>
-<url>
 <loc>https://kubevirt.io//docs/</loc>
 </url>
 <url>
@@ -792,6 +789,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//videos/interviews</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//videos/kubevirt-summit</loc>
@@ -1686,6 +1686,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2024-07-08T13:39:11+00:00</lastmod>
+<lastmod>2024-07-10T14:39:10+00:00</lastmod>
 </url>
 </urlset>
