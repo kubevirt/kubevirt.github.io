@@ -1,12 +1,12 @@
 toc:
   - title: General
     subfolderitems:
-      - page: Demos
-        url: /videos/demos.html
       - page: Talks
         url: /videos/talks.html
-      - page: Tech Demos
+      - page: Demos
         url: /videos/tech-demos.html
+      - page: Interviews
+        url: /videos/interviews.html
       - page: Kubevirt Summit
         url: /videos/kubevirt-summit.html
   - title: Community
