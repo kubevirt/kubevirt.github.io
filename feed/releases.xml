@@ -1,4 +1,110 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-07-10T14:40:21+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.2.0</title><link href="https://kubevirt.io//2024/changelog-v1.2.0.html" rel="alternate" type="text/html" title="KubeVirt v1.2.0" /><published>2024-03-05T00:00:00+00:00</published><updated>2024-03-05T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.2.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.2.0.html"><![CDATA[<h2 id="v120">v1.2.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-07-29T11:25:46+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.3.0</title><link href="https://kubevirt.io//2024/changelog-v1.3.0.html" rel="alternate" type="text/html" title="KubeVirt v1.3.0" /><published>2024-07-17T00:00:00+00:00</published><updated>2024-07-17T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.3.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.3.0.html"><![CDATA[<h2 id="v130">v1.3.0</h2>
+
+<p>Released on: Wed Jul 17 15:09:44 2024 +0000</p>
+
+<ul>
+  <li>[PR #12319][Sreeja1725] Add v1.3.0 perf and scale benchmarks data</li>
+  <li>[PR #12330][kubevirt-bot] Fix wrong KubeVirtVMIExcessiveMigrations alert calculation in an upgrade scenario.</li>
+  <li>[PR #12328][acardace] enable only for VMs with memory &gt;= 1Gi</li>
+  <li>[PR #12272][Sreeja1725] Add unit tests to check for API backward compatibility</li>
+  <li>[PR #12296][orelmisan] Network binding plugins: Enable the ability to specify compute memory overhead</li>
+  <li>[PR #12279][kubevirt-bot] Fix: persistent tpm can be used with vmis containing dots in their name</li>
+  <li>[PR #12226][kubevirt-bot] Virt export route has an edge termination of redirect</li>
+  <li>[PR #12240][kubevirt-bot] Updated common-instancetypes bundles to v1.0.1</li>
+  <li>[PR #12249][kubevirt-bot] Fix missing performance metrics for VMI resources</li>
+  <li>[PR #12237][vladikr] Only a single vgpu display option with ramfb will be configured per VMI.</li>
+  <li>[PR #12122][kubevirt-bot] Fix VMPools when <code class="language-plaintext highlighter-rouge">LiveUpdate</code> as <code class="language-plaintext highlighter-rouge">vmRolloutStrategy</code> is used.</li>
+  <li>[PR #12201][kubevirt-bot] fix RerunOnFailure stuck in Provisioning</li>
+  <li>[PR #12151][kubevirt-bot] Bugfix: Implement retry mechanism in export server and vmexport</li>
+  <li>[PR #12171][kubevirt-bot] <code class="language-plaintext highlighter-rouge">PreferredDiskDedicatedIoThread</code> is now only applied to <code class="language-plaintext highlighter-rouge">virtio</code> disk devices</li>
+  <li>[PR #12146][kubevirt-bot] Memory Hotplug fixes and stabilization</li>
+  <li>[PR #12185][kubevirt-bot] VMs with a single socket and NetworkInterfaceMultiqueue enabled require a restart to hotplug additional CPU sockets.</li>
+  <li>[PR #12132][kubevirt-bot] Introduce validatingAdmissionPolicy to restrict node patches on virt-handler</li>
+  <li>[PR #12109][acardace] Support Memory Hotplug with Hugepages</li>
+  <li>[PR #12009][xpivarc] By enabling NodeRestriction feature gate, Kubevirt now authorize virt-handler’s requests to modify VMs.</li>
+  <li>[PR #11681][lyarwood] The <code class="language-plaintext highlighter-rouge">CommonInstancetypesDeployment</code> feature and gate are retrospectively moved to Beta from the 1.2.0 release.</li>
+  <li>[PR #12025][fossedihelm] Add descheduler compatibility</li>
+  <li>[PR #12097][fossedihelm] Bump k8s deps to 0.30.0</li>
+  <li>[PR #12089][jean-edouard] Less privileged virt-operator ClusterRole</li>
+  <li>[PR #12064][akalenyu] BugFix: Graceful deletion skipped for any delete call to the VM (not VMI) resource</li>
+  <li>[PR #10490][jschintag] Add support for building and running kubevirt on s390x.</li>
+  <li>[PR #12079][EdDev] Network hotplug feature is declared as Beta.</li>
+  <li>[PR #11455][lyarwood] <code class="language-plaintext highlighter-rouge">LiveUpdates</code>  of VMs using instance types are now supported with the same caveats as when making changes to a vanilla VM.</li>
+  <li>[PR #12000][machadovilaca] Create kubevirt_vmi_launcher_memory_overhead_bytes metric</li>
+  <li>[PR #11915][ormergi] The ‘passt’ core network binding is discontinued and removed.</li>
+  <li>[PR #12016][acardace] fix starting VM with Manual RunStrategy</li>
+  <li>[PR #11533][alicefr] Implement volume migration and introduce the migration updateVolumesStrategy field</li>
+  <li>[PR #11934][assafad] Add kubevirt_vmi_last_connection_timestamp_seconds metric</li>
+  <li>[PR #11956][mhenriks] Introduce export.kibevirt.io/v1beta1</li>
+  <li>[PR #11996][ShellyKa13] BugFix: Fix restore panic in case of volumesnapshot missing</li>
+  <li>[PR #11957][mhenriks] snapshot: Ignore unfreeze error if VMSnapshot deleting</li>
+  <li>[PR #11906][machadovilaca] Create kubevirt_vmi_info metric</li>
+  <li>[PR #11969][iholder101] Infra components control-plane nodes NoSchedule toleration</li>
+  <li>[PR #11955][mhenriks] Introduce snapshot.kibevirt.io/v1beta1</li>
+  <li>[PR #11883][orelmisan] Restart of a VM is required when the CPU socket count is reduced</li>
+  <li>[PR #11835][talcoh2x] add Intel Gaudi to adopters.</li>
+  <li>[PR #11344][aerosouund] Refactor device plugins to use a base plugin and define a common interface</li>
+  <li>[PR #11973][fossedihelm] Bug fix: Correctly reflect RestartRequired condition</li>
+  <li>[PR #11963][acardace] Fix RerunOnFailure RunStrategy</li>
+  <li>[PR #11962][lyarwood] <code class="language-plaintext highlighter-rouge">VirtualMachines</code> referencing an instance type are now allowed when the <code class="language-plaintext highlighter-rouge">LiveUpdate</code> feature is enabled and will trigger the <code class="language-plaintext highlighter-rouge">RestartRequired</code> condition if the reference within the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> is changed.</li>
+  <li>[PR #11942][ido106] Update virtctl to use v1beta1 endpoint for both regular and async image upload</li>
+  <li>[PR #11648][kubevirt-bot] Updated common-instancetypes bundles to v1.0.0</li>
+  <li>[PR #11659][iholder101] Require scheduling infra components onto control-plane nodes</li>
+  <li>[PR #10545][lyarwood] <code class="language-plaintext highlighter-rouge">ControllerRevisions</code> containing instance types and preferences are now upgraded to their latest available version when the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> owning them is resync’d by <code class="language-plaintext highlighter-rouge">virt-controller</code>.</li>
+  <li>[PR #11901][EdDev] The ‘macvtap’ core network binding is discontinued and removed.</li>
+  <li>[PR #11922][alromeros] Bugfix: Fix VM manifest rendering in export controller</li>
+  <li>[PR #11908][victortoso] sidecar-shim: allow stderr log from binary hooks</li>
+  <li>[PR #11729][lyarwood] <code class="language-plaintext highlighter-rouge">spreadOptions</code> have been introduced to preferences in order to allow for finer grain control of the <code class="language-plaintext highlighter-rouge">preferSpread</code> <code class="language-plaintext highlighter-rouge">preferredCPUTopology</code>. This includes the ability to now spread vCPUs across guest visible sockets, cores and threads.</li>
+  <li>[PR #11655][acardace] Allow to hotplug vcpus for VMs with CPU requests and/or limits set</li>
+  <li>[PR #11701][EdDev] The SLIRP core binding is deprecated and removed.</li>
+  <li>[PR #11773][jean-edouard] Persistent TPM/UEFI will use the default storage class if none is specified in the CR.</li>
+  <li>[PR #11846][victortoso] SMBios sidecar can be built out-of-tree</li>
+  <li>[PR #11788][ormergi] The network-info annotation is now used for mapping between SR-IOV network and the underlying device PCI address</li>
+  <li>[PR #11700][alicefr] Add the updateVolumeStrategy field</li>
+  <li>[PR #11256][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 10.0.0 and QEMU 8.2.0.</li>
+  <li>[PR #11482][brianmcarey] Build KubeVirt with go v1.22.2</li>
+  <li>[PR #11641][alicefr] Add kubevirt.io/testWorkloadUpdateMigrationAbortion annotation and a mechanism to abort workload updates</li>
+  <li>[PR #11770][alicefr] Fix the live updates for volumes and disks</li>
+  <li>[PR #11790][aburdenthehand] Re-adding Cloudflare to our ADOPTERS list</li>
+  <li>[PR #11718][fossedihelm] Fix: SEV methods in client-go now satisfy the proxy server configuration, if provided</li>
+  <li>[PR #11685][fossedihelm] Updated go version of the client-go to 1.21</li>
+  <li>[PR #11618][AlonaKaplan] Extend network binding plugin to support device-info DownwardAPI.</li>
+  <li>[PR #11283][assafad] Collect VMI OS info from the Guest agent as <code class="language-plaintext highlighter-rouge">kubevirt_vmi_phase_count</code> metric labels</li>
+  <li>[PR #11676][machadovilaca] Rename rest client metrics to include kubevirt prefix</li>
+  <li>[PR #11557][avlitman] New memory statistics added named kubevirt_memory_delta_from_requested_bytes</li>
+  <li>[PR #11678][Vicente-Cheng] Improve the handling of ordinal pod interface name for upgrade</li>
+  <li>[PR #11653][EdDev] Build the <code class="language-plaintext highlighter-rouge">passt</code>custom CNI binary statically, for the <code class="language-plaintext highlighter-rouge">passt</code> network binding plugin.</li>
+  <li>[PR #11294][machadovilaca] Fix kubevirt_vm_created_total being broken down by virt-api pod</li>
+  <li>[PR #11307][machadovilaca] Add e2e tests for metrics</li>
+  <li>[PR #11479][vladikr] virtual machines instance will no longer be stuck in an irrecoverable state after an interrupted postcopy migration. Instead, these will fail and could be restarted again.</li>
+  <li>[PR #11416][dhiller] emission of k8s logs when using programmatic focus with <code class="language-plaintext highlighter-rouge">FIt</code></li>
+  <li>[PR #11272][dharmit] Make ‘image’ field in hook sidecar annotation optional.</li>
+  <li>[PR #11500][iholder101] Support HyperV Passthrough: automatically use all available HyperV features</li>
+  <li>[PR #11484][jcanocan] Reduce the downwardMetrics server maximum number of request per second to 1.</li>
+  <li>[PR #11498][acardace] Allow to hotplug memory for VMs with memory limits set</li>
+  <li>[PR #11470][brianmcarey] Build KubeVirt with Go version 1.21.8</li>
+  <li>[PR #11312][alromeros] Improve handling of export resources in virtctl vmexport</li>
+  <li>[PR #11367][alromeros] Bugfix: Allow vmexport download redirections by printing logs into stderr</li>
+  <li>[PR #11219][alromeros] Bugfix: Improve handling of IOThreads with incompatible buses</li>
+  <li>[PR #11149][0xFelix] virtctl: It is possible to import volumes from GCS when creating a VM now</li>
+  <li>[PR #11404][avlitman] KubeVirtComponentExceedsRequestedCPU and KubeVirtComponentExceedsRequestedMemory alerts are deprecated; they do not indicate a genuine issue.</li>
+  <li>[PR #11331][anjuls] add cloudraft to adopters.</li>
+  <li>[PR #11387][alaypatel07] add perf-scale benchmarks for release v1.2</li>
+  <li>[PR #11095][ShellyKa13] Expose volumesnapshot error in vmsnapshot object</li>
+  <li>[PR #11372][xpivarc] Bug-fix: Fix nil panic if VM update fails</li>
+  <li>[PR #11267][mhenriks] BugFix: Ensure DataVolumes created by virt-controller (DataVolumeTemplates) are recreated and owned by the VM in the case of DR and backup/restore.</li>
+  <li>[PR #10900][KarstenB] BugFix: Fixed incorrect APIVersion of APIResourceList</li>
+  <li>[PR #11306][fossedihelm] fix(ksm): set the <code class="language-plaintext highlighter-rouge">kubevirt.io/ksm-enabled</code> node label to true if the ksm is managed by KubeVirt, instead of reflect the actual ksm value.</li>
+  <li>[PR #11330][jean-edouard] More information in the migration state of VMI / migration objects</li>
+  <li>[PR #11264][machadovilaca] Fix perfscale buckets error</li>
+  <li>[PR #11183][dhiller] Extend OWNERS for sig-buildsystem</li>
+  <li>[PR #11058][fossedihelm] fix(vmclone): delete vmclone resource when the target vm is deleted</li>
+  <li>[PR #11265][xpivarc] Bug fix: VM controller doesn’t corrupt its cache anymore</li>
+  <li>[PR #11205][akalenyu] Fix migration breaking in case the VM has an rng device after hotplugging a block volume on cgroupsv2</li>
+  <li>[PR #11051][alromeros] Bugfix: Improve error reporting when fsfreeze fails</li>
+  <li>[PR #11156][nunnatsa] Move some verification from the VMI create validation webhook to the CRD</li>
+  <li>[PR #11146][RamLavi] node-labeller: Remove obsolete functionalities</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.3.0 changes]]></summary></entry><entry><title type="html">KubeVirt v1.2.0</title><link href="https://kubevirt.io//2024/changelog-v1.2.0.html" rel="alternate" type="text/html" title="KubeVirt v1.2.0" /><published>2024-03-05T00:00:00+00:00</published><updated>2024-03-05T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.2.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.2.0.html"><![CDATA[<h2 id="v120">v1.2.0</h2>
 
 <p>Released on: Tue Mar 5 20:25:04 2024 +0000</p>
 
@@ -460,30 +566,4 @@
   <li>[PR #7529][xpivarc] NoReadyVirtController and NoReadyVirtOperator should be properly fired.</li>
   <li>[PR #7465][machadovilaca] Add metrics for migrations and respective phases</li>
   <li>[PR #7592][akalenyu] BugFix: virtctl guestfs incorrectly assumes image name</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.54.0 changes]]></summary></entry><entry><title type="html">KubeVirt v0.53.0</title><link href="https://kubevirt.io//2022/changelog-v0.53.0.html" rel="alternate" type="text/html" title="KubeVirt v0.53.0" /><published>2022-05-09T00:00:00+00:00</published><updated>2022-05-09T00:00:00+00:00</updated><id>https://kubevirt.io//2022/changelog-v0.53.0</id><content type="html" xml:base="https://kubevirt.io//2022/changelog-v0.53.0.html"><![CDATA[<h2 id="v0530">v0.53.0</h2>
-
-<p>Released on: Mon May 9 14:02:20 2022 +0000</p>
-
-<ul>
-  <li>[PR #7533][akalenyu] Add several VM snapshot metrics</li>
-  <li>[PR #7574][rmohr] Pull in cdi dependencies with minimized transitive dependencies to ease API adoption</li>
-  <li>[PR #7318][iholder-redhat] Snapshot restores now support restoring to a target VM different than the source</li>
-  <li>[PR #7474][borod108] Added the following metrics for live migration: kubevirt_migrate_vmi_data_processed_bytes, kubevirt_migrate_vmi_data_remaining_bytes, kubevirt_migrate_vmi_dirty_memory_rate_bytes</li>
-  <li>[PR #7441][rmohr] Add <code class="language-plaintext highlighter-rouge">virtctl scp</code> to ease copying files from and to VMs and VMIs</li>
-  <li>[PR #7265][rthallisey] Support steady-state job types in the load-generator tool</li>
-  <li>[PR #7544][fossedihelm] Upgraded go version to 1.17.8</li>
-  <li>[PR #7582][acardace] Fix failed reported migrations when actually they were successful.</li>
-  <li>[PR #7546][0xFelix] Update virtio-container-disk to virtio-win version 0.1.217-1</li>
-  <li>[PR #7530][iholder-redhat] [External Kernel Boot]: Disallow kernel args without providing custom kernel</li>
-  <li>[PR #7493][davidvossel] Adds new EvictionStrategy “External” for blocking eviction which is handled by an external controller</li>
-  <li>[PR #7563][akalenyu] Switch VolumeSnapshot to v1</li>
-  <li>[PR #7406][acardace] Reject <code class="language-plaintext highlighter-rouge">LiveMigrate</code> as a workload-update strategy if the <code class="language-plaintext highlighter-rouge">LiveMigration</code> feature gate is not enabled.</li>
-  <li>[PR #7103][jean-edouard] Non-persistent vTPM now supported. Keep in mind that the state of the TPM is wiped after each shutdown. Do not enable Bitlocker!</li>
-  <li>[PR #7277][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 8.0.0 and QEMU 6.2.0.</li>
-  <li>[PR #7130][Barakmor1] Add field to kubevirtCR to set Prometheus ServiceMonitor object’s namespace</li>
-  <li>[PR #7401][iholder-redhat] virt-api deployment is now scalable - replicas are determined by the number of nodes in the cluster</li>
-  <li>[PR #7500][awels] BugFix: Fixed RBAC for admin/edit user to allow virtualmachine/addvolume and removevolume. This allows for persistent disks</li>
-  <li>[PR #7328][apoorvajagtap] Don’t ignore –identity-file when setting –local-ssh=true on <code class="language-plaintext highlighter-rouge">virtctl ssh</code></li>
-  <li>[PR #7469][xpivarc] Users can now enable the NonRoot feature gate instead of NonRootExperimental</li>
-  <li>[PR #7451][fossedihelm] Reduce virt-launcher memory usage by splitting monitoring and launcher processes</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.53.0 changes]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v0.54.0 changes]]></summary></entry></feed>

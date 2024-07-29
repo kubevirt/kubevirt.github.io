@@ -52,7 +52,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2024-07-10 14:40:21 +0000" >
+    <meta property="og:article:published_time" content="2024-07-29 11:25:46 +0000" >
     <meta name="twitter:title" content="Use KubeVirt | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -469,9 +469,13 @@ less vm.yaml
 <p>Apply the manifest to Kubernetes.</p>
 
 <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> https://kubevirt.io/labs/manifests/vm.yaml
-virtualmachine.kubevirt.io <span class="s2">"testvm"</span> created
-  virtualmachineinstancepreset.kubevirt.io <span class="s2">"small"</span> created
 </code></pre></div></div>
+
+<p>You should see following results</p>
+<blockquote>
+  <p>virtualmachine.kubevirt.io “testvm” created
+virtualmachineinstancepreset.kubevirt.io “small” created</p>
+</blockquote>
 
 <h3 id="manage-virtual-machines-optional">Manage Virtual Machines (optional):</h3>
 
@@ -506,11 +510,15 @@ kubectl patch virtualmachine testvm <span class="nt">--type</span> merge <span c
     <span class="s1">'{"spec":{"running":false}}'</span>
 </code></pre></div></div>
 
-<p>Now that the Virtual Machine has been started, check the status. Note the <code class="language-plaintext highlighter-rouge">running</code> status.</p>
+<p>Now that the Virtual Machine has been started, check the status (<code class="language-plaintext highlighter-rouge">kubectl get vms</code>). Note the <code class="language-plaintext highlighter-rouge">Running</code> status.</p>
+
+<p>You now want to see the instance of the vm you just started :</p>
 
 <div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl get vmis
 kubectl get vmis -o yaml testvm
 </code></pre></div></div>
+
+<p>Note the difference between VM (virtual machine) resource and VMI (virtual machine instance) resource. The VMI does not exist before starting the VM and the VMI will be deleted when you stop the VM. (Also note that restart of the VM is needed if you like to change some properties. Just modifying VM is not sufficient, the VMI has to be replaced.)</p>
 
 <h3 id="accessing-vms-serial-console">Accessing VMs (serial console)</h3>
 
@@ -520,6 +528,8 @@ kubectl get vmis -o yaml testvm
 </code></pre></div></div>
 
 <p>Disconnect from the virtual machine console by typing: <code class="language-plaintext highlighter-rouge">ctrl+]</code>.</p>
+
+<p>If you like to see the complete boot sequence logs from the console. You need to connect to the serial console just after starting the VM (you can test this by stopping and starting the VM again, see below).</p>
 
 <h3 id="controlling-the-state-of-the-vm">Controlling the State of the VM</h3>
 
