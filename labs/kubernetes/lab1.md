@@ -34,9 +34,11 @@ Apply the manifest to Kubernetes.
 
 ```bash
 {% include scriptlets/lab1/02_create_testvm.sh -%}
-  virtualmachine.kubevirt.io "testvm" created
-  virtualmachineinstancepreset.kubevirt.io "small" created
 ```
+
+You should see following results
+> virtualmachine.kubevirt.io "testvm" created
+> virtualmachineinstancepreset.kubevirt.io "small" created
 
 ### Manage Virtual Machines (optional):
 
@@ -74,11 +76,15 @@ kubectl patch virtualmachine testvm --type merge -p \
     '{"spec":{"running":false}}'
 ```
 
-Now that the Virtual Machine has been started, check the status. Note the `running` status.
+Now that the Virtual Machine has been started, check the status (`kubectl get vms`). Note the `Running` status.
+
+You now want to see the instance of the vm you just started :
 
 ```
 {% include scriptlets/lab1/05_verify_testvm_instance.sh -%}
 ```
+
+Note the difference between VM (virtual machine) resource and VMI (virtual machine instance) resource. The VMI does not exist before starting the VM and the VMI will be deleted when you stop the VM. (Also note that restart of the VM is needed if you like to change some properties. Just modifying VM is not sufficient, the VMI has to be replaced.) 
 
 ### Accessing VMs (serial console)
 
@@ -89,6 +95,8 @@ Connect to the serial console of the Cirros VM. Hit return / enter a few times a
 ```
 
 Disconnect from the virtual machine console by typing: `ctrl+]`.
+
+If you like to see the complete boot sequence logs from the console. You need to connect to the serial console just after starting the VM (you can test this by stopping and starting the VM again, see below).
 
 ### Controlling the State of the VM
 
