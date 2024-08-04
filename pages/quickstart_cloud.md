@@ -59,7 +59,7 @@ KubeVirt can be installed using the KubeVirt operator, which manages the lifecyc
 * Again use `kubectl` to deploy the KubeVirt custom resource definitions:
 
   ```bash
-  kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
+  kubectl create -f "https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml"
   ```
 
 ### Verify components
