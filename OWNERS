@@ -3,11 +3,9 @@ filters:
     reviewers:
       - aburdenthehand
       - brianmcarey
-      - cwilkers
       - jean-edouard
     approvers:
       - aburdenthehand
-      - cwilkers
       - fabiand
       - davidvossel
       - dhiller
@@ -15,6 +13,7 @@ filters:
       - phoracek
       - stu-gott
     emeritus_approvers:
+      - cwilkers # 03 Oct 2024
       - mazzystr # 20 Nov 2023
       - codificat # 09 June 2021
       - hroyrh # 09 June 2021
