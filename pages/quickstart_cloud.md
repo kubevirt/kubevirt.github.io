@@ -45,7 +45,7 @@ KubeVirt can be installed using the KubeVirt operator, which manages the lifecyc
   ```bash
   export VERSION=$(curl -s https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt)
   echo $VERSION
-  kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml
+  kubectl create -f "https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-operator.yaml"
   ```
 
   > warning "Nested virtualization"
@@ -59,7 +59,7 @@ KubeVirt can be installed using the KubeVirt operator, which manages the lifecyc
 * Again use `kubectl` to deploy the KubeVirt custom resource definitions:
 
   ```bash
-  kubectl create -f https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml
+  kubectl create -f "https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/kubevirt-cr.yaml"
   ```
 
 ### Verify components
