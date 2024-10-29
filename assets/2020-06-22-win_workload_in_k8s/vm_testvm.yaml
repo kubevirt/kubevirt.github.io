@@ -8,7 +8,7 @@ metadata:
     special: key
   name: testvm
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       creationTimestamp: null

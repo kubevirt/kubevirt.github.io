@@ -139,7 +139,7 @@ metadata:
     kubevirt.io/vm: vm1
   name: vm1
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:
@@ -193,7 +193,7 @@ metadata:
     kubevirt.io/vm: vm2
   name: vm2
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:
@@ -247,7 +247,7 @@ metadata:
     kubevirt.io/vm: vm3
   name: vm3
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:
@@ -301,7 +301,7 @@ metadata:
     kubevirt.io/vm: vm4
   name: vm4
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:
@@ -355,7 +355,7 @@ metadata:
     kubevirt.io/vm: vm5
   name: vm5
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:
@@ -409,7 +409,7 @@ metadata:
     kubevirt.io/vm: vm6
   name: vm6
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:

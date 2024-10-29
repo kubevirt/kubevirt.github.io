@@ -37,6 +37,7 @@ We decided to tackle both issues at the same time--by deprecating the "Running" 
 
 * Always: If a VM is stopped for any reason, a new instance will be spawned.
 * RerunOnFailure: If a VM ends execution in an error state, a new instance will be spawned. This addressed the second concern listed above. If a user halts a VM manually a new instance will not be spawned.
+* Once: The VM will run once and not be restarted upon completion regardless if the completion is of phase Failure or Success.
 * Manual: This is exactly what it means. KubeVirt will neither attempt to start or stop a VM. In order to change state, the user must invoke start/stop/restart from the API. There exist convenience functions in the virtctl command line client as well.
 * Halted: The VM will be stopped if it's running, and will remain off.
 

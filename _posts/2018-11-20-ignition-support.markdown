@@ -60,7 +60,7 @@ kind: VirtualMachine
 metadata:
   name: myvm1
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:

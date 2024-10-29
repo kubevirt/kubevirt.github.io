@@ -49,7 +49,7 @@ To proceed with the Installation steps the different elements involved are liste
    metadata:
      name: win2k12-iso
    spec:
-     running: false
+     runStrategy: Halted
      template:
        metadata:
          labels:
@@ -173,7 +173,7 @@ To proceed with the Installation steps the different elements involved are liste
    metadata:
      name: win2k12-iso
    spec:
-     running: false
+     runStrategy: Halted
      template:
        metadata:
          labels:

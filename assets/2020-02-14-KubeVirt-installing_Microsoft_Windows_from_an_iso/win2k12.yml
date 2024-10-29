@@ -15,7 +15,7 @@ kind: VirtualMachine
 metadata:
   name: win2k12-iso
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       labels:

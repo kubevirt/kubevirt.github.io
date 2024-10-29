@@ -122,7 +122,7 @@ kind: VirtualMachine
 metadata:
   name: vm-server
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       domain:
@@ -172,7 +172,7 @@ kind: VirtualMachine
 metadata:
   name: vm-client
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       domain:

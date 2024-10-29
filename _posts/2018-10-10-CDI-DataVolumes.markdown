@@ -100,7 +100,7 @@ spec:
         source:
           http:
             url: "https://cloud.centos.org/centos/7/images/CentOS-7-x86_64-GenericCloud.qcow2"
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:

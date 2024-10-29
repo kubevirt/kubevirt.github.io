@@ -397,7 +397,7 @@ kind: VirtualMachine
 metadata:
   name: win10vm1
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       creationTimestamp: null

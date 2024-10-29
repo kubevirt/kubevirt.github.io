@@ -52,7 +52,7 @@ metadata:
     kubevirt.io/vm: vm-test-01
   name: vm-test-01
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       creationTimestamp: null
