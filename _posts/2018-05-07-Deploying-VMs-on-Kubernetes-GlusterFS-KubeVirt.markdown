@@ -389,7 +389,7 @@ metadata:
     kubevirt.io/ovm: cirros
   name: cirros
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       creationTimestamp: null

@@ -150,7 +150,7 @@ kind: VirtualMachine
 metadata:
   name: monitorable-vm
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       name: monitorable-vm

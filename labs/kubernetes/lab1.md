@@ -69,11 +69,11 @@ Alternatively you could use `kubectl patch`:
 ```shell
 # Start the virtual machine:
 kubectl patch virtualmachine testvm --type merge -p \
-    '{"spec":{"running":true}}'
+    '{"spec":{"runStrategy": "Always"}}'
 
 # Stop the virtual machine:
 kubectl patch virtualmachine testvm --type merge -p \
-    '{"spec":{"running":false}}'
+    '{"spec":{"runStrategy": "Halted"}}'
 ```
 
 Now that the Virtual Machine has been started, check the status (`kubectl get vms`). Note the `Running` status.

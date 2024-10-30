@@ -387,7 +387,7 @@ metadata:
     kubevirt.io/vm: nginx
   name: nginx
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:

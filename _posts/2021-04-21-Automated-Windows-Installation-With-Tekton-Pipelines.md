@@ -525,7 +525,7 @@ spec:
           pvc:
             name: PVC_NAME
             namespace: PVC_NAMESPACE
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       labels:

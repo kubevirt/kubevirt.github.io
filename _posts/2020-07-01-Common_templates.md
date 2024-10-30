@@ -67,7 +67,7 @@ The created object is now a regular VirtualMachine object and from now it can be
 
 An alternative way to start the VM is with the oc patch command. Example:
 
-`$ oc patch virtualmachine rheltinyvm --type merge -p '{"spec":{"running":true}}'`
+`$ oc patch virtualmachine rheltinyvm --type merge -p '{"spec":{"runStrategy":"Always"}}'`
 
 As soon as VM starts, openshift creates a new type of object - `VirtualMachineInstance`. It has a similar name to VirtualMachine.
 

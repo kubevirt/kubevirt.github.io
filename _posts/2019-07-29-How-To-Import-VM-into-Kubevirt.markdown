@@ -176,7 +176,7 @@ metadata:
     kubevirt.io/vm: vm-alpine-datavolume
   name: vm-alpine-datavolume
 spec:
-  running: false
+  runStrategy: Halted
   template:
     metadata:
       labels:

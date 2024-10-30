@@ -138,7 +138,7 @@ metadata:
   labels:
     metallb-service: nginx
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:

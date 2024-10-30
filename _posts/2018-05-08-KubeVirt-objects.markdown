@@ -382,17 +382,17 @@ spec:
 
 ### What is Running in OfflineVirtualMachine?
 
-[.spec.running](https://kubevirt.io/api-reference/master/definitions.html#_v1_offlinevirtualmachinespec) controls whether the associated VirtualMachine object is created. In other words this changes the [power status](https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine) of the virtual machine.
+[.spec.runStrategy](https://kubevirt.io/api-reference/master/definitions.html) controls whether and when the associated VirtualMachineInstance object is created. In other words this controls the [power status](https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine) of the virtual machine.
 
-      running: true
+      runStrategy: Always
 
-This will create a `VirtualMachine` object which will instantiate and power on a virtual machine.
+This will create a `VirtualMachineInstance` object which will instantiate and power on a virtual machine.
 
-    kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true }}' -n nodejs-ex
+    kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"runStrategy": "Always"}}' -n nodejs-ex
 
-This will delete the `VirtualMachine` object which will power off the virtual machine.
+This will delete the `VirtualMachineInstance` object which will power off the virtual machine.
 
-    kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":false }}' -n nodejs-ex
+    kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"runStrategy": "Halted"}}' -n nodejs-ex
 
 And if you would rather not have to remember the `kubectl patch` command above
 the KubeVirt team has provided a cli tool `virtctl` that can start and stop

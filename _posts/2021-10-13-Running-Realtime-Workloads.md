@@ -103,7 +103,7 @@ metadata:
   name: fedora-realtime
   namespace: poc
 spec:
-  running: true
+  runStrategy: Always
   template:
     metadata:
       labels:

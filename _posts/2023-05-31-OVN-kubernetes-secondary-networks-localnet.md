@@ -173,7 +173,7 @@ kind: VirtualMachine
 metadata:
   name: vm-server
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
@@ -221,7 +221,7 @@ kind: VirtualMachine
 metadata:
   name: vm-client
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
@@ -418,7 +418,7 @@ kind: VirtualMachine
 metadata:
   name: vm-red-1
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
@@ -466,7 +466,7 @@ kind: VirtualMachine
 metadata:
   name: vm-red-2
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
@@ -514,7 +514,7 @@ kind: VirtualMachine
 metadata:
   name: vm-blue-1
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
@@ -562,7 +562,7 @@ kind: VirtualMachine
 metadata:
   name: vm-blue-2
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:

@@ -430,7 +430,7 @@ kind: VirtualMachine
 metadata:
   name: vma
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
@@ -484,7 +484,7 @@ kind: VirtualMachine
 metadata:
   name: vmb
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       nodeSelector:
