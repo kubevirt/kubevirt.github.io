@@ -53,7 +53,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2024-10-15 10:12:51 +0000" >
+    <meta property="og:article:published_time" content="2024-10-30 13:11:13 +0000" >
     <meta name="twitter:title" content="Use KubeVirt | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -497,11 +497,11 @@ kubectl virt stop testvm
 
 <div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Start the virtual machine:</span>
 kubectl patch virtualmachine testvm <span class="nt">--type</span> merge <span class="nt">-p</span> <span class="se">\</span>
-    <span class="s1">'{"spec":{"running":true}}'</span>
+    <span class="s1">'{"spec":{"runStrategy": "Always"}}'</span>
 
 <span class="c"># Stop the virtual machine:</span>
 kubectl patch virtualmachine testvm <span class="nt">--type</span> merge <span class="nt">-p</span> <span class="se">\</span>
-    <span class="s1">'{"spec":{"running":false}}'</span>
+    <span class="s1">'{"spec":{"runStrategy": "Halted"}}'</span>
 </code></pre></div></div>
 
 <p>Now that the Virtual Machine has been started, check the status (<code class="language-plaintext highlighter-rouge">kubectl get vms</code>). Note the <code class="language-plaintext highlighter-rouge">Running</code> status.</p>

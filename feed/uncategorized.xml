@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-10-15T10:12:51+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html"><![CDATA[<h2 id="monitoring-kubevirt-vms-from-the-inside">Monitoring KubeVirt VMs from the inside</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-10-30T13:11:13+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html"><![CDATA[<h2 id="monitoring-kubevirt-vms-from-the-inside">Monitoring KubeVirt VMs from the inside</h2>
 
 <p>This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus <a href="https://github.com/prometheus/node_exporter">node-exporter</a>. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.</p>
 
@@ -120,7 +120,7 @@ kubectl rollout status <span class="nt">-n</span> cdi deployment cdi-deployment
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">monitorable-vm</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">monitorable-vm</span>
@@ -2511,19 +2511,19 @@ metadata:
 
 <h3 id="what-is-running-in-offlinevirtualmachine">What is Running in OfflineVirtualMachine?</h3>
 
-<p><a href="https://kubevirt.io/api-reference/master/definitions.html#_v1_offlinevirtualmachinespec">.spec.running</a> controls whether the associated VirtualMachine object is created. In other words this changes the <a href="https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine">power status</a> of the virtual machine.</p>
+<p><a href="https://kubevirt.io/api-reference/master/definitions.html">.spec.runStrategy</a> controls whether and when the associated VirtualMachineInstance object is created. In other words this controls the <a href="https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine">power status</a> of the virtual machine.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  running: true
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  runStrategy: Always
 </code></pre></div></div>
 
-<p>This will create a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> object which will instantiate and power on a virtual machine.</p>
+<p>This will create a <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> object which will instantiate and power on a virtual machine.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true }}' -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"runStrategy": "Always"}}' -n nodejs-ex
 </code></pre></div></div>
 
-<p>This will delete the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> object which will power off the virtual machine.</p>
+<p>This will delete the <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> object which will power off the virtual machine.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":false }}' -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"runStrategy": "Halted"}}' -n nodejs-ex
 </code></pre></div></div>
 
 <p>And if you would rather not have to remember the <code class="language-plaintext highlighter-rouge">kubectl patch</code> command above
@@ -3036,7 +3036,7 @@ Note the PVC containing the cirros image must be listed as the first disk under 
     <span class="na">kubevirt.io/ovm</span><span class="pi">:</span> <span class="s">cirros</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">cirros</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">false</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Halted</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>

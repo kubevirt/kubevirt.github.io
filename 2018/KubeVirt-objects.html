@@ -633,19 +633,19 @@ metadata:
 
 <h3 id="what-is-running-in-offlinevirtualmachine">What is Running in OfflineVirtualMachine?</h3>
 
-<p><a href="https://kubevirt.io/api-reference/master/definitions.html#_v1_offlinevirtualmachinespec">.spec.running</a> controls whether the associated VirtualMachine object is created. In other words this changes the <a href="https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine">power status</a> of the virtual machine.</p>
+<p><a href="https://kubevirt.io/api-reference/master/definitions.html">.spec.runStrategy</a> controls whether and when the associated VirtualMachineInstance object is created. In other words this controls the <a href="https://kubevirt.io/user-guide/virtual_machines/lifecycle/#stopping-a-virtual-machine">power status</a> of the virtual machine.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  running: true
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  runStrategy: Always
 </code></pre></div></div>
 
-<p>This will create a <code class="language-plaintext highlighter-rouge">VirtualMachine</code> object which will instantiate and power on a virtual machine.</p>
+<p>This will create a <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> object which will instantiate and power on a virtual machine.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":true }}' -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"runStrategy": "Always"}}' -n nodejs-ex
 </code></pre></div></div>
 
-<p>This will delete the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> object which will power off the virtual machine.</p>
+<p>This will delete the <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code> object which will power off the virtual machine.</p>
 
-<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"running":false }}' -n nodejs-ex
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl patch offlinevirtualmachine mongodb --type merge -p '{"spec":{"runStrategy": "Halted"}}' -n nodejs-ex
 </code></pre></div></div>
 
 <p>And if you would rather not have to remember the <code class="language-plaintext highlighter-rouge">kubectl patch</code> command above

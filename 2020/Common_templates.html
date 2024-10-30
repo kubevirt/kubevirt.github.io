@@ -310,7 +310,7 @@ There are two ways to install and configure templates:</p>
 
 <p>An alternative way to start the VM is with the oc patch command. Example:</p>
 
-<p><code class="language-plaintext highlighter-rouge">$ oc patch virtualmachine rheltinyvm --type merge -p '{"spec":{"running":true}}'</code></p>
+<p><code class="language-plaintext highlighter-rouge">$ oc patch virtualmachine rheltinyvm --type merge -p '{"spec":{"runStrategy":"Always"}}'</code></p>
 
 <p>As soon as VM starts, openshift creates a new type of object - <code class="language-plaintext highlighter-rouge">VirtualMachineInstance</code>. It has a similar name to VirtualMachine.</p>
 

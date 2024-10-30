@@ -412,7 +412,7 @@ preventing OVN-Kubernetes from assigning that IP address to the workloads.</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-server</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -460,7 +460,7 @@ preventing OVN-Kubernetes from assigning that IP address to the workloads.</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-client</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -650,7 +650,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-red-1</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -698,7 +698,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-red-2</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -746,7 +746,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-blue-1</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -794,7 +794,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-blue-2</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>

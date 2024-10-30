@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-10-15T10:12:51+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2024-10-30T13:11:13+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
 
 <h2 id="what-is-kubevirt-summit">What is KubeVirt Summit?</h2>
 
@@ -423,7 +423,7 @@ kind: VirtualMachine
 metadata:
   name: testvm
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       domain:
@@ -1000,7 +1000,7 @@ a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
     <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm1</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm1</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">labels</span><span class="pi">:</span>
@@ -1054,7 +1054,7 @@ a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
     <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm2</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm2</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">labels</span><span class="pi">:</span>
@@ -1108,7 +1108,7 @@ a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
     <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm3</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm3</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">labels</span><span class="pi">:</span>
@@ -1162,7 +1162,7 @@ a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
     <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm4</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm4</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">labels</span><span class="pi">:</span>
@@ -1216,7 +1216,7 @@ a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
     <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm5</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm5</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">labels</span><span class="pi">:</span>
@@ -1270,7 +1270,7 @@ a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
     <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm6</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm6</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">labels</span><span class="pi">:</span>
@@ -1667,7 +1667,7 @@ preventing OVN-Kubernetes from assigning that IP address to the workloads.</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-server</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -1715,7 +1715,7 @@ preventing OVN-Kubernetes from assigning that IP address to the workloads.</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-client</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -1905,7 +1905,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-red-1</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -1953,7 +1953,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-red-2</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -2001,7 +2001,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-blue-1</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -2049,7 +2049,7 @@ networks share the same OVS bridge, each on a different VLAN).</p>
 <span class="na">metadata</span><span class="pi">:</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">vm-blue-2</span>
 <span class="na">spec</span><span class="pi">:</span>
-  <span class="na">running</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">nodeSelector</span><span class="pi">:</span>
@@ -2309,7 +2309,7 @@ kind: VirtualMachine
 metadata:
   name: vm-server
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       domain:
@@ -2359,7 +2359,7 @@ kind: VirtualMachine
 metadata:
   name: vm-client
 spec:
-  running: true
+  runStrategy: Always
   template:
     spec:
       domain:
