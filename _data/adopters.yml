@@ -57,3 +57,6 @@ adopters:
   - link: https://puzl.cloud/
     logo: puzl.png
     name: Puzl
+  - link: https://www.spectrocloud.com/solutions/vms-on-kubernetes
+    logo: SpectroCloud.png
+    name: Spectro Cloud
