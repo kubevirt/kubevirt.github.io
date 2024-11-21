@@ -4,19 +4,43 @@ adopters:
   - link: https://www.arm.com
     logo: arm.svg
     name: arm
+  - link: https://www.bytedance.com/en/
+    logo: Bytedance.png
+    name: Bytedance
   - link: https://www.civo.com
     logo: Civo.png
     name: Civo
+  - link: https://www.cloudflare.com/
+    logo: CLOUDFLARE.png
+    name: Cloudflare
+  - link: https://cloudraft.io/
+    logo: CloudRaft.png
+    name: CloudRaft
   - link: https://www.coreweave.com
     logo: CoreWeave.png
     name: CoreWeave
+  - link: https://genesiscloud.com/
+    logo: GenesisCloud.png
+    name: Genesis Cloud
+  - link: https://habana.ai/
+    logo: IntelGaudi.png
+    name: Intel Gaudi
   - link: https://killercoda.com
     logo: Killercoda.svg
     name: Killercoda
+  - link: https://training.linuxfoundation.org/
+    logo: TheLinuxFoundationTrainingandCertification.png
+    name: The Linux Foundation - Training and Certification
   - link: https://www.nvidia.com
     logo: NVIDIA.png
     name: NVIDIA
+  - link: https://www.s3ns.io/en
+    logo: S3NS.svg
+    name: S3NS
   integrations:
+  - link: https://docs.kasten.io/latest/usage/openshift_virtualization.html?highlight=kubevirt
+    logo: KastenbyVeeam.png
+    name: Kasten by Veeam
   - link: https://minikube.sigs.k8s.io
     logo: minikube.png
     name: minikube
@@ -29,10 +53,19 @@ adopters:
   - link: https://github.com/project-flotta/osbuild-operator
     logo: osbuildoperator.png
     name: osbuild-operator
+  - link: https://www.pitsdatarecovery.net/
+    logo: PITSGlobalDataRecoveryServices.svg
+    name: PITS Global Data Recovery Services
   - link: https://trilio.io/
     logo: Trilio.svg
     name: Trilio
   vendors:
+  - link: https://aenix.io/
+    logo: nix.png
+    name: "\xC6nix"
+  - link: https://www.alauda.io/
+    logo: Alauda.png
+    name: Alauda
   - link: https://deckhouse.io/
     logo: Deckhouse.svg
     name: Deckhouse
@@ -45,15 +78,30 @@ adopters:
   - link: https://www.kubermatic.com/products/kubevirt/
     logo: KUBERMATIC.png
     name: KUBERMATIC
+  - link: https://kubesphere.cloud/en/ksv/
+    logo: KUBESPHERE.svg
+    name: KUBESPHERE
+  - link: https://www.microsoft.com/
+    logo: Microsoft.png
+    name: Microsoft
+  - link: https://www.ncrvoyix.com/
+    logo: NCRVoyix.svg
+    name: NCR Voyix
+  - link: https://www.oracle.com
+    logo: Oracle.png
+    name: Oracle
   - link: https://platform9.com/managed-kubevirt/
     logo: PLATFORM9.png
     name: PLATFORM9
-  - link: https://www.redhat.com
-    logo: RedHatInc.png
-    name: Red Hat, Inc.
-  - link: https://www.suse.com/
-    logo: SUSE.png
-    name: SUSE
   - link: https://puzl.cloud/
     logo: puzl.png
     name: Puzl
+  - link: https://www.redhat.com
+    logo: RedHatInc.png
+    name: Red Hat, Inc.
+  - link: https://www.spectrocloud.com/solutions/vms-on-kubernetes
+    logo: SpectroCloud.png
+    name: Spectro Cloud
+  - link: https://www.suse.com/
+    logo: SUSE.png
+    name: SUSE
