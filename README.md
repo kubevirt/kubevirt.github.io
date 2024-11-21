@@ -234,6 +234,17 @@ Targets:
 * `status`: Basically `${BUILD_ENGINE} ps` for an easy way to see what's running.
 * `stop`: Stop container and app
 
+## Adopters
+
+If you are a KubeVirt adopter and want to see your logo on the website:
+
+1. Ensure that you have added yourself to our [adopters file](https://github.com/kubevirt/kubevirt/blob/main/ADOPTERS.md) in the kubevirt/kubevirt repo. There are three [adopter types](https://github.com/kubevirt/kubevirt/blob/main/ADOPTERS.md#adopter-types) and each list is alphabetical. The PR needs to be merged before you can open the PR to add your logo here.
+1. Open a branch of this repo and add your logo in `assets/images/adopters` in either png or svg format.
+1. In the same branch, run the `_data/adopters.py` script from within the `_data` folder. This script checks our ADOPTERS file in kubevirt/kubevirt and automatically updates the associated adopters file in our website code with your logo.
+1. (Optional but good practice) [Test your changes](https://github.com/kubevirt/kubevirt.github.io?tab=readme-ov-file#test-work) by building a local copy of the website.
+1. Open a PR to merge your branch in the repo. There should be two files changed: a new file for your logo and the edited `adopters.yml` file in `_data`.
+1. Feel free to ping your reviewers if they have not responded in a week or two.  
+
 ## Getting Help
 
 * Mailing list: https://groups.google.com/g/kubevirt-dev
