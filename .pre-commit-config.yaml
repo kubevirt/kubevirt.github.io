@@ -51,7 +51,7 @@ repos:
     args:
     - --indent=4
 - repo: https://github.com/asottile/blacken-docs
-  rev:  master
+  rev:  main
   hooks:
   - id: blacken-docs
 - repo: https://github.com/hcodes/yaspeller.git
