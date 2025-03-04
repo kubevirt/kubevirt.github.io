@@ -1,4 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-03-04T12:16:38+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.4.0</title><link href="https://kubevirt.io//2024/changelog-v1.4.0.html" rel="alternate" type="text/html" title="KubeVirt v1.4.0" /><published>2024-11-13T00:00:00+00:00</published><updated>2024-11-13T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.4.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.4.0.html"><![CDATA[<h2 id="v140">v1.4.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-03-04T12:21:16+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">VirtualMachineInstanceMigrations RBAC hardening</title><link href="https://kubevirt.io//2025/Hardening-VMIM.html" rel="alternate" type="text/html" title="VirtualMachineInstanceMigrations RBAC hardening" /><published>2025-02-26T00:00:00+00:00</published><updated>2025-02-26T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Hardening-VMIM</id><content type="html" xml:base="https://kubevirt.io//2025/Hardening-VMIM.html"><![CDATA[<h3 id="context">Context</h3>
+<p>The request to live migrate a VM is represented by a <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceMigration</code> instance.
+A VirtualMachineInstanceMigration (VMIM) is a namespaced CRD, and its instances are expected to be in the namespace of the VM they refer to.</p>
+
+<p>Up to KubeVirt v1.4, by default, a namespace admin (usually a namespace “owner” in a less formal definition) was able to create VMs and also VMIM objects to enqueue a live migration request for a VM within their namespace.
+At the same time, live migrations can be triggered as part of critical infrastructure operations like node drains or upgrades, which are the domain of cluster admins. <br />
+So, if namespace admins can continuously enqueue migration requests or delete scheduled VMIM objects needed for ongoing infrastructure-critical operations, they could delay or even prevent cluster-critical operations started by cluster admins, a role with greater privileges.</p>
+
+<p>It was therefore possible that a malicious, lesser-privileged user could abuse this, causing a kind of DoS at the cluster level.
+Even worse, Kubernetes RBAC permissions are purely additive (there are no “deny” rules), and KubeVirt roles are constantly reconciled by the virt-operator, so even a cluster admin who was aware of the issue was unable to deny these permissions as a precautionary measure.</p>
+
+<p>For this reason, starting from KubeVirt v1.5, create/delete/update rights will no longer be granted by default to all namespace admins, in accordance with the principle of least privilege.
+A new convenient ClusterRole named <code class="language-plaintext highlighter-rouge">kubevirt.io:migrate</code> has been introduced to allow cluster admins to easily grant this permission to selected users.</p>
+
+<h3 id="side-effects-on-hotplug-operations">Side effects on hotplug operations</h3>
+<p>Device hotplug operations, at least for CPU and memory, implicitly trigger a live migration executed by the virt-controller on behalf of the user. These operations will not be affected by this change. Under some circumstances or cluster configurations, live migrations are not automatically triggered when NIC devices are hotplugged. In such cases, the only option for namespace admins is to request VMIM permissions from a cluster admin to manually trigger the migration or concatenate two device hotplug operations (where the second one will implicitly complete the NIC hotplug).</p>
+
+<h3 id="cluster-admin-tasks">Cluster-admin tasks</h3>
+<p>A cluster admin can bind the new kubevirt.io:migrate ClusterRole to selected trusted users/groups at the namespace scope using:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-n</span> usernamespace rolebinding kvmigrate <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:migrate <span class="nt">--user</span><span class="o">=</span>user1 <span class="nt">--user</span><span class="o">=</span>user2 <span class="nt">--group</span><span class="o">=</span>group1
+</code></pre></div></div>
+<p>or at the cluster scope:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create clusterrolebinding kvmigrate <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:migrate <span class="nt">--user</span><span class="o">=</span>user1 <span class="nt">--user</span><span class="o">=</span>user2 <span class="nt">--group</span><span class="o">=</span>group1
+</code></pre></div></div>
+
+<p>A cluster admin can also restore the previous behavior (where all namespace admins are allowed to manage migrations) with:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl label <span class="nt">--overwrite</span> clusterrole kubevirt.io:migrate rbac.authorization.k8s.io/aggregate-to-admin<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>A highly cautious cluster admin who does not want any disruption due to the upgrade process could still create a temporary ClusterRole for migration before the upgrade, labeling it with <code class="language-plaintext highlighter-rouge">rbac.authorization.k8s.io/aggregate-to-admin=true</code>.
+For example:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">rbac.authorization.k8s.io/aggregate-to-admin=true</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt.io:upgrademigrate</span>
+<span class="na">rules</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">apiGroups</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">subresources.kubevirt.io</span>
+  <span class="na">resources</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">virtualmachines/migrate</span>
+  <span class="na">verbs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">update</span>
+<span class="pi">-</span> <span class="na">apiGroups</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">kubevirt.io</span>
+  <span class="na">resources</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">virtualmachineinstancemigrations</span>
+  <span class="na">verbs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">get</span>
+  <span class="pi">-</span> <span class="s">delete</span>
+  <span class="pi">-</span> <span class="s">create</span>
+  <span class="pi">-</span> <span class="s">update</span>
+  <span class="pi">-</span> <span class="s">patch</span>
+  <span class="pi">-</span> <span class="s">list</span>
+  <span class="pi">-</span> <span class="s">watch</span>
+  <span class="pi">-</span> <span class="s">deletecollection</span>
+</code></pre></div></div>
+<p>This ClusterRole will be aggregated into the <code class="language-plaintext highlighter-rouge">admin</code> role before the KubeVirt upgrade, and the upgrade process will not modify it, ensuring the previous behavior is maintained.
+After the upgrade, the cluster admin will have sufficient time to bind the new <code class="language-plaintext highlighter-rouge">kubevirt.io:migrate</code> ClusterRole to selected users before removing the temporary ClusterRole.</p>]]></content><author><name>tiraboschi</name></author><category term="news" /><category term="VMIM" /><category term="migrate" /><category term="migrations" /><category term="RBAC" /><category term="hardening" /><category term="security" /><category term="v1.5" /><summary type="html"><![CDATA[Apply the principle of least privilege (PoLP) to VirtualMachineInstanceMigrations]]></summary></entry><entry><title type="html">KubeVirt v1.4.0</title><link href="https://kubevirt.io//2024/changelog-v1.4.0.html" rel="alternate" type="text/html" title="KubeVirt v1.4.0" /><published>2024-11-13T00:00:00+00:00</published><updated>2024-11-13T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.4.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.4.0.html"><![CDATA[<h2 id="v140">v1.4.0</h2>
 
 <p>Released on: Wed Nov 13 08:14:06 2024 +0000</p>
 
@@ -1307,590 +1366,4 @@ kubectl create secret generic my-pub-key <span class="nt">--from-file</span><spa
 
 <p>Interested in learning more, providing feedback or contributing? Head over to the <code class="language-plaintext highlighter-rouge">kubevirt.core</code> GitHub repository to continue your journey and get involved.</p>
 
-<p><a href="https://github.com/kubevirt/kubevirt.core">https://github.com/kubevirt/kubevirt.core</a></p>]]></content><author><name>Felix Matouschek, Andrew Block</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Ansible" /><category term="ansible collection" /><category term="kubevirt.core" /><category term="iac" /><summary type="html"><![CDATA[This post explains how to manage KubeVirt VMs with the kubevirt.core Ansible collection.]]></summary></entry><entry><title type="html">NetworkPolicies for KubeVirt VMs secondary networks using OVN-Kubernetes</title><link href="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-policies.html" rel="alternate" type="text/html" title="NetworkPolicies for KubeVirt VMs secondary networks using OVN-Kubernetes" /><published>2023-07-24T00:00:00+00:00</published><updated>2023-07-24T00:00:00+00:00</updated><id>https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-policies</id><content type="html" xml:base="https://kubevirt.io//2023/OVN-kubernetes-secondary-networks-policies.html"><![CDATA[<h2 id="introduction">Introduction</h2>
-<p>Kubernetes <a href="https://kubernetes.io/docs/concepts/services-networking/network-policies/">NetworkPolicies</a> are constructs to control traffic flow at the IP
-address or port level (OSI layers 3 or 4).
-They allow the user to specify how a pod (or group of pods) is allowed to
-communicate with other entities on the network. In simpler words: the user can
-specify ingress from or egress to other workloads, using L3 / L4 semantics.</p>
-
-<p>Keeping in mind <code class="language-plaintext highlighter-rouge">NetworkPolicy</code> is a Kubernetes construct - which only cares
-about a single network interface - they are only usable for the cluster’s
-default network interface. This leaves a considerable gap for Virtual Machine
-users, since they are heavily invested in secondary networks.</p>
-
-<p>The <a href="https://github.com/k8snetworkplumbingwg">k8snetworkplumbingwg</a> has addressed this limitation by providing a
-<code class="language-plaintext highlighter-rouge">MultiNetworkPolicy</code> CRD - it features the exact same API as <code class="language-plaintext highlighter-rouge">NetworkPolicy</code>
-but can target <a href="https://github.com/k8snetworkplumbingwg/multus-cni/blob/master/docs/how-to-use.md#create-network-attachment-definition">network-attachment-definitions</a>.
-<a href="https://github.com/ovn-org/ovn-kubernetes">OVN-Kubernetes</a> implements this API, and configures access control accordingly
-for secondary networks in the cluster.</p>
-
-<p>In this post we will see how we can govern access control for VMs using the
-multi-network policy API. On our simple example, we’ll only allow into our VMs
-for traffic ingressing from a particular CIDR range.</p>
-
-<h2 id="current-limitations-of-multinetworkpolicies-for-vms">Current limitations of <code class="language-plaintext highlighter-rouge">MultiNetworkPolicies</code> for VMs</h2>
-<p>Kubernetes <code class="language-plaintext highlighter-rouge">NetworkPolicy</code> has three types of policy peers:</p>
-<ul>
-  <li>namespace selectors: allows ingress-from, egress-to based on the peer’s namespace labels</li>
-  <li>pod selectors: allows ingress-from, egress-to based on the peer’s labels</li>
-  <li>ip block: allows ingress-from, egress-to based on the peer’s IP address</li>
-</ul>
-
-<p>While <code class="language-plaintext highlighter-rouge">MultiNetworkPolicy</code> allows these three types, when used with VMs we
-recommend using <strong>only</strong> the <code class="language-plaintext highlighter-rouge">IPBlock</code> policy peer - both <code class="language-plaintext highlighter-rouge">namespace</code> and <code class="language-plaintext highlighter-rouge">pod</code>
-selectors prevent the live-migration of Virtual Machines (these policy peers
-require OVN-K managed IPAM, and currently the live-migration feature is only
-available when IPAM is not enabled on the interfaces).</p>
-
-<h2 id="demo">Demo</h2>
-<p>To run this demo, we will prepare a Kubernetes cluster with the following
-components installed:</p>
-<ul>
-  <li><a href="https://github.com/ovn-org/ovn-kubernetes">OVN-Kubernetes</a></li>
-  <li><a href="https://github.com/k8snetworkplumbingwg/multus-cni">multus-cni</a></li>
-  <li><a href="https://github.com/kubevirt/kubevirt">KubeVirt</a></li>
-  <li><a href="https://github.com/k8snetworkplumbingwg/multi-networkpolicy">Multi-Network policy API</a></li>
-</ul>
-
-<p>The <a href="#setup-demo-environment">following section</a> will show you how to create a
-<a href="https://kind.sigs.k8s.io/">KinD</a> cluster, with upstream latest OVN-Kubernetes,
-upstream latest multus-cni, and the multi-network policy CRDs deployed.</p>
-
-<h3 id="setup-demo-environment">Setup demo environment</h3>
-<p>Refer to the OVN-Kubernetes repo
-<a href="https://github.com/ovn-org/ovn-kubernetes/blob/master/docs/kind.md#ovn-kubernetes-kind-setup">KIND documentation</a>
-for more details; the gist of it is you should clone the OVN-Kubernetes
-repository, and run their kind helper script:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>git clone git@github.com:ovn-org/ovn-kubernetes.git
-
-<span class="nb">cd </span>ovn-kubernetes
-<span class="nb">pushd </span>contrib <span class="p">;</span> ./kind.sh <span class="nt">--multi-network-enable</span> <span class="p">;</span> <span class="nb">popd</span>
-</code></pre></div></div>
-
-<p>This will get you a running kind cluster (one control plane, and two worker
-nodes), configured to use OVN-Kubernetes as the default cluster network,
-configuring the multi-homing OVN-Kubernetes feature gate, and deploying
-<code class="language-plaintext highlighter-rouge">multus-cni</code> in the cluster.</p>
-
-<h3 id="install-kubevirt-in-the-cluster">Install KubeVirt in the cluster</h3>
-<p>Follow Kubevirt’s
-<a href="https://kubevirt.io/user-guide/operations/installation/#installing-kubevirt-on-kubernetes">user guide</a>
-to install the latest released version (currently, v1.0.0).</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">RELEASE</span><span class="o">=</span><span class="si">$(</span>curl https://storage.googleapis.com/kubevirt-prow/release/kubevirt/kubevirt/stable.txt<span class="si">)</span>
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-operator.yaml"</span>
-kubectl apply <span class="nt">-f</span> <span class="s2">"https://github.com/kubevirt/kubevirt/releases/download/</span><span class="k">${</span><span class="nv">RELEASE</span><span class="k">}</span><span class="s2">/kubevirt-cr.yaml"</span>
-kubectl <span class="nt">-n</span> kubevirt <span class="nb">wait </span>kv kubevirt <span class="nt">--timeout</span><span class="o">=</span>360s <span class="nt">--for</span> <span class="nv">condition</span><span class="o">=</span>Available
-</code></pre></div></div>
-
-<p>Now we have a Kubernetes cluster with all the pieces to start the Demo.</p>
-
-<h3 id="limiting-ingress-to-a-kubevirt-vm">Limiting ingress to a KubeVirt VM</h3>
-<p>In this example, we will configure a <code class="language-plaintext highlighter-rouge">MultiNetworkPolicy</code> allowing ingress into
-our VMs only from a particular CIDR range - let’s say <code class="language-plaintext highlighter-rouge">10.200.0.0/30</code>.</p>
-
-<p>Provision the following NAD (to allow our VMs to live-migrate, we do not define
-a <code class="language-plaintext highlighter-rouge">subnet</code>):</p>
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">k8s.cni.cncf.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">NetworkAttachmentDefinition</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2net</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">config</span><span class="pi">:</span> <span class="pi">|2</span>
-    <span class="s">{</span>
-            <span class="s">"cniVersion": "0.4.0",</span>
-            <span class="s">"name": "flatl2net",</span>
-            <span class="s">"type": "ovn-k8s-cni-overlay",</span>
-            <span class="s">"topology":"layer2",</span>
-            <span class="s">"netAttachDefName": "default/flatl2net"</span>
-    <span class="s">}</span>
-</code></pre></div></div>
-
-<p>Let’s now provision our six VMs, with the following name to IP address
-(statically configured via cloud-init) association:</p>
-<ul>
-  <li>vm1: 10.200.0.1</li>
-  <li>vm2: 10.200.0.2</li>
-  <li>vm3: 10.200.0.3</li>
-  <li>vm4: 10.200.0.4</li>
-  <li>vm5: 10.200.0.5</li>
-  <li>vm6: 10.200.0.6</li>
-</ul>
-
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm1</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">vm1</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">access-control</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">vm1</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm1</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-          <span class="na">rng</span><span class="pi">:</span> <span class="pi">{}</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024Mi</span>
-      <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">multus</span><span class="pi">:</span>
-          <span class="na">networkName</span><span class="pi">:</span> <span class="s">flatl2net</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-      <span class="na">termination/GracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.0.0</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">ethernets:</span>
-              <span class="s">eth0:</span>
-                <span class="s">addresses:</span>
-                <span class="s">- 10.200.0.1/24</span>
-            <span class="s">version: 2</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">user: fedora</span>
-            <span class="s">password: password</span>
-            <span class="s">chpasswd: { expire: False }</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-<span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm2</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">vm2</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">access-control</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">vm2</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm2</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-          <span class="na">rng</span><span class="pi">:</span> <span class="pi">{}</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024Mi</span>
-      <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">multus</span><span class="pi">:</span>
-          <span class="na">networkName</span><span class="pi">:</span> <span class="s">flatl2net</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-      <span class="na">termination/GracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.0.0</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">ethernets:</span>
-              <span class="s">eth0:</span>
-                <span class="s">addresses:</span>
-                <span class="s">- 10.200.0.2/24</span>
-            <span class="s">version: 2</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">user: fedora</span>
-            <span class="s">password: password</span>
-            <span class="s">chpasswd: { expire: False }</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-<span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm3</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">vm3</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">access-control</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">vm3</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm3</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-          <span class="na">rng</span><span class="pi">:</span> <span class="pi">{}</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024Mi</span>
-      <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">multus</span><span class="pi">:</span>
-          <span class="na">networkName</span><span class="pi">:</span> <span class="s">flatl2net</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-      <span class="na">termination/GracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.0.0</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">ethernets:</span>
-              <span class="s">eth0:</span>
-                <span class="s">addresses:</span>
-                <span class="s">- 10.200.0.3/24</span>
-            <span class="s">version: 2</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">user: fedora</span>
-            <span class="s">password: password</span>
-            <span class="s">chpasswd: { expire: False }</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-<span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm4</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">vm4</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">access-control</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">vm4</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm4</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-          <span class="na">rng</span><span class="pi">:</span> <span class="pi">{}</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024Mi</span>
-      <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">multus</span><span class="pi">:</span>
-          <span class="na">networkName</span><span class="pi">:</span> <span class="s">flatl2net</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-      <span class="na">termination/GracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.0.0</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">ethernets:</span>
-              <span class="s">eth0:</span>
-                <span class="s">addresses:</span>
-                <span class="s">- 10.200.0.4/24</span>
-            <span class="s">version: 2</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">user: fedora</span>
-            <span class="s">password: password</span>
-            <span class="s">chpasswd: { expire: False }</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-<span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm5</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">vm5</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">access-control</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">vm5</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm5</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-          <span class="na">rng</span><span class="pi">:</span> <span class="pi">{}</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024Mi</span>
-      <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">multus</span><span class="pi">:</span>
-          <span class="na">networkName</span><span class="pi">:</span> <span class="s">flatl2net</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-      <span class="na">termination/GracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.0.0</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">ethernets:</span>
-              <span class="s">eth0:</span>
-                <span class="s">addresses:</span>
-                <span class="s">- 10.200.0.5/24</span>
-            <span class="s">version: 2</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">user: fedora</span>
-            <span class="s">password: password</span>
-            <span class="s">chpasswd: { expire: False }</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-<span class="nn">---</span>
-<span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
-<span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
-<span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">labels</span><span class="pi">:</span>
-    <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm6</span>
-  <span class="na">name</span><span class="pi">:</span> <span class="s">vm6</span>
-<span class="na">spec</span><span class="pi">:</span>
-  <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Always</span>
-  <span class="na">template</span><span class="pi">:</span>
-    <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">labels</span><span class="pi">:</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">access-control</span>
-        <span class="na">kubevirt.io/domain</span><span class="pi">:</span> <span class="s">vm6</span>
-        <span class="na">kubevirt.io/vm</span><span class="pi">:</span> <span class="s">vm6</span>
-    <span class="na">spec</span><span class="pi">:</span>
-      <span class="na">domain</span><span class="pi">:</span>
-        <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">disks</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-          <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
-              <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-          <span class="na">interfaces</span><span class="pi">:</span>
-          <span class="pi">-</span> <span class="na">bridge</span><span class="pi">:</span> <span class="pi">{}</span>
-            <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-          <span class="na">rng</span><span class="pi">:</span> <span class="pi">{}</span>
-        <span class="na">resources</span><span class="pi">:</span>
-          <span class="na">requests</span><span class="pi">:</span>
-            <span class="na">memory</span><span class="pi">:</span> <span class="s">1024Mi</span>
-      <span class="na">networks</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">multus</span><span class="pi">:</span>
-          <span class="na">networkName</span><span class="pi">:</span> <span class="s">flatl2net</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">flatl2-overlay</span>
-      <span class="na">termination/GracePeriodSeconds</span><span class="pi">:</span> <span class="m">30</span>
-      <span class="na">volumes</span><span class="pi">:</span>
-      <span class="pi">-</span> <span class="na">containerDisk</span><span class="pi">:</span>
-          <span class="na">image</span><span class="pi">:</span> <span class="s">quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.0.0</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">containerdisk</span>
-      <span class="pi">-</span> <span class="na">cloudInitNoCloud</span><span class="pi">:</span>
-          <span class="na">networkData</span><span class="pi">:</span> <span class="pi">|</span>
-            <span class="s">ethernets:</span>
-              <span class="s">eth0:</span>
-                <span class="s">addresses:</span>
-                <span class="s">- 10.200.0.6/24</span>
-            <span class="s">version: 2</span>
-          <span class="na">userData</span><span class="pi">:</span> <span class="pi">|-</span>
-            <span class="s">#cloud-config</span>
-            <span class="s">user: fedora</span>
-            <span class="s">password: password</span>
-            <span class="s">chpasswd: { expire: False }</span>
-        <span class="na">name</span><span class="pi">:</span> <span class="s">cloudinitdisk</span>
-</code></pre></div></div>
-<p><strong>NOTE:</strong> it is important to highlight all the Virtual Machines (and the
-<code class="language-plaintext highlighter-rouge">network-attachment-definition</code>) are defined in the <code class="language-plaintext highlighter-rouge">default</code> namespace.</p>
-
-<p>After this step, we should have the following deployment:</p>
-
-<p><img src="/assets/2023-07-10-OVN-kubernetes-secondary-networks-policies/01-vms-provisioned.png" alt="image" /></p>
-
-<p>Let’s check the VMs <code class="language-plaintext highlighter-rouge">vm1</code> and <code class="language-plaintext highlighter-rouge">vm4</code> can ping their peers in the same subnet.
-For that we will
-<a href="https://kubevirt.io/user-guide/virtual_machines/accessing_virtual_machines/#accessing-the-serial-console">connect to the VMs over their serial console</a>:</p>
-
-<p>First, let’s check <code class="language-plaintext highlighter-rouge">vm1</code>:</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>➜  virtctl console vm1
-Successfully connected to vm1 console. The escape sequence is ^]
-
-<span class="o">[</span>fedora@vm1 ~]<span class="nv">$ </span>ping 10.200.0.2 <span class="nt">-c</span> 4
-PING 10.200.0.2 <span class="o">(</span>10.200.0.2<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>5.16 ms
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.41 ms
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>34.2 ms
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>2.56 ms
-
-<span class="nt">---</span> 10.200.0.2 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3005ms
-rtt min/avg/max/mdev <span class="o">=</span> 1.406/10.841/34.239/13.577 ms
-<span class="o">[</span>fedora@vm1 ~]<span class="nv">$ </span>ping 10.200.0.6 <span class="nt">-c</span> 4
-PING 10.200.0.6 <span class="o">(</span>10.200.0.6<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>3.77 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.46 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>5.47 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.74 ms
-
-<span class="nt">---</span> 10.200.0.6 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3007ms
-rtt min/avg/max/mdev <span class="o">=</span> 1.459/3.109/5.469/1.627 ms
-<span class="o">[</span>fedora@vm1 ~]<span class="nv">$ </span>
-</code></pre></div></div>
-
-<p>And from vm4:</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>➜  ~ virtctl console vm4
-Successfully connected to vm4 console. The escape sequence is ^]
-
-<span class="o">[</span>fedora@vm4 ~]<span class="nv">$ </span>ping 10.200.0.1 <span class="nt">-c</span> 4
-PING 10.200.0.1 <span class="o">(</span>10.200.0.1<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 10.200.0.1: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>3.20 ms
-64 bytes from 10.200.0.1: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.62 ms
-64 bytes from 10.200.0.1: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.44 ms
-64 bytes from 10.200.0.1: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.951 ms
-
-<span class="nt">---</span> 10.200.0.1 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3006ms
-rtt min/avg/max/mdev <span class="o">=</span> 0.951/1.803/3.201/0.843 ms
-<span class="o">[</span>fedora@vm4 ~]<span class="nv">$ </span>ping 10.200.0.6 <span class="nt">-c</span> 4
-PING 10.200.0.6 <span class="o">(</span>10.200.0.6<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.85 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.02 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.27 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>0.970 ms
-
-<span class="nt">---</span> 10.200.0.6 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3005ms
-rtt min/avg/max/mdev <span class="o">=</span> 0.970/1.275/1.850/0.350 ms
-</code></pre></div></div>
-
-<p>We will now provision a <code class="language-plaintext highlighter-rouge">MultiNetworkPolicy</code> applying to all the VMs defined
-above. To do this mapping correcly, the policy has to:</p>
-<ul>
-  <li>Be in the same namespace as the VM.</li>
-  <li>Set <code class="language-plaintext highlighter-rouge">k8s.v1.cni.cncf.io/policy-for</code> annotation matching the secondary 
-network used by the VM.</li>
-  <li>Set <code class="language-plaintext highlighter-rouge">matchLabels</code> selector matching the labels set on VM’s
-<code class="language-plaintext highlighter-rouge">spec.template.metadata</code>.</li>
-</ul>
-
-<p>This policy will allow ingress into these <code class="language-plaintext highlighter-rouge">access-control</code> labeled pods 
-<strong>only if</strong> the traffic originates from within the <code class="language-plaintext highlighter-rouge">10.200.0.0/30</code> CIDR range
-(IPs 10.200.0.1-3).</p>
-
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nt">---</span>
-apiVersion: k8s.cni.cncf.io/v1beta1
-kind: MultiNetworkPolicy
-metadata:
-  name:  ingress-ipblock
-  annotations:
-    k8s.v1.cni.cncf.io/policy-for: default/flatl2net
-spec:
-  podSelector:
-    matchLabels:
-        name: access-control
-  policyTypes:
-  - Ingress
-  ingress:
-  - from:
-    - ipBlock:
-        cidr: 10.200.0.0/30
-</code></pre></div></div>
-
-<p>Taking into account our example, only
-<code class="language-plaintext highlighter-rouge">vm1</code>, <code class="language-plaintext highlighter-rouge">vm2</code>, and <code class="language-plaintext highlighter-rouge">vm3</code> will be able to contact any of its peers, as pictured
-by the following diagram:</p>
-
-<p><img src="/assets/2023-07-10-OVN-kubernetes-secondary-networks-policies/02-no-access.png" alt="MultiNetworkPolicy is provisioned" /></p>
-
-<p>Let’s try again the ping after provisioning the <code class="language-plaintext highlighter-rouge">MultiNetworkPolicy</code> object:</p>
-
-<p>From <code class="language-plaintext highlighter-rouge">vm1</code> (inside the allowed ip block range):</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>fedora@vm1 ~]<span class="nv">$ </span>ping 10.200.0.2 <span class="nt">-c</span> 4
-PING 10.200.0.2 <span class="o">(</span>10.200.0.2<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>6.48 ms
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>4.40 ms
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.28 ms
-64 bytes from 10.200.0.2: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.51 ms
-
-<span class="nt">---</span> 10.200.0.2 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3006ms
-rtt min/avg/max/mdev <span class="o">=</span> 1.283/3.418/6.483/2.154 ms
-<span class="o">[</span>fedora@vm1 ~]<span class="nv">$ </span>ping 10.200.0.6 <span class="nt">-c</span> 4
-PING 10.200.0.6 <span class="o">(</span>10.200.0.6<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>1 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>3.81 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>2 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>2.67 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>3 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.68 ms
-64 bytes from 10.200.0.6: <span class="nv">icmp_seq</span><span class="o">=</span>4 <span class="nv">ttl</span><span class="o">=</span>64 <span class="nb">time</span><span class="o">=</span>1.63 ms
-
-<span class="nt">---</span> 10.200.0.6 ping statistics <span class="nt">---</span>
-4 packets transmitted, 4 received, 0% packet loss, <span class="nb">time </span>3006ms
-rtt min/avg/max/mdev <span class="o">=</span> 1.630/2.446/3.808/0.888 ms
-</code></pre></div></div>
-
-<p>From <code class="language-plaintext highlighter-rouge">vm4</code> (<strong>outside</strong> the allowed ip block range):</p>
-<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="o">[</span>fedora@vm4 ~]<span class="nv">$ </span>ping 10.200.0.1 <span class="nt">-c</span> 4
-PING 10.200.0.1 <span class="o">(</span>10.200.0.1<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-
-<span class="nt">---</span> 10.200.0.1 ping statistics <span class="nt">---</span>
-4 packets transmitted, 0 received, 100% packet loss, <span class="nb">time </span>3083ms
-
-<span class="o">[</span>fedora@vm4 ~]<span class="nv">$ </span>ping 10.200.0.6 <span class="nt">-c</span> 4
-PING 10.200.0.6 <span class="o">(</span>10.200.0.6<span class="o">)</span> 56<span class="o">(</span>84<span class="o">)</span> bytes of data.
-
-<span class="nt">---</span> 10.200.0.6 ping statistics <span class="nt">---</span>
-4 packets transmitted, 0 received, 100% packet loss, <span class="nb">time </span>3089ms
-</code></pre></div></div>
-
-<h2 id="conclusions">Conclusions</h2>
-<p>In this post we’ve shown how <code class="language-plaintext highlighter-rouge">MultiNetworkPolicies</code> can be used to provide
-access control to VMs with secondary network interfaces.</p>
-
-<p>We have provided a comprehensive example on how a policy can be used to limit
-ingress to our VMs only from desired sources, based on the client’s IP address.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><category term="NetworkPolicy" /><summary type="html"><![CDATA[This post explains how to configure NetworkPolicies for KubeVirt VMs secondary networks.]]></summary></entry></feed>
+<p><a href="https://github.com/kubevirt/kubevirt.core">https://github.com/kubevirt/kubevirt.core</a></p>]]></content><author><name>Felix Matouschek, Andrew Block</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="Ansible" /><category term="ansible collection" /><category term="kubevirt.core" /><category term="iac" /><summary type="html"><![CDATA[This post explains how to manage KubeVirt VMs with the kubevirt.core Ansible collection.]]></summary></entry></feed>

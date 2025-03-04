@@ -1,4 +1,63 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-03-04T12:16:38+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">You wanted more? It’s KubeVirt v1.4!</title><link href="https://kubevirt.io//2024/KubeVirt-v1-4.html" rel="alternate" type="text/html" title="You wanted more? It’s KubeVirt v1.4!" /><published>2024-11-12T00:00:00+00:00</published><updated>2024-11-12T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-v1-4</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-v1-4.html"><![CDATA[<p>The KubeVirt Community is proud to announce the release of <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.4.0">v1.4</a>. This release aligns with <a href="https://kubernetes.io/blog/2024/08/13/kubernetes-v1-31-release/">Kubernetes v1.31</a> and is the sixth KubeVirt release to follow the Kubernetes release cadence.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-03-04T12:21:16+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">VirtualMachineInstanceMigrations RBAC hardening</title><link href="https://kubevirt.io//2025/Hardening-VMIM.html" rel="alternate" type="text/html" title="VirtualMachineInstanceMigrations RBAC hardening" /><published>2025-02-26T00:00:00+00:00</published><updated>2025-02-26T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Hardening-VMIM</id><content type="html" xml:base="https://kubevirt.io//2025/Hardening-VMIM.html"><![CDATA[<h3 id="context">Context</h3>
+<p>The request to live migrate a VM is represented by a <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceMigration</code> instance.
+A VirtualMachineInstanceMigration (VMIM) is a namespaced CRD, and its instances are expected to be in the namespace of the VM they refer to.</p>
+
+<p>Up to KubeVirt v1.4, by default, a namespace admin (usually a namespace “owner” in a less formal definition) was able to create VMs and also VMIM objects to enqueue a live migration request for a VM within their namespace.
+At the same time, live migrations can be triggered as part of critical infrastructure operations like node drains or upgrades, which are the domain of cluster admins. <br />
+So, if namespace admins can continuously enqueue migration requests or delete scheduled VMIM objects needed for ongoing infrastructure-critical operations, they could delay or even prevent cluster-critical operations started by cluster admins, a role with greater privileges.</p>
+
+<p>It was therefore possible that a malicious, lesser-privileged user could abuse this, causing a kind of DoS at the cluster level.
+Even worse, Kubernetes RBAC permissions are purely additive (there are no “deny” rules), and KubeVirt roles are constantly reconciled by the virt-operator, so even a cluster admin who was aware of the issue was unable to deny these permissions as a precautionary measure.</p>
+
+<p>For this reason, starting from KubeVirt v1.5, create/delete/update rights will no longer be granted by default to all namespace admins, in accordance with the principle of least privilege.
+A new convenient ClusterRole named <code class="language-plaintext highlighter-rouge">kubevirt.io:migrate</code> has been introduced to allow cluster admins to easily grant this permission to selected users.</p>
+
+<h3 id="side-effects-on-hotplug-operations">Side effects on hotplug operations</h3>
+<p>Device hotplug operations, at least for CPU and memory, implicitly trigger a live migration executed by the virt-controller on behalf of the user. These operations will not be affected by this change. Under some circumstances or cluster configurations, live migrations are not automatically triggered when NIC devices are hotplugged. In such cases, the only option for namespace admins is to request VMIM permissions from a cluster admin to manually trigger the migration or concatenate two device hotplug operations (where the second one will implicitly complete the NIC hotplug).</p>
+
+<h3 id="cluster-admin-tasks">Cluster-admin tasks</h3>
+<p>A cluster admin can bind the new kubevirt.io:migrate ClusterRole to selected trusted users/groups at the namespace scope using:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create <span class="nt">-n</span> usernamespace rolebinding kvmigrate <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:migrate <span class="nt">--user</span><span class="o">=</span>user1 <span class="nt">--user</span><span class="o">=</span>user2 <span class="nt">--group</span><span class="o">=</span>group1
+</code></pre></div></div>
+<p>or at the cluster scope:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl create clusterrolebinding kvmigrate <span class="nt">--clusterrole</span><span class="o">=</span>kubevirt.io:migrate <span class="nt">--user</span><span class="o">=</span>user1 <span class="nt">--user</span><span class="o">=</span>user2 <span class="nt">--group</span><span class="o">=</span>group1
+</code></pre></div></div>
+
+<p>A cluster admin can also restore the previous behavior (where all namespace admins are allowed to manage migrations) with:</p>
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl label <span class="nt">--overwrite</span> clusterrole kubevirt.io:migrate rbac.authorization.k8s.io/aggregate-to-admin<span class="o">=</span><span class="nb">true</span>
+</code></pre></div></div>
+
+<p>A highly cautious cluster admin who does not want any disruption due to the upgrade process could still create a temporary ClusterRole for migration before the upgrade, labeling it with <code class="language-plaintext highlighter-rouge">rbac.authorization.k8s.io/aggregate-to-admin=true</code>.
+For example:</p>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">rbac.authorization.k8s.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">ClusterRole</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">labels</span><span class="pi">:</span>
+    <span class="s">rbac.authorization.k8s.io/aggregate-to-admin=true</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt.io:upgrademigrate</span>
+<span class="na">rules</span><span class="pi">:</span>
+<span class="pi">-</span> <span class="na">apiGroups</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">subresources.kubevirt.io</span>
+  <span class="na">resources</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">virtualmachines/migrate</span>
+  <span class="na">verbs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">update</span>
+<span class="pi">-</span> <span class="na">apiGroups</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">kubevirt.io</span>
+  <span class="na">resources</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">virtualmachineinstancemigrations</span>
+  <span class="na">verbs</span><span class="pi">:</span>
+  <span class="pi">-</span> <span class="s">get</span>
+  <span class="pi">-</span> <span class="s">delete</span>
+  <span class="pi">-</span> <span class="s">create</span>
+  <span class="pi">-</span> <span class="s">update</span>
+  <span class="pi">-</span> <span class="s">patch</span>
+  <span class="pi">-</span> <span class="s">list</span>
+  <span class="pi">-</span> <span class="s">watch</span>
+  <span class="pi">-</span> <span class="s">deletecollection</span>
+</code></pre></div></div>
+<p>This ClusterRole will be aggregated into the <code class="language-plaintext highlighter-rouge">admin</code> role before the KubeVirt upgrade, and the upgrade process will not modify it, ensuring the previous behavior is maintained.
+After the upgrade, the cluster admin will have sufficient time to bind the new <code class="language-plaintext highlighter-rouge">kubevirt.io:migrate</code> ClusterRole to selected users before removing the temporary ClusterRole.</p>]]></content><author><name>tiraboschi</name></author><category term="news" /><category term="VMIM" /><category term="migrate" /><category term="migrations" /><category term="RBAC" /><category term="hardening" /><category term="security" /><category term="v1.5" /><summary type="html"><![CDATA[Apply the principle of least privilege (PoLP) to VirtualMachineInstanceMigrations]]></summary></entry><entry><title type="html">You wanted more? It’s KubeVirt v1.4!</title><link href="https://kubevirt.io//2024/KubeVirt-v1-4.html" rel="alternate" type="text/html" title="You wanted more? It’s KubeVirt v1.4!" /><published>2024-11-12T00:00:00+00:00</published><updated>2024-11-12T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-v1-4</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-v1-4.html"><![CDATA[<p>The KubeVirt Community is proud to announce the release of <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.4.0">v1.4</a>. This release aligns with <a href="https://kubernetes.io/blog/2024/08/13/kubernetes-v1-31-release/">Kubernetes v1.31</a> and is the sixth KubeVirt release to follow the Kubernetes release cadence.</p>
 
 <p>What’s 1/3 of one thousand? Because that’s how many people have <a href="https://kubevirt.devstats.cncf.io/d/66/developer-activity-counts-by-companies?orgId=1&amp;var-period_name=v1.3.0%20-%20now&amp;var-metric=contributions&amp;var-repogroup_name=All&amp;var-country_name=All&amp;var-companies=All">contributed in some way</a> to this release, with 90 of those 333 people <a href="https://kubevirt.devstats.cncf.io/d/66/developer-activity-counts-by-companies?orgId=1&amp;var-period_name=v1.3.0%20-%20now&amp;var-metric=commits&amp;var-repogroup_name=All&amp;var-country_name=All&amp;var-companies=All">contributing commits to our repos</a>.</p>
 
@@ -2522,31 +2581,4 @@ rtt min/avg/max/mdev <span class="o">=</span> 0.902/0.997/1.046/0.058 ms
 <h2 id="conclusion">Conclusion</h2>
 <p>In this post we have seen how to use OVN-Kubernetes to create an overlay to
 connect VMs in different nodes using secondary networks, without having to
-configure any physical networking infrastructure.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure cluster-wide overlays as secondary networks for KubeVirt virtual machines.]]></summary></entry><entry><title type="html">KubeVirt Summit 2023!</title><link href="https://kubevirt.io//2023/KubeVirt-Summit-2023.html" rel="alternate" type="text/html" title="KubeVirt Summit 2023!" /><published>2023-03-03T00:00:00+00:00</published><updated>2023-03-03T00:00:00+00:00</updated><id>https://kubevirt.io//2023/KubeVirt-Summit-2023</id><content type="html" xml:base="https://kubevirt.io//2023/KubeVirt-Summit-2023.html"><![CDATA[<p>The third online <a href="/summit/">KubeVirt Summit</a> starts March 29, 2023!</p>
-
-<h2 id="when">When</h2>
-
-<p>The event will take place online over two half-days:</p>
-
-<ul>
-  <li>Dates: March 29 and 30, 2023.</li>
-  <li>Time: 14:00 – 19:00 UTC (9:00–14:00 EST, 15:00–20:00 CET)</li>
-</ul>
-
-<h2 id="register">Register</h2>
-
-<p><a href="/summit/">KubeVirt Summit</a> is hosted on Community.CNCF.io. This is a free event but you need to register in order to attend.</p>
-
-<p><a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2023/">Register for KubeVirt Summit 2023</a></p>
-
-<p>If this is your first time attending, you will need to create an account with CNCF.io.</p>
-
-<h2 id="schedule">Schedule</h2>
-
-<p>The schedule is available on the <a href="https://community.cncf.io/events/details/cncf-kubevirt-community-presents-kubevirt-summit-2023/">CNCF Community Events page</a> where you register, as well as on the <a href="/summit/">KubeVirt Summit page</a>.</p>
-
-<h2 id="keep-up-to-date">Keep up to date</h2>
-
-<p>Connect with the KubeVirt Community through our <a href="/community">community page</a>.</p>
-
-<p>See you there!</p>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's third annual dedicated online event]]></summary></entry></feed>
+configure any physical networking infrastructure.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="Kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="VM" /><category term="SDN" /><category term="OVN" /><summary type="html"><![CDATA[This post explains how to configure cluster-wide overlays as secondary networks for KubeVirt virtual machines.]]></summary></entry></feed>
