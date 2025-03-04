@@ -401,17 +401,17 @@ kind: VirtualMachine
   <span class="na">clock</span><span class="pi">:</span>
     <span class="na">timer</span><span class="pi">:</span>
       <span class="na">hpet</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">hyperv</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">kvm</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">pit</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">rtc</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
         <span class="na">track</span><span class="pi">:</span> <span class="s">string</span>
 </code></pre></div></div>
@@ -454,31 +454,31 @@ The <a href="http://kubevirt.io/api-reference/master/definitions.html#_v1_featur
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">features</span><span class="pi">:</span>
   <span class="na">acpi</span><span class="pi">:</span>
-    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
   <span class="na">apic</span><span class="pi">:</span>
-    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
-    <span class="na">endOfInterrupt</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
+    <span class="na">endOfInterrupt</span><span class="pi">:</span> <span class="kc">true</span>
   <span class="na">hyperv</span><span class="pi">:</span>
     <span class="na">relaxed</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">reset</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">runtime</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">spinlocks</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">spinlocks</span><span class="pi">:</span> <span class="m">0</span>
     <span class="na">synic</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">synictimer</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">vapic</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">vendorid</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">vendorid</span><span class="pi">:</span> <span class="s">string</span>
     <span class="na">vpindex</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
 </code></pre></div></div>
 
 <h3 id="qemu-machine-type">QEMU Machine Type</h3>
@@ -509,17 +509,17 @@ The <a href="http://kubevirt.io/api-reference/master/definitions.html#_v1_featur
   <span class="na">disks</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tray</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">disk</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">floppy</span><span class="pi">:</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tray</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">lun</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">volumeName</span><span class="pi">:</span> <span class="s">string</span>
 </code></pre></div></div>
@@ -550,7 +550,7 @@ cloud-init coniguration: <code class="language-plaintext highlighter-rouge">secr
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">ephemeral</span><span class="pi">:</span>
   <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
     <span class="na">claimName</span><span class="pi">:</span> <span class="s">string</span>
-    <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
 <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
 </code></pre></div></div>
 
@@ -558,7 +558,7 @@ cloud-init coniguration: <code class="language-plaintext highlighter-rouge">secr
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">persistentVolumeClaim</span><span class="pi">:</span>
   <span class="na">claimName</span><span class="pi">:</span> <span class="s">string</span>
-  <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
 </code></pre></div></div>
 
 <p><a href="https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk">registryDisk volume</a> type uses a virtual machine disk that is stored in a container image registry.</p>

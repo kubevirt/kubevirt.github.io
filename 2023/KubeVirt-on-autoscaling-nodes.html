@@ -427,15 +427,15 @@ always bring up a node in the AZ where a VM’s EBS-backed PV is located.</p>
       <span class="na">alpha.eksctl.io/cluster-name</span><span class="pi">:</span> <span class="s">my-cluster</span>
       <span class="na">alpha.eksctl.io/nodegroup-name</span><span class="pi">:</span> <span class="s">ng-${EKS_AZ}-c5-metal</span>
       <span class="na">workload</span><span class="pi">:</span> <span class="s">vm</span>
-    <span class="na">privateNetworking</span><span class="pi">:</span> <span class="no">false</span>
+    <span class="na">privateNetworking</span><span class="pi">:</span> <span class="kc">false</span>
     <span class="na">ssh</span><span class="pi">:</span>
-      <span class="na">allow</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">allow</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">publicKeyPath</span><span class="pi">:</span> <span class="s">${RD_EC2_KEYPAIR_NAME}</span>
     <span class="na">volumeSize</span><span class="pi">:</span> <span class="m">500</span>
     <span class="na">volumeIOPS</span><span class="pi">:</span> <span class="m">10000</span>
     <span class="na">volumeThroughput</span><span class="pi">:</span> <span class="m">750</span>
     <span class="na">volumeType</span><span class="pi">:</span> <span class="s">gp3</span>
-    <span class="na">propagateASGTags</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">propagateASGTags</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">tags</span><span class="pi">:</span>
       <span class="na">alpha.eksctl.io/nodegroup-name</span><span class="pi">:</span> <span class="s">ng-${EKS_AZ}-c5-metal</span>
       <span class="na">alpha.eksctl.io/nodegroup-type</span><span class="pi">:</span> <span class="s">managed</span>

@@ -292,9 +292,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>With the cluster configured to provide the dedicated resources for the workload, it’s time to review an example of a VM manifest using the optimizations for low CPU latency. The first focus is to reduce the VM’s I/O by limiting it’s devices to only serial console:</p>
 
-<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.devices.autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
-<span class="na">spec.domain.devices.autoattachMemBalloon</span><span class="pi">:</span> <span class="no">false</span>
-<span class="na">spec.domain.devices.autoattachGraphicsDevice</span><span class="pi">:</span> <span class="no">false</span>
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.devices.autoattachSerialConsole</span><span class="pi">:</span> <span class="kc">true</span>
+<span class="na">spec.domain.devices.autoattachMemBalloon</span><span class="pi">:</span> <span class="kc">false</span>
+<span class="na">spec.domain.devices.autoattachGraphicsDevice</span><span class="pi">:</span> <span class="kc">false</span>
 </code></pre></div></div>
 
 <p>The pod needs to have a guaranteed QoS for its memory and CPU resources, to make sure that the CPU manager will dedicate the requested CPUs to the pod.</p>
@@ -308,8 +308,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <p>Still on the CPU front, we add the settings to instruct the KVM to give a clear visibility of the host’s features to the guest, request the CPU manager in the node to isolate the assigned CPUs and to make sure that the emulator and IO threads in the VM run in their own dedicated VCPU rather than sharing the computational time with the workload.</p>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec.domain.cpu.model</span><span class="pi">:</span> <span class="s">host-passthrough</span>
-<span class="na">spec.domain.cpu.dedicateCpuPlacement</span><span class="pi">:</span> <span class="no">true</span>
-<span class="na">spec.domain.cpu.isolateEmulatorThread</span><span class="pi">:</span> <span class="no">true</span>
+<span class="na">spec.domain.cpu.dedicateCpuPlacement</span><span class="pi">:</span> <span class="kc">true</span>
+<span class="na">spec.domain.cpu.isolateEmulatorThread</span><span class="pi">:</span> <span class="kc">true</span>
 <span class="na">spec.domain.cpu.ioThreadsPolicy</span><span class="pi">:</span> <span class="s">auto</span>
 </code></pre></div></div>
 
@@ -348,9 +348,9 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <span class="na">spec</span><span class="pi">:</span>
       <span class="na">domain</span><span class="pi">:</span>
         <span class="na">devices</span><span class="pi">:</span>
-          <span class="na">autoattachSerialConsole</span><span class="pi">:</span> <span class="no">true</span>
-          <span class="na">autoattachMemBalloon</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">autoattachGraphicsDevice</span><span class="pi">:</span> <span class="no">false</span>
+          <span class="na">autoattachSerialConsole</span><span class="pi">:</span> <span class="kc">true</span>
+          <span class="na">autoattachMemBalloon</span><span class="pi">:</span> <span class="kc">false</span>
+          <span class="na">autoattachGraphicsDevice</span><span class="pi">:</span> <span class="kc">false</span>
           <span class="na">disks</span><span class="pi">:</span>
           <span class="pi">-</span> <span class="na">disk</span><span class="pi">:</span>
               <span class="na">bus</span><span class="pi">:</span> <span class="s">virtio</span>
@@ -369,8 +369,8 @@ autocomplete(document.getElementById("search-input"), mykeywords);
             <span class="na">cpu</span><span class="pi">:</span> <span class="m">2</span>
         <span class="na">cpu</span><span class="pi">:</span>
           <span class="na">model</span><span class="pi">:</span> <span class="s">host-passthrough</span>
-          <span class="na">dedicatedCpuPlacement</span><span class="pi">:</span> <span class="no">true</span>
-          <span class="na">isolateEmulatorThread</span><span class="pi">:</span> <span class="no">true</span>
+          <span class="na">dedicatedCpuPlacement</span><span class="pi">:</span> <span class="kc">true</span>
+          <span class="na">isolateEmulatorThread</span><span class="pi">:</span> <span class="kc">true</span>
           <span class="na">ioThreadsPolicy</span><span class="pi">:</span> <span class="s">auto</span>
           <span class="na">features</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">tsc-deadline</span>

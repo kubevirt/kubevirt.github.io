@@ -365,7 +365,7 @@ git clone https://github.com/kubevirt/kubevirt
     <span class="err">./hack/check.sh</span>
 
 <span class="nv">OUT_DIR</span><span class="o">=</span>./_out
-<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="nv">${OUT_DIR}</span>/tests
+<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="p">${</span>OUT_DIR<span class="p">}</span>/tests
 
 <span class="nl">functest</span><span class="o">:</span> <span class="nf">build</span>
     <span class="err">go</span> <span class="err">build</span> <span class="err">-v</span> <span class="err">./tests/...</span>

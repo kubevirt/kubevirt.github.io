@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.2.2">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-01-15T17:13:55+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html"><![CDATA[<h2 id="monitoring-kubevirt-vms-from-the-inside">Monitoring KubeVirt VMs from the inside</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/uncategorized.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-03-04T12:16:38+00:00</updated><id>https://kubevirt.io//feed/uncategorized.xml</id><title type="html">KubeVirt.io | Uncategorized</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Monitoring KubeVirt VMs from the inside</title><link href="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html" rel="alternate" type="text/html" title="Monitoring KubeVirt VMs from the inside" /><published>2020-12-10T00:00:00+00:00</published><updated>2020-12-10T00:00:00+00:00</updated><id>https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside</id><content type="html" xml:base="https://kubevirt.io//2020/Monitoring-KubeVirt-VMs-from-the-inside.html"><![CDATA[<h2 id="monitoring-kubevirt-vms-from-the-inside">Monitoring KubeVirt VMs from the inside</h2>
 
 <p>This blog post will guide you on how to monitor KubeVirt Linux based VirtualMachines with Prometheus <a href="https://github.com/prometheus/node_exporter">node-exporter</a>. Since node_exporter will run inside the VM and expose metrics at an HTTP endpoint, you can use this same guide to expose custom applications that expose metrics in the Prometheus format.</p>
 
@@ -212,7 +212,7 @@ EOF'</span>
     <span class="na">release</span><span class="pi">:</span> <span class="s">monitoring</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">namespaceSelector</span><span class="pi">:</span>
-    <span class="na">any</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">any</span><span class="pi">:</span> <span class="kc">true</span>
   <span class="na">selector</span><span class="pi">:</span>
     <span class="na">matchLabels</span><span class="pi">:</span>
       <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
@@ -249,7 +249,7 @@ EOF'</span>
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
   <span class="na">namespaceSelector</span><span class="pi">:</span>
-    <span class="na">any</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">any</span><span class="pi">:</span> <span class="kc">true</span>
   <span class="na">selector</span><span class="pi">:</span>
     <span class="na">matchLabels</span><span class="pi">:</span>
       <span class="na">prometheus.kubevirt.io</span><span class="pi">:</span> <span class="s2">"</span><span class="s">node-exporter"</span>
@@ -491,7 +491,7 @@ git clone https://github.com/kubevirt/kubevirt
     <span class="err">./hack/check.sh</span>
 
 <span class="nv">OUT_DIR</span><span class="o">=</span>./_out
-<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="nv">${OUT_DIR}</span>/tests
+<span class="nv">TESTS_OUT_DIR</span><span class="o">=</span><span class="p">${</span>OUT_DIR<span class="p">}</span>/tests
 
 <span class="nl">functest</span><span class="o">:</span> <span class="nf">build</span>
     <span class="err">go</span> <span class="err">build</span> <span class="err">-v</span> <span class="err">./tests/...</span>
@@ -584,7 +584,7 @@ check: using similar code to the one used in the standard makefile: formatting f
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
@@ -593,7 +593,7 @@ check: using similar code to the one used in the standard makefile: formatting f
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">annotations</span><span class="pi">:</span>
         <span class="na">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
     <span class="na">spec</span><span class="pi">:</span>
@@ -610,7 +610,7 @@ check: using similar code to the one used in the standard makefile: formatting f
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">ALL</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
@@ -668,15 +668,15 @@ check: using similar code to the one used in the standard makefile: formatting f
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
-            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
-              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">initContainers</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">-p</span>
@@ -702,14 +702,14 @@ check: using similar code to the one used in the standard makefile: formatting f
           <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">volumes</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
             <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
           <span class="na">secret</span><span class="pi">:</span>
-            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
           <span class="na">hostPath</span><span class="pi">:</span>
@@ -839,7 +839,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
@@ -848,7 +848,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">annotations</span><span class="pi">:</span>
         <span class="na">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
     <span class="na">spec</span><span class="pi">:</span>
@@ -865,7 +865,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">ALL</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
@@ -883,7 +883,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
           <span class="na">name</span><span class="pi">:</span> <span class="s">proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">NET_ADMIN</span>
@@ -932,15 +932,15 @@ Also all the traffic that came into the pod will be pass to envoy and after that
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
-            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
-              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">initContainers</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">-p</span>
@@ -968,14 +968,14 @@ Also all the traffic that came into the pod will be pass to envoy and after that
           <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">volumes</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
             <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
           <span class="na">secret</span><span class="pi">:</span>
-            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
           <span class="na">hostPath</span><span class="pi">:</span>
@@ -1203,7 +1203,7 @@ backend guest
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
@@ -1212,7 +1212,7 @@ backend guest
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">annotations</span><span class="pi">:</span>
         <span class="na">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
     <span class="na">spec</span><span class="pi">:</span>
@@ -1229,7 +1229,7 @@ backend guest
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">ALL</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
@@ -1247,7 +1247,7 @@ backend guest
           <span class="na">name</span><span class="pi">:</span> <span class="s">proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">NET_ADMIN</span>
@@ -1296,15 +1296,15 @@ backend guest
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
-            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
-              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">initContainers</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">-p</span>
@@ -1332,14 +1332,14 @@ backend guest
           <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">volumes</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
             <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
           <span class="na">secret</span><span class="pi">:</span>
-            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
           <span class="na">hostPath</span><span class="pi">:</span>
@@ -2279,17 +2279,17 @@ kind: VirtualMachine
   <span class="na">clock</span><span class="pi">:</span>
     <span class="na">timer</span><span class="pi">:</span>
       <span class="na">hpet</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">hyperv</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">kvm</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">pit</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">rtc</span><span class="pi">:</span>
-        <span class="na">present</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">present</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tickPolicy</span><span class="pi">:</span> <span class="s">string</span>
         <span class="na">track</span><span class="pi">:</span> <span class="s">string</span>
 </code></pre></div></div>
@@ -2332,31 +2332,31 @@ The <a href="http://kubevirt.io/api-reference/master/definitions.html#_v1_featur
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">features</span><span class="pi">:</span>
   <span class="na">acpi</span><span class="pi">:</span>
-    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
   <span class="na">apic</span><span class="pi">:</span>
-    <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
-    <span class="na">endOfInterrupt</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
+    <span class="na">endOfInterrupt</span><span class="pi">:</span> <span class="kc">true</span>
   <span class="na">hyperv</span><span class="pi">:</span>
     <span class="na">relaxed</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">reset</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">runtime</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">spinlocks</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">spinlocks</span><span class="pi">:</span> <span class="m">0</span>
     <span class="na">synic</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">synictimer</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">vapic</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
     <span class="na">vendorid</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">vendorid</span><span class="pi">:</span> <span class="s">string</span>
     <span class="na">vpindex</span><span class="pi">:</span>
-      <span class="na">enabled</span><span class="pi">:</span> <span class="no">true</span>
+      <span class="na">enabled</span><span class="pi">:</span> <span class="kc">true</span>
 </code></pre></div></div>
 
 <h3 id="qemu-machine-type">QEMU Machine Type</h3>
@@ -2387,17 +2387,17 @@ The <a href="http://kubevirt.io/api-reference/master/definitions.html#_v1_featur
   <span class="na">disks</span><span class="pi">:</span>
     <span class="pi">-</span> <span class="na">cdrom</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tray</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">disk</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">floppy</span><span class="pi">:</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
         <span class="na">tray</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">lun</span><span class="pi">:</span>
         <span class="na">bus</span><span class="pi">:</span> <span class="s">string</span>
-        <span class="na">readonly</span><span class="pi">:</span> <span class="no">true</span>
+        <span class="na">readonly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
       <span class="na">volumeName</span><span class="pi">:</span> <span class="s">string</span>
 </code></pre></div></div>
@@ -2428,7 +2428,7 @@ cloud-init coniguration: <code class="language-plaintext highlighter-rouge">secr
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">ephemeral</span><span class="pi">:</span>
   <span class="na">persistentVolumeClaim</span><span class="pi">:</span>
     <span class="na">claimName</span><span class="pi">:</span> <span class="s">string</span>
-    <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+    <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
 <span class="na">name</span><span class="pi">:</span> <span class="s">string</span>
 </code></pre></div></div>
 
@@ -2436,7 +2436,7 @@ cloud-init coniguration: <code class="language-plaintext highlighter-rouge">secr
 
 <div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">persistentVolumeClaim</span><span class="pi">:</span>
   <span class="na">claimName</span><span class="pi">:</span> <span class="s">string</span>
-  <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+  <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
 </code></pre></div></div>
 
 <p><a href="https://kubevirt.io/user-guide/virtual_machines/disks_and_volumes/#containerdisk">registryDisk volume</a> type uses a virtual machine disk that is stored in a container image registry.</p>
@@ -3031,7 +3031,7 @@ Note the PVC containing the cirros image must be listed as the first disk under 
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1alpha2</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">VirtualMachine</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">labels</span><span class="pi">:</span>
     <span class="na">kubevirt.io/ovm</span><span class="pi">:</span> <span class="s">cirros</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">cirros</span>
@@ -3039,7 +3039,7 @@ Note the PVC containing the cirros image must be listed as the first disk under 
   <span class="na">runStrategy</span><span class="pi">:</span> <span class="s">Halted</span>
   <span class="na">template</span><span class="pi">:</span>
     <span class="na">metadata</span><span class="pi">:</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">kubevirt.io/ovm</span><span class="pi">:</span> <span class="s">cirros</span>
     <span class="na">spec</span><span class="pi">:</span>

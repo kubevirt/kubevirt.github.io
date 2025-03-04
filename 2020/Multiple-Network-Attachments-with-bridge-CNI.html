@@ -444,7 +444,7 @@ used later on by the bridge CNI.</p>
       <span class="na">bridge</span><span class="pi">:</span>
         <span class="na">options</span><span class="pi">:</span>
           <span class="na">stp</span><span class="pi">:</span>
-            <span class="na">enabled</span><span class="pi">:</span> <span class="no">false</span>
+            <span class="na">enabled</span><span class="pi">:</span> <span class="kc">false</span>
         <span class="na">port</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">eth1</span>
 <span class="s">EOF</span>
@@ -501,26 +501,26 @@ interface configuration:</p>
           <span class="na">options</span><span class="pi">:</span>
             <span class="na">group-forward-mask</span><span class="pi">:</span> <span class="m">0</span>
             <span class="na">mac-ageing-time</span><span class="pi">:</span> <span class="m">300</span>
-            <span class="na">multicast-snooping</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">multicast-snooping</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">stp</span><span class="pi">:</span>
-              <span class="na">enabled</span><span class="pi">:</span> <span class="no">false</span>
+              <span class="na">enabled</span><span class="pi">:</span> <span class="kc">false</span>
               <span class="na">forward-delay</span><span class="pi">:</span> <span class="m">15</span>
               <span class="na">hello-time</span><span class="pi">:</span> <span class="m">2</span>
               <span class="na">max-age</span><span class="pi">:</span> <span class="m">20</span>
               <span class="na">priority</span><span class="pi">:</span> <span class="m">32768</span>
           <span class="na">port</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">eth1</span>
-              <span class="na">stp-hairpin-mode</span><span class="pi">:</span> <span class="no">false</span>
+              <span class="na">stp-hairpin-mode</span><span class="pi">:</span> <span class="kc">false</span>
               <span class="na">stp-path-cost</span><span class="pi">:</span> <span class="m">100</span>
               <span class="na">stp-priority</span><span class="pi">:</span> <span class="m">32</span>
         <span class="na">description</span><span class="pi">:</span> <span class="s">Linux bridge with eth1 as a port</span>
         <span class="na">ipv4</span><span class="pi">:</span>
-          <span class="na">dhcp</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">enabled</span><span class="pi">:</span> <span class="no">false</span>
+          <span class="na">dhcp</span><span class="pi">:</span> <span class="kc">false</span>
+          <span class="na">enabled</span><span class="pi">:</span> <span class="kc">false</span>
         <span class="na">ipv6</span><span class="pi">:</span>
-          <span class="na">autoconf</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">dhcp</span><span class="pi">:</span> <span class="no">false</span>
-          <span class="na">enabled</span><span class="pi">:</span> <span class="no">false</span>
+          <span class="na">autoconf</span><span class="pi">:</span> <span class="kc">false</span>
+          <span class="na">dhcp</span><span class="pi">:</span> <span class="kc">false</span>
+          <span class="na">enabled</span><span class="pi">:</span> <span class="kc">false</span>
         <span class="na">mac-address</span><span class="pi">:</span> <span class="s">52:55:00:D1:56:00</span>
         <span class="na">mtu</span><span class="pi">:</span> <span class="m">1500</span>
         <span class="na">name</span><span class="pi">:</span> <span class="s">br0</span>

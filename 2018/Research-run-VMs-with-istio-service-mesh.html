@@ -314,7 +314,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
@@ -323,7 +323,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">annotations</span><span class="pi">:</span>
         <span class="na">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
     <span class="na">spec</span><span class="pi">:</span>
@@ -340,7 +340,7 @@ autocomplete(document.getElementById("search-input"), mykeywords);
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">ALL</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
@@ -398,15 +398,15 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
-            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
-              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">initContainers</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">-p</span>
@@ -432,14 +432,14 @@ autocomplete(document.getElementById("search-input"), mykeywords);
           <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">volumes</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
             <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
           <span class="na">secret</span><span class="pi">:</span>
-            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
           <span class="na">hostPath</span><span class="pi">:</span>
@@ -569,7 +569,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
@@ -578,7 +578,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">annotations</span><span class="pi">:</span>
         <span class="na">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-nat-proxt</span>
     <span class="na">spec</span><span class="pi">:</span>
@@ -595,7 +595,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">ALL</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
@@ -613,7 +613,7 @@ Also all the traffic that came into the pod will be pass to envoy and after that
           <span class="na">name</span><span class="pi">:</span> <span class="s">proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">NET_ADMIN</span>
@@ -662,15 +662,15 @@ Also all the traffic that came into the pod will be pass to envoy and after that
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
-            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
-              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">initContainers</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">-p</span>
@@ -698,14 +698,14 @@ Also all the traffic that came into the pod will be pass to envoy and after that
           <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">volumes</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
             <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
           <span class="na">secret</span><span class="pi">:</span>
-            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
           <span class="na">hostPath</span><span class="pi">:</span>
@@ -933,7 +933,7 @@ backend guest
 <span class="na">apiVersion</span><span class="pi">:</span> <span class="s">extensions/v1beta1</span>
 <span class="na">kind</span><span class="pi">:</span> <span class="s">Deployment</span>
 <span class="na">metadata</span><span class="pi">:</span>
-  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+  <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
   <span class="na">name</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
 <span class="na">spec</span><span class="pi">:</span>
   <span class="na">replicas</span><span class="pi">:</span> <span class="m">1</span>
@@ -942,7 +942,7 @@ backend guest
     <span class="na">metadata</span><span class="pi">:</span>
       <span class="na">annotations</span><span class="pi">:</span>
         <span class="na">sidecar.istio.io/status</span><span class="pi">:</span> <span class="s1">'</span><span class="s">{"version":"43466efda2266e066fb5ad36f2d1658de02fc9411f6db00ccff561300a2a3c78","initContainers":["istio-init","enable-core-dump"],"containers":["istio-proxy"],"volumes":["istio-envoy","istio-certs"]}'</span>
-      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="no">null</span>
+      <span class="na">creationTimestamp</span><span class="pi">:</span> <span class="kc">null</span>
       <span class="na">labels</span><span class="pi">:</span>
         <span class="na">app</span><span class="pi">:</span> <span class="s">libvirtd-devel</span>
     <span class="na">spec</span><span class="pi">:</span>
@@ -959,7 +959,7 @@ backend guest
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">ALL</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">0</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/var/lib/libvirt/images</span>
@@ -977,7 +977,7 @@ backend guest
           <span class="na">name</span><span class="pi">:</span> <span class="s">proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">capabilities</span><span class="pi">:</span>
               <span class="na">add</span><span class="pi">:</span>
                 <span class="pi">-</span> <span class="s">NET_ADMIN</span>
@@ -1026,15 +1026,15 @@ backend guest
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-proxy</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">false</span>
-            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">false</span>
+            <span class="na">readOnlyRootFilesystem</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">runAsUser</span><span class="pi">:</span> <span class="m">1337</span>
           <span class="na">volumeMounts</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/istio/proxy</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
             <span class="pi">-</span> <span class="na">mountPath</span><span class="pi">:</span> <span class="s">/etc/certs/</span>
               <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
-              <span class="na">readOnly</span><span class="pi">:</span> <span class="no">true</span>
+              <span class="na">readOnly</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">initContainers</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">args</span><span class="pi">:</span>
             <span class="pi">-</span> <span class="s">-p</span>
@@ -1062,14 +1062,14 @@ backend guest
           <span class="na">name</span><span class="pi">:</span> <span class="s">enable-core-dump</span>
           <span class="na">resources</span><span class="pi">:</span> <span class="pi">{}</span>
           <span class="na">securityContext</span><span class="pi">:</span>
-            <span class="na">privileged</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">privileged</span><span class="pi">:</span> <span class="kc">true</span>
       <span class="na">volumes</span><span class="pi">:</span>
         <span class="pi">-</span> <span class="na">emptyDir</span><span class="pi">:</span>
             <span class="na">medium</span><span class="pi">:</span> <span class="s">Memory</span>
           <span class="na">name</span><span class="pi">:</span> <span class="s">istio-envoy</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">istio-certs</span>
           <span class="na">secret</span><span class="pi">:</span>
-            <span class="na">optional</span><span class="pi">:</span> <span class="no">true</span>
+            <span class="na">optional</span><span class="pi">:</span> <span class="kc">true</span>
             <span class="na">secretName</span><span class="pi">:</span> <span class="s">istio.default</span>
         <span class="pi">-</span> <span class="na">name</span><span class="pi">:</span> <span class="s">host-dev</span>
           <span class="na">hostPath</span><span class="pi">:</span>

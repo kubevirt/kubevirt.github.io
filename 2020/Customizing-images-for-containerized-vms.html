@@ -626,14 +626,14 @@ Example-http-server
 <span class="nn">[[customizations.user]]</span>
 <span class="py">name</span> <span class="p">=</span> <span class="s">"developer"</span>
 <span class="py">description</span> <span class="p">=</span> <span class="s">"developer"</span>
-<span class="py">groups</span> <span class="p">=</span> <span class="nn">["wheel"]</span>
+<span class="py">groups</span> <span class="p">=</span> <span class="p">[</span><span class="s">"wheel"</span><span class="p">]</span>
 <span class="py">password</span> <span class="p">=</span> <span class="s">"$6$wlIgNacMnqCcXn3o$mPpw0apT4iZ3jDq0q6epXN3xCmNN.oVGFW.Gvu9r0nDVX.FXY3iCwfFkfPEcmhj7Kxw4Ppoes2LsUzPtNRjez0"</span>
 
 <span class="nn">[customizations.services]</span>
-<span class="py">enabled</span> <span class="p">=</span> <span class="nn">["httpd","mariadb","sshd"]</span>
+<span class="py">enabled</span> <span class="p">=</span> <span class="p">[</span><span class="s">"httpd"</span><span class="p">,</span><span class="s">"mariadb"</span><span class="p">,</span><span class="s">"sshd"</span><span class="p">]</span>
 
 <span class="nn">[customizations.firewall.services]</span>
-<span class="py">enabled</span> <span class="p">=</span> <span class="nn">["http","https","mysql","ssh"]</span>
+<span class="py">enabled</span> <span class="p">=</span> <span class="p">[</span><span class="s">"http"</span><span class="p">,</span><span class="s">"https"</span><span class="p">,</span><span class="s">"mysql"</span><span class="p">,</span><span class="s">"ssh"</span><span class="p">]</span>
 
 <span class="nn">[[repos.git]]</span>
 <span class="py">rpmname</span> <span class="p">=</span> <span class="s">"manual"</span>
