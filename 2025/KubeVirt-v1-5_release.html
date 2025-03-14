@@ -36,26 +36,26 @@
     <meta name="google-site-verification" content="ljFssJAOE7EegX8RSNhm2heZib4B2JPUwzoDLnIo0VM" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//blogs/page30/">
+    <link rel="canonical" href="https://kubevirt.io//2025/KubeVirt-v1-5_release.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Blogs | KubeVirt.io</title>
+    <title>Announcing the release of KubeVirt v1.5 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="KubeVirt Maintainers" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
-    <meta property="og:title" content="Blogs | KubeVirt.io">
+    <meta name="description" content="With the release of KubeVirt v1.5 we see the community adding some features that align with more traditional virtualization platforms.">
+    <meta name="keywords" content="KubeVirt, v1.5, release, community, cncf, milestone, party time" >
+    <meta property="og:title" content="Announcing the release of KubeVirt v1.5 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//blogs/page30/" >
+    <meta property="og:url" content="https://kubevirt.io//2025/KubeVirt-v1-5_release.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="With the release of KubeVirt v1.5 we see the community adding some features that align with more traditional virtualization platforms." >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2025-03-14 09:53:21 +0000" >
-    <meta name="twitter:title" content="Blogs | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="KubeVirt Maintainers" >
+    <meta property="og:article:published_time" content="2025-03-05 00:00:00 +0000" >
+    <meta name="twitter:title" content="Announcing the release of KubeVirt v1.5 | KubeVirt.io">
+    <meta name="twitter:description" content="With the release of KubeVirt v1.5 we see the community adding some features that align with more traditional virtualization platforms.">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -86,7 +86,7 @@
       
 
       
-        <li  class="nav-item active" >
+        <li  class="nav-item" >
           <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
         </li>
       
@@ -237,224 +237,140 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container-fluid">
+      <div class="container">
   <div class="row">
-    <h1 class="page-title pl-3">Blogs</h1>
-  </div>
-  <div class="row">
-    <div class="col-sm-12 col-md-4 col-lg-3 col-xl-2">
-      
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">Announcing the release of KubeVirt v1.5</h1>
+          <div class="post-info">
+            <span class="post-author">Author: KubeVirt Maintainers</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/kubevirt">KubeVirt</a>&nbsp;|&nbsp;<a href="/tag/v1.5">v1.5</a>&nbsp;|&nbsp;<a href="/tag/release">release</a>&nbsp;|&nbsp;<a href="/tag/community">community</a>&nbsp;|&nbsp;<a href="/tag/cncf">cncf</a>&nbsp;|&nbsp;<a href="/tag/milestone">milestone</a>&nbsp;|&nbsp;<a href="/tag/party-time">party time</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: March 5, 2025  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: news
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <p>The KubeVirt Community is pleased to announce the release of <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.5.0">KubeVirt v1.5</a>. This release aligns with <a href="https://kubernetes.io/blog/2024/12/11/kubernetes-v1-32-release/">Kubernetes v1.32</a> and is the seventh KubeVirt release to follow the Kubernetes release cadence.</p>
+
+<p>This release sees the project adding some features that are aligned with more traditional virtualization platforms, such as enhanced volume and VM migration, increased CPU performance, and more precise network state control.</p>
+
+<p>You can read the full <a href="https://kubevirt.io/user-guide/release_notes/#v150">release notes</a> in our user-guide, but we have included some highlights in this blog.</p>
+
+<h3 id="breaking-change">Breaking change</h3>
+<p>Please be aware that in v1.5 we have <a href="https://github.com/kubevirt/kubevirt/pull/13497">introduced a change</a> that affects permissions of namespace admins to trigger live migrations. As a hardening measure (principle of least privilege), the right of creating, editing and deleting <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceMigrations</code> are no longer assigned by default to namespace admins.</p>
+
+<p>For more information, see our post on the <a href="https://kubevirt.io/2025/Hardening-VMIM.html">KubeVirt blog</a>.</p>
+
+<h3 id="feature-ga">Feature GA</h3>
+
+<p>This release marks the graduation of a number of features to GA; deprecating the feature gate and now enabled by default:</p>
+
+<ul>
+  <li><a href="https://kubevirt.io/user-guide/storage/volume_migration/">Migration Update Strategy and Volume Migration</a>: Storage migration can be useful in the cases where the users need to change the underlying storage, for example, if the storage class has been deprecated, or there is a new more performant driver available.</li>
+  <li><a href="https://kubevirt.io/user-guide/compute/resources_requests_and_limits/">Auto Resource Limits</a>: Automatically apply CPU limits to a VMI.</li>
+  <li>VM Live Update Features: This feature underpins hotplugging of CPU, memory, and volume resources.</li>
+  <li><a href="https://kubevirt.io/user-guide/network/network_binding_plugins/">Network Binding Plugin</a>: A modular plugin which integrates with KubeVirt to implement a network binding.</li>
+</ul>
+
+<h3 id="compute">Compute</h3>
+
+<p>You can now specify the number of <a href="https://kubevirt.io/user-guide/storage/disks_and_volumes/#iothreads">IOThreads to use</a> through virtqueue mapping to improve CPU performance. We also added <a href="https://github.com/kubevirt/kubevirt/pull/13606">virtio video support for amd64</a> as well as the <a href="https://github.com/kubevirt/kubevirt/pull/13208">ability to reset VMs</a>, which provides the means to restart the guest OS without requiring a new pod to be scheduled.</p>
+
+<h3 id="networking">Networking</h3>
+
+<p>You can now <a href="https://kubevirt.io/user-guide/network/interfaces_and_networks/#link-state-management">dynamically control the link state</a> (up/down) of a network interface.</p>
+
+<h3 id="scale-and-performance">Scale and Performance</h3>
+
+<p>A comprehensive list of performance and scale benchmarks for the release is <a href="https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md">available here</a>. A notable change added to the benchmarks was the <a href="https://github.com/kubevirt/kubevirt/pull/13250">virt-handler resource utilization metrics</a>. This metric gives the avg, max and min memory/cpu utilization per VMI that is scheduled on the node where virt-handler is running. Another notable shoutout from the benchmark document is changing how <a href="https://github.com/kubevirt/kubevirt/pull/12716">list calls are tracked</a>. KubeVirt clients were misreporting watch calls as list calls, which was fixed in this release.</p>
+
+<h3 id="storage">Storage</h3>
+
+<p>With this release you can now migrate <a href="https://kubevirt.io/user-guide/storage/volume_migration/">hotplugged volumes</a>. You can also migrate VMIs with a volume shared using virtiofs. And we <a href="https://github.com/kubevirt/kubevirt/pull/13713">addressed a recent change in libvirt</a> that was preventing some NFS shared volumes from migrating by providing shared filesystem paths upfront.</p>
+
+<h3 id="thank-you-for-your-contribution">Thank you for your contribution!</h3>
+<p>A lot of work from a <a href="https://kubevirt.devstats.cncf.io/d/66/developer-activity-counts-by-companies?orgId=1&amp;var-period_name=v1.4.0%20-%20now&amp;var-metric=contributions&amp;var-repogroup_name=All&amp;var-country_name=All&amp;var-companies=All">huge amount of people</a> goes into a release. A huge thank you to the 350+ people who contributed to this v1.5 release.</p>
+
+<p>And if you’re interested in contributing to the project and being a part of the next release, please check out our <a href="https://kubevirt.io/user-guide/contributing/">contributing guide</a> and our <a href="https://github.com/kubevirt/community/blob/main/membership_policy.md">community membership guidelines</a>.</p>
+
+<p>Contributing needn’t be designing a new feature or committing to a <a href="https://github.com/kubevirt/enhancements">Virtualization Enhancement Proposal</a>, there is always a need for reviews, help with our docs and website, or submitting good quality bugs. Every little bit counts.</p>
+
+        </article>
         
-          
-          <ul class="blogs-navigation">
-            <h3>Categories</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/news.html"  class="blogs-navigation--item_link" >
-                  News
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/updates.html"  class="blogs-navigation--item_link" >
-                  Weekly Updates
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/releases.html"  class="blogs-navigation--item_link" >
-                  Releases
-                </a>
-                
-              </li>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/uncategorized.html"  class="blogs-navigation--item_link" >
-                  Uncategorized
-                </a>
-                
-              </li>
-            
-          </ul>
-          
         
-          
-          <ul class="blogs-navigation">
-            <h3>Additional filters</h3>
-            
-              <li class="blogs-navigation--item">
-                <a href="/blogs/date.html"  class="blogs-navigation--item_link" >
-                  Grouped by Date
-                </a>
-                
-              </li>
-            
-          </ul>
-          
-        
-      
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=Announcing the release of KubeVirt v1.5&url=https://www.kubevirt.io/2025/KubeVirt-v1-5_release.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
     </div>
-    <div class="col-sm-12 col-md-8 col-lg-9 col-xl-10">
-      <ul class="posts">
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Non-Dockerized-Build.html">Non Dockerized Build</a></h2>
-            <div class="posts-date">June 07, 2018</div>
-            This post tries to unveil some of the internals of our build system, by allowing you to build natively on your host
-            
-            <div class="readmore">
-    <a href="/2018/Non-Dockerized-Build.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Research-run-VMs-with-istio-service-mesh.html">Research Run Vms With Istio Service Mesh</a></h2>
-            <div class="posts-date">June 03, 2018</div>
-            In this post we will deploy a vm on top of kubernetes with istio service mesh
-            
-            <div class="readmore">
-    <a href="/2018/Research-run-VMs-with-istio-service-mesh.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Use-VS-Code-for-Kube-Virt-Development.html">Use Vs Code For Kube Virt Development</a></h2>
-            <div class="posts-date">May 22, 2018</div>
-            In this post we will install and configure vscode for KubeVirt development
-            
-            <div class="readmore">
-    <a href="/2018/Use-VS-Code-for-Kube-Virt-Development.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/ovn-multi-network-plugin-for-kubernetes-kubetron.html">Ovn Multi Network Plugin For Kubernetes Kubetron</a></h2>
-            <div class="posts-date">May 16, 2018</div>
-            OVN Multi-Network Plugin for Kubernetes, Kubetron
-            
-            <div class="readmore">
-    <a href="/2018/ovn-multi-network-plugin-for-kubernetes-kubetron.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-          <li>
-            <h2 class="posts-title"><a href="/2018/Use-GlusterFS-Cloning-with-KubeVirt.html">Use Glusterfs Cloning With Kubevirt</a></h2>
-            <div class="posts-date">May 16, 2018</div>
-            A first look at using gluster cloning with kubevirt
-            
-            <div class="readmore">
-    <a href="/2018/Use-GlusterFS-Cloning-with-KubeVirt.html" aria-label="Read more about this blog post">Read More <i class="fas fa-angle-right"></i></a>
-</div>
-
-          </li>
-        
-      </ul>
-    </div>
-    
-<div class="pagination align-items-center">
-  
-    <a href="/blogs/page29" class="btn btn-outline-secondary btn-light mr-2">
-      <i class="fas fa-angle-left"></i> New
-    </a>
-  
-
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-        <strong class="font-weight-bold">30</strong>
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-      
-  
-  <strong>of 38</strong>
-
-  
-    <a href="/blogs/page31" class="btn btn-outline-secondary btn-light ml-2">
-      Old <i class="fas fa-angle-right"></i>
-    </a>
-  
-
-</div>
-
   </div>
 </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 
