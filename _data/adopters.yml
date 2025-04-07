@@ -39,7 +39,7 @@ adopters:
     name: S3NS
   integrations:
   - link: https://docs.kasten.io/latest/usage/openshift_virtualization.html?highlight=kubevirt
-    logo: KastenbyVeeam.png
+    logo: KastenbyVeeam.svg
     name: Kasten by Veeam
   - link: https://isovalent.com/labs/cilium-kubevirt/
     logo: isovalent.svg
