@@ -105,3 +105,6 @@ adopters:
   - link: https://www.suse.com/
     logo: SUSE.png
     name: SUSE
+  - link: https://www.swisscom.ch/en/business/enterprise/offer/cloud/cloudnative/container-services.html
+    logo: Swisscom.svg
+    name: Swisscom
