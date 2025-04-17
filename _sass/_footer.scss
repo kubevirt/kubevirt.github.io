@@ -9,7 +9,9 @@
       &-mail,
       &-calendar,
       &-slack,
-      &-youtube {
+      &-youtube,
+      &-bluesky,
+      &-mastodon {
         color: $kv-color--black-400;
         @media (max-width: 576px) {
           font-size: 2rem;
@@ -53,7 +55,24 @@
           color: #cc0000;
         }
       }
+
+      &-bluesky {
+        margin-right: 1rem;
+
+        &:hover {
+          color: #0A79FC;
+        }
+      }
+
+      &-mastodon {
+        margin-right: 1rem;
+
+        &:hover {
+          color: #5B4BE1;
+        }
+      }
     }
+
     &.privacy-statement {
       &-link {
         &:hover {
@@ -61,14 +80,17 @@
         }
       }
     }
+
     &:hover {
       text-decoration: none;
     }
   }
+
   &-licensing {
-    font-size: .8rem;
+    font-size: 0.8rem;
+
     a {
-        font-size: .8rem;
+      font-size: 0.8rem;
     }
   }
 }
