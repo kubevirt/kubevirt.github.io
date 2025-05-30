@@ -41,6 +41,9 @@ adopters:
   - link: https://docs.kasten.io/latest/usage/openshift_virtualization.html?highlight=kubevirt
     logo: KastenbyVeeam.png
     name: Kasten by Veeam
+  - link: https://isovalent.com/labs/cilium-kubevirt/
+    logo: isovalent.svg
+    name: Isovalent at Cisco
   - link: https://minikube.sigs.k8s.io
     logo: minikube.png
     name: minikube
