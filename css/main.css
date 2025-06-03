@@ -968,11 +968,11 @@ table th, table td {
 .footer a {
   color: #006166;
 }
-.footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar, .footer a.link-social-slack, .footer a.link-social-youtube {
+.footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar, .footer a.link-social-slack, .footer a.link-social-youtube, .footer a.link-social-bluesky, .footer a.link-social-mastodon {
   color: #72767b;
 }
 @media (max-width: 576px) {
-  .footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar, .footer a.link-social-slack, .footer a.link-social-youtube {
+  .footer a.link-social-twitter, .footer a.link-social-github, .footer a.link-social-mail, .footer a.link-social-calendar, .footer a.link-social-slack, .footer a.link-social-youtube, .footer a.link-social-bluesky, .footer a.link-social-mastodon {
     font-size: 2rem;
   }
 }
@@ -1011,6 +1011,18 @@ table th, table td {
 }
 .footer a.link-social-youtube:hover {
   color: #cc0000;
+}
+.footer a.link-social-bluesky {
+  margin-right: 1rem;
+}
+.footer a.link-social-bluesky:hover {
+  color: #0A79FC;
+}
+.footer a.link-social-mastodon {
+  margin-right: 1rem;
+}
+.footer a.link-social-mastodon:hover {
+  color: #5B4BE1;
 }
 .footer a.privacy-statement-link:hover {
   color: #00aab2;
