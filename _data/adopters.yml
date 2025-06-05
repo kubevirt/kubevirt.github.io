@@ -59,6 +59,9 @@ adopters:
   - link: https://www.pitsdatarecovery.net/
     logo: PITSGlobalDataRecoveryServices.svg
     name: PITS Global Data Recovery Services
+  - link: https://portworx.com/services/kubernetes-storage/
+    logo: PORTWORX.png
+    name: Portworx
   - link: https://trilio.io/
     logo: Trilio.svg
     name: Trilio
