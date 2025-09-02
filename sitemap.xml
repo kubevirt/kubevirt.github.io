@@ -761,6 +761,10 @@
 <lastmod>2025-03-13T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2025/changelog-v1.6.0.html</loc>
+<lastmod>2025-07-30T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//application-aware-quota/</loc>
 </url>
 <url>
@@ -1734,6 +1738,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2025-06-23T09:56:49+00:00</lastmod>
+<lastmod>2025-09-02T08:50:22+00:00</lastmod>
 </url>
 </urlset>
