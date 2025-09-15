@@ -765,6 +765,10 @@
 <lastmod>2025-07-30T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2025/Building-VM-golden-image-with-Packer.html</loc>
+<lastmod>2025-09-15T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//application-aware-quota/</loc>
 </url>
 <url>
@@ -1626,6 +1630,12 @@
 <loc>https://kubevirt.io//tag/v1.5.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//tag/packer.html</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//tag/plugin.html</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
 </url>
 <url>
@@ -1738,6 +1748,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2025-09-09T08:29:06+00:00</lastmod>
+<lastmod>2025-09-15T13:13:10+00:00</lastmod>
 </url>
 </urlset>

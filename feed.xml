@@ -1,4 +1,377 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-09-09T08:30:21+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.6.0</title><link href="https://kubevirt.io//2025/changelog-v1.6.0.html" rel="alternate" type="text/html" title="KubeVirt v1.6.0" /><published>2025-07-30T00:00:00+00:00</published><updated>2025-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2025/changelog-v1.6.0</id><content type="html" xml:base="https://kubevirt.io//2025/changelog-v1.6.0.html"><![CDATA[<h2 id="v160">v1.6.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-09-15T13:14:17+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Building VM golden images with Packer</title><link href="https://kubevirt.io//2025/Building-VM-golden-image-with-Packer.html" rel="alternate" type="text/html" title="Building VM golden images with Packer" /><published>2025-09-15T00:00:00+00:00</published><updated>2025-09-15T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Building-VM-golden-image-with-Packer</id><content type="html" xml:base="https://kubevirt.io//2025/Building-VM-golden-image-with-Packer.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+
+<p>Creating and maintaining VM golden images can be time-consuming, often
+requiring local virtualization tools and manual setup. With <a href="https://kubevirt.io">KubeVirt</a>
+running inside your <a href="https://kubernetes.io">Kubernetes</a> cluster, you can
+manage virtual machines alongside your containers, but it lacks automation
+for creating consistent, reusable VM images.</p>
+
+<p>That’s where <a href="https://packer.io">Packer</a> and the new KubeVirt plugin come
+in. The plugin lets you build VM images directly in Kubernetes, enabling you
+to automate OS installation from ISO, customize the VM during build, and produce
+a reusable bootable volume, all without leaving your cluster.</p>
+
+<h2 id="prerequisites">Prerequisites</h2>
+
+<p>Before you begin, make sure you have the following installed:</p>
+
+<ul>
+  <li><a href="https://developer.hashicorp.com/packer/install">Packer</a></li>
+  <li><a href="https://kubernetes.io/docs/tasks/tools">Kubernetes</a></li>
+  <li><a href="https://kubevirt.io/user-guide/cluster_admin/installation">KubeVirt</a></li>
+  <li><a href="https://kubevirt.io/user-guide/storage/containerized_data_importer/#install-cdi">Containerized Data Importer (CDI)</a></li>
+</ul>
+
+<h2 id="plugin-features">Plugin Features</h2>
+
+<p>The Packer plugin for KubeVirt offers a variety of features that simplify
+the VM golden image creation process:</p>
+
+<ul>
+  <li><strong>HCL Template</strong>: Define infrastructure as code for easy versioning and reuse using <a href="https://developer.hashicorp.com/packer/docs/templates/hcl_templates">HCL templates</a>.</li>
+  <li><strong>ISO Installation</strong>: Build VM golden images from an ISO file using the <code class="language-plaintext highlighter-rouge">kubevirt-iso</code> builder.</li>
+  <li><strong>ISO Media Files</strong>: Include additional files (e.g., configs, scripts, and more) during the installation process.</li>
+  <li><strong>Boot Command</strong>: Automate the VM boot process via a <a href="https://en.wikipedia.org/wiki/VNC">VNC</a> connection with a predefined set of commands.</li>
+  <li><strong>Integrated SSH/WinRM Access</strong>: Provision and customize VMs via <a href="https://man7.org/linux/man-pages/man1/ssh.1.html">SSH</a> or <a href="https://learn.microsoft.com/en-us/windows/win32/winrm/portal">WinRM</a>.</li>
+</ul>
+
+<p><strong>Note</strong>: This plugin is currently in pre-release and actively under development by
+<a href="https://www.redhat.com">Red Hat</a> and <a href="https://www.hashicorp.com">HashiCorp</a> together.</p>
+
+<h2 id="plugin-components">Plugin Components</h2>
+
+<p>The core component of this plugin is the <code class="language-plaintext highlighter-rouge">kubevirt-iso</code> builder. This builder
+allows you to start from an ISO file and create a VM golden image directly
+on your Kubernetes cluster.</p>
+
+<h3 id="builder-design">Builder Design</h3>
+
+<p align="center">
+  <img src="../assets/2025-09-15-Packer-Plugin/kubevirt-iso-builder-design.png" alt="Design" width="1125" />
+</p>
+
+<p>This diagram shows the workflow for building a bootable volume in a
+Kubernetes cluster using Packer with the KubeVirt plugin.</p>
+
+<ol>
+  <li>Creates a temporary VM from an ISO image.</li>
+  <li>Runs provisioning using either the <a href="https://developer.hashicorp.com/packer/docs/provisioners/shell">Shell</a> or <a href="https://developer.hashicorp.com/packer/integrations/hashicorp/ansible/latest/components/provisioner/ansible">Ansible</a> provisioner.</li>
+  <li>Clones the VM’s disk to create a reusable bootable volume (<a href="https://kubevirt.io/user-guide/storage/disks_and_volumes/#datavolume">DataVolume and DataSource</a>).</li>
+</ol>
+
+<p>This bootable volume can then be reused to instantiate new VMs without
+repeating the installation.</p>
+
+<h2 id="step-by-step-example-building-a-fedora-vm-image">Step-by-Step Example: Building a Fedora VM Image</h2>
+
+<p>The following Packer template (Fedora 42) demonstrates key features:</p>
+
+<ul>
+  <li>ISO-based installation using the <code class="language-plaintext highlighter-rouge">kubevirt-iso</code> builder.</li>
+  <li>Embedded configuration file to automate the installation.</li>
+  <li>Sending boot commands to inject <code class="language-plaintext highlighter-rouge">ks.cfg</code> in GRUB.</li>
+  <li>SSH provisioning with a <a href="https://developer.hashicorp.com/packer/docs/provisioners/shell">Shell</a> provisioner.</li>
+  <li>Full integration with <a href="https://kubevirt.io/user-guide/user_workloads/instancetypes">InstanceTypes and Preferences</a>.</li>
+</ul>
+
+<p>Follow these steps to build a Fedora VM image inside your Kubernetes cluster.</p>
+
+<h3 id="step-1-export-kubeconfig-variable">Step 1: Export KubeConfig Variable</h3>
+
+<p>Export your <a href="https://kubernetes.io/docs/concepts/configuration/organize-cluster-access-kubeconfig/#the-kubeconfig-environment-variable">KubeConfig</a>
+variable, which is also used by the Packer plugin:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">export </span><span class="nv">KUBECONFIG</span><span class="o">=</span>~/.kube/config
+</code></pre></div></div>
+
+<p>This is required to communicate with your Kubernetes cluster.</p>
+
+<h3 id="step-2-deploy-iso-datavolume">Step 2: Deploy ISO DataVolume</h3>
+
+<p>Create a <a href="https://kubevirt.io/user-guide/storage/disks_and_volumes/#datavolume">DataVolume</a> to import the Fedora ISO into your cluster’s storage:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: cdi.kubevirt.io/v1beta1
+kind: DataVolume
+metadata:
+  name: fedora-42-x86-64-iso
+  annotations:
+    #
+    # This annotation triggers immediate binding of the PVC,
+    # speeding up provisioning.
+    #
+    cdi.kubevirt.io/storage.bind.immediate.requested: "true"
+spec:
+  source:
+    http:
+      #
+      # Please check if this URL link is valid, in case the import fails.
+      # If so, please modify the URL here below.
+      #
+      url: "https://download.fedoraproject.org/pub/fedora/linux/releases/42/Server/x86_64/iso/Fedora-Server-dvd-x86_64-42-1.1.iso"
+  pvc:
+    accessModes:
+      - ReadWriteOnce
+    resources:
+      requests:
+        storage: 3Gi
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<h4 id="alternative-upload-a-local-iso">Alternative: Upload a local ISO</h4>
+
+<p>Instead of importing from a URL, you can upload a local ISO
+using the <a href="https://kubevirt.io/user-guide/user_workloads/virtctl_client_tool">virtctl</a> client tool:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>virtctl image-upload dv fedora-42-x86-64-iso <span class="se">\</span>
+  <span class="nt">--size</span><span class="o">=</span>3Gi <span class="se">\</span>
+  <span class="nt">--image-path</span><span class="o">=</span>./Fedora-Server-dvd-x86_64-42-1.1.iso <span class="se">\</span>
+</code></pre></div></div>
+
+<p>The <a href="https://fedoraproject.org/server/download">Fedora Server 42 ISO</a> is available on Fedora’s official website.</p>
+
+<h3 id="step-3-create-kickstart-file">Step 3: Create Kickstart File</h3>
+
+<p>This <a href="https://en.wikipedia.org/wiki/Kickstart_(Linux)">Kickstart</a> file automates
+Fedora installation, enabling unattended VM setup.</p>
+
+<p>Create a file named <code class="language-plaintext highlighter-rouge">ks.cfg</code> with the following configuration:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> ks.cfg <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">'
+cdrom
+text
+firstboot --disable
+lang en_US.UTF-8
+keyboard us
+timezone Europe/Paris --utc
+selinux --enforcing
+rootpw root
+firewall --enabled --ssh
+network --bootproto dhcp
+user --groups=wheel --name=user --password=root --uid=1000 --gecos="user" --gid=1000
+
+bootloader --location=mbr --append="net.ifnames=0 biosdevname=0 crashkernel=no"
+
+zerombr
+clearpart --all --initlabel
+autopart --type=lvm
+
+poweroff
+
+%packages --excludedocs
+@core
+qemu-guest-agent
+openssh-server
+%end
+
+%post
+systemctl enable --now sshd
+systemctl enable --now qemu-guest-agent
+%end
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>This configuration enables SSH to provision the temporary VM, and <a href="https://qemu-project.gitlab.io/qemu/interop/qemu-ga.html">QEMU Guest Agent</a>
+to have a better integration with KubeVirt itself.</p>
+
+<h3 id="step-4-create-packer-template">Step 4: Create Packer Template</h3>
+
+<p>Create an example of the Packer template (<code class="language-plaintext highlighter-rouge">fedora.pkr.hcl</code>):</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">cat</span> <span class="o">&gt;</span> fedora.pkr.hcl <span class="o">&lt;&lt;</span> <span class="sh">'</span><span class="no">EOF</span><span class="sh">'
+packer {
+  required_plugins {
+    kubevirt = {
+      source  = "github.com/hashicorp/kubevirt"
+      version = "&gt;= 0.8.0"
+    }
+  }
+}
+
+variable "kube_config" {
+  type    = string
+  default = "</span><span class="k">${</span><span class="nv">env</span><span class="p">(</span><span class="s2">"KUBECONFIG"</span><span class="p">)</span><span class="k">}</span><span class="sh">"
+}
+
+variable "namespace" {
+  type    = string
+  default = "vm-images"
+}
+
+variable "name" {
+  type    = string
+  default = "fedora-42-rand-85"
+}
+
+source "kubevirt-iso" "fedora" {
+  # Kubernetes configuration
+  kube_config   = var.kube_config
+  name          = var.name
+  namespace     = var.namespace
+
+  # ISO configuration
+  iso_volume_name = "fedora-42-x86-64-iso"
+
+  # VM type and preferences
+  disk_size          = "10Gi"
+  instance_type      = "o1.medium"
+  preference         = "fedora"
+  os_type            = "linux"
+
+  # Default network configuration
+  networks {
+    name = "default"
+
+    pod {}
+  }
+
+  # Files to include in the ISO installation
+  media_files = [
+    "./ks.cfg"
+  ]
+
+  # Boot process configuration
+  # A set of commands to send over VNC connection
+  boot_command = [
+    "&lt;up&gt;e",                            # Modify GRUB entry
+    "&lt;down&gt;&lt;down&gt;&lt;end&gt;",                # Navigate to kernel line
+    " inst.ks=hd:LABEL=OEMDRV:/ks.cfg", # Set kickstart file location
+    "&lt;leftCtrlOn&gt;x&lt;leftCtrlOff&gt;"        # Boot with modified command line
+  ]
+  boot_wait                 = "10s"     # Time to wait after boot starts
+  installation_wait_timeout = "15m"     # Timeout for installation to complete
+
+  # SSH configuration
+  communicator      = "ssh"
+  ssh_host          = "127.0.0.1"
+  ssh_local_port    = 2020
+  ssh_remote_port   = 22
+  ssh_username      = "user"
+  ssh_password      = "root"
+  ssh_wait_timeout  = "20m"
+}
+
+build {
+  sources = ["source.kubevirt-iso.fedora"]
+
+  provisioner "shell" {
+    inline = [
+      "echo 'Install packages, configure services, or tweak system settings here.'",
+    ]
+  }
+}
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<h3 id="step-5-export-vm-image-optional">Step 5: Export VM Image (Optional)</h3>
+
+<p>Optionally, export the newly created disk image and package it
+into a <a href="https://kubevirt.io/user-guide/storage/disks_and_volumes/#containerdisk">containerDisk</a>
+so it can be shared across multiple Kubernetes clusters.</p>
+
+<h4 id="required-dependencies">Required Dependencies</h4>
+
+<p>Install these tools on the machine running Packer:</p>
+
+<ul>
+  <li><code class="language-plaintext highlighter-rouge">virtctl</code>: Exports the VM image from the KubeVirt cluster.</li>
+  <li><code class="language-plaintext highlighter-rouge">qemu-img</code>: Converts raw images to qcow2 format.</li>
+  <li><code class="language-plaintext highlighter-rouge">gunzip</code>: Decompresses exported VM images.</li>
+  <li><code class="language-plaintext highlighter-rouge">podman</code>: Builds and pushes container images.</li>
+</ul>
+
+<h4 id="example">Example</h4>
+
+<p>Add a <code class="language-plaintext highlighter-rouge">shell-local</code> post-processor to the Packer build, which runs after the build is completed:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>variable <span class="s2">"registry"</span> <span class="o">{</span>
+  <span class="nb">type</span>    <span class="o">=</span> string
+  default <span class="o">=</span> <span class="s2">"quay.io/containerdisks"</span>
+<span class="o">}</span>
+
+variable <span class="s2">"registry_username"</span> <span class="o">{</span>
+  <span class="nb">type</span>      <span class="o">=</span> string
+  sensitive <span class="o">=</span> <span class="nb">true</span>
+<span class="o">}</span>
+
+variable <span class="s2">"registry_password"</span> <span class="o">{</span>
+  <span class="nb">type</span>      <span class="o">=</span> string
+  sensitive <span class="o">=</span> <span class="nb">true</span>
+<span class="o">}</span>
+
+variable <span class="s2">"image_tag"</span> <span class="o">{</span>
+  <span class="nb">type</span>    <span class="o">=</span> string
+  default <span class="o">=</span> <span class="s2">"latest"</span>
+<span class="o">}</span>
+
+build <span class="o">{</span>
+  ...
+
+  post-processor <span class="s2">"shell-local"</span> <span class="o">{</span>
+    inline <span class="o">=</span> <span class="o">[</span>
+      <span class="c"># Export VM disk image from PVC</span>
+      <span class="s2">"virtctl -n </span><span class="k">${</span><span class="nv">var</span><span class="p">.namespace</span><span class="k">}</span><span class="s2"> vmexport download </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">-export --pvc=</span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2"> --output=</span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.img.gz"</span>,
+
+      <span class="c"># Decompress exported VM image</span>
+      <span class="s2">"gunzip -k </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.img.gz"</span>,
+
+      <span class="c"># Convert raw image to qcow2 (smaller and more efficient format)</span>
+      <span class="s2">"qemu-img convert -c -O qcow2 </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.img </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.qcow2"</span>,
+
+      <span class="c"># Generate Containerfile</span>
+      <span class="s2">"echo 'FROM scratch' &gt; </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.Containerfile"</span>,
+      <span class="s2">"echo 'COPY </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.qcow2 /disk/' &gt;&gt; </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.Containerfile"</span>,
+
+      <span class="c"># Login to registry</span>
+      <span class="s2">"podman login -u </span><span class="k">${</span><span class="nv">var</span><span class="p">.registry_username</span><span class="k">}</span><span class="s2"> -p </span><span class="k">${</span><span class="nv">var</span><span class="p">.registry_password</span><span class="k">}</span><span class="s2"> </span><span class="k">${</span><span class="nv">var</span><span class="p">.registry</span><span class="k">}</span><span class="s2">"</span>,
+
+      <span class="c"># Build and push image</span>
+      <span class="s2">"podman build -t </span><span class="k">${</span><span class="nv">var</span><span class="p">.registry</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">:</span><span class="k">${</span><span class="nv">var</span><span class="p">.image_tag</span><span class="k">}</span><span class="s2"> -f </span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">.Containerfile ."</span>,
+      <span class="s2">"podman push </span><span class="k">${</span><span class="nv">var</span><span class="p">.registry</span><span class="k">}</span><span class="s2">/</span><span class="k">${</span><span class="nv">var</span><span class="p">.name</span><span class="k">}</span><span class="s2">:</span><span class="k">${</span><span class="nv">var</span><span class="p">.image_tag</span><span class="k">}</span><span class="s2">"</span>
+    <span class="o">]</span>
+  <span class="o">}</span>
+<span class="o">}</span>
+</code></pre></div></div>
+
+<p>Sensitive credentials such as registry usernames and passwords should never be hardcoded in templates.</p>
+
+<h3 id="step-6-initialize-packer-plugin">Step 6: Initialize Packer Plugin</h3>
+
+<p>Run the following command once to install the Packer plugin:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>packer init fedora.pkr.hcl
+</code></pre></div></div>
+
+<p>This downloads and sets up the KubeVirt plugin automatically.</p>
+
+<h3 id="step-7-run-packer-build">Step 7: Run Packer Build</h3>
+
+<p>Finally, run a build to create a new VM golden image with:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>packer build fedora.pkr.hcl
+</code></pre></div></div>
+
+<p>Packer will create a new VM golden image in your Kubernetes cluster.</p>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>In this walkthrough, you built a Fedora VM golden image inside Kubernetes
+using Packer and the KubeVirt plugin. You defined an ISO source, automated
+installation with Kickstart configuration and provisioned the VM over SSH
+— all within your Kubernetes cluster.</p>
+
+<p>From here, you can:</p>
+
+<ul>
+  <li>Reuse the bootable volume to launch new VMs instantly.</li>
+  <li>Integrate Packer builds into your CI/CD pipelines.</li>
+  <li>Adapt the same process to build images for other operating systems, such as <a href="https://github.com/hashicorp/packer-plugin-kubevirt/tree/main/examples/builder/kubevirt-iso/rhel">RHEL</a> and <a href="https://github.com/hashicorp/packer-plugin-kubevirt/tree/main/examples/builder/kubevirt-iso/windows">Windows</a>.</li>
+</ul>
+
+<p>The plugin is still in pre-release, but it already offers a streamlined way
+to create consistent VM images inside Kubernetes.</p>
+
+<p>Give it a try and share your feedback or contributions on <a href="https://github.com/hashicorp/packer-plugin-kubevirt">GitHub</a>!</p>]]></content><author><name>Ben Oukhanov</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="packer" /><category term="plugin" /><category term="images" /><summary type="html"><![CDATA[Packer plugin for KubeVirt that builds VM golden images inside Kubernetes.]]></summary></entry><entry><title type="html">KubeVirt v1.6.0</title><link href="https://kubevirt.io//2025/changelog-v1.6.0.html" rel="alternate" type="text/html" title="KubeVirt v1.6.0" /><published>2025-07-30T00:00:00+00:00</published><updated>2025-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2025/changelog-v1.6.0</id><content type="html" xml:base="https://kubevirt.io//2025/changelog-v1.6.0.html"><![CDATA[<h2 id="v160">v1.6.0</h2>
 
 <p>Released on: Wed Jul 30 18:23:13 2025 +0000</p>
 
@@ -701,67 +1074,4 @@ We have two tracks to cater for developer talks, and another for end users to sh
   <li>[PR #10571][tiraboschi] vmi memory footprint increase by 35M when guest serial console logging is turned on (default on).</li>
   <li>[PR #10425][ormergi] Introduce network binding plugin for Passt networking, interfacing with Kubevirt new network binding plugin API.</li>
   <li>[PR #10479][dharmit] Ability to run scripts through hook sidecar</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.2.0 changes]]></summary></entry><entry><title type="html">Announcing KubeVirt v1.1</title><link href="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html" rel="alternate" type="text/html" title="Announcing KubeVirt v1.1" /><published>2023-11-07T00:00:00+00:00</published><updated>2023-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2023/Announcing-KubeVirt-v1-1</id><content type="html" xml:base="https://kubevirt.io//2023/Announcing-KubeVirt-v1-1.html"><![CDATA[<p>The KubeVirt Community is very pleased to announce the release of KubeVirt v1.1. This comes 17 weeks after our celebrated v1.0 release, and follows the predictable schedule we moved to three releases ago to follow the Kubernetes release cadence.</p>
-
-<p>You can read the full <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.1.0">v1.1 release notes here</a>, but we’ve asked the KubeVirt SIGs to summarize their largest successes, as well as one of the community members from Arm to list their integration accomplishments for this release.</p>
-
-<h2 id="sig-compute">SIG-compute</h2>
-<p>SIG-compute covers the core functionality of KubeVirt. This includes scheduling VMs, the API, and all KubeVirt operators.</p>
-
-<p>For the v1.1 release, we have added quite a few features. This includes memory hotplug, as a follow up to CPU hotplug, which was part of the 1.0 release. Basic KSM support was already part of KubeVirt, but we have now extended that with more tuning parameters and KubeVirt can also dynamically configure KSM based on system pressure. We’ve added persistent NVRAM support (requires that a VM use UEFI) so that settings are preserved across reboots.</p>
-
-<p>We’ve also added host-side USB passthrough support, so that USB devices on a cluster node can be made available to workloads. KubeVirt can now automatically apply limits to a VM running in a namespace with quotas. We’ve also added refinements to VM cloning, as well as the ability to create clones using the virtctl CLI tool. And you can now stream guest’s console logs.</p>
-
-<p>Finally, on the confidential computing front, we now have an API for SEV attestation.</p>
-
-<h2 id="sig-infra">SIG-infra</h2>
-<p>SIG-infra takes care of KubeVirt’s own infrastructure, user workloads and other user-focused integrations through automation and the reduction of complexity wherever possible, providing a quality experience for end users.</p>
-
-<p>In this release, two major instance type-related features were added to KubeVirt. The first feature is the deployment of Common InstanceTypes by the virt-operator. This provides users with a useful set of InstanceTypes and Preferences right out of the box and allows them to easily create virtual machines tailored to the needs of their workloads. For now this feature remains behind a feature gate, but in future versions we aim to enable the deployment by default.</p>
-
-<p>Secondly, the inference of InstanceTypes and Preferences has been enabled by default when creating virtual machines with virtctl. This feature was already present in the previous release, but users still needed to explicitly enable it. Now it is enabled by default, being as transparent as possible so as to not let the creation of virtual machines fail if inference should not be possible. This significantly improves usability, as the command line for creating virtual machines is now even simpler.</p>
-
-<h2 id="sig-network">SIG-network</h2>
-<p>SIG-network is committed to enhancing and maintaining all aspects of Virtual Machine network connectivity and management in KubeVirt.</p>
-
-<p>For the v1.1 release, we have re-designed the interface hot plug/unplug API, while adding hotplug support for SR-IOV interfaces. On top of that, we have added a network binding option allowing the community to extend the KubeVirt network configuration in the pod by injecting custom CNI plugins to configure the networking stack, and a sidecar to configure the libvirt domain. The existing <code class="language-plaintext highlighter-rouge">slirp</code> network configuration has been extracted from the code and re-designed as one such network binding, and can be used by the community as an example on how to extend KubeVirt bindings.</p>
-
-<h2 id="sig-scale">SIG-scale</h2>
-<p>SIG-scale continues to track scale and performance across releases.  The v1.1 testing lanes ran on Kubernetes 1.27 and we observed a slight performance improvement from Kubernetes.  There’s no other notable performance or scale changes in KubeVirt v1.1 as our focus has been on improving our tracking.</p>
-
-<h4 id="vmicreationtorunningsecondsp95">vmiCreationToRunningSecondsP95</h4>
-<ul>
-  <li>The gray dotted line in the graph is Feb 1, 2023, denoting release of v0.59</li>
-  <li>The blue dotted line in the graph is March 1, 2023, denoting release of v0.60</li>
-  <li>The green dotted line in the graph is July 6, 2023, denoting release of v1.0.0</li>
-  <li>The red dotted line in the graph is September 6, 2023, denoting change in k8s provider from v1.25 to v1.27</li>
-</ul>
-
-<p><img src="/assets/2023-11-07-Announcing-KubeVirt-v1-1/vmi-p95-Creation-to-Running.png" alt="Alt text" />
-<img src="/assets/2023-11-07-Announcing-KubeVirt-v1-1/vm-p95-Creation-to-Running.png" alt="Alt text" /></p>
-
-<p>Full v1.1 data source: <a href="https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md">https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md</a></p>
-
-<h2 id="sig-storage">SIG-storage</h2>
-<p>SIG-storage is focused on providing persistent storage to KubeVirt VMs and managing that storage throughout the lifecycle of the VM. This begins with provisioning and populating PVCs with bootable images but also includes features such as disk hotplug, snapshots, backup and restore, disaster recovery, and virtual machine export.</p>
-
-<p>For this release we aimed to draw closer to Kubernetes principles when it comes to managing storage artifacts. Introducing CDI volume populators, which is CDI’s implementation of importing/uploading/cloning data to PVCs using the <code class="language-plaintext highlighter-rouge">dataSourceRef</code> field. This follows the Kubernetes way of populating PVCs and enables us to populate PVCs directly without the need for DataVolumes, an important but bespoke object that has served the KubeVirt use case for many years.</p>
-
-<p>Speaking of DataVolumes, they will no longer be garbage collected by default, something that violated a fundamental principle of Kubernetes (even though it was very useful for our use case).</p>
-
-<p>And, finally, we can now use snapshots to store operating system “golden images”, to serve as the base image for cloning.</p>
-
-<h2 id="kubevirt-and-arm">KubeVirt and Arm</h2>
-<p>We are excited to announce the successful integration of KubeVirt on Arm64 platforms. Here are some key accomplishments:</p>
-<ol>
-  <li><strong>Building and Compiling</strong>: We have released multi-architecture KubeVirt component images and binaries, while also allowing cross-compiling Arm64 architecture images and binaries on x86_64 platforms.</li>
-  <li><strong>Core Functionality</strong>: Our dedicated efforts have focused on enabling the core functionality of KubeVirt on Arm64 platforms.</li>
-  <li><strong>Testing Integration</strong>: Quality assurance is of paramount importance. We have integrated unit tests and end-to-end tests on Arm64 servers into the pull request (PR) pre-submit process. This guarantees that KubeVirt maintains its reliability and functionality on Arm64.</li>
-  <li><strong>Comprehensive Documentation</strong>: To provide valuable insights into KubeVirt’s capabilities on Arm64 platforms, we have compiled extensive documentation. Explore the status of <a href="https://kubevirt.io/user-guide/operations/feature_gate_status_on_Arm64/">feature gates</a> and dive into <a href="https://kubevirt.io/user-guide/virtual_machines/device_status_on_Arm64/">device status documentation</a>.</li>
-  <li><strong>Hybrid Cluster Compatibility Preview</strong>: Hybrid x86_64 and Arm64 clusters can work together now as a preview feature. Try it out and provide feedback.</li>
-</ol>
-
-<p>We are thrilled to declare that KubeVirt now offers tier-one support on Arm64 platforms. This milestone represents a culmination of collaborative efforts, unwavering dedication, and a commitment to innovation within the KubeVirt community. KubeVirt is no longer just an option; it has evolved to become a first-class citizen on Arm64 platforms.</p>
-
-<h2 id="conclusion">Conclusion</h2>
-<p>Thank you to everyone in the KubeVirt Community who contributed to this release, whether you pitched in on any of the features listed above, helped out with any of the other features or maintenance improvements listed in our release notes, or made any number of non-code contributions to our website, user guide or meetings.</p>]]></content><author><name>KubeVirt Community</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.1.0" /><category term="release" /><category term="community" /><category term="cncf" /><summary type="html"><![CDATA[We are very pleased to announce the release of KubeVirt v1.1!]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.2.0 changes]]></summary></entry></feed>
