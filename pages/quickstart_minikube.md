@@ -39,7 +39,7 @@ Minikube ships a kubectl client version that matches the kubernetes version to a
 
   ```bash
   VERSION=$(minikube kubectl version | head -1 | awk -F', ' {'print $3'} | awk -F':' {'print $2'} | sed s/\"//g)
-  sudo install ${HOME}/.minikube/cache/linux/${VERSION}/kubectl /usr/local/bin
+  sudo install -m 0755 ${HOME}/.minikube/cache/linux/${VERSION}/kubectl /usr/local/bin
   ```
 
 * To install minikube please follow the official documentation for your system using the instructions located [_here_](https://kubernetes.io/docs/tasks/tools/install-minikube/).
