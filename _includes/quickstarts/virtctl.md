@@ -12,7 +12,7 @@ ARCH=$(uname -s | tr A-Z a-z)-$(uname -m | sed 's/x86_64/amd64/') || windows-amd
 echo ${ARCH}
 curl -L -o virtctl https://github.com/kubevirt/kubevirt/releases/download/${VERSION}/virtctl-${VERSION}-${ARCH}
 chmod +x virtctl
-sudo install virtctl /usr/local/bin
+sudo install -m 0755 virtctl /usr/local/bin
 ```
 
 ### Install as Krew plugin
