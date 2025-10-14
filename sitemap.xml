@@ -784,10 +784,10 @@
 <loc>https://kubevirt.io//cluster-api-provider-external/</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//category/community.html</loc>
+<loc>https://kubevirt.io//community/</loc>
 </url>
 <url>
-<loc>https://kubevirt.io//community/</loc>
+<loc>https://kubevirt.io//category/community.html</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//blogs/community</loc>
@@ -1748,6 +1748,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2025-09-15T13:13:10+00:00</lastmod>
+<lastmod>2025-10-14T13:11:26+00:00</lastmod>
 </url>
 </urlset>
