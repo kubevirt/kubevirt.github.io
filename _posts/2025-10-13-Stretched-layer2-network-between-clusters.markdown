@@ -433,6 +433,89 @@ KUBECONFIG=bin/kubeconfig-pe-kind-a virtctl console vm-1
 As you can see, the VM running in cluster A was able to successfully reach into
 the VM running in cluster B.
 
+### Bonus track: connecting to provider networks using an L3VNI
+This extra (optional) step showcases how you can import provider network routes
+into the Kubernetes clusters - essentially creating an L3 overlay - using
+`openperouter`s L3VNI CRD.
+
+We will use it to reach into the webserver hosted in `hostA` (attached to
+`leafA` in the [diagram](#the-testbed)) from the VMs running in both clusters.
+Please refer to the image below to get a better understanding of the scenario.
+
+![Workloads on both clusters can access services in the red VRF](/assets/2025-10-13-evpn-integration/03-wrap-l3vni-over-stretched-l2.png "Wrap an L3VNI over a stretched L2 EVPN")
+
+Since we already have configured the `underlay` in a
+[previous step](#configuring-the-underlay-network), all we need to do is to
+configure the `L3VNI`; for that, provision the following CR in **both**
+clusters:
+
+```yaml
+apiVersion: openpe.openperouter.github.io/v1alpha1
+kind: L3VNI
+metadata:
+  name: red
+  namespace: openperouter-system
+spec:
+  vni: 100
+  vrf: red
+```
+
+This will essentially wrap the existing `L2VNI` with an L3 domain - i.e. a
+separate Virtual Routing Function (VRF), whose Virtual Network Identifier (VNI)
+is 100. This will enable the Kubernetes clusters to reach into services located in
+the **red** VRF (which have VNI = 100). Services on `hostA` and/or `hostB` with
+VNI = 200 are not accessible, since we haven't exposed them over EVPN (using an
+`L3VNI`).
+
+Once we've provisioned the aforementioned `L3VNI`, we can now check accessing
+the webserver located in the host in `leafA` - `clab-kind-leafA`.
+
+```shell
+docker exec clab-kind-hostA_red ip -4 addr show dev eth1
+228: eth1@if227: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9500 qdisc noqueue state UP group default  link-netnsid 1
+    inet 192.168.20.2/24 scope global eth1
+       valid_lft forever preferred_lft forever
+```
+
+Let's also check the same thing for the `blue` VRF - for which we do **not**
+have any VNI configuration.
+```shell
+docker exec clab-kind-hostA_blue ip -4 addr show dev eth1
+273: eth1@if272: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 9500 qdisc noqueue state UP group default  link-netnsid 1
+    inet 192.168.21.2/24 scope global eth1
+       valid_lft forever preferred_lft forever
+```
+
+And let's now access these services from the VMs we have in both clusters.
+
+From `vm-1`, in cluster A:
+```shell
+# username/password => fedora/fedora
+virtctl console vm-1
+Successfully connected to vm-1 console. The escape sequence is ^]
+
+vm-1 login: fedora
+Password:
+[fedora@vm-1 ~]$ curl 192.168.20.2:8090/clientip # we have access to the RED VRF
+192.170.1.3:35146
+[fedora@vm-1 ~]$ curl 192.168.21.2:8090/clientip # we do NOT have access to the BLUE VRF
+curl: (28) Failed to connect to 192.168.21.2 port 8090 after 128318 ms: Connection timed out
+```
+
+From `vm-2`, in cluster B:
+```shell
+# username/password => fedora/fedora
+virtctl console vm-2
+Successfully connected to vm-2 console. The escape sequence is ^]
+
+vm-2 login: fedora
+Password:
+[fedora@vm-2 ~]$ curl 192.168.20.2:8090/clientip # we have access to the RED VRF
+192.170.1.30:52924
+[fedora@vm-2 ~]$ curl 192.168.21.2:8090/clientip # we do NOT have access to the BLUE VRF
+curl: (28) Failed to connect to 192.168.21.2 port 8090 after 130643 ms: Connection timed out
+```
+
 ## Conclusions
 In this article we have explained EVPN and which virtualization use cases it
 can provide.
@@ -440,3 +523,7 @@ can provide.
 We have also shown the reader how
 [openperouter](https://openperouter.github.io/) `L2VNI` CRD can be used to
 stretch a layer2 overlay across multiple Kubernetes clusters.
+
+Finally, we have also seen how `openperouter` `L3VNI` can be used to create
+Layer3 overlays, which allows the VMs running in the Kubernetes clusters to
+access services in the exposed provider networks.
