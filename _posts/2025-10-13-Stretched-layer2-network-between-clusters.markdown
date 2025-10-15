@@ -113,6 +113,20 @@ ls $(pwd)/bin/kubeconfig-*
 /root/github/openperouter/bin/kubeconfig-pe-kind-a  /root/github/openperouter/bin/kubeconfig-pe-kind-b
 ```
 
+Before moving to the configuration section, let's install KubeVirt in both
+clusters:
+```shell
+for kubeconfig in $(ls bin/kubeconfig-*); do
+    echo "Installing KubeVirt in cluster using KUBECONFIG=$kubeconfig"
+    KUBECONFIG=$kubeconfig kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v1.5.2/kubevirt-operator.yaml
+    KUBECONFIG=$kubeconfig kubectl apply -f https://github.com/kubevirt/kubevirt/releases/download/v1.5.2/kubevirt-cr.yaml
+    # Patch KubeVirt to allow scheduling on control-planes, so we can test live migration between two nodes
+    KUBECONFIG=$kubeconfig kubectl patch -n kubevirt kubevirt kubevirt --type merge --patch '{"spec": {"workloads": {"nodePlacement": {"tolerations": [{"key": "node-role.kubernetes.io/control-plane", "operator": "Exists", "effect": "NoSchedule"}]}}}}'
+    KUBECONFIG=$kubeconfig kubectl wait --for=condition=Available kubevirt/kubevirt -n kubevirt --timeout=10m
+    echo "Finished installing KubeVirt in cluster using KUBECONFIG=$kubeconfig"
+done
+```
+
 ## Configuring the KubeVirt clusters
 As indicated in the [introduction](#introduction) section, the end goal is to
 stretch a layer 2 network across both Kubernetes clusters, using EVPN. Please
