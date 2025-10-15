@@ -142,7 +142,8 @@ For that,
 you will need to provision the following CRs:
 
 - in cluster A.
-```yaml
+```shell
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-a kubectl apply -f - <<EOF
 apiVersion: openpe.openperouter.github.io/v1alpha1
 kind: Underlay
 metadata:
@@ -157,10 +158,12 @@ spec:
   neighbors:
     - asn: 64512
       address: 192.168.11.2
+EOF
 ```
 
 - in cluster B.
-```yaml
+```shell
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-b kubectl apply -f - <<EOF
 apiVersion: openpe.openperouter.github.io/v1alpha1
 kind: Underlay
 metadata:
@@ -176,16 +179,7 @@ spec:
   neighbors:
     - asn: 64516
       address: 192.168.12.2
-```
-
-[!IMPORTANT]
-Remember that you need to point at the proper kubeconfig file to
-connect to the desired cluster.
-To provision the manifest into cluster-A you would do something like the
-following:
-```shell
-cd <path to openperouter repo>
-KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-a kubectl apply -f <manifest>
+EOF
 ```
 
 ### Configuring the EVPN VNI
@@ -196,7 +190,9 @@ that, we will use openperouter's `L2VNI` CRD.
 The configuration is the same for both clusters; please provision the following
 `L2VNI` CR in both clusters:
 
-```yaml
+```shell
+# provision L2VNI in cluster: pe-kind-a
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-a kubectl apply -f - <<EOF
 apiVersion: openpe.openperouter.github.io/v1alpha1
 kind: L2VNI
 metadata:
@@ -209,6 +205,23 @@ spec:
   l2gatewayip: 192.170.1.1/24
   vni: 110
   vrf: red
+EOF
+
+# provision L2VNI in cluster: pe-kind-b
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-b kubectl apply -f - <<EOF
+apiVersion: openpe.openperouter.github.io/v1alpha1
+kind: L2VNI
+metadata:
+  name: layer2
+  namespace: openperouter-system
+spec:
+  hostmaster:
+    autocreate: true
+    type: bridge
+  l2gatewayip: 192.170.1.1/24
+  vni: 110
+  vrf: red
+EOF
 ```
 
 After this step, we will have created an L2 overlay network on top of the
@@ -216,7 +229,9 @@ network fabric. We now need to enable it to be plumbed to the workloads. And
 for that, we will need to provision a network attachment definition (again, in
 both clusters).
 
-```yaml
+```shell
+# provision NAD in cluster: pe-kind-a
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-a kubectl apply -f - <<EOF
 apiVersion: "k8s.cni.cncf.io/v1"
 kind: NetworkAttachmentDefinition
 metadata:
@@ -231,6 +246,25 @@ spec:
       "macspoofchk": false,
       "disableContainerInterface": true
     }
+EOF
+
+# provision NAD in cluster: pe-kind-b
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-b kubectl apply -f - <<EOF
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: evpn
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "name": "evpn",
+      "type": "bridge",
+      "bridge": "br-hs-110",
+      "macspoofchk": false,
+      "disableContainerInterface": true
+    }
+EOF
 ```
  
 Now that we have set up networking for the workloads, we can proceed with
@@ -253,8 +287,9 @@ Both VMs have static IPs, configured over cloud-init. They are:
 To provision these, follow these steps:
 
 1. provision `vm-1` in cluster `pe-kind-a`:
-```yaml
- apiVersion: kubevirt.io/v1
+```shell
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-a kubectl apply -f - <<EOF
+apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
   name: vm-1
@@ -304,10 +339,12 @@ spec:
                 - 192.170.1.3/24
                 gateway4: 192.170.1.1
         name: cloudinitdisk
+EOF
 ```
 
 2. provision `vm-2` in cluster `pe-kind-b`:
-```yaml
+```shell
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-b kubectl apply -f - <<EOF
 apiVersion: kubevirt.io/v1
 kind: VirtualMachine
 metadata:
@@ -358,6 +395,7 @@ spec:
                 - 192.170.1.30/24
                 gateway4: 192.170.1.1
         name: cloudinitdisk
+EOF
 ```
 
 We will use `VM-2` (which runs in cluster **B**) as the "server", and `VM-1`
@@ -449,7 +487,9 @@ Since we already have configured the `underlay` in a
 configure the `L3VNI`; for that, provision the following CR in **both**
 clusters:
 
-```yaml
+```shell
+# provision L3VNI in cluster: pe-kind-a
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-a kubectl apply -f - <<EOF
 apiVersion: openpe.openperouter.github.io/v1alpha1
 kind: L3VNI
 metadata:
@@ -458,6 +498,19 @@ metadata:
 spec:
   vni: 100
   vrf: red
+EOF
+
+# provision L3VNI in cluster: pe-kind-b
+KUBECONFIG=$(pwd)/bin/kubeconfig-pe-kind-b kubectl apply -f - <<EOF
+apiVersion: openpe.openperouter.github.io/v1alpha1
+kind: L3VNI
+metadata:
+  name: red
+  namespace: openperouter-system
+spec:
+  vni: 100
+  vrf: red
+EOF
 ```
 
 This will essentially wrap the existing `L2VNI` with an L3 domain - i.e. a
