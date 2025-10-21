@@ -56,7 +56,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2025-10-14 13:12:28 +0000" >
+    <meta property="og:article:published_time" content="2025-10-21 12:26:44 +0000" >
     <meta name="twitter:title" content="KubeVirt quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -475,7 +475,7 @@ To install kubectl client please follow the official documentation for your syst
     <p>It can be installed directly to the host by running the following:</p>
 
     <div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">VERSION</span><span class="o">=</span><span class="si">$(</span>minikube kubectl version | <span class="nb">head</span> <span class="nt">-1</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">', '</span> <span class="o">{</span><span class="s1">'print $3'</span><span class="o">}</span> | <span class="nb">awk</span> <span class="nt">-F</span><span class="s1">':'</span> <span class="o">{</span><span class="s1">'print $2'</span><span class="o">}</span> | <span class="nb">sed </span>s/<span class="se">\"</span>//g<span class="si">)</span>
-<span class="nb">sudo install</span> <span class="k">${</span><span class="nv">HOME</span><span class="k">}</span>/.minikube/cache/linux/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/kubectl /usr/local/bin
+<span class="nb">sudo install</span> <span class="nt">-m</span> 0755 <span class="k">${</span><span class="nv">HOME</span><span class="k">}</span>/.minikube/cache/linux/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/kubectl /usr/local/bin
 </code></pre></div>    </div>
   </li>
   <li>
@@ -619,8 +619,7 @@ If for any reason nested virtualization cannot be enabled do enable KubeVirt emu
 <span class="nv">ARCH</span><span class="o">=</span><span class="si">$(</span><span class="nb">uname</span> <span class="nt">-s</span> | <span class="nb">tr </span>A-Z a-z<span class="si">)</span>-<span class="si">$(</span><span class="nb">uname</span> <span class="nt">-m</span> | <span class="nb">sed</span> <span class="s1">'s/x86_64/amd64/'</span><span class="si">)</span> <span class="o">||</span> windows-amd64.exe
 <span class="nb">echo</span> <span class="k">${</span><span class="nv">ARCH</span><span class="k">}</span>
 curl <span class="nt">-L</span> <span class="nt">-o</span> virtctl https://github.com/kubevirt/kubevirt/releases/download/<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>/virtctl-<span class="k">${</span><span class="nv">VERSION</span><span class="k">}</span>-<span class="k">${</span><span class="nv">ARCH</span><span class="k">}</span>
-<span class="nb">chmod</span> +x virtctl
-<span class="nb">sudo install </span>virtctl /usr/local/bin
+<span class="nb">sudo install</span> <span class="nt">-m</span> 0755 virtctl /usr/local/bin
 </code></pre></div>    </div>
   </li>
 </ul>
