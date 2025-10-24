@@ -79,7 +79,9 @@ data centers. It consists of leaf switches that connect to end devices, and
 spine switches that interconnect all leaf switches. This way, workloads will
 always be (at most) two hops away from one another.
 
-![This diagram portrays the testbed we will use for this blog article.](/assets/2025-10-13-evpn-integration/01-evpn-integration-testbed-resized.png)
+<p align="center">
+  <img src="../assets/2025-10-13-evpn-integration/01-evpn-integration-testbed.png" alt="The testbed" width="100%"/>
+</p>
 
 The diagram highlights the autonomous system (AS) numbers each of the
 components will use.
@@ -138,7 +140,9 @@ As indicated in the [introduction](#introduction) section, the end goal is to
 stretch a layer 2 network across both Kubernetes clusters, using EVPN. Please
 refer to the image below for a simple diagram.
 
-![A layer 2 network which is stretched across both Kubernetes clusters using EVPN](/assets/2025-10-13-evpn-integration/02-stretched-l2-evpn-resized.png "Layer 2 network stretched across both clusters")
+<p align="center">
+  <img src="../assets/2025-10-13-evpn-integration/02-stretched-l2-evpn.png" alt="Layer 2 network stretched across both clusters" width="100%"/>
+</p>
 
 In order to stretch an L2 overlay across both cluster we need to:
 - configure the underlay network
@@ -506,7 +510,10 @@ We will use it to reach into the webserver hosted in `hostA` (attached to
 `leafA` in the [diagram](#the-testbed)) from the VMs running in both clusters.
 Please refer to the image below to get a better understanding of the scenario.
 
-![Workloads on both clusters can access services in the red VRF](/assets/2025-10-13-evpn-integration/03-wrap-l3vni-over-stretched-l2-resized.png "Wrap an L3VNI over a stretched L2 EVPN")
+<p align="center">
+  <img src="../assets/2025-10-13-evpn-integration/03-wrap-l3vni-over-stretched-l2.png" alt="Wrap an L3VNI over a stretched L2 EVPN" width="100%"/>
+</p>
+
 
 Since we already have configured the `underlay` in a
 [previous step](#configuring-the-underlay-network), all we need to do is to
