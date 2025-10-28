@@ -1,8 +1,8 @@
 ---
 layout: post
 author: Miguel Duarte Barroso
-title: Stretching a layer2 network over multiple KubeVirt clusters
-description: How to stretch a layer2 overlay over multiple KubeVirt clusters.
+title: Stretching a Layer 2 network over multiple KubeVirt clusters
+description: Explore EVPN and see how openperouter creates Layer 2 and Layer 3 overlays across Kubernetes clusters.
 navbar_active: Blogs
 pub-date: October 24
 pub-year: 2025
