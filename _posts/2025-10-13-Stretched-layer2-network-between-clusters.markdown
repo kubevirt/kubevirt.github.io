@@ -100,12 +100,14 @@ To spawn the tested in your laptop, you should clone the openperouter repo.
 ```sh
 git clone https://github.com/openperouter/openperouter.git
 git checkout c9d591a
+cd openperouter
 ```
 
 Assuming you have all the [requirements](#prerequisites) installed in your
 laptop, all you need to do is build the router component, and execute the
 `deploy-multi` make target. Then, you should be ready to go!
 ```sh
+sysctl -w fs.inotify.max_user_instances=1024 # might need sudo
 make docker-build && make deploy-multi
 ```
 
