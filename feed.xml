@@ -1,4 +1,59 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-10-30T15:46:02+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Stretching a Layer 2 network over multiple KubeVirt clusters</title><link href="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html" rel="alternate" type="text/html" title="Stretching a Layer 2 network over multiple KubeVirt clusters" /><published>2025-10-13T00:00:00+00:00</published><updated>2025-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Stretched-layer2-network-between-clusters</id><content type="html" xml:base="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-11-07T16:28:13+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Announcing the results of our Security Audit</title><link href="https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html" rel="alternate" type="text/html" title="Announcing the results of our Security Audit" /><published>2025-11-07T00:00:00+00:00</published><updated>2025-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results</id><content type="html" xml:base="https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html"><![CDATA[<p>The KubeVirt Community is very pleased to share the results of our security audit, completed through the guidance of the Open Source Technology Improvement Fund (OSTIF) and the technical expertise of Quarkslab.</p>
+
+<p>This is a critical step in KubeVirt moving to Graduation within the CNCF framework, and is the first time the project has been publicly audited.</p>
+
+<p>The audit was conducted by Quarkslab earlier this year, beginning with an architectural review of KubeVirt and the creation of a threat model that identified threat actors, attack scenarios, and attack surfaces of the project. These were used to then test, prod, and poke to uncover and exploit any weak points.</p>
+
+<p>The audit found the following:</p>
+
+<ul>
+  <li>15 findings with a Security Impact:
+    <ul>
+      <li>0 Critical</li>
+      <li>1 High
+        <ul>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-46xp-26xh-hpqh">CVE-2025-64324</a></li>
+        </ul>
+      </li>
+      <li>7 Medium
+        <ul>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-38jw-g2qx-4286">CVE-2025-64432</a></li>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-qw6q-3pgr-5cwq">CVE-2025-64433</a></li>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-ggp9-c99x-54gp">CVE-2025-64434</a></li>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-9m94-w2vq-hcf9">CVE-2025-64435</a></li>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-7xgm-5prm-v5gc">CVE-2025-64436</a></li>
+          <li><a href="https://github.com/kubevirt/kubevirt/security/advisories/GHSA-2r4r-5x78-mvqf">CVE-2025-64437</a></li>
+        </ul>
+      </li>
+      <li>4 Low</li>
+      <li>3 Informational</li>
+    </ul>
+  </li>
+</ul>
+
+<p>Quarkslab also provided us with a Custom Threat Model and Fix Recommendations, and kept in touch after delivering the audit to help us understand and address the weaknesses they found. One of their team even volunteered their time to help remediate some of these issues, which we greatly appreciated!</p>
+
+<p>These findings were provided to the project maintainers privately with an agreed response time to allow KubeVirt to address them prior to publication.</p>
+
+<p>The KubeVirt maintainers are very happy with these results, as they demonstrate not only the strength and security focus of our community, as well as the payoff of our earlier investment of moving to non-privileged by default, and by being compliant with the standard Kubernetes Security Model, which includes SELinux policies, seccomp and Pod Security Standards. It is worth noting that Kubernetes is also maturing and providing more security features, allowing KubeVirt and other projects in the ecosystem to inherently increase our security.</p>
+
+<p>This all highlights the unique benefits and additional isolation of running virtual machines as containers in addition to the benefits of using virtual machines.</p>
+
+<p>Having your project audited is both nerve-inducing and extremely comforting. The KubeVirt project is deeply invested in following security best practices, and part of these best practices is having your project audited by a third party to find any possible weaknesses before a malicious actor. KubeVirt maintainers appreciate the OSTIF initiative in promoting security of CNCF projects.</p>
+
+<p>You can read the <a href="https://ostif.org/wp-content/uploads/2025/10/KubeVirt_OSTIF_Report_25-06-2150-REP_v1.2.pdf">full Audit Report here</a>.</p>
+
+<p><a href="https://blog.quarkslab.com/kubevirt-security-audit.html">Quarkslab’s blog on the process here</a>.</p>
+
+<p>And <a href="https://ostif.org/kubevirt-audit-complete/">OSTIF’s blog here</a>.</p>
+
+<p>A huge thanks to everyone involved:<br />
+<strong>Quarkslab</strong>: Sébastien Rolland, Mihail Kirov, and Pauline Sauder<br />
+<strong>OSTIF</strong>: Helen Woeste and Amir Montazery<br />
+<strong>KubeVirt</strong>: Jed Lejosne, Ľuboslav Pivarč, Vladik Romanovsky, Federico Fossemò, Stu Gott, Roman Mohr, Fabian Deutsch, and Andrew Burden</p>
+
+<p>We recommend users update their clusters to the latest supported z-stream version of KubeVirt.<br />
+See our <a href="https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md">KubeVirt to Kubernetes version support matrix</a> for more information on supported KubeVirt versions.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="graduation" /><category term="security" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[As part of our application to Graduate, KubeVirt has a security audit performed by a third-party, organised through the CNCF and OSTIF.]]></summary></entry><entry><title type="html">Stretching a Layer 2 network over multiple KubeVirt clusters</title><link href="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html" rel="alternate" type="text/html" title="Stretching a Layer 2 network over multiple KubeVirt clusters" /><published>2025-10-13T00:00:00+00:00</published><updated>2025-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Stretched-layer2-network-between-clusters</id><content type="html" xml:base="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>KubeVirt enables you to run virtual machines (VMs) within Kubernetes clusters,
 but networking VMs across multiple clusters presents significant challenges.
 Current KubeVirt networking relies on cluster-local solutions, which cannot
@@ -1575,41 +1630,4 @@ After the upgrade, the cluster admin will have sufficient time to bind the new <
   <li>[PR #11051][alromeros] Bugfix: Improve error reporting when fsfreeze fails</li>
   <li>[PR #11156][nunnatsa] Move some verification from the VMI create validation webhook to the CRD</li>
   <li>[PR #11146][RamLavi] node-labeller: Remove obsolete functionalities</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.3.0 changes]]></summary></entry><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
-
-<h2 id="what-is-kubevirt-summit">What is KubeVirt Summit?</h2>
-
-<p>KubeVirt Summit is our annual online conference, now in its fourth year, in which the entire broader community meets to showcase technical architecture, new features, proposed changes, and in-depth tutorials.
-We have two tracks to cater for developer talks, and another for end users to share their deployment journey with KubeVirt and their use case(s) at scale. And there’s no reason why a talk can’t be both :)</p>
-
-<h2 id="when-is-it">When is it?</h2>
-
-<p>The event will take place online over two half-days:</p>
-
-<ul>
-  <li>Dates: <del>June 25 and 26</del> <strong>June 24 and 25</strong>, 2024</li>
-  <li>Time: TBD 
-(In the past we have aimed for 1200-1700 UTC but may modify these times slightly depending on our speaker timezones)</li>
-</ul>
-
-<h2 id="how-to-submit-a-proposal">How to submit a proposal?</h2>
-
-<ul>
-  <li>Please submit through this <a href="https://docs.google.com/forms/d/e/1FAIpQLSeELmfpD_20kZnrciXkdSdDS_MLFLN9xSaZDKptNPjg3JGLaA/viewform">Googleform</a></li>
-  <li>CfP closes: <strong>May 20</strong>, 2024</li>
-  <li>Schedule will announced at the end of May</li>
-</ul>
-
-<p>Do consider proposing a session, and help make our fourth Summit as valuable as possible. We welcome a range of session types, any of which can be simple and intended for beginners or face-meltingly technical. Check out <a href="https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q">last year’s talks</a> for some ideas.</p>
-
-<h2 id="have-questions">Have questions?</h2>
-
-<p>Our <a href="/summit/">KubeVirt Summit 2024</a> page will continue to evolve with details as we get closer.</p>
-
-<p>You can also reach out on our <a href="https://kubernetes.slack.com/messages/virtualization">virtualization</a> Slack channel (in the Kubernetes workspace).</p>
-
-<h2 id="keep-up-to-date">Keep up to date</h2>
-
-<p>Connect with the KubeVirt Community through our mailing list, slack channels, weekly meetings, and more, all list in our <a href="https://github.com/kubevirt/community">community repo</a>.</p>
-
-<p>Good luck!</p>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's fourth annual dedicated online event]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.3.0 changes]]></summary></entry></feed>
