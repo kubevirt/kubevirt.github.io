@@ -54,14 +54,14 @@ Having your project audited is both nerve-inducing and extremely comforting. The
 
 You can read the [full Audit Report here](https://ostif.org/wp-content/uploads/2025/10/KubeVirt_OSTIF_Report_25-06-2150-REP_v1.2.pdf).
 
-<!-- [Quarkslab's blog on the process here](XXX) -->
+[Quarkslab's blog on the process here](https://blog.quarkslab.com/kubevirt-security-audit.html).
 
 And [OSTIF's blog here](https://ostif.org/kubevirt-audit-complete/).
 
-A huge thanks to everyone involved:
+A huge thanks to everyone involved:<br>
+**Quarkslab**: Sébastien Rolland, Mihail Kirov, and Pauline Sauder<br>
+**OSTIF**: Helen Woeste and Amir Montazery<br>
+**KubeVirt**: Jed Lejosne, Ľuboslav Pivarč, Vladik Romanovsky, Federico Fossemò, Stu Gott, Roman Mohr, Fabian Deutsch, and Andrew Burden
 
-Quarkslab: Sébastien Rolland, Mihail Kirov, and Pauline Sauder<br>
-OSTIF: Helen Woeste and Amir Montazery<br>
-KubeVirt: Jed Lejosne, Ľuboslav Pivarč, Vladik Romanovsky, Federico Fossemò, Stu Gott, Roman Mohr, Fabian Deutsch, and Andrew Burden
-
-We recommend users update their clusters to the latest supported z-stream version of KubeVirt. See our [KubeVirt to Kubernetes version support matrix](https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md) for more information on supported KubeVirt versions.
+We recommend users update their clusters to the latest supported z-stream version of KubeVirt.<br>
+See our [KubeVirt to Kubernetes version support matrix](https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md) for more information on supported KubeVirt versions.
