@@ -27,12 +27,20 @@ This is a critical step in KubeVirt moving to Graduation within the CNCF framewo
 The audit was conducted by Quarkslab earlier this year, beginning with an architectural review of KubeVirt and the creation of a threat model that identified threat actors, attack scenarios, and attack surfaces of the project. These were used to then test, prod, and poke to uncover and exploit any weak points. 
 
 The audit found the following:
-15 findings with a Security Impact:
-* 0 Critical
-* 1 High
-* 7 Medium
-* 4 Low
-* 3 Informational
+
+* 15 findings with a Security Impact:
+    * 0 Critical
+    * 1 High
+        * [CVE-2025-64324](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-46xp-26xh-hpqh)
+    * 7 Medium
+        * [CVE-2025-64432](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-38jw-g2qx-4286)
+        * [CVE-2025-64433](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-qw6q-3pgr-5cwq)
+        * [CVE-2025-64434](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-ggp9-c99x-54gp)
+        * [CVE-2025-64435](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-9m94-w2vq-hcf9)
+        * [CVE-2025-64436](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-7xgm-5prm-v5gc)
+        * [CVE-2025-64437](https://github.com/kubevirt/kubevirt/security/advisories/GHSA-2r4r-5x78-mvqf)
+    * 4 Low
+    * 3 Informational
 
 Quarkslab also provided us with a Custom Threat Model and Fix Recommendations, and kept in touch after delivering the audit to help us understand and address the weaknesses they found. One of their team even volunteered their time to help remediate some of these issues, which we greatly appreciated!
 
@@ -44,15 +52,16 @@ This all highlights the unique benefits and additional isolation of running virt
 
 Having your project audited is both nerve-inducing and extremely comforting. The KubeVirt project is deeply invested in following security best practices, and part of these best practices is having your project audited by a third party to find any possible weaknesses before a malicious actor. KubeVirt maintainers appreciate the OSTIF initiative in promoting security of CNCF projects.
 
-You can read the full Audit Report here: https://ostif.org/wp-content/uploads/2025/10/KubeVirt_OSTIF_Report_25-06-2150-REP_v1.2.pdf
+You can read the [full Audit Report here](https://ostif.org/wp-content/uploads/2025/10/KubeVirt_OSTIF_Report_25-06-2150-REP_v1.2.pdf).
 
-Quarkslab's blog on the process here: XXX
+<!-- [Quarkslab's blog on the process here](XXX) -->
 
-And OSTIF's blog here: https://ostif.org/kubevirt-audit-complete/ 
+And [OSTIF's blog here](https://ostif.org/kubevirt-audit-complete/).
 
 A huge thanks to everyone involved:
-Quarkslab: Sébastien Rolland, Mihail Kirov, and Pauline Sauder
-OSTIF: Helen Woeste and Amir Montazery
+
+Quarkslab: Sébastien Rolland, Mihail Kirov, and Pauline Sauder<br>
+OSTIF: Helen Woeste and Amir Montazery<br>
 KubeVirt: Jed Lejosne, Ľuboslav Pivarč, Vladik Romanovsky, Federico Fossemò, Stu Gott, Roman Mohr, Fabian Deutsch, and Andrew Burden
 
 We recommend users update their clusters to the latest supported z-stream version of KubeVirt. See our [KubeVirt to Kubernetes version support matrix](https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md) for more information on supported KubeVirt versions.
