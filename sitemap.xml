@@ -773,6 +773,10 @@
 <lastmod>2025-10-13T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2025/Dedicated-migration-network-for-cross-cluster-live-migration.html</loc>
+<lastmod>2025-10-31T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html</loc>
 <lastmod>2025-11-07T00:00:00+00:00</lastmod>
 </url>
@@ -1653,6 +1657,9 @@
 <loc>https://kubevirt.io//tag/openperouter.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//tag/live-migration.html</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//tag/graduation.html</loc>
 </url>
 <url>
@@ -1771,6 +1778,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2025-11-07T16:27:17+00:00</lastmod>
+<lastmod>2025-11-26T11:26:12+00:00</lastmod>
 </url>
 </urlset>

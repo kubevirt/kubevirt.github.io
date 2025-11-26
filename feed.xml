@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-11-07T16:28:13+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Announcing the results of our Security Audit</title><link href="https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html" rel="alternate" type="text/html" title="Announcing the results of our Security Audit" /><published>2025-11-07T00:00:00+00:00</published><updated>2025-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results</id><content type="html" xml:base="https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html"><![CDATA[<p>The KubeVirt Community is very pleased to share the results of our security audit, completed through the guidance of the Open Source Technology Improvement Fund (OSTIF) and the technical expertise of Quarkslab.</p>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2025-11-26T11:27:28+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Announcing the results of our Security Audit</title><link href="https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html" rel="alternate" type="text/html" title="Announcing the results of our Security Audit" /><published>2025-11-07T00:00:00+00:00</published><updated>2025-11-07T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results</id><content type="html" xml:base="https://kubevirt.io//2025/Announcing-KubeVirt-Security-Audit-Results.html"><![CDATA[<p>The KubeVirt Community is very pleased to share the results of our security audit, completed through the guidance of the Open Source Technology Improvement Fund (OSTIF) and the technical expertise of Quarkslab.</p>
 
 <p>This is a critical step in KubeVirt moving to Graduation within the CNCF framework, and is the first time the project has been publicly audited.</p>
 
@@ -53,7 +53,417 @@
 <strong>KubeVirt</strong>: Jed Lejosne, Ľuboslav Pivarč, Vladik Romanovsky, Federico Fossemò, Stu Gott, Roman Mohr, Fabian Deutsch, and Andrew Burden</p>
 
 <p>We recommend users update their clusters to the latest supported z-stream version of KubeVirt.<br />
-See our <a href="https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md">KubeVirt to Kubernetes version support matrix</a> for more information on supported KubeVirt versions.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="graduation" /><category term="security" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[As part of our application to Graduate, KubeVirt has a security audit performed by a third-party, organised through the CNCF and OSTIF.]]></summary></entry><entry><title type="html">Stretching a Layer 2 network over multiple KubeVirt clusters</title><link href="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html" rel="alternate" type="text/html" title="Stretching a Layer 2 network over multiple KubeVirt clusters" /><published>2025-10-13T00:00:00+00:00</published><updated>2025-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Stretched-layer2-network-between-clusters</id><content type="html" xml:base="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+See our <a href="https://github.com/kubevirt/sig-release/blob/main/releases/k8s-support-matrix.md">KubeVirt to Kubernetes version support matrix</a> for more information on supported KubeVirt versions.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="graduation" /><category term="security" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[As part of our application to Graduate, KubeVirt has a security audit performed by a third-party, organised through the CNCF and OSTIF.]]></summary></entry><entry><title type="html">Dedicated Migration Networks for Cross-Cluster Live Migration with KubeVirt and EVPN</title><link href="https://kubevirt.io//2025/Dedicated-migration-network-for-cross-cluster-live-migration.html" rel="alternate" type="text/html" title="Dedicated Migration Networks for Cross-Cluster Live Migration with KubeVirt and EVPN" /><published>2025-10-31T00:00:00+00:00</published><updated>2025-10-31T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Dedicated-migration-network-for-cross-cluster-live-migration</id><content type="html" xml:base="https://kubevirt.io//2025/Dedicated-migration-network-for-cross-cluster-live-migration.html"><![CDATA[<h2 id="introduction">Introduction</h2>
+
+<p>In our <a href="https://kubevirt.io/2025/Stretched-layer2-network-between-clusters.html">previous post</a>,
+we explored how to stretch Layer 2 networks across multiple KubeVirt clusters
+using EVPN and OpenPERouter. While this enables cross-cluster connectivity, VMs
+often need to move between clusters. This happens during disaster recovery,
+cluster maintenance, resource optimization, or compliance requirements.</p>
+
+<p>Cross cluster live migration moves a running VM from one cluster to another
+without stopping it. This generates substantial network traffic and needs
+reliable, high-bandwidth connectivity. When you use the same network for both
+application traffic and migration, you risk network congestion and security
+issues from mixing migration traffic with user data.</p>
+
+<p>A dedicated migration network solves this problem. By configuring a separate
+Layer 2 Virtual Network Interface (L2VNI) for migration traffic, you isolate
+this critical operation from application networking, improving both security and
+performance. Furthermore, the cluster/network admins’ lives are simplified by
+making the dedicated migration network an overlay: instead of physically
+running and maintaining new cables, configuring switches, and adding network
+interfaces to each Kubernetes node (a complex and time-consuming underlay
+network expansion), an L2VNI builds upon the existing physical network
+infrastructure - admins can define and manage this overlay network logically,
+making it a much more agile (and less disruptive) solution for dedicated
+migration paths.</p>
+
+<h2 id="why-should-you-have-a-dedicated-migration-network">Why should you have a dedicated migration network</h2>
+
+<p>Dedicated migration networks provide several key advantages:</p>
+
+<ul>
+  <li>
+    <p><strong>Traffic Isolation</strong>: Migration data flows through a separate network path,
+preventing interference with application traffic and allowing for independent
+network policies and monitoring.</p>
+  </li>
+  <li>
+    <p><strong>Security Boundaries</strong>: Migration traffic can be encrypted and routed through
+dedicated security zones, reducing the attack surface and enabling fine-grained
+access controls.</p>
+  </li>
+  <li>
+    <p><strong>Performance Optimization</strong>: Migration networks can be configured with
+specific bandwidth allocations, MTU settings, and QoS policies optimized for
+bulk data transfer.</p>
+  </li>
+  <li>
+    <p><strong>Operational Visibility</strong>: Separate networks enable dedicated monitoring and
+troubleshooting of migration operations without impacting application network
+analysis.</p>
+  </li>
+</ul>
+
+<h2 id="configuring-the-dedicated-migration-network">Configuring the Dedicated Migration Network</h2>
+
+<p>Building on our previous multi-cluster setup, we’ll now add a dedicated
+migration network using a separate L2VNI. This configuration assumes you
+already have the base clusters and stretched L2 network from the
+<a href="https://kubevirt.io/2025/Stretched-layer2-network-between-clusters.html">previous article</a>.</p>
+
+<h3 id="prerequisites">Prerequisites</h3>
+
+<p>Ensure you have:</p>
+<ul>
+  <li>The multi-cluster testbed from the previous post deployed using
+<code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code></li>
+  <li>KubeVirt 1.6.2 or higher installed (included in
+<code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code>)</li>
+  <li>Whereabouts IPAM CNI installed (included in <code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code>)</li>
+  <li>The <code class="language-plaintext highlighter-rouge">DecentralizedLiveMigration</code> feature gate enabled (included in
+<code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code>)</li>
+</ul>
+
+<h3 id="configuring-the-migration-l2vni">Configuring the Migration L2VNI</h3>
+
+<p>Now we’ll create a separate L2VNI dedicated to migration traffic. Note that
+we’re using VNI 666 and VRF “rouge” to distinguish this from our application
+network (VNI 110, VRF “red”).</p>
+
+<p><strong>NOTE:</strong> this dedicated migration network (implemented by this L2VNI) is
+pre-provisioned when you run <code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code>.</p>
+
+<p><strong>Cluster A Migration Network:</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-a kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: openpe.openperouter.github.io/v1alpha1
+kind: L2VNI
+metadata:
+  name: migration
+  namespace: openperouter-system
+spec:
+  hostmaster:
+    autocreate: true
+    type: bridge
+  l2gatewayip: 192.170.10.1/24
+  vni: 666
+  vrf: rouge
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p><strong>Cluster B Migration Network:</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-b kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: openpe.openperouter.github.io/v1alpha1
+kind: L2VNI
+metadata:
+  name: migration
+  namespace: openperouter-system
+spec:
+  hostmaster:
+    autocreate: true
+    type: bridge
+  l2gatewayip: 192.170.10.1/24
+  vni: 666
+  vrf: rouge
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<h3 id="creating-migration-network-attachment-definitions">Creating Migration Network Attachment Definitions</h3>
+
+<p>Next, we create Network Attachment Definitions (NADs) for the migration
+network. Note the reduced MTU of 1400 to account for VXLAN overhead:</p>
+
+<p><strong>Cluster A Migration NAD:</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-a kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: migration-evpn
+  namespace: kubevirt
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "name": "migration-evpn",
+      "type": "bridge",
+      "bridge": "br-hs-666",
+      "mtu": 1400,
+      "ipam": {
+        "type": "whereabouts",
+        "range": "192.170.10.0/24",
+        "exclude": [
+          "192.170.10.1/32",
+          "192.170.10.128/25"
+        ]
+      }
+    }
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p><strong>Cluster B Migration NAD:</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-b kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: "k8s.cni.cncf.io/v1"
+kind: NetworkAttachmentDefinition
+metadata:
+  name: migration-evpn
+  namespace: kubevirt
+spec:
+  config: |
+    {
+      "cniVersion": "0.3.1",
+      "name": "migration-evpn",
+      "type": "bridge",
+      "bridge": "br-hs-666",
+      "mtu": 1400,
+      "ipam": {
+        "type": "whereabouts",
+        "range": "192.170.10.0/24",
+        "exclude": [
+          "192.170.10.1/32",
+          "192.170.10.0/25"
+        ]
+      }
+    }
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p><strong>NOTE:</strong> these NADs are already pre-provisioned when you run
+<code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code>.</p>
+
+<h4 id="understanding-the-ip-range-strategy">Understanding the IP Range Strategy</h4>
+
+<p>Both clusters define the same 192.170.10.0/24 range but use different
+exclusion patterns to avoid IP conflicts:</p>
+
+<ul>
+  <li><strong>Cluster A</strong> excludes <code class="language-plaintext highlighter-rouge">192.170.10.128/25</code> (192.170.10.128 to 192.170.10.255),
+giving it access to IPs 192.170.10.2 to 192.170.10.127</li>
+  <li><strong>Cluster B</strong> excludes <code class="language-plaintext highlighter-rouge">192.170.10.0/25</code> (192.170.10.0 to 192.170.10.127),
+giving it access to IPs 192.170.10.128 to 192.170.10.255</li>
+  <li>Both exclude <code class="language-plaintext highlighter-rouge">192.170.10.1/32</code> (the gateway IP)</li>
+</ul>
+
+<p>This approach ensures that VMs in each cluster get IPs from non-overlapping
+ranges while maintaining the same L2 network, allowing seamless migration
+without IP conflicts or the need for IP reassignment during the migration
+process.</p>
+
+<p>Since all the prerequisites including certificate exchange are handled by
+<code class="language-plaintext highlighter-rouge">make deploy-multi-cluster</code>, we can proceed directly to preparing the VM to be
+migrated. All the manifests and instructions are available in
+<a href="https://github.com/openperouter/openperouter/blob/main/website/content/docs/examples/evpnexamples/kubevirt-multi-cluster.md#l2-vni-as-kubevirt-dedicated-migration-network-for-cross-cluster-live-migration">OpenPERouter cross-cluster live migration examples</a>.</p>
+
+<h2 id="cross-cluster-live-migration-in-action">Cross-Cluster Live Migration in Action</h2>
+
+<p>Now let’s demonstrate cross-cluster live migration using our dedicated
+migration network. We’ll create VMs that use both the application network
+(evpn) and have an EVPN <code class="language-plaintext highlighter-rouge">L2VNI</code> as the migration network. Keep in mind that the
+latter network is <strong>not</strong> plumbed into the VMs! It is used by the KubeVirt
+agents (privileged components, which run in the Kubernetes nodes) to move
+the migration between the different nodes (which happen to run in different
+clusters).</p>
+
+<h3 id="creating-migration-ready-vms">Creating Migration-Ready VMs</h3>
+
+<p><strong>VM in Cluster A (Migration Source):</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-a kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-1
+spec:
+  runStrategy: Always
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: vm-1
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      domain:
+        devices:
+          interfaces:
+          - bridge: {}
+            name: evpn
+            macAddress: 02:03:04:05:06:07
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+        resources:
+          requests:
+            memory: 2048M
+        machine:
+          type: ""
+      networks:
+      - multus:
+          networkName: evpn
+        name: evpn
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - containerDisk:
+          image: quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.6.2
+        name: containerdisk
+      - cloudInitNoCloud:
+          networkData: |
+            version: 2
+            ethernets:
+              eth0:
+                addresses:
+                - 192.170.1.3/24
+                gateway4: 192.170.1.1
+        name: cloudinitdisk
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p><strong>VM in Cluster B (Migration Target):</strong></p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-b kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: kubevirt.io/v1
+kind: VirtualMachine
+metadata:
+  name: vm-1
+spec:
+  runStrategy: WaitAsReceiver
+  template:
+    metadata:
+      labels:
+        kubevirt.io/vm: vm-1
+    spec:
+      tolerations:
+      - key: node-role.kubernetes.io/control-plane
+        operator: Exists
+        effect: NoSchedule
+      domain:
+        devices:
+          interfaces:
+          - bridge: {}
+            name: evpn
+          disks:
+          - disk:
+              bus: virtio
+            name: containerdisk
+          - disk:
+              bus: virtio
+            name: cloudinitdisk
+        resources:
+          requests:
+            memory: 2048M
+        machine:
+          type: ""
+      networks:
+      - multus:
+          networkName: evpn
+        name: evpn
+      terminationGracePeriodSeconds: 0
+      volumes:
+      - containerDisk:
+          image: quay.io/kubevirt/fedora-with-test-tooling-container-disk:v1.6.2
+        name: containerdisk
+      - cloudInitNoCloud:
+          networkData: |
+            version: 2
+            ethernets:
+              eth0:
+                addresses:
+                - 192.170.1.3/24
+                gateway4: 192.170.1.1
+        name: cloudinitdisk
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>As you can see, both VM definitions are the same - except the <code class="language-plaintext highlighter-rouge">runStrategy</code>.</p>
+
+<h3 id="performing-the-cross-cluster-live-migration">Performing the Cross Cluster Live Migration</h3>
+
+<p>To live-migrate the VM between clusters, we first need to wait for the source
+VM to be ready:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-a kubectl <span class="nb">wait </span>vm vm-1 <span class="se">\</span>
+  <span class="nt">--for</span><span class="o">=</span><span class="nv">condition</span><span class="o">=</span>Ready <span class="nt">--timeout</span><span class="o">=</span>60s
+</code></pre></div></div>
+
+<p>After that, we can create the migration receiver in cluster B:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-b kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstanceMigration
+metadata:
+  name: migration-target
+spec:
+  receive:
+    migrationID: "cross-cluster-demo"
+  vmiName: vm-1
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>We need to get the URL for the destination cluster migration agent. This
+information will be required to provision the source cluster migration CR.</p>
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">TARGET_IP</span><span class="o">=</span><span class="si">$(</span><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-b kubectl get vmim <span class="se">\</span>
+  migration-target <span class="nt">-o</span> <span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.status.synchronizationAddresses[0]}'</span><span class="si">)</span>
+<span class="nb">echo</span> <span class="s2">"Target migration IP: </span><span class="nv">$TARGET_IP</span><span class="s2">"</span>
+</code></pre></div></div>
+
+<p>Now that we know the IP of the destination migration controller, we can initiate
+the migration from cluster A:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-a kubectl apply <span class="nt">-f</span> - <span class="o">&lt;&lt;</span><span class="no">EOF</span><span class="sh">
+apiVersion: kubevirt.io/v1
+kind: VirtualMachineInstanceMigration
+metadata:
+  name: migration-source
+spec:
+  sendTo:
+    connectURL: "</span><span class="k">${</span><span class="nv">TARGET_IP</span><span class="k">}</span><span class="sh">:9185"
+    migrationID: "cross-cluster-demo"
+  vmiName: vm-1
+</span><span class="no">EOF
+</span></code></pre></div></div>
+
+<p>Monitor the migration progress:</p>
+
+<div class="language-shell highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="c"># Watch migration status in cluster A</span>
+<span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-a kubectl get vmim <span class="se">\</span>
+  migration-source <span class="nt">-w</span>
+
+<span class="c"># Watch VM status in cluster B</span>
+<span class="nv">KUBECONFIG</span><span class="o">=</span><span class="si">$(</span><span class="nb">pwd</span><span class="si">)</span>/bin/kubeconfig-pe-kind-b kubectl get vm vm-1 <span class="nt">-w</span>
+</code></pre></div></div>
+
+<h2 id="conclusion">Conclusion</h2>
+
+<p>Dedicated migration networks are essential for production KubeVirt deployments
+that require VM mobility. Without traffic isolation, live migrations compete
+with application workloads for bandwidth, potentially degrading service
+performance and creating security risks by mixing operational traffic with user
+data.</p>
+
+<p>In this post, we have built upon the foundation laid in our
+<a href="https://kubevirt.io/2025/Stretched-layer2-network-between-clusters.html">previous article</a>
+and enhanced our multi-cluster KubeVirt deployment with cross-cluster live
+migration capabilities. We have configured a secondary <code class="language-plaintext highlighter-rouge">L2VNI</code> (VNI 666, VRF
+“rouge”) as a dedicated migration network between KubeVirt clusters. This
+overlay network provides isolated, high-performance connectivity for migration
+operations without requiring additional physical infrastructure. By using EVPN
+and OpenPERouter, we demonstrated how cross-cluster live migration works in
+practice while maintaining complete separation from application networking.</p>
+
+<p>This setup enables organizations to achieve workload mobility across clusters
+with the security, performance, and operational visibility required for
+production environments. The overlay approach simplifies management by avoiding
+the complexity of physical network expansion while providing the dedicated
+bandwidth and monitoring capabilities that enterprise migrations demand.</p>]]></content><author><name>Miguel Duarte Barroso</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="evpn" /><category term="bgp" /><category term="openperouter" /><category term="network" /><category term="networking" /><category term="live-migration" /><summary type="html"><![CDATA[Learn how to configure a separate L2VNI for dedicated migration networks to enable secure, efficient cross-cluster live migration with KubeVirt and OpenPERouter.]]></summary></entry><entry><title type="html">Stretching a Layer 2 network over multiple KubeVirt clusters</title><link href="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html" rel="alternate" type="text/html" title="Stretching a Layer 2 network over multiple KubeVirt clusters" /><published>2025-10-13T00:00:00+00:00</published><updated>2025-10-13T00:00:00+00:00</updated><id>https://kubevirt.io//2025/Stretched-layer2-network-between-clusters</id><content type="html" xml:base="https://kubevirt.io//2025/Stretched-layer2-network-between-clusters.html"><![CDATA[<h2 id="introduction">Introduction</h2>
 <p>KubeVirt enables you to run virtual machines (VMs) within Kubernetes clusters,
 but networking VMs across multiple clusters presents significant challenges.
 Current KubeVirt networking relies on cluster-local solutions, which cannot
@@ -1524,110 +1934,4 @@ After the upgrade, the cluster admin will have sufficient time to bind the new <
 <h3 id="thanks">Thanks!</h3>
 <p>A lot of work from a huge amount of people go into these releases. Some contributions are small, such as raising a bug or attending our community meeting, and others are massive, like working on a feature or reviewing PRs. Whatever your part: we thank you.</p>
 
-<p>And if you’re interested in contributing to the project and being a part of the next release, please check out our <a href="https://kubevirt.io/user-guide/contributing/">contributing guide</a> and our <a href="https://github.com/kubevirt/community/blob/main/membership_policy.md">community membership guidelines</a>.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.4" /><category term="release" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[Introducing the KubeVirt v1.4 release]]></summary></entry><entry><title type="html">KubeVirt v1.3.0</title><link href="https://kubevirt.io//2024/changelog-v1.3.0.html" rel="alternate" type="text/html" title="KubeVirt v1.3.0" /><published>2024-07-17T00:00:00+00:00</published><updated>2024-07-17T00:00:00+00:00</updated><id>https://kubevirt.io//2024/changelog-v1.3.0</id><content type="html" xml:base="https://kubevirt.io//2024/changelog-v1.3.0.html"><![CDATA[<h2 id="v130">v1.3.0</h2>
-
-<p>Released on: Wed Jul 17 15:09:44 2024 +0000</p>
-
-<ul>
-  <li>[PR #12319][Sreeja1725] Add v1.3.0 perf and scale benchmarks data</li>
-  <li>[PR #12330][kubevirt-bot] Fix wrong KubeVirtVMIExcessiveMigrations alert calculation in an upgrade scenario.</li>
-  <li>[PR #12328][acardace] enable only for VMs with memory &gt;= 1Gi</li>
-  <li>[PR #12272][Sreeja1725] Add unit tests to check for API backward compatibility</li>
-  <li>[PR #12296][orelmisan] Network binding plugins: Enable the ability to specify compute memory overhead</li>
-  <li>[PR #12279][kubevirt-bot] Fix: persistent tpm can be used with vmis containing dots in their name</li>
-  <li>[PR #12226][kubevirt-bot] Virt export route has an edge termination of redirect</li>
-  <li>[PR #12240][kubevirt-bot] Updated common-instancetypes bundles to v1.0.1</li>
-  <li>[PR #12249][kubevirt-bot] Fix missing performance metrics for VMI resources</li>
-  <li>[PR #12237][vladikr] Only a single vgpu display option with ramfb will be configured per VMI.</li>
-  <li>[PR #12122][kubevirt-bot] Fix VMPools when <code class="language-plaintext highlighter-rouge">LiveUpdate</code> as <code class="language-plaintext highlighter-rouge">vmRolloutStrategy</code> is used.</li>
-  <li>[PR #12201][kubevirt-bot] fix RerunOnFailure stuck in Provisioning</li>
-  <li>[PR #12151][kubevirt-bot] Bugfix: Implement retry mechanism in export server and vmexport</li>
-  <li>[PR #12171][kubevirt-bot] <code class="language-plaintext highlighter-rouge">PreferredDiskDedicatedIoThread</code> is now only applied to <code class="language-plaintext highlighter-rouge">virtio</code> disk devices</li>
-  <li>[PR #12146][kubevirt-bot] Memory Hotplug fixes and stabilization</li>
-  <li>[PR #12185][kubevirt-bot] VMs with a single socket and NetworkInterfaceMultiqueue enabled require a restart to hotplug additional CPU sockets.</li>
-  <li>[PR #12132][kubevirt-bot] Introduce validatingAdmissionPolicy to restrict node patches on virt-handler</li>
-  <li>[PR #12109][acardace] Support Memory Hotplug with Hugepages</li>
-  <li>[PR #12009][xpivarc] By enabling NodeRestriction feature gate, Kubevirt now authorize virt-handler’s requests to modify VMs.</li>
-  <li>[PR #11681][lyarwood] The <code class="language-plaintext highlighter-rouge">CommonInstancetypesDeployment</code> feature and gate are retrospectively moved to Beta from the 1.2.0 release.</li>
-  <li>[PR #12025][fossedihelm] Add descheduler compatibility</li>
-  <li>[PR #12097][fossedihelm] Bump k8s deps to 0.30.0</li>
-  <li>[PR #12089][jean-edouard] Less privileged virt-operator ClusterRole</li>
-  <li>[PR #12064][akalenyu] BugFix: Graceful deletion skipped for any delete call to the VM (not VMI) resource</li>
-  <li>[PR #10490][jschintag] Add support for building and running kubevirt on s390x.</li>
-  <li>[PR #12079][EdDev] Network hotplug feature is declared as Beta.</li>
-  <li>[PR #11455][lyarwood] <code class="language-plaintext highlighter-rouge">LiveUpdates</code>  of VMs using instance types are now supported with the same caveats as when making changes to a vanilla VM.</li>
-  <li>[PR #12000][machadovilaca] Create kubevirt_vmi_launcher_memory_overhead_bytes metric</li>
-  <li>[PR #11915][ormergi] The ‘passt’ core network binding is discontinued and removed.</li>
-  <li>[PR #12016][acardace] fix starting VM with Manual RunStrategy</li>
-  <li>[PR #11533][alicefr] Implement volume migration and introduce the migration updateVolumesStrategy field</li>
-  <li>[PR #11934][assafad] Add kubevirt_vmi_last_connection_timestamp_seconds metric</li>
-  <li>[PR #11956][mhenriks] Introduce export.kibevirt.io/v1beta1</li>
-  <li>[PR #11996][ShellyKa13] BugFix: Fix restore panic in case of volumesnapshot missing</li>
-  <li>[PR #11957][mhenriks] snapshot: Ignore unfreeze error if VMSnapshot deleting</li>
-  <li>[PR #11906][machadovilaca] Create kubevirt_vmi_info metric</li>
-  <li>[PR #11969][iholder101] Infra components control-plane nodes NoSchedule toleration</li>
-  <li>[PR #11955][mhenriks] Introduce snapshot.kibevirt.io/v1beta1</li>
-  <li>[PR #11883][orelmisan] Restart of a VM is required when the CPU socket count is reduced</li>
-  <li>[PR #11835][talcoh2x] add Intel Gaudi to adopters.</li>
-  <li>[PR #11344][aerosouund] Refactor device plugins to use a base plugin and define a common interface</li>
-  <li>[PR #11973][fossedihelm] Bug fix: Correctly reflect RestartRequired condition</li>
-  <li>[PR #11963][acardace] Fix RerunOnFailure RunStrategy</li>
-  <li>[PR #11962][lyarwood] <code class="language-plaintext highlighter-rouge">VirtualMachines</code> referencing an instance type are now allowed when the <code class="language-plaintext highlighter-rouge">LiveUpdate</code> feature is enabled and will trigger the <code class="language-plaintext highlighter-rouge">RestartRequired</code> condition if the reference within the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> is changed.</li>
-  <li>[PR #11942][ido106] Update virtctl to use v1beta1 endpoint for both regular and async image upload</li>
-  <li>[PR #11648][kubevirt-bot] Updated common-instancetypes bundles to v1.0.0</li>
-  <li>[PR #11659][iholder101] Require scheduling infra components onto control-plane nodes</li>
-  <li>[PR #10545][lyarwood] <code class="language-plaintext highlighter-rouge">ControllerRevisions</code> containing instance types and preferences are now upgraded to their latest available version when the <code class="language-plaintext highlighter-rouge">VirtualMachine</code> owning them is resync’d by <code class="language-plaintext highlighter-rouge">virt-controller</code>.</li>
-  <li>[PR #11901][EdDev] The ‘macvtap’ core network binding is discontinued and removed.</li>
-  <li>[PR #11922][alromeros] Bugfix: Fix VM manifest rendering in export controller</li>
-  <li>[PR #11908][victortoso] sidecar-shim: allow stderr log from binary hooks</li>
-  <li>[PR #11729][lyarwood] <code class="language-plaintext highlighter-rouge">spreadOptions</code> have been introduced to preferences in order to allow for finer grain control of the <code class="language-plaintext highlighter-rouge">preferSpread</code> <code class="language-plaintext highlighter-rouge">preferredCPUTopology</code>. This includes the ability to now spread vCPUs across guest visible sockets, cores and threads.</li>
-  <li>[PR #11655][acardace] Allow to hotplug vcpus for VMs with CPU requests and/or limits set</li>
-  <li>[PR #11701][EdDev] The SLIRP core binding is deprecated and removed.</li>
-  <li>[PR #11773][jean-edouard] Persistent TPM/UEFI will use the default storage class if none is specified in the CR.</li>
-  <li>[PR #11846][victortoso] SMBios sidecar can be built out-of-tree</li>
-  <li>[PR #11788][ormergi] The network-info annotation is now used for mapping between SR-IOV network and the underlying device PCI address</li>
-  <li>[PR #11700][alicefr] Add the updateVolumeStrategy field</li>
-  <li>[PR #11256][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 10.0.0 and QEMU 8.2.0.</li>
-  <li>[PR #11482][brianmcarey] Build KubeVirt with go v1.22.2</li>
-  <li>[PR #11641][alicefr] Add kubevirt.io/testWorkloadUpdateMigrationAbortion annotation and a mechanism to abort workload updates</li>
-  <li>[PR #11770][alicefr] Fix the live updates for volumes and disks</li>
-  <li>[PR #11790][aburdenthehand] Re-adding Cloudflare to our ADOPTERS list</li>
-  <li>[PR #11718][fossedihelm] Fix: SEV methods in client-go now satisfy the proxy server configuration, if provided</li>
-  <li>[PR #11685][fossedihelm] Updated go version of the client-go to 1.21</li>
-  <li>[PR #11618][AlonaKaplan] Extend network binding plugin to support device-info DownwardAPI.</li>
-  <li>[PR #11283][assafad] Collect VMI OS info from the Guest agent as <code class="language-plaintext highlighter-rouge">kubevirt_vmi_phase_count</code> metric labels</li>
-  <li>[PR #11676][machadovilaca] Rename rest client metrics to include kubevirt prefix</li>
-  <li>[PR #11557][avlitman] New memory statistics added named kubevirt_memory_delta_from_requested_bytes</li>
-  <li>[PR #11678][Vicente-Cheng] Improve the handling of ordinal pod interface name for upgrade</li>
-  <li>[PR #11653][EdDev] Build the <code class="language-plaintext highlighter-rouge">passt</code>custom CNI binary statically, for the <code class="language-plaintext highlighter-rouge">passt</code> network binding plugin.</li>
-  <li>[PR #11294][machadovilaca] Fix kubevirt_vm_created_total being broken down by virt-api pod</li>
-  <li>[PR #11307][machadovilaca] Add e2e tests for metrics</li>
-  <li>[PR #11479][vladikr] virtual machines instance will no longer be stuck in an irrecoverable state after an interrupted postcopy migration. Instead, these will fail and could be restarted again.</li>
-  <li>[PR #11416][dhiller] emission of k8s logs when using programmatic focus with <code class="language-plaintext highlighter-rouge">FIt</code></li>
-  <li>[PR #11272][dharmit] Make ‘image’ field in hook sidecar annotation optional.</li>
-  <li>[PR #11500][iholder101] Support HyperV Passthrough: automatically use all available HyperV features</li>
-  <li>[PR #11484][jcanocan] Reduce the downwardMetrics server maximum number of request per second to 1.</li>
-  <li>[PR #11498][acardace] Allow to hotplug memory for VMs with memory limits set</li>
-  <li>[PR #11470][brianmcarey] Build KubeVirt with Go version 1.21.8</li>
-  <li>[PR #11312][alromeros] Improve handling of export resources in virtctl vmexport</li>
-  <li>[PR #11367][alromeros] Bugfix: Allow vmexport download redirections by printing logs into stderr</li>
-  <li>[PR #11219][alromeros] Bugfix: Improve handling of IOThreads with incompatible buses</li>
-  <li>[PR #11149][0xFelix] virtctl: It is possible to import volumes from GCS when creating a VM now</li>
-  <li>[PR #11404][avlitman] KubeVirtComponentExceedsRequestedCPU and KubeVirtComponentExceedsRequestedMemory alerts are deprecated; they do not indicate a genuine issue.</li>
-  <li>[PR #11331][anjuls] add cloudraft to adopters.</li>
-  <li>[PR #11387][alaypatel07] add perf-scale benchmarks for release v1.2</li>
-  <li>[PR #11095][ShellyKa13] Expose volumesnapshot error in vmsnapshot object</li>
-  <li>[PR #11372][xpivarc] Bug-fix: Fix nil panic if VM update fails</li>
-  <li>[PR #11267][mhenriks] BugFix: Ensure DataVolumes created by virt-controller (DataVolumeTemplates) are recreated and owned by the VM in the case of DR and backup/restore.</li>
-  <li>[PR #10900][KarstenB] BugFix: Fixed incorrect APIVersion of APIResourceList</li>
-  <li>[PR #11306][fossedihelm] fix(ksm): set the <code class="language-plaintext highlighter-rouge">kubevirt.io/ksm-enabled</code> node label to true if the ksm is managed by KubeVirt, instead of reflect the actual ksm value.</li>
-  <li>[PR #11330][jean-edouard] More information in the migration state of VMI / migration objects</li>
-  <li>[PR #11264][machadovilaca] Fix perfscale buckets error</li>
-  <li>[PR #11183][dhiller] Extend OWNERS for sig-buildsystem</li>
-  <li>[PR #11058][fossedihelm] fix(vmclone): delete vmclone resource when the target vm is deleted</li>
-  <li>[PR #11265][xpivarc] Bug fix: VM controller doesn’t corrupt its cache anymore</li>
-  <li>[PR #11205][akalenyu] Fix migration breaking in case the VM has an rng device after hotplugging a block volume on cgroupsv2</li>
-  <li>[PR #11051][alromeros] Bugfix: Improve error reporting when fsfreeze fails</li>
-  <li>[PR #11156][nunnatsa] Move some verification from the VMI create validation webhook to the CRD</li>
-  <li>[PR #11146][RamLavi] node-labeller: Remove obsolete functionalities</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.3.0 changes]]></summary></entry></feed>
+<p>And if you’re interested in contributing to the project and being a part of the next release, please check out our <a href="https://kubevirt.io/user-guide/contributing/">contributing guide</a> and our <a href="https://github.com/kubevirt/community/blob/main/membership_policy.md">community membership guidelines</a>.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.4" /><category term="release" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[Introducing the KubeVirt v1.4 release]]></summary></entry></feed>
