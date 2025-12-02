@@ -18,7 +18,7 @@ order: 10
         <p>
           <a href="https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q">Click here for a playlist of all of our KubeVirt Summit 2023 sessions</a>.
         </p>
-              </figcaption>
+      </figcaption>
     </figure>
   </div>
   <div class="col-6">
