@@ -39,26 +39,26 @@
     <meta name="google-site-verification" content="ljFssJAOE7EegX8RSNhm2heZib4B2JPUwzoDLnIo0VM" />
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
     <link rel="stylesheet" href="/css/main.css">
-    <link rel="canonical" href="https://kubevirt.io//category/weekly-updates.html">
+    <link rel="canonical" href="https://kubevirt.io//2025/changelog-v1.7.0.html">
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
     
-    <title>Weekly Updates | KubeVirt.io</title>
+    <title>KubeVirt v1.7.0 | KubeVirt.io</title>
     <!-- # Opengraph protocol properties: https://ogp.me/ -->
-    <meta name="author" content="The KubeVirt.io website team, " >
-    
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
     <meta name="twitter:card" content="summary">
-    <meta name="description" content="Virtual Machine Management on Kubernetes">
-    <meta name="keywords" content="news, updates, releases, uncategorized, " >
-    <meta property="og:title" content="Weekly Updates | KubeVirt.io">
+    <meta name="description" content="This article provides information about KubeVirt release v1.7.0 changes">
+    <meta name="keywords" content="release notes, changelog" >
+    <meta property="og:title" content="KubeVirt v1.7.0 | KubeVirt.io">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://kubevirt.io//category/weekly-updates.html" >
+    <meta property="og:url" content="https://kubevirt.io//2025/changelog-v1.7.0.html" >
     <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
-    <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
+    <meta property="og:description" content="This article provides information about KubeVirt release v1.7.0 changes" >
     <meta property="og:site_name" content="KubeVirt.io" >
-    <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2025-12-03 13:07:20 +0000" >
-    <meta name="twitter:title" content="Weekly Updates | KubeVirt.io">
-    <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2025-11-27 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v1.7.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v1.7.0 changes">
 
     <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
     <script src="//code.jquery.com/jquery.min.js"></script>
@@ -89,7 +89,7 @@
       
 
       
-        <li  class="nav-item" >
+        <li  class="nav-item active" >
           <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
         </li>
       
@@ -240,109 +240,221 @@ autocomplete(document.getElementById("search-input"), mykeywords);
     </nav>
 
     <main role="main" style="margin-top: 60px;">
-      <div class="container post">
-  <h1 class="page-title">Weekly Updates</h1>
-  <article class="post-content">
-    
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-23.html">
-      This Week In Kube Virt 23
-    </a>
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v1.7.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/changelog">changelog</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: November 27, 2025  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
 
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-22.html">
-      This Week In Kube Virt 22
-    </a>
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="v170">v1.7.0</h2>
 
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-21.html">
-      This Week In Kube Virt 21
-    </a>
+<p>Released on: Thu Nov 27 10:16:02 2025 +0000</p>
 
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-20.html">
-      This Week In Kube Virt 20
-    </a>
+<ul>
+  <li>[PR #16199][kubevirt-bot] Don’t use attachment pods marked for deletion for hotplug volume status updates.</li>
+  <li>[PR #16168][kubevirt-bot] Migration is using dedicated certificate for mTLS.</li>
+  <li>[PR #16198][kubevirt-bot] Bug fix: KubeVirt.spec.imagetag installation is working again</li>
+  <li>[PR #16150][kubevirt-bot] fix: KSM is enabled in case of node pressure within 3 minutes</li>
+  <li>[PR #16129][kubevirt-bot] Add RestartRequired when detaching CD-ROMs from a running VM</li>
+  <li>[PR #16108][kubevirt-bot] Allow migration when host model changes after libvirt upgrade.</li>
+  <li>[PR #16089][kubevirt-bot] A decentralized live migration failure is properly propagates between source and target</li>
+  <li>[PR #16097][kubevirt-bot] Introduce a new subresource <code class="language-plaintext highlighter-rouge">/evacuate/cancel</code> and <code class="language-plaintext highlighter-rouge">virtctl evacuate-cancel</code> command to allow users to cancel the evacuation process for a VirtualMachineInstance (VMI). This clears the <code class="language-plaintext highlighter-rouge">evacuationNodeName</code> field in the VMI’s status, stopping the automatic creation of migration resources and fully aborting the eviction cycle.</li>
+  <li>[PR #16076][kubevirt-bot] NodeRestriction: Source of node update is now verified</li>
+  <li>[PR #16033][noamasu] VMSnapshot: add SourceIndications status field to list snapshot indications with descriptions for clearer meaning.</li>
+  <li>[PR #16041][kubevirt-bot] The KubevirtSeccompProfile feature is now in Beta</li>
+  <li>[PR #16039][kubevirt-bot] Promote IBM Secure Execution Feature to Beta stage.</li>
+  <li>[PR #16051][kubevirt-bot] Introduce pool.kubevirt.io/v1beta1</li>
+  <li>[PR #16027][kubevirt-bot] VMPool: Add support for auto-healing startegy</li>
+  <li>[PR #16011][kubevirt-bot] BugFix: The migration limit was not accurately being used with decentralized live migrations</li>
+  <li>[PR #16026][fossedihelm] support v0.32.5 code generator</li>
+  <li>[PR #16005][kubevirt-bot] promote ImageVolume FG to Beta</li>
+  <li>[PR #15999][kubevirt-bot] VMpool: Add Scale-in strategy support with Proactive, opportunistic modes and statePreservation</li>
+  <li>[PR #14973][Barakmor1] support live migration for ImageVolume with modified container disk images</li>
+  <li>[PR #15939][dasionov] Beta: VideoConfig</li>
+  <li>[PR #15887][fossedihelm] Alpha: Generalized Migration Priority in KubeVirt</li>
+  <li>[PR #14575][zhencliu] Experimental support of Intel TDX</li>
+  <li>[PR #15718][Vicente-Cheng] Bump k8s v1.33</li>
+  <li>[PR #15123][Sreeja1725] VMpool: Add UpdateStrategy support with Proactive, Opportunistic modes and Selection policies</li>
+  <li>[PR #15878][Sreeja1725] Add v1.6.0 perf and scale benchmarks data</li>
+  <li>[PR #15936][kubevirt-bot] Updated common-instancetypes bundles to v1.5.1</li>
+  <li>[PR #15008][fossedihelm] Fix possible nil pointer caused by migration during kv upgrade</li>
+  <li>[PR #14845][alancaldelas] Experimental support for AMD SEV-SNP that is behind the <code class="language-plaintext highlighter-rouge">WorkloadEncruptionSEV</code> feature gate.</li>
+  <li>[PR #15783][orelmisan] Specify correct label selection when creating a service via virtctl expose. The expose command on virtctl v1.7 and above will not work with older KubeVirt versions.</li>
+  <li>[PR #15830][varunrsekar] Beta: PanicDevices</li>
+  <li>[PR #15698][Acedus] It is now possible to configure discard_granularity for VM disks.</li>
+  <li>[PR #15867][xpivarc] Bug fix: Thousands of migrations should not cause failures of active migrations</li>
+  <li>[PR #15712][lyarwood] The <code class="language-plaintext highlighter-rouge">DefaultVirtHandler{QPS,Burst}</code> values are increased to ensure no bottleneck forms within <code class="language-plaintext highlighter-rouge">virt-handler</code></li>
+  <li>[PR #15788][mhenriks] Fix RestartRequired handling for hotplug volumes</li>
+  <li>[PR #15539][tiraboschi] Add VirtualMachineInstanceEvictionRequested condition for eviction tracking</li>
+  <li>[PR #14902][tiraboschi] The list of annotations and labels synced from VM.spec.template.metadata to VMI and then to virt-launcher pods can be extended</li>
+  <li>[PR #15784][brianmcarey] Build KubeVirt with go v1.24.7</li>
+  <li>[PR #15706][ksimon1] fix: prioritize expired cert removal over 50-cert limit in MergeCABundle</li>
+  <li>[PR #15798][lyarwood] Support for the <code class="language-plaintext highlighter-rouge">ioThreads</code> VMI configurable is added to the <code class="language-plaintext highlighter-rouge">instancetype.kubevirt.io/v1beta1</code> API allowing <code class="language-plaintext highlighter-rouge">supplementalPoolThreadCount</code> to now be provided by an instance type.</li>
+  <li>[PR #15615][alromeros] Object Graph: Include NADs and ServiceAccounts</li>
+  <li>[PR #15398][lyarwood] Preferences can now express preferred and required architecture values for use within VirtualMachines</li>
+  <li>[PR #15676][xpivarc] Bug fix, virt-launcher is properly reaped</li>
+  <li>[PR #15690][lyarwood] Replicas of <code class="language-plaintext highlighter-rouge">virt-api</code> are now scaled depending on the number of nodes within the environment with the <code class="language-plaintext highlighter-rouge">kubevirt.io/schedulable=true</code> label.</li>
+  <li>[PR #15692][awels] BugFix: Restoring naked PVCs from a VMSnapshot are now properly owned by the VM if the restore policy is set to VM</li>
+  <li>[PR #15759][lyarwood] Only a single <code class="language-plaintext highlighter-rouge">Signaled Graceful Shutdown</code> event is now sent to avoid spamming the event recorder during long graceful shutdown attempts</li>
+  <li>[PR #15400][lyarwood] The deprecated <code class="language-plaintext highlighter-rouge">instancetype.kubevirt.io/v1alpha{1,2}</code> API and CRDs have been removed</li>
+  <li>[PR #15681][jean-edouard] Memory overcommit is now recalculated on migration.</li>
+  <li>[PR #13111][brianmcarey] build: update to bazel v6.5.0 and rules_oci</li>
+  <li>[PR #15406][Sreeja1725] Add VMpool finalizer to ensure proper cleanup</li>
+  <li>[PR #15669][HarshithaMS005] Normalise iface status to ensure test stability of hotplug and hotunplug tests</li>
+  <li>[PR #14772][ShellyKa13] ChangedBlockTracking: enable add/remove of qcow2 overlay if vm matches label selector</li>
+  <li>[PR #15661][nirdothan] Support Istio versions 1.25 and above.</li>
+  <li>[PR #15531][Yu-Jack] bump prometheus operator to 0.80.1</li>
+  <li>[PR #15605][awels] BugFix: Able to cancel in flight decentralized live migrations properly</li>
+  <li>[PR #15238][victortoso] Does Screenshot without the usage of VNC</li>
+  <li>[PR #15504][sradco] Update metric kubevirt_vm_container_free_memory_bytes_based_on_rss and kubevirt_vm_container_free_memory_bytes_based_on_working_set_bytes names to kubevirt_vm_container_memory_request_margin_based_on_rss_bytes and kubevirt_vm_container_memory_request_margin_based_on_working_set_bytes so they will be clearer</li>
+  <li>[PR #15503][Sreeja1725] Enhance VMPool unit tests to make use of fake client</li>
+  <li>[PR #15422][lyarwood] The <code class="language-plaintext highlighter-rouge">DefaultVirtWebhookClient{QPS,Burst}</code> values are aligned with <code class="language-plaintext highlighter-rouge">DefaultVirtWebhookClient{QPS,Burst}</code> to help avoid saturating the webhook client with requests it is unable to serve during mass eviction events</li>
+  <li>[PR #15651][dcarrier] Add WithUploadSource builder to libdv</li>
+  <li>[PR #15642][akalenyu] BugFix: Windows VM with vTPM that was previously Storage Migrated cannot live migrate</li>
+  <li>[PR #15181][avlitman] Add kubevirt_vm_labels metric which shows vm labels converted to Prometheus labels, and can be configured using config map with ignore and allow lists.</li>
+  <li>[PR #15630][awels] Allow decentralized live migration on L3 networks</li>
+  <li>[PR #15513][jean-edouard] Fixed priority escalation bug in migration controller</li>
+  <li>[PR #15603][akalenyu] BugFix: Fix volume migration for VMs with long name</li>
+  <li>[PR #15344][SkalaNetworks] Added VolumeOwnershipPolicy to decide how volumes are owned once they are restored.</li>
+  <li>[PR #14976][dasionov] remove ppc64le architecture configuration support</li>
+  <li>[PR #15509][alromeros] Bugfix: Exclude lost+found from export server</li>
+  <li>[PR #15557][fossedihelm] Fix: grpc client in handler rest requests are properly closed</li>
+  <li>[PR #15227][sradco] New VM alerts - VirtualMachineStuckInUnhealthyState, VirtualMachineStuckOnNode</li>
+  <li>[PR #15478][0xFelix] virtctl: The –local-ssh flag and native ssh and scp clients are removed from virtctl. From now on the local ssh and scp clients on a host are always wrapped by virtctl ssh and scp.</li>
+  <li>[PR #13500][brandboat] Fix incorrect metric name kubevirt_vmi_migration_disk_transfer_rate_bytes to kubevirt_vmi_migration_memory_transfer_rate_bytes</li>
+  <li>[PR #15464][avlitman] Added virt-launcher to kubevirt_memory_delta_from_requested_bytes metric and cnv_abnormal metrics.</li>
+  <li>[PR #15267][victortoso] Add <code class="language-plaintext highlighter-rouge">preserve session</code> option to VNC endpoint</li>
+  <li>[PR #15357][dasionov] ensure default Firmware.Serial value on newly created vms</li>
+  <li>[PR #15470][awels] BugFix: Unable to delete source VM on failed decentralized live migration</li>
+  <li>[PR #15423][tiraboschi] Derive eviction-in-progress annotation from VMI eviction status</li>
+  <li>
+    <table>
+      <tbody>
+        <tr>
+          <td>[PR #15475][0xFelix] virtctl (portfoward</td>
+          <td>ssh</td>
+          <td>scp): Drop support for legacy dot syntax. In case the old dot syntax was used virtctl could ask for verification of the host key again. In some cases the known_hosts file might need to be updated manually.</td>
+        </tr>
+      </tbody>
+    </table>
+  </li>
+  <li>[PR #15170][dasionov] bugfix: ensure grace period metadata cache is synced in virt-launcher</li>
+  <li>[PR #15397][ShellyKa13] bugfix: prevent VMSnapshotContent repeated update with the same error message</li>
+  <li>[PR #15167][Sreeja1725] Add Command line flag to disable Node Labeller service</li>
+  <li>[PR #15365][tiraboschi] Aligning descheduler opt-out annotation name</li>
+  <li>[PR #14983][sradco] This PR adds the following alerts: GuestPeakVCPUQueueHighWarning, GuestPeakVCPUQueueHighCritical</li>
+  <li>[PR #15096][lyarwood] The <code class="language-plaintext highlighter-rouge">foregroundDeleteVirtualMachine</code> has been deprecated and replaced with the domain-qualified <code class="language-plaintext highlighter-rouge">kubevirt.io/foregroundDeleteVirtualMachine</code>.</li>
+  <li>[PR #15001][noamasu] bugfix: Enable vmsnapshot for paused VMs</li>
+  <li>[PR #15093][Acedus] bugfix: volume hotplug pod is no longer evicted when associated VM can live migrate.</li>
+  <li>[PR #14879][machadovilaca] Add GuestAgentInfo info metrics</li>
+  <li>[PR #15305][Acedus] bugfix: snapshot and restore now works correctly for VMs after a storage volume migration</li>
+  <li>[PR #15314][xpivarc] Common Names are now enforce for aggregated API</li>
+  <li>[PR #15253][0xFelix] Bumped the bundled common-instancetypes to v1.4.0 which add new preferences.</li>
+  <li>[PR #15182][akalenyu] BugFix: export fails when VMExport has dots in secret</li>
+  <li>[PR #15061][lyarwood] Support for all <code class="language-plaintext highlighter-rouge">*_SHASUM</code> environment variables has been removed from the <code class="language-plaintext highlighter-rouge">virt-operator</code> component. Users should instead use the remaining <code class="language-plaintext highlighter-rouge">*_IMAGE</code> environment variables to request a specific image version using a tag, digest or both.</li>
+  <li>[PR #15157][jean-edouard] virt-operator won’t schedule on worker nodes</li>
+  <li>[PR #15118][dankenigsberg] Drop an arbitrary limitation on VM’s domain.firmaware.serial. Any string is passed verbatim to smbios. Illegal may be tweaked or ignored based on qemu/smbios version.</li>
+  <li>[PR #15098][dominikholler] Update dependecy golang.org/x/oauth2 to v0.27.0</li>
+  <li>[PR #15016][fossedihelm] Fix postcopy multifd compatibility during upgrade</li>
+  <li>[PR #15100][dominikholler] Update dependecy golang.org/x/net to v0.38.0</li>
+  <li>[PR #15099][akalenyu] BugFix: export fails when VMExport has dots in name</li>
+  <li>[PR #14685][seanbanko] allows virtual machine instances with an instance type to specify memory fields that do not conflict with the instance type</li>
+  <li>[PR #14888][akalenyu] Cleanup: libvmi: add consistently named cpu/mem setters</li>
+  <li>[PR #15067][alromeros] Bugfix: Label upload PVCs to support CDI WebhookPvcRendering</li>
+  <li>[PR #15037][jean-edouard] HostDisk: KubeVirt no longer performs chown/chmod to compensate for storage that doesn’t support fsGroup</li>
+  <li>[PR #15017][nekkunti] Added support for architecture-specific configuration of <code class="language-plaintext highlighter-rouge">s390x</code> (IBM Z) in KubeVirt cluster config.</li>
+  <li>[PR #15022][awels] The synchronization controller migration network IP address is advertised by the KubeVirt CR</li>
+  <li>[PR #15021][awels] Decentralized migration resource now shows the synchronization address</li>
+  <li>[PR #14365][alaypatel07] Add support for DRA devices such as GPUs and HostDevices.</li>
+  <li>[PR #14882][awels] Decentralized live migration is available to allow migration across namespaces and clusters</li>
+  <li>[PR #14964][xpivarc] Beta: NodeRestriction</li>
+  <li>[PR #14986][awels] Possible to trust additional CAs for verifying kubevirt infra structure components</li>
+  <li>[PR #14875][nirdothan] Support seamless TCP migration with passt (alpha)</li>
+</ul>
 
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-19.html">
-      This Week In Kube Virt 19
-    </a>
+        </article>
+        
+        
 
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-18.html">
-      This Week In Kube Virt 18
-    </a>
-
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-17.html">
-      This Week In Kube Virt 17
-    </a>
-
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-size-XL.html">
-      This Week In Kube Virt 16 Size Xl
-    </a>
-
-    <a href="https://kubevirt.io//2018/This-Week-in-Kube-Virt-16-Holiday-Wrap-Up-Edition.html">
-      This Week In Kube Virt 16 Holiday Wrap Up Edition
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-15.html">
-      This Week In Kube Virt 15
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-14.html">
-      This Week In Kube Virt 14
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-13.html">
-      This Week In Kube Virt 13
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-12.html">
-      This Week In Kube Virt 12
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-11.html">
-      This Week In Kube Virt 11
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-10-base-10.html">
-      This Week In Kube Virt 10 Base 10
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-9.html">
-      This Week In Kube Virt 9
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-8.html">
-      This Week In Kube Virt 8
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-7.html">
-      This Week In Kube Virt 7
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-6.html">
-      This Week In Kube Virt 6
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-5.html">
-      This Week In Kube Virt 5
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-4.html">
-      This Week In Kube Virt 4
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-3.html">
-      This Week In Kube Virt 3
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-2.html">
-      This Week In Kube Virt 2
-    </a>
-
-    <a href="https://kubevirt.io//2017/This-Week-in-Kube-Virt-1.html">
-      This Week In Kube Virt 1
-    </a>
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v1.7.0&url=https://www.kubevirt.io/2025/changelog-v1.7.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
 
 
-  </article>
+      </div>
+    </div>
+  </div>
 </div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
 
     </main>
 
