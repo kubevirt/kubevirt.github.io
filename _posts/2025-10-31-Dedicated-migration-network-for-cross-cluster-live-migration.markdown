@@ -7,7 +7,7 @@ description: Learn how to configure a separate L2VNI for dedicated migration
   networks to enable secure, efficient cross-cluster live migration with
   KubeVirt and OpenPERouter.
 navbar_active: Blogs
-pub-date: October 31
+pub-date: November 26
 pub-year: 2025
 category: news
 tags: ["kubevirt", "kubernetes", "evpn", "bgp", "openperouter", "network",
