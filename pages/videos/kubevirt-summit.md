@@ -9,6 +9,34 @@ order: 10
 <div class="row">
   <div class="col-6">
     <figure class="figure">
+      <iframe style="width: 400px; height: 300px;" src="https://www.youtube-nocookie.com/embed/videoseries?list=PLj6h78yzYM2PHiIU_qr729UCWibWvtcQB" frameborder="0" allow="autoplay; encrypted-media" title=">KubeVirt Summit 2025" allowfullscreen></iframe>
+      <figcaption class="figure-caption">
+        <h3>KubeVirt Summit 2025</h3>
+        <p>
+          Watch Session 1, KubeVirt Summit 2025 above.
+        </p>
+        <p>
+          <a href="https://www.youtube.com/playlist?list=PLj6h78yzYM2PHiIU_qr729UCWibWvtcQB">Click here for a playlist of all of our KubeVirt Summit 2025 sessions</a>.
+        </p>
+      </figcaption>
+    </figure>
+  </div>
+  <div class="col-6">
+    <figure class="figure">
+      <iframe style="width: 400px; height: 300px;" src="https://www.youtube-nocookie.com/embed/videoseries?list=PLnLpXX8KHIYy8VOalYQ7FnLTOR0eZ5KxD" frameborder="0" allow="autoplay; encrypted-media" title=">KubeVirt Summit 2024" allowfullscreen></iframe>
+      <figcaption class="figure-caption">
+        <h3>KubeVirt Summit 2024</h3>
+        <p>
+          Watch Session 1, KubeVirt Summit 2024 above.
+        </p>
+        <p>
+          <a href="https://www.youtube.com/playlist?list=PLnLpXX8KHIYy8VOalYQ7FnLTOR0eZ5KxD">Click here for a playlist of all of our KubeVirt Summit 2024 sessions</a>.
+        </p>
+      </figcaption>
+    </figure>
+  </div>
+  <div class="col-6">
+    <figure class="figure">
       <iframe style="width: 400px; height: 300px;" src="https://www.youtube-nocookie.com/embed/videoseries?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q" frameborder="0" allow="autoplay; encrypted-media" title="KubeVirt Community Weekly Meetings" allowfullscreen></iframe>
       <figcaption class="figure-caption">
         <h3>KubeVirt Summit 2023</h3>
@@ -18,7 +46,7 @@ order: 10
         <p>
           <a href="https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q">Click here for a playlist of all of our KubeVirt Summit 2023 sessions</a>.
         </p>
-              </figcaption>
+      </figcaption>
     </figure>
   </div>
   <div class="col-6">
