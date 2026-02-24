@@ -1,7 +1,4 @@
 ---
-layout: page
-title:
+layout: go-import
 permalink: /node-maintenance-operator/
 ---
-
-To fetch Node Maintenance Operator sources run `go get -d kubevirt.io/node-maintenance-operator`.

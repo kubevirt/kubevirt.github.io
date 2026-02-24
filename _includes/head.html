@@ -3,32 +3,10 @@
     <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
-    <meta name="go-import" content="kubevirt.io/kubevirt git https://github.com/kubevirt/kubevirt">
-    <meta name="go-import" content="kubevirt.io/client-go git https://github.com/kubevirt/client-go">
-    <meta name="go-import" content="kubevirt.io/containerized-data-importer git https://github.com/kubevirt/containerized-data-importer">
-    <meta name="go-import" content="kubevirt.io/managed-tenant-quota git https://github.com/kubevirt/managed-tenant-quota">
-    <meta name="go-import" content="kubevirt.io/applications-aware-quota git https://github.com/kubevirt/applications-aware-quota">
-    <meta name="go-import" content="kubevirt.io/application-aware-quota git https://github.com/kubevirt/application-aware-quota">
-    <meta name="go-import" content="kubevirt.io/hostpath-provisioner git https://github.com/kubevirt/hostpath-provisioner">
-    <meta name="go-import" content="kubevirt.io/hostpath-provisioner-operator git https://github.com/kubevirt/hostpath-provisioner-operator">
-    <meta name="go-import" content="kubevirt.io/qe-tools git https://github.com/kubevirt/qe-tools">
-    <meta name="go-import" content="kubevirt.io/machine-remediation git https://github.com/kubevirt/machine-remediation">
-    <meta name="go-import" content="kubevirt.io/cloud-provider-kubevirt git https://github.com/kubevirt/cloud-provider-kubevirt">
-    <meta name="go-import" content="kubevirt.io/controller-lifecycle-operator-sdk git https://github.com/kubevirt/controller-lifecycle-operator-sdk">
-    <meta name="go-import" content="kubevirt.io/ssp-operator git https://github.com/kubevirt/ssp-operator">
-    <meta name="go-import" content="kubevirt.io/vm-console-proxy git https://github.com/kubevirt/vm-console-proxy">
-    <meta name="go-import" content="kubevirt.io/cpu-nfd-plugin git https://github.com/kubevirt/cpu-nfd-plugin">
-    <meta name="go-import" content="kubevirt.io/containerized-data-importer-api git https://github.com/kubevirt/containerized-data-importer-api">
-    <meta name="go-import" content="kubevirt.io/application-aware-quota-api git https://github.com/kubevirt/application-aware-quota-api">
-    <meta name="go-import" content="kubevirt.io/api git https://github.com/kubevirt/api">
-    <meta name="go-import" content="kubevirt.io/node-maintenance-operator git https://github.com/kubevirt/node-maintenance-operator">
-    <meta name="go-import" content="kubevirt.io/containerdisks git https://github.com/kubevirt/containerdisks">
-    <meta name="go-import" content="kubevirt.io/virt-template git https://github.com/kubevirt/virt-template">
-    <meta name="go-import" content="kubevirt.io/virt-template-api git https://github.com/kubevirt/virt-template-api">
-    <meta name="go-import" content="kubevirt.io/virt-template-client-go git https://github.com/kubevirt/virt-template-client-go">
-    <meta name="go-import" content="kubevirt.io/virt-template-engine git https://github.com/kubevirt/virt-template-engine">
-    <meta name="go-import" content="kubevirt.io/kubevirt-migration-operator git https://github.com/kubevirt/kubevirt-migration-operator">
-    <meta name="go-import" content="kubevirt.io/kubevirt-migration-controller git https://github.com/kubevirt/kubevirt-migration-controller">
+    {%- if page.layout == 'go-import' %}
+    {% assign package = page.url | remove_first: '/' | split: '/' | first -%}
+    <meta name="go-import" content="kubevirt.io/{{ package }} git https://github.com/kubevirt/{{ package }}">
+    {%- endif %}
     <link rel="apple-touch-icon" sizes="72x72" href="{{ site.baseurl }}/assets/favicon/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="{{ site.baseurl }}/assets/favicon/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="{{ site.baseurl }}/assets/favicon/favicon-16x16.png">

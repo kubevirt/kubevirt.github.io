@@ -1,7 +1,4 @@
 ---
-layout: page
-title:
+layout: go-import
 permalink: /kubevirt/
 ---
-
-To fetch the KubeVirt sources run `go get -d kubevirt.io/kubevirt`.

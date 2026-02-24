@@ -1,0 +1,9 @@
+---
+layout: default
+---
+{%- assign package = page.url | remove_first: '/' | split: '/' | first %}
+<div class="container post">
+  <article class="post-content">
+    <p>To fetch the <code>kubevirt.io/{{ package }}</code> Go package, run <code>go get -d kubevirt.io/{{ package }}</code>.</p>
+  </article>
+</div>

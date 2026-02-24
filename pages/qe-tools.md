@@ -1,7 +1,4 @@
 ---
-layout: page
-title:
+layout: go-import
 permalink: /qe-tools/
 ---
-
-To fetch QE Tools sources run `go get -d kubevirt.io/qe-tools`.

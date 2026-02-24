@@ -1,7 +1,4 @@
 ---
-layout: page
-title:
+layout: go-import
 permalink: /hostpath-provisioner/
 ---
-
-To fetch Hostpath Provisioner sources run `go get -d kubevirt.io/hostpath-provisioner`.
