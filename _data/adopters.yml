@@ -4,9 +4,15 @@ adopters:
   - link: https://www.arm.com
     logo: arm.svg
     name: arm
+  - link: https://www.aussiebroadband.com.au
+    logo: AussieBroadband.png
+    name: Aussie Broadband
   - link: https://www.bytedance.com/en/
     logo: Bytedance.png
     name: Bytedance
+  - link: https://childrescuecoalition.org
+    logo: ChildRescueCoalition.png
+    name: Child Rescue Coalition
   - link: https://www.civo.com
     logo: Civo.png
     name: Civo
@@ -38,6 +44,9 @@ adopters:
     logo: S3NS.svg
     name: S3NS
   integrations:
+  - link: https://cloudcasa.io/backup-recovery-kubevirt-red-hat-openshift-suse-harvester/
+    logo: CloudCasabyCatalogic.png
+    name: CloudCasa by Catalogic
   - link: https://docs.kasten.io/latest/usage/openshift_virtualization.html?highlight=kubevirt
     logo: KastenbyVeeam.svg
     name: Kasten by Veeam
