@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <!-- Adding Adobe Analytics -->
+    <script id="dpal" src="//www.redhat.com/ma/dpal.js" type="text/javascript"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width initial-scale=1, shrink-to-fit=no" >
+    <link rel="apple-touch-icon" sizes="72x72" href="/assets/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/assets/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/assets/favicon/favicon-16x16.png">
+    <link rel="manifest" href="/assets/favicon/site.webmanifest">
+    <link rel="mask-icon" href="/assets/favicon/safari-pinned-tab.svg" color="#5bbad5">
+    <meta name="msapplication-TileColor" content="#00aba9">
+    <meta name="theme-color" content="#ffffff">
+    <meta name="google-site-verification" content="ljFssJAOE7EegX8RSNhm2heZib4B2JPUwzoDLnIo0VM" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/css/bootstrap.min.css" integrity="sha384-9gVQ4dYFwwWSjIDZnLEWnxCjeSWFphJiwGPXr1jddIhOegiu1FwO5qRGvFXOdJZ4" crossorigin="anonymous">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="canonical" href="https://kubevirt.io//2026/changelog-v1.8.0.html">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet">
+    
+    <title>KubeVirt v1.8.0 | KubeVirt.io</title>
+    <!-- # Opengraph protocol properties: https://ogp.me/ -->
+    <meta name="author" content="kube🤖" >
+    <meta property="og:type" content="article" >
+    <meta name="twitter:card" content="summary">
+    <meta name="description" content="This article provides information about KubeVirt release v1.8.0 changes">
+    <meta name="keywords" content="release notes, changelog" >
+    <meta property="og:title" content="KubeVirt v1.8.0 | KubeVirt.io">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://kubevirt.io//2026/changelog-v1.8.0.html" >
+    <meta property="og:image" content="https://kubevirt.io//assets/images/KubeVirt_logo_color.png">
+    <meta property="og:description" content="This article provides information about KubeVirt release v1.8.0 changes" >
+    <meta property="og:site_name" content="KubeVirt.io" >
+    <meta property="og:article:author" content="kube🤖" >
+    <meta property="og:article:published_time" content="2026-03-24 00:00:00 +0000" >
+    <meta name="twitter:title" content="KubeVirt v1.8.0 | KubeVirt.io">
+    <meta name="twitter:description" content="This article provides information about KubeVirt release v1.8.0 changes">
+
+    <link type="application/atom+xml" rel="alternate" href="https://kubevirt.io//feed.xml" title="KubeVirt.io" />
+    <script src="//code.jquery.com/jquery.min.js"></script>
+    
+    <!-- Photoswipe.com gallery-->
+
+    <!-- Core CSS file -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.css">
+
+    <!-- Skin CSS file (styling of UI - buttons, caption, etc.)
+        In the folder of skin CSS file there are also:
+        - .png and .svg icons sprite,
+        - preloader.gif (for browsers that do not support CSS animations) -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/default-skin/default-skin.min.css">
+</head>
+
+
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark fixed-top" role="navigation">
+        <a class="navbar-brand" href="/">
+    <img src="/assets/images/KubeVirt_logo_color.svg" class="navbar-brand-image d-inline-block align-top" alt="KubeVirt.io">
+  </a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+    <i class="fas fa-th-large"></i>
+  </button>
+  <div class="collapse navbar-collapse" id="navbarSupportedContent">
+    <ul class="navbar-nav">
+      
+
+      
+        <li  class="nav-item active" >
+          <a class="nav-link text-uppercase" href="/blogs/">Blogs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/videos/">Videos</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/gallery/">Gallery</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="//kubevirt.io/user-guide">Docs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/labs/">Labs</a>
+        </li>
+      
+        <li  class="nav-item" >
+          <a class="nav-link text-uppercase" href="/community/">Community</a>
+        </li>
+      
+
+      <li class='nav-item'>
+        <form action="/search.html" class="nav-item__search" method="get" autocomplete="off">
+          <div class="autocomplete" style="width:150px;">
+            <input type="text" id="search-input" class="docs-search--input" placeholder="search term" name="query">
+          </div>
+          <input id="search-button" type="submit" value="🔍" disabled='true'>
+        </form>
+      </li>
+
+    </ul>
+  </div>
+<script>
+function autocomplete(inp, arr) {
+  /*the autocomplete function takes two arguments,
+  the text field element and an array of possible autocompleted values:*/
+  var currentFocus;
+  /*execute a function when someone writes in the text field:*/
+  inp.addEventListener("input", function(e) {
+      var a, b, i, val = this.value;
+      /*close any already open lists of autocompleted values*/
+      closeAllLists();
+      if (!val) { return false;}
+      currentFocus = -1;
+      /*create a DIV element that will contain the items (values):*/
+      a = document.createElement("DIV");
+      a.setAttribute("id", this.id + "autocomplete-list");
+      a.setAttribute("class", "autocomplete-items");
+      /*append the DIV element as a child of the autocomplete container:*/
+      this.parentNode.appendChild(a);
+      /*for each item in the array...*/
+      for (i = 0; i < arr.length; i++) {
+        /*check if the item starts with the same letters as the text field value:*/
+        if (arr[i].substr(0, val.length).toUpperCase() == val.toUpperCase()) {
+          /*create a DIV element for each matching element:*/
+          b = document.createElement("DIV");
+          /*make the matching letters bold:*/
+          b.innerHTML = "<strong>" + arr[i].substr(0, val.length) + "</strong>";
+          b.innerHTML += arr[i].substr(val.length);
+          /*insert a input field that will hold the current array item's value:*/
+          b.innerHTML += "<input type='hidden' value='" + arr[i] + "'>";
+          /*execute a function when someone clicks on the item value (DIV element):*/
+              b.addEventListener("click", function(e) {
+              /*insert the value for the autocomplete text field:*/
+              inp.value = this.getElementsByTagName("input")[0].value;
+              /*close the list of autocompleted values,
+              (or any other open lists of autocompleted values:*/
+              closeAllLists();
+          });
+          a.appendChild(b);
+        }
+      }
+  });
+  /*execute a function presses a key on the keyboard:*/
+  inp.addEventListener("keydown", function(e) {
+      document.getElementById("search-button").disabled= undefined;
+      var x = document.getElementById(this.id + "autocomplete-list");
+      if (x) x = x.getElementsByTagName("div");
+      if (e.keyCode == 40) {
+        /*If the arrow DOWN key is pressed,
+        increase the currentFocus variable:*/
+        currentFocus++;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 38) { //up
+        /*If the arrow UP key is pressed,
+        decrease the currentFocus variable:*/
+        currentFocus--;
+        /*and and make the current item more visible:*/
+        addActive(x);
+      } else if (e.keyCode == 13) {
+        /*If the ENTER key is pressed, prevent the form from being submitted,*/
+        if (currentFocus > -1) {
+          /*and simulate a click on the "active" item:*/
+          if (x) {
+            x[currentFocus].click();
+            e.preventDefault();
+          }
+        }
+        if (document.getElementById("search-input").value == "") {
+          e.preventDefault();
+        }
+      }
+  });
+  function addActive(x) {
+    /*a function to classify an item as "active":*/
+    if (!x) return false;
+    /*start by removing the "active" class on all items:*/
+    removeActive(x);
+    if (currentFocus >= x.length) currentFocus = 0;
+    if (currentFocus < 0) currentFocus = (x.length - 1);
+    /*add class "autocomplete-active":*/
+    x[currentFocus].classList.add("autocomplete-active");
+  }
+  function removeActive(x) {
+    /*a function to remove the "active" class from all autocomplete items:*/
+    for (var i = 0; i < x.length; i++) {
+      x[i].classList.remove("autocomplete-active");
+    }
+  }
+  function closeAllLists(elmnt) {
+    /*close all autocomplete lists in the document,
+    except the one passed as an argument:*/
+    var x = document.getElementsByClassName("autocomplete-items");
+    for (var i = 0; i < x.length; i++) {
+      if (elmnt != x[i] && elmnt != inp) {
+      x[i].parentNode.removeChild(x[i]);
+    }
+  }
+}
+/*execute a function when someone clicks in the document:*/
+document.addEventListener("click", function (e) {
+    closeAllLists(e.target);
+});
+}
+</script>
+
+<script>
+var mykeywords = ["libvirt", "KubeVirt", "ClearContainers", "virtlet", "CRI", "OpenStack", "ovirt", "release notes", "changelog", "hilights", "network", "flannel", "kubevirt-ansible", "Skydive", "openshift", "glusterfs", "heketi", "virtual machine", "weavenet", "custom resources", "kubevirt objects", "objects", "VirtualMachine", "api", "rbac", "roles", "storage", "ovn", "kubetron", "neutron", "vscode", "development", "debug", "istio", "iptables", "tproxy", "service mesh", "ebtables", "docker", "container", "build", "multus", "roadmap", "kvm", "qemu", "device plugins", "unit testing", "review", "hugepages", "kubevirtci", "ci-cd", "cicd", "memory", "overcommitment", "networking", "CNI", "multiple networks", "ovs-cni", "import", "clone", "upload", "disk image", "cdi", "datavolumes", "volume types", "serviceaccount", "ignition", "coreos", "rhcos", "kubecon", "conference", "gcp", "autodeployer", "metrics", "prometheus", "grafana", "federation", "kubefed", "multicluster", "HCO", "hyperconverged operator", "ansible", "vagrant", "lifecycle", "virtual machines", "website", "community", "vm import", "node drain", "eviction", "nmo", "condition types", "Condition types", "CNCF", "sandbox", "lab", "cri-o", "quickstart", "homelab", "kubernetes", "kubevirt installation", "rook", "ceph", "ntp", "chronyd", "prow", "infrastructure", "kubevirt-tutorial", "CI-CD", "continuous integration", "jenkins", "KubeCon", "cloudnativecon", "America", "talk", "gathering", "contra-lib", "admin", "operations", "create vm", "start vm", "connect to console", "connect to ssh", "stop vm", "remove vm", "operator manual", "basic operations", "laboratory", "installing kubevirt", "use kubevirt", "admin operations", "CDI", "containerized data importer", "octant", "okd", "openshift console", "cockpit", "noVNC", "user interface", "web interface", "virtVNC", "OKD console", "kubevirt upgrade", "upgrading", "OpenShift web console", "OKD", "video", "virtual machine management", "NUMA", "CPU pinning", "QEMU", "KVM", "GPU", "NVIDIA", "GPU workloads", "pass-through", "passthrough", "kubevirt", "Microsoft Windows kubernetes", "Microsoft Windows container", "Windows", "VM", "Advanced VM scheduling", "affinity", "scheduling", "topologyKeys", "Live Migration", "design", "architecture", "security", "operation", "images", "Kubernetes", "windows", "common-templates", "minikube", "addons", "oVirt", "kubevirt-hyperconverged", "cnao", "cluster-network-addons-operator", "kubernetes-nmstate", "nmstate", "bridge", "containerDisk", "registry", "composer-cli", "virt-customize", "builder tool", "prometheus-operator", "node-exporter", "monitoring", "event", "Tekton Pipelines", "KubeVirt Tekton Tasks", "vGPU", "Intel", "Fedora", "go", "authentication", "mesh", "AWS", "EC2", "AMI", "real-time", "CPUManager", "live migration", "dedicated network", "Kubevirt", "load-balancer", "MetalLB", "instancetypes", "preferences", "VirtualMachineInstancetype", "VirtualMachinePreference", "SDN", "OVN", "v1.0", "release", "cncf", "milestone", "party time", "NetworkPolicy", "Ansible", "ansible collection", "kubevirt.core", "iac", "Cluster Autoscaler", "EKS", "v1.1.0", "v1.4", "VMIM", "migrate", "migrations", "RBAC", "hardening", "v1.5", "packer", "plugin", "evpn", "bgp", "openperouter", "live-migration", "graduation", "v1.8", ]
+autocomplete(document.getElementById("search-input"), mykeywords);
+</script>
+
+<script src="/js/clipboard.min.js"></script>
+
+    </nav>
+
+    <main role="main" style="margin-top: 60px;">
+      <div class="container">
+  <div class="row">
+    <div class="col">
+      <div class="post">
+        <header class="post-header">
+          <h1></h1>
+          <h1 class="post-title">KubeVirt v1.8.0</h1>
+          <div class="post-info">
+            <span class="post-author">Author: kube🤖</span>
+            <div>
+              <span class="post-category-name">
+                Tags: <a href="/tag/release-notes">release notes</a>&nbsp;|&nbsp;<a href="/tag/changelog">changelog</a>
+              </span>
+            </div>
+            <div>
+              <span class="post-meta">Publication Date: March 24, 2026  </span>
+            </div>
+            <div>
+              <span class="post-category-name">
+                Category: releases
+              </span>
+            </div>
+
+          </div>
+        </header>
+        <article class="post-content">
+          <h2 id="v180">v1.8.0</h2>
+
+<p>Released on: Tue Mar 24 14:09:37 2026 +0000</p>
+
+<ul>
+  <li>[PR #17267][kubevirt-bot] bug-fix: restart virt-handler’s domain-notify server on unexpected exit.</li>
+  <li>[PR #17236][kubevirt-bot] fix VMExport failure with long PVC names</li>
+  <li>[PR #17006][kubevirt-bot] BugFix: VMs requiring enlightenment are now able to be live migrated after a decentralized live migration</li>
+  <li>[PR #17145][kubevirt-bot] Fixed an infinite VMI status update loop between virt-controller and virt-handler that occurred when the VMI spec listed the primary network interface after a secondary one.</li>
+  <li>[PR #17058][mhenriks] Fix PCI address stability across upgrades with v3 hotplug port topology</li>
+  <li>[PR #17061][ShellyKa13] fix: Prevent stale VMI backup status update when reusing backup names</li>
+  <li>[PR #17075][kubevirt-bot] Handle migration during backup according to migration priority</li>
+  <li>[PR #17077][kubevirt-bot] VEP-10: Update DRA devices implementation to read from metadata file instead of VMI status</li>
+  <li>[PR #17017][kubevirt-bot] Expose Memory Overhead on VMI Status behind VmiMemoryOverheadReport feature gate</li>
+  <li>[PR #16952][kubevirt-bot] Allow disabling Velero hooks in virt-launcher via Annotation</li>
+  <li>[PR #17018][mresvanis] Add PCIe NUMA-aware topology placement for GPU and host devices behind the PCINUMAAwareTopology feature gate (Alpha). When enabled, devices are automatically placed on PCIe expander buses matching their NUMA affinity for improved performance.</li>
+  <li>[PR #16986][kubevirt-bot] Use defined deployment number of replicas as base to fire low count alerts</li>
+  <li>[PR #16987][kubevirt-bot] Subtract non-schedulable nodes from kubevirt_allocatable_nodes</li>
+  <li>[PR #16993][frenzyfriday] Allows the user to update the NAD reference (networkName) of a network on a running VM through Live Migration.</li>
+  <li>[PR #16977][orenc1] Add a new config option to opt-out RBAC aggregation</li>
+  <li>[PR #16687][0xFelix] feat: virtctl gained new virt-template / VirtualMachineTemplate related commands (process, create and convert)</li>
+  <li>[PR #16662][mhenriks] VEP 165: Containerpath Volumes</li>
+  <li>[PR #16821][nirdothan] Remove network-attachment-definition get permissions from virt-controller ClusterRole conditioned by a feature gate.</li>
+  <li>[PR #16643][kwonkwonn] Bug-fix: Correctly detect CDI and Prometheus crds, preventing to misinterpret with different objects.</li>
+  <li>[PR #16528][Acedus] Fix: live-migration with CBT no longer fails on virtual disk size evaluation errors.</li>
+  <li>[PR #16426][Acedus] Handle CBT backup abort requests and failures</li>
+  <li>[PR #16582][lyarwood] Add initial CentOS Stream 10 build support with KUBEVIRT_CENTOS_STREAM_VERSION environment variable, these builds will be untested until v1.9.0 and beyond</li>
+  <li>[PR #16833][akalenyu] BugFix: storage migration fails with Google Cloud NetApp Volumes</li>
+  <li>[PR #16820][nirdothan] Support seamless migration with core passt binding (beta).</li>
+  <li>[PR #16655][0xFelix] Support for the deployment of virt-template through virt-operator was added (VEP76)</li>
+  <li>[PR #16666][iholder101] Expose guest panic as a Kubernetes event</li>
+  <li>[PR #16791][lyarwood] Bug fix: VIRT_*_IMAGE environment variable overrides on the virt-operator deployment are now correctly propagated to component deployments (virt-controller, virt-handler, etc.). Previously, changing these env vars had no effect due to the image values being excluded from the install strategy deployment ID hash.</li>
+  <li>[PR #16802][lyarwood] <code class="language-plaintext highlighter-rouge">PrefixTargetName</code> is now allowed as a <code class="language-plaintext highlighter-rouge">VolumeNamePolicy</code> for <code class="language-plaintext highlighter-rouge">VirtualMachineClone</code></li>
+  <li>[PR #16778][Acedus] fix: domain job completion events would not be processed if the domain was paused due to an I/O error.</li>
+  <li>[PR #16579][MarSik] A VMI.spec.domain.rebootPolicy field can be used to control the method the domain uses to handle reboots originating from inside the VM. Either the hypervisor processes the reboot silently behind the scenes (default) or the user can opt-in to a more visible behavior, where the hypervisor terminates the domain and lets kubevirt to handle the restart according to the runStrategy rules.</li>
+  <li>[PR #16466][Ronilerr] Fix LowReadyVirtOperatorsCount use running instead of up and changing kubevirt_virt_operator_ready to use sum and * instead of count and +</li>
+  <li>[PR #16734][orelmisan] An admin can disable the NAD query logic and use network-resources-injector instead to have less API calls</li>
+  <li>[PR #16653][noamasu] Replaced QuiesceFailed with QuiesceTimeout indication and added 60s Velero pre-backup hook timeout to better handle Windows VSS limitations.</li>
+  <li>[PR #16642][orelmisan] Existing VMs that retain the legacy ordinal naming scheme for secondary interfaces are automatically upgraded without a reboot.</li>
+  <li>[PR #16448][ShellyKa13] Incremental backups supported after VM restart by redefining checkpoints metadata in libvirt</li>
+  <li>[PR #16621][akalenyu] BugFix: vmsnapshot: report volumes being deleted</li>
+  <li>[PR #16645][Ronilerr] Fix grammar mistakes</li>
+  <li>[PR #16370][iholder101] Feature gates can now become explicitly disabled using <code class="language-plaintext highlighter-rouge">kv.spec.configuration.developerConfiguration.disabledFeatureGates</code>.</li>
+  <li>[PR #16366][elliot-gustafsson] Let libvirt lookup the actual disk size if block device to ensure compatibility with encrypted disks.</li>
+  <li>[PR #16229][noamasu] Bugfix: Label memorydump-created PVCs to support CDI WebhookPvcRendering</li>
+  <li>[PR #16637][awels] BugFix: Decentralized live migration between volumes with different volumeModes now successfully completes</li>
+  <li>[PR #16705][kubevirt-bot] Updated common-instancetypes bundles to v1.6.0</li>
+  <li>[PR #16512][awels] Decentralized Live Migration now has a separate condition in VMI and VMIM to indicate any issues</li>
+  <li>[PR #16489][lyarwood] Add new <code class="language-plaintext highlighter-rouge">PrefixTargetName</code> VolumeRestorePolicy for VirtualMachineRestore that creates restored volume names using the format <code class="language-plaintext highlighter-rouge">{targetVMName}-{volumeName}</code>. This provides predictable, readable names while avoiding collisions when restoring snapshots to different target VMs.</li>
+  <li>[PR #16404][iholder101] Add missing “Direct” and “Extended” options to Hyperv TLBFlush</li>
+  <li>[PR #16491][lyarwood] virt-operator now configures client rate limiting (default: 200 QPS / 400 burst) to improve reconciliation performance when processing large numbers of objects. Rate limits can be customized via –client-qps and –client-burst flags or VIRT_OPERATOR_CLIENT_QPS and VIRT_OPERATOR_CLIENT_BURST environment variables.</li>
+  <li>[PR #16600][woojoong88] Fix block volume hotplug breaking autoattachVSOCK</li>
+  <li>[PR #15898][bgartzi] Network downward API network-info includes mac addresses</li>
+  <li>[PR #16558][fossedihelm] The MigrationPriorityQueue feature gate has been promoted from Alpha to Beta.</li>
+  <li>[PR #16585][Sreeja1725] Preserve VM Specific fields during update</li>
+  <li>[PR #16326][harshitgupta1337] Introduce <code class="language-plaintext highlighter-rouge">HypervisorConfigurations</code> field in the <code class="language-plaintext highlighter-rouge">KubevirtConfiguration</code> CRD.</li>
+  <li>[PR #16527][lukashes] Fixed missing object context in client-go log output after changing verbosity.</li>
+  <li>[PR #16510][ShellyKa13] Apply CBT to a hotplug volume</li>
+  <li>[PR #16212][Barakmor1] Add target-side premigration hook system</li>
+  <li>[PR #16511][Ronilerr] Refactor doc-generator</li>
+  <li>[PR #16498][lyarwood] Fix ResourceVersion conflicts in VM reconciliation when instancetype controller modifies Status. The instancetype controller now properly propagates ResourceVersion from PatchStatus responses, preventing conflicts in subsequent UpdateStatus calls.</li>
+  <li>[PR #16220][lyarwood] The <code class="language-plaintext highlighter-rouge">DisableMDEVConfiguration</code> feature gate is now deprecated ahead of removal in a future release in favour of a new <code class="language-plaintext highlighter-rouge">kubevirt.spec.configuration.mediatedDevicesConfiguration.enabled</code> configurable</li>
+  <li>[PR #16488][lyarwood] VirtualMachineClone API now includes <code class="language-plaintext highlighter-rouge">VolumeNamePolicy</code> field to control volume cloning behavior.</li>
+  <li>[PR #14661][oujonny] Add tolerations for unschedulable taints to hot-plug pods</li>
+  <li>[PR #15113][alromeros] Label memory-dump PVCs to support CDI WebhookPvcRendering</li>
+  <li>[PR #16463][akalenyu] BugFix: migration metrics missing</li>
+  <li>[PR #16024][Sreeja1725] Scale up KWOK performance test and add virt-controller queue metrics</li>
+  <li>[PR #16453][nirdothan] Macvtap core binding has been removed.</li>
+  <li>[PR #16456][orelmisan] The discontinued core SLIRP binding has been completely removed.</li>
+  <li>[PR #16329][dasionov] Prevent false restart-required conditions when the VM and corresponding VMI already share the same firmware UUID.</li>
+  <li>[PR #16429][Acedus] fix: DataVolumeTemplates with a sourceRef of a DataSource that points to another DataSource now correctly resolves the backing source.</li>
+  <li>[PR #15975][sradco] kubevirt_vmi_migration_data_total_bytes is deprecated in favor of kubevirt_vmi_migration_data_bytes_total, in order to comply with the metrics naming conventions.</li>
+  <li>[PR #15278][sradco] Report allocated CPU and memory requests as simplified metrics with source=”guest_effective” label , showing final values after applying instance types, preferences, and hierarchy.```</li>
+  <li>[PR #16342][sradco] New VirtLauncherPodsStuckFailed alert</li>
+  <li>[PR #15237][sradco] The KubeVirtVMGuestMemoryPressure</li>
+  <li>[PR #16351][sradco] Fix bug in GuestFilesystemAlmostOutOfSpace, that fired for non relevant file system types.</li>
+  <li>[PR #16391][frenzyfriday] Limits the number of guest only interfaces reported on the VMI status to 10. This does not affect the interfaces specified on the spec.</li>
+  <li>[PR #16336][akalenyu] Maintenance: fix release branches potentially failing over identical remote images existing on nodes</li>
+  <li>[PR #16280][Dsanatar] deprecate –persist flag from virtctl add/remove volume</li>
+  <li>[PR #16285][ShellyKa13] Add support for incremental VM backups</li>
+  <li>[PR #15815][Dsanatar] Add Ephemeral Hotplug Volume Metric and Alert</li>
+  <li>[PR #16354][akalenyu] Maintenance: windows lane: W/A wrong nfs image SEEK_DATA impl</li>
+  <li>[PR #15992][Aseeef] * Fixed a bug in socket devices that resulted in clusters making use of the Persistent Reservations feature not properly updating their current health.</li>
+  <li>[PR #16355][Sreeja1725] Improve boolean flag formatting to parse it correctly.</li>
+  <li>[PR #16343][ShellyKa13] BugFix: Don’t modify VMI CBT status when feature gate is disabled</li>
+  <li>[PR #16333][Acedus] fix: ensure VMI CBT state remains disabled when the VM has no CBT matcher.</li>
+  <li>[PR #16174][dominikholler] Update dependecy golang.org/x/crypto to v0.45.0</li>
+  <li>[PR #16242][orelmisan] Omit LLA from the status report when using masquerade binding.</li>
+  <li>[PR #16081][ShellyKa13] VMBackup: introduce new VM backup API</li>
+  <li>[PR #16173][dominikholler] Update dependecy github.com/opencontainers/selinux to v1.13.0</li>
+  <li>[PR #16060][dasionov] bugfix: prevent cross-vendor migrations</li>
+  <li>[PR #15821][SamAlber] Add event logging for pause and unpause VM operations to align with other VM lifecycle events such as reset</li>
+  <li>[PR #15868][frank-gen] VirtualMachinePool now correctly appends index to CloudInit secret references when appendIndexToSecretRefs: true is set, enabling unique cloud-init configurations for each VM in the pool.</li>
+  <li>[PR #15913][germag] The <code class="language-plaintext highlighter-rouge">EnableVirtioFsConfigVolumes</code> feature has graduated to GA and no longer requires the associated feature gate to be enabled.</li>
+  <li>[PR #15863][HarshithaMS005] Test Fix: make Alpine ISO mount checks architecture-agnostic</li>
+  <li>[PR #16122][dasionov] Document allowed values for <code class="language-plaintext highlighter-rouge">spec.runStrategy</code>.</li>
+  <li>[PR #16159][Dsanatar] Don’t use attachment pods marked for deletion for hotplug volume status updates.</li>
+  <li>[PR #15442][Dsanatar] Allow VMExport with PVCs from Completed Pods</li>
+  <li>[PR #15949][xpivarc] Migration is using dedicated certificate for mTLS.</li>
+  <li>[PR #16049][fossedihelm] fix: KSM is enabled in case of node pressure within 3 minutes</li>
+  <li>[PR #15922][ShellyKa13] Introduce new API - UtilityVolumes - direct virt-launcher attachment mechanism</li>
+  <li>[PR #14892][xpivarc] kubevirt.io/cpumanager label is advertised for nodes capable of running dedicated VMs.</li>
+  <li>[PR #15694][Barakmor1] Allow migration when host model changes after libvirt upgrade.</li>
+  <li>[PR #15969][Dsanatar] Add RestartRequired when detaching CD-ROMs from a running VM</li>
+  <li>[PR #15714][machadovilaca] Add GuestFilesystemAlmostOutOfSpace alerts</li>
+  <li>[PR #15957][xpivarc] Introduce a new subresource <code class="language-plaintext highlighter-rouge">/evacuate/cancel</code> and <code class="language-plaintext highlighter-rouge">virtctl evacuate-cancel</code> command to allow users to cancel the evacuation process for a VirtualMachineInstance (VMI). This clears the <code class="language-plaintext highlighter-rouge">evacuationNodeName</code> field in the VMI’s status, stopping the automatic creation of migration resources and fully aborting the eviction cycle.</li>
+  <li>[PR #16023][lyarwood] The <code class="language-plaintext highlighter-rouge">MultiArchitecture</code> feature gate has been deprecated and is no longer used to determine if VirtualMachines with a differing architecture to the control plane should be rejected by the admission webhooks</li>
+  <li>[PR #15405][dasionov] Reject stop requests for paused VMIs.  A paused VMI must be unpaused before it can be stopped.</li>
+  <li>[PR #15716][awels] A decentralized live migration failure is properly propagates between source and target</li>
+  <li>[PR #15374][xpivarc] NodeRestriction: Source of node update is now verified</li>
+  <li>[PR #16050][xpivarc] Bug fix: KubeVirt.spec.imagetag installation is working again</li>
+  <li>[PR #15968][sradco] Recording rule kubevirt_vmi_vcpu_count name changes to vmi:kubevirt_vmi_vcpu:count</li>
+  <li>[PR #15166][Sreeja1725] Introduce pool.kubevirt.io/v1beta1</li>
+  <li>[PR #15409][noamasu] VMSnapshot: add SourceIndications status field to list snapshot indications with descriptions for clearer meaning.</li>
+  <li>[PR #15934][jschintag] Promote IBM Secure Execution Feature to Beta stage.</li>
+  <li>[PR #15767][awels] BugFix: The migration limit was not accurately being used with decentralized live migrations</li>
+  <li>[PR #15970][jean-edouard] The KubevirtSeccompProfile feature is now in Beta</li>
+  <li>[PR #15960][Barakmor1] promote ImageVolume FG to Beta</li>
+  <li>[PR #15638][Sreeja1725] VMPool: Add support for auto-healing startegy</li>
+  <li>[PR #15604][Sreeja1725] VMpool: Add Scale-in strategy support with Proactive, opportunistic modes and statePreservation</li>
+  <li>[PR #15529][Yu-Jack] support v0.32.5 code generator</li>
+</ul>
+
+        </article>
+        
+        
+
+<a class="twitter-share-button" href="https://twitter.com/intent/tweet?text=KubeVirt v1.8.0&url=https://www.kubevirt.io/2026/changelog-v1.8.0.html&screen_name=kubevirt" aria-label="Share this on Twitter">
+  <i class="fab fa-twitter mr-1"></i> Tweet
+</a>
+<hr/>
+
+
+      </div>
+    </div>
+  </div>
+</div>
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+    <!-- Background of PhotoSwipe.
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+        <!-- Container that holds slides.
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+            <div class="pswp__top-bar">
+                <!--  Controls are self-explanatory. Order can be changed. -->
+                <div class="pswp__counter"></div>
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+                <!-- Preloader demo https://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                      <div class="pswp__preloader__cut">
+                        <div class="pswp__preloader__donut"></div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="/js/photoswipe-page.js">
+</script>
+
+    </main>
+
+    <footer class="footer" role="footer">
+      <div class="container-fluid">
+  <div class="row justify-content-between">
+    <div class="col-sm-12 col-md-5">
+      <p>We are a <a href="https://cncf.io/">Cloud Native Computing Foundation</a> incubating project.</p>
+      <p><a href="https://cncf.io/"><img src="/assets/images/cncf-color.png" alt="Cloud Native Computing Foundation"/></a></p>
+    </div>
+    <div class="col-sm-12 col-md-5" style="text-align: center;">
+      <p class="text-md-right">
+
+        <a href="https://twitter.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Follow us on Twitter!" aria-label="Visit us on Twitter" class="link-social-twitter">
+          <i class="fab fa-twitter fa-lg"></i>
+        </a>
+
+        <a href="https://kubernetes.slack.com/archives/C8ED7RKFE" data-toggle="tooltip" data-placement="top" title="Join our Slack channel!" class="link-social-slack">
+          <i class="fab fa-slack fa-lg"></i>
+        </a>
+
+        <a href="https://github.com/kubevirt" data-toggle="tooltip" data-placement="top" title="Check our GitHub!" class="link-social-github">
+          <i class="fab fa-github fa-lg"></i>
+        </a>
+
+        <a href="https://groups.google.com/forum/#!forum/kubevirt-dev" data-toggle="tooltip" data-placement="top" title="Join our mailing list!" class="link-social-mail">
+          <i class="fas fa-envelope fa-lg"></i>
+        </a>
+
+        <a href="https://calendar.google.com/calendar/u/0/embed?src=kubevirt@cncf.io" data-toggle="tooltip" data-placement="top" title="See our events calendar!" class="link-social-calendar">
+          <i class="fas fa-calendar fa-lg"></i>
+        </a>
+
+        <a href="https://www.youtube.com/channel/UC2FH36TbZizw25pVT1P3C3g/videos" data-toggle="tooltip" data-placement="top" title="Subscribe to our YouTube channel!" class="link-social-youtube">
+          <i class="fab fa-youtube fa-lg"></i>
+        </a>
+        
+        <a href="https://bsky.app/profile/kubevirt.bsky.social" data-toggle="tooltip" data-placement="top" title="Follow us on Bluesky!" class="link-social-bluesky">
+          <i class="fa-brands fa-bluesky fa-lg"></i>
+        </a>
+
+        <a href="https://fosstodon.org/@kubevirt" rel="me" data-toggle="tooltip" data-placement="top" title="Follow us on Mastodon!" class="link-social-mastodon">
+          <i class="fab fa-mastodon fa-lg"></i>
+        </a>
+
+      </p>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col text-sm-left footer-licensing" style="text-align: center;">
+      Copyright 2026 The KubeVirt Contributors<br>
+      Copyright 2026 The Linux Foundation. All Rights Reserved. The Linux Foundation has registered trademarks and uses trademarks. For a list of trademarks of The Linux Foundation, please see our <a href="https://www.linuxfoundation.org/trademark-usage">Trademark Usage</a> page.<br>
+      This site is powered by <a href="https://www.netlify.com/legal/open-source-policy/">Netlify</a>.
+      <p class="privacy-statement text-sm-left" style="text-align: center;">
+        <a href="/privacy" class="privacy-statement-link">Privacy Statement</a>
+      </p>
+  </div>
+</div>
+<script src="/js/copy.js"></script>
+
+    </footer>
+
+    <script defer src="https://use.fontawesome.com/releases/v5.1.0/js/all.js" integrity="sha384-3LK/3kTpDE/Pkp8gTNp2gR/2gOiwQ6QaO7Td0zV76UFJVhqLl4Vl3KL1We6q6wR9" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.0/umd/popper.min.js" integrity="sha384-cs/chFZiN24E4KMATLdqdvsezGxaGsi4hLGOzlXwp5UZB1LY//20VyM2taTB4QvJ" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.0/js/bootstrap.min.js" integrity="sha384-uefMccjFJAIv6A+rW+L4AHf99KvxDjWSu1z9VI8SKNVmz4sk7buKt/6v9KI65qnm" crossorigin="anonymous"></script>
+    <script src="/js/kubevirt-io.js"></script>
+    <!-- Photoswipe -->
+    <!-- Core JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe.min.js"></script>
+    <!-- UI JS file -->
+    <script src="//cdnjs.cloudflare.com/ajax/libs/photoswipe/4.1.3/photoswipe-ui-default.min.js"></script>
+
+    <!-- This comes from DTM/DPAL and must be latest entry in body-->
+
+    <script type="text/javascript">
+        if (("undefined" !== typeof _satellite) && ("function" === typeof _satellite.pageBottom)) {
+            _satellite.pageBottom();
+        }
+    </script>
+  </body>
+</html>

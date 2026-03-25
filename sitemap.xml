@@ -785,6 +785,14 @@
 <lastmod>2025-11-27T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2026/changelog-v1.8.0.html</loc>
+<lastmod>2026-03-24T00:00:00+00:00</lastmod>
+</url>
+<url>
+<loc>https://kubevirt.io//2026/KubeVirt-v1-8-release.html</loc>
+<lastmod>2026-03-25T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//api/</loc>
 </url>
 <url>
@@ -1700,6 +1708,9 @@
 <loc>https://kubevirt.io//tag/graduation.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//tag/v1.8.html</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
 </url>
 <url>
@@ -1814,7 +1825,10 @@
 <loc>https://kubevirt.io//blogs/page39/</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//blogs/page40/</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2026-03-16T16:23:28+00:00</lastmod>
+<lastmod>2026-03-25T08:02:55+00:00</lastmod>
 </url>
 </urlset>
