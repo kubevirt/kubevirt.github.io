@@ -90,6 +90,9 @@ adopters:
   - link: https://www.h3c.com/en/Products_Technology/Enterprise_Products/Cloud_Computing/Cloud_Computing_Products/H3C_CloudOS/H3C_CloudOS_full-stack/
     logo: H3C.png
     name: H3C
+  - link: https://kube-dc.com/
+    logo: KubeDC.png
+    name: Kube-DC
   - link: https://www.kubermatic.com/products/kubevirt/
     logo: KUBERMATIC.png
     name: KUBERMATIC
