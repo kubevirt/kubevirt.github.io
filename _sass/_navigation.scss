@@ -178,3 +178,50 @@
 .navbar-brand {
   padding: 0;
 }
+
+// Social icons in the navbar header
+.navbar-social-icons {
+  flex-direction: row;
+  align-items: center;
+  margin-left: auto;
+  padding-left: 0.5rem;
+  border-left: 1px solid rgba(255, 255, 255, 0.25);
+
+  .nav-item {
+    margin-bottom: 0;
+    border-bottom: none;
+
+    &:hover,
+    &:focus {
+      margin-bottom: 0;
+      border-bottom: none;
+    }
+  }
+
+  .nav-link {
+    padding: 0.25rem 0.4rem;
+    font-size: 1.1rem;
+    color: rgba(255, 255, 255, 0.7);
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #fff;
+    }
+  }
+
+  @media (max-width: 991px) {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    border-left: none;
+    border-top: 1px solid rgba(255, 255, 255, 0.25);
+    padding-left: 0;
+    padding-top: 0.5rem;
+    margin-top: 0.5rem;
+    margin-left: 0;
+
+    .nav-link {
+      font-size: 1.3rem;
+      padding: 0.4rem 0.6rem;
+    }
+  }
+}
