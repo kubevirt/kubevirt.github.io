@@ -544,13 +544,15 @@ pre > code {
   position: relative;
   text-transform: capitalize;
   top: 0;
-  transition: all 0.15s ease-in-out;
 }
 .kv-btn svg {
   margin-right: 0.5rem;
 }
 .kv-btn svg g {
   fill: #ffb300;
+}
+.kv-btn {
+  transition: all 0.15s ease-in-out;
 }
 .kv-btn:hover, .kv-btn:active, .kv-btn:focus {
   color: #ffb300;
@@ -921,13 +923,15 @@ pre > code {
 }
 .docs-search--input {
   border: 1px solid #fff;
-  color: #fff;
 }
 @media (min-width: 992px) {
   .docs-search--input {
     margin-left: 16px;
     padding: 6px 0 6px 8px;
   }
+}
+.docs-search--input {
+  color: #fff;
 }
 .docs-search--input::placeholder {
   color: #fff;

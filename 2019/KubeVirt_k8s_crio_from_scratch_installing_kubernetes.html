@@ -261,16 +261,16 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p>To install the K8s packages a new repo has to be added:</p>
 
-<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">k8s-test.local</span><span class="c"># vim /etc/yum.repos.d/kubernetes.repo
-</span><span class="nn">[Kubernetes]</span>
-<span class="py">name</span><span class="p">=</span><span class="s">Kubernetes</span>
+<div class="language-ini highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">k8s-test.local</span><span class="c"># vim /etc/yum.repos.d/kubernetes.repo
+</span><span class="nn">[Kubernetes]</span><span class="w">
+</span><span class="py">name</span><span class="p">=</span><span class="s">Kubernetes</span>
 <span class="py">baseurl</span><span class="p">=</span><span class="s">https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64</span>
 <span class="py">enabled</span><span class="p">=</span><span class="s">1</span>
 <span class="py">gpgcheck</span><span class="p">=</span><span class="s">1</span>
 <span class="py">repo_gpgcheck</span><span class="p">=</span><span class="s">1</span>
 <span class="py">gpgkey</span><span class="p">=</span><span class="s">https://packages.cloud.google.com/yum/doc/yum-key.gpg</span>
-<span class="err">https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg</span>
-</code></pre></div></div>
+<span class="na">https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg</span><span class="w">
+</span></code></pre></div></div>
 
 <p>Now, the gpg keys of the packages can be imported into the system and the installation can proceed:</p>
 

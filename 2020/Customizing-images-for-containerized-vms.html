@@ -559,70 +559,70 @@ Example-http-server
 </div></div>
 <p>This is the final building configuration file, it can be downloaded from <a href="/assets/2020-12-01-Customizing-images-for-containerized-vms/devstation-centos8.toml">here</a></p>
 
-<div class="language-toml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="py">name</span> <span class="p">=</span> <span class="s">"devstation-centos8"</span>
-<span class="py">description</span> <span class="p">=</span> <span class="s">"A developer station"</span>
-<span class="py">version</span> <span class="p">=</span> <span class="s">"0.0.1"</span>
-<span class="py">modules</span> <span class="p">=</span> <span class="p">[]</span>
-<span class="py">groups</span> <span class="p">=</span> <span class="p">[]</span>
+<div class="language-toml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"devstation-centos8"</span>
+<span class="n">description</span> <span class="o">=</span><span class="w"> </span><span class="s">"A developer station"</span>
+<span class="n">version</span> <span class="o">=</span><span class="w"> </span><span class="s">"0.0.1"</span>
+<span class="n">modules</span> <span class="o">=</span><span class="w"> </span><span class="p">[]</span>
+<span class="n">groups</span> <span class="o">=</span><span class="w"> </span><span class="p">[]</span>
 
-<span class="nn">[[packages]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"httpd"</span>
-<span class="py">version</span> <span class="p">=</span> <span class="s">"2.4.37"</span>
+<span class="k">[[</span><span class="n">packages</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"httpd"</span>
+<span class="n">version</span> <span class="o">=</span><span class="w"> </span><span class="s">"2.4.37"</span>
 
-<span class="nn">[[packages]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"mod_ssl"</span>
-<span class="py">version</span> <span class="p">=</span> <span class="s">"2.4.37"</span>
+<span class="k">[[</span><span class="n">packages</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"mod_ssl"</span>
+<span class="n">version</span> <span class="o">=</span><span class="w"> </span><span class="s">"2.4.37"</span>
 
-<span class="nn">[[packages]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"php"</span>
-<span class="py">version</span> <span class="p">=</span> <span class="s">"7.2.24"</span>
+<span class="k">[[</span><span class="n">packages</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"php"</span>
+<span class="n">version</span> <span class="o">=</span><span class="w"> </span><span class="s">"7.2.24"</span>
 
-<span class="nn">[[packages]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"mariadb-server"</span>
-<span class="py">version</span> <span class="p">=</span> <span class="s">"10.3.17"</span>
+<span class="k">[[</span><span class="n">packages</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"mariadb-server"</span>
+<span class="n">version</span> <span class="o">=</span><span class="w"> </span><span class="s">"10.3.17"</span>
 
-<span class="nn">[[packages]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"openssh-server"</span>
-<span class="py">version</span> <span class="p">=</span> <span class="s">"*"</span>
+<span class="k">[[</span><span class="n">packages</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"openssh-server"</span>
+<span class="n">version</span> <span class="o">=</span><span class="w"> </span><span class="s">"*"</span>
 
-<span class="nn">[customizations]</span>
-<span class="py">hostname</span> <span class="p">=</span> <span class="s">"devstation"</span>
+<span class="k">[</span><span class="n">customizations</span><span class="k">]</span>
+<span class="n">hostname</span> <span class="o">=</span><span class="w"> </span><span class="s">"devstation"</span>
 
-<span class="nn">[customizations.kernel]</span>
-<span class="py">append</span> <span class="p">=</span> <span class="py">"console</span><span class="p">=</span><span class="err">tty</span><span class="mi">0</span> <span class="py">console</span><span class="p">=</span><span class="err">ttyS</span><span class="mi">0</span><span class="p">,</span><span class="mi">19200</span><span class="err">n</span><span class="mi">81</span><span class="s">"</span><span class="err">
-</span>
-<span class="nn">[customizations.timezone]</span>
-<span class="py">timezone</span> <span class="p">=</span> <span class="s">"Europe/Madrid"</span>
-<span class="py">ntpservers</span> <span class="p">=</span> <span class="p">[</span><span class="s">"0.europe.pool.ntp.org"</span><span class="p">,</span> <span class="s">"1.europe.pool.ntp.org"</span><span class="p">]</span>
+<span class="k">[</span><span class="n">customizations</span><span class="k">.</span><span class="n">kernel</span><span class="k">]</span>
+<span class="n">append</span> <span class="o">=</span><span class="w"> </span><span class="s">"console=tty0 console=ttyS0,19200n81"</span>
 
-<span class="nn">[[customizations.user]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"sysadmin"</span>
-<span class="py">description</span> <span class="p">=</span> <span class="s">"Company Systems Admin"</span>
-<span class="py">password</span> <span class="p">=</span> <span class="s">"$6$ZGmDxvGu3Q0M4RO/$KkfU0bD32FrLNpUCWEL8sy3dknJVyqExoy.NJMOcSCRjpt1H6sFKFjx8mFWn8H5CWTP7.bibPLBrRSRq3MrDb."</span>
-<span class="py">home</span> <span class="p">=</span> <span class="s">"/home/sysadmin/"</span>
-<span class="py">shell</span> <span class="p">=</span> <span class="s">"/usr/bin/bash"</span>
-<span class="py">groups</span> <span class="p">=</span> <span class="p">[</span><span class="s">"users"</span><span class="p">,</span> <span class="s">"wheel"</span><span class="p">]</span>
+<span class="k">[</span><span class="n">customizations</span><span class="k">.</span><span class="n">timezone</span><span class="k">]</span>
+<span class="n">timezone</span> <span class="o">=</span><span class="w"> </span><span class="s">"Europe/Madrid"</span>
+<span class="n">ntpservers</span> <span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">"0.europe.pool.ntp.org"</span><span class="p">,</span> <span class="s">"1.europe.pool.ntp.org"</span><span class="p">]</span>
 
-<span class="nn">[[customizations.user]]</span>
-<span class="py">name</span> <span class="p">=</span> <span class="s">"developer"</span>
-<span class="py">description</span> <span class="p">=</span> <span class="s">"developer"</span>
-<span class="py">groups</span> <span class="p">=</span> <span class="p">[</span><span class="s">"wheel"</span><span class="p">]</span>
-<span class="py">password</span> <span class="p">=</span> <span class="s">"$6$wlIgNacMnqCcXn3o$mPpw0apT4iZ3jDq0q6epXN3xCmNN.oVGFW.Gvu9r0nDVX.FXY3iCwfFkfPEcmhj7Kxw4Ppoes2LsUzPtNRjez0"</span>
+<span class="k">[[</span><span class="n">customizations</span><span class="k">.</span><span class="n">user</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"sysadmin"</span>
+<span class="n">description</span> <span class="o">=</span><span class="w"> </span><span class="s">"Company Systems Admin"</span>
+<span class="n">password</span> <span class="o">=</span><span class="w"> </span><span class="s">"$6$ZGmDxvGu3Q0M4RO/$KkfU0bD32FrLNpUCWEL8sy3dknJVyqExoy.NJMOcSCRjpt1H6sFKFjx8mFWn8H5CWTP7.bibPLBrRSRq3MrDb."</span>
+<span class="n">home</span> <span class="o">=</span><span class="w"> </span><span class="s">"/home/sysadmin/"</span>
+<span class="n">shell</span> <span class="o">=</span><span class="w"> </span><span class="s">"/usr/bin/bash"</span>
+<span class="n">groups</span> <span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">"users"</span><span class="p">,</span> <span class="s">"wheel"</span><span class="p">]</span>
 
-<span class="nn">[customizations.services]</span>
-<span class="py">enabled</span> <span class="p">=</span> <span class="p">[</span><span class="s">"httpd"</span><span class="p">,</span><span class="s">"mariadb"</span><span class="p">,</span><span class="s">"sshd"</span><span class="p">]</span>
+<span class="k">[[</span><span class="n">customizations</span><span class="k">.</span><span class="n">user</span><span class="k">]]</span>
+<span class="n">name</span> <span class="o">=</span><span class="w"> </span><span class="s">"developer"</span>
+<span class="n">description</span> <span class="o">=</span><span class="w"> </span><span class="s">"developer"</span>
+<span class="n">groups</span> <span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">"wheel"</span><span class="p">]</span>
+<span class="n">password</span> <span class="o">=</span><span class="w"> </span><span class="s">"$6$wlIgNacMnqCcXn3o$mPpw0apT4iZ3jDq0q6epXN3xCmNN.oVGFW.Gvu9r0nDVX.FXY3iCwfFkfPEcmhj7Kxw4Ppoes2LsUzPtNRjez0"</span>
 
-<span class="nn">[customizations.firewall.services]</span>
-<span class="py">enabled</span> <span class="p">=</span> <span class="p">[</span><span class="s">"http"</span><span class="p">,</span><span class="s">"https"</span><span class="p">,</span><span class="s">"mysql"</span><span class="p">,</span><span class="s">"ssh"</span><span class="p">]</span>
+<span class="k">[</span><span class="n">customizations</span><span class="k">.</span><span class="n">services</span><span class="k">]</span>
+<span class="n">enabled</span> <span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">"httpd"</span><span class="p">,</span><span class="s">"mariadb"</span><span class="p">,</span><span class="s">"sshd"</span><span class="p">]</span>
 
-<span class="nn">[[repos.git]]</span>
-<span class="py">rpmname</span> <span class="p">=</span> <span class="s">"manual"</span>
-<span class="py">rpmversion</span> <span class="p">=</span> <span class="s">"1.0"</span>
-<span class="py">rpmrelease</span> <span class="p">=</span> <span class="s">"1"</span>
-<span class="py">summary</span> <span class="p">=</span> <span class="s">"Manual how to work with devstation"</span>
-<span class="py">repo</span> <span class="p">=</span> <span class="s">"https://github.com/alosadagrande/lorax"</span>
-<span class="py">ref</span> <span class="p">=</span> <span class="s">"master"</span>
-<span class="py">destination</span> <span class="p">=</span> <span class="s">"/var/www/html/manual"</span>
+<span class="k">[</span><span class="n">customizations</span><span class="k">.</span><span class="n">firewall</span><span class="k">.</span><span class="n">services</span><span class="k">]</span>
+<span class="n">enabled</span> <span class="o">=</span><span class="w"> </span><span class="p">[</span><span class="s">"http"</span><span class="p">,</span><span class="s">"https"</span><span class="p">,</span><span class="s">"mysql"</span><span class="p">,</span><span class="s">"ssh"</span><span class="p">]</span>
+
+<span class="k">[[</span><span class="n">repos</span><span class="k">.</span><span class="n">git</span><span class="k">]]</span>
+<span class="n">rpmname</span> <span class="o">=</span><span class="w"> </span><span class="s">"manual"</span>
+<span class="n">rpmversion</span> <span class="o">=</span><span class="w"> </span><span class="s">"1.0"</span>
+<span class="n">rpmrelease</span> <span class="o">=</span><span class="w"> </span><span class="s">"1"</span>
+<span class="n">summary</span> <span class="o">=</span><span class="w"> </span><span class="s">"Manual how to work with devstation"</span>
+<span class="n">repo</span> <span class="o">=</span><span class="w"> </span><span class="s">"https://github.com/alosadagrande/lorax"</span>
+<span class="n">ref</span> <span class="o">=</span><span class="w"> </span><span class="s">"master"</span>
+<span class="n">destination</span> <span class="o">=</span><span class="w"> </span><span class="s">"/var/www/html/manual"</span>
 </code></pre></div></div>
 
 <div class="premonition note"><div class="fa fa-check-square"></div><div class="content"><p class="header">Note</p><p>In this case, we are using a Git repository to download useful information on how to deal with the customized image. However, it is possible to download for instance code or other information that can be stored in Git. And what is most important, it is versioned.</p>
