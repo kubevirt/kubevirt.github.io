@@ -3,7 +3,7 @@ Jekyll::Hooks.register :site, :post_write do |site|
     .select { |p| p.data["layout"] == "go-import" }
     .map do |page|
       package = (page.data["permalink"] || page.url).delete_prefix("/").chomp("/")
-      "/#{package}/*  /#{package}/  200"
+      "/#{package}/*  /#{package}/index.html  200"
     end
 
   next if rules.empty?
