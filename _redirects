@@ -19,6 +19,7 @@
 /managed-tenant-quota/*  /managed-tenant-quota/index.html  200
 /node-maintenance-operator/*  /node-maintenance-operator/index.html  200
 /qe-tools/*  /qe-tools/index.html  200
+/ssp-operator/api/*  /ssp-operator/api/index.html  200
 /ssp-operator/*  /ssp-operator/index.html  200
 /virt-template-api/*  /virt-template-api/index.html  200
 /virt-template-client-go/*  /virt-template-client-go/index.html  200
