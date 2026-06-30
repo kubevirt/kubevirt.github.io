@@ -37,6 +37,9 @@ adopters:
   - link: https://training.linuxfoundation.org/
     logo: TheLinuxFoundationTrainingandCertification.png
     name: The Linux Foundation - Training and Certification
+  - link: https://nebius.com/
+    logo: nebius.png
+    name: Nebius
   - link: https://www.nvidia.com
     logo: NVIDIA.png
     name: NVIDIA
