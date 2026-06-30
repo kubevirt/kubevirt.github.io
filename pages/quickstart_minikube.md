@@ -74,9 +74,6 @@ Below are two examples of how to install KubeVirt using the latest release.
 
 ### The easy way
 
-> warning "Addon currently broken"
-> An issue has been [reported](https://github.com/kubernetes/minikube/issues/15918) where more recent versions of minikube break the kubevirt addon. Fall back to the "in-depth" section below until this is resolved.
-
 * Installing KubeVirt can be as simple as the following command:
 
   ```bash
