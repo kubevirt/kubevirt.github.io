@@ -1,4 +1,278 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-07-07T16:56:42+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Announcing the release of KubeVirt v1.8</title><link href="https://kubevirt.io//2026/KubeVirt-v1-8-release.html" rel="alternate" type="text/html" title="Announcing the release of KubeVirt v1.8" /><published>2026-03-25T00:00:00+00:00</published><updated>2026-03-25T00:00:00+00:00</updated><id>https://kubevirt.io//2026/KubeVirt-v1-8-release</id><content type="html" xml:base="https://kubevirt.io//2026/KubeVirt-v1-8-release.html"><![CDATA[<p>Author: The Kubevirt Community
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-07-14T12:27:35+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Beta Features Enabled by Default in KubeVirt v1.9</title><link href="https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9.html" rel="alternate" type="text/html" title="Beta Features Enabled by Default in KubeVirt v1.9" /><published>2026-07-10T00:00:00+00:00</published><updated>2026-07-10T00:00:00+00:00</updated><id>https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9</id><content type="html" xml:base="https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9.html"><![CDATA[<p>Starting from KubeVirt v1.9, <strong>all Beta feature gates are enabled by default</strong>.
+This is a significant behavioral change from previous versions, where Beta
+features had to be explicitly opted into.
+If you are a downstream vendor, cluster administrator, or anyone deploying
+KubeVirt in production, please read on to understand what this means and how
+to prepare.</p>
+
+<h2 id="why-this-change">Why This Change?</h2>
+
+<p>The Beta phase of a feature is a “dress rehearsal” before General
+Availability (GA).
+During this phase, the community needs to ensure the feature is stable,
+gather wide user feedback, and validate that the API remains solid.</p>
+
+<p>Previously, Beta features were off by default. This meant they were often
+under-tested in real environments, limiting the community’s ability to catch
+issues early. By enabling Beta features by default, we:</p>
+
+<ul>
+  <li><strong>Test Beta features in CI with every PR</strong>, catching regressions early.</li>
+  <li><strong>Turn every contributor into a Beta tester by default</strong> during
+development.</li>
+  <li><strong>Test Beta features alongside each other</strong>, uncovering interaction bugs.</li>
+  <li><strong>Give reviewers higher confidence when approving GA graduation</strong>, backed
+by real-world exposure rather than opt-in-only testing.</li>
+</ul>
+
+<p>This change was proposed and discussed publicly in
+<a href="https://github.com/kubevirt/enhancements/blob/main/veps/meta-VEPs/229-beta-features-on-by-default/vep.md">VEP 229</a>
+and implemented in
+<a href="https://github.com/kubevirt/kubevirt/pull/17405">PR #17405</a>.</p>
+
+<h2 id="what-changes-in-practice">What Changes in Practice?</h2>
+
+<h3 id="before-v19">Before v1.9</h3>
+
+<p>All Beta feature gates were <strong>disabled</strong> by default.
+To use a Beta feature, you had to explicitly add it to
+<code class="language-plaintext highlighter-rouge">spec.configuration.developerConfiguration.featureGates</code> in the KubeVirt CR:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">KubeVirt</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">configuration</span><span class="pi">:</span>
+    <span class="na">developerConfiguration</span><span class="pi">:</span>
+      <span class="na">featureGates</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">Snapshot</span>
+        <span class="pi">-</span> <span class="s">ImageVolume</span>
+</code></pre></div></div>
+
+<h3 id="from-v19-onwards">From v1.9 Onwards</h3>
+
+<p>All Beta feature gates are <strong>enabled</strong> by default.
+To disable a Beta feature you do not want, add it to
+<code class="language-plaintext highlighter-rouge">spec.configuration.developerConfiguration.disabledFeatureGates</code>:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">apiVersion</span><span class="pi">:</span> <span class="s">kubevirt.io/v1</span>
+<span class="na">kind</span><span class="pi">:</span> <span class="s">KubeVirt</span>
+<span class="na">metadata</span><span class="pi">:</span>
+  <span class="na">name</span><span class="pi">:</span> <span class="s">kubevirt</span>
+  <span class="na">namespace</span><span class="pi">:</span> <span class="s">kubevirt</span>
+<span class="na">spec</span><span class="pi">:</span>
+  <span class="na">configuration</span><span class="pi">:</span>
+    <span class="na">developerConfiguration</span><span class="pi">:</span>
+      <span class="na">disabledFeatureGates</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">Snapshot</span>
+        <span class="pi">-</span> <span class="s">ImageVolume</span>
+</code></pre></div></div>
+
+<p>Note that Alpha features remain off by default and must still be explicitly
+enabled via <code class="language-plaintext highlighter-rouge">featureGates</code>.</p>
+
+<h2 id="feature-gate-report---know-what-is-active">Feature Gate Report - Know What Is Active</h2>
+
+<p>To help downstream vendors and cluster administrators understand which
+features are active and at what maturity level, starting from v1.9,
+KubeVirt ships a <strong>feature gate report</strong> as part of every release’s
+artifacts.</p>
+
+<p>This is a JSON file listing every non-GA feature gate and its current
+state (Alpha, Beta, or Deprecated). You can find it in the
+<a href="https://github.com/kubevirt/kubevirt/releases">release artifacts</a>
+for each version.</p>
+
+<p>You can also generate the report yourself from any KubeVirt source
+tree by running:</p>
+
+<div class="language-bash highlighter-rouge"><div class="highlight"><pre class="highlight"><code>make feature-gate-report
+</code></pre></div></div>
+
+<p>At the time of writing, the feature gate report looks as follows
+(the actual report shipped with the v1.9 release artifacts may
+differ):</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="p">[</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"AlignCPUs"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CPUManager"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ConfigurableHypervisor"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ContainerPathVolumes"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DecentralizedLiveMigration"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DeclarativeHotplugVolumes"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DownwardMetrics"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"EnableVirtioFsStorageVolumes"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ExperimentalIgnitionSupport"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"GPUsWithDRA"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HostDevices"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HostDevicesWithDRA"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HostDisk"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HotplugVolumes"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"HypervStrictCheck"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"IncrementalBackup"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LibvirtHooksServerAndClient"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"OptOutRoleAggregation"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PCINUMAAwareTopology"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PersistentReservation"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"RebootPolicy"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ReservedOverheadMemlock"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Root"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Sidecar"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Template"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"UtilityVolumes"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VGPULiveMigration"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VSOCK"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VmiMemoryOverheadReport"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"WorkloadEncryptionSEV"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"WorkloadEncryptionTDX"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Alpha"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ExternalNetResourceInjection"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ImageVolume"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"KubevirtSeccompProfile"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LiveUpdateNADRef"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MigrationPriorityQueue"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"NodeRestriction"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PasstBinding"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"PodSecondaryInterfaceNamingUpgrade"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"SecureExecution"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Snapshot"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"VideoConfig"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Beta"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DisableMDEVConfiguration"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deprecated"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DockerSELinuxMCSWorkaround"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deprecated"</span><span class="p">},</span><span class="w">
+  </span><span class="p">{</span><span class="nl">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MultiArchitecture"</span><span class="p">,</span><span class="w"> </span><span class="nl">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Deprecated"</span><span class="p">}</span><span class="w">
+</span><span class="p">]</span><span class="w">
+</span></code></pre></div></div>
+
+<p>Using this report, you can easily identify all Beta features that will now
+be on by default and decide which, if any, you want to disable.</p>
+
+<h2 id="upgrade-considerations">Upgrade Considerations</h2>
+
+<h3 id="upgrading-from-v18-to-v19">Upgrading from v1.8 to v1.9</h3>
+
+<p>If you are upgrading from v1.8, the <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> mechanism is
+already available to you.
+Before upgrading, review the feature gate report and add any Beta features
+you want to keep disabled to <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> in your KubeVirt CR.</p>
+
+<h3 id="upgrading-from-v17-or-older-to-v19">Upgrading from v1.7 (or older) to v1.9</h3>
+
+<p>The <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> field was introduced in
+<a href="https://github.com/kubevirt/enhancements/issues/104">v1.8</a>.
+If you are skipping v1.8 and upgrading directly from v1.7 to v1.9, be
+aware that:</p>
+
+<ul>
+  <li>After the upgrade, all Beta features will become active immediately.</li>
+  <li>You should update your KubeVirt CR to add <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> as soon
+as the upgrade completes.</li>
+  <li>We recommend testing the upgrade in a staging environment first, with
+particular attention to the newly enabled Beta features.</li>
+</ul>
+
+<h3 id="general-recommendations">General Recommendations</h3>
+
+<ol>
+  <li><strong>Automatically disable Beta feature gates in production.</strong> Use the
+feature gate report JSON from the release artifacts to programmatically
+populate the <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> list in your KubeVirt CR. This
+ensures newly promoted Beta features are not silently enabled in
+production after an upgrade.</li>
+  <li><strong>Do not skip v1.8.</strong> The <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> mechanism was
+introduced in v1.8. If you upgrade directly from v1.7 (or older)
+to v1.9, Beta features will be unconditionally enabled until you
+manually patch the KubeVirt CR post-upgrade. Upgrading to v1.8
+first lets you configure <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> before Beta
+features become on by default.</li>
+</ol>
+
+<h2 id="downstream-vendors">Downstream Vendors</h2>
+
+<p>If you ship a product based on KubeVirt, this change directly affects your
+release pipeline. Here are specific recommendations:</p>
+
+<h3 id="non-hco-deployments">Non-HCO Deployments</h3>
+
+<p>Use <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> in your KubeVirt CR to disable features that are
+not ready for your product:</p>
+
+<div class="language-yaml highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="na">spec</span><span class="pi">:</span>
+  <span class="na">configuration</span><span class="pi">:</span>
+    <span class="na">developerConfiguration</span><span class="pi">:</span>
+      <span class="na">disabledFeatureGates</span><span class="pi">:</span>
+        <span class="pi">-</span> <span class="s">FeatureYouWantDisabled</span>
+</code></pre></div></div>
+
+<p>As recommended above, use the feature gate report JSON from the release
+artifacts to programmatically extract all Beta features and disable them
+in your KubeVirt CR.</p>
+
+<h3 id="hco-based-deployments">HCO-Based Deployments</h3>
+
+<p><a href="https://github.com/kubevirt/hyperconverged-cluster-operator">HCO</a>
+(Hyperconverged Cluster Operator) will explicitly manage which Beta
+features are enabled or disabled.
+HCO maintainers will use the feature gate report to decide on defaults,
+with an in-code exception list for features they choose to configure
+differently.</p>
+
+<p>If HCO’s defaults do not match your needs, you can override the KubeVirt
+CR’s <code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> list using
+<a href="https://github.com/kubevirt/hyperconverged-cluster-operator/blob/main/docs/cluster-configuration.md">JSON patches</a>.</p>
+
+<h2 id="summary">Summary</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>Aspect</th>
+      <th>Before v1.9</th>
+      <th>From v1.9</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Alpha features</td>
+      <td>Off by default</td>
+      <td>Off by default (no change)</td>
+    </tr>
+    <tr>
+      <td>Beta features</td>
+      <td>Off by default</td>
+      <td><strong>On by default</strong></td>
+    </tr>
+    <tr>
+      <td>GA features</td>
+      <td>Always on</td>
+      <td>Always on (no change)</td>
+    </tr>
+    <tr>
+      <td>Opt-in mechanism</td>
+      <td><code class="language-plaintext highlighter-rouge">featureGates</code></td>
+      <td><code class="language-plaintext highlighter-rouge">featureGates</code> (Alpha only)</td>
+    </tr>
+    <tr>
+      <td>Opt-out mechanism</td>
+      <td><code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> (from v1.8)</td>
+      <td><code class="language-plaintext highlighter-rouge">disabledFeatureGates</code> (from v1.8)</td>
+    </tr>
+    <tr>
+      <td>Feature visibility</td>
+      <td>Parse source code</td>
+      <td><strong>JSON report in release artifacts</strong></td>
+    </tr>
+  </tbody>
+</table>
+
+<p>This change helps the community deliver more stable features at GA.
+If you have questions, please reach out on the
+<a href="https://groups.google.com/g/kubevirt-dev">kubevirt-dev mailing list</a>
+or join the <code class="language-plaintext highlighter-rouge">#kubevirt-dev</code> channel on
+<a href="https://kubernetes.slack.com/archives/C0163DT0R8X">Kubernetes Slack</a>.</p>
+
+<p>For full details, see
+<a href="https://github.com/kubevirt/enhancements/blob/main/veps/meta-VEPs/229-beta-features-on-by-default/vep.md">VEP 229</a>.</p>]]></content><author><name>iholder101</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.9" /><category term="feature gates" /><category term="beta" /><category term="upgrade" /><category term="VEP" /><summary type="html"><![CDATA[Starting from v1.9, all Beta feature gates are enabled by default. Learn what this means for your cluster and how to control feature gate behavior.]]></summary></entry><entry><title type="html">Announcing the release of KubeVirt v1.8</title><link href="https://kubevirt.io//2026/KubeVirt-v1-8-release.html" rel="alternate" type="text/html" title="Announcing the release of KubeVirt v1.8" /><published>2026-03-25T00:00:00+00:00</published><updated>2026-03-25T00:00:00+00:00</updated><id>https://kubevirt.io//2026/KubeVirt-v1-8-release</id><content type="html" xml:base="https://kubevirt.io//2026/KubeVirt-v1-8-release.html"><![CDATA[<p>Author: The Kubevirt Community
 Release date and time: 25th March</p>
 
 <p>The <a href="https://kubevirt.io">KubeVirt</a> Community is happy to announce the release of <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.8.0">v1.8</a>, which aligns with <a href="https://kubernetes.io/blog/2025/12/17/kubernetes-v1-35-release/">Kubernetes v1.35</a>.</p>
@@ -1986,47 +2260,4 @@ to create consistent VM images inside Kubernetes.</p>
   <li>[PR #12628][ShellyKa13] VMs admitter: remove validation of vm clone volume from the webhook</li>
   <li>[PR #13006][chomatdam] Added labels, annotations to VM Export resources and configurable pod readiness timeout</li>
   <li>[PR #13091][acardace] GA the <code class="language-plaintext highlighter-rouge">VMLiveUpdateFeatures</code> feature-gate.</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.5.0 changes]]></summary></entry><entry><title type="html">Announcing the release of KubeVirt v1.5</title><link href="https://kubevirt.io//2025/KubeVirt-v1-5_release.html" rel="alternate" type="text/html" title="Announcing the release of KubeVirt v1.5" /><published>2025-03-05T00:00:00+00:00</published><updated>2025-03-05T00:00:00+00:00</updated><id>https://kubevirt.io//2025/KubeVirt-v1-5_release</id><content type="html" xml:base="https://kubevirt.io//2025/KubeVirt-v1-5_release.html"><![CDATA[<p>The KubeVirt Community is pleased to announce the release of <a href="https://github.com/kubevirt/kubevirt/releases/tag/v1.5.0">KubeVirt v1.5</a>. This release aligns with <a href="https://kubernetes.io/blog/2024/12/11/kubernetes-v1-32-release/">Kubernetes v1.32</a> and is the seventh KubeVirt release to follow the Kubernetes release cadence.</p>
-
-<p>This release sees the project adding some features that are aligned with more traditional virtualization platforms, such as enhanced volume and VM migration, increased CPU performance, and more precise network state control.</p>
-
-<p>You can read the full <a href="https://kubevirt.io/user-guide/release_notes/#v150">release notes</a> in our user-guide, but we have included some highlights in this blog.</p>
-
-<h3 id="breaking-change">Breaking change</h3>
-<p>Please be aware that in v1.5 we have <a href="https://github.com/kubevirt/kubevirt/pull/13497">introduced a change</a> that affects permissions of namespace admins to trigger live migrations. As a hardening measure (principle of least privilege), the right of creating, editing and deleting <code class="language-plaintext highlighter-rouge">VirtualMachineInstanceMigrations</code> are no longer assigned by default to namespace admins.</p>
-
-<p>For more information, see our post on the <a href="https://kubevirt.io/2025/Hardening-VMIM.html">KubeVirt blog</a>.</p>
-
-<h3 id="feature-ga">Feature GA</h3>
-
-<p>This release marks the graduation of a number of features to GA; deprecating the feature gate and now enabled by default:</p>
-
-<ul>
-  <li><a href="https://kubevirt.io/user-guide/storage/volume_migration/">Migration Update Strategy and Volume Migration</a>: Storage migration can be useful in the cases where the users need to change the underlying storage, for example, if the storage class has been deprecated, or there is a new more performant driver available.</li>
-  <li><a href="https://kubevirt.io/user-guide/compute/resources_requests_and_limits/">Auto Resource Limits</a>: Automatically apply CPU limits to a VMI.</li>
-  <li>VM Live Update Features: This feature underpins hotplugging of CPU, memory, and volume resources.</li>
-  <li><a href="https://kubevirt.io/user-guide/network/network_binding_plugins/">Network Binding Plugin</a>: A modular plugin which integrates with KubeVirt to implement a network binding.</li>
-</ul>
-
-<h3 id="compute">Compute</h3>
-
-<p>You can now specify the number of <a href="https://kubevirt.io/user-guide/storage/disks_and_volumes/#iothreads">IOThreads to use</a> through virtqueue mapping to improve CPU performance. We also added <a href="https://github.com/kubevirt/kubevirt/pull/13606">virtio video support for amd64</a> as well as the <a href="https://github.com/kubevirt/kubevirt/pull/13208">ability to reset VMs</a>, which provides the means to restart the guest OS without requiring a new pod to be scheduled.</p>
-
-<h3 id="networking">Networking</h3>
-
-<p>You can now <a href="https://kubevirt.io/user-guide/network/interfaces_and_networks/#link-state-management">dynamically control the link state</a> (up/down) of a network interface.</p>
-
-<h3 id="scale-and-performance">Scale and Performance</h3>
-
-<p>A comprehensive list of performance and scale benchmarks for the release is <a href="https://github.com/kubevirt/kubevirt/blob/main/docs/perf-scale-benchmarks.md">available here</a>. A notable change added to the benchmarks was the <a href="https://github.com/kubevirt/kubevirt/pull/13250">virt-handler resource utilization metrics</a>. This metric gives the avg, max and min memory/cpu utilization per VMI that is scheduled on the node where virt-handler is running. Another notable shoutout from the benchmark document is changing how <a href="https://github.com/kubevirt/kubevirt/pull/12716">list calls are tracked</a>. KubeVirt clients were misreporting watch calls as list calls, which was fixed in this release.</p>
-
-<h3 id="storage">Storage</h3>
-
-<p>With this release you can now migrate <a href="https://kubevirt.io/user-guide/storage/volume_migration/">hotplugged volumes</a>. You can also migrate VMIs with a volume shared using virtiofs. And we <a href="https://github.com/kubevirt/kubevirt/pull/13713">addressed a recent change in libvirt</a> that was preventing some NFS shared volumes from migrating by providing shared filesystem paths upfront.</p>
-
-<h3 id="thank-you-for-your-contribution">Thank you for your contribution!</h3>
-<p>A lot of work from a <a href="https://kubevirt.devstats.cncf.io/d/66/developer-activity-counts-by-companies?orgId=1&amp;var-period_name=v1.4.0%20-%20now&amp;var-metric=contributions&amp;var-repogroup_name=All&amp;var-country_name=All&amp;var-companies=All">huge amount of people</a> goes into a release. A huge thank you to the 350+ people who contributed to this v1.5 release.</p>
-
-<p>And if you’re interested in contributing to the project and being a part of the next release, please check out our <a href="https://kubevirt.io/user-guide/contributing/">contributing guide</a> and our <a href="https://github.com/kubevirt/community/blob/main/membership_policy.md">community membership guidelines</a>.</p>
-
-<p>Contributing needn’t be designing a new feature or committing to a <a href="https://github.com/kubevirt/enhancements">Virtualization Enhancement Proposal</a>, there is always a need for reviews, help with our docs and website, or submitting good quality bugs. Every little bit counts.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.5" /><category term="release" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[With the release of KubeVirt v1.5 we see the community adding some features that align with more traditional virtualization platforms.]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.5.0 changes]]></summary></entry></feed>
