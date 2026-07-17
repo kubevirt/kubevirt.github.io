@@ -33,7 +33,7 @@
     <meta property="og:description" content="Virtual Machine Management on Kubernetes" >
     <meta property="og:site_name" content="KubeVirt.io" >
     <meta property="og:article:author" content="The KubeVirt.io website team" >
-    <meta property="og:article:published_time" content="2026-07-16 14:06:01 +0000" >
+    <meta property="og:article:published_time" content="2026-07-17 10:36:14 +0000" >
     <meta name="twitter:title" content="KubeVirt quickstart with Minikube | KubeVirt.io">
     <meta name="twitter:description" content="Virtual Machine Management on Kubernetes">
 
@@ -430,6 +430,11 @@ autocomplete(document.getElementById("search-input"), mykeywords);
 
 <p><a href="https://minikube.sigs.k8s.io/docs/start/">Minikube</a> quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.</p>
 
+<div class="premonition warning"><div class="fa fa-exclamation-circle"></div><div class="content"><p class="header">Not supported on macOS or Windows hosts</p><p>KubeVirt needs Linux/KVM on the host kernel, which macOS and Windows don’t provide (see <a href="https://github.com/kubevirt/kubevirt/issues/12410">kubevirt/kubevirt#12410</a>).
+If you’re on a Mac, try the <a href="https://github.com/kubevirt/kubevirt/pull/11830">devcontainer setup</a> or use the <a href="/quickstart_cloud/">cloud-provider quickstart</a> instead.</p>
+
+
+</div></div>
 <h2 id="prepare-minikube-kubernetes-environment">Prepare minikube Kubernetes environment</h2>
 
 <ul>
