@@ -21,6 +21,9 @@ tags:
 
 [Minikube](https://minikube.sigs.k8s.io/docs/start/) quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
 
+> warning "Not supported on macOS or Windows hosts"
+> KubeVirt needs Linux/KVM on the host kernel, which macOS and Windows don't provide (see [kubevirt/kubevirt#12410](https://github.com/kubevirt/kubevirt/issues/12410)).
+> If you're on a Mac, try the [devcontainer setup](https://github.com/kubevirt/kubevirt/pull/11830) or use the [cloud-provider quickstart](/quickstart_cloud/) instead.
 
 ## Prepare minikube Kubernetes environment
 
