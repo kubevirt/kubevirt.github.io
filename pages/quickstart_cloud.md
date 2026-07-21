@@ -20,6 +20,8 @@ tags: [
   ]
 ---
 
+> ⚠️ **Note:** These quickstarts are not supported on Mac. Please use a Linux environment instead. Alternatively, you can use [devContainers](https://github.com/kubevirt/kubevirt/pull/11830).
+
 ## Easy install using cloud providers
 
 KubeVirt can be used on cloud computing providers such as AWS, Azure, GCP, AliCloud.
