@@ -22,7 +22,7 @@
     "url": "https://github.com/kubevirt/kubevirt.github.io/issues"
   },
   "devDependencies": {
-    "pre-commit": "^1.2.2",
+    "pre-commit": "^2.0.0",
     "yaspeller-ci": "^1.0.2"
   },
   "dependencies": {
