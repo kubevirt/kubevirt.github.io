@@ -797,6 +797,10 @@
 <lastmod>2026-07-10T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2026/changelog-v1.9.0.html</loc>
+<lastmod>2026-07-30T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//api/</loc>
 </url>
 <url>
@@ -978,6 +982,9 @@
 </url>
 <url>
 <loc>https://kubevirt.io//vm-console-proxy/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//vm-file-restore-operator/</loc>
 </url>
 <url>
 <loc>https://kubevirt.io//category/weekly-updates.html</loc>
@@ -1851,6 +1858,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2026-07-21T12:33:20+00:00</lastmod>
+<lastmod>2026-08-05T14:36:23+00:00</lastmod>
 </url>
 </urlset>

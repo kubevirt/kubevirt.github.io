@@ -26,3 +26,4 @@
 /virt-template-engine/*  /virt-template-engine/index.html  200
 /virt-template/*  /virt-template/index.html  200
 /vm-console-proxy/*  /vm-console-proxy/index.html  200
+/vm-file-restore-operator/*  /vm-file-restore-operator/index.html  200
