@@ -46,6 +46,9 @@ adopters:
   - link: https://www.s3ns.io/en
     logo: S3NS.svg
     name: S3NS
+  - link: https://www.sktelecom.com/en
+    logo: sktelecom.png
+    name: SK Telecom
   integrations:
   - link: https://cloudcasa.io/backup-recovery-kubevirt-red-hat-openshift-suse-harvester/
     logo: CloudCasabyCatalogic.png
