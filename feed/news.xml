@@ -1,4 +1,136 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-09-18T08:35:29+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Beta Features Enabled by Default in KubeVirt v1.9</title><link href="https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9.html" rel="alternate" type="text/html" title="Beta Features Enabled by Default in KubeVirt v1.9" /><published>2026-07-10T00:00:00+00:00</published><updated>2026-07-10T00:00:00+00:00</updated><id>https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9</id><content type="html" xml:base="https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9.html"><![CDATA[<p>Starting from KubeVirt v1.9, <strong>all Beta feature gates are enabled by default</strong>.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/news.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-09-18T15:37:32+00:00</updated><id>https://kubevirt.io//feed/news.xml</id><title type="html">KubeVirt.io | News</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Understanding KubeVirt’s Host Kernel and Userspace Dependencies</title><link href="https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies.html" rel="alternate" type="text/html" title="Understanding KubeVirt’s Host Kernel and Userspace Dependencies" /><published>2026-09-03T00:00:00+00:00</published><updated>2026-09-03T00:00:00+00:00</updated><id>https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies</id><content type="html" xml:base="https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies.html"><![CDATA[<p>KubeVirt runs each VM inside a <code class="language-plaintext highlighter-rouge">virt-launcher</code> pod. QEMU and libvirt are userspace processes scheduled like any other container, with host kernel devices (<code class="language-plaintext highlighter-rouge">/dev/kvm</code>, <code class="language-plaintext highlighter-rouge">/dev/vhost-net</code>, <code class="language-plaintext highlighter-rouge">/dev/net/tun</code>) mapped in. Like any workload that probes kernel device capabilities, a mismatch between the userspace stack and the host kernel can cause failures. What makes the virtualization case distinct is that those probe results feed directly into guest device feature negotiation and live-migration Application Binary Interface (ABI), so a kernel/userspace mismatch can surface not just as startup instability, but as broken live migrations across <code class="language-plaintext highlighter-rouge">virt-launcher</code> versions.</p>
+
+<p>Upstream KubeVirt builds default <code class="language-plaintext highlighter-rouge">virt-launcher</code> images with Enterprise Linux (EL) userspace and runs CI against EL host kernels. When this EL userspace runs on non-EL host kernels, subtle compatibility assumptions can break in ways upstream CI never sees. A recent issue, <a href="https://github.com/kubevirt/kubevirt/issues/16386">kubevirt/kubevirt#16386</a>, brought this reality into sharp focus.</p>
+
+<hr />
+
+<h2 id="the-anatomy-of-a-regression-issue-16386">The Anatomy of a Regression: Issue #16386</h2>
+
+<p>During upgrades from KubeVirt v1.6 to v1.7+ on Ubuntu worker nodes, live migrations failed across thousands of running VMs:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qemu-kvm: Features 0x1c0010130afffaf unsupported. Allowed features: 0x10179bfffef
+qemu-kvm: Failed to load virtio-net:virtio
+qemu-kvm: error while loading state for instance 0x0 of device 'virtio-net'
+qemu-kvm: load of migration failed: Operation not permitted
+</code></pre></div></div>
+
+<p>The bit difference <code class="language-plaintext highlighter-rouge">0x1c0000000000000</code> corresponds to three <code class="language-plaintext highlighter-rouge">virtio-net</code> feature bits for <strong>UDP Segmentation Offload (USO)</strong>:</p>
+
+<ul>
+  <li><strong>Bit 54</strong>: <code class="language-plaintext highlighter-rouge">VIRTIO_NET_F_GUEST_USO4</code></li>
+  <li><strong>Bit 55</strong>: <code class="language-plaintext highlighter-rouge">VIRTIO_NET_F_GUEST_USO6</code></li>
+  <li><strong>Bit 56</strong>: <code class="language-plaintext highlighter-rouge">VIRTIO_NET_F_HOST_USO</code></li>
+</ul>
+
+<h3 id="how-the-layers-diverged">How the Layers Diverged</h3>
+
+<ol>
+  <li><strong>Host Kernel Support:</strong> Upstream Linux merged TAP USO (<code class="language-plaintext highlighter-rouge">TUN_F_USO4</code>/<code class="language-plaintext highlighter-rouge">USO6</code>) in <strong>Linux 6.2</strong>.</li>
+  <li><strong>QEMU Probe:</strong> At VM startup, QEMU probes the host TAP backend via <code class="language-plaintext highlighter-rouge">ioctl(fd, TUNSETOFFLOAD, ...)</code>.
+    <ul>
+      <li>On <strong>kernels &gt;= 6.2</strong> (e.g. Ubuntu 22.04 HWE, 24.04, 26.04), the probe succeeds. QEMU advertised USO, and modern guests negotiated bits 54–56.</li>
+      <li>On <strong>kernels &lt; 6.2</strong> (e.g. stock CentOS Stream 9 / RHEL 9 on kernel 5.14), the ioctl returns <code class="language-plaintext highlighter-rouge">-EINVAL</code>. QEMU silently disabled USO.</li>
+    </ul>
+  </li>
+  <li><strong>The Downstream Change:</strong> In <code class="language-plaintext highlighter-rouge">qemu-kvm-9.1.0-20.el9</code> (shipped in KubeVirt 1.7), patch <code class="language-plaintext highlighter-rouge">kvm-virtio-net-disable-USO-for-virt-rhel9.6.patch</code> (<a href="https://issues.redhat.com/browse/RHEL-80313">RHEL-80313</a>) retroactively disabled USO on <code class="language-plaintext highlighter-rouge">pc-q35-rhel9.6.0</code> machine types to fix RHEL 10 → RHEL 9 migration.</li>
+  <li><strong>The Failure:</strong> Existing VMs running on Ubuntu nodes held negotiated USO bits from KubeVirt 1.6. When migrating to the 1.7 <code class="language-plaintext highlighter-rouge">virt-launcher</code>, the new QEMU rejected the incoming state.</li>
+</ol>
+
+<h3 id="why-ci-missed-it">Why CI Missed It</h3>
+
+<p>Upstream KubeVirt release images are built on <strong>CentOS Stream 9</strong>, and upstream CI runs on <strong>EL9 host kernels (5.14)</strong>.</p>
+
+<p>Because CI nodes run kernel 5.14, QEMU’s TAP probe always failed. <strong>USO was never enabled in CI</strong>, so migration tests passed cleanly when the downstream QEMU patch dropped the feature. Only clusters running modern non-EL host kernels encountered the breakage.</p>
+
+<hr />
+
+<h2 id="the-three-way-dependency">The Three-Way Dependency</h2>
+
+<p><code class="language-plaintext highlighter-rouge">virt-launcher</code> is a translation layer between the host node and the guest OS:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>┌────────────────────────────────────────────────────────┐
+│                      Guest OS                          │
+│        (Kernel virtio drivers &amp; negotiated ABI)        │
+└───────────────────────────▲────────────────────────────┘
+                            │ Virtio Features
+┌───────────────────────────▼────────────────────────────┐
+│              virt-launcher Pod (Container)             │
+│       Bundled Userspace: QEMU, libvirt, swtpm...       │
+│        (Upstream built on CentOS Stream 9/10)          │
+└───────────────────────────▲────────────────────────────┘
+                            │ ioctls (/dev/kvm, TAP, vhost)
+┌───────────────────────────▼────────────────────────────┐
+│                    Host Node Kernel                    │
+│   (CentOS Stream, RHEL, Ubuntu, Debian, Flatcar...)   │
+└────────────────────────────────────────────────────────┘
+</code></pre></div></div>
+
+<p>Compatibility requires alignment across all three boundaries:</p>
+
+<ul>
+  <li><strong>Host Kernel ↔ Userspace:</strong> Does the host kernel support the ioctl flags QEMU/libvirt probe for?</li>
+  <li><strong>Userspace ↔ Target Userspace:</strong> Does a newer QEMU in an updated <code class="language-plaintext highlighter-rouge">virt-launcher</code> accept the device state and feature bitmap of the source QEMU?</li>
+  <li><strong>Userspace ↔ Guest OS:</strong> Are virtual hardware features stable across migrations without breaking guest ABI?</li>
+</ul>
+
+<hr />
+
+<h2 id="aligned-stack-approaches-across-distributions">Aligned Stack Approaches Across Distributions</h2>
+
+<p>Distributions address this by aligning the entire stack, ensuring the host kernel and the containerized virtualization userspace are built from the same distribution base.</p>
+
+<p><strong>Harvester</strong> (built on SUSE / Rancher) does not run upstream CentOS Stream images on its nodes. Instead:</p>
+
+<ul>
+  <li><strong>Host OS:</strong> Runs on an immutable appliance OS derived from <strong>SLE Micro</strong>.</li>
+  <li><strong>Userspace:</strong> SUSE builds and ships its own <code class="language-plaintext highlighter-rouge">virt-launcher</code> images in <code class="language-plaintext highlighter-rouge">registry.suse.com</code> using <strong>SLES / SLE Micro</strong> packages from OBS.</li>
+</ul>
+
+<p><strong>OpenShift Virtualization</strong> (Red Hat) takes a similar approach within the OpenShift platform:</p>
+
+<ul>
+  <li><strong>Host OS:</strong> OpenShift enforces <strong>Red Hat CoreOS (RHCOS)</strong> as the worker node OS, built from the same RHEL base as the container images.</li>
+  <li><strong>Userspace:</strong> Red Hat builds and ships <code class="language-plaintext highlighter-rouge">virt-launcher</code> images from RHEL packages, validated against the same RHEL kernel version running on RHCOS worker nodes.</li>
+</ul>
+
+<p>In both cases, because the host kernel and the containerized hypervisor share the same distribution base, they avoid the impedance mismatch that arises from running userspace built for one kernel generation on a host running a different one.</p>
+
+<hr />
+
+<h2 id="improving-transparency-current-initiatives">Improving Transparency: Current Initiatives</h2>
+
+<p>We are working to make these boundaries explicit:</p>
+
+<ul>
+  <li><strong>User Guide Requirements (<a href="https://github.com/kubevirt/user-guide/pull/1029">#1029</a>):</strong> Documented host kernel and virtualization userspace requirements for cluster operators (now merged).</li>
+  <li><strong>Architectural Gap Tracking (<a href="https://github.com/kubevirt/kubevirt/issues/19000">kubevirt#19000</a>):</strong> Auditing implicit dependencies between <code class="language-plaintext highlighter-rouge">virt-launcher</code>, <code class="language-plaintext highlighter-rouge">virt-handler</code>, and host kernel capabilities.</li>
+  <li><strong>Automated Support Matrix (<a href="https://github.com/kubevirt/sig-release/issues/69">sig-release#69</a>):</strong> Automatically publishing a release → userspace/kernel matrix by extracting pinned component NEVRAs (<strong>N</strong>ame, <strong>E</strong>poch, <strong>V</strong>ersion, <strong>R</strong>elease, <strong>A</strong>rchitecture) from <code class="language-plaintext highlighter-rouge">hack/rpm-deps.sh</code>.</li>
+</ul>
+
+<hr />
+
+<h2 id="moving-forward-shared-community-ownership">Moving Forward: Shared Community Ownership</h2>
+
+<p>Documenting assumptions is essential, but documentation alone does not prevent regressions.</p>
+
+<p>Upstream maintainers validate release artifacts built on Enterprise Linux userspace and tested on EL host kernels. Upstream cannot realistically absorb the testing matrix and debugging burden of arbitrary host distributions without dedicated capacity.</p>
+
+<p>If you rely on KubeVirt on non-EL hosts (Ubuntu, Debian, Flatcar, Talos, etc.):</p>
+
+<ol>
+  <li><strong>Third-Party CI:</strong> Provide external CI lanes that test these host distributions against KubeVirt pull requests and releases.</li>
+  <li><strong>Aligned Virt Stacks:</strong> Help maintain or validate alternative <code class="language-plaintext highlighter-rouge">virt-launcher</code> bases where host/userspace alignment is required.</li>
+</ol>
+
+<hr />
+
+<h2 id="get-involved">Get Involved</h2>
+
+<ul>
+  <li>Share your thoughts on the <a href="https://groups.google.com/g/kubevirt-dev">kubevirt-dev mailing list</a>.</li>
+  <li>Contribute to documentation in <a href="https://github.com/kubevirt/user-guide/pull/1029">kubevirt/user-guide#1029</a>.</li>
+  <li>Join the weekly <a href="https://github.com/kubevirt/community#community-meetings">community meetings</a> to discuss multi-distro CI and testing.</li>
+</ul>]]></content><author><name>Lee Yarwood</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="kernel" /><category term="qemu" /><category term="libvirt" /><category term="live migration" /><summary type="html"><![CDATA[Why virt-launcher's relationship with the host kernel matters, lessons from issue #16386, and how we sustainably manage this matrix across distributions.]]></summary></entry><entry><title type="html">Beta Features Enabled by Default in KubeVirt v1.9</title><link href="https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9.html" rel="alternate" type="text/html" title="Beta Features Enabled by Default in KubeVirt v1.9" /><published>2026-07-10T00:00:00+00:00</published><updated>2026-07-10T00:00:00+00:00</updated><id>https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9</id><content type="html" xml:base="https://kubevirt.io//2026/Beta-Features-On-By-Default-In-v1-9.html"><![CDATA[<p>Starting from KubeVirt v1.9, <strong>all Beta feature gates are enabled by default</strong>.
 This is a significant behavioral change from previous versions, where Beta
 features had to be explicitly opted into.
 If you are a downstream vendor, cluster administrator, or anyone deploying
@@ -1934,41 +2066,4 @@ After the upgrade, the cluster admin will have sufficient time to bind the new <
 <h3 id="thanks">Thanks!</h3>
 <p>A lot of work from a huge amount of people go into these releases. Some contributions are small, such as raising a bug or attending our community meeting, and others are massive, like working on a feature or reviewing PRs. Whatever your part: we thank you.</p>
 
-<p>And if you’re interested in contributing to the project and being a part of the next release, please check out our <a href="https://kubevirt.io/user-guide/contributing/">contributing guide</a> and our <a href="https://github.com/kubevirt/community/blob/main/membership_policy.md">community membership guidelines</a>.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.4" /><category term="release" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[Introducing the KubeVirt v1.4 release]]></summary></entry><entry><title type="html">KubeVirt Summit 2024 CfP is open!</title><link href="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html" rel="alternate" type="text/html" title="KubeVirt Summit 2024 CfP is open!" /><published>2024-03-19T00:00:00+00:00</published><updated>2024-03-19T00:00:00+00:00</updated><id>https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP</id><content type="html" xml:base="https://kubevirt.io//2024/KubeVirt-Summit-2024-CfP.html"><![CDATA[<p>We are very pleased to announce the details for this year’s KubeVirt Summit!!</p>
-
-<h2 id="what-is-kubevirt-summit">What is KubeVirt Summit?</h2>
-
-<p>KubeVirt Summit is our annual online conference, now in its fourth year, in which the entire broader community meets to showcase technical architecture, new features, proposed changes, and in-depth tutorials.
-We have two tracks to cater for developer talks, and another for end users to share their deployment journey with KubeVirt and their use case(s) at scale. And there’s no reason why a talk can’t be both :)</p>
-
-<h2 id="when-is-it">When is it?</h2>
-
-<p>The event will take place online over two half-days:</p>
-
-<ul>
-  <li>Dates: <del>June 25 and 26</del> <strong>June 24 and 25</strong>, 2024</li>
-  <li>Time: TBD 
-(In the past we have aimed for 1200-1700 UTC but may modify these times slightly depending on our speaker timezones)</li>
-</ul>
-
-<h2 id="how-to-submit-a-proposal">How to submit a proposal?</h2>
-
-<ul>
-  <li>Please submit through this <a href="https://docs.google.com/forms/d/e/1FAIpQLSeELmfpD_20kZnrciXkdSdDS_MLFLN9xSaZDKptNPjg3JGLaA/viewform">Googleform</a></li>
-  <li>CfP closes: <strong>May 20</strong>, 2024</li>
-  <li>Schedule will announced at the end of May</li>
-</ul>
-
-<p>Do consider proposing a session, and help make our fourth Summit as valuable as possible. We welcome a range of session types, any of which can be simple and intended for beginners or face-meltingly technical. Check out <a href="https://www.youtube.com/playlist?list=PLnLpXX8KHIYwe_V5pCXfXVDs-lY5dX55Q">last year’s talks</a> for some ideas.</p>
-
-<h2 id="have-questions">Have questions?</h2>
-
-<p>Our <a href="/summit/">KubeVirt Summit 2024</a> page will continue to evolve with details as we get closer.</p>
-
-<p>You can also reach out on our <a href="https://kubernetes.slack.com/messages/virtualization">virtualization</a> Slack channel (in the Kubernetes workspace).</p>
-
-<h2 id="keep-up-to-date">Keep up to date</h2>
-
-<p>Connect with the KubeVirt Community through our mailing list, slack channels, weekly meetings, and more, all list in our <a href="https://github.com/kubevirt/community">community repo</a>.</p>
-
-<p>Good luck!</p>]]></content><author><name>Andrew Burden</name></author><category term="news" /><category term="kubevirt" /><category term="event" /><category term="community" /><summary type="html"><![CDATA[Join us for the KubeVirt community's fourth annual dedicated online event]]></summary></entry></feed>
+<p>And if you’re interested in contributing to the project and being a part of the next release, please check out our <a href="https://kubevirt.io/user-guide/contributing/">contributing guide</a> and our <a href="https://github.com/kubevirt/community/blob/main/membership_policy.md">community membership guidelines</a>.</p>]]></content><author><name>KubeVirt Maintainers</name></author><category term="news" /><category term="KubeVirt" /><category term="v1.4" /><category term="release" /><category term="community" /><category term="cncf" /><category term="milestone" /><category term="party time" /><summary type="html"><![CDATA[Introducing the KubeVirt v1.4 release]]></summary></entry></feed>

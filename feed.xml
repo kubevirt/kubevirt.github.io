@@ -1,4 +1,136 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-09-18T08:35:29+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.9.0</title><link href="https://kubevirt.io//2026/changelog-v1.9.0.html" rel="alternate" type="text/html" title="KubeVirt v1.9.0" /><published>2026-07-30T00:00:00+00:00</published><updated>2026-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2026/changelog-v1.9.0</id><content type="html" xml:base="https://kubevirt.io//2026/changelog-v1.9.0.html"><![CDATA[<h2 id="v190">v1.9.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-09-18T15:37:32+00:00</updated><id>https://kubevirt.io//feed.xml</id><title type="html">KubeVirt.io</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">Understanding KubeVirt’s Host Kernel and Userspace Dependencies</title><link href="https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies.html" rel="alternate" type="text/html" title="Understanding KubeVirt’s Host Kernel and Userspace Dependencies" /><published>2026-09-03T00:00:00+00:00</published><updated>2026-09-03T00:00:00+00:00</updated><id>https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies</id><content type="html" xml:base="https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies.html"><![CDATA[<p>KubeVirt runs each VM inside a <code class="language-plaintext highlighter-rouge">virt-launcher</code> pod. QEMU and libvirt are userspace processes scheduled like any other container, with host kernel devices (<code class="language-plaintext highlighter-rouge">/dev/kvm</code>, <code class="language-plaintext highlighter-rouge">/dev/vhost-net</code>, <code class="language-plaintext highlighter-rouge">/dev/net/tun</code>) mapped in. Like any workload that probes kernel device capabilities, a mismatch between the userspace stack and the host kernel can cause failures. What makes the virtualization case distinct is that those probe results feed directly into guest device feature negotiation and live-migration Application Binary Interface (ABI), so a kernel/userspace mismatch can surface not just as startup instability, but as broken live migrations across <code class="language-plaintext highlighter-rouge">virt-launcher</code> versions.</p>
+
+<p>Upstream KubeVirt builds default <code class="language-plaintext highlighter-rouge">virt-launcher</code> images with Enterprise Linux (EL) userspace and runs CI against EL host kernels. When this EL userspace runs on non-EL host kernels, subtle compatibility assumptions can break in ways upstream CI never sees. A recent issue, <a href="https://github.com/kubevirt/kubevirt/issues/16386">kubevirt/kubevirt#16386</a>, brought this reality into sharp focus.</p>
+
+<hr />
+
+<h2 id="the-anatomy-of-a-regression-issue-16386">The Anatomy of a Regression: Issue #16386</h2>
+
+<p>During upgrades from KubeVirt v1.6 to v1.7+ on Ubuntu worker nodes, live migrations failed across thousands of running VMs:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>qemu-kvm: Features 0x1c0010130afffaf unsupported. Allowed features: 0x10179bfffef
+qemu-kvm: Failed to load virtio-net:virtio
+qemu-kvm: error while loading state for instance 0x0 of device 'virtio-net'
+qemu-kvm: load of migration failed: Operation not permitted
+</code></pre></div></div>
+
+<p>The bit difference <code class="language-plaintext highlighter-rouge">0x1c0000000000000</code> corresponds to three <code class="language-plaintext highlighter-rouge">virtio-net</code> feature bits for <strong>UDP Segmentation Offload (USO)</strong>:</p>
+
+<ul>
+  <li><strong>Bit 54</strong>: <code class="language-plaintext highlighter-rouge">VIRTIO_NET_F_GUEST_USO4</code></li>
+  <li><strong>Bit 55</strong>: <code class="language-plaintext highlighter-rouge">VIRTIO_NET_F_GUEST_USO6</code></li>
+  <li><strong>Bit 56</strong>: <code class="language-plaintext highlighter-rouge">VIRTIO_NET_F_HOST_USO</code></li>
+</ul>
+
+<h3 id="how-the-layers-diverged">How the Layers Diverged</h3>
+
+<ol>
+  <li><strong>Host Kernel Support:</strong> Upstream Linux merged TAP USO (<code class="language-plaintext highlighter-rouge">TUN_F_USO4</code>/<code class="language-plaintext highlighter-rouge">USO6</code>) in <strong>Linux 6.2</strong>.</li>
+  <li><strong>QEMU Probe:</strong> At VM startup, QEMU probes the host TAP backend via <code class="language-plaintext highlighter-rouge">ioctl(fd, TUNSETOFFLOAD, ...)</code>.
+    <ul>
+      <li>On <strong>kernels &gt;= 6.2</strong> (e.g. Ubuntu 22.04 HWE, 24.04, 26.04), the probe succeeds. QEMU advertised USO, and modern guests negotiated bits 54–56.</li>
+      <li>On <strong>kernels &lt; 6.2</strong> (e.g. stock CentOS Stream 9 / RHEL 9 on kernel 5.14), the ioctl returns <code class="language-plaintext highlighter-rouge">-EINVAL</code>. QEMU silently disabled USO.</li>
+    </ul>
+  </li>
+  <li><strong>The Downstream Change:</strong> In <code class="language-plaintext highlighter-rouge">qemu-kvm-9.1.0-20.el9</code> (shipped in KubeVirt 1.7), patch <code class="language-plaintext highlighter-rouge">kvm-virtio-net-disable-USO-for-virt-rhel9.6.patch</code> (<a href="https://issues.redhat.com/browse/RHEL-80313">RHEL-80313</a>) retroactively disabled USO on <code class="language-plaintext highlighter-rouge">pc-q35-rhel9.6.0</code> machine types to fix RHEL 10 → RHEL 9 migration.</li>
+  <li><strong>The Failure:</strong> Existing VMs running on Ubuntu nodes held negotiated USO bits from KubeVirt 1.6. When migrating to the 1.7 <code class="language-plaintext highlighter-rouge">virt-launcher</code>, the new QEMU rejected the incoming state.</li>
+</ol>
+
+<h3 id="why-ci-missed-it">Why CI Missed It</h3>
+
+<p>Upstream KubeVirt release images are built on <strong>CentOS Stream 9</strong>, and upstream CI runs on <strong>EL9 host kernels (5.14)</strong>.</p>
+
+<p>Because CI nodes run kernel 5.14, QEMU’s TAP probe always failed. <strong>USO was never enabled in CI</strong>, so migration tests passed cleanly when the downstream QEMU patch dropped the feature. Only clusters running modern non-EL host kernels encountered the breakage.</p>
+
+<hr />
+
+<h2 id="the-three-way-dependency">The Three-Way Dependency</h2>
+
+<p><code class="language-plaintext highlighter-rouge">virt-launcher</code> is a translation layer between the host node and the guest OS:</p>
+
+<div class="language-text highlighter-rouge"><div class="highlight"><pre class="highlight"><code>┌────────────────────────────────────────────────────────┐
+│                      Guest OS                          │
+│        (Kernel virtio drivers &amp; negotiated ABI)        │
+└───────────────────────────▲────────────────────────────┘
+                            │ Virtio Features
+┌───────────────────────────▼────────────────────────────┐
+│              virt-launcher Pod (Container)             │
+│       Bundled Userspace: QEMU, libvirt, swtpm...       │
+│        (Upstream built on CentOS Stream 9/10)          │
+└───────────────────────────▲────────────────────────────┘
+                            │ ioctls (/dev/kvm, TAP, vhost)
+┌───────────────────────────▼────────────────────────────┐
+│                    Host Node Kernel                    │
+│   (CentOS Stream, RHEL, Ubuntu, Debian, Flatcar...)   │
+└────────────────────────────────────────────────────────┘
+</code></pre></div></div>
+
+<p>Compatibility requires alignment across all three boundaries:</p>
+
+<ul>
+  <li><strong>Host Kernel ↔ Userspace:</strong> Does the host kernel support the ioctl flags QEMU/libvirt probe for?</li>
+  <li><strong>Userspace ↔ Target Userspace:</strong> Does a newer QEMU in an updated <code class="language-plaintext highlighter-rouge">virt-launcher</code> accept the device state and feature bitmap of the source QEMU?</li>
+  <li><strong>Userspace ↔ Guest OS:</strong> Are virtual hardware features stable across migrations without breaking guest ABI?</li>
+</ul>
+
+<hr />
+
+<h2 id="aligned-stack-approaches-across-distributions">Aligned Stack Approaches Across Distributions</h2>
+
+<p>Distributions address this by aligning the entire stack, ensuring the host kernel and the containerized virtualization userspace are built from the same distribution base.</p>
+
+<p><strong>Harvester</strong> (built on SUSE / Rancher) does not run upstream CentOS Stream images on its nodes. Instead:</p>
+
+<ul>
+  <li><strong>Host OS:</strong> Runs on an immutable appliance OS derived from <strong>SLE Micro</strong>.</li>
+  <li><strong>Userspace:</strong> SUSE builds and ships its own <code class="language-plaintext highlighter-rouge">virt-launcher</code> images in <code class="language-plaintext highlighter-rouge">registry.suse.com</code> using <strong>SLES / SLE Micro</strong> packages from OBS.</li>
+</ul>
+
+<p><strong>OpenShift Virtualization</strong> (Red Hat) takes a similar approach within the OpenShift platform:</p>
+
+<ul>
+  <li><strong>Host OS:</strong> OpenShift enforces <strong>Red Hat CoreOS (RHCOS)</strong> as the worker node OS, built from the same RHEL base as the container images.</li>
+  <li><strong>Userspace:</strong> Red Hat builds and ships <code class="language-plaintext highlighter-rouge">virt-launcher</code> images from RHEL packages, validated against the same RHEL kernel version running on RHCOS worker nodes.</li>
+</ul>
+
+<p>In both cases, because the host kernel and the containerized hypervisor share the same distribution base, they avoid the impedance mismatch that arises from running userspace built for one kernel generation on a host running a different one.</p>
+
+<hr />
+
+<h2 id="improving-transparency-current-initiatives">Improving Transparency: Current Initiatives</h2>
+
+<p>We are working to make these boundaries explicit:</p>
+
+<ul>
+  <li><strong>User Guide Requirements (<a href="https://github.com/kubevirt/user-guide/pull/1029">#1029</a>):</strong> Documented host kernel and virtualization userspace requirements for cluster operators (now merged).</li>
+  <li><strong>Architectural Gap Tracking (<a href="https://github.com/kubevirt/kubevirt/issues/19000">kubevirt#19000</a>):</strong> Auditing implicit dependencies between <code class="language-plaintext highlighter-rouge">virt-launcher</code>, <code class="language-plaintext highlighter-rouge">virt-handler</code>, and host kernel capabilities.</li>
+  <li><strong>Automated Support Matrix (<a href="https://github.com/kubevirt/sig-release/issues/69">sig-release#69</a>):</strong> Automatically publishing a release → userspace/kernel matrix by extracting pinned component NEVRAs (<strong>N</strong>ame, <strong>E</strong>poch, <strong>V</strong>ersion, <strong>R</strong>elease, <strong>A</strong>rchitecture) from <code class="language-plaintext highlighter-rouge">hack/rpm-deps.sh</code>.</li>
+</ul>
+
+<hr />
+
+<h2 id="moving-forward-shared-community-ownership">Moving Forward: Shared Community Ownership</h2>
+
+<p>Documenting assumptions is essential, but documentation alone does not prevent regressions.</p>
+
+<p>Upstream maintainers validate release artifacts built on Enterprise Linux userspace and tested on EL host kernels. Upstream cannot realistically absorb the testing matrix and debugging burden of arbitrary host distributions without dedicated capacity.</p>
+
+<p>If you rely on KubeVirt on non-EL hosts (Ubuntu, Debian, Flatcar, Talos, etc.):</p>
+
+<ol>
+  <li><strong>Third-Party CI:</strong> Provide external CI lanes that test these host distributions against KubeVirt pull requests and releases.</li>
+  <li><strong>Aligned Virt Stacks:</strong> Help maintain or validate alternative <code class="language-plaintext highlighter-rouge">virt-launcher</code> bases where host/userspace alignment is required.</li>
+</ol>
+
+<hr />
+
+<h2 id="get-involved">Get Involved</h2>
+
+<ul>
+  <li>Share your thoughts on the <a href="https://groups.google.com/g/kubevirt-dev">kubevirt-dev mailing list</a>.</li>
+  <li>Contribute to documentation in <a href="https://github.com/kubevirt/user-guide/pull/1029">kubevirt/user-guide#1029</a>.</li>
+  <li>Join the weekly <a href="https://github.com/kubevirt/community#community-meetings">community meetings</a> to discuss multi-distro CI and testing.</li>
+</ul>]]></content><author><name>Lee Yarwood</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="virtual machine" /><category term="kernel" /><category term="qemu" /><category term="libvirt" /><category term="live migration" /><summary type="html"><![CDATA[Why virt-launcher's relationship with the host kernel matters, lessons from issue #16386, and how we sustainably manage this matrix across distributions.]]></summary></entry><entry><title type="html">KubeVirt v1.9.0</title><link href="https://kubevirt.io//2026/changelog-v1.9.0.html" rel="alternate" type="text/html" title="KubeVirt v1.9.0" /><published>2026-07-30T00:00:00+00:00</published><updated>2026-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2026/changelog-v1.9.0</id><content type="html" xml:base="https://kubevirt.io//2026/changelog-v1.9.0.html"><![CDATA[<h2 id="v190">v1.9.0</h2>
 
 <p>Released on: Thu Jul 30 12:39:35 2026 +0000</p>
 
@@ -2205,123 +2337,4 @@ installation with Kickstart configuration and provisioned the VM over SSH
 <p>The plugin is still in pre-release, but it already offers a streamlined way
 to create consistent VM images inside Kubernetes.</p>
 
-<p>Give it a try and share your feedback or contributions on <a href="https://github.com/hashicorp/packer-plugin-kubevirt">GitHub</a>!</p>]]></content><author><name>Ben Oukhanov</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="packer" /><category term="plugin" /><category term="images" /><summary type="html"><![CDATA[Packer plugin for KubeVirt that builds VM golden images inside Kubernetes.]]></summary></entry><entry><title type="html">KubeVirt v1.6.0</title><link href="https://kubevirt.io//2025/changelog-v1.6.0.html" rel="alternate" type="text/html" title="KubeVirt v1.6.0" /><published>2025-07-30T00:00:00+00:00</published><updated>2025-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2025/changelog-v1.6.0</id><content type="html" xml:base="https://kubevirt.io//2025/changelog-v1.6.0.html"><![CDATA[<h2 id="v160">v1.6.0</h2>
-
-<p>Released on: Wed Jul 30 18:23:13 2025 +0000</p>
-
-<ul>
-  <li>[PR #15264][fossedihelm] Quarantined <code class="language-plaintext highlighter-rouge">should live migrate a container disk vm, with an additional PVC mounted, should stay mounted after migration</code> test</li>
-  <li>[PR #15256][kubevirt-bot] Bumped the bundled common-instancetypes to v1.4.0 which add new preferences.</li>
-  <li>[PR #15114][kubevirt-bot] Bugfix: Label upload PVCs to support CDI WebhookPvcRendering</li>
-  <li>[PR #15214][dhiller] Quarantine flaky test <code class="language-plaintext highlighter-rouge">[sig-compute]VM state with persistent TPM VM option enabled should persist VM state of EFI across migration and restart</code></li>
-  <li>[PR #15191][kubevirt-bot] Drop an arbitrary limitation on VM’s domain.firmaware.serial. Any string is passed verbatim to smbios. Illegal may be tweaked or ignored based on qemu/smbios version.</li>
-  <li>[PR #15202][kubevirt-bot] BugFix: export fails when VMExport has dots in secret</li>
-  <li>[PR #15201][xpivarc] Known issue: ParallelOutboundMigrationsPerNode might be ignored because of race condition</li>
-  <li>[PR #15178][kubevirt-bot] Fix postcopy multifd compatibility during upgrade</li>
-  <li>[PR #15171][kubevirt-bot] BugFix: export fails when VMExport has dots in name</li>
-  <li>[PR #15102][dominikholler] Update dependecy golang.org/x/net to v0.38.0</li>
-  <li>[PR #15101][dominikholler] Update dependecy golang.org/x/oauth2 to v0.27.0</li>
-  <li>[PR #15080][kubevirt-bot] The synchronization controller migration network IP address is advertised by the KubeVirt CR</li>
-  <li>[PR #15047][kubevirt-bot] Beta: NodeRestriction</li>
-  <li>[PR #15039][alaypatel07] Add support for DRA devices such as GPUs and HostDevices.</li>
-  <li>[PR #15020][kubevirt-bot] Possible to trust additional CAs for verifying kubevirt infra structure components</li>
-  <li>[PR #15014][kubevirt-bot] Support seamless TCP migration with passt (alpha)</li>
-  <li>[PR #14887][oshoval] Release passt CNI image, instead the CNI binary itself.</li>
-  <li>[PR #13898][brandboat] Changed the time unit conversion in the kubevirt_vmi_vcpu_seconds_total metric from microseconds to nanoseconds.</li>
-  <li>[PR #14935][alromeros] Add virtctl objectgraph command</li>
-  <li>[PR #14744][tiraboschi] A few dynamic annotations are synced from VMs template to VMIs and to virt-launcher pods</li>
-  <li>[PR #14907][mhenriks] Allow virtio bus for hotplugged disks</li>
-  <li>[PR #14754][mhenriks] Allocate more PCI ports for hotplug</li>
-  <li>[PR #13103][varunrsekar] Feature: Support for defining panic devices in VirtualMachineInstances to catch crash signals from the guest.</li>
-  <li>[PR #14961][akalenyu] BugFix: Can’t LiveMigrate Windows VM after Storage Migration from HPP to OCS</li>
-  <li>[PR #14956][RobertoMachorro] Added CRC to ADOPTERS document.</li>
-  <li>[PR #14705][jean-edouard] The migration controller in virt-handler has been re-architected, migrations should be more stable</li>
-  <li>[PR #13764][xpivarc] KubeVirt doesn’t use PDBs anymore</li>
-  <li>[PR #14801][arsiesys] VirtualMachinePool now supports a <code class="language-plaintext highlighter-rouge">.ScaleInStrategy.Proactive.SelectionPolicy.BasePolicy</code> field to control scale-down behavior. The new <code class="language-plaintext highlighter-rouge">"DescendingOrder"</code> strategy deletes VMs by descending ordinal index, offering predictable downscale behavior. Defaults to <code class="language-plaintext highlighter-rouge">"random"</code> if not specified.</li>
-  <li>[PR #14259][orelmisan] Integrate NIC hotplug with LiveUpdate rollout strategy</li>
-  <li>[PR #14673][dasionov] Add Video Configuration Field for VMs to Enable Explicit Video Device Selection</li>
-  <li>[PR #14681][victortoso] Windows offline activation with ACPI MSDM table</li>
-  <li>[PR #14723][SkalaNetworks] Add VolumeRestorePolicies and VolumeRestoreOverrides to VMRestores</li>
-  <li>[PR #14040][jschintag] Add support for Secure Execution VMs on IBM Z</li>
-  <li>[PR #13847][mhenriks] Declarative Volume Hotplug with CD-ROM Inject/Eject</li>
-  <li>[PR #14807][alromeros] Add Object Graph subresource</li>
-  <li>[PR #14793][jean-edouard] Failed post-copy migrations now always end in VMI failure</li>
-  <li>[PR #14632][iholder101] virt-handler: Reduce Get() calls for KSM handling</li>
-  <li>[PR #14658][alromeros] Bugfix: Update backend-storage logic so it works with PVCs with non-standard naming convention</li>
-  <li>[PR #14827][orelmisan] Fix network setup when emulation is enabled</li>
-  <li>[PR #14538][iholder101] Move cgroup v1 to maintenance mode</li>
-  <li>[PR #14823][xmulligan] Adding Isovalent to Adopters</li>
-  <li>[PR #14805][machadovilaca] Replace metric labels’ none values with empty values</li>
-  <li>[PR #14768][oshoval] Expose CONTAINER_NAME on hook sidecars.</li>
-  <li>[PR #14183][aqilbeig] Add maxUnavailable support to VirtualMachinePool</li>
-  <li>[PR #14695][alromeros] Bugfix: Fix online expansion by requeuing VMIs on PVC size change</li>
-  <li>[PR #14738][oshoval] Clean absent interfaces and their relative networks from stopped VMs.</li>
-  <li>[PR #14737][ShellyKa13] virt-Freeze: skip freeze if domain is not in running state</li>
-  <li>[PR #14728][orelmisan] CPU hotplug with net multi-queue is now allowed</li>
-  <li>[PR #14616][awels] VirtualMachineInstanceMigrations can now express that they are source or target migrations</li>
-  <li>[PR #14619][cloud-j-luna] virtctl vnc command now supports user provided VNC clients.</li>
-  <li>[PR #14130][dasionov] bug-fix: persist VM’s firmware UUID for existing VMs</li>
-  <li>[PR #14640][xpivarc] ARM: CPU pinning doesn’t panic now</li>
-  <li>[PR #14664][brianmcarey] Build KubeVirt with go v1.23.9</li>
-  <li>[PR #14599][HarshithaMS005] Enabled watchdog validation on watchdog device models</li>
-  <li>[PR #13806][iholder101] Dirty rate is reported as part of a new <code class="language-plaintext highlighter-rouge">GetDomainDirtyRateStats()</code> gRPC method and by a Prometheus metric: <code class="language-plaintext highlighter-rouge">kubevirt_vmi_dirty_rate_bytes_per_second</code>.</li>
-  <li>[PR #14617][SkalaNetworks] Added support for custom JSON patches in VirtualMachineClones.</li>
-  <li>[PR #14637][alromeros] Label backend PVC to support CDI WebhookPvcRendering</li>
-  <li>[PR #14440][pstaniec-catalogicsoftware] add CloudCasa by Catalogic to integrations in the adopters.md</li>
-  <li>[PR #14602][orelmisan] The “RestartRequired” condition is not set on VM objects for live-updatable network fields</li>
-  <li>[PR #14267][Barakmor1] Implement container disk functionality using ImageVolume, protected by the ImageVolume feature gate.</li>
-  <li>[PR #14539][nirdothan] Enable vhost-user mode for passt network binding plugin</li>
-  <li>[PR #14520][dasionov] Enable node-labeller for ARM64 clusters, supporting machine-type labels.</li>
-  <li>[PR #14203][machadovilaca] Trigger VMCannotBeEvicted only for running VMIs</li>
-  <li>[PR #14449][0xFelix] The 64-Bit PCI hole can now be disabled by adding the kubevirt.io/disablePCIHole annotation to VirtualMachineInstances. This allows legacy OSes such as Windows XP or Server 2003 to boot on KubeVirt using the Q35 machine type.</li>
-  <li>[PR #13297][mhenriks] hotplug volume: Boot from hotpluggable disk</li>
-  <li>[PR #14509][phoracek] Network conformance tests are now marked using the <code class="language-plaintext highlighter-rouge">Conformance</code> decorator. Use <code class="language-plaintext highlighter-rouge">--ginkgo.label-filter '(sig-network &amp;&amp; conformance)</code> to select them.</li>
-  <li>[PR #14338][dasionov] Bug fix: MaxSockets is limited so maximum of vcpus doesn’t go over 512.</li>
-  <li>[PR #14327][machadovilaca] Handle lowercase instancetypes/preference keys in VM monitoring</li>
-  <li>[PR #14437][jschintag] Ensure stricter check for valid machine type when validating VMI</li>
-  <li>[PR #13911][avlitman] VirtHandlerRESTErrorsHigh, VirtOperatorRESTErrorsHigh, VirtAPIRESTErrorsHigh and VirtControllerRESTErrorsHigh alerts removed.</li>
-  <li>[PR #14277][HarshithaMS005] Enable Watchdog device support on s390x using the Diag288 device model.</li>
-  <li>[PR #13422][mhenriks] guest console log: make virt-tail a proper sidecar</li>
-  <li>[PR #14426][avlitman] Added kubevirt_vmi_migrations_in_unset_phase, instead of including it in kubevirt_vmi_migration_failed.</li>
-  <li>[PR #14428][jean-edouard] To use nfs-csi, the env variable KUBEVIRT_NFS_DIR has to be set to a location on the host for NFS data</li>
-  <li>[PR #13951][alromeros] Bugfix: Truncate volume names in export pod</li>
-  <li>[PR #14405][jpeimer] supplementalPool added to the description of the ioThreadsPolicy possible values</li>
-  <li>[PR #14145][ayushpatil2122] handle nil pointer dereference in cellToCell</li>
-  <li>[PR #14281][ShellyKa13] VMRestore: Keep VM RunStrategy as before the restore</li>
-  <li>[PR #14374][kubevirt-bot] Updated common-instancetypes bundles to v1.3.1</li>
-  <li>[PR #14219][lyarwood] A request to create a VirtualMachines that references a non-existent  instance type or preference are no longer rejected. The VirtualMachine will be created but will fail to start until the missing resources are created in the cluster.</li>
-  <li>[PR #14288][qinqon] Don’t expose as VMI status the implicit qemu domain pause at the end of live migration</li>
-  <li>[PR #14309][alicefr] Fixed persistent reservation support for multipathd by improving socket access and multipath files in pr-helper</li>
-  <li>[PR #14325][vamsikrishna-siddu] fix: disks-images-provider is pointing to wrong alpine image for s390x.</li>
-  <li>[PR #14048][lyarwood] The <code class="language-plaintext highlighter-rouge">v1alpha{1,2}</code> versions of the <code class="language-plaintext highlighter-rouge">instancetype.kubevirt.io</code> API group are no longer served or supported.</li>
-  <li>[PR #14316][lyarwood] A new <code class="language-plaintext highlighter-rouge">Enabled</code> attribute has been added to the <code class="language-plaintext highlighter-rouge">TPM</code> device allowing users to explicitly disable the device regardless of any referenced preference.</li>
-  <li>[PR #14328][akalenyu] Cleanup: Fix unit tests on a sane, non-host-cgroup-sharing development setup</li>
-  <li>[PR #14108][machadovilaca] Add interface name label to kubevirt_vmi_status_addresses</li>
-  <li>[PR #14050][lyarwood] The <code class="language-plaintext highlighter-rouge">InstancetypeReferencePolicy</code> feature has graduated to GA and no longer requires the associated feature gate to be enabled.</li>
-  <li>[PR #14286][machadovilaca] Register k8s client-go latency metrics on init</li>
-  <li>[PR #14304][jean-edouard] Update module github.com/containers/common to v0.60.4</li>
-  <li>[PR #14065][jean-edouard] VM Persistent State GA</li>
-  <li>[PR #14096][ShellyKa13] VMSnapshot: add QuiesceFailed indication to snapshot if freeze failed</li>
-  <li>[PR #14215][dominikholler] Update module golang.org/x/oauth2 to v0.27.0</li>
-  <li>[PR #14068][jean-edouard] Default VM Rollout Strategy is now LiveUpdate. Important: to preserve previous behavior, rolloutStrategy needs to be set to “Stage” in the KubeVirt CR.</li>
-  <li>[PR #14222][dominikholler] Update module golang.org/x/net to v0.36.0</li>
-  <li>[PR #14218][dominikholler] Update golang.org/x/crypto to v0.35.0</li>
-  <li>[PR #14217][dominikholler] Update module github.com/opencontainers/runc to v1.1.14</li>
-  <li>[PR #14141][jean-edouard] Large number of migrations should no longer lead to active migrations timing out</li>
-  <li>[PR #13870][dasionov] Ensure launcher pods are finalized and deleted before removing the VMI finalizer when the VMI is marked for deletion.</li>
-  <li>[PR #14101][qinqon] libvirt: 10.10.0-7, qemu: 9.1.0-15</li>
-  <li>[PR #14071][alicefr] Add entrypoint to the pr-helper for creating the symlink to the multipath socket</li>
-  <li>[PR #12725][tiraboschi] Support live migration to a named node</li>
-  <li>[PR #13888][Sreeja1725] Add v1.5.0 perf and scale benchmarks data</li>
-  <li>[PR #13939][0xFelix] The virtctl port-forward/ssh/scp syntax was changed to type/name[/namespace]. It now supports resources with dots in their name properly.</li>
-  <li>[PR #13807][Barakmor1] virt-launcher now uses bash to retrieve disk info and verify container-disk files, requiring bash to be included in the launcher image</li>
-  <li>[PR #13744][nirdothan] Network interfaces state can be set to <code class="language-plaintext highlighter-rouge">down</code> or <code class="language-plaintext highlighter-rouge">up</code> in order to set the link state accordingly when VM is running. Hot plugging of interface in these states is also supported.</li>
-  <li>[PR #13536][jean-edouard] Interrupted migrations will now be reconciled on next VM start.</li>
-  <li>[PR #13690][dasionov] bug-fix: add machine type to <code class="language-plaintext highlighter-rouge">NodeSelector</code> to prevent breaking changes on unsupported nodes</li>
-  <li>[PR #13940][tiraboschi] The node-restriction Validating Admission Policy will return consistent reasons on failures</li>
-  <li>[PR #13916][lyarwood] Instance type and preference runtime data is now stored under <code class="language-plaintext highlighter-rouge">Status.{Instancetype,Preference}Ref</code> and is no longer mutated into the core VirtualMachine<code class="language-plaintext highlighter-rouge"> </code>Spec`.</li>
-  <li>[PR #13831][ShellyKa13] VMClone: Remove webhook that checks Snapshot Source</li>
-  <li>[PR #13815][acardace] GA ClusterProfiler FG and add a config to enable it</li>
-  <li>[PR #13928][kubevirt-bot] Updated common-instancetypes bundles to v1.3.0</li>
-  <li>[PR #13805][machadovilaca] Fetch non-cluster instance type and preferences with namespace key</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.6.0 changes]]></summary></entry></feed>
+<p>Give it a try and share your feedback or contributions on <a href="https://github.com/hashicorp/packer-plugin-kubevirt">GitHub</a>!</p>]]></content><author><name>Ben Oukhanov</name></author><category term="news" /><category term="kubevirt" /><category term="kubernetes" /><category term="packer" /><category term="plugin" /><category term="images" /><summary type="html"><![CDATA[Packer plugin for KubeVirt that builds VM golden images inside Kubernetes.]]></summary></entry></feed>

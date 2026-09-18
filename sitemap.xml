@@ -801,6 +801,10 @@
 <lastmod>2026-07-30T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2026/understanding-kubevirt-host-kernel-userspace-dependencies.html</loc>
+<lastmod>2026-09-03T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//api/</loc>
 </url>
 <url>
@@ -1740,6 +1744,9 @@
 <loc>https://kubevirt.io//tag/vep.html</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//tag/kernel.html</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//blogs/page2/</loc>
 </url>
 <url>
@@ -1858,6 +1865,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2026-09-18T08:34:15+00:00</lastmod>
+<lastmod>2026-09-18T15:36:17+00:00</lastmod>
 </url>
 </urlset>
