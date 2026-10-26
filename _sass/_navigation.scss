@@ -84,6 +84,40 @@
     }
   }
 }
+.navbar-nav {
+  .dropdown-menu {
+    background-color: rgba(224, 247, 246, .92);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, .15);
+    border: none;
+    border-radius: 0 0 4px 4px;
+    margin-top: 0;
+    padding: 0;
+    min-width: 0;
+    width: max-content;
+  }
+  .dropdown-item {
+    font-family: $kv-font-family--base;
+    text-transform: uppercase;
+    font-weight: 600;
+    background-color: transparent;
+    padding: 10px 20px;
+    white-space: nowrap;
+    color: $kv-color--green-300;
+    @supports ((background-clip: text) or (-webkit-background-clip: text)) {
+      background-image: linear-gradient(to top, #3accc5, #00aab2);
+      background-clip: text;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      color: transparent;
+    }
+    &:hover, &:focus {
+      background-color: rgba(0, 0, 0, .06);
+    }
+    &.active {
+      background-color: rgba(0, 0, 0, .1);
+    }
+  }
+}
 
 .labs-title {
   margin-left: 25px;
