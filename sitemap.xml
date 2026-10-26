@@ -985,6 +985,9 @@
 <loc>https://kubevirt.io//virt-template/</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//vm-console-proxy/api</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//vm-console-proxy/</loc>
 </url>
 <url>
@@ -1865,6 +1868,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2026-09-28T07:49:52+00:00</lastmod>
+<lastmod>2026-10-26T13:44:47+00:00</lastmod>
 </url>
 </urlset>
