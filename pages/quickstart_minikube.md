@@ -17,7 +17,10 @@ tags:
   ]
 ---
 
-## Easy install using minikube
+
+
+
+> ⚠️ **Note:** These quickstarts are not supported on Mac. Please use a Linux environment instead. Alternatively, you can use [devContainers](https://github.com/kubevirt/kubevirt/pull/11830).## Easy install using minikube
 
 [Minikube](https://minikube.sigs.k8s.io/docs/start/) quickly sets up a local Kubernetes cluster on macOS, Linux, and Windows allowing software developers to quickly get started working with Kubernetes.
 
