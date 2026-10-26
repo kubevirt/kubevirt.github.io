@@ -130,10 +130,19 @@
   &-networks {
     min-height: 25vh;
     background-color: $kv-color--black-150;
-    &--twitter-feed {
-      background-color: $kv-color--black-150;
-    }
   }
+}
+
+.community-icon {
+  color: $kv-color--black-400;
+}
+
+.fa-mastodon.community-icon {
+  color: #5B4BE1;
+}
+
+.community-icon--bluesky {
+  color: #0A79FC;
 }
 
 .page-title {

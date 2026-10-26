@@ -48,7 +48,7 @@ order: 10
     <div class="col">
       <h2 class="text-center">KubeVirt Community Calendar</h2>
       <p class="text-center mt-4">
-        As a member of the KubeVirt Community, <a href="{{ site.calendar }}" target="_blank">join any of our community meetings</a> - no registration required.
+        As a member of the KubeVirt Community, <a href="{{ site.calendar }}" target="_blank">you are welcome to join any of our weekly and regular community meetings</a> - no registration required.
       </p>
       <!-- <iframe src="https://calendar.google.com/calendar/embed?src=kubevirt%40cncf.io&ctz=America%2FLos_Angeles" style="border: 0" width="800" height="600" frameborder="0" scrolling="no"></iframe> -->
     </div>
@@ -68,16 +68,32 @@ order: 10
         <img src="{{ site.baseurl }}/assets/images/community-image-col1.svg" class="img-fluid" alt="Twitter icon">
         <h4>@kubevirt</h4>
       </a>
-      <p>Get the latest news and updates</p>
+      <p>Follow us on Twitter</p>
     </div>
     <div class="col order-md-2 text-center">
+      <a href="https://fosstodon.org/@kubevirt" target="_blank" rel="me noopener" aria-label="Visit us on Mastodon">
+        <i class="fab fa-mastodon fa-5x community-icon"></i>
+        <h4>@kubevirt@fosstodon.org</h4>
+      </a>
+      <p>Follow us on Mastodon</p>
+    </div>
+    <div class="col order-md-3 text-center">
+      <a href="https://bsky.app/profile/kubevirt.bsky.social" target="_blank" rel="noopener" aria-label="Visit us on Bluesky">
+        <svg width="70" height="70" viewBox="0 0 24 24" class="community-icon community-icon--bluesky" role="img" aria-label="Bluesky icon" xmlns="http://www.w3.org/2000/svg">
+          <path fill="currentColor" d="M5.202 2.857C7.954 4.922 10.913 9.11 12 11.358c1.087-2.247 4.046-6.436 6.798-8.501C20.783 1.366 24 .213 24 3.883c0 .732-.42 6.156-.667 7.037-.856 3.061-3.978 3.842-6.755 3.37 4.854.826 6.089 3.562 3.422 6.299-5.065 5.196-7.28-1.304-7.847-2.97-.104-.305-.152-.448-.153-.327 0-.121-.05.022-.153.327-.568 1.666-2.782 8.166-7.847 2.97-2.667-2.737-1.432-5.473 3.422-6.3-2.777.473-5.899-.308-6.755-3.369C.42 10.04 0 4.615 0 3.883c0-3.67 3.217-2.517 5.202-1.026"/>
+        </svg>
+        <h4>@kubevirt.bsky.social</h4>
+      </a>
+      <p>Follow us on Bluesky</p>
+    </div>
+    <div class="col order-md-4 text-center">
       <a href="https://github.com/{{ site.github_username }}" target="_blank" aria-label="View our repo on GitHub">
         <img src="{{ site.baseurl }}/assets/images/community-image-col2.svg" class="img-fluid" alt="GitHub icon">
         <h4>GitHub Project</h4>
       </a>
       <p>Check out the project and consider contributing</p>
     </div>
-    <div class="col order-md-3 text-center">
+    <div class="col order-md-5 text-center">
       <svg width="80" height="80" class="c-nav--footer__svgicon c-slackhash" viewBox="0 0 54 54" xmlns="http://www.w3.org/2000/svg"><g fill="none" fill-rule="evenodd"><path d="M19.712.133a5.381 5.381 0 0 0-5.376 5.387 5.381 5.381 0 0 0 5.376 5.386h5.376V5.52A5.381 5.381 0 0 0 19.712.133m0 14.365H5.376A5.381 5.381 0 0 0 0 19.884a5.381 5.381 0 0 0 5.376 5.387h14.336a5.381 5.381 0 0 0 5.376-5.387 5.381 5.381 0 0 0-5.376-5.386" fill="#36C5F0"></path><path d="M53.76 19.884a5.381 5.381 0 0 0-5.376-5.386 5.381 5.381 0 0 0-5.376 5.386v5.387h5.376a5.381 5.381 0 0 0 5.376-5.387m-14.336 0V5.52A5.381 5.381 0 0 0 34.048.133a5.381 5.381 0 0 0-5.376 5.387v14.364a5.381 5.381 0 0 0 5.376 5.387 5.381 5.381 0 0 0 5.376-5.387" fill="#2EB67D"></path><path d="M34.048 54a5.381 5.381 0 0 0 5.376-5.387 5.381 5.381 0 0 0-5.376-5.386h-5.376v5.386A5.381 5.381 0 0 0 34.048 54m0-14.365h14.336a5.381 5.381 0 0 0 5.376-5.386 5.381 5.381 0 0 0-5.376-5.387H34.048a5.381 5.381 0 0 0-5.376 5.387 5.381 5.381 0 0 0 5.376 5.386" fill="#ECB22E"></path><path d="M0 34.249a5.381 5.381 0 0 0 5.376 5.386 5.381 5.381 0 0 0 5.376-5.386v-5.387H5.376A5.381 5.381 0 0 0 0 34.25m14.336-.001v14.364A5.381 5.381 0 0 0 19.712 54a5.381 5.381 0 0 0 5.376-5.387V34.25a5.381 5.381 0 0 0-5.376-5.387 5.381 5.381 0 0 0-5.376 5.387" fill="#E01E5A"></path></g></svg>
       <a href="https://slack.kubernetes.io/" target="_blank" aria-label="Chat with us on Slack">
         <h4>Kubernetes Slack Workspace<p>Get an invitation to join</p></h4>
@@ -89,44 +105,6 @@ order: 10
         <h4>#kubevirt-dev<p>Connect with other developers</p>
         </h4>
       </a>
-    </div>
-  </div>
-  <div class="row bg-white align-items-start justify-content-left pb-4 row-community-networks--twitter-feed">
-    <div class="col-sm-12 col-md-10 offset-md-1">
-      <div class="twitter-arrow_up"></div>
-      <div class="twitter-feed">
-        <h2 class="twitter-feed--title">
-          <i class="fab fa-twitter"></i> Live Twitter Feed
-          <a href="https://twitter.com/kubevirt" target="top" class="twitter-feed--icon_share" aria-label="Visit KubeVirt.io on Twitter">
-            <i class="fas fa-external-link-alt"></i>
-          </a>
-        </h2>
-      </div>
-      <div class="twitter-feed--timeline-background pt-3">
-        <a class="twitter-timeline twitter-feed--timeline-list"
-            data-height="400"
-            data-width="100%"
-            data-dnt="true"
-            data-theme="light"
-            data-chrome="noheader nofooter noborder transparent"
-            data-link-color="#00797f"
-            data-converstation="none"
-            data-aria-polite="assertive"
-            href="https://twitter.com/kubevirt?ref_src=twsrc%5Etfw">
-            <span class="pl-3">
-              Loading tweets by KubeVirt...
-            </span>
-        </a>
-        <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
-      </div>
-      <div class="twitter-feed--footer">
-        <div class="twitter-feed--footer-wrapper">
-          <span class="twitter-feed--footer-wrapper_inner">
-            <i class="fab fa-twitter fa-lg pr-2 twitter-feed--footer-wrapper_inner-icon"></i>
-            <span class="twitter-feed--footer-wrapper_inner-text">Tweet to @kubevirt</span>
-          </span>
-        </div>
-      </div>
     </div>
   </div>
 </div>
