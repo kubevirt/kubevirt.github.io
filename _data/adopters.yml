@@ -43,6 +43,9 @@ adopters:
   - link: https://www.nvidia.com
     logo: NVIDIA.png
     name: NVIDIA
+  - link: https://prepare.sh
+    logo: Preparesh.svg
+    name: Prepare.sh
   - link: https://www.s3ns.io/en
     logo: S3NS.svg
     name: S3NS
