@@ -1,0 +1,155 @@
+---
+layout: post
+author: Andrew Burden
+title: "10 Years of KubeVirt"
+description: "Celebrating 10 years of the KubeVirt project: an interview with the maintainers."
+navbar_active: Blogs
+category: news
+tags:
+  [
+    "kubevirt",
+    "milestone",
+    "celebration",
+    "interview"
+  ]
+comments: true
+pub-date: November 10
+pub-year: 2026
+---
+
+In August 2016, the first public commit appeared in the kubevirt/kubevirt repo. To celebrate this 10 year milestone for the KubeVirt project, we interviewed four of the project maintainers who were there in those early days. 
+
+**Q1. Tell me about how the project started.**
+
+**_Roman Mohr:_** Itamar, our Director back then at Red Hat, had the vision. So he put us on the project and we started hacking. I vividly remember the discussions about whether we should use Python or Golang, and you will find traces of Python in the very first commits :)
+
+Also, while quite familiar with containers, I knew nothing about k8s. One of my first efforts was fixing the Vagrant setup (yes, Vagrant!) turnup flow in the Kubernetes repo, just to finally see k8s for the first time in reality.
+
+**_Fabian Deutsch:_** Back then, a few months past the public release of Kubernetes by Google, a group of Red Hatters from Red Hat Virtualization got together in order to discuss what this actually means for virtualization: What are the commonalities, what makes them different.
+
+This led to two paths that we could take: Adding VM support to Kubernetes or running VMs on Kubernetes.
+
+In order to make a call, we kicked off an internal hackathon to try out both options, leading to an internal (temporary) fork of Kubernetes with VM support. This was way before CRI-O — which made container runtimes pluggable — and the other approach was one building on Third Party Resources, an early extension to Kube that was eventually replaced by CRDs.
+
+After a few iterations we settled on CRDs, also because this would allow us to write the whole application (that KubeVirt is) with container principles. Roman was one of those who really kickstarted this whole effort.
+
+**_Stu Gott:_** By the time I got on board, the core codebase basically already existed. The architecture was a bit different back in the inception of the project. I recall there was some sort of experiment using Cockpit early on.
+
+We always used containers from the very beginning, but in KubeVirt's first iteration, we used the host system's libvirt daemon. This came with its own challenges that we need not dig into too deeply — this is a celebration, not a doctoral thesis. The premise that we were running VMs inside containers was still true, by the way; we originally had a shim where we replaced the qemu command with a shell script that fired off a container to run the VM inside. In modern KubeVirt, of course, we've reversed that, and now run a libvirt daemon inside the virt-launcher container, which handles the VM running inside that container.
+
+**_Vladik Romanovsky:_** I wasn't there for the first days. I joined in 2017, when there was already a skeleton: a VM as a Kubernetes object, QEMU running outside of the pod.
+
+What I remember as the start of the project is the next sentence. OpenStack and oVirt/RHV could do networking, storage, scheduling, and live migration because they owned the node. We didn't. A VM in KubeVirt had to be a pod. That meant using the scheduler, CNI, and volumes Kubernetes already had — and giving up virt features when they required us to stop being a Kubernetes citizen.
+
+There was competition (virtlet?) early on that used Kubernetes objects and then did the real work off to the side. We decided the pod is the VM: VMM inside the pod, same decoupling as any other workload. That is the decision that aged well. CSI, CNI, later ImageVolume, DRA, and the rest could attach to VMs the same way they attach to pods (almost :) ).
+
+
+**Q2. What was your "Wow, this idea might have some real legs" moment?** 
+
+**_Fabian:_** Well, I'm biased, but very early on — like a few months in — I think we saw that this can work out. We managed to achieve live migration, we could update seamlessly — all with bugs, and it took a few years to make this rock solid, but the overall concept seemed to work out.
+
+Then I was amazed to hear what early adopters we had, and how fast they were able to adopt KubeVirt and make it useful for them. Some of them have not disclosed their adoption until this day, but that was like my "holy cow, that's cool" moment.
+
+By today, by the way, I think that the thing that is holding KubeVirt most back is the whole situation around it: managing bare metal. All the features (disaster recovery, backup — incremental backup! — SDN, deployment of kube, …). All of this is not handled by KubeVirt, intentionally, but took a long while to get rolling, and many of those are these days the differentiating factors between the different Kubernetes and KubeVirt distributions. Every vendor (and adopter) is making their own decisions on this.
+
+**_Stu:_** When KubeVirt first started, the concept of operators in Kubernetes wasn't really an established pattern that the project had adopted yet. Between putting libvirt into the container and the introduction of virt-operator into the code, we suddenly found ourselves with a project where an admin could basically install the operator and literally everything else was just handled. No host-level changes needed to be made. Install virt-operator, get VMs. Profit.
+
+**_Vladik:_** Networking.
+
+CNI could already put an interface in the pod. That wasn't enough. The guest still had no identity on that network, and we refused to solve it by picking a CNI vendor. We wanted the same deal a normal application gets: whatever CNI the cluster runs, the workload still works.
+
+We wrote a small DHCP server inside virt-launcher, took the address and routes off the pod interface, and handed that identity to the guest. Petr Horáček was central to that first DHCP and to making the idea hold. When the VM came up on the pod network — same CNI, no private networking stack — the architecture stopped being a demo. A VM really was a pod that happened to run QEMU.
+
+
+**Q3. When you started, where did you think KubeVirt was going? Did you have an inkling to where it is 10 years later?**
+
+**_Roman:_** At that point, I lacked vision and was simply happy to learn a lot of new stuff about k8s and fit pieces together.
+
+**_Vladik:_** I didn't, and that was never the question for me.
+
+I was sold on running VMs alongside pods on the same platform — including as pieces of one application — and I wanted to make that real. It wasn't easy. What I hoped for was narrower than a ten-year forecast: hit the technical objectives, serve cloud-native apps with modern use cases, and still be a stable platform for traditional datacenter workloads. I also wanted the project not to be a hostile place, and I tried to live up to that myself.
+
+I did not forecast the later scale, other vendors, or people leaving classic hypervisors. I thought VMs belonged in Kubernetes as first-class citizens. That was the whole bet.
+
+**_Stu:_** Implausibly, I kind of expected us to be sort of where we are today. No, really. When I took my first software engineering job, my manager at the time asserted that it takes 10 years for a project to become mature. When KubeVirt first started, we were in more of a move-fast-and-break-things mode. About a year in, we announced the project to the public. From there we gradually moved from a skunkworks project to something with more rigor and a maintenance mindset.
+
+The one thing I did misestimate is how many features would be in active development. With the VEP process having exploded onto the scene, it really highlights how many different initiatives are converging on the project all at once.
+
+**_Fabian:_** I'm not sure if I ever thought about where KubeVirt would be in 10 years. Come on, 10 years, that's a long time. And to some extent I'm surprised that we are not further along; on the other hand, virtualization is also a challenging space to be in. Virtualization is still — and is expected to continue — running some of the most critical workloads in the world, be it in finance, governments, or factories, often for operation and efficiency reasons, and gaining the trust to run those is taking a while. In that sense, KubeVirt is growing at a fair pace.
+
+
+**Q4. What was a difficult technical decision the project had to make early on, and would you make the same decision today with hindsight?**
+
+**_Roman:_** Two aspects are very present in my mind. First: should we build KubeVirt around the idea of a container runtime implementation, or should we run VMs inside a Pod? I was initially favouring the CRI approach, but Fabian convinced me to take the other route: running VMs inside containers. This was a key decision that set the project up for success.
+
+Second: We had a workgroup to directly use QEMU and not use libvirt in between. I was a strong proponent of that approach. While I appreciate all the support we received from the libvirt team over the years, I still think using libvirt was the architecturally wrong call, causing us more problems than benefits. I would have insisted more on that one.
+
+**_Fabian:_** To me there are two as well. First: VMs inside of Kubernetes or on top of Kubernetes. It's difficult to say if the on-top-of approach is the superior one, but to me it is exactly giving us what we wanted to achieve back then: develop KubeVirt just like any cloud native application would be developed, and benefit from the aspects that cloud native applications have. Note also that Hyper.sh, for example, took the different approach and provided a VM runtime for a Pod API, and some features were much more difficult to achieve that way than with a native VM API.
+
+Second: KubeVirt is a VM API and runtime. KubeVirt really only solves this one problem — specifying and running VMs. Almost everything else was expected to be provided by Kubernetes and the CNCF ecosystem, and this took looong to grow. Because it took so long, we also made some compromises (i.e., on incremental backup) in order to expedite some features.
+
+**_Vladik:_** Yes: stay Kubernetes-native even when that meant giving features up. The alternative was a hidden virt control plane that only looked like Kubernetes. Faster in 2017. Wrong now.
+
+We still paid a tax. Traditional virt expects to hotplug a NIC, a disk, memory, CPU on a running guest. A Kubernetes pod did not work that way. For a long time the honest implementation was a coordinated live migration wearing a hotplug costume, and the APIs were split — some declarative, some subresources. We were solving a VM problem with a mechanism pods did not have. Live migration itself started as "can we even move this thing." It is now how we upgrade clusters, hotplug, and rebalance. We built containerDisk before ImageVolume, DataVolume before volume populators, AAQ because ResourceQuota still does not understand a VM. Waiting on Kubernetes was the cost. Growing with it was the payoff.
+
+A second, slower decision sat on top of that: treat virt-launcher as an untrusted, unprivileged pod, same as any default workload. The guest is third-party code. If something breaks out of QEMU, it should land in a tight box. We spent years stripping capabilities and privileges off virt-launcher to make that true. I would do both again.
+
+**_Stu:_** When KubeVirt first started, we used the name "VirtualMachine" to reference the ThirdPartyResource that was running the actual VM. We then realized we needed an object to track the state of what a VM was supposed to look like when there wasn't a VM actually running. We called this an OfflineVirtualMachine. These names were confusing and kind of misleading. We eventually changed the naming convention to what we have today: VirtualMachine and VirtualMachineInstance. A radical API change of that impactful a nature is never fun, but it was a necessary transition. I'm glad we decided to embrace that change, as it turned out well.
+
+**Q5. What's something about the project's culture you'd want to preserve for the next 10 years?**
+
+_Stu_: I like the open collaboration we enjoy as a community. Anybody can contribute, and anybody can provide a code review. You don't have to be a member or maintainer of the project to contribute.
+
+_Roman_: I appreciate the transformations the project went through. I loved the anarchic early days when I could just think of a use case and implement a new feature end-to-end. I also appreciate the work that many long-term contributors are putting in nowadays to wrestle with the bureaucracy that comes with growing projects.
+
+I would especially want to preserve our CI culture, which we built up, and which can test so much, and so thoroughly, on every PR that gets merged.
+
+**_Fabian:_** We have so many friendly and skilled people — I hope to see this throughout the next 10 years as well.
+
+**_Vladik:_** The Razor: if something is useful for pods, do not implement it only for VMs.
+
+We did step over it. Hotplug is the obvious case. I still think the Razor is right overall. Those exceptions should stay rare, and they should shrink when Kubernetes grows the primitive (in-place pod resize is the current example).
+
+I won't pretend people stay because they like each other. Plenty of early people left. What I felt in the early days was personal. What I would actually point at as culture is this: people motivated enough by the idea to keep making KubeVirt more of a Kubernetes project, not a private hypervisor with YAML on top — and to keep the community welcoming rather than hostile. That is how the project grew from "can we boot QEMU in a pod" into storage depth, network binding plugins, DRA, a general plugin mechanism, even multiple hypervisors, without throwing the original shape away.
+
+
+**Q6. Who is someone whose early contributions maybe never got the recognition that they deserve?**
+
+**_Vladik:_** Petr Horáček — first DHCP, and the idea that the guest can inherit the pod's network identity without a vendor CNI.
+
+Marc Sluiter — early, and not on the usual founder list.
+
+There were and still are a lot of people in that category. Those two are the names I would not let fall off a ten-year post.
+
+**_Stu:_** The earliest members of the KubeVirt project were actually Fabian, Roman, myself, and Adam Young. Adam left early enough in the project's lifecycle that he doesn't often get counted as an original community member. Subsequently, we also enjoyed the company of David Vossel and Vladik Romanovsky, who both have had a profound impact on the project.
+
+**_Roman:_** There were too many small but important improvements — every single one mattered to bring the project to where it is now.
+
+While it was not an active contribution, Itamar, our director back then, just decided to put some people on the experiment and let us run with practically no constraints. As a result, we brought a quite nice thing to the OSS world.
+
+**_Fabian:_** Oh, there are many. Red Hat itself should be named. Even during tough times, Red Hat stayed committed to KubeVirt, and in my opinion took a big share in making KubeVirt what it is today.
+
+
+**Q7. KubeVirt made the decision to join the CNCF as a sandbox project in 2019. What was the impetus behind that, and would you recommend it to other projects?**
+
+**_Stu:_** In my view, the motivation to pursue joining the CNCF was to emphasize the fact that KubeVirt is truly a community project, not owned by a single company. This turned out to be an extremely good decision, in that such a stance on vendor neutrality has encouraged a welcoming ecosystem where other vendors and companies feel willing to contribute. Yes, the CNCF incubation and graduation process is... rigorous... but the payoff in community support is well worth it. I'd highly recommend it to any project with the opportunity to join.
+
+**_Roman:_** Being part of the CNCF ecosystem is an important indicator of product readiness. Joining the CNCF was an important message to external contributors and adopters, signaling our readiness as we worked through the graduation process.
+
+**_Fabian:_** That was also a small "wow" moment. To me, the CNCF is — and was — managing this ecosystem of projects very well. They are welcoming, supportive, and really try to have an eye on the needs of the projects. So, tipping my hat and kudos to them.
+
+Seeing how the CNCF supports projects was amazing, and we needed this at that time. It also allowed us to join KubeCons more easily and get in touch with adopters and developers. And lastly, this is also driven by adopters — they see graduation as a critical step in the maturing of the project itself. While it is not so much of a technical nature, it is still a reflection of the technical maturity and adoption, which in turn is a manifestation, in some way, of trust of others.
+
+**_Vladik:_** I was not driving that proposal. From where I sat, the useful part showed up later: the project stopped reading as a Red Hat side project. Contributors and users showed up who would have had a harder time if the home had stayed a vendor repo.
+
+I also thought VMs belong in Kubernetes as first-class citizens. A foundation next to Kubernetes was the right kind of home for that claim.
+
+I would still tell a project that wants to be infrastructure — not a product feature — to go to a foundation when the design is stable enough that neutrality matters more than speed. Sandbox first was the right shape for us.
+
+**Bonus question: Is there anything else you'd like to add about KubeVirt's origins, early development, or the 10 years journey since?**
+
+**_Stu:_** A fun piece of trivia: in its original inception, KubeVirt used Docker as the primary container engine. In modern KubeVirt, we now default to podman.
+
+**_Fabian:_** Well, at some point the trademark on Kubernetes was more enforced. And for a couple of weeks — when it was unclear who could keep the "Kube" prefix — we were racing to figure out new or alternative names for KubeVirt. It could have led to the same project now being named Amodea, McLean, Kerosene, Virtnetes, Veliform, TriVirt, Virtrinity, Littoral, and others to run your VMs. I'm quite happy that we could stick to KubeVirt, which is simple and spot-on: Kubernetes Virtualization.
+
+**_Vladik:_** The interesting ten years were not the first boot of QEMU in a pod. They were the years of looking like we were behind traditional virt — no full control of the node — while we waited for Kubernetes to grow the primitives we had faked. ImageVolume showing up after containerDisk is the pattern I care about. Same architecture, less private machinery.
