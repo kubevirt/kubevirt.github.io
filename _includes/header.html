@@ -9,9 +9,24 @@
       {% assign doclist = site.data.site_nav_pages.nav  %}
 
       {% for item in doclist %}
-        <li {% if page.navbar_active == item.title %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
-          <a class="nav-link text-uppercase" href="{{ item.url | prepend: site.baseurl }}">{{ item.title }}</a>
-        </li>
+        {% if item.children %}
+          {% assign child_active = false %}
+          {% for child in item.children %}
+            {% if page.navbar_active == child.title %}{% assign child_active = true %}{% endif %}
+          {% endfor %}
+          <li class="nav-item dropdown {% if child_active %}active{% endif %}">
+            <a class="nav-link dropdown-toggle text-uppercase" href="#" id="navbarDropdown-{{ forloop.index }}" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">{{ item.title }}</a>
+            <div class="dropdown-menu" aria-labelledby="navbarDropdown-{{ forloop.index }}">
+              {% for child in item.children %}
+                <a class="dropdown-item {% if page.navbar_active == child.title %}active{% endif %}" href="{{ child.url | prepend: site.baseurl }}">{{ child.title }}</a>
+              {% endfor %}
+            </div>
+          </li>
+        {% else %}
+          <li {% if page.navbar_active == item.title %} class="nav-item active" {% else %} class="nav-item" {% endif %}>
+            <a class="nav-link text-uppercase" href="{{ item.url | prepend: site.baseurl }}">{{ item.title }}</a>
+          </li>
+        {% endif %}
       {% endfor %}
 
       <li class='nav-item'>
