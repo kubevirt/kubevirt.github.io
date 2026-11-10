@@ -155,6 +155,30 @@ All Blog posts are located in the [\_posts](/_posts/) directory, each entry is a
 
 - As for the contents, follow the general guidelines above
 
+### Go module import pages
+
+A Go module whose `go.mod` declares `module kubevirt.io/<name>` can only be fetched with `go get kubevirt.io/<name>` once this website serves a `go-import` landing page for that path. Add one whenever a new KubeVirt Go module (or a new nested module, e.g. an `api` submodule) uses a `kubevirt.io/...` import path.
+
+- Create `pages/<github-repo-name>.md`, where `<github-repo-name>` is the repository name under `github.com/kubevirt`:
+
+  ```yaml
+  ---
+  layout: go-import
+  permalink: /<github-repo-name>/
+  ---
+  ```
+
+- For a nested module, such as `kubevirt.io/<github-repo-name>/api`, create `pages/<github-repo-name>-api.md` with `permalink: /<github-repo-name>/api/`.
+
+The `go-import` layout adds a `<meta name="go-import" content="kubevirt.io/<github-repo-name> git https://github.com/kubevirt/<github-repo-name>">` tag to the page. The repository name is taken from the first segment of the permalink, so nested modules resolve to their parent repository.
+
+To verify the page after it is merged and the site is deployed, check that the tag is served and that Go can resolve the module:
+
+```console
+curl -s "https://kubevirt.io/<github-repo-name>/?go-get=1" | grep go-import
+GOPROXY=direct go list -m kubevirt.io/<github-repo-name>@latest
+```
+
 ### Labs
 
 Labs are usually a set of directed excercises with the objective of teaching something by practising it, e.g. KubeVirt 101, which would introduce KubeVirt to new and potential users through a series of easy (101!) exercises. Labs are composed of a [Landing page](https://en.wikipedia.org/wiki/Landing_page) and the actual exercises.
