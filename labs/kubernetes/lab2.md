@@ -42,7 +42,7 @@ Review the "cdi" pods that were added.
 
 #### Use CDI to Import a Disk Image
 
-First, you need to create a DataVolume that points to the source data you want to import. In this example, we'll use a DataVolume to import a Fedora37 Cloud Image into a PVC and launch a Virtual Machine making use of it.
+First, you need to create a DataVolume that points to the source data you want to import. In this example, we'll use a DataVolume to import a Fedora 42 Cloud Image into a PVC and launch a Virtual Machine making use of it.
 
 ```bash
 {% include scriptlets/lab2/06_create_fedora_cloud_instance.sh -%}
