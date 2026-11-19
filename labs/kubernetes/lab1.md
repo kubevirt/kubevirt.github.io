@@ -95,7 +95,15 @@ Connect to the serial console of the Cirros VM. Hit return / enter a few times a
 
 Disconnect from the virtual machine console by typing: `ctrl+]`.
 
-If you like to see the complete boot sequence logs from the console. You need to connect to the serial console just after starting the VM (you can test this by stopping and starting the VM again, see below).
+If you like to see the complete boot sequence logs from the console, you need to connect to the serial console just after starting the VM (you can test this by stopping and starting the VM again, see below).
+
+You can also stream guest serial console output through Kubernetes logging. When serial console logging is enabled (`spec.domain.devices.logSerialConsole: true`, or the cluster-wide default when unset), KubeVirt collects the console output and exposes it from a `guest-console-log` container on the virt-launcher pod:
+
+```
+kubectl logs <virt-launcher-pod> -c guest-console-log
+```
+
+This is useful when you want boot and guest console history without attaching interactively with `virtctl console`. See the [KubeVirt API](https://github.com/kubevirt/kubevirt/blob/main/staging/src/kubevirt.io/api/core/v1/schema.go) field `logSerialConsole` for details. Serial console logging is not available when `autoattachSerialConsole` is disabled.
 
 ### Controlling the State of the VM
 
