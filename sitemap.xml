@@ -809,6 +809,10 @@
 <lastmod>2026-11-10T00:00:00+00:00</lastmod>
 </url>
 <url>
+<loc>https://kubevirt.io//2026/changelog-v1.10.0.html</loc>
+<lastmod>2026-11-18T00:00:00+00:00</lastmod>
+</url>
+<url>
 <loc>https://kubevirt.io//api/</loc>
 </url>
 <url>
@@ -1877,7 +1881,10 @@
 <loc>https://kubevirt.io//blogs/page40/</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//blogs/page41/</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2026-11-10T19:13:03+00:00</lastmod>
+<lastmod>2026-11-23T13:11:51+00:00</lastmod>
 </url>
 </urlset>

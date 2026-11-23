@@ -1,4 +1,188 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-11-10T19:14:08+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.9.0</title><link href="https://kubevirt.io//2026/changelog-v1.9.0.html" rel="alternate" type="text/html" title="KubeVirt v1.9.0" /><published>2026-07-30T00:00:00+00:00</published><updated>2026-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2026/changelog-v1.9.0</id><content type="html" xml:base="https://kubevirt.io//2026/changelog-v1.9.0.html"><![CDATA[<h2 id="v190">v1.9.0</h2>
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.4.1">Jekyll</generator><link href="https://kubevirt.io//feed/releases.xml" rel="self" type="application/atom+xml" /><link href="https://kubevirt.io//" rel="alternate" type="text/html" /><updated>2026-11-23T13:13:09+00:00</updated><id>https://kubevirt.io//feed/releases.xml</id><title type="html">KubeVirt.io | Releases</title><subtitle>Virtual Machine Management on Kubernetes</subtitle><entry><title type="html">KubeVirt v1.10.0</title><link href="https://kubevirt.io//2026/changelog-v1.10.0.html" rel="alternate" type="text/html" title="KubeVirt v1.10.0" /><published>2026-11-18T00:00:00+00:00</published><updated>2026-11-18T00:00:00+00:00</updated><id>https://kubevirt.io//2026/changelog-v1.10.0</id><content type="html" xml:base="https://kubevirt.io//2026/changelog-v1.10.0.html"><![CDATA[<h2 id="v1100">v1.10.0</h2>
+
+<p>Released on: Wed Nov 18 17:05:31 2026 +0000</p>
+
+<ul>
+  <li>[PR #19862][kubevirt-bot] Bump libvirtxml to v1.12007.0 and fix the smmuv3 IOMMU ssidsize attribute, so Grace IOVirtualization VMIs get their SSID size and keep their IOMMU driver attributes when guest definition plugin hooks run.</li>
+  <li>[PR #19771][kubevirt-bot] Fix VMIs with SR-IOV, GPU or PCI host devices failing to start when the Plugins feature gate is enabled and any Plugin exists in the cluster.</li>
+  <li>[PR #19863][kubevirt-bot] Node hooks now fall back to the Plugin-level failureStrategy when they do not set their own, like launcher hooks. Plugins with spec.failureStrategy: Ignore no longer block VM start, stop or migration when one of their node hooks without its own failureStrategy fails.</li>
+  <li>[PR #19743][kubevirt-bot] Fixed a virt-handler panic when a device plugin is restarted, which on nodes with host devices happened on every kubelet restart.</li>
+  <li>[PR #19732][stu-gott] Live migrations are no longer scheduled from a node running an updated virt-handler onto a node that has not yet been updated, preventing migrations from getting stuck during a rolling upgrade.</li>
+  <li>[PR #19690][kubevirt-bot] Beta: IncrementalBackup, and introduce backup.kubevirt.io/v1beta1</li>
+  <li>[PR #19688][kubevirt-bot] CBT overlays are now keyed by volume and PVC name. Pointing a volume at a different PVC triggers a Full backup instead of an incorrect incremental.</li>
+  <li>[PR #19294][alromeros] Offline incremental backup</li>
+  <li>[PR #19492][caxu-rh] Fixed a bug that caused a gRPC connection to leak when virt-handler client initialization fails</li>
+  <li>[PR #19574][noamasu] Guest writes are recovered when a VM starts after a virt-launcher crash during an External mode snapshot.</li>
+  <li>[PR #19360][noamasu] VEP 321: add External mode VirtualMachineSnapshot</li>
+  <li>[PR #19485][0xFelix] Exported OCI archives now contain the Image Index as a blob referenced from index.json with ref.name “latest”, so pushing them creates an Image Index in the registry</li>
+  <li>[PR #19550][Acedus] Memory dumps are attached as utility volumes and require the UtilityVolumes feature gate, which is promoted to Beta and enabled by default. VM snapshots and exports no longer include the memory dump PVC.</li>
+  <li>[PR #19056][Acedus] VirtualMachineBackup no longer fails when a disk has lost the base checkpoint’s bitmap; that disk is backed up in full and type is now reported per volume in <code class="language-plaintext highlighter-rouge">status.includedVolumes[].type</code>, replacing the removed <code class="language-plaintext highlighter-rouge">status.type</code>.</li>
+  <li>[PR #19511][nirdothan] NetworkDevicesWithDRA Feature Gate is now in Beta stage</li>
+  <li>[PR #17135][lyarwood] Add Alpha UEFI Secure Boot support for ARM64 guests through the ARM64SecureBoot and FirmwareAutoSelection feature gates. Requires CentOS Stream 10 virt-launcher images with suitable QEMU, libvirt, and edk2 firmware. Supports persistent EFI state through existing backend storage.</li>
+  <li>[PR #19590][lyarwood] Build KubeVirt with go 1.26.10</li>
+  <li>[PR #19066][0xFelix] The io.kubevirt.disk.name annotation of exported OCI artifacts now carries the volume name from the VM instead of the PersistentVolumeClaim name</li>
+  <li>[PR #19228][Sreeja1725] Alpha: Add CPUsWithDRA to provision dedicated VMI CPUs via a DRA CPU driver instead of kubelet’s CPU manager.</li>
+  <li>[PR #19572][orelmisan] The pod-status VMI network interface info source is now reported for interfaces whose device is ready in the pod (DRA-backed, and Multus-backed secondary interfaces), when the NetworkDevicesWithDRA feature gate is enabled.</li>
+  <li>[PR #19173][alromeros] Declarative VirtualMachineState</li>
+  <li>[PR #19410][Acedus] HostDisk volumes are no longer eligible for changed block tracking.</li>
+  <li>[PR #19520][noamasu] Use a memory-backed emptyDir for the hotplug mount root to support mount propagation.</li>
+  <li>[PR #19435][awels] Cleanup CBT overlays when disabling CBT</li>
+  <li>[PR #19382][mhenriks] ContainerPath volumes graduate to beta</li>
+  <li>[PR #19240][vladikr] virt-launcher-monitor is rewritten in C to reduce memory footprint to about 2Mi</li>
+  <li>[PR #19064][0xFelix] Fixed a bug where a VirtualMachineExport of a VM with two claims whose names differ only in dots would never complete</li>
+  <li>[PR #18249][dsanatar] IOThread Virtqueue Mapping for virtio-scsi</li>
+  <li>[PR #19546][dasionov] Renamed the alpha feature gate for mdev-based vGPU live migration from VGPULiveMigration to MDevVGPULiveMigration.</li>
+  <li>[PR #19534][caxu-rh] Fixed a bug where a Unix socket listener may be left open if an error occurs while setting file ownership on the socket</li>
+  <li>[PR #19490][awels] Only add virt-handler migration identity to synchronization controller if proxy is enabled.</li>
+  <li>[PR #19470][avlitman] Added a has_panic_device label (true/false) to the kubevirt_vmi_info metric</li>
+  <li>[PR #19409][Acedus] Live migration of CBT-enabled VMs creates the target’s CBT overlays from the source’s domain, and unplugging a volume removes its CBT overlay regardless of the VMI’s CBT state.</li>
+  <li>[PR #19403][iholder101] Add PreBoot and PreMigrationSource sidecar launcher hook points for plugins.</li>
+  <li>[PR #19251][mhenriks] Check ContainerPathVolume feature gate at admission time.  Reject /run/kubevirt* and /run/libvirt* paths.</li>
+  <li>[PR #19234][vladikr] Add pkg/render for rendering Pod specs from VM/VMI definitions without a running cluster</li>
+  <li>[PR #19215][Barakmor1] Add TLSGroupPreferences feature gate and Groups field to TLSConfiguration, enabling cluster administrators to configure TLS supported groups (elliptic curves) across all virt pod endpoints for Post-Quantum Cryptography readiness</li>
+  <li>[PR #18753][orelmisan] Fix SSRF vulnerability (CVE-2026-13318) in virt-api port-forward that allowed a malicious QEMU guest agent to redirect virtctl port-forward and ssh traffic to arbitrary network endpoints. virt-api now dials only the launcher pod IP and never the guest-agent-reported interface IP.</li>
+  <li>[PR #18267][akalenyu] Default LUN bus to SCSI when persistent reservation is enabled</li>
+  <li>[PR #18618][imantaba] Fixed the VirtualMachineRestore admitter rejecting valid patches whose value contains “:” or “,” , such as replacing an interface MAC address, or whose value is an object or an array.</li>
+  <li>[PR #19499][fjvbn2003] virt-operator no longer queries the API server for the ContainerPathVolumes mutating webhook on every reconcile when the feature gate is disabled.</li>
+  <li>[PR #19213][Acedus] Hotplugged volumes no longer wait to attach while another hotplugged volume on the same VMI is still populating, references a missing claim, or cannot start its population.</li>
+  <li>[PR #19521][kubevirt-bot] Updated common-instancetypes bundles to v1.8.0</li>
+  <li>[PR #19481][lyarwood] Fix repeated synchronization endpoint misconfiguration Warning events caused by unstable cache ordering.</li>
+  <li>[PR #19244][jschintag] Add configuration option for cluster wide and per VM emulation (Alpha Stage).</li>
+  <li>[PR #19468][orelmisan] VMI whose DRA network is backed by a ResourceClaim (rather than a ResourceClaimTemplate) are now reported as non-migratable.</li>
+  <li>[PR #19484][Acedus] Backups whose VMI is deleted mid-backup now fail immediately, and pull-mode backups remove their export.</li>
+  <li>[PR #19192][machadovilaca] Keep partial VMStats when a sub-command fails</li>
+  <li>[PR #19351][awels] Decentralized live migration using the proxy dataPath supports Route/Ingress/Service endpoints</li>
+  <li>[PR #19019][lllamnyp] virt-api: the port-forward subresource (used by <code class="language-plaintext highlighter-rouge">virtctl port-forward</code> and <code class="language-plaintext highlighter-rouge">virtctl ssh</code>) now dials the virt-launcher pod IP for VMIs connected to the pod network, instead of the first IP reported in the VMI interface status. The virt-api cluster role gains the <code class="language-plaintext highlighter-rouge">watch</code> verb on pods.</li>
+  <li>[PR #17399][dasionov] Removed legacy name-based firmware UUID calculation and the firmware synchronizer.</li>
+  <li>[PR #18853][davmarro] Enable readOnlyRootFilesystem for all KubeVirt infrastructure containers</li>
+  <li>[PR #19362][NoamBerkoLaor] Removed deprecated virtctl create vm flags –volume-blank, –volume-datasource, and –volume-clone-pvc. Use –volume-import with type:blank, type:ds, or type:pvc instead.</li>
+  <li>[PR #19099][HarshithaMS005] virt-handler no longer deletes mediated devices it did not create, so DRA-owned vfio-ap devices are not torn out from under running VMs</li>
+  <li>[PR #19239][akalenyu] Istio sidecar proxy termination is no longer handled by virt-launcher-monitor; Istio &gt;= 1.27 is required with kubevirt (alternatively, use native sidecar mode)</li>
+  <li>[PR #19057][0xFelix] Fixed a bug where a VirtualMachineExport of a source referencing the same PVC from more than one volume would never complete</li>
+  <li>[PR #19388][0xFelix] Updated virt-template to v0.3.0</li>
+  <li>[PR #18941][0xFelix] The kubevirt.io/disablePCIHole64 annotation now also stops SeaBIOS from programming a 64-bit PCI hole, allowing legacy guests like Windows Server 2003 to run with 4Gi of memory or more.</li>
+  <li>[PR #18606][OOsemka] Make new virt-export Services headless on port 8443 so virt-exportproxy can reach exporters across isolated networks. Existing ClusterIP/443 export Services are left in place. Internal VMExport links include the Service dial port (:8443 or :443).</li>
+  <li>[PR #19160][iholder101] Plugin’s spec.domainHooks is renamed to spec.launcherHooks. Launcher hooks now require explicit hook points. PreVMStop is renamed to OnVMStop.</li>
+  <li>[PR #19011][michalskrivanek] When Windows guest crashes and VM has a <code class="language-plaintext highlighter-rouge">hyperv</code> panic device configured, kubevirt no longer immediately terminates the VM and allows Windows to finish its default memory dump process and reboot. The actual behavior is guest-side configurable.</li>
+  <li>[PR #19315][Acedus] Fix: incremental pull-mode backups no longer silently leave out changed blocks from the backup map on fragmented disks.</li>
+  <li>[PR #19006][lyarwood] Propagate the <code class="language-plaintext highlighter-rouge">instancetype.kubevirt.io/common-instancetypes-version</code> label from referenced instancetype and preference objects to their captured <code class="language-plaintext highlighter-rouge">ControllerRevision</code> metadata labels.</li>
+  <li>[PR #17974][bxuan1999] virt-handler now exposes a per-VMI gauge containing the downtime reported for the latest successful live migration.</li>
+  <li>[PR #18537][davmarro] Add structured <code class="language-plaintext highlighter-rouge">links</code> field to <code class="language-plaintext highlighter-rouge">VirtualMachineBackup</code> status exposing both internal and external export endpoints for pull-mode backups. The existing endpoint fields are removed.</li>
+  <li>[PR #18938][machadovilaca] Accept a per-VMI VMStatsRequest body in virt-handler GetVMStats</li>
+  <li>[PR #17985][sradco] Virt*Down alerts include container waiting reason when the component is fully unavailable</li>
+  <li>[PR #19166][alromeros] Bugfix: Increase timeout for velero post-backup hook</li>
+  <li>[PR #19120][akalenyu] BugFix: blockresize spam when doing I/O for filesystem volumes</li>
+  <li>[PR #19033][michalskrivanek] adds kubevirt.io/mergeable-memory annotation to opt out the guest memory from kernel memory merging</li>
+  <li>[PR #19149][sradco] Add vm label to kubevirt_vm_info and kubevirt_vmi_info (VMI only when owned by a VirtualMachine)</li>
+  <li>[PR #19144][machadovilaca] Add GPU utilization time and active engine time recording rules</li>
+  <li>[PR #17922][awels] Decentralized live migration can now use a proxy to reduce the number of ip addresses required</li>
+  <li>[PR #19155][0xFelix] The VSOCK feature gate graduated to Beta and is now enabled by default.</li>
+  <li>[PR #19169][0xFelix] VMStats guest agent data is refreshed after a guest OS reboot instead of being served from cache until its TTL expires</li>
+  <li>[PR #19100][xpivarc] Label “cpumanager” is no longer used</li>
+  <li>[PR #19131][vishnubijukumar] Fixed a bug where hotplugging a block volume or triggering a live migration on s390x crashed virtqemud due to /dev/urandom being removed from the cgroup device allow list. /dev/urandom (char 1:9) is now unconditionally included in the default cgroup device rules, consistent with the OCI runtime specification. This also fixes a latent bug on x86_64 where /dev/urandom was incorrectly revoked but masked by the RDRAND hardware entropy fallback.</li>
+  <li>[PR #19164][0xFelix] Add a warning when disabling acpi on amd64 architectures</li>
+  <li>[PR #18872][ameya-keskar] Report InvalidImageName container disk errors on the VMI and surface ErrImagePull on the VM instead of leaving the VM stuck in Starting. Pool autoheal for VM’s may apply, on the error condition, where it did not before.</li>
+  <li>[PR #19089][jean-edouard] Guest clock now properly syncs after multiple pause/unpause</li>
+  <li>[PR #18943][HoustonBoston] Users will now receive a simplified error message than what QEMU reports when two VMs share the same disk image when an NFS storage class is uitilized in the ‘Conditions’ field in the faulty VM/VMI. The complicated QEMU error can still be found in the ‘virt-handler’ pod.</li>
+  <li>[PR #19085][0xFelix] Fixed a bug where an OCI VirtualMachineExport of a VM with a persistent TPM or EFI never became ready</li>
+  <li>[PR #18951][dsanatar] image changes for Centos Stream 10 compatibility, notably adds /var/run -&gt; ../run symlink to virt-handler image layer due to how CS10 creates sockets in /run/ but kubevirt expects them to exist in /var/run/</li>
+  <li>[PR #19070][lyarwood] Vera Rubin GPU (10de:3041) is now recognised as a Grace GPU, enabling GraceIOVirtualization for VMs with a passthrough Vera Rubin GPU.</li>
+  <li>[PR #18962][machadovilaca] Add VMI GPU usage recording rules correlating DCGM metrics</li>
+  <li>[PR #18287][dasionov] Ensure terminated launcher pods are pruned from VMI status.activePods after live migration</li>
+  <li>[PR #18416][Acedus] VMs with CBT now correctly factor in the required memory overhead for each of their included disks.</li>
+  <li>[PR #19041][machadovilaca] Allow Prometheus to list EndpointSlices in the KubeVirt namespace</li>
+  <li>[PR #19048][michalskrivanek] Libvirt updated to 12.5.0-4.el10</li>
+  <li>[PR #17718][michalskrivanek] Added support for “directsync” disk cache modes Directsync is similar to “none” + “writethrough” combined, the host page cache is bypassed and there is also no caching on the guest side, all writes go directly to storage. This offers better performance than “writethrough” with lower host memory overhead since the host page cache is bypassed.</li>
+  <li>[PR #18274][ksimon1] virtctl: add vsock ssh proxy command</li>
+  <li>[PR #18843][awels] BugFix: Prevent duplicate attachment pods when both utility volumes and hotplug volumes are used in a single VM</li>
+  <li>[PR #19007][codingben] Expose guest device info via VMStatsCollector</li>
+  <li>[PR #18827][germanovm] Fix PVC expansion preallocating new space on full thin provisioned disks</li>
+  <li>[PR #18965][lukashes] Fixed VirtualMachineExport manifests retaining stale CA certificates when exporter Pods are recreated after CA rotation, which could cause CDI disk imports to fail TLS verification</li>
+  <li>[PR #18888][dankenigsberg] Graduate the KubevirtSeccompProfile feature gate to GA. The custom seccomp profile is now always installed. Tighten profile file permissions to 0600, and write it atomically.</li>
+  <li>[PR #19002][machadovilaca] Add guest-get-fsinfo to GetVMStats</li>
+  <li>[PR #18604][awels] BugFix: Fixed race condition where target node and source fields were racing which could cause a migration failed.</li>
+  <li>[PR #16346][ram2valar] Fixed a bug where virt-handler ignored the –kubelet-root flag when detecting whether CPU Manager is enabled, causing incorrect node labeling on clusters with a non-default kubelet root directory (e.g. k3s, k0s, MicroK8s).```</li>
+  <li>[PR #18741][frenzyfriday] Network Binding Plugins sidecars receive DRA resource claims for device metadata access</li>
+  <li>[PR #18988][davmarro] Fixed a source-side ghost record leak on decentralized live migration that could prevent a subsequent same-name VirtualMachineInstance from starting on the same node.</li>
+  <li>[PR #18458][Ahmad-Hafe] Add Conformance decorator to PVC expansion test for storage</li>
+  <li>[PR #18874][xpivarc] client-go: GetKubevirtSubresourceClient is removed</li>
+  <li>[PR #18994][avlitman] Fix GuestFilesystemAlmostOutOfSpace firing on Windows VMs when a UDF CDROM/ISO is attached.</li>
+  <li>[PR #18986][Ronilerr] Changing recording rule expression</li>
+  <li>[PR #18942][Ronilerr] Fix no ready alerts</li>
+  <li>[PR #18970][xpivarc] Bug fix: unresponsive sockets are not correctly accounted</li>
+  <li>[PR #18497][orelmisan] ExternalNetResourceInjection graduated to GA. virt-controller no longer queries NetworkAttachmentDefinition objects or injects network resource requests into the launcher pod. The k8s.cni.cncf.io network-attachment-definitions get rule is</li>
+  <li>[PR #18908][kubevirt-bot] Updated virt-template to v0.2.3</li>
+  <li>[PR #18451][orelmisan] SR-IOV interfaces are no longer supported with DRA networks.</li>
+  <li>[PR #18317][orelmisan] Graduate the PodSecondaryInterfaceNamingUpgrade feature gate to GA. The pre-migration hook that converts ordinal network interface names to hashed equivalents now runs unconditionally.</li>
+  <li>[PR #18902][machadovilaca] Add name label to kubevirt_vmi_gpu_info</li>
+  <li>[PR #18854][sradco] Add uid label (Kubernetes object UID) to kubevirt_vm_info and kubevirt_vmi_info</li>
+  <li>[PR #18905][fossedihelm] Fix PCI passthrough regression on kernels without CONFIG_VFIO_DEVICE_CDEV support. VMs with GPU/PCI host devices now correctly fall back to legacy VFIO group interface when IOMMUFD cdev is unavailable.</li>
+  <li>[PR #18880][jean-edouard] Memory overcommit is now ignored for VMIs with hugepages</li>
+  <li>[PR #18867][cwedgwood] Fix a virt-handler crash that could occur when preparing VFIO device ownership fails.</li>
+  <li>[PR #18315][alancaldelas] Kubernetes dependencies have been updated to v0.36.4 (Kubernetes 1.36)</li>
+  <li>[PR #18716][xpivarc] Bug fix: Ensuring that records (ghost records, mount records) are written atomically to disk</li>
+  <li>[PR #18624][dsanatar] plugin: consolidate CEL evaluators</li>
+  <li>[PR #18787][davmarro] Fixed a bug where a VM with RunStrategyRerunOnFailure incorrectly showed WaitingForVolumeBinding status after being manually stopped when its PVC was unbound.</li>
+  <li>[PR #18829][omastama-spec] Added NUMA node distance passthrough from host topology to guest VMs, enabling performance-sensitive applications to make optimal scheduling decisions on multi-NUMA systems.</li>
+  <li>[PR #18822][sradco] Fix OrphanedVirtualMachineInstances false positives and VirtLauncherPodsStuckFailed per-namespace threshold by restoring cluster-scoped evaluation with a static install-namespace label</li>
+  <li>[PR #18847][akalenyu] Cleanup: Remove legacy containerdisk CRC32 checksum computation</li>
+  <li>[PR #18761][lentzi90] Build KubeVirt with go 1.26.6</li>
+  <li>[PR #17008][xpivarc] Bug fix: “virtctl evacuate-cancel” now works</li>
+  <li>[PR #18388][dasionov] Bumped QEMU process memory overhead from 30Mi to 50Mi, increasing VMI pod memory requests by 20Mi to reflect actual QEMU RSS requirements with current QEMU versions.</li>
+  <li>[PR #18521][Ronilerr] Add recording rule for report suspected orphaned PVCs</li>
+  <li>[PR #18687][Barakmor1] Graduate LibvirtHooksServerAndClient feature gate to GA</li>
+  <li>[PR #18708][Barakmor1] Graduate VmiMemoryOverheadReport feature gate to GA</li>
+  <li>[PR #18545][amasolov] Fix premature domain undefine during slow QEMU startup that left VMs transient and broke hotplug</li>
+  <li>[PR #18470][Acedus] Backend storage PVC size is increased by 1Gi for VMs with CBT enabled.</li>
+  <li>[PR #18303][Aseeef] BREAKING CHANGE: Modifies internal on-the-wire API fields for the stall detector feature; MigrationStallDetection FG must be disabled for cluster upgrades to succeed.</li>
+  <li>[PR #18200][naruto-lgtm] Fixed a timing side channel in the export server token check by switching to a constant-time comparison.</li>
+  <li>[PR #17605][dasionov] Bug fix: Prevent guest OS from ejecting critical PCI devices (disks, memory balloon, RNG, watchdog) via hotplug mechanisms like the Windows “Safely Remove Hardware” tray menu. PCI root ports hosting non-NIC devices are now marked as non-hotpluggable, while NIC ports and empty ports reserved for future hotplug remain available.</li>
+  <li>[PR #18692][vamsikrishna-siddu] Bump hermetic_launcher to v0.0.15 to fix s390x container image builds.</li>
+  <li>[PR #18613][orelmisan] Removed the slirp network binding plugin sidecar image. The plugin had no known consumers.</li>
+  <li>[PR #17480][michalskrivanek] Live migration downtime can now be dynamically tuned by using .spec.experimental.downtimeTuning field in MigrationPolicy. When enabled, QEMU’s max_downtime is gradually increased from an initial value (default 150ms) to a configurable ceiling (default 1050ms), helping migrations converge with bounded sub-second switchover downtime.</li>
+  <li>[PR #18362][iholder101] Bug fix: During live migration, domain stats collection no longer blocks on the libvirt job lock for up to 30 seconds. The NOWAIT flag is used to skip locked domains instead of waiting, avoiding lock contention and disruptive error logs.</li>
+  <li>[PR #18311][akalenyu] BugFix: Online expansion scales poorly with many volumes</li>
+  <li>[PR #18460][dasionov] Fix sidecar hooks silently dropping QEMU command-line arguments (qemu:commandline) during XML round-trip</li>
+  <li>[PR #17598][vamsikrishna-siddu] Migrate container image builds from rules_oci to rules_img, enabling hermetic multi-arch image builds with native s390x platform support.</li>
+  <li>[PR #18542][thc1006] RamFB display validation now treats a vGPU whose ramFB is present with its enabled field unset as an enabled display, matching the API default. A VirtualMachine or VirtualMachineInstanceReplicaSet template with more than one such vGPU is now rejected at creation instead of being accepted and failing later when its VMI is created.</li>
+  <li>[PR #18400][awels] BugFix: file descriptor leak in vmexport proxy</li>
+  <li>[PR #18491][vladikr] Add support for OCI artifacts (e.g. raw disk images pushed with ORAS) as containerDisk sources via the ImageVolume path. Set the annotation <code class="language-plaintext highlighter-rouge">kubevirt.io/image-volume-skip-digest-resolution: "true"</code> on the VMI to skip the digest-resolving init containers that are incompatible with non-container OCI artifacts. The disk file discovery now also supports images with the disk at the root directory, not just under /disk.</li>
+  <li>[PR #18410][vikin91] Fix a goroutine (and connection resource) leak in client-go’s AsyncSubresourceHelper when its StreamInterface is consumed via AsConn() instead of Stream() (affects VSOCK, PortForward TCP/UDP, and similar consumers).</li>
+  <li>[PR #18414][iholder101] Fix CallNodeHooks to evaluate plugin-level Spec.Condition, ensuring consistent behavior between domain hooks and node hooks.</li>
+  <li>[PR #18453][iholder101] Bug fix: Running VMIs are no longer immediately marked as Failed when virt-handler restarts and temporarily loses the launcher socket connection. A 3-minute grace period (matching the existing Scheduled VMI behavior) now allows the launcher client to reconnect before transitioning the VMI to Failed.</li>
+  <li>[PR #17995][sradco] Add namespace label to all KubeVirt alerts for proper OpenShift</li>
+  <li>[PR #18374][orelmisan] Fixed missing validation for network interface bindings: interfaces with no binding or multiple bindings are now rejected at admission instead of failing silently at runtime.</li>
+  <li>[PR #18300][lyarwood] Bug fix: Expose VFIO cdev devices (/dev/vfio/devices/vfioN) to virt-launcher containers, fixing IOMMUFD-based GPU passthrough on ARM64 systems with SMMUv3.</li>
+  <li>[PR #18222][lukashes] Fixed VMI owner resolution when an attachment pod is deleted while the virt-launcher pod is gone</li>
+  <li>[PR #18044][maxwmsft] BugFix: hotplug volume detach deadlock for already removed volumes.</li>
+  <li>[PR #17707][jean-edouard] virt-launcher pods get cleaned up along with migration objects</li>
+  <li>[PR #18045][maxwmsft] BugFix: hotplug volume detach deadlock when VMIs exchange RWO PVCs between attachment pods.</li>
+  <li>[PR #18435][orelmisan] Network binding plugin sidecars can now infer their registration name using the <code class="language-plaintext highlighter-rouge">NETWORK_BINDING_PLUGIN_NAME</code> environment variable.</li>
+  <li>[PR #17117][suPer8Hu] N/A</li>
+  <li>[PR #13881][akrejcir] Deprecated old method to set SSH key in a VM.</li>
+  <li>[PR #17857][lyarwood] Set unlimited memlock prlimit for VMs requiring memory locking (VFIO, realtime, SEV, explicit memlock), ensuring libvirt’s memlock calculation always succeeds in session mode.</li>
+  <li>[PR #18194][frenzyfriday] Require restart for NAD swap for non-migratable VMs</li>
+  <li>[PR #18380][Ronilerr] Low virt count alerts are using running rule intead of up rule</li>
+  <li>[PR #17752][iholder101] Bug fix: VMs with NFS-backed storage are no longer incorrectly restarted during temporary NFS unavailability (e.g., NFS server failover).</li>
+  <li>[PR #17286][alromeros] Bugfix: Fix VM restore when backend storage is not snapshottable</li>
+  <li>[PR #18021][orelmisan] Network conformance tests can now be run with a custom network binding plugin via the <code class="language-plaintext highlighter-rouge">--primary-network-binding-plugin</code> test flag.</li>
+  <li>[PR #18392][akalenyu] BugFix: Importer pod rejected by ValidatingAdmissionPolicy ‘kubevirt-plugin-sidecar-subpath-policy’</li>
+  <li>[PR #18370][michalskrivanek] The <code class="language-plaintext highlighter-rouge">kubevirt_vmi_guest_os_panic_total</code> metric is now emitted</li>
+  <li>[PR #18061][Sreeja1725] Add E2E tests support for DRA feature.</li>
+  <li>[PR #18272][laxmi-333] Bug fix: Fixed hugetblfs-dir EmptyDir volume masking the parent hugetlbfs mount at /dev/hugepages, which prevented QEMU from allocating hugepages via -mem-path. The EmptyDir is now explicitly hugepage-backed.</li>
+  <li>[PR #18294][guzalv] client-go/log: The <code class="language-plaintext highlighter-rouge">-v</code> verbosity flag is no longer registered on <code class="language-plaintext highlighter-rouge">flag.CommandLine</code> during <code class="language-plaintext highlighter-rouge">init()</code>. External consumers that used <code class="language-plaintext highlighter-rouge">flag.CommandLine.Lookup("v")</code> to obtain the verbosity flag must switch to <code class="language-plaintext highlighter-rouge">log.VerbosityFlag()</code>. This eliminates panics when importing <code class="language-plaintext highlighter-rouge">kubevirt.io/client-go</code> alongside packages that also register a <code class="language-plaintext highlighter-rouge">-v</code> flag (e.g. glog, klog).</li>
+  <li>[PR #17936][dsanatar] virtctl: addvolume optional –disk-name flag</li>
+  <li>[PR #18206][lukashes] Fixed a delay in VM/VMI deletion that could happen when the VMI controller missed a pod event.</li>
+  <li>[PR #17880][Shreesha001] Fix panic in ClusterConfig CRD delete handler when the informer delivers a tombstone object instead of the deleted CRD.</li>
+  <li>[PR #18337][0xFelix] Support inferFromVolume for VolumeSnapshot-backed DataVolumes, DataVolumeTemplates, and DataSources</li>
+  <li>[PR #18316][fanzhangio] Set explicit SMMUv3 address capability defaults for Grace I/O Virtualization.</li>
+  <li>[PR #18314][lyarwood] Bug fix: PreferredPanicDeviceModel now creates a panic device when none exist on the VMI, instead of silently ignoring the preference.</li>
+  <li>[PR #18247][alaypatel07] vep-10: move GPUsWithDRA and HostDevicesWithDRA to beta</li>
+  <li>[PR #18154][Ronilerr] Adding NoLeadingVirtController alert</li>
+  <li>[PR #17775][akalenyu] BugFix: admin can remove memory dump from their VM</li>
+  <li>[PR #17509][michalskrivanek] Live migration data stream can be compressed now by using .spec.experimental.compression field in MigrationPolicy applied to a set of VMs. Currently only “zstd” algorithm is supported.</li>
+  <li>[PR #17955][akrejcir] Add namespace-aware VSOCK dialing support in virt-handler (VEP 222)</li>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.10.0 changes]]></summary></entry><entry><title type="html">KubeVirt v1.9.0</title><link href="https://kubevirt.io//2026/changelog-v1.9.0.html" rel="alternate" type="text/html" title="KubeVirt v1.9.0" /><published>2026-07-30T00:00:00+00:00</published><updated>2026-07-30T00:00:00+00:00</updated><id>https://kubevirt.io//2026/changelog-v1.9.0</id><content type="html" xml:base="https://kubevirt.io//2026/changelog-v1.9.0.html"><![CDATA[<h2 id="v190">v1.9.0</h2>
 
 <p>Released on: Thu Jul 30 12:39:35 2026 +0000</p>
 
@@ -1021,104 +1205,4 @@
   <li>[PR #9818][akrejcir] Added “virtctl credentials” commands to dynamically change SSH keys in a VM, and to set user’s password.</li>
   <li>[PR #9872][alromeros] Bugfix: Allow lun disks to be mapped to DataVolume sources</li>
   <li>[PR #9073][machadovilaca] Fix incorrect KubevirtVmHighMemoryUsage description</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.1.0 changes]]></summary></entry><entry><title type="html">KubeVirt v1.0.0</title><link href="https://kubevirt.io//2023/changelog-v1.0.0.html" rel="alternate" type="text/html" title="KubeVirt v1.0.0" /><published>2023-07-06T00:00:00+00:00</published><updated>2023-07-06T00:00:00+00:00</updated><id>https://kubevirt.io//2023/changelog-v1.0.0</id><content type="html" xml:base="https://kubevirt.io//2023/changelog-v1.0.0.html"><![CDATA[<h2 id="v100">v1.0.0</h2>
-
-<p>Released on: Thu Jul 6 17:39:42 2023 +0000</p>
-
-<ul>
-  <li>[PR #10037][kubevirt-bot] The VM controller now replicates spec interfaces MAC addresses to the corresponding interfaces in the VMI spec.</li>
-  <li>[PR #9992][machadovilaca] Fix incorrect KubevirtVmHighMemoryUsage description</li>
-  <li>[PR #9965][kubevirt-bot] Disable network interface hotplug/unplug for VMIs. It will be supported for VMs only.</li>
-  <li>[PR #9931][kubevirt-bot] Fix for hotplug with WFFC SCI storage class which uses CDI populators</li>
-  <li>[PR #9946][kubevirt-bot] On hotunplug - remove bridge, tap and dummy interface from virt-launcher and the caches (file and volatile) from the node.</li>
-  <li>[PR #9757][enp0s3] Introduce CPU hotplug</li>
-  <li>[PR #9811][machadovilaca] Remove unnecessary marketplace tool</li>
-  <li>[PR #7742][Fuzzy-Math] Experimental support for AMD SEV-ES</li>
-  <li>[PR #9799][vladikr] Introduce an ability to set memory overcommit percentage in instanceType spec</li>
-  <li>[PR #8780][lyarwood] Add basic support for expressing minimum resource requirements for CPU and Memory within VirtualMachine{Preferences,ClusterPreferences}</li>
-  <li>[PR #9812][mhenriks] Handle DataVolume PendingPopulation phase</li>
-  <li>[PR #9858][fossedihelm] build virtctl for all os/architectures when <code class="language-plaintext highlighter-rouge">KUBEVIRT_RELEASE</code> env var is true</li>
-  <li>[PR #9765][lyarwood] Allow to define preferred cpu features in VirtualMachine{Preferences,ClusterPreferences}</li>
-  <li>[PR #9844][EdDev] Drop the <code class="language-plaintext highlighter-rouge">kubevirt.io/interface</code> resource name API for reserving domain resources for network interfaces.</li>
-  <li>[PR #9841][ormergi] Support hot-unplug of network interfaces on VirtualMachine objects</li>
-  <li>[PR #9851][lxs137] virt-api: portfowrad can handle IPv6 VM</li>
-  <li>[PR #9845][lxs137] DHCPv6 server handle request without iana option</li>
-  <li>[PR #9769][lyarwood] Allow to define the preferred subdomain in VirtualMachine{Preferences,ClusterPreferences}</li>
-  <li>[PR #9246][jean-edouard] Fixed migration issue for VMIs that have RWX disks backed by filesystem storage classes.</li>
-  <li>[PR #9808][jcanocan] DownwardMetrics: Rename AllocatedToVirtualServers metric to AllocatedToVirtualServers and add ResourceProcessorLimit metric</li>
-  <li>[PR #9832][tiraboschi] build virtctl also for arm64 for linux, darwin and windows</li>
-  <li>[PR #9744][lyarwood] Allow to define the preferred termination grace period in VirtualMachine{Preferences,ClusterPreferences}</li>
-  <li>[PR #9828][rthallisey] Publish multiarch manifests with each release</li>
-  <li>[PR #9761][lyarwood] Allow to define the preferred masquerade configuration in VirtualMachine{Preferences,ClusterPreferences}</li>
-  <li>[PR #9768][jean-edouard] New CR option to enable auto CPU limits for virt-launcher on some namespaces</li>
-  <li>[PR #9779][EdDev] Support hot-unplug of network interfaces on VMI objects</li>
-  <li>[PR #9688][xpivarc] Users are warned about the usage of deprecated fields</li>
-  <li>[PR #9798][rmohr] Add LiveMigrateIfPossible eviction strategy to allow admins to express a live migration preference instead of a live migration requirement for evictions.</li>
-  <li>[PR #9764][fossedihelm] Cluster admins can enable ksm in a set of nodes via kv configuration</li>
-  <li>[PR #9753][lyarwood] The following flags have been added to the <code class="language-plaintext highlighter-rouge">virtctl image-upload</code> command allowing users to associate a default instance type and/or preference with an image during upload. <code class="language-plaintext highlighter-rouge">--default-instancetype</code>,  <code class="language-plaintext highlighter-rouge">--default-instancetype-kind</code>, <code class="language-plaintext highlighter-rouge">--default-preference</code> and <code class="language-plaintext highlighter-rouge">--default-preference-kind</code>. <a href="https://kubevirt.io/user-guide/virtual_machines/instancetypes/#inferfromvolume">See the user-guide documentation</a> for more details on using the uploaded image with the <code class="language-plaintext highlighter-rouge">inferFromVolume</code> feature during <code class="language-plaintext highlighter-rouge">VirtualMachine</code> creation.</li>
-  <li>[PR #9575][lyarwood] A new <code class="language-plaintext highlighter-rouge">v1beta1</code> version of the <code class="language-plaintext highlighter-rouge">instancetype.kubevirt.io</code> API and CRDs has been introduced.</li>
-  <li>[PR #9738][Barakmor1] Add condition to migrations that indicates that migration was rejected by ResourceQuota</li>
-  <li>[PR #9730][assafad] Add <code class="language-plaintext highlighter-rouge">kubevirt_vmi_memory_cached_bytes</code> metric</li>
-  <li>[PR #9674][fossedihelm] Introduce cluster configuration <code class="language-plaintext highlighter-rouge">VirtualMachineOptions</code> to specify virtual machine behavior at cluster level</li>
-  <li>[PR #9724][0xFelix] An alert which triggers when KubeVirt APIs marked as deprecated are used was added.</li>
-  <li>[PR #9623][rmohr] Bump to apimachinery 1.26</li>
-  <li>[PR #9747][lyarwood] action required - With the <code class="language-plaintext highlighter-rouge">v1.0.0</code> release of KubeVirt the storage version of all core <code class="language-plaintext highlighter-rouge">kubevirt.io</code> APIs will be moving to version <code class="language-plaintext highlighter-rouge">v1</code>. To accommodate the eventual removal of the <code class="language-plaintext highlighter-rouge">v1alpha3</code> version with KubeVirt &gt;=<code class="language-plaintext highlighter-rouge">v1.2.0</code> it is recommended that operators deploy the <a href="https://github.com/kubernetes-sigs/kube-storage-version-migrator"><code class="language-plaintext highlighter-rouge">kube-storage-version-migrator</code></a> tool within their environment. This will ensure any existing <code class="language-plaintext highlighter-rouge">v1alpha3</code> stored objects are migrated to <code class="language-plaintext highlighter-rouge">v1</code> well in advance of the removal of the underlying <code class="language-plaintext highlighter-rouge">v1alpha3</code> version.</li>
-  <li>[PR #9268][ormergi] virt-launcher pods network interfaces name scheme is changed to hashed names (SHA256), based on the VMI spec network names.</li>
-  <li>[PR #9746][EdDev] Introduce the <code class="language-plaintext highlighter-rouge">kubevirt.io/interface</code> resource name to reserve domain resources for network interfaces.</li>
-  <li>[PR #9652][machadovilaca] Add kubevirt_number_of_vms recording rule</li>
-  <li>[PR #9691][fossedihelm] ksm enabled nodes will have <code class="language-plaintext highlighter-rouge">kubevirt.io/ksm-enabled</code> label</li>
-  <li>[PR #9628][lyarwood] * The <code class="language-plaintext highlighter-rouge">kubevirt.io/v1</code> <code class="language-plaintext highlighter-rouge">apiVersion</code> is now the default storage version for newly created objects</li>
-  <li>[PR #8293][daghaian] Add multi-arch support to KubeVirt. This allows a single KubeVirt installation to run VMs on different node architectures in the same cluster.</li>
-  <li>[PR #9686][maiqueb] Fix ownership of macvtap’s char devices on non-root pods</li>
-  <li>[PR #9631][0xFelix] virtctl: Allow to infer instancetype or preference from specified volume when creating VMs</li>
-  <li>[PR #9665][rmohr] Expose the final resolved qemu machine type on the VMI on status.machine</li>
-  <li>[PR #9609][germag] Add support for running virtiofsd in an unprivileged container when sharing configuration volumes.</li>
-  <li>[PR #9651][0xFelix] virtctl: Allow to specify memory of created VMs. Default to 512Mi if no instancetype was specified or is inferred.</li>
-  <li>[PR #9640][jean-edouard] TSC-enabled VMs can now migrate to a node with a non-identical (but close-enough) frequency</li>
-  <li>[PR #9629][0xFelix] virtctl: Allow to specify the boot order of volumes when creating VMs</li>
-  <li>[PR #9632][toelke] * Add Genesis Cloud to the adopters list</li>
-  <li>[PR #9572][fossedihelm] Enable freePageReporting for new non high performance vmi</li>
-  <li>[PR #9435][rmohr] Ensure existence of all PVCs attached to the VMI before creating the VM target pod.</li>
-  <li>[PR #8156][jean-edouard] TPM VM device can now be set to persistent</li>
-  <li>[PR #8575][iholder101] QEMU-level migration parallelism (a.k.a. multifd) + Upgrade QEMU to 7.2.0-11.el9</li>
-  <li>[PR #9603][qinqon] Adapt node-labeller.sh script to work at non kvm envs with emulation.</li>
-  <li>[PR #9591][awels] BugFix: allow multiple NFS disks to be used/hotplugged</li>
-  <li>[PR #9596][iholder101] Add “virtctl create clone” command</li>
-  <li>[PR #9422][awels] Ability to specify cpu/mem request limit for supporting containers (hotplug/container disk/virtiofs/side car)</li>
-  <li>[PR #9536][akalenyu] BugFix: virtualmachineclusterinstancetypes/preferences show up for get all -n <namespace></namespace></li>
-  <li>[PR #9177][alicefr] Adding SCSI persistent reservation</li>
-  <li>[PR #9470][machadovilaca] Enable libvirt GetDomainStats on paused VMs</li>
-  <li>[PR #9407][assafad] Use env <code class="language-plaintext highlighter-rouge">RUNBOOK_URL_TEMPLATE</code> for the runbooks URL template</li>
-  <li>[PR #9399][maiqueb] Compute the interfaces to be hotplugged based on the current domain info, rather than on the interface status.</li>
-  <li>[PR #9491][orelmisan] API, AddInterfaceOptions: Rename NetworkName to NetworkAttachmentDefinitionName and InterfaceName to Name</li>
-  <li>[PR #9327][jcanocan] DownwardMetrics: Swap KubeVirt build info with qemu version in VirtProductInfo field</li>
-  <li>[PR #9478][xpivarc] Bug fix: Fixes case when migration is not retried if the migration Pod gets denied.</li>
-  <li>[PR #9421][lyarwood] Requests to update the target <code class="language-plaintext highlighter-rouge">Name</code> of a <code class="language-plaintext highlighter-rouge">{Instancetype,Preference}Matcher</code> without also updating the <code class="language-plaintext highlighter-rouge">RevisionName</code> are now rejected.</li>
-  <li>[PR #9367][machadovilaca] Add VM instancetype and preference label to vmi_phase_count metric</li>
-  <li>[PR #9392][awels] virtctl supports retrieving vm manifest for VM export</li>
-  <li>[PR #9442][EdDev] Remove the VMI Status interface <code class="language-plaintext highlighter-rouge">podConfigDone</code> field in favor of a new source option in <code class="language-plaintext highlighter-rouge">infoSource</code>.</li>
-  <li>[PR #9376][ShellyKa13] Fix vmrestore with WFFC snapshotable storage class</li>
-  <li>[PR #6852][maiqueb] Dev preview: Enables network interface hotplug for VMs / VMIs</li>
-  <li>[PR #9300][xpivarc] Bug fix: API and virtctl invoked migration is not rejected when the VM is paused</li>
-  <li>[PR #9189][xpivarc] Bug fix: DNS integration continues to work after migration</li>
-  <li>[PR #9322][iholder101] Add guest-to-request memory headroom ratio.</li>
-  <li>[PR #8906][machadovilaca] Alert if there are no available nodes to run VMs</li>
-  <li>[PR #9320][darfux] node-labeller: Check arch on the handler side</li>
-  <li>[PR #9127][fossedihelm] Use ECDSA instead of RSA for key generation</li>
-  <li>[PR #9330][qinqon] Skip label kubevirt.io/migrationTargetNodeName from virtctl expose service selector</li>
-  <li>[PR #9163][vladikr] fixes the requests/limits CPU number mismatch for VMs with isolatedEmulatorThread</li>
-  <li>[PR #9250][vladikr] externally created mediated devices will not be deleted by virt-handler</li>
-  <li>[PR #9193][qinqon] Add annotation for live migration and bridged pod interface</li>
-  <li>[PR #9260][ShellyKa13] Fix bug of possible re-trigger of memory dump</li>
-  <li>[PR #9241][akalenyu] BugFix: Guestfs image url not constructed correctly</li>
-  <li>[PR #9220][orelmisan] client-go: Added context to VirtualMachine’s methods.</li>
-  <li>[PR #9228][rumans] Bump virtiofs container limit</li>
-  <li>[PR #9169][lyarwood] The <code class="language-plaintext highlighter-rouge">dedicatedCPUPlacement</code> attribute is once again supported within the <code class="language-plaintext highlighter-rouge">VirtualMachineInstancetype</code> and <code class="language-plaintext highlighter-rouge">VirtualMachineClusterInstancetype</code> CRDs after a recent bugfix improved <code class="language-plaintext highlighter-rouge">VirtualMachine</code> validations, ensuring defaults are applied before any attempt to validate.</li>
-  <li>[PR #9159][andreabolognani] This version of KubeVirt includes upgraded virtualization technology based on libvirt 9.0.0 and QEMU 7.2.0.</li>
-  <li>[PR #8989][rthallisey] Integrate multi-architecture container manifests into the bazel make recipes</li>
-  <li>[PR #9188][awels] Default RBAC for clone and export</li>
-  <li>[PR #9145][awels] Show VirtualMachine name in the VMExport status</li>
-  <li>[PR #8937][fossedihelm] Added foreground finalizer to  virtual machine</li>
-  <li>[PR #9133][ShellyKa13] Fix addvolume not rejecting adding existing volume source, fix removevolume allowing to remove non hotpluggable volume</li>
-  <li>[PR #9047][machadovilaca] Deprecate VM stuck in status alerts</li>
-</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.0.0 changes]]></summary></entry></feed>
+</ul>]]></content><author><name>kube🤖</name></author><category term="releases" /><category term="release notes" /><category term="changelog" /><summary type="html"><![CDATA[This article provides information about KubeVirt release v1.1.0 changes]]></summary></entry></feed>
