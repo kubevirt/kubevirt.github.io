@@ -981,6 +981,15 @@
 <loc>https://kubevirt.io//videos/</loc>
 </url>
 <url>
+<loc>https://kubevirt.io//virt-import-api/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//virt-import-client-go/</loc>
+</url>
+<url>
+<loc>https://kubevirt.io//virt-import/</loc>
+</url>
+<url>
 <loc>https://kubevirt.io//virt-template-api/</loc>
 </url>
 <url>
@@ -1885,6 +1894,6 @@
 </url>
 <url>
 <loc>https://kubevirt.io//assets/files/summit24-sponsor.pdf</loc>
-<lastmod>2026-11-23T13:11:51+00:00</lastmod>
+<lastmod>2026-11-25T10:49:52+00:00</lastmod>
 </url>
 </urlset>
